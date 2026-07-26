@@ -1,0 +1,14 @@
+[project]
+name = "reviewcompass3"
+version = "0.0.1"
+description = "ReviewCompass scratch rebuild"
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.reviewcompass3.bootstrap]
+lifecycle = "provisional"
+normative_status = "non-normative"
+promotion_required = true
