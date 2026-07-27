@@ -18,7 +18,7 @@
     },
     {
       "requirement_id": "REQ-CONTEXT-002",
-      "classification": "conformant",
+      "classification": "adapt",
       "target_design_id": "DES-REVIEW-CONTEXT",
       "implementation_evidence": [
         "tools/bootstrap/material_bundle.py"
@@ -26,8 +26,10 @@
       "test_evidence": [
         "tests/test_bootstrap_material_bundle.py"
       ],
-      "rationale": "本文、役割、source identity、Digestを持つ決定的材料束を実装・試験済み",
-      "gaps": []
+      "rationale": "本文、役割、source identity、Digestの材料束はあるが、prior identityと宣言Digestの反証試験が不足する",
+      "gaps": [
+        "GAP-CONTEXT-002"
+      ]
     },
     {
       "requirement_id": "REQ-CONTEXT-003",
@@ -151,7 +153,7 @@
     },
     {
       "requirement_id": "REQ-EXEC-004",
-      "classification": "conformant",
+      "classification": "adapt",
       "target_design_id": "DES-HARNESSED-EXECUTION",
       "implementation_evidence": [
         "tools/bootstrap/review_execution.py"
@@ -159,8 +161,10 @@
       "test_evidence": [
         "tests/test_bootstrap_review_execution.py"
       ],
-      "rationale": "main・independent担当と結果を対象payloadへ結線し欠落を拒否する",
-      "gaps": []
+      "rationale": "担当別結果は保持するが、round、Target、topology identityを正式契約どおり固定していない",
+      "gaps": [
+        "GAP-EXEC-004"
+      ]
     },
     {
       "requirement_id": "REQ-EXEC-005",
@@ -463,7 +467,7 @@
     },
     {
       "requirement_id": "REQ-PORTABLE-003",
-      "classification": "conformant",
+      "classification": "adapt",
       "target_design_id": "DES-PORTABLE-LIFECYCLE",
       "implementation_evidence": [
         "tools/session_logs/deployment_lifecycle.py"
@@ -471,8 +475,10 @@
       "test_evidence": [
         "tests/test_session_log_deployment_lifecycle.py"
       ],
-      "rationale": "所有設定だけを移行・解除し利用者データを保持する補償境界を試験済み",
-      "gaps": []
+      "rationale": "所有境界付き配置はあるが、途中cleanup失敗時の逆順補償を正式契約どおり反証していない",
+      "gaps": [
+        "GAP-PORTABLE-003"
+      ]
     },
     {
       "requirement_id": "REQ-PORTABLE-004",
@@ -550,18 +556,18 @@
   "validation": {
     "contract": "tools/design/bootstrap_conformance.py:validate_bootstrap_conformance",
     "counts": {
-      "adapt": 24,
-      "conformant": 4,
+      "adapt": 27,
+      "conformant": 1,
       "defer": 5,
       "replace": 4
     },
-    "digest": "2c2cde6f31703a636a6e7804e6e570f665e29fd01efdd3f8049976068dadde6f",
+    "digest": "23dc3997185d9f0e4cb649c75535f343a895d5571cb11fe280ffc2d36469eb2c",
     "requirement_count": 37,
     "integrity_contract": "tools/design/bootstrap_conformance.py:validate_evidence_backed_bootstrap_conformance",
     "integrity_record": "records/design/bootstrap-conformance-integrity.json",
-    "integrity_digest": "a0e303d7d192364a9c34f756efba24031b62f807234ac9f920dbccbf917e22be",
+    "integrity_digest": "16d04c2fec1874c4edcdec2849da526add052c5bc49f4d7f1cdd697a88c0c36c",
     "evidence_count": 61,
-    "gap_count": 33,
+    "gap_count": 36,
     "status": "complete"
   },
   "policy": {

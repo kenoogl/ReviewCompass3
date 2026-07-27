@@ -635,9 +635,9 @@
       "category": "adaptation",
       "component": "review_task_definition",
       "atomic_obligation_ids": [
-        "REQ-CONTEXT-001#statement",
-        "REQ-CONTEXT-001#acceptance-01",
-        "REQ-CONTEXT-001#acceptance-02"
+        "REQ-CONTEXT-001#acceptance_criteria.001",
+        "REQ-CONTEXT-001#acceptance_criteria.002",
+        "REQ-CONTEXT-001#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -646,17 +646,33 @@
       "stop_condition": "Targetが一意に定まらない／必須項目が欠けるか未解決である"
     },
     {
+      "gap_id": "GAP-CONTEXT-002",
+      "requirement_id": "REQ-CONTEXT-002",
+      "category": "adaptation",
+      "component": "material_bundle",
+      "atomic_obligation_ids": [
+        "REQ-CONTEXT-002#acceptance_criteria.001",
+        "REQ-CONTEXT-002#acceptance_criteria.002",
+        "REQ-CONTEXT-002#statement"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-CONTEXT-002"
+      ],
+      "stop_condition": "参照先が存在しない／宣言したDigestと本文が一致しない／本文または出所が欠ける"
+    },
+    {
       "gap_id": "GAP-CONTEXT-003",
       "requirement_id": "REQ-CONTEXT-003",
       "category": "adaptation",
-      "component": "review_task_definition",
+      "component": "scope_composer",
       "atomic_obligation_ids": [
-        "REQ-CONTEXT-003#statement",
-        "REQ-CONTEXT-003#acceptance-01",
-        "REQ-CONTEXT-003#acceptance-02",
-        "REQ-CONTEXT-003#acceptance-03",
-        "REQ-CONTEXT-003#acceptance-04",
-        "REQ-CONTEXT-003#acceptance-05"
+        "REQ-CONTEXT-003#acceptance_criteria.001",
+        "REQ-CONTEXT-003#acceptance_criteria.002",
+        "REQ-CONTEXT-003#acceptance_criteria.003",
+        "REQ-CONTEXT-003#acceptance_criteria.004",
+        "REQ-CONTEXT-003#acceptance_criteria.005",
+        "REQ-CONTEXT-003#statement"
       ],
       "depends_on_gap_ids": [
         "GAP-TRACE-004"
@@ -670,11 +686,11 @@
       "gap_id": "GAP-CONTEXT-004",
       "requirement_id": "REQ-CONTEXT-004",
       "category": "adaptation",
-      "component": "review_task_definition",
+      "component": "context_identity",
       "atomic_obligation_ids": [
-        "REQ-CONTEXT-004#statement",
-        "REQ-CONTEXT-004#acceptance-01",
-        "REQ-CONTEXT-004#acceptance-02"
+        "REQ-CONTEXT-004#acceptance_criteria.001",
+        "REQ-CONTEXT-004#acceptance_criteria.002",
+        "REQ-CONTEXT-004#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -686,11 +702,11 @@
       "gap_id": "GAP-CONTEXT-005",
       "requirement_id": "REQ-CONTEXT-005",
       "category": "adaptation",
-      "component": "review_task_definition",
+      "component": "scope_composer",
       "atomic_obligation_ids": [
-        "REQ-CONTEXT-005#statement",
-        "REQ-CONTEXT-005#acceptance-01",
-        "REQ-CONTEXT-005#acceptance-02"
+        "REQ-CONTEXT-005#acceptance_criteria.001",
+        "REQ-CONTEXT-005#acceptance_criteria.002",
+        "REQ-CONTEXT-005#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -702,11 +718,11 @@
       "gap_id": "GAP-CONTEXT-006",
       "requirement_id": "REQ-CONTEXT-006",
       "category": "adaptation",
-      "component": "review_task_definition",
+      "component": "handoff_builder",
       "atomic_obligation_ids": [
-        "REQ-CONTEXT-006#statement",
-        "REQ-CONTEXT-006#acceptance-01",
-        "REQ-CONTEXT-006#acceptance-02"
+        "REQ-CONTEXT-006#acceptance_criteria.001",
+        "REQ-CONTEXT-006#acceptance_criteria.002",
+        "REQ-CONTEXT-006#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -718,12 +734,12 @@
       "gap_id": "GAP-CONTEXT-007",
       "requirement_id": "REQ-CONTEXT-007",
       "category": "adaptation",
-      "component": "review_task_definition",
+      "component": "handoff_builder",
       "atomic_obligation_ids": [
-        "REQ-CONTEXT-007#statement",
-        "REQ-CONTEXT-007#acceptance-01",
-        "REQ-CONTEXT-007#acceptance-02",
-        "REQ-CONTEXT-007#acceptance-03"
+        "REQ-CONTEXT-007#acceptance_criteria.001",
+        "REQ-CONTEXT-007#acceptance_criteria.002",
+        "REQ-CONTEXT-007#acceptance_criteria.003",
+        "REQ-CONTEXT-007#statement"
       ],
       "depends_on_gap_ids": [
         "GAP-PORTABLE-002",
@@ -740,9 +756,9 @@
       "category": "deferred",
       "component": "evidence_evaluator",
       "atomic_obligation_ids": [
-        "REQ-EVAL-001#statement",
-        "REQ-EVAL-001#acceptance-01",
-        "REQ-EVAL-001#acceptance-02"
+        "REQ-EVAL-001#acceptance_criteria.001",
+        "REQ-EVAL-001#acceptance_criteria.002",
+        "REQ-EVAL-001#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -754,11 +770,11 @@
       "gap_id": "GAP-EVAL-002",
       "requirement_id": "REQ-EVAL-002",
       "category": "deferred",
-      "component": "evidence_evaluator",
+      "component": "observation_interpreter",
       "atomic_obligation_ids": [
-        "REQ-EVAL-002#statement",
-        "REQ-EVAL-002#acceptance-01",
-        "REQ-EVAL-002#acceptance-02"
+        "REQ-EVAL-002#acceptance_criteria.001",
+        "REQ-EVAL-002#acceptance_criteria.002",
+        "REQ-EVAL-002#statement"
       ],
       "depends_on_gap_ids": [
         "GAP-EXEC-006"
@@ -772,11 +788,11 @@
       "gap_id": "GAP-EVAL-003",
       "requirement_id": "REQ-EVAL-003",
       "category": "deferred",
-      "component": "evidence_evaluator",
+      "component": "evaluation_package",
       "atomic_obligation_ids": [
-        "REQ-EVAL-003#statement",
-        "REQ-EVAL-003#acceptance-01",
-        "REQ-EVAL-003#acceptance-02"
+        "REQ-EVAL-003#acceptance_criteria.001",
+        "REQ-EVAL-003#acceptance_criteria.002",
+        "REQ-EVAL-003#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -790,10 +806,10 @@
       "category": "adaptation",
       "component": "run_controller",
       "atomic_obligation_ids": [
-        "REQ-EXEC-001#statement",
-        "REQ-EXEC-001#acceptance-01",
-        "REQ-EXEC-001#acceptance-02",
-        "REQ-EXEC-001#acceptance-03"
+        "REQ-EXEC-001#acceptance_criteria.001",
+        "REQ-EXEC-001#acceptance_criteria.002",
+        "REQ-EXEC-001#acceptance_criteria.003",
+        "REQ-EXEC-001#statement"
       ],
       "depends_on_gap_ids": [
         "GAP-WORKFLOW-002"
@@ -807,11 +823,11 @@
       "gap_id": "GAP-EXEC-002",
       "requirement_id": "REQ-EXEC-002",
       "category": "adaptation",
-      "component": "run_controller",
+      "component": "external_send_gate",
       "atomic_obligation_ids": [
-        "REQ-EXEC-002#statement",
-        "REQ-EXEC-002#acceptance-01",
-        "REQ-EXEC-002#acceptance-02"
+        "REQ-EXEC-002#acceptance_criteria.001",
+        "REQ-EXEC-002#acceptance_criteria.002",
+        "REQ-EXEC-002#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -823,13 +839,13 @@
       "gap_id": "GAP-EXEC-003",
       "requirement_id": "REQ-EXEC-003",
       "category": "adaptation",
-      "component": "run_controller",
+      "component": "provider_capture",
       "atomic_obligation_ids": [
-        "REQ-EXEC-003#statement",
-        "REQ-EXEC-003#acceptance-01",
-        "REQ-EXEC-003#acceptance-02",
-        "REQ-EXEC-003#acceptance-03",
-        "REQ-EXEC-003#acceptance-04"
+        "REQ-EXEC-003#acceptance_criteria.001",
+        "REQ-EXEC-003#acceptance_criteria.002",
+        "REQ-EXEC-003#acceptance_criteria.003",
+        "REQ-EXEC-003#acceptance_criteria.004",
+        "REQ-EXEC-003#statement"
       ],
       "depends_on_gap_ids": [
         "GAP-PORTABLE-002",
@@ -841,15 +857,31 @@
       "stop_condition": "request、Attemptまたは送信条件へ結線できない／raw captureと値なし診断の双方を耐久保存できない"
     },
     {
-      "gap_id": "GAP-EXEC-005",
-      "requirement_id": "REQ-EXEC-005",
+      "gap_id": "GAP-EXEC-004",
+      "requirement_id": "REQ-EXEC-004",
       "category": "adaptation",
       "component": "run_controller",
       "atomic_obligation_ids": [
-        "REQ-EXEC-005#statement",
-        "REQ-EXEC-005#acceptance-01",
-        "REQ-EXEC-005#acceptance-02",
-        "REQ-EXEC-005#acceptance-03"
+        "REQ-EXEC-004#acceptance_criteria.001",
+        "REQ-EXEC-004#acceptance_criteria.002",
+        "REQ-EXEC-004#statement"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-EXEC-004"
+      ],
+      "stop_condition": "必須担当または対象が欠ける／同じ担当結果が競合する"
+    },
+    {
+      "gap_id": "GAP-EXEC-005",
+      "requirement_id": "REQ-EXEC-005",
+      "category": "adaptation",
+      "component": "validation_pipeline",
+      "atomic_obligation_ids": [
+        "REQ-EXEC-005#acceptance_criteria.001",
+        "REQ-EXEC-005#acceptance_criteria.002",
+        "REQ-EXEC-005#acceptance_criteria.003",
+        "REQ-EXEC-005#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -861,11 +893,11 @@
       "gap_id": "GAP-EXEC-006",
       "requirement_id": "REQ-EXEC-006",
       "category": "adaptation",
-      "component": "run_controller",
+      "component": "attempt_store",
       "atomic_obligation_ids": [
-        "REQ-EXEC-006#statement",
-        "REQ-EXEC-006#acceptance-01",
-        "REQ-EXEC-006#acceptance-02"
+        "REQ-EXEC-006#acceptance_criteria.001",
+        "REQ-EXEC-006#acceptance_criteria.002",
+        "REQ-EXEC-006#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -879,9 +911,9 @@
       "category": "deferred",
       "component": "feedback_ledger",
       "atomic_obligation_ids": [
-        "REQ-IMPROVE-001#statement",
-        "REQ-IMPROVE-001#acceptance-01",
-        "REQ-IMPROVE-001#acceptance-02"
+        "REQ-IMPROVE-001#acceptance_criteria.001",
+        "REQ-IMPROVE-001#acceptance_criteria.002",
+        "REQ-IMPROVE-001#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -893,11 +925,11 @@
       "gap_id": "GAP-IMPROVE-002",
       "requirement_id": "REQ-IMPROVE-002",
       "category": "deferred",
-      "component": "feedback_ledger",
+      "component": "policy_change_gate",
       "atomic_obligation_ids": [
-        "REQ-IMPROVE-002#statement",
-        "REQ-IMPROVE-002#acceptance-01",
-        "REQ-IMPROVE-002#acceptance-02"
+        "REQ-IMPROVE-002#acceptance_criteria.001",
+        "REQ-IMPROVE-002#acceptance_criteria.002",
+        "REQ-IMPROVE-002#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -911,10 +943,10 @@
       "category": "adaptation",
       "component": "platform_matrix",
       "atomic_obligation_ids": [
-        "REQ-PORTABLE-001#statement",
-        "REQ-PORTABLE-001#acceptance-01",
-        "REQ-PORTABLE-001#acceptance-02",
-        "REQ-PORTABLE-001#acceptance-03"
+        "REQ-PORTABLE-001#acceptance_criteria.001",
+        "REQ-PORTABLE-001#acceptance_criteria.002",
+        "REQ-PORTABLE-001#acceptance_criteria.003",
+        "REQ-PORTABLE-001#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -926,11 +958,11 @@
       "gap_id": "GAP-PORTABLE-002",
       "requirement_id": "REQ-PORTABLE-002",
       "category": "adaptation",
-      "component": "platform_matrix",
+      "component": "atomic_artifact_store",
       "atomic_obligation_ids": [
-        "REQ-PORTABLE-002#statement",
-        "REQ-PORTABLE-002#acceptance-01",
-        "REQ-PORTABLE-002#acceptance-02"
+        "REQ-PORTABLE-002#acceptance_criteria.001",
+        "REQ-PORTABLE-002#acceptance_criteria.002",
+        "REQ-PORTABLE-002#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -939,15 +971,31 @@
       "stop_condition": "parse、Schema、原子的保存に失敗する"
     },
     {
+      "gap_id": "GAP-PORTABLE-003",
+      "requirement_id": "REQ-PORTABLE-003",
+      "category": "adaptation",
+      "component": "install_lifecycle",
+      "atomic_obligation_ids": [
+        "REQ-PORTABLE-003#acceptance_criteria.001",
+        "REQ-PORTABLE-003#acceptance_criteria.002",
+        "REQ-PORTABLE-003#statement"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-PORTABLE-003"
+      ],
+      "stop_condition": "所有対象が曖昧または利用者データ変更を検出する"
+    },
+    {
       "gap_id": "GAP-PORTABLE-004",
       "requirement_id": "REQ-PORTABLE-004",
       "category": "adaptation",
-      "component": "platform_matrix",
+      "component": "sensitive_record_vault",
       "atomic_obligation_ids": [
-        "REQ-PORTABLE-004#statement",
-        "REQ-PORTABLE-004#acceptance-01",
-        "REQ-PORTABLE-004#acceptance-02",
-        "REQ-PORTABLE-004#acceptance-03"
+        "REQ-PORTABLE-004#acceptance_criteria.001",
+        "REQ-PORTABLE-004#acceptance_criteria.002",
+        "REQ-PORTABLE-004#acceptance_criteria.003",
+        "REQ-PORTABLE-004#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -961,9 +1009,9 @@
       "category": "adaptation",
       "component": "session_ingestion",
       "atomic_obligation_ids": [
-        "REQ-SESSION-001#statement",
-        "REQ-SESSION-001#acceptance-01",
-        "REQ-SESSION-001#acceptance-02"
+        "REQ-SESSION-001#acceptance_criteria.001",
+        "REQ-SESSION-001#acceptance_criteria.002",
+        "REQ-SESSION-001#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -975,12 +1023,12 @@
       "gap_id": "GAP-SESSION-002",
       "requirement_id": "REQ-SESSION-002",
       "category": "adaptation",
-      "component": "session_ingestion",
+      "component": "raw_preserver",
       "atomic_obligation_ids": [
-        "REQ-SESSION-002#statement",
-        "REQ-SESSION-002#acceptance-01",
-        "REQ-SESSION-002#acceptance-02",
-        "REQ-SESSION-002#acceptance-03"
+        "REQ-SESSION-002#acceptance_criteria.001",
+        "REQ-SESSION-002#acceptance_criteria.002",
+        "REQ-SESSION-002#acceptance_criteria.003",
+        "REQ-SESSION-002#statement"
       ],
       "depends_on_gap_ids": [
         "GAP-PORTABLE-004"
@@ -996,9 +1044,9 @@
       "category": "adaptation",
       "component": "semantic_graph",
       "atomic_obligation_ids": [
-        "REQ-TRACE-001#statement",
-        "REQ-TRACE-001#acceptance-01",
-        "REQ-TRACE-001#acceptance-02"
+        "REQ-TRACE-001#acceptance_criteria.001",
+        "REQ-TRACE-001#acceptance_criteria.002",
+        "REQ-TRACE-001#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1010,12 +1058,12 @@
       "gap_id": "GAP-TRACE-002",
       "requirement_id": "REQ-TRACE-002",
       "category": "adaptation",
-      "component": "semantic_graph",
+      "component": "coverage_validator",
       "atomic_obligation_ids": [
-        "REQ-TRACE-002#statement",
-        "REQ-TRACE-002#acceptance-01",
-        "REQ-TRACE-002#acceptance-02",
-        "REQ-TRACE-002#acceptance-03"
+        "REQ-TRACE-002#acceptance_criteria.001",
+        "REQ-TRACE-002#acceptance_criteria.002",
+        "REQ-TRACE-002#acceptance_criteria.003",
+        "REQ-TRACE-002#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1027,11 +1075,11 @@
       "gap_id": "GAP-TRACE-003",
       "requirement_id": "REQ-TRACE-003",
       "category": "adaptation",
-      "component": "semantic_graph",
+      "component": "coverage_validator",
       "atomic_obligation_ids": [
-        "REQ-TRACE-003#statement",
-        "REQ-TRACE-003#acceptance-01",
-        "REQ-TRACE-003#acceptance-02"
+        "REQ-TRACE-003#acceptance_criteria.001",
+        "REQ-TRACE-003#acceptance_criteria.002",
+        "REQ-TRACE-003#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1043,11 +1091,11 @@
       "gap_id": "GAP-TRACE-004",
       "requirement_id": "REQ-TRACE-004",
       "category": "adaptation",
-      "component": "semantic_graph",
+      "component": "impact_closure",
       "atomic_obligation_ids": [
-        "REQ-TRACE-004#statement",
-        "REQ-TRACE-004#acceptance-01",
-        "REQ-TRACE-004#acceptance-02"
+        "REQ-TRACE-004#acceptance_criteria.001",
+        "REQ-TRACE-004#acceptance_criteria.002",
+        "REQ-TRACE-004#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1059,12 +1107,12 @@
       "gap_id": "GAP-TRACE-005",
       "requirement_id": "REQ-TRACE-005",
       "category": "adaptation",
-      "component": "semantic_graph",
+      "component": "provenance_validator",
       "atomic_obligation_ids": [
-        "REQ-TRACE-005#statement",
-        "REQ-TRACE-005#acceptance-01",
-        "REQ-TRACE-005#acceptance-02",
-        "REQ-TRACE-005#acceptance-03"
+        "REQ-TRACE-005#acceptance_criteria.001",
+        "REQ-TRACE-005#acceptance_criteria.002",
+        "REQ-TRACE-005#acceptance_criteria.003",
+        "REQ-TRACE-005#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1078,8 +1126,8 @@
       "category": "adaptation",
       "component": "result_summarizer",
       "atomic_obligation_ids": [
-        "REQ-TRIAGE-001#statement",
-        "REQ-TRIAGE-001#acceptance-01"
+        "REQ-TRIAGE-001#acceptance_criteria.001",
+        "REQ-TRIAGE-001#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1091,11 +1139,11 @@
       "gap_id": "GAP-TRIAGE-002",
       "requirement_id": "REQ-TRIAGE-002",
       "category": "adaptation",
-      "component": "result_summarizer",
+      "component": "finding_merger",
       "atomic_obligation_ids": [
-        "REQ-TRIAGE-002#statement",
-        "REQ-TRIAGE-002#acceptance-01",
-        "REQ-TRIAGE-002#acceptance-02"
+        "REQ-TRIAGE-002#acceptance_criteria.001",
+        "REQ-TRIAGE-002#acceptance_criteria.002",
+        "REQ-TRIAGE-002#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1107,12 +1155,12 @@
       "gap_id": "GAP-TRIAGE-003",
       "requirement_id": "REQ-TRIAGE-003",
       "category": "adaptation",
-      "component": "result_summarizer",
+      "component": "human_decision_gate",
       "atomic_obligation_ids": [
-        "REQ-TRIAGE-003#statement",
-        "REQ-TRIAGE-003#acceptance-01",
-        "REQ-TRIAGE-003#acceptance-02",
-        "REQ-TRIAGE-003#acceptance-03"
+        "REQ-TRIAGE-003#acceptance_criteria.001",
+        "REQ-TRIAGE-003#acceptance_criteria.002",
+        "REQ-TRIAGE-003#acceptance_criteria.003",
+        "REQ-TRIAGE-003#statement"
       ],
       "depends_on_gap_ids": [
         "GAP-TRACE-005"
@@ -1128,9 +1176,9 @@
       "category": "replacement",
       "component": "active_work_selector",
       "atomic_obligation_ids": [
-        "REQ-WORKFLOW-001#statement",
-        "REQ-WORKFLOW-001#acceptance-01",
-        "REQ-WORKFLOW-001#acceptance-02"
+        "REQ-WORKFLOW-001#acceptance_criteria.001",
+        "REQ-WORKFLOW-001#acceptance_criteria.002",
+        "REQ-WORKFLOW-001#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1142,12 +1190,12 @@
       "gap_id": "GAP-WORKFLOW-002",
       "requirement_id": "REQ-WORKFLOW-002",
       "category": "replacement",
-      "component": "active_work_selector",
+      "component": "workflow_state_machine",
       "atomic_obligation_ids": [
-        "REQ-WORKFLOW-002#statement",
-        "REQ-WORKFLOW-002#acceptance-01",
-        "REQ-WORKFLOW-002#acceptance-02",
-        "REQ-WORKFLOW-002#acceptance-03"
+        "REQ-WORKFLOW-002#acceptance_criteria.001",
+        "REQ-WORKFLOW-002#acceptance_criteria.002",
+        "REQ-WORKFLOW-002#acceptance_criteria.003",
+        "REQ-WORKFLOW-002#statement"
       ],
       "depends_on_gap_ids": [
         "GAP-PORTABLE-002",
@@ -1162,11 +1210,11 @@
       "gap_id": "GAP-WORKFLOW-003",
       "requirement_id": "REQ-WORKFLOW-003",
       "category": "replacement",
-      "component": "active_work_selector",
+      "component": "artifact_write_gate",
       "atomic_obligation_ids": [
-        "REQ-WORKFLOW-003#statement",
-        "REQ-WORKFLOW-003#acceptance-01",
-        "REQ-WORKFLOW-003#acceptance-02"
+        "REQ-WORKFLOW-003#acceptance_criteria.001",
+        "REQ-WORKFLOW-003#acceptance_criteria.002",
+        "REQ-WORKFLOW-003#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1178,11 +1226,11 @@
       "gap_id": "GAP-WORKFLOW-004",
       "requirement_id": "REQ-WORKFLOW-004",
       "category": "replacement",
-      "component": "active_work_selector",
+      "component": "workflow_state_machine",
       "atomic_obligation_ids": [
-        "REQ-WORKFLOW-004#statement",
-        "REQ-WORKFLOW-004#acceptance-01",
-        "REQ-WORKFLOW-004#acceptance-02"
+        "REQ-WORKFLOW-004#acceptance_criteria.001",
+        "REQ-WORKFLOW-004#acceptance_criteria.002",
+        "REQ-WORKFLOW-004#statement"
       ],
       "depends_on_gap_ids": [],
       "acceptance_test_ids": [
@@ -1239,19 +1287,39 @@
   ],
   "validation": {
     "contract": "tools/design/bootstrap_conformance.py:validate_evidence_backed_bootstrap_conformance",
-    "digest": "a0e303d7d192364a9c34f756efba24031b62f807234ac9f920dbccbf917e22be",
+    "commit_contract": "tools/design/bootstrap_conformance.py:validate_commit_blob_claims",
+    "digest": "16d04c2fec1874c4edcdec2849da526add052c5bc49f4d7f1cdd697a88c0c36c",
     "counts": {
-      "adapt": 24,
-      "conformant": 4,
+      "adapt": 27,
+      "conformant": 1,
       "defer": 5,
       "replace": 4
     },
     "requirement_count": 37,
+    "approved_obligation_count": 464,
     "evidence_count": 61,
-    "gap_count": 33,
+    "gap_count": 36,
+    "dependency_count": 11,
     "status": "complete"
   },
   "lifecycle": "provisional",
   "normative_status": "non-normative",
-  "promotion_required": true
+  "promotion_required": true,
+  "approved_inputs": {
+    "obligation_source": {
+      "path": "records/requirements/obligation-source-trace.json",
+      "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7",
+      "obligation_count": 464
+    },
+    "boundary_relations": {
+      "path": "records/requirements/requirement-boundary-relations.json",
+      "sha256": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e",
+      "dependency_count": 11
+    },
+    "design": {
+      "path": "records/design/stage-five-design.json",
+      "sha256": "d1f8424214a0662d18c6df9e529a077da4553cbe420c79b7294fa31f53a691dd",
+      "design_count": 9
+    }
+  }
 }

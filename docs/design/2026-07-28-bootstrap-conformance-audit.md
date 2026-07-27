@@ -20,8 +20,8 @@ promotion_required: true
 
 | 分類 | 件数 | 意味 |
 |---|---:|---|
-| conformant | 4 | 実装・テスト両証拠があり依存先も適合、gapなし |
-| adapt | 24 | 類似責務はあるが正式設計の関門または依存境界が不足 |
+| conformant | 1 | 全義務の実装・反証試験があり依存先も適合、gapなし |
+| adapt | 27 | 類似責務はあるが正式設計の義務、関門または依存境界が不足 |
 | replace | 4 | 既存責務境界が設計と異なり置換が必要 |
 | defer | 5 | 初期bootstrap範囲外で後段実装 |
 
@@ -29,10 +29,12 @@ promotion_required: true
 
 ## そのまま昇格可能な責務
 
-- `REQ-CONTEXT-002`：本文とDigestを持つ材料束
-- `REQ-EXEC-004`：複数担当と結果の結線
 - `REQ-SESSION-003`：追記・改変・消失・転写変異の検出
-- `REQ-PORTABLE-003`：所有境界付き配置ライフサイクル
+
+`REQ-CONTEXT-002`はprior identityと宣言Digestの反証試験、
+`REQ-EXEC-004`はround・Target・topology identity、
+`REQ-PORTABLE-003`は途中cleanup失敗時の逆順補償が不足するため、
+いずれもconformantからadaptへ戻した。
 
 ## 修正が必要な主な境界
 
@@ -51,8 +53,10 @@ conformantとはせず、依存gapを明示したadaptとして扱う。
 
 61件の実装・テストEvidenceは、パスだけでなく監査対象commitから読み出した
 blob内容のSHA-256へ結び付けた。監査対象commitのarchiveに対する全試験は
-361件通過した。33件の非適合要件は、それぞれstatement・受け入れ条件、
-対象component、受け入れ試験、停止条件および直接依存gapへ結び付けた。
+361件通過した。36件の非適合要件は、承認済み464原子的義務IDから
+該当statement・受け入れ条件を参照し、正しい対象component、受け入れ試験、
+停止条件および直接依存gapへ結び付けた。validatorは監査対象commitから
+各blobを直接読み出し、宣言SHA-256と照合する。
 
 ## 置換対象
 

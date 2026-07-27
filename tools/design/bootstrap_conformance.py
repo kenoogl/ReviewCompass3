@@ -278,6 +278,7 @@ def validate_evidence_backed_bootstrap_conformance(
   approved_requirement_dependencies=None,
   normalized_test_output=None,
   expected_passed_count=None,
+  repository_root=None,
 ):
   if (
     not isinstance(requirement_design_map, dict)
@@ -333,6 +334,12 @@ def validate_evidence_backed_bootstrap_conformance(
   ):
     raise BootstrapConformanceError(
       "evidence manifest coverage must be exact"
+    )
+  if repository_root is not None:
+    validate_commit_blob_claims(
+      repository_root=repository_root,
+      bootstrap_commit=bootstrap_commit,
+      commit_blob_map=commit_blob_map,
     )
 
   if (
