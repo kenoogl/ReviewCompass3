@@ -9,7 +9,7 @@ import dataclasses
 
 from tools.session_logs import parse_claude
 from tools.session_logs.provenance import build_provenance
-from tools.session_logs.redaction import redact_text
+from tools.session_logs.redaction import redact_text_strict
 from tools.session_logs.source_kind import identify_source_kind
 from tools.session_logs.transcript import render_transcript
 
@@ -41,7 +41,7 @@ def prepare_artifact(
 
   parsed = parse_claude.parse_claude_log(raw_log)
   transcript_text = render_transcript(parsed)
-  redacted = redact_text(transcript_text, rules)
+  redacted = redact_text_strict(transcript_text, rules)
   artifact_provenance = build_provenance(
     raw_log,
     raw_root=raw_root,
