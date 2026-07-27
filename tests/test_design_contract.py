@@ -553,6 +553,15 @@ def _validate_stage_five(contract, architecture):
       "PROTOCOL-FINDING-PREFAIL",
       "PROTOCOL-FINDING-FINALFAIL",
     ),
+    required_failure_handoffs=(
+      {
+        "producer_machine_id": "SM-RUN",
+        "consumer_machine_id": "SM-WORKFLOW",
+        "interface_id": (
+          "IF-HARNESS-WORKFLOW-RUN-RESULT"
+        ),
+      },
+    ),
     required_failure_correlations=(
       {
         "source_machine_id": "SM-PROVIDER-CAPTURE",
@@ -682,6 +691,33 @@ def test_rejects_nonterminal_failure_protocol_main_path():
   protocol_value["expected_states"]["SM-WORKFLOW"] = (
     "running"
   )
+
+  with pytest.raises(contract.DesignContractError):
+    _validate_stage_five(contract, architecture)
+
+
+def test_rejects_missing_failure_result_handoff():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+  architecture, _, _, _ = _stage_five_inputs()
+  architecture = copy.deepcopy(architecture)
+  protocol_value = next(
+    value
+    for value in architecture["protocols"]
+    if value["protocol_id"] == "PROTOCOL-RUN-START"
+  )
+  authorize = next(
+    value
+    for value in protocol_value["steps"]
+    if value["step_id"] == "RUN-START-003"
+  )
+  for failure in authorize["on_failure"]:
+    if failure["machine_id"] in {
+      "SM-RUN",
+      "SM-WORKFLOW",
+    }:
+      failure["interface_role"] = "state_only"
 
   with pytest.raises(contract.DesignContractError):
     _validate_stage_five(contract, architecture)
