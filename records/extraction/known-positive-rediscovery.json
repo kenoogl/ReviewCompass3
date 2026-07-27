@@ -1,0 +1,112 @@
+{
+  "classification_digest": "4b4e9a012a5ec587bf8a07550cde9893d6cc1d277179c3374c318952c4092577",
+  "groups": [
+    {
+      "identifier": "absolute_path_contamination_lint",
+      "responsibilities": [
+        {
+          "candidate_count": 1,
+          "name": "implementation"
+        },
+        {
+          "candidate_count": 1,
+          "name": "tests"
+        }
+      ]
+    },
+    {
+      "identifier": "current_advantages_inventory",
+      "responsibilities": [
+        {
+          "candidate_count": 1,
+          "name": "inventory"
+        }
+      ]
+    },
+    {
+      "identifier": "extracted_1416_rules",
+      "responsibilities": [
+        {
+          "candidate_count": 3,
+          "name": "extraction"
+        },
+        {
+          "candidate_count": 2,
+          "name": "ledger"
+        }
+      ]
+    },
+    {
+      "identifier": "known_failures_and_mutation_knowledge",
+      "responsibilities": [
+        {
+          "candidate_count": 1,
+          "name": "implementation"
+        },
+        {
+          "candidate_count": 1,
+          "name": "tests"
+        },
+        {
+          "candidate_count": 1,
+          "name": "precheck"
+        }
+      ]
+    },
+    {
+      "identifier": "review_material_lifecycle",
+      "responsibilities": [
+        {
+          "candidate_count": 7,
+          "name": "preparation"
+        },
+        {
+          "candidate_count": 3,
+          "name": "execution"
+        },
+        {
+          "candidate_count": 1,
+          "name": "recording"
+        },
+        {
+          "candidate_count": 11,
+          "name": "tests"
+        }
+      ]
+    },
+    {
+      "identifier": "session_log_implementation_and_tests",
+      "responsibilities": [
+        {
+          "candidate_count": 12,
+          "name": "implementation"
+        },
+        {
+          "candidate_count": 14,
+          "name": "tests"
+        }
+      ]
+    },
+    {
+      "identifier": "user_decisions_ud_001_093",
+      "responsibilities": [
+        {
+          "candidate_count": 1,
+          "name": "inventory"
+        },
+        {
+          "candidate_count": 1,
+          "name": "extraction"
+        }
+      ]
+    }
+  ],
+  "lifecycle": "provisional",
+  "missing_requirement_count": 0,
+  "normative_status": "non-normative",
+  "population_count": 18692,
+  "promotion_required": true,
+  "record_version": 1,
+  "rediscovery_digest": "56b641c4ede8ef003c2e6f633b7f8af200dd2a21a0fb44ce4fe64702b4a44811",
+  "status": "complete"
+}
