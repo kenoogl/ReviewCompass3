@@ -43,16 +43,23 @@ def reaudit_stage_two(
     prior_not_selected_values
   )
   new_extracted = []
+  new_merged = []
   new_not_selected = []
   for resolution in tuple(batch_resolutions):
     if (
       not isinstance(resolution, dict)
-      or set(resolution) != {"extracted", "not_selected"}
+      or set(resolution) not in (
+        {"extracted", "not_selected"},
+        {"extracted", "merged", "not_selected"},
+      )
     ):
       raise ValueError("batch resolution requires fixed fields")
     new_extracted.extend(resolution["extracted"])
+    new_merged.extend(resolution.get("merged", ()))
     new_not_selected.extend(resolution["not_selected"])
-  new_values = tuple(new_extracted + new_not_selected)
+  new_values = tuple(
+    new_extracted + new_merged + new_not_selected
+  )
   if (
     len(set(new_values)) != len(new_values)
     or prior & set(new_values)
@@ -61,7 +68,9 @@ def reaudit_stage_two(
     raise ValueError(
       "new batch coverage must be unique, known, and incremental"
     )
-  extracted = prior_extracted_values + tuple(new_extracted)
+  extracted = prior_extracted_values + tuple(
+    new_extracted + new_merged
+  )
   not_selected = prior_not_selected_values + tuple(new_not_selected)
   audit = audit_stage_two(
     population=population_values,
