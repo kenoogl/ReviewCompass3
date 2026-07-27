@@ -23,13 +23,16 @@
           "from_state": "idle",
           "event": "prepare",
           "to_state": "ready",
-          "on_failure": {
-            "machine_id": "SM-WORKFLOW",
-            "from_state": "idle",
-            "event": "prepare_failed",
-            "to_state": "blocked",
-            "persistence": "開始要求拒否を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "idle",
+              "event": "prepare_failed",
+              "to_state": "blocked",
+              "persistence": "開始要求拒否を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "RUN-START-002",
@@ -39,13 +42,16 @@
           "from_state": "ready",
           "event": "permit",
           "to_state": "running",
-          "on_failure": {
-            "machine_id": "SM-WORKFLOW",
-            "from_state": "ready",
-            "event": "invalidate",
-            "to_state": "blocked",
-            "persistence": "permit未発行と無効化を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "ready",
+              "event": "invalidate",
+              "to_state": "blocked",
+              "persistence": "permit未発行と無効化を保存する"
+            }
+          ],
+          "interface_role": "output"
         },
         {
           "step_id": "RUN-START-003",
@@ -55,13 +61,16 @@
           "from_state": "pending",
           "event": "authorize",
           "to_state": "permitted",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "pending",
-            "event": "authorization_failed",
-            "to_state": "blocked",
-            "persistence": "未送信blocked終端を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "pending",
+              "event": "authorization_failed",
+              "to_state": "blocked",
+              "persistence": "未送信blocked終端を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "RUN-START-004",
@@ -71,13 +80,16 @@
           "from_state": "permitted",
           "event": "prepare_send",
           "to_state": "awaiting_send_approval",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "permitted",
-            "event": "prepare_send_failed",
-            "to_state": "failed",
-            "persistence": "候補固定失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "permitted",
+              "event": "prepare_send_failed",
+              "to_state": "failed",
+              "persistence": "候補固定失敗を保存する"
+            }
+          ],
+          "interface_role": "output"
         },
         {
           "step_id": "RUN-START-005",
@@ -87,13 +99,16 @@
           "from_state": "awaiting_send_approval",
           "event": "approve_send",
           "to_state": "send_approved",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "awaiting_send_approval",
-            "event": "send_approval_failed",
-            "to_state": "failed",
-            "persistence": "拒否または不一致を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_send_approval",
+              "event": "send_approval_failed",
+              "to_state": "failed",
+              "persistence": "拒否または不一致を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "RUN-START-006",
@@ -103,13 +118,16 @@
           "from_state": "send_approved",
           "event": "send",
           "to_state": "executing",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "send_approved",
-            "event": "send_failed",
-            "to_state": "failed",
-            "persistence": "capture予約失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "send_approved",
+              "event": "send_failed",
+              "to_state": "failed",
+              "persistence": "capture予約失敗を保存する"
+            }
+          ],
+          "interface_role": "input"
         }
       ]
     },
@@ -125,18 +143,21 @@
         {
           "step_id": "RETRY-001",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-SEND-APPROVAL-REQUEST",
+          "interface_id": "IF-HARNESS-VALIDATION-RESULT",
           "state_machine_id": "SM-RUN",
           "from_state": "validating",
           "event": "validation_retryable",
           "to_state": "retry_pending",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "validating",
-            "event": "validation_failed",
-            "to_state": "failed",
-            "persistence": "復旧不能Validationを保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "復旧不能Validationを保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "RETRY-002",
@@ -146,13 +167,16 @@
           "from_state": "retry_pending",
           "event": "prepare_retry",
           "to_state": "awaiting_send_approval",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "retry_pending",
-            "event": "prepare_retry_failed",
-            "to_state": "failed",
-            "persistence": "子Attempt準備失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "retry_pending",
+              "event": "prepare_retry_failed",
+              "to_state": "failed",
+              "persistence": "子Attempt準備失敗を保存する"
+            }
+          ],
+          "interface_role": "output"
         },
         {
           "step_id": "RETRY-003",
@@ -162,13 +186,16 @@
           "from_state": "awaiting_send_approval",
           "event": "approve_send",
           "to_state": "send_approved",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "awaiting_send_approval",
-            "event": "send_approval_failed",
-            "to_state": "failed",
-            "persistence": "再承認拒否を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_send_approval",
+              "event": "send_approval_failed",
+              "to_state": "failed",
+              "persistence": "再承認拒否を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "RETRY-004",
@@ -178,13 +205,16 @@
           "from_state": "send_approved",
           "event": "send",
           "to_state": "executing",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "send_approved",
-            "event": "send_failed",
-            "to_state": "failed",
-            "persistence": "retry capture予約失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "send_approved",
+              "event": "send_failed",
+              "to_state": "failed",
+              "persistence": "retry capture予約失敗を保存する"
+            }
+          ],
+          "interface_role": "input"
         }
       ]
     },
@@ -209,13 +239,30 @@
           "from_state": "candidate",
           "event": "freeze",
           "to_state": "candidate_frozen",
-          "on_failure": {
-            "machine_id": "SM-TRIAGE-PROVENANCE",
-            "from_state": "candidate",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "候補固定失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-TRIAGE-PROVENANCE",
+              "from_state": "candidate",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "候補固定失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "Triage障害をRun failedへ伝播する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "provenance_failed",
+              "to_state": "blocked",
+              "persistence": "Triage障害をWorkflow blockedへ伝播する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "FINDING-002",
@@ -225,13 +272,30 @@
           "from_state": "candidate_frozen",
           "event": "prevalidate",
           "to_state": "prevalidated",
-          "on_failure": {
-            "machine_id": "SM-TRIAGE-PROVENANCE",
-            "from_state": "candidate_frozen",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "pre不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-TRIAGE-PROVENANCE",
+              "from_state": "candidate_frozen",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "pre不合格を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "Triage障害をRun failedへ伝播する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "provenance_failed",
+              "to_state": "blocked",
+              "persistence": "Triage障害をWorkflow blockedへ伝播する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "FINDING-003",
@@ -241,13 +305,30 @@
           "from_state": "prevalidated",
           "event": "human_decide",
           "to_state": "decided",
-          "on_failure": {
-            "machine_id": "SM-TRIAGE-PROVENANCE",
-            "from_state": "prevalidated",
-            "event": "decision_missing",
-            "to_state": "blocked",
-            "persistence": "判断欠落を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-TRIAGE-PROVENANCE",
+              "from_state": "prevalidated",
+              "event": "decision_missing",
+              "to_state": "blocked",
+              "persistence": "判断欠落を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "Triage障害をRun failedへ伝播する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "provenance_failed",
+              "to_state": "blocked",
+              "persistence": "Triage障害をWorkflow blockedへ伝播する"
+            }
+          ],
+          "interface_role": "internal_evidence"
         },
         {
           "step_id": "FINDING-004",
@@ -257,13 +338,30 @@
           "from_state": "decided",
           "event": "record_final",
           "to_state": "final_recorded",
-          "on_failure": {
-            "machine_id": "SM-TRIAGE-PROVENANCE",
-            "from_state": "decided",
-            "event": "record_failed",
-            "to_state": "blocked",
-            "persistence": "Final Finding保存失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-TRIAGE-PROVENANCE",
+              "from_state": "decided",
+              "event": "record_failed",
+              "to_state": "blocked",
+              "persistence": "Final Finding保存失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "Triage障害をRun failedへ伝播する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "provenance_failed",
+              "to_state": "blocked",
+              "persistence": "Triage障害をWorkflow blockedへ伝播する"
+            }
+          ],
+          "interface_role": "output"
         },
         {
           "step_id": "FINDING-005",
@@ -273,13 +371,30 @@
           "from_state": "final_recorded",
           "event": "final_validate",
           "to_state": "completed",
-          "on_failure": {
-            "machine_id": "SM-TRIAGE-PROVENANCE",
-            "from_state": "final_recorded",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "final不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-TRIAGE-PROVENANCE",
+              "from_state": "final_recorded",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "final不合格を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "Triage障害をRun failedへ伝播する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "provenance_failed",
+              "to_state": "blocked",
+              "persistence": "Triage障害をWorkflow blockedへ伝播する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "FINDING-006",
@@ -289,13 +404,16 @@
           "from_state": "awaiting_triage",
           "event": "final_provenance_passed",
           "to_state": "succeeded",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "awaiting_triage",
-            "event": "provenance_failed",
-            "to_state": "failed",
-            "persistence": "Runのfinal不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "Runのfinal不合格を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "FINDING-007",
@@ -305,13 +423,16 @@
           "from_state": "running",
           "event": "execution_finished",
           "to_state": "awaiting_final_provenance",
-          "on_failure": {
-            "machine_id": "SM-WORKFLOW",
-            "from_state": "running",
-            "event": "execution_failed",
-            "to_state": "blocked",
-            "persistence": "Run結果返却失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "Run結果返却失敗を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "FINDING-008",
@@ -321,13 +442,16 @@
           "from_state": "awaiting_final_provenance",
           "event": "provenance_passed",
           "to_state": "completed",
-          "on_failure": {
-            "machine_id": "SM-WORKFLOW",
-            "from_state": "awaiting_final_provenance",
-            "event": "provenance_failed",
-            "to_state": "blocked",
-            "persistence": "Workflowのfinal不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "awaiting_final_provenance",
+              "event": "provenance_failed",
+              "to_state": "blocked",
+              "persistence": "Workflowのfinal不合格を保存する"
+            }
+          ],
+          "interface_role": "input"
         }
       ]
     },
@@ -352,13 +476,16 @@
           "from_state": "candidate_frozen",
           "event": "reject",
           "to_state": "blocked",
-          "on_failure": {
-            "machine_id": "SM-TRIAGE-PROVENANCE",
-            "from_state": "candidate_frozen",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "pre不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-TRIAGE-PROVENANCE",
+              "from_state": "candidate_frozen",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "pre不合格を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "PREFAIL-002",
@@ -368,13 +495,16 @@
           "from_state": "awaiting_triage",
           "event": "provenance_failed",
           "to_state": "failed",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "awaiting_triage",
-            "event": "provenance_failed",
-            "to_state": "failed",
-            "persistence": "Runのpre不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "Runのpre不合格を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "PREFAIL-003",
@@ -384,13 +514,16 @@
           "from_state": "running",
           "event": "provenance_failed",
           "to_state": "blocked",
-          "on_failure": {
-            "machine_id": "SM-WORKFLOW",
-            "from_state": "running",
-            "event": "provenance_failed",
-            "to_state": "blocked",
-            "persistence": "Workflowのpre不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "provenance_failed",
+              "to_state": "blocked",
+              "persistence": "Workflowのpre不合格を保存する"
+            }
+          ],
+          "interface_role": "input"
         }
       ]
     },
@@ -415,13 +548,16 @@
           "from_state": "final_recorded",
           "event": "reject",
           "to_state": "blocked",
-          "on_failure": {
-            "machine_id": "SM-TRIAGE-PROVENANCE",
-            "from_state": "final_recorded",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "final不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-TRIAGE-PROVENANCE",
+              "from_state": "final_recorded",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "final不合格を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "FINALFAIL-002",
@@ -431,13 +567,16 @@
           "from_state": "awaiting_triage",
           "event": "provenance_failed",
           "to_state": "failed",
-          "on_failure": {
-            "machine_id": "SM-RUN",
-            "from_state": "awaiting_triage",
-            "event": "provenance_failed",
-            "to_state": "failed",
-            "persistence": "Runのfinal不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "Runのfinal不合格を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "FINALFAIL-003",
@@ -447,13 +586,16 @@
           "from_state": "running",
           "event": "provenance_failed",
           "to_state": "blocked",
-          "on_failure": {
-            "machine_id": "SM-WORKFLOW",
-            "from_state": "running",
-            "event": "provenance_failed",
-            "to_state": "blocked",
-            "persistence": "Workflowのfinal不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "provenance_failed",
+              "to_state": "blocked",
+              "persistence": "Workflowのfinal不合格を保存する"
+            }
+          ],
+          "interface_role": "input"
         }
       ]
     },
@@ -476,13 +618,16 @@
           "from_state": "awaiting_evaluation",
           "event": "receive_evaluation",
           "to_state": "hypothesis_ready",
-          "on_failure": {
-            "machine_id": "SM-IMPROVEMENT",
-            "from_state": "awaiting_evaluation",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "評価package拒否を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-IMPROVEMENT",
+              "from_state": "awaiting_evaluation",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "評価package拒否を保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "IMPROVEMENT-002",
@@ -492,13 +637,16 @@
           "from_state": "hypothesis_ready",
           "event": "validate_hypothesis",
           "to_state": "validated",
-          "on_failure": {
-            "machine_id": "SM-IMPROVEMENT",
-            "from_state": "hypothesis_ready",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "固定比較失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-IMPROVEMENT",
+              "from_state": "hypothesis_ready",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "固定比較失敗を保存する"
+            }
+          ],
+          "interface_role": "internal_evidence"
         },
         {
           "step_id": "IMPROVEMENT-003",
@@ -508,13 +656,16 @@
           "from_state": "validated",
           "event": "human_approve",
           "to_state": "approved",
-          "on_failure": {
-            "machine_id": "SM-IMPROVEMENT",
-            "from_state": "validated",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "Human拒否を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-IMPROVEMENT",
+              "from_state": "validated",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "Human拒否を保存する"
+            }
+          ],
+          "interface_role": "output"
         },
         {
           "step_id": "IMPROVEMENT-004",
@@ -524,13 +675,16 @@
           "from_state": "approved",
           "event": "propose_change",
           "to_state": "completed",
-          "on_failure": {
-            "machine_id": "SM-IMPROVEMENT",
-            "from_state": "approved",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "提案生成失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-IMPROVEMENT",
+              "from_state": "approved",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "提案生成失敗を保存する"
+            }
+          ],
+          "interface_role": "output"
         },
         {
           "step_id": "CONFIGURATION-001",
@@ -540,13 +694,16 @@
           "from_state": "awaiting_change",
           "event": "receive_change",
           "to_state": "change_received",
-          "on_failure": {
-            "machine_id": "SM-CONFIGURATION",
-            "from_state": "awaiting_change",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "不完全変更提案を拒否して保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-CONFIGURATION",
+              "from_state": "awaiting_change",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "不完全変更提案を拒否して保存する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "CONFIGURATION-002",
@@ -556,13 +713,16 @@
           "from_state": "change_received",
           "event": "validate_change",
           "to_state": "validated",
-          "on_failure": {
-            "machine_id": "SM-CONFIGURATION",
-            "from_state": "change_received",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "変更検証不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-CONFIGURATION",
+              "from_state": "change_received",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "変更検証不合格を保存する"
+            }
+          ],
+          "interface_role": "internal_evidence"
         },
         {
           "step_id": "CONFIGURATION-003",
@@ -572,13 +732,16 @@
           "from_state": "validated",
           "event": "apply_change",
           "to_state": "applied",
-          "on_failure": {
-            "machine_id": "SM-CONFIGURATION",
-            "from_state": "validated",
-            "event": "reject",
-            "to_state": "blocked",
-            "persistence": "適用前条件不一致を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-CONFIGURATION",
+              "from_state": "validated",
+              "event": "reject",
+              "to_state": "blocked",
+              "persistence": "適用前条件不一致を保存する"
+            }
+          ],
+          "interface_role": "internal_evidence"
         }
       ]
     },
@@ -587,12 +750,14 @@
       "initial_states": {
         "SM-ATTEMPT": "prepared",
         "SM-PROVIDER-CAPTURE": "reserved",
-        "SM-VALIDATION": "pending"
+        "SM-VALIDATION": "pending",
+        "SM-RUN": "executing"
       },
       "expected_states": {
         "SM-ATTEMPT": "validated",
         "SM-PROVIDER-CAPTURE": "sealed",
-        "SM-VALIDATION": "passed"
+        "SM-VALIDATION": "passed",
+        "SM-RUN": "awaiting_triage"
       },
       "steps": [
         {
@@ -603,13 +768,16 @@
           "from_state": "prepared",
           "event": "dispatch",
           "to_state": "sent",
-          "on_failure": {
-            "machine_id": "SM-ATTEMPT",
-            "from_state": "prepared",
-            "event": "fail",
-            "to_state": "failed",
-            "persistence": "未送信Attempt失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-ATTEMPT",
+              "from_state": "prepared",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "未送信Attempt失敗を保存する"
+            }
+          ],
+          "interface_role": "internal_evidence"
         },
         {
           "step_id": "CAPTURE-001",
@@ -619,13 +787,30 @@
           "from_state": "reserved",
           "event": "open",
           "to_state": "receiving",
-          "on_failure": {
-            "machine_id": "SM-PROVIDER-CAPTURE",
-            "from_state": "reserved",
-            "event": "fail",
-            "to_state": "failed",
-            "persistence": "capture領域確保失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-PROVIDER-CAPTURE",
+              "from_state": "reserved",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "capture領域確保失敗を保存する"
+            },
+            {
+              "machine_id": "SM-ATTEMPT",
+              "from_state": "sent",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "Attempt capture失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "capture_failed",
+              "to_state": "irrecoverable",
+              "persistence": "capture障害をRun irrecoverableへ伝播する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "CAPTURE-002",
@@ -635,93 +820,219 @@
           "from_state": "receiving",
           "event": "seal",
           "to_state": "sealed",
-          "on_failure": {
-            "machine_id": "SM-PROVIDER-CAPTURE",
-            "from_state": "receiving",
-            "event": "fail",
-            "to_state": "failed",
-            "persistence": "受信中capture失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-PROVIDER-CAPTURE",
+              "from_state": "receiving",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "受信中capture失敗を保存する"
+            },
+            {
+              "machine_id": "SM-ATTEMPT",
+              "from_state": "sent",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "Attempt capture失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "capture_failed",
+              "to_state": "irrecoverable",
+              "persistence": "capture障害をRun irrecoverableへ伝播する"
+            }
+          ],
+          "interface_role": "internal_evidence"
         },
         {
           "step_id": "ATTEMPT-002",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-PORTABLE-HARNESS-STORE",
+          "interface_id": "IF-HARNESS-CAPTURE-RESULT",
           "state_machine_id": "SM-ATTEMPT",
           "from_state": "sent",
           "event": "capture",
           "to_state": "response_captured",
-          "on_failure": {
-            "machine_id": "SM-ATTEMPT",
-            "from_state": "sent",
-            "event": "fail",
-            "to_state": "failed",
-            "persistence": "Attempt capture失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-ATTEMPT",
+              "from_state": "sent",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "Attempt capture失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "capture_failed",
+              "to_state": "irrecoverable",
+              "persistence": "capture障害をRun irrecoverableへ伝播する"
+            }
+          ],
+          "interface_role": "input"
+        },
+        {
+          "step_id": "RUN-CAPTURE-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-CAPTURE-RESULT",
+          "interface_role": "input",
+          "state_machine_id": "SM-RUN",
+          "from_state": "executing",
+          "event": "capture_complete",
+          "to_state": "validating",
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "capture_failed",
+              "to_state": "irrecoverable",
+              "persistence": "capture失敗をRun終端へ保存する"
+            }
+          ]
         },
         {
           "step_id": "VALIDATION-001",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "interface_id": "IF-HARNESS-VALIDATION-CANDIDATE",
           "state_machine_id": "SM-VALIDATION",
           "from_state": "pending",
           "event": "schema_passed",
           "to_state": "schema_validated",
-          "on_failure": {
-            "machine_id": "SM-VALIDATION",
-            "from_state": "pending",
-            "event": "reject",
-            "to_state": "failed",
-            "persistence": "Schema不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-VALIDATION",
+              "from_state": "pending",
+              "event": "reject",
+              "to_state": "failed",
+              "persistence": "Schema不合格を保存する"
+            },
+            {
+              "machine_id": "SM-ATTEMPT",
+              "from_state": "response_captured",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "Attempt Validation失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "Validation障害をRun failedへ伝播する"
+            }
+          ],
+          "interface_role": "input"
         },
         {
           "step_id": "VALIDATION-002",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "interface_id": "IF-HARNESS-VALIDATION-CANDIDATE",
           "state_machine_id": "SM-VALIDATION",
           "from_state": "schema_validated",
           "event": "evidence_passed",
           "to_state": "evidence_validated",
-          "on_failure": {
-            "machine_id": "SM-VALIDATION",
-            "from_state": "schema_validated",
-            "event": "reject",
-            "to_state": "failed",
-            "persistence": "Evidence不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-VALIDATION",
+              "from_state": "schema_validated",
+              "event": "reject",
+              "to_state": "failed",
+              "persistence": "Evidence不合格を保存する"
+            },
+            {
+              "machine_id": "SM-ATTEMPT",
+              "from_state": "response_captured",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "Attempt Validation失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "Validation障害をRun failedへ伝播する"
+            }
+          ],
+          "interface_role": "internal_evidence"
         },
         {
           "step_id": "VALIDATION-003",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "interface_id": "IF-HARNESS-VALIDATION-CANDIDATE",
           "state_machine_id": "SM-VALIDATION",
           "from_state": "evidence_validated",
           "event": "scope_passed",
           "to_state": "passed",
-          "on_failure": {
-            "machine_id": "SM-VALIDATION",
-            "from_state": "evidence_validated",
-            "event": "reject",
-            "to_state": "failed",
-            "persistence": "Scope不合格を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-VALIDATION",
+              "from_state": "evidence_validated",
+              "event": "reject",
+              "to_state": "failed",
+              "persistence": "Scope不合格を保存する"
+            },
+            {
+              "machine_id": "SM-ATTEMPT",
+              "from_state": "response_captured",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "Attempt Validation失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "Validation障害をRun failedへ伝播する"
+            }
+          ],
+          "interface_role": "internal_evidence"
         },
         {
           "step_id": "ATTEMPT-003",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "interface_id": "IF-HARNESS-VALIDATION-RESULT",
           "state_machine_id": "SM-ATTEMPT",
           "from_state": "response_captured",
           "event": "validate",
           "to_state": "validated",
-          "on_failure": {
-            "machine_id": "SM-ATTEMPT",
-            "from_state": "response_captured",
-            "event": "fail",
-            "to_state": "failed",
-            "persistence": "Attempt Validation失敗を保存する"
-          }
+          "on_failure": [
+            {
+              "machine_id": "SM-ATTEMPT",
+              "from_state": "response_captured",
+              "event": "fail",
+              "to_state": "failed",
+              "persistence": "Attempt Validation失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "Validation障害をRun failedへ伝播する"
+            }
+          ],
+          "interface_role": "input"
+        },
+        {
+          "step_id": "RUN-VALIDATION-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-VALIDATION-RESULT",
+          "interface_role": "input",
+          "state_machine_id": "SM-RUN",
+          "from_state": "validating",
+          "event": "validation_passed",
+          "to_state": "awaiting_triage",
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "Validation不合格をRun終端へ保存する"
+            }
+          ]
         }
       ]
     }
@@ -784,6 +1095,24 @@
       ],
       "failure_verdict": "測定条件、観測値または解釈の由来が欠ければ改善仮説を生成しない",
       "owner_design_id": "DES-EVIDENCE-EVALUATION"
+    },
+    {
+      "interface_id": "IF-HARNESS-CAPTURE-RESULT",
+      "provider_design_id": "DES-HARNESSED-EXECUTION",
+      "consumer_design_id": "DES-HARNESSED-EXECUTION",
+      "identity_fields": [
+        "attempt_id",
+        "capture_id",
+        "capture_digest",
+        "capture_status"
+      ],
+      "payload_fields": [
+        "raw_response_ref",
+        "quarantine_ref",
+        "capture_diagnostics"
+      ],
+      "failure_verdict": "sealed capture以外をValidationへ進めずRunをfailedまたはirrecoverableにする",
+      "owner_design_id": "DES-HARNESSED-EXECUTION"
     },
     {
       "interface_id": "IF-HARNESS-EVALUATION-OBSERVATION",
@@ -885,6 +1214,42 @@
         "provider_capture_ids"
       ],
       "failure_verdict": "未検証Attemptまたは欠落captureを含む結果集合は候補化しない",
+      "owner_design_id": "DES-HARNESSED-EXECUTION"
+    },
+    {
+      "interface_id": "IF-HARNESS-VALIDATION-CANDIDATE",
+      "provider_design_id": "DES-HARNESSED-EXECUTION",
+      "consumer_design_id": "DES-HARNESSED-EXECUTION",
+      "identity_fields": [
+        "attempt_id",
+        "capture_digest",
+        "parsed_candidate_digest"
+      ],
+      "payload_fields": [
+        "parsed_candidate_ref",
+        "schema_policy",
+        "evidence_inputs",
+        "scope_contract"
+      ],
+      "failure_verdict": "captureまたはcandidateが不一致ならValidationを開始しない",
+      "owner_design_id": "DES-HARNESSED-EXECUTION"
+    },
+    {
+      "interface_id": "IF-HARNESS-VALIDATION-RESULT",
+      "provider_design_id": "DES-HARNESSED-EXECUTION",
+      "consumer_design_id": "DES-HARNESSED-EXECUTION",
+      "identity_fields": [
+        "attempt_id",
+        "parsed_candidate_digest",
+        "validation_digest"
+      ],
+      "payload_fields": [
+        "schema_verdict",
+        "evidence_verdict",
+        "scope_verdict",
+        "validation_diagnostics"
+      ],
+      "failure_verdict": "全verdict合格だけをRunとTriageへ渡し不合格をRun failedへ伝播する",
       "owner_design_id": "DES-HARNESSED-EXECUTION"
     },
     {
@@ -1947,12 +2312,12 @@
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_architecture",
-    "digest": "77980b406fb02971fef8b5481791d005f6c07660ae0491159bad3a7b7be74082",
+    "digest": "2d45e0a7803b8ccb25ecbf699ed4e0e79fa20897257e9f85470ca2cd66468d81",
     "boundary_count": 23,
-    "interface_count": 26,
+    "interface_count": 29,
     "state_machine_count": 8,
     "protocol_count": 7,
-    "event_route_count": 21,
+    "event_route_count": 23,
     "status": "complete"
   },
   "lifecycle": "provisional",
@@ -2155,6 +2520,18 @@
       "source_interface_id": "IF-IMPROVEMENT-WORKFLOW-CHANGE",
       "target_state_machine_id": "SM-CONFIGURATION",
       "event": "receive_change"
+    },
+    {
+      "route_id": "ROUTE-CAPTURE-RESULT-RUN",
+      "source_interface_id": "IF-HARNESS-CAPTURE-RESULT",
+      "target_state_machine_id": "SM-RUN",
+      "event": "capture_complete"
+    },
+    {
+      "route_id": "ROUTE-VALIDATION-RESULT-RUN",
+      "source_interface_id": "IF-HARNESS-VALIDATION-RESULT",
+      "target_state_machine_id": "SM-RUN",
+      "event": "validation_passed"
     }
   ],
   "required_interface_fields": {
@@ -2231,6 +2608,22 @@
       "approval_authority_digest",
       "decision_digest",
       "expires_at"
+    ],
+    "IF-HARNESS-CAPTURE-RESULT": [
+      "attempt_id",
+      "capture_id",
+      "capture_digest",
+      "capture_status"
+    ],
+    "IF-HARNESS-VALIDATION-CANDIDATE": [
+      "attempt_id",
+      "capture_digest",
+      "parsed_candidate_digest"
+    ],
+    "IF-HARNESS-VALIDATION-RESULT": [
+      "attempt_id",
+      "parsed_candidate_digest",
+      "validation_digest"
     ]
   },
   "required_boundary_fields": {

@@ -695,8 +695,8 @@
       "oracle_type": "machine",
       "setup": "Attempt identity、request identityおよび送信条件／provider response stream／REQ-PORTABLE-002とREQ-PORTABLE-004を満たすwrite-ahead隔離保存境界",
       "stimulus": "システムはprovider responseの受領とrawの耐久的captureを別状態として管理し、解析前に共有隔離保存境界へwrite-ahead captureしなければならない",
-      "expected": "送信前予約、receiving、sealed、quarantined、failedを区別する／rawと値なし診断の双方が保存不能ならirrecoverable終端にする／Validation失敗は親子Attemptを保存してretryするかfailedで閉じる",
-      "negative_case": "受信中障害、隔離、診断保存不能、retry枯渇またはクラッシュ後に状態が非終端のまま残る"
+      "expected": "Attempt、Capture、ValidationとRunを一つのprotocolでexecutingからawaiting_triageまで順に進める／capture障害はAttemptとRun、Validation障害はValidation・Attempt・Runを耐久的終端へ伝播する",
+      "negative_case": "検証後Triage結果をValidation入力へ循環利用する／下位machineだけをfailedにしてRunを非終端に残す／Runのcapture・validation eventが欠ける"
     },
     {
       "test_id": "AT-EXEC-004",
@@ -749,8 +749,8 @@
       "oracle_type": "hybrid",
       "setup": "triage結果と判断候補／Humanの採用、拒否、保留判断／REQ-TRACE-005のOperational Provenance verdict",
       "stimulus": "システムはFindingの最終採否をHuman判断として対象と内容へ束縛し、来歴関門通過後だけ確定しなければならない",
-      "expected": "候補Digest凍結、pre-provenance合格、Human判断、Final Finding保存、final provenance合格の順序を機械検査する／preまたはfinal不合格はTriage、Run、Workflowをblockedまたはfailed終端へ伝播する／訂正版は旧失敗を保持した新しい版として再開する",
-      "negative_case": "順序を迂回する／候補または判断対象Digestが変わる／preまたはfinal不合格後にFinding、Runまたは段階を完了する"
+      "expected": "候補固定、pre、Human判断、Final Finding、final、Run成功、結果返却、Workflow完了を順に進める／候補固定・判断・保存失敗もTriage、Run、Workflowの全関連状態へ伝播する",
+      "negative_case": "局所TriageだけをblockedにしてRunまたはWorkflowを非終端に残す／preまたはfinal不合格後に完了する"
     },
     {
       "test_id": "AT-TRACE-001",
@@ -944,19 +944,19 @@
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_contract",
-    "digest": "5aa239c88120751c7b3ec2724bb083df9f869f2acf3dfd9426cda5c0a0c3123b",
+    "digest": "ce5da0f0ed4eeb9b25e06833de3e73805618f5838d5bbb8b13ddb6749042ca26",
     "feature_count": 9,
     "requirement_count": 37,
     "acceptance_test_count": 37,
     "boundary_count": 23,
     "architecture_contract": "tools/design/design_contract.py:validate_design_architecture",
     "architecture_record": "records/design/stage-five-architecture-integrity.json",
-    "architecture_digest": "77980b406fb02971fef8b5481791d005f6c07660ae0491159bad3a7b7be74082",
-    "interface_count": 26,
+    "architecture_digest": "2d45e0a7803b8ccb25ecbf699ed4e0e79fa20897257e9f85470ca2cd66468d81",
+    "interface_count": 29,
     "state_machine_count": 8,
     "status": "complete",
     "protocol_count": 7,
-    "event_route_count": 21
+    "event_route_count": 23
   },
   "lifecycle": "provisional",
   "normative_status": "non-normative",
