@@ -1,0 +1,47 @@
+{
+  "material_digest": "c70e540112023fc267aa0317c65fff6d14325027e0199e213f72fee6bf5b6feb",
+  "resolution_count": 9,
+  "resolved_finding_count": 13,
+  "remaining_count": 0,
+  "changed_artifacts": [
+    "docs/design/2026-07-28-reviewcompass3-design.md",
+    "docs/design/2026-07-28-bootstrap-conformance-audit.md",
+    "records/design/stage-five-design.json",
+    "records/design/stage-five-architecture-integrity.json",
+    "records/design/bootstrap-conformance-audit.json",
+    "records/design/bootstrap-conformance-integrity.json",
+    "tools/design/design_contract.py",
+    "tools/design/bootstrap_conformance.py",
+    "tests/test_design_contract.py",
+    "tests/test_bootstrap_conformance.py"
+  ],
+  "verification": {
+    "design_contract": {
+      "boundary_count": 23,
+      "interface_count": 13,
+      "state_machine_count": 6,
+      "status": "complete"
+    },
+    "bootstrap_conformance": {
+      "requirement_count": 37,
+      "evidence_count": 61,
+      "gap_count": 33,
+      "counts": {
+        "adapt": 24,
+        "conformant": 4,
+        "defer": 5,
+        "replace": 4
+      },
+      "status": "complete"
+    },
+    "tests": "379 passed",
+    "status": "ready_for_fixed_material_rereview"
+  },
+  "resolution_commits": [
+    "a757477",
+    "5a9a6bb",
+    "ee6c99a",
+    "5204725"
+  ],
+  "status": "resolved"
+}

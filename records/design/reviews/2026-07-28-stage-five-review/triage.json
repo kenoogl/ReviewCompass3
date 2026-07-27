@@ -1,0 +1,85 @@
+{
+  "material_digest": "c70e540112023fc267aa0317c65fff6d14325027e0199e213f72fee6bf5b6feb",
+  "finding_count": 13,
+  "adopted_count": 13,
+  "rejected_count": 0,
+  "groups": [
+    {
+      "finding_ids": [
+        "DSB-001"
+      ],
+      "resolution_id": "STAGE5-RES-001",
+      "disposition": "adopted",
+      "reason": "全9設計を13件の段間interfaceで結び、提供側、利用側、identity、payload、失敗verdictおよび所有責務を固定する"
+    },
+    {
+      "finding_ids": [
+        "TDR-001"
+      ],
+      "resolution_id": "STAGE5-RES-002",
+      "disposition": "adopted",
+      "reason": "候補凍結、pre-provenance、Human判断、Final Finding、final provenance、Workflow完了の二段階protocolへ分離する"
+    },
+    {
+      "finding_ids": [
+        "TDR-002"
+      ],
+      "resolution_id": "STAGE5-RES-003",
+      "disposition": "adopted",
+      "reason": "Run開始要求と単回permitをTask、active work、Context、freshness、Execution Spec、発行者および期限へ束縛する"
+    },
+    {
+      "finding_ids": [
+        "TDR-003"
+      ],
+      "resolution_id": "STAGE5-RES-004",
+      "disposition": "adopted",
+      "reason": "Workflow、Run、Attempt、provider capture、ValidationおよびTriage/Provenanceへ閉じた状態・event・guard・保存点を定義する"
+    },
+    {
+      "finding_ids": [
+        "DSB-002",
+        "ACF-006",
+        "TDR-004"
+      ],
+      "resolution_id": "STAGE5-RES-005",
+      "disposition": "adopted",
+      "reason": "AT-TRIAGE-003とAT-IMPROVE-002をhybrid oracleへ変更し機械関門とHuman判断を分離する"
+    },
+    {
+      "finding_ids": [
+        "DSB-003"
+      ],
+      "resolution_id": "STAGE5-RES-006",
+      "disposition": "adopted",
+      "reason": "未定義の機微情報例外を廃止し、Humanが版付きpolicyを承認しても機械関門を免除できない契約にする"
+    },
+    {
+      "finding_ids": [
+        "ACF-001",
+        "ACF-002",
+        "ACF-005"
+      ],
+      "resolution_id": "STAGE5-RES-007",
+      "disposition": "adopted",
+      "reason": "固定commitのblob SHA-256、試験結果、要件・設計対応、分類別gap、原子的義務、component、依存gapおよび受け入れ試験を機械検証する"
+    },
+    {
+      "finding_ids": [
+        "ACF-003"
+      ],
+      "resolution_id": "STAGE5-RES-008",
+      "disposition": "adopted",
+      "reason": "承認済みboundary tupleの完全一致、要件featureとdesign所有およびboundary全内容を検証Digestへ含める"
+    },
+    {
+      "finding_ids": [
+        "ACF-004"
+      ],
+      "resolution_id": "STAGE5-RES-009",
+      "disposition": "adopted",
+      "reason": "未適合なREQ-PORTABLE-004へ依存するREQ-SESSION-002をconformantからadaptへ変更し依存gapを結線する"
+    }
+  ],
+  "status": "complete"
+}
