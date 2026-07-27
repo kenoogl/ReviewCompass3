@@ -14,6 +14,7 @@ from tools.session_logs.pipeline import (
   UnsupportedSourceKind,
   prepare_artifact,
 )
+from tools.session_logs.preservation import preserve_raw_log
 from tools.session_logs.redaction import (
   SensitiveDataRemaining,
   write_sensitive_report,
@@ -26,6 +27,7 @@ EXIT_SENSITIVE_DATA = 2
 EXIT_NO_TARGETS = 3
 EXIT_UNSUPPORTED = 4
 EXIT_FAILED = 5
+EXIT_PRESERVATION_FAILED = 6
 
 
 def run(argv=None) -> int:
@@ -46,6 +48,22 @@ def run(argv=None) -> int:
 
   for relative_path in relative_paths:
     raw_log = config.raw_root / relative_path
+    if (
+      not args.dry_run
+      and config.preservation_enabled
+      and config.backup_root is not None
+    ):
+      try:
+        preserve_raw_log(
+          raw_log,
+          raw_root=config.raw_root,
+          backup_root=config.backup_root,
+        )
+      except Exception:
+        exit_value = max(
+          exit_value,
+          EXIT_PRESERVATION_FAILED,
+        )
     try:
       artifact = prepare_artifact(
         raw_log,

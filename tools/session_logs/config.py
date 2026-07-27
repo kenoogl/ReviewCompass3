@@ -19,6 +19,8 @@ class Config:
   summary_root: Path
   provenance_root: Path
   sensitive_report_root: object
+  backup_root: object
+  preservation_enabled: bool
   tool_version: str
   redaction_rules: tuple
   allow_patterns: tuple
@@ -34,6 +36,7 @@ def load_config(path) -> Config:
   data = json.loads(config_path.read_text(encoding="utf-8"))
   base = config_path.parent
   report_root = data.get("sensitive_report_root")
+  backup_root = data.get("backup_root")
   return Config(
     raw_root=_resolve(base, data["raw_root"]),
     transcript_root=_resolve(base, data["transcript_root"]),
@@ -43,6 +46,14 @@ def load_config(path) -> Config:
       _resolve(base, report_root)
       if report_root is not None
       else None
+    ),
+    backup_root=(
+      _resolve(base, backup_root)
+      if backup_root is not None
+      else None
+    ),
+    preservation_enabled=bool(
+      data.get("preservation_enabled", False)
     ),
     tool_version=data["tool_version"],
     redaction_rules=tuple(
