@@ -1,8 +1,11 @@
 {
   "hook": {
+    "installed_owned_count": 2,
     "operation_exit_code": 0,
     "planned_count": 586,
     "preview_action": "installed",
+    "remaining_owned_count": 0,
+    "settings_reencoded": true,
     "settings_mutated": false,
     "status": "passed"
   },
@@ -10,10 +13,18 @@
   "normative_status": "non-normative",
   "promotion_required": true,
   "schedule": {
-    "action": "planned",
-    "environment_mutated": false,
+    "install_action": "installed",
+    "running_status": "running",
+    "uninstall_action": "uninstalled",
+    "unregistered": true,
     "status": "passed"
   },
-  "status": "preflight_passed",
+  "retention": {
+    "after_file_count": 652,
+    "before_file_count": 652,
+    "digest_match": true,
+    "status": "passed"
+  },
+  "status": "limited_deployment_passed",
   "validated_at": "2026-07-27"
 }

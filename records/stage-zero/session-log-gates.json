@@ -19,8 +19,9 @@
       "evidence_paths": [
         "records/stage-zero/user-environment-preflight.json"
       ],
+      "actual_status": "passed",
       "preflight_status": "passed",
-      "status": "pending"
+      "status": "passed"
     }
   },
   "gates": {
