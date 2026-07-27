@@ -7,9 +7,11 @@ promotion_required: true
 
 import dataclasses
 import hashlib
+import json
 from pathlib import Path
 
 from tools.session_logs.parse_claude import parse_claude_bytes
+from tools.session_logs.parse_codex import parse_codex_bytes
 from tools.session_logs.provenance import read_recorded_range
 from tools.session_logs.redaction import (
   redact_text_strict,
@@ -37,6 +39,22 @@ class RegenerationResult:
   status: str = "matches"
 
 
+def _parse_source_bytes(data):
+  first_line = next((
+    line
+    for line in data.splitlines()
+    if line.strip()
+  ), b"")
+  first_record = json.loads(first_line) if first_line else {}
+  if (
+    isinstance(first_record, dict)
+    and first_record.get("type") == "thread.started"
+    and isinstance(first_record.get("thread_id"), str)
+  ):
+    return parse_codex_bytes(data)
+  return parse_claude_bytes(data)
+
+
 def regenerate_transcript(
   record,
   *,
@@ -49,7 +67,7 @@ def regenerate_transcript(
   raw_log = Path(raw_root) / record.source_path
   try:
     source_bytes = read_recorded_range(raw_log, record)
-    parsed = parse_claude_bytes(source_bytes)
+    parsed = _parse_source_bytes(source_bytes)
     transcript = render_transcript(parsed)
     redacted = redact_text_strict(
       transcript,
