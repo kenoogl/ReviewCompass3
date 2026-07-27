@@ -1,0 +1,13 @@
+{
+  "reviewer_role": "design_scope_and_boundary",
+  "material_digest": "f79185086c8b6125d344f15e3e555abfd92a60d3c3f33e2b4d96b23093f418c3",
+  "verdict": "fail",
+  "summary": "直接の開始要求・結果返却指摘は解決したが、Portable境界、final関門、pre失敗、改善protocolにblocking issueが残る。",
+  "findings": [
+    {"id":"DSB-FR-001","severity":"error","document":"records/design/stage-five-architecture-integrity.json","location":"BOUNDARY-003〜006","issue":"Portable→Context interfaceが原子的書込み・再読込・復旧・分類・access・削除契約を持たない。","suggestion":"必須payloadと機械検査を追加する。"},
+    {"id":"DSB-FR-002","severity":"error","document":"records/design/stage-five-architecture-integrity.json","location":"BOUNDARY-022〜023","issue":"最終Finding関門をpre-verdictだけへ対応させている。","suggestion":"final-verdict interfaceへ対応させる。"},
+    {"id":"DSB-FR-003","severity":"error","document":"records/design/stage-five-architecture-integrity.json","location":"pre失敗route","issue":"pre失敗にfinal_finding_digest必須のfinal interfaceを使う。","suggestion":"Run・Workflow向けpre interfaceを追加する。"},
+    {"id":"DSB-FR-004","severity":"error","document":"records/design/stage-five-architecture-integrity.json","location":"改善protocol","issue":"評価package受領を無関係なWorkflow prepareへ結線している。","suggestion":"改善専用状態機械を定義する。"},
+    {"id":"DSB-FR-005","severity":"warning","document":"tools/design/design_contract.py","location":"意味整合検査","issue":"境界必須field、protocol状態列の意味整合を検査しない。","suggestion":"必須fieldと状態列を機械検証する。"}
+  ]
+}

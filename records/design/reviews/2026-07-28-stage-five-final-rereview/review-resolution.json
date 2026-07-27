@@ -1,0 +1,17 @@
+{
+  "material_digest": "f79185086c8b6125d344f15e3e555abfd92a60d3c3f33e2b4d96b23093f418c3",
+  "resolved_finding_count": 14,
+  "remaining_count": 0,
+  "verification": {
+    "interfaces": 25,
+    "state_machines": 7,
+    "protocols": 6,
+    "event_routes": 21,
+    "bootstrap_counts": {"adapt":28,"conformant":0,"defer":5,"replace":4},
+    "gap_count": 37,
+    "tests": "385 passed",
+    "status": "ready_for_minimal_final_verification"
+  },
+  "resolution_commits": ["48c5486","bd7c5db","518b6c2","156bf83"],
+  "status": "resolved"
+}

@@ -1,0 +1,15 @@
+{
+  "material_digest": "f79185086c8b6125d344f15e3e555abfd92a60d3c3f33e2b4d96b23093f418c3",
+  "finding_count": 14,
+  "adopted_count": 14,
+  "rejected_count": 0,
+  "groups": [
+    {"resolution_id":"STAGE5-FR-RES-001","finding_ids":["DSB-FR-001"],"disposition":"adopted","reason":"Portable→Contextの必須保存契約を追加する"},
+    {"resolution_id":"STAGE5-FR-RES-002","finding_ids":["DSB-FR-002","DSB-FR-003","TDRF-001","TDRF-002","ACF-FR-001","ACF-FR-004"],"disposition":"adopted","reason":"pre専用通知とRun成功・結果返却・Workflow待機・final通知の順序を固定する"},
+    {"resolution_id":"STAGE5-FR-RES-003","finding_ids":["DSB-FR-004"],"disposition":"adopted","reason":"改善専用状態機械を追加する"},
+    {"resolution_id":"STAGE5-FR-RES-004","finding_ids":["DSB-FR-005","TDRF-004"],"disposition":"adopted","reason":"境界必須fieldとprotocol状態列を機械検証する"},
+    {"resolution_id":"STAGE5-FR-RES-005","finding_ids":["TDRF-003","TDRF-005"],"disposition":"adopted","reason":"初回・retry送信承認と訂正identity付き再開を追加する"},
+    {"resolution_id":"STAGE5-FR-RES-006","finding_ids":["ACF-FR-002","ACF-FR-003"],"disposition":"adopted","reason":"conformantを0件へ訂正しstrict必須監査を分離する"}
+  ],
+  "status": "complete"
+}

@@ -1,0 +1,13 @@
+{
+  "reviewer_role": "task_runtime_design",
+  "material_digest": "f79185086c8b6125d344f15e3e555abfd92a60d3c3f33e2b4d96b23093f418c3",
+  "verdict": "fail",
+  "summary": "freshness、capture、retryは概ね解決したが、pre失敗、final配送順、外部送信承認、protocol状態検証にblocking issueが残る。",
+  "findings": [
+    {"id":"TDRF-001","severity":"error","document":"records/design/stage-five-architecture-integrity.json","location":"pre失敗配送","issue":"pre失敗で構成不能なfinal interfaceを使う。","suggestion":"candidate digest付きpre interfaceへ分離する。"},
+    {"id":"TDRF-002","severity":"error","document":"records/design/stage-five-architecture-integrity.json","location":"final配送順","issue":"Run成功、結果返却、Workflow待機、final verdictの順序がなく完了不能になる。","suggestion":"正常protocolへ順序を固定する。"},
+    {"id":"TDRF-003","severity":"error","document":"records/design/stage-five-architecture-integrity.json","location":"外部送信関門","issue":"payload、Provider、送信先、承認者・権限・期限を初回とretryで照合しない。","suggestion":"各Attemptの送信承認状態とinterfaceを追加する。"},
+    {"id":"TDRF-004","severity":"error","document":"tools/design/design_contract.py","location":"protocol検証","issue":"stepの現在状態と前後到達状態を検証しない。","suggestion":"開始・期待終了状態からstep列をシミュレートする。"},
+    {"id":"TDRF-005","severity":"warning","document":"records/design/stage-five-architecture-integrity.json","location":"reopen","issue":"candidateまたはprovenanceだけの訂正をWorkflow再開条件が許さない。","suggestion":"訂正identityを再開条件へ加える。"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "reviewer_role": "adversarial_conformance",
+  "material_digest": "f79185086c8b6125d344f15e3e555abfd92a60d3c3f33e2b4d96b23093f418c3",
+  "verdict": "fail",
+  "summary": "固定証拠は一致したが、正常protocol、唯一のconformant、strict検証必須性にblocking issueが残る。",
+  "findings": [
+    {"id":"ACF-FR-001","severity":"error","document":"records/design/stage-five-architecture-integrity.json","location":"Finding正常protocol","issue":"Run成功・結果返却前にWorkflowへfinal verdictを送り完了不能になる。","suggestion":"状態順をprotocolで実行検証する。"},
+    {"id":"ACF-FR-002","severity":"error","document":"records/design/bootstrap-conformance-audit.json","location":"REQ-SESSION-003","issue":"消失と非追記変更の別分類、変更前後identity・診断保存を全義務で証明しない。","suggestion":"adaptへ戻す。"},
+    {"id":"ACF-FR-003","severity":"error","document":"tools/design/bootstrap_conformance.py","location":"optional integrity inputs","issue":"承認義務・component・依存・試験・repository入力を省略してもcompleteになる。","suggestion":"strict必須関数へ分離し検証実施をDigestへ含める。"},
+    {"id":"ACF-FR-004","severity":"warning","document":"records/design/stage-five-architecture-integrity.json","location":"BOUNDARY-022〜023","issue":"final関門interfaceが承認境界へ対応しない。","suggestion":"final interfaceへ対応させる。"}
+  ]
+}
