@@ -1,0 +1,42 @@
+{
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "scope": "material_payload"
+  },
+  "lifecycle": "provisional",
+  "material_digest": "888c141f13e0a6ddec637d62393d70d7dd6c4f3852ecd4bf6b3a132ace5ccbeb",
+  "material_payload": {
+    "artifacts": [
+      {"path":"docs/intent/2026-07-27-reviewcompass3-intent-draft.md","role":"approved_intent","sha256":"5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"},
+      {"path":"records/requirements/canonical-approved-essence-ledger.json","role":"canonical_approved_essence_ledger","sha256":"96b82e68583b415ce0d74a8791da112974c35f266cd8136ffc5fd1b6dee61ca3"},
+      {"path":"records/requirements/intent-source-catalog.json","role":"stable_intent_fragments","sha256":"bfaab933c4f75741b3304226f2ba25839779f7b23179ce2ab12eae79cbadd82a"},
+      {"path":"records/requirements/feature-partition.json","role":"feature_partition","sha256":"d2bc778f24101e7d2fce3257a9e427860c76962e45c7d6ccfd504931bb084167"},
+      {"path":"docs/requirements/review-context-requirements.md","role":"context_requirements","sha256":"40d0fceb058c2d0a2762992bb8686ce5f4b1384f2f402857c47f6d53680f1afc"},
+      {"path":"records/requirements/review-context-batch-0001.json","role":"context_requirement_trace","sha256":"2073a9e61f8dc9cf27c1f22584a76f8e6d13a8ad1128de68246b9674c23d8d32"},
+      {"path":"docs/requirements/remaining-feature-requirements.md","role":"remaining_requirements","sha256":"912d1b95a64abf3aee1e8f6ac47b394b625bb0face089cdcbfc384dad4a46071"},
+      {"path":"records/requirements/remaining-batches-0002-0009.json","role":"remaining_requirement_trace","sha256":"da7b287a8ced4bc73155499d14af5e126c3d9dc920945a4646c40dbab813565a"},
+      {"path":"records/requirements/obligation-trace-policy.json","role":"obligation_trace_policy","sha256":"9b7fa28bd8f7ed4427a64e03735292b48b3a5c5a7df3ead27175c4bda6309f66"},
+      {"path":"records/requirements/requirements-coverage-audit.json","role":"mechanical_coverage_audit","sha256":"bfa2eb9110d3aae072c75bb0a7d44b9337c3b66aab959b9b6a70e754229ab7b0"},
+      {"path":"tools/requirements/requirement_batch.py","role":"requirement_contract","sha256":"2e91889620ae18e2b49b856939d07102429b9d07d24b707fcd9d4b1ecb6f3986"},
+      {"path":"tools/requirements/source_trace.py","role":"trace_contract","sha256":"1ef601f95b4c38c837b8a7ad0580176e1d35f7789cd59c472dedbc517fb1b163"}
+    ],
+    "criteria": [
+      "9機能33要件がapproved intentと47エッセンスを意味的に満たす",
+      "各要件の外部振る舞い、入力、出力、停止、復旧、保存、受け入れ、対象外が反証可能である",
+      "Human、LLM、機械処理の責務がintent原理Aと一致する",
+      "Context、Harness、Triage、Workflow、Evaluationの所有境界が重複しない",
+      "全requirementと全essenceの双方向由来が解決する",
+      "実装方法を不必要に固定せずdesignへ進める十分な契約になっている"
+    ],
+    "review_roles": [
+      "scope_and_feature_boundary_final",
+      "task_runtime_requirements_final",
+      "adversarial_traceability_final"
+    ]
+  },
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "fixed"
+}
