@@ -66,13 +66,9 @@ def _semantic_kind(path, value):
     and ("properties" in keys or "$defs" in keys)
   ):
     return "schema"
-  if (
-    "/approvals/" in path
-    and "approved_by" in keys
-    and (
-      "approved_action" in keys
-      or "decision" in keys
-    )
+  if "approved_by" in keys and (
+    "approved_action" in keys
+    or "decision" in keys
   ):
     return "approval"
   if (
@@ -94,6 +90,12 @@ def _semantic_kind(path, value):
   ):
     return "raw_response"
   if (
+    "/reviews/" in path
+    and "/raw/" in path
+    and bool(keys & {"response", "raw_response", "events"})
+  ):
+    return "raw_response"
+  if (
     "/evidence/reviews/" in path
     and (
       "verdict" in keys
@@ -103,10 +105,33 @@ def _semantic_kind(path, value):
     )
   ):
     return "generated_evidence"
+  if "/reviews/" in path and (
+    (
+      "findings" in keys
+      and bool(keys & {"model", "provider", "role"})
+    )
+    or "model_results" in keys
+    or ("models" in keys and "run_id" in keys)
+    or ("triage_status" in keys and "items" in keys)
+    or (
+      "run_id" in keys
+      and "target_files" in keys
+      and "roles" not in keys
+    )
+  ):
+    return "generated_evidence"
+  if (
+    "/reviews/" in path
+    and "schema_version" in keys
+    and "roles" in keys
+    and "target_files" in keys
+  ):
+    return "canonical_spec"
   if (
     ("/specs/" in path or path.startswith("specs/"))
-    and "schema_version" in keys
+    and ("schema_version" in keys or "version" in keys)
     and bool(keys & {
+      "coverage",
       "units",
       "requirements",
       "features",
