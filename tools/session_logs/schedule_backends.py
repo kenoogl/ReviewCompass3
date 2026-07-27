@@ -80,6 +80,54 @@ class LaunchdBackend:
     )
 
 
+class SystemdUserBackend:
+  backend_id = "systemd_user"
+
+  def __init__(self, *, runner=None):
+    self.runner = runner
+
+  def run(self, operation, request, *, dry_run=False):
+    from tools.session_logs import systemd_scheduler
+    arguments = [
+      operation,
+      "--timer",
+      str(request.schedule_path),
+      "--python",
+      str(request.python_executable),
+      "--config",
+      str(request.config_path),
+      "--interval",
+      str(request.interval_seconds),
+      "--stdout",
+      str(request.stdout_path),
+      "--stderr",
+      str(request.stderr_path),
+    ]
+    if dry_run:
+      arguments.append("--dry-run")
+    output = io.StringIO()
+    try:
+      with contextlib.redirect_stdout(output):
+        if self.runner is None:
+          systemd_scheduler.run(tuple(arguments))
+        else:
+          systemd_scheduler.run(
+            tuple(arguments),
+            runner=self.runner,
+          )
+      payload = json.loads(output.getvalue())
+    except Exception as error:
+      raise ScheduleBackendError(
+        "Schedule backend execution failed"
+      ) from error
+    return ScheduleBackendResult(
+      backend=self.backend_id,
+      action=payload["action"],
+      status=payload["status"],
+      reason=payload.get("reason"),
+    )
+
+
 _PLATFORM_BACKEND_IDS = {
   "darwin": "launchd",
   "linux": "systemd_user",
@@ -99,7 +147,10 @@ def select_schedule_backend(
   )
   backend_id = _PLATFORM_BACKEND_IDS.get(selected_platform)
   available = (
-    {"launchd": LaunchdBackend()}
+    {
+      "launchd": LaunchdBackend(),
+      "systemd_user": SystemdUserBackend(),
+    }
     if registry is None
     else registry
   )
