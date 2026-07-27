@@ -20,10 +20,29 @@ class Provenance:
   tool_version: str
 
 
+@dataclasses.dataclass(frozen=True)
+class VerificationResult:
+  source_matches: bool
+  transcript_matches: bool
+
+
 def _line_count(data: bytes) -> int:
   if not data:
     return 0
   return data.count(b"\n") + (0 if data.endswith(b"\n") else 1)
+
+
+def _lf_lines(data):
+  lines = []
+  start = 0
+  while start < len(data):
+    end = data.find(b"\n", start)
+    if end < 0:
+      lines.append(data[start:])
+      break
+    lines.append(data[start:end + 1])
+    start = end + 1
+  return tuple(lines)
 
 
 def build_provenance(
@@ -44,4 +63,29 @@ def build_provenance(
     source_sha256=hashlib.sha256(raw_bytes).hexdigest(),
     transcript_sha256=hashlib.sha256(transcript_bytes).hexdigest(),
     tool_version=tool_version,
+  )
+
+
+def read_recorded_range(raw_log, record) -> bytes:
+  raw_bytes = Path(raw_log).read_bytes()
+  lines = _lf_lines(raw_bytes)
+  return b"".join(lines[record.start_line - 1:record.end_line])
+
+
+def verify_provenance(
+  record,
+  *,
+  raw_log,
+  transcript_text,
+) -> VerificationResult:
+  source_bytes = read_recorded_range(raw_log, record)
+  transcript_bytes = transcript_text.encode("utf-8")
+  return VerificationResult(
+    source_matches=(
+      hashlib.sha256(source_bytes).hexdigest() == record.source_sha256
+    ),
+    transcript_matches=(
+      hashlib.sha256(transcript_bytes).hexdigest()
+      == record.transcript_sha256
+    ),
   )
