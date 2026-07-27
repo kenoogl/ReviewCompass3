@@ -1,8 +1,14 @@
 """第5段のdesign契約に関する暫定テスト。"""
 
+import copy
 import importlib
+import json
+from pathlib import Path
 
 import pytest
+
+
+ROOT = Path(__file__).parents[1]
 
 
 def _design(**overrides):
@@ -282,6 +288,9 @@ def test_validates_protocol_boundary_map_and_event_routes():
                 "persistence": "before visibility",
               },
             ),
+            "failure_expected_states": {
+              "SM-WORKFLOW": "blocked",
+            },
           },
         ),
       },
@@ -397,6 +406,9 @@ def test_rejects_protocol_state_sequence_mismatch():
                   "persistence": "before visibility",
                 },
               ),
+              "failure_expected_states": {
+                "SM-WORKFLOW": "blocked",
+              },
             },
           ),
         },
@@ -453,3 +465,173 @@ def test_rejects_unreachable_state():
       defined_interface_ids=(),
       defined_state_machine_ids=("SM-WORKFLOW",),
     )
+
+
+def _stage_five_inputs():
+  architecture = json.loads((
+    ROOT
+    / "records/design/stage-five-architecture-integrity.json"
+  ).read_text())
+  design = json.loads((
+    ROOT / "records/design/stage-five-design.json"
+  ).read_text())
+  requirements = json.loads((
+    ROOT
+    / "records/requirements/review-context-batch-0001.json"
+  ).read_text())["requirements"]
+  remaining = json.loads((
+    ROOT
+    / "records/requirements/remaining-batches-0002-0009.json"
+  ).read_text())["batches"]
+  for batch in remaining:
+    requirements.extend(batch["requirements"])
+  relations = json.loads((
+    ROOT
+    / "records/requirements/requirement-boundary-relations.json"
+  ).read_text())["relations"]
+  return architecture, design, requirements, relations
+
+
+def _validate_stage_five(contract, architecture):
+  _, design, requirements, relations = _stage_five_inputs()
+  return contract.validate_design_architecture(
+    designs=design["designs"],
+    boundary_catalog=design["boundary_catalog"],
+    approved_boundary_relations=relations,
+    requirement_feature_map={
+      value["requirement_id"]: value["feature_id"]
+      for value in requirements
+    },
+    interfaces=architecture["interfaces"],
+    state_machines=architecture["state_machines"],
+    defined_interface_ids=[
+      value["interface_id"]
+      for value in architecture["interfaces"]
+    ],
+    defined_state_machine_ids=[
+      value["machine_id"]
+      for value in architecture["state_machines"]
+    ],
+    protocols=architecture["protocols"],
+    boundary_interface_map=(
+      architecture["boundary_interface_map"]
+    ),
+    event_routes=architecture["event_routes"],
+    required_interface_fields=(
+      architecture["required_interface_fields"]
+    ),
+    required_boundary_fields=(
+      architecture["required_boundary_fields"]
+    ),
+    required_protocol_machine_ids=(
+      architecture["required_protocol_machine_ids"]
+    ),
+    required_generated_interface_ids=(
+      "IF-HARNESS-CAPTURE-RESULT",
+      "IF-HARNESS-VALIDATION-CANDIDATE",
+      "IF-HARNESS-VALIDATION-RESULT",
+      "IF-HARNESS-WORKFLOW-RUN-RESULT",
+    ),
+    required_failure_state_groups=(
+      {
+        "SM-RUN": (
+          "failed",
+          "irrecoverable",
+          "blocked",
+          "succeeded",
+        ),
+        "SM-WORKFLOW": ("blocked",),
+      },
+    ),
+    required_failure_correlations=(
+      {
+        "source_machine_id": "SM-PROVIDER-CAPTURE",
+        "source_from_state": "receiving",
+        "source_event": "diagnostic_failed",
+        "target_machine_id": "SM-RUN",
+        "target_event": "capture_diagnostic_failed",
+        "target_state": "failed",
+      },
+      {
+        "source_machine_id": "SM-PROVIDER-CAPTURE",
+        "source_from_state": "receiving",
+        "source_event": "quarantine",
+        "target_machine_id": "SM-RUN",
+        "target_event": "capture_quarantined",
+        "target_state": "failed",
+      },
+      {
+        "source_machine_id": "SM-PROVIDER-CAPTURE",
+        "source_from_state": "receiving",
+        "source_event": "fail",
+        "target_machine_id": "SM-RUN",
+        "target_event": "capture_failed",
+        "target_state": "irrecoverable",
+      },
+    ),
+  )
+
+
+def test_rejects_required_generated_interface_as_initial_input():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+  architecture, _, _, _ = _stage_five_inputs()
+  architecture = copy.deepcopy(architecture)
+  normal = next(
+    value
+    for value in architecture["protocols"]
+    if value["protocol_id"]
+    == "PROTOCOL-ATTEMPT-CAPTURE-VALIDATION"
+  )
+  normal["initial_interfaces"].append(
+    "IF-HARNESS-CAPTURE-RESULT"
+  )
+
+  with pytest.raises(contract.DesignContractError):
+    _validate_stage_five(contract, architecture)
+
+
+def test_rejects_incomplete_protocol_failure_state_vector():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+  architecture, _, _, _ = _stage_five_inputs()
+  architecture = copy.deepcopy(architecture)
+  normal = next(
+    value
+    for value in architecture["protocols"]
+    if value["protocol_id"]
+    == "PROTOCOL-ATTEMPT-CAPTURE-VALIDATION"
+  )
+  capture_open = next(
+    value
+    for value in normal["steps"]
+    if value["step_id"] == "CAPTURE-001"
+  )
+  capture_open["on_failure"] = [
+    value
+    for value in capture_open["on_failure"]
+    if value["machine_id"] != "SM-WORKFLOW"
+  ]
+
+  with pytest.raises(contract.DesignContractError):
+    _validate_stage_five(contract, architecture)
+
+
+def test_rejects_capture_and_run_failure_classification_mismatch():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+  architecture, _, _, _ = _stage_five_inputs()
+  architecture = copy.deepcopy(architecture)
+  protocol_value = next(
+    value
+    for value in architecture["protocols"]
+    if value["protocol_id"]
+    == "PROTOCOL-CAPTURE-IRRECOVERABLE"
+  )
+  protocol_value["steps"][0]["event"] = "diagnostic_failed"
+
+  with pytest.raises(contract.DesignContractError):
+    _validate_stage_five(contract, architecture)
