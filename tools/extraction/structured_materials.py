@@ -60,6 +60,7 @@ def _semantic_kind(path, value):
   if not isinstance(value, dict):
     return None
   keys = set(value)
+  name = path.rsplit("/", 1)[-1]
   if (
     ("schemas/" in path or path.endswith(".schema.json"))
     and "$schema" in keys
@@ -82,6 +83,8 @@ def _semantic_kind(path, value):
     )
   ):
     return "state"
+  if name == "spec.json" and "workflow_state" in keys:
+    return "state"
   if (
     "/evidence/exchanges/" in path
     and (
@@ -94,7 +97,18 @@ def _semantic_kind(path, value):
   if (
     "/reviews/" in path
     and "/raw/" in path
-    and bool(keys & {"response", "raw_response", "events"})
+    and bool(keys & {
+      "response",
+      "response_text",
+      "raw_response",
+      "events",
+    })
+  ):
+    return "raw_response"
+  if (
+    "/reviews/" in path
+    and name.endswith(".raw.yaml")
+    and "response_text" in keys
   ):
     return "raw_response"
   if (
@@ -124,6 +138,27 @@ def _semantic_kind(path, value):
     return "generated_evidence"
   if (
     "/reviews/" in path
+    and "/raw/" in path
+    and bool(keys & {
+      "role",
+      "findings",
+      "final_findings",
+      "decision_units",
+      "review_completion",
+    })
+  ):
+    return "generated_evidence"
+  if (
+    "/reviews/" in path
+    and (
+      name == "review-execution-spec.yaml"
+      or name == "variant-role-assignment.yaml"
+      or name.endswith("-contract.yaml")
+    )
+  ):
+    return "canonical_spec"
+  if (
+    "/reviews/" in path
     and "schema_version" in keys
     and "roles" in keys
     and "target_files" in keys
@@ -131,6 +166,14 @@ def _semantic_kind(path, value):
     return "canonical_spec"
   if "/reviews/" in path and "schema_version" in keys:
     return "generated_evidence"
+  if "/reviews/" in path:
+    return "generated_evidence"
+  if (
+    "/specs/" in path
+    and name.endswith("-handoff-package.yaml")
+    and {"change_policy", "packages"} <= keys
+  ):
+    return "canonical_spec"
   if (
     ("/specs/" in path or path.startswith("specs/"))
     and ("schema_version" in keys or "version" in keys)
