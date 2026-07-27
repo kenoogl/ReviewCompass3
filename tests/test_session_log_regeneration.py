@@ -168,3 +168,48 @@ def test_regeneration_failure_diagnostic_does_not_include_value(tmp_path):
 
   assert error.value.reason == "SensitiveDataRemaining"
   assert secret not in repr(error.value)
+
+
+def test_regenerates_public_codex_json_stream(tmp_path):
+  raw_root = tmp_path / "raw"
+  raw_log = raw_root / "codex.jsonl"
+  raw_root.mkdir()
+  records = (
+    {
+      "type": "thread.started",
+      "thread_id": "thread-1",
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item-agent",
+        "type": "agent_message",
+        "text": "Done.",
+      },
+    },
+  )
+  raw_log.write_text(
+    "".join(json.dumps(record) + "\n" for record in records),
+    encoding="utf-8",
+  )
+  pipeline = importlib.import_module("tools.session_logs.pipeline")
+  artifact = pipeline.prepare_artifact(
+    raw_log,
+    raw_root=raw_root,
+    rules=(),
+    tool_version="0.0.1",
+  )
+  regeneration = importlib.import_module(
+    "tools.session_logs.regeneration"
+  )
+
+  result = regeneration.regenerate_transcript(
+    artifact.provenance,
+    raw_root=raw_root,
+    stored_text=artifact.text,
+    rules=(),
+    tool_version="0.0.1",
+  )
+
+  assert result.status == "matches"
+  assert result.text == artifact.text
