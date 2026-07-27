@@ -109,3 +109,39 @@ def test_pipeline_fails_closed_when_high_entropy_remains(tmp_path):
     )
 
   assert secret not in repr(error.value)
+
+
+def test_pipeline_prepares_public_codex_json_stream(tmp_path):
+  raw_root = tmp_path / "raw"
+  raw_log = raw_root / "codex.jsonl"
+  raw_root.mkdir()
+  records = (
+    {
+      "type": "thread.started",
+      "thread_id": "thread-1",
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item-agent",
+        "type": "agent_message",
+        "text": "Done.",
+      },
+    },
+  )
+  raw_log.write_text(
+    "".join(json.dumps(record) + "\n" for record in records),
+    encoding="utf-8",
+  )
+  pipeline = importlib.import_module("tools.session_logs.pipeline")
+
+  artifact = pipeline.prepare_artifact(
+    raw_log,
+    raw_root=raw_root,
+    rules=(),
+    tool_version="0.0.1",
+  )
+
+  assert artifact.source_kind == "codex"
+  assert artifact.text == "## assistant\n\nDone.\n"
+  assert artifact.parse_issues == ()

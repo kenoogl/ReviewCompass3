@@ -36,3 +36,18 @@ def test_returns_none_for_unidentified_log(tmp_path):
   source_kind = importlib.import_module("tools.session_logs.source_kind")
 
   assert source_kind.identify_source_kind(raw_log) is None
+
+
+def test_identifies_public_codex_exec_json_stream(tmp_path):
+  raw_log = tmp_path / "codex.jsonl"
+  raw_log.write_text(
+    json.dumps({
+      "type": "thread.started",
+      "thread_id": "0199a213-81c0-7800-8aa1-bbab2a035a53",
+    }) + "\n",
+    encoding="utf-8",
+  )
+
+  source_kind = importlib.import_module("tools.session_logs.source_kind")
+
+  assert source_kind.identify_source_kind(raw_log) == "codex"
