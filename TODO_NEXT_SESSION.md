@@ -141,7 +141,11 @@
 - 修正版4artifact、revision 3、レビュー解決記録をmaterial revision 4へ束縛済み
 - revision 4のmaterial digestは
   `e718154a843dd3813602a43557c212a1c9487c1fccf4c1fa30b02388a307011d`
-- 第3段intentはrevision 4の最終再検証待ち
+- material revision 4を同じ3観点で最終再検証済み
+- 旧3件は解消2件、残存1件。新規1件を加え、統合後はwarning 2件
+- 最終検証はerror 0件、warning 2件、材料不一致・未対応0件
+- 外部送信のHuman承認境界に2件残るため、intent承認候補は未生成
+- 第3段intentはwarning 2件の反映判断待ち
 - 全テスト結果：`302 passed`
 - 作業ツリーは本TODO更新前の時点でクリーン
 - intentは起草中、requirements、designは未着手
@@ -215,7 +219,10 @@ follow_up 0件、未解決0件の`ready`で、台帳47項目は固定source dige
 revision 3の3担当再レビューでは旧7件のうち6件を解消し、1件を残存と判定した。
 残存1件と新規2件はerror 1件、warning 2件へ統合した。利用者の「次へ」に
 基づき3件を推奨方針どおり反映し、固定commitを隔離archiveで直接試験した
-verificationとmaterial revision 4を作成した。現在は最終再検証待ちである。
+verificationとmaterial revision 4を作成した。revision 4の最終再検証では
+旧3件のうち2件を解消し、残存1件と新規1件を
+warning 2件へ統合した。外部送信のHuman承認境界に残るため、現在は
+反映判断待ちであり、第3段の承認候補は未生成である。
 
 ## 完了済み
 
@@ -682,33 +689,34 @@ Task Runtimeの中核概念を反映した。3担当の独立レビューも完�
 7件は推奨方針どおり反映し、material revision 3へ束縛した。
 revision 3の再レビューとtriageも完了し、旧6件を解消、残存1件と
 新規2件を確認した。3件は推奨方針どおり反映し、material revision 4へ束縛した。
+revision 4の最終再検証では旧2件を解消し、外部送信境界のwarning 2件を確認した。
 
-### 1. material revision 4の最終再検証
+### 1. warning 2件の反映判断
 
-- 直近3件の解消、材料SHA-256、material digestを同じ3観点で確認する
-- 隔離archive検証とevidenceの結線を確認する
+- candidate payloadを承認前からidentityへ含め、承認・拒否を状態付きで記録する
+- Provider、endpoint、account、regionを承認対象と送信前一致検査へ含める
 
-### 2. 最終結果のtriage
+### 2. 最終修正と材料更新
 
-- error、warning、担当間競合、材料不一致、未対応を統合する
-- 未解決があれば利用者へ示し、解消済みなら承認候補を作る
+- 採用した2件だけを概念文書へ反映する
+- 修正版を新しい材料revisionとしてrevision 4へ結線する
 
-### 3. 必要な最終修正
+### 3. 最小最終検証とintent承認
 
-- 最終再検証で残った指摘だけを反映する
-- 修正した場合は新しい材料revisionとしてrevision 4へ結線する
+- 2件の解消と材料digestだけを検証する
+- 未解決0件なら利用者のintent承認候補を作る
 
-### 4. intent承認と第4段への移行
+### 4. 第4段への移行
 
 - レビュー反映版を利用者が承認した時点で第3段を完了する
 - 第3段で承認されたintentとエッセンス台帳へ各要件を結線する
 
 ## 次の作業進行
 
-1. material revision 4のartifactとdigestを確認する。
-2. revision 4を同じ3観点で最終再検証する。
-3. 結果をtriageし、未解決がなければ承認候補を作る。
-4. 必要な場合だけ最終修正を行う。
+1. revision 4 final reviewのwarning 2件を確認する。
+2. 利用者が2件の採否を判断する。
+3. 採用指摘を反映し、新しい材料revisionへ束縛する。
+4. 2件だけを最小再検証し、未解決0件ならintent承認候補を作る。
 5. 利用者承認後にだけ第4段へ進む。
 
 ## 完了条件
