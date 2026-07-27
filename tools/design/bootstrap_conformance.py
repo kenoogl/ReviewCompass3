@@ -690,3 +690,129 @@ def validate_commit_blob_claims(
     "evidence_count": len(commit_blob_map),
     "status": "complete",
   }
+
+
+def validate_strict_evidence_backed_bootstrap_conformance(
+  *,
+  records,
+  requirement_design_map,
+  evidence_manifest,
+  commit_blob_map,
+  test_run,
+  gaps,
+  requirement_dependencies,
+  bootstrap_commit,
+  approved_obligation_map,
+  design_component_map,
+  requirement_acceptance_test_map,
+  approved_requirement_dependencies,
+  normalized_test_output,
+  expected_passed_count,
+  repository_root,
+  approved_input_digests,
+  conformant_evidence_obligation_map,
+):
+  if (
+    not isinstance(approved_input_digests, dict)
+    or not approved_input_digests
+    or any(
+      not _text(label)
+      or _DIGEST.fullmatch(digest) is None
+      for label, digest
+      in approved_input_digests.items()
+    )
+  ):
+    raise BootstrapConformanceError(
+      "approved input digests are required"
+    )
+  result = validate_evidence_backed_bootstrap_conformance(
+    records=records,
+    requirement_design_map=requirement_design_map,
+    evidence_manifest=evidence_manifest,
+    commit_blob_map=commit_blob_map,
+    test_run=test_run,
+    gaps=gaps,
+    requirement_dependencies=requirement_dependencies,
+    bootstrap_commit=bootstrap_commit,
+    approved_obligation_map=approved_obligation_map,
+    design_component_map=design_component_map,
+    requirement_acceptance_test_map=(
+      requirement_acceptance_test_map
+    ),
+    approved_requirement_dependencies=(
+      approved_requirement_dependencies
+    ),
+    normalized_test_output=normalized_test_output,
+    expected_passed_count=expected_passed_count,
+    repository_root=repository_root,
+  )
+  if not isinstance(
+    conformant_evidence_obligation_map,
+    dict,
+  ):
+    raise BootstrapConformanceError(
+      "conformant obligation evidence map is required"
+    )
+  conformant_ids = {
+    value["requirement_id"]
+    for value in records
+    if value["classification"] == "conformant"
+  }
+  if set(conformant_evidence_obligation_map) != conformant_ids:
+    raise BootstrapConformanceError(
+      "conformant obligation evidence coverage must be exact"
+    )
+  for requirement_id in conformant_ids:
+    required = {
+      obligation_id
+      for obligation_id, source_requirement_id
+      in approved_obligation_map.items()
+      if source_requirement_id == requirement_id
+    }
+    claimed = set(_unique_texts(
+      conformant_evidence_obligation_map[
+        requirement_id
+      ],
+      "conformant obligation evidence",
+    ))
+    if claimed != required:
+      raise BootstrapConformanceError(
+        "conformant evidence must cover every obligation"
+      )
+  strict_document = {
+    "approved_input_digests": dict(sorted(
+      approved_input_digests.items()
+    )),
+    "base_validation_digest": result.digest,
+    "commit_verification": {
+      "bootstrap_commit": bootstrap_commit,
+      "evidence_count": len(commit_blob_map),
+      "status": "complete",
+    },
+    "conformant_evidence_obligation_map": {
+      requirement_id: sorted(obligation_ids)
+      for requirement_id, obligation_ids
+      in sorted(
+        conformant_evidence_obligation_map.items()
+      )
+    },
+    "normalized_test_output_digest": hashlib.sha256(
+      normalized_test_output.encode("utf-8")
+    ).hexdigest(),
+    "schema_version": 1,
+  }
+  digest = hashlib.sha256(
+    json.dumps(
+      strict_document,
+      ensure_ascii=False,
+      separators=(",", ":"),
+      sort_keys=True,
+    ).encode("utf-8")
+  ).hexdigest()
+  return EvidenceBackedBootstrapConformance(
+    status=result.status,
+    counts=result.counts,
+    gap_count=result.gap_count,
+    evidence_count=result.evidence_count,
+    digest=digest,
+  )

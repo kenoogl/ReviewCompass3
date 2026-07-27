@@ -126,6 +126,8 @@ _TRANSITION_FIELDS = {
 }
 _PROTOCOL_FIELDS = {
   "protocol_id",
+  "initial_states",
+  "expected_states",
   "steps",
 }
 _PROTOCOL_STEP_FIELDS = {
@@ -133,7 +135,9 @@ _PROTOCOL_STEP_FIELDS = {
   "actor_design_id",
   "interface_id",
   "state_machine_id",
+  "from_state",
   "event",
+  "to_state",
   "on_failure",
 }
 _EVENT_ROUTE_FIELDS = {
@@ -362,6 +366,7 @@ def validate_design_architecture(
   boundary_interface_map=None,
   event_routes=(),
   required_interface_fields=None,
+  required_boundary_fields=None,
 ):
   parsed_designs = tuple(designs)
   if not parsed_designs:
@@ -605,6 +610,40 @@ def validate_design_architecture(
           "boundary interface endpoints must match"
         )
       parsed_boundary_map[boundary_id] = resolved_ids
+  if required_boundary_fields is not None:
+    if (
+      boundary_interface_map is None
+      or not isinstance(required_boundary_fields, dict)
+      or set(required_boundary_fields)
+      - set(boundary_ids)
+    ):
+      raise DesignContractError(
+        "required boundary fields must resolve"
+      )
+    for boundary_id, fields in (
+      required_boundary_fields.items()
+    ):
+      required = set(_texts(
+        fields,
+        "required boundary fields",
+      ))
+      available = {
+        field
+        for interface_id
+        in parsed_boundary_map[boundary_id]
+        for field in (
+          *interface_by_id[interface_id][
+            "identity_fields"
+          ],
+          *interface_by_id[interface_id][
+            "payload_fields"
+          ],
+        )
+      }
+      if not required <= available:
+        raise DesignContractError(
+          "boundary contract fields are missing"
+        )
 
   machine_ids = _defined(
     defined_state_machine_ids,
@@ -748,6 +787,8 @@ def validate_design_architecture(
       or set(value) != _PROTOCOL_FIELDS
       or not _text(value["protocol_id"])
       or value["protocol_id"] in protocol_ids
+      or not isinstance(value["initial_states"], dict)
+      or not isinstance(value["expected_states"], dict)
       or not isinstance(value["steps"], (list, tuple))
       or not value["steps"]
     ):
@@ -755,6 +796,31 @@ def validate_design_architecture(
         "protocols require ordered steps"
       )
     protocol_ids.add(value["protocol_id"])
+    initial_states = dict(value["initial_states"])
+    expected_states = dict(value["expected_states"])
+    if (
+      not initial_states
+      or set(initial_states) != set(expected_states)
+      or any(
+        machine_id not in machine_ids
+        or state not in machine_by_id[machine_id][
+          "states"
+        ]
+        for machine_id, state
+        in initial_states.items()
+      )
+      or any(
+        state not in machine_by_id[machine_id][
+          "states"
+        ]
+        for machine_id, state
+        in expected_states.items()
+      )
+    ):
+      raise DesignContractError(
+        "protocol state contracts must resolve"
+      )
+    current_states = dict(initial_states)
     steps = []
     for step in value["steps"]:
       if (
@@ -765,17 +831,57 @@ def validate_design_architecture(
         or step["actor_design_id"] not in design_ids
         or step["interface_id"] not in interface_ids
         or step["state_machine_id"] not in machine_ids
+        or step["state_machine_id"]
+        not in current_states
+        or step["from_state"]
+        != current_states[step["state_machine_id"]]
         or step["event"] not in machine_by_id[
           step["state_machine_id"]
         ]["events"]
+        or step["to_state"] not in machine_by_id[
+          step["state_machine_id"]
+        ]["states"]
         or not _text(step["on_failure"])
       ):
         raise DesignContractError(
           "protocol steps must resolve"
         )
+      interface = interface_by_id[step["interface_id"]]
+      if step["actor_design_id"] not in {
+        interface["provider_design_id"],
+        interface["consumer_design_id"],
+        interface["owner_design_id"],
+      }:
+        raise DesignContractError(
+          "protocol actor must participate in interface"
+        )
+      if not any(
+        transition["from"] == step["from_state"]
+        and transition["event"] == step["event"]
+        and transition["to"] == step["to_state"]
+        for transition in machine_by_id[
+          step["state_machine_id"]
+        ]["transitions"]
+      ):
+        raise DesignContractError(
+          "protocol step must match state transition"
+        )
+      current_states[step["state_machine_id"]] = (
+        step["to_state"]
+      )
       step_ids.add(step["step_id"])
       steps.append(dict(step))
+    if current_states != expected_states:
+      raise DesignContractError(
+        "protocol must reach expected states"
+      )
     parsed_protocols.append({
+      "expected_states": dict(sorted(
+        expected_states.items()
+      )),
+      "initial_states": dict(sorted(
+        initial_states.items()
+      )),
       "protocol_id": value["protocol_id"],
       "steps": tuple(steps),
     })
@@ -784,6 +890,18 @@ def validate_design_architecture(
     "boundary_interface_map": dict(sorted(
       parsed_boundary_map.items()
     )),
+    "required_boundary_fields": (
+      {}
+      if required_boundary_fields is None
+      else dict(sorted(
+        (
+          boundary_id,
+          tuple(fields),
+        )
+        for boundary_id, fields
+        in required_boundary_fields.items()
+      ))
+    ),
     "boundaries": sorted(
       parsed_boundaries,
       key=lambda value: value["boundary_id"],
