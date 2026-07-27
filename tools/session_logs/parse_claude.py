@@ -47,6 +47,7 @@ class ParseIssue:
   kind: str
   line_no: int
   detail: str
+  block_index: int = -1
 
 
 @dataclasses.dataclass(frozen=True)
@@ -71,7 +72,7 @@ def _extract_text(content) -> str:
   return ""
 
 
-def _parse_content(event_id, role, content, line_no) -> tuple:
+def _parse_content(event_id, role, content, line_no, issues) -> tuple:
   if isinstance(content, str):
     return (Event(
       event_id=event_id,
@@ -100,18 +101,36 @@ def _parse_content(event_id, role, content, line_no) -> tuple:
         line_no=line_no,
       ))
     elif block_type == "tool_use":
+      call_id = block.get("id")
+      if not isinstance(call_id, str) or not call_id:
+        issues.append(ParseIssue(
+          kind="incomplete_tool_event",
+          line_no=line_no,
+          detail="missing_call_id",
+          block_index=block_index,
+        ))
+        continue
       events.append(ToolCall(
         event_id=event_id,
-        call_id=block.get("id"),
+        call_id=call_id,
         name=block.get("name"),
         arguments=block.get("input"),
         line_no=line_no,
         block_index=block_index,
       ))
     elif block_type == "tool_result":
+      call_id = block.get("tool_use_id")
+      if not isinstance(call_id, str) or not call_id:
+        issues.append(ParseIssue(
+          kind="incomplete_tool_event",
+          line_no=line_no,
+          detail="missing_call_id",
+          block_index=block_index,
+        ))
+        continue
       events.append(ToolResult(
         event_id=event_id,
-        call_id=block.get("tool_use_id"),
+        call_id=call_id,
         text=_extract_text(block.get("content")),
         is_error=bool(block.get("is_error")),
         line_no=line_no,
@@ -182,6 +201,7 @@ def parse_claude_log(path) -> ParseResult:
       role=role,
       content=message.get("content"),
       line_no=line_no,
+      issues=issues,
     ))
   return ParseResult(events=tuple(events), issues=tuple(issues))
 
