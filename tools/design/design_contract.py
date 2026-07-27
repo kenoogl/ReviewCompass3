@@ -141,6 +141,7 @@ _PROTOCOL_STEP_FIELDS = {
   "event",
   "to_state",
   "on_failure",
+  "failure_expected_states",
 }
 _INTERFACE_ROLES = {
   "input",
@@ -159,6 +160,14 @@ _EVENT_ROUTE_FIELDS = {
   "source_interface_id",
   "target_state_machine_id",
   "event",
+}
+_FAILURE_CORRELATION_FIELDS = {
+  "source_machine_id",
+  "source_from_state",
+  "source_event",
+  "target_machine_id",
+  "target_event",
+  "target_state",
 }
 
 
@@ -382,6 +391,9 @@ def validate_design_architecture(
   required_interface_fields=None,
   required_boundary_fields=None,
   required_protocol_machine_ids=None,
+  required_generated_interface_ids=(),
+  required_failure_state_groups=(),
+  required_failure_correlations=(),
 ):
   parsed_designs = tuple(designs)
   if not parsed_designs:
@@ -549,6 +561,15 @@ def validate_design_architecture(
     value["interface_id"]: value
     for value in parsed_interfaces
   }
+  required_generated_interfaces = set(_texts(
+    required_generated_interface_ids,
+    "required generated interface IDs",
+    empty=True,
+  ))
+  if not required_generated_interfaces <= interface_ids:
+    raise DesignContractError(
+      "required generated interfaces must resolve"
+    )
   if required_interface_fields is not None:
     if (
       not isinstance(required_interface_fields, dict)
@@ -770,6 +791,78 @@ def validate_design_architecture(
     value["machine_id"]: value
     for value in parsed_machines
   }
+  parsed_failure_groups = []
+  for group in required_failure_state_groups:
+    if not isinstance(group, dict) or not group:
+      raise DesignContractError(
+        "required failure state groups must resolve"
+      )
+    parsed_group = {}
+    for machine_id, states in group.items():
+      if machine_id not in machine_ids:
+        raise DesignContractError(
+          "required failure machine must resolve"
+        )
+      parsed_states = _texts(
+        states,
+        "required failure states",
+      )
+      if not set(parsed_states) <= set(
+        machine_by_id[machine_id]["states"]
+      ):
+        raise DesignContractError(
+          "required failure states must resolve"
+        )
+      parsed_group[machine_id] = parsed_states
+    parsed_failure_groups.append(parsed_group)
+
+  parsed_failure_correlations = []
+  for correlation in required_failure_correlations:
+    if (
+      not isinstance(correlation, dict)
+      or set(correlation)
+      != _FAILURE_CORRELATION_FIELDS
+      or correlation["source_machine_id"]
+      not in machine_ids
+      or correlation["target_machine_id"]
+      not in machine_ids
+      or not all(
+        _text(correlation[field])
+        for field in _FAILURE_CORRELATION_FIELDS
+      )
+    ):
+      raise DesignContractError(
+        "required failure correlations must resolve"
+      )
+    source_machine = machine_by_id[
+      correlation["source_machine_id"]
+    ]
+    target_machine = machine_by_id[
+      correlation["target_machine_id"]
+    ]
+    if (
+      not any(
+        transition["from"]
+        == correlation["source_from_state"]
+        and transition["event"]
+        == correlation["source_event"]
+        for transition in source_machine["transitions"]
+      )
+      or not any(
+        transition["event"]
+        == correlation["target_event"]
+        and transition["to"]
+        == correlation["target_state"]
+        for transition in target_machine["transitions"]
+      )
+    ):
+      raise DesignContractError(
+        "required failure correlation transitions "
+        "must resolve"
+      )
+    parsed_failure_correlations.append(
+      dict(correlation)
+    )
 
   parsed_routes = []
   route_ids = set()
@@ -825,6 +918,13 @@ def validate_design_architecture(
       raise DesignContractError(
         "protocol initial interfaces must resolve"
       )
+    if (
+      set(initial_interfaces)
+      & required_generated_interfaces
+    ):
+      raise DesignContractError(
+        "required generated interfaces cannot be initial"
+      )
     initial_states = dict(value["initial_states"])
     expected_states = dict(value["expected_states"])
     if (
@@ -851,6 +951,8 @@ def validate_design_architecture(
       )
     available_interfaces = set(initial_interfaces)
     current_states = dict(initial_states)
+    main_transitions = []
+    failure_transition_vectors = []
     steps = []
     for step in value["steps"]:
       if (
@@ -877,6 +979,10 @@ def validate_design_architecture(
           (list, tuple),
         )
         or not step["on_failure"]
+        or not isinstance(
+          step["failure_expected_states"],
+          dict,
+        )
       ):
         raise DesignContractError(
           "protocol step must resolve: "
@@ -935,6 +1041,7 @@ def validate_design_architecture(
           "protocol step must match state transition"
         )
       failure_states = dict(current_states)
+      failure_transitions = []
       for failure in step["on_failure"]:
         if (
           not isinstance(failure, dict)
@@ -970,13 +1077,96 @@ def validate_design_architecture(
         failure_states[failure["machine_id"]] = (
           failure["to_state"]
         )
+        failure_transitions.append((
+          failure["machine_id"],
+          failure["from_state"],
+          failure["event"],
+          failure["to_state"],
+        ))
+      failure_expected_states = dict(
+        step["failure_expected_states"]
+      )
+      if (
+        set(failure_expected_states)
+        != set(current_states)
+        or any(
+          state not in machine_by_id[machine_id][
+            "states"
+          ]
+          for machine_id, state
+          in failure_expected_states.items()
+        )
+        or failure_states != failure_expected_states
+      ):
+        raise DesignContractError(
+          "protocol failure must reach expected states"
+        )
+      for group in parsed_failure_groups:
+        group_machine_ids = set(group)
+        if group_machine_ids & set(current_states):
+          if (
+            not group_machine_ids <= set(current_states)
+            or any(
+              failure_states[machine_id]
+              not in group[machine_id]
+              for machine_id in group_machine_ids
+            )
+          ):
+            raise DesignContractError(
+              "protocol failure group must terminate"
+            )
+      failure_transition_vectors.append(
+        tuple(failure_transitions)
+      )
       current_states[step["state_machine_id"]] = (
         step["to_state"]
       )
+      main_transitions.append((
+        step["state_machine_id"],
+        step["from_state"],
+        step["event"],
+        step["to_state"],
+      ))
       if step["interface_role"] == "output":
         available_interfaces.add(step["interface_id"])
       step_ids.add(step["step_id"])
       steps.append(dict(step))
+    for correlation in parsed_failure_correlations:
+      source = (
+        correlation["source_machine_id"],
+        correlation["source_from_state"],
+        correlation["source_event"],
+      )
+      target = (
+        correlation["target_machine_id"],
+        correlation["target_event"],
+        correlation["target_state"],
+      )
+      if any(
+        transition[:3] == source
+        for transition in main_transitions
+      ) and not any(
+        transition[0] == target[0]
+        and transition[2] == target[1]
+        and transition[3] == target[2]
+        for transition in main_transitions
+      ):
+        raise DesignContractError(
+          "protocol failure classification must correlate"
+        )
+      for transitions in failure_transition_vectors:
+        if any(
+          transition[:3] == source
+          for transition in transitions
+        ) and not any(
+          transition[0] == target[0]
+          and transition[2] == target[1]
+          and transition[3] == target[2]
+          for transition in transitions
+        ):
+          raise DesignContractError(
+            "protocol failure classification must correlate"
+          )
     if current_states != expected_states:
       raise DesignContractError(
       "protocol must reach expected states"
@@ -994,6 +1184,19 @@ def validate_design_architecture(
       "protocol_id": value["protocol_id"],
       "steps": tuple(steps),
     })
+  generated_interfaces = {
+    step["interface_id"]
+    for protocol in parsed_protocols
+    for step in protocol["steps"]
+    if step["interface_role"] == "output"
+  }
+  if not (
+    required_generated_interfaces
+    <= generated_interfaces
+  ):
+    raise DesignContractError(
+      "required generated interfaces need producers"
+    )
   if required_protocol_machine_ids is not None:
     required_protocol_machines = set(_texts(
       required_protocol_machine_ids,
@@ -1049,6 +1252,24 @@ def validate_design_architecture(
       if required_protocol_machine_ids is None
       else tuple(sorted(required_protocol_machine_ids))
     ),
+    "required_generated_interface_ids": tuple(sorted(
+      required_generated_interfaces
+    )),
+    "required_failure_state_groups": tuple(
+      {
+        machine_id: tuple(states)
+        for machine_id, states in sorted(group.items())
+      }
+      for group in parsed_failure_groups
+    ),
+    "required_failure_correlations": tuple(sorted(
+      parsed_failure_correlations,
+      key=lambda value: (
+        value["source_machine_id"],
+        value["source_from_state"],
+        value["source_event"],
+      ),
+    )),
     "schema_version": 1,
     "state_machines": sorted(
       parsed_machines,
