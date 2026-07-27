@@ -9,6 +9,7 @@ import argparse
 import dataclasses
 import json
 import shlex
+import sys
 from pathlib import Path
 
 from tools.session_logs.cli import run as run_cli
@@ -78,7 +79,7 @@ def _record_hook_event(path, *, phase, result, reason=None):
           sort_keys=True,
         ) + "\n")
   except Exception:
-    pass
+    print("session hook observation failed", file=sys.stderr)
 
 
 def _run_hook(

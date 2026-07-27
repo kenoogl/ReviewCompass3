@@ -27,6 +27,7 @@ class Config:
   backup_root: object
   preservation_ledger_path: object
   summary_revision_range: object
+  hook_event_log_path: object
   preservation_enabled: bool
   tool_version: str
   redaction_rules: tuple
@@ -66,6 +67,7 @@ def _validate_storage_boundaries(config):
     ("transcript_root", config.transcript_root),
     ("sensitive_report_root", config.sensitive_report_root),
     ("backup_root", config.backup_root),
+    ("hook_event_log_path", config.hook_event_log_path),
   )
   for name, path in private_roots:
     if path is not None and _within(path, repository_root):
@@ -87,6 +89,7 @@ def load_config(path) -> Config:
   report_root = data.get("sensitive_report_root")
   backup_root = data.get("backup_root")
   ledger_path = data.get("preservation_ledger_path")
+  hook_event_log_path = data.get("hook_event_log_path")
   config = Config(
     repository_root=(
       _resolve(base, repository_root).resolve()
@@ -113,6 +116,11 @@ def load_config(path) -> Config:
       else None
     ),
     summary_revision_range=data.get("summary_revision_range"),
+    hook_event_log_path=(
+      _resolve(base, hook_event_log_path)
+      if hook_event_log_path is not None
+      else None
+    ),
     preservation_enabled=bool(
       data.get("preservation_enabled", False)
     ),

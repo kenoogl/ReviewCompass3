@@ -10,6 +10,9 @@ import json
 import os
 from pathlib import Path
 
+from tools.session_logs.config import load_config
+from tools.session_logs.hooks import build_hook_commands
+
 
 class HookInstallationError(Exception):
   """フック設定を安全に更新できない。"""
@@ -120,6 +123,34 @@ def install_claude_hooks(
   return HookInstallationResult(
     action="installed" if changed else "unchanged",
     settings_path=path,
+  )
+
+
+def install_configured_claude_hooks(
+  settings_path,
+  *,
+  python_executable,
+  config_path,
+) -> HookInstallationResult:
+  try:
+    config = load_config(config_path)
+  except Exception as error:
+    raise HookInstallationError(
+      "Cannot load configured hooks"
+    ) from error
+  if config.hook_event_log_path is None:
+    raise HookInstallationError(
+      "Hook observation path is not configured"
+    )
+  commands = build_hook_commands(
+    python_executable,
+    config_path,
+    event_log_path=config.hook_event_log_path,
+  )
+  return install_claude_hooks(
+    settings_path,
+    start_command=commands.start,
+    end_command=commands.end,
   )
 
 
