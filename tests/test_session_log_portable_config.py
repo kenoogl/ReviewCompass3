@@ -114,3 +114,104 @@ def test_rejects_relative_raw_or_override_paths():
       overrides={"state_root": "relative-state"},
       tool_version="0.0.1",
     )
+
+
+def test_init_config_cli_dry_run_and_idempotent_install(
+  tmp_path,
+  monkeypatch,
+  capsys,
+):
+  deployment_paths = importlib.import_module(
+    "tools.session_logs.deployment_paths"
+  )
+
+  class FakePlatformDirs:
+    user_config_path = tmp_path / "config"
+    user_data_path = tmp_path / "data"
+    user_state_path = tmp_path / "state"
+    user_log_path = tmp_path / "log"
+    user_cache_path = tmp_path / "cache"
+
+  monkeypatch.setattr(
+    deployment_paths,
+    "_default_platform_dirs_factory",
+    lambda **_arguments: FakePlatformDirs(),
+  )
+  raw_root = tmp_path / "raw"
+  raw_root.mkdir()
+  config_file = tmp_path / "config" / "session-logs.json"
+  entry = importlib.import_module("tools.session_logs.entry")
+  arguments = (
+    "init-config",
+    "--raw-root",
+    str(raw_root),
+    "--tool-version",
+    "0.0.1",
+  )
+
+  assert entry.run((*arguments, "--dry-run")) == 0
+  assert json.loads(capsys.readouterr().out) == {
+    "action": "planned",
+    "status": "ok",
+  }
+  assert not config_file.exists()
+
+  assert entry.run(arguments) == 0
+  assert json.loads(capsys.readouterr().out) == {
+    "action": "installed",
+    "status": "ok",
+  }
+  assert config_file.is_file()
+
+  assert entry.run(arguments) == 0
+  assert json.loads(capsys.readouterr().out) == {
+    "action": "unchanged",
+    "status": "ok",
+  }
+
+
+def test_init_config_cli_preserves_different_existing_file(
+  tmp_path,
+  monkeypatch,
+  capsys,
+):
+  deployment_paths = importlib.import_module(
+    "tools.session_logs.deployment_paths"
+  )
+
+  class FakePlatformDirs:
+    user_config_path = tmp_path / "config"
+    user_data_path = tmp_path / "data"
+    user_state_path = tmp_path / "state"
+    user_log_path = tmp_path / "log"
+    user_cache_path = tmp_path / "cache"
+
+  monkeypatch.setattr(
+    deployment_paths,
+    "_default_platform_dirs_factory",
+    lambda **_arguments: FakePlatformDirs(),
+  )
+  raw_root = tmp_path / "raw"
+  raw_root.mkdir()
+  config_file = tmp_path / "config" / "session-logs.json"
+  config_file.parent.mkdir()
+  config_file.write_text('{"keep": true}\n', encoding="utf-8")
+  entry = importlib.import_module("tools.session_logs.entry")
+
+  assert entry.run((
+    "init-config",
+    "--raw-root",
+    str(raw_root),
+    "--tool-version",
+    "0.0.1",
+  )) == 5
+
+  output = capsys.readouterr().out
+  assert json.loads(output) == {
+    "action": "preserved",
+    "status": "error",
+  }
+  assert config_file.read_text(encoding="utf-8") == (
+    '{"keep": true}\n'
+  )
+  assert str(tmp_path) not in output
