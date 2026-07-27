@@ -10,6 +10,7 @@ import plistlib
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 
 def test_installs_and_uninstalls_owned_launchd_schedule_idempotently(
@@ -162,3 +163,115 @@ def test_scheduled_command_runs_outside_repository_cwd(tmp_path):
   assert (
     tmp_path / "private-backup" / "session.jsonl"
   ).read_bytes() == raw_log.read_bytes()
+
+
+def test_launchd_activation_reports_running_and_stopped_idempotently(
+  tmp_path,
+):
+  scheduler = importlib.import_module("tools.session_logs.scheduler")
+  plist_path = tmp_path / "LaunchAgents" / "session-logs.plist"
+  scheduler.install_launchd_schedule(
+    plist_path,
+    python_executable="/usr/bin/python3",
+    config_path=tmp_path / "session-logs.json",
+    interval_seconds=60,
+    stdout_path=tmp_path / "stdout.log",
+    stderr_path=tmp_path / "stderr.log",
+  )
+  running = False
+  commands = []
+
+  def fake_run(command, **_kwargs):
+    nonlocal running
+    commands.append(command)
+    if command[1] == "print":
+      return SimpleNamespace(returncode=0 if running else 1)
+    if command[1] == "bootstrap":
+      running = True
+      return SimpleNamespace(returncode=0)
+    if command[1] == "bootout":
+      running = False
+      return SimpleNamespace(returncode=0)
+    raise AssertionError("unexpected launchctl command")
+
+  activated = scheduler.activate_launchd_schedule(
+    plist_path,
+    uid=501,
+    runner=fake_run,
+  )
+  repeated = scheduler.activate_launchd_schedule(
+    plist_path,
+    uid=501,
+    runner=fake_run,
+  )
+  stopped = scheduler.deactivate_launchd_schedule(
+    plist_path,
+    uid=501,
+    runner=fake_run,
+  )
+  repeated_stop = scheduler.deactivate_launchd_schedule(
+    plist_path,
+    uid=501,
+    runner=fake_run,
+  )
+
+  assert activated == scheduler.ActivationResult(
+    action="activated",
+    status="running",
+  )
+  assert repeated == scheduler.ActivationResult(
+    action="unchanged",
+    status="running",
+  )
+  assert stopped == scheduler.ActivationResult(
+    action="deactivated",
+    status="stopped",
+  )
+  assert repeated_stop == scheduler.ActivationResult(
+    action="unchanged",
+    status="stopped",
+  )
+  assert commands[0] == [
+    "/bin/launchctl",
+    "print",
+    "gui/501/com.reviewcompass.session-log-preservation",
+  ]
+  assert commands[1] == [
+    "/bin/launchctl",
+    "bootstrap",
+    "gui/501",
+    str(plist_path),
+  ]
+
+
+def test_launchd_activation_failure_is_safe_and_value_free(tmp_path):
+  scheduler = importlib.import_module("tools.session_logs.scheduler")
+  plist_path = tmp_path / "LaunchAgents" / "session-logs.plist"
+  scheduler.install_launchd_schedule(
+    plist_path,
+    python_executable="/usr/bin/python3",
+    config_path=tmp_path / "session-logs.json",
+    interval_seconds=60,
+    stdout_path=tmp_path / "stdout.log",
+    stderr_path=tmp_path / "stderr.log",
+  )
+
+  def failing_run(command, **_kwargs):
+    return SimpleNamespace(
+      returncode=1 if command[1] == "print" else 5,
+      stdout="private launchctl output",
+      stderr="private launchctl error",
+    )
+
+  result = scheduler.activate_launchd_schedule(
+    plist_path,
+    uid=501,
+    runner=failing_run,
+  )
+
+  assert result == scheduler.ActivationResult(
+    action="failed",
+    status="stopped",
+    reason="exit_code_5",
+  )
+  assert "private launchctl" not in repr(result)
