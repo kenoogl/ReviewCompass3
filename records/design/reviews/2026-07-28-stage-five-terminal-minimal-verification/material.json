@@ -1,0 +1,102 @@
+{
+  "material_digest": "c4983794f2e7cc7aa4603ac94a4eeeeef52a73a51f9e938ed6d86b89cdd57588",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "records/requirements/requirement-boundary-relations.json",
+        "sha256": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e"
+      },
+      {
+        "path": "records/requirements/obligation-source-trace.json",
+        "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7"
+      },
+      {
+        "path": "docs/design/2026-07-28-reviewcompass3-design.md",
+        "sha256": "f250cf6bf91afd1e7c786952a1fb9c9530ccac2a51ef14b34172f5be65ccd8b5"
+      },
+      {
+        "path": "records/design/stage-five-design.json",
+        "sha256": "29ed55927061c9991ec7bbad3f03c929214527b653979d3453c9bbd7eb499c4f"
+      },
+      {
+        "path": "records/design/stage-five-architecture-integrity.json",
+        "sha256": "8b7e7666fd1918a4da0981e22fa274fa62e77f0b96ec7c47fd4aac09cac77f2a"
+      },
+      {
+        "path": "docs/design/2026-07-28-bootstrap-conformance-audit.md",
+        "sha256": "e63db43c07647961c8df9b370b521629aac26ac3ca8745408852f3648c5858d0"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-audit.json",
+        "sha256": "5f3cde65775ef1f80b234d2c599aae9b752f324d6e91ec0a5b2ce0d536f70219"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-integrity.json",
+        "sha256": "e0cb6a3382a45d41cf0f0f928a797549be6bda6488cf760f7ad0a5dc30da8220"
+      },
+      {
+        "path": "tools/design/design_contract.py",
+        "sha256": "4678b9e16a5e4b02b3e065ab69c94ffacc10a975986c2d0c238039ea02ad3792"
+      },
+      {
+        "path": "tools/design/bootstrap_conformance.py",
+        "sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+      },
+      {
+        "path": "tests/test_design_contract.py",
+        "sha256": "c766e2f55247642c9b8bd44b2abfd0698bca98894de455b7c1b23addb4bb5416"
+      },
+      {
+        "path": "tests/test_bootstrap_conformance.py",
+        "sha256": "2a282d032d26a2719832e650ccd605ba4e697eaf8226d79d7e010f7116faadbb"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-acceptance-verification/material.json",
+        "sha256": "05508368a1bd09c823d0350d7eb6326932bdbe4c654cd33cbc93e3615fc8fb72"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-acceptance-verification/scope-review.json",
+        "sha256": "bbe3269425c66f9cc89cd7512df6984e89c432b0ee25fcd25c1beafee77324b1"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-acceptance-verification/task-runtime-review.json",
+        "sha256": "73d24683fe19c25f50b273bba00828249976c128e6adc16b44615f5d6d11f329"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-acceptance-verification/adversarial-review.json",
+        "sha256": "dab66150d3e072a8e3be49e9f998c7b3c7c73a94ec949d5abd6e85d39a8756b5"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-acceptance-verification/triage.json",
+        "sha256": "99b41df7f2421e791580991089cb641ab5fc9eb3ef88fa488787d5d1e49fc3de"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-acceptance-verification/review-resolution.json",
+        "sha256": "5262f3c3b366a7c07afb1632f67f07a8e40061d403f1bc926adf28fc9bd48f85"
+      }
+    ],
+    "criteria": [
+      "final acceptance verificationの1 findingが解決済みである",
+      "正常protocolはCapture結果、Validation候補、Validation結果を生成後に消費する",
+      "dispatch・Capture・Validation失敗はfailedまたはirrecoverable Run結果を介してWorkflow blockedへ伝播する",
+      "Capture失敗は診断保存可能、隔離、raw・診断保存不能を別protocolで分類する",
+      "validatorはproducer-before-consumerと失敗状態ベクトルを機械検証する",
+      "既承認23境界、29 interface、8状態機械、14 protocol、28 event routeが機械検証される",
+      "開始・retry失敗と成功Run結果が生成後にWorkflowへ渡る",
+      "内部生成必須interfaceをinitialへ偽装できない",
+      "Capture局所分類とRun終端分類の相関が機械検証される",
+      "失敗branch内でRun結果outputがWorkflow inputより先にある",
+      "失敗専用protocol主経路もRun・Workflow失敗終端へ到達する",
+      "成功Run結果生成失敗はRun failedへ到達する",
+      "Run結果output→Workflow input handoff自体が必須検証される",
+      "strict監査と392現行テストが通過する"
+    ],
+    "review_roles": [
+      "design_scope_and_boundary",
+      "task_runtime_design",
+      "adversarial_conformance"
+    ]
+  },
+  "status": "fixed",
+  "record_version": 1
+}
