@@ -171,3 +171,70 @@ def test_classifies_versioned_review_observations_and_scoped_approvals():
       "generated_evidence",
     ),
   )
+
+
+def test_classifies_workflow_state_contracts_and_structured_raw_results():
+  structured = importlib.import_module(
+    "tools.extraction.structured_materials"
+  )
+  documents = {
+    "source:.reviewcompass/specs/analysis/spec.json": (
+      '{"feature_name":"analysis","workflow_state":"design"}'
+    ),
+    "source:.reviewcompass/specs/f/reviews/run/"
+    "limited-intake-contract.yaml": (
+      "schema_version: v1\n"
+      "required_claim_ids: [claim-1]\n"
+      "reviewed_target: requirements.md\n"
+    ),
+    "source:.reviewcompass/specs/f/reviews/run/"
+    "variant-role-assignment.yaml": (
+      "schema_version: v1\n"
+      "roles: [primary, judgment]\n"
+      "variant: limited\n"
+    ),
+    "source:.reviewcompass/specs/f/reviews/run/raw/judgment.yaml": (
+      "role: judgment\n"
+      "final_findings: []\n"
+      "review_completion: complete\n"
+    ),
+    "source:.reviewcompass/specs/f/reviews/run/raw/provider.raw.yaml": (
+      "provider: test\n"
+      "model: model\n"
+      "response_text: value\n"
+    ),
+  }
+
+  result = structured.classify_structured_materials(
+    documents,
+    _provenance(documents),
+  )
+
+  assert result.status == "complete"
+  assert tuple(
+    (item.identifier, item.kind)
+    for item in result.items
+  ) == (
+    (
+      "source:.reviewcompass/specs/analysis/spec.json",
+      "state",
+    ),
+    (
+      "source:.reviewcompass/specs/f/reviews/run/"
+      "limited-intake-contract.yaml",
+      "canonical_spec",
+    ),
+    (
+      "source:.reviewcompass/specs/f/reviews/run/raw/judgment.yaml",
+      "generated_evidence",
+    ),
+    (
+      "source:.reviewcompass/specs/f/reviews/run/raw/provider.raw.yaml",
+      "raw_response",
+    ),
+    (
+      "source:.reviewcompass/specs/f/reviews/run/"
+      "variant-role-assignment.yaml",
+      "canonical_spec",
+    ),
+  )
