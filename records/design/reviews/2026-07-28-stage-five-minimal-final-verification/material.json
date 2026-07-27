@@ -1,0 +1,155 @@
+{
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "scope": "material_payload"
+  },
+  "material_digest": "509d759c5b43560e6c7390dde0b73de1ca7b1975a68bcfccf18172f7f5b232f4",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+        "role": "minimal_final_material",
+        "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+      },
+      {
+        "path": "records/requirements/review-context-batch-0001.json",
+        "role": "minimal_final_material",
+        "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+      },
+      {
+        "path": "records/requirements/remaining-batches-0002-0009.json",
+        "role": "minimal_final_material",
+        "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+      },
+      {
+        "path": "records/requirements/requirement-boundary-relations.json",
+        "role": "minimal_final_material",
+        "sha256": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e"
+      },
+      {
+        "path": "records/requirements/obligation-source-trace.json",
+        "role": "minimal_final_material",
+        "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7"
+      },
+      {
+        "path": "records/design/stage-five-entry.json",
+        "role": "minimal_final_material",
+        "sha256": "e6dc3abbb5ab6e33320ba7df81705ab61cce6afb9c77d5c38cc8d4fe3264beec"
+      },
+      {
+        "path": "docs/design/2026-07-28-reviewcompass3-design.md",
+        "role": "minimal_final_material",
+        "sha256": "379f59f186ad6ee613c04f81a2405815749ab543852180e00da6c8cd1adf7014"
+      },
+      {
+        "path": "records/design/stage-five-design.json",
+        "role": "minimal_final_material",
+        "sha256": "9a300744e658f68bd2b9fdb014112c3922f2d5e2fd8f81b2baa5b0a54583c363"
+      },
+      {
+        "path": "records/design/stage-five-architecture-integrity.json",
+        "role": "minimal_final_material",
+        "sha256": "3b0d1abf8358d718273754e5793a5bdaa8241c2e23b85fdf66e6c0a670937d3b"
+      },
+      {
+        "path": "docs/design/2026-07-28-bootstrap-conformance-audit.md",
+        "role": "minimal_final_material",
+        "sha256": "e63db43c07647961c8df9b370b521629aac26ac3ca8745408852f3648c5858d0"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-audit.json",
+        "role": "minimal_final_material",
+        "sha256": "229106a6a2615319f20586ecad3888c20139e4c581c1e21e340278776f66de33"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-integrity.json",
+        "role": "minimal_final_material",
+        "sha256": "41ec545b1c2d860cef0ada4e4ba630ebbf12261e88f6e5b3b139b33497183b69"
+      },
+      {
+        "path": "tools/design/design_contract.py",
+        "role": "minimal_final_material",
+        "sha256": "aede36ae0545d3107e11c4f499fd4c4e5327597bb82abb032387cefce72993fb"
+      },
+      {
+        "path": "tools/design/bootstrap_conformance.py",
+        "role": "minimal_final_material",
+        "sha256": "7ae5b61772db56a774f8890eaab0052a18793253204172eeba09415c16b19ba3"
+      },
+      {
+        "path": "tests/test_design_contract.py",
+        "role": "minimal_final_material",
+        "sha256": "fbf8f890b897b42ba302bbfda7c4084d65ef8967638027a0ab605c04498bb95f"
+      },
+      {
+        "path": "tests/test_bootstrap_conformance.py",
+        "role": "minimal_final_material",
+        "sha256": "32e49280c68187205016c5d5721a0706711e0dfefa5828426fd97eeba7e97326"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-review/review-resolution.json",
+        "role": "minimal_final_material",
+        "sha256": "7ad2d7376add10bc510be514bda5bb499d0733bf12de8f08bc2ab3b041f1be1d"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-rereview/review-resolution.json",
+        "role": "minimal_final_material",
+        "sha256": "b4c6c176f4699de9710daf985267cf9185a3f72c3eddc111eaef846835e274c3"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-rereview/material.json",
+        "role": "minimal_final_material",
+        "sha256": "dc197e567aefe9a06e30a3640d3ba9d35b3994debdb0462afbf574e70aeae8d6"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-rereview/scope-review.json",
+        "role": "minimal_final_material",
+        "sha256": "3feda33d769fe5b2bc40fa6e8da1ecd7e07bc29d3e09434edcf451dac7a668c8"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-rereview/task-runtime-review.json",
+        "role": "minimal_final_material",
+        "sha256": "38f9125b84bd19fea519fd01c0ce62f12c28923b22ecdfc4471fecdd5ad0b984"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-rereview/adversarial-review.json",
+        "role": "minimal_final_material",
+        "sha256": "7c2372d4d91a15d6d6b53299672de824c1e922cb27df41de419e10083078ccea"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-rereview/triage.json",
+        "role": "minimal_final_material",
+        "sha256": "a0ce21a35e77b4fefff8c836f0314e47645aab6989c4953315aaa4f547f0892f"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-rereview/review-resolution.json",
+        "role": "minimal_final_material",
+        "sha256": "59e65919a0adc21dc201fb08e1f487937c1856e7b8abac1e931811d164ab6269"
+      }
+    ],
+    "criteria": [
+      "全40件の初回・再レビューfindingが解決済みである",
+      "25 interfaceが23承認境界と全段間経路を閉じる",
+      "pre不合格はFinal FindingなしでRun・Workflow終端へ到達する",
+      "正常系はTrace→Run、Run結果→Workflow待機、Trace→Workflowの順で完了する",
+      "初回とretryの各外部送信がpayload・Provider・送信先・承認者・権限・期限へ束縛される",
+      "6 protocolが7状態機械の開始状態から期待終了状態まで機械シミュレートされる",
+      "Portable→Contextの原子的書込み・再読込・復旧・分類・access・retention・削除契約が必須である",
+      "改善周期が専用状態機械で評価・比較・Human承認・提案の順に進む",
+      "strict監査が464義務・design component・37受け入れ試験・11依存・61 commit blob・361試験観測を必須入力としてDigest化する",
+      "bootstrap分類はadapt 28、replace 4、defer 5、conformant 0で過大評価がない",
+      "現行385テストが通過する"
+    ],
+    "review_roles": [
+      "design_scope_and_boundary",
+      "task_runtime_design",
+      "adversarial_conformance"
+    ]
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "fixed"
+}
