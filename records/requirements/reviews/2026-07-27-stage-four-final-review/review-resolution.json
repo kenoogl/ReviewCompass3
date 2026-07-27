@@ -1,0 +1,31 @@
+{
+  "material_digest": "888c141f13e0a6ddec637d62393d70d7dd6c4f3852ecd4bf6b3a132ace5ccbeb",
+  "resolution_count": 12,
+  "resolved_finding_count": 16,
+  "remaining_count": 0,
+  "result": {
+    "feature_count": 9,
+    "requirement_count": 37,
+    "essence_count": 47,
+    "obligation_count": 296,
+    "uncovered_essence_count": 0,
+    "uncovered_obligation_count": 0
+  },
+  "changed_artifacts": [
+    "docs/requirements/review-context-requirements.md",
+    "docs/requirements/remaining-feature-requirements.md",
+    "records/requirements/review-context-batch-0001.json",
+    "records/requirements/remaining-batches-0002-0009.json",
+    "records/requirements/obligation-trace-policy.json",
+    "records/requirements/obligation-source-trace.json",
+    "records/requirements/requirement-boundary-relations.json",
+    "records/requirements/requirements-coverage-audit.json",
+    "tools/requirements/source_trace.py"
+  ],
+  "verification": {
+    "declared_hashes": "match",
+    "requirement_contract_tests": "33 passed",
+    "status": "ready_for_fixed_material_rereview"
+  },
+  "status": "resolved"
+}

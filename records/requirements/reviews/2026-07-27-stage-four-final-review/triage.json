@@ -1,0 +1,81 @@
+{
+  "material_digest": "888c141f13e0a6ddec637d62393d70d7dd6c4f3852ecd4bf6b3a132ace5ccbeb",
+  "finding_count": 16,
+  "adopted_count": 16,
+  "rejected_count": 0,
+  "groups": [
+    {
+      "finding_ids": ["SFBF-001", "ATF-002"],
+      "resolution_id": "STAGE4-RES-001",
+      "disposition": "adopted",
+      "reason": "影響候補母集合の生成とScope分類を分離して追加する"
+    },
+    {
+      "finding_ids": ["TRF-001"],
+      "resolution_id": "STAGE4-RES-002",
+      "disposition": "adopted",
+      "reason": "Task入力から最終FindingまでのOperational Provenanceを追加する"
+    },
+    {
+      "finding_ids": ["ATF-001"],
+      "resolution_id": "STAGE4-RES-003",
+      "disposition": "adopted",
+      "reason": "296義務へ安定IDと個別source relationを追加し機械検査する"
+    },
+    {
+      "finding_ids": ["ATF-003", "ATF-004", "ATF-005", "SFBF-003"],
+      "resolution_id": "STAGE4-RES-004",
+      "disposition": "adopted",
+      "reason": "Portableを共有保存境界としraw、session、Contextの依存関係を固定する"
+    },
+    {
+      "finding_ids": ["TRF-002"],
+      "resolution_id": "STAGE4-RES-005",
+      "disposition": "adopted",
+      "reason": "WorkflowをRun開始許可、HarnessをRun内部状態の正本とする"
+    },
+    {
+      "finding_ids": ["TRF-003"],
+      "resolution_id": "STAGE4-RES-006",
+      "disposition": "adopted",
+      "reason": "承認者identityと権限を外部送信identityへ追加する"
+    },
+    {
+      "finding_ids": ["TRF-004"],
+      "resolution_id": "STAGE4-RES-007",
+      "disposition": "adopted",
+      "reason": "Review Task入力を正本どおり7項目へ一致させる"
+    },
+    {
+      "finding_ids": ["SFBF-002"],
+      "resolution_id": "STAGE4-RES-008",
+      "disposition": "adopted",
+      "reason": "Harnessの観測記録をEvaluationの解釈へ渡す依存関係を明示する"
+    },
+    {
+      "finding_ids": ["SFBF-004"],
+      "resolution_id": "STAGE4-RES-009",
+      "disposition": "adopted",
+      "reason": "ReviewCompass3自身への通常契約適用を受け入れ要件にする"
+    },
+    {
+      "finding_ids": ["ATF-006"],
+      "resolution_id": "STAGE4-RES-010",
+      "disposition": "adopted",
+      "reason": "形式復旧を閉じた機械変換またはHuman裁定へ限定する"
+    },
+    {
+      "finding_ids": ["ATF-007"],
+      "resolution_id": "STAGE4-RES-011",
+      "disposition": "adopted",
+      "reason": "必須義務の非採用を禁止し、限定義務の非採用をHuman判断へ束縛する"
+    },
+    {
+      "finding_ids": ["ATF-008"],
+      "resolution_id": "STAGE4-RES-012",
+      "disposition": "adopted",
+      "reason": "完了markerという設計指定を耐久的確定の外部保証へ置換する"
+    }
+  ],
+  "status": "complete"
+}
