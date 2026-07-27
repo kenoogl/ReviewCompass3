@@ -126,6 +126,7 @@ _TRANSITION_FIELDS = {
 }
 _PROTOCOL_FIELDS = {
   "protocol_id",
+  "initial_interfaces",
   "initial_states",
   "expected_states",
   "steps",
@@ -815,6 +816,15 @@ def validate_design_architecture(
         "protocols require ordered steps"
       )
     protocol_ids.add(value["protocol_id"])
+    initial_interfaces = _texts(
+      value["initial_interfaces"],
+      "protocol initial interfaces",
+      empty=True,
+    )
+    if not set(initial_interfaces) <= interface_ids:
+      raise DesignContractError(
+        "protocol initial interfaces must resolve"
+      )
     initial_states = dict(value["initial_states"])
     expected_states = dict(value["expected_states"])
     if (
@@ -839,6 +849,7 @@ def validate_design_architecture(
       raise DesignContractError(
         "protocol state contracts must resolve"
       )
+    available_interfaces = set(initial_interfaces)
     current_states = dict(initial_states)
     steps = []
     for step in value["steps"]:
@@ -901,6 +912,17 @@ def validate_design_architecture(
         raise DesignContractError(
           "protocol interface role must match owner"
         )
+      if (
+        step["interface_role"] in {
+          "input",
+          "internal_evidence",
+        }
+        and step["interface_id"]
+        not in available_interfaces
+      ):
+        raise DesignContractError(
+          "protocol interface must be produced before use"
+        )
       if not any(
         transition["from"] == step["from_state"]
         and transition["event"] == step["event"]
@@ -912,11 +934,17 @@ def validate_design_architecture(
         raise DesignContractError(
           "protocol step must match state transition"
         )
+      failure_states = dict(current_states)
       for failure in step["on_failure"]:
         if (
           not isinstance(failure, dict)
           or set(failure) != _FAILURE_BRANCH_FIELDS
           or failure["machine_id"] not in machine_ids
+          or failure["machine_id"]
+          not in failure_states
+          or failure["from_state"] != failure_states[
+            failure["machine_id"]
+          ]
           or failure["from_state"] not in machine_by_id[
             failure["machine_id"]
           ]["states"]
@@ -939,9 +967,14 @@ def validate_design_architecture(
           raise DesignContractError(
             "protocol failure branch must match transition"
           )
+        failure_states[failure["machine_id"]] = (
+          failure["to_state"]
+        )
       current_states[step["state_machine_id"]] = (
         step["to_state"]
       )
+      if step["interface_role"] == "output":
+        available_interfaces.add(step["interface_id"])
       step_ids.add(step["step_id"])
       steps.append(dict(step))
     if current_states != expected_states:
@@ -951,6 +984,9 @@ def validate_design_architecture(
     parsed_protocols.append({
       "expected_states": dict(sorted(
         expected_states.items()
+      )),
+      "initial_interfaces": tuple(sorted(
+        initial_interfaces
       )),
       "initial_states": dict(sorted(
         initial_states.items()
