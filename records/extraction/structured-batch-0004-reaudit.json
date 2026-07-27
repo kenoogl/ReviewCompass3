@@ -1,0 +1,93 @@
+{
+  "audit": {
+    "approval_candidate": null,
+    "covered_count": 1090,
+    "digest": "3b3cbd267cc427a874a39af74d356915fca3f64de5eab07e2a6e793343725bd8",
+    "newly_covered_count": 250,
+    "prior_covered_count": 840,
+    "status": "blocked",
+    "uncovered_count": 17602,
+    "unresolved_count": 17605
+  },
+  "batch": {
+    "candidate_count": 250,
+    "candidate_digest": "40149a534ccc4399cfafbc9e253b0f864a7305a96ad434d0fa59b521e16c750d",
+    "classification_digest": "44ce5fa828f9af5f44f35c935cd5f1e90f9fcae04f1c5a89c2e6fc371598640b",
+    "classification_kind_counts": {
+      "canonical_spec": 4,
+      "generated_evidence": 246
+    },
+    "classification_status": "complete",
+    "extracted_count": 0,
+    "identifier": "structured_materials-0004",
+    "merge_target_counts": {
+      "ESS-0005": 24,
+      "ESS-0022": 85,
+      "ESS-0023": 6,
+      "ESS-0024": 35,
+      "ESS-0025": 51,
+      "ESS-0026": 2,
+      "ESS-0027": 37,
+      "ESS-0028": 8,
+      "ESS-0029": 2
+    },
+    "merged_count": 250,
+    "not_selected_count": 0,
+    "resolution_digest": "dba7b1b41a75928f886fdfb5b8f01609066235fe8db311c02a2ce5b2e5fcd142",
+    "status": "complete"
+  },
+  "design_decision": {
+    "approval_candidate": {
+      "approved": false,
+      "material_digest": "f95a1d3485e86ac8e7f239012dba738492387c44476d6b132e9641b275213745",
+      "selected_disposition": null,
+      "target_id": "ESS-0012"
+    },
+    "digest": "f95a1d3485e86ac8e7f239012dba738492387c44476d6b132e9641b275213745",
+    "identifier": "ESS-0012",
+    "selected_disposition": null,
+    "status": "awaiting_user_review"
+  },
+  "fixed_sources": [
+    {
+      "commit": "35ef8d4cc66b9a00aca9c6da10b645837b06564b",
+      "repository": "ReviewCompass"
+    },
+    {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "repository": "ReviewCompass2"
+    }
+  ],
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "priority_plan_digest": "9c9374c2bc3eb74e8dda0ec046a624d5800398df1069aa870c11f6101ac78602",
+  "promotion_required": true,
+  "reassessments": [
+    {
+      "agreed_count": 250,
+      "batch_identifier": "structured_materials-0003",
+      "conflict_count": 0,
+      "digest": "79f7f9f9dd312ee99c7c6cfbfbc28438569a6925403ce0a4cdfe2ec672f02217",
+      "material_digest": "9885af54f9955413a23f4d4452e770dedd75112256ea92ece60f9fe2c826ac03",
+      "paths": [
+        "main",
+        "independent"
+      ],
+      "status": "complete"
+    },
+    {
+      "agreed_count": 250,
+      "batch_identifier": "structured_materials-0004",
+      "conflict_count": 0,
+      "digest": "e5dcb7bc30edaf383411594d2fe58bae34a94782a1ee1a36c4812e528b474026",
+      "material_digest": "44ce5fa828f9af5f44f35c935cd5f1e90f9fcae04f1c5a89c2e6fc371598640b",
+      "paths": [
+        "main",
+        "independent"
+      ],
+      "status": "complete"
+    }
+  ],
+  "record_version": 1,
+  "status": "blocked"
+}
