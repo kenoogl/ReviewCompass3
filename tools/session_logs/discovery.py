@@ -18,5 +18,5 @@ def discover_raw_logs(root) -> tuple:
   return tuple(sorted(
     path.relative_to(root_path).as_posix()
     for path in root_path.rglob("*.jsonl")
-    if path.is_file()
+    if path.is_file() and not path.is_symlink()
   ))
