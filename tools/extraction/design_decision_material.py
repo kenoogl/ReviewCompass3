@@ -34,6 +34,19 @@ class DesignDecisionMaterial:
   digest: str
 
 
+@dataclasses.dataclass(frozen=True)
+class DesignDecisionSelection:
+  status: str
+  identifier: str
+  selected_disposition: str
+  destination: object
+  statement: str
+  rationale: str
+  evidence: tuple
+  material_digest: str
+  digest: str
+
+
 _DISPOSITIONS = frozenset({"transfer", "redesign", "reject"})
 _FIELDS = {
   "disposition",
@@ -142,5 +155,61 @@ def build_design_decision_material(
       "selected_disposition": None,
       "target_id": identifier,
     },
+    digest=digest,
+  )
+
+
+def select_design_decision(material, approval):
+  if (
+    not isinstance(material, DesignDecisionMaterial)
+    or material.status != "awaiting_user_review"
+    or material.selected_disposition is not None
+    or not isinstance(approval, dict)
+    or set(approval) != {
+      "approved",
+      "material_digest",
+      "selected_disposition",
+      "target_id",
+    }
+    or approval["approved"] is not True
+    or approval["material_digest"] != material.digest
+    or approval["target_id"] != material.identifier
+  ):
+    raise DesignDecisionMaterialError(
+      "selection requires matching explicit approval"
+    )
+  by_disposition = {
+    option.disposition: option
+    for option in material.options
+  }
+  selected = by_disposition.get(
+    approval["selected_disposition"]
+  )
+  if selected is None:
+    raise DesignDecisionMaterialError(
+      "selected disposition must be a material option"
+    )
+  document = {
+    "approval": dict(approval),
+    "identifier": material.identifier,
+    "material_digest": material.digest,
+    "selected_option": dataclasses.asdict(selected),
+    "schema_version": 1,
+  }
+  digest = hashlib.sha256(json.dumps(
+    document,
+    ensure_ascii=False,
+    separators=(",", ":"),
+    sort_keys=True,
+  ).encode()).hexdigest()
+  return DesignDecisionSelection(
+    status="resolved",
+    identifier=material.identifier,
+    selected_disposition=selected.disposition,
+    destination=selected.destination,
+    statement=selected.statement,
+    rationale=selected.rationale,
+    evidence=selected.evidence,
+    material_digest=material.digest,
     digest=digest,
   )
