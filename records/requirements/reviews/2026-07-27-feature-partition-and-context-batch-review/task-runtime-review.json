@@ -1,0 +1,32 @@
+{
+  "findings": [
+    {
+      "document": "docs/requirements/review-context-requirements.md",
+      "id": "TRQ-001",
+      "issue": "Execution Context identityの入力が材料束、Scope contract、取得状態とDigestに限られ、版付きReview Task定義とComposition記録を含まない。Task criteria、Expected Output、Validation Policy、採用目的・採否が変わっても同じidentityになり得る。",
+      "location": "REQ-CONTEXT-004 Context identityとstale検出",
+      "severity": "error",
+      "suggestion": "Execution Context identityへReview Task定義、材料束、Scope contract、Composition記録、完全性・取得状態の各Digestを含め、各構成要素の変更で旧結果の再利用を拒否する。"
+    },
+    {
+      "document": "docs/requirements/review-context-requirements.md",
+      "id": "TRQ-002",
+      "issue": "Scopeは全候補の分類だけを検査し、Targetが母集合にない場合やexclude・deferへ分類された場合でも受け入れられる。",
+      "location": "REQ-CONTEXT-003 Scope contract",
+      "severity": "warning",
+      "suggestion": "Targetが固定母集合へ解決され許可分類へ入ることを停止・受け入れ条件へ追加する。"
+    },
+    {
+      "document": "cross",
+      "id": "TRQ-003",
+      "issue": "REQ-CONTEXT-006はContext identityだけで成果再利用と新Review Run開始を定める。同じContextでもPrompt、Validation、モデル等が変わった場合の再利用拒否を判定できず、Review Contextが他機能のRun開始責務まで所有する。",
+      "location": "feature partitionとREQ-CONTEXT-006",
+      "severity": "error",
+      "suggestion": "Context側はhandoff packageの生成、照合、freshness判定に限定する。Harness側の固定実行条件identity一致とWorkflow側の再開判断へ境界を分離する。"
+    }
+  ],
+  "material_digest": "ffdd8bae67dde65fc8681cf0a80f11356fb7cae365c39b80028f6211c44d9a48",
+  "reviewer_role": "task_runtime_requirements",
+  "summary": "material digestと全9 artifact SHAは一致した。6要件は外部可観測な基本構造を持つが、Execution Context identityの入力範囲、ScopeでのTarget漏れ検査、再開時の実行条件と機能責務に反証可能性上の欠落がある。",
+  "verdict": "findings"
+}

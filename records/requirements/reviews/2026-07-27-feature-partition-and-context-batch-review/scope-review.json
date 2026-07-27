@@ -1,0 +1,32 @@
+{
+  "findings": [
+    {
+      "document": "review-context-requirements.md",
+      "id": "SFB-001",
+      "issue": "REQ-CONTEXT-004のidentity入力は材料束、Scope contract、取得状態とDigestだけであり、REQ-CONTEXT-001が生成する版付きReview Task入力定義やREQ-CONTEXT-005のComposition記録を含まない。Goal、Task criteria、Constraints、Expected Output、Validation Policy、Provenanceまたは採用判断が変わっても旧Context identityを再利用でき、FEAT-REVIEW-CONTEXTの責務を満たさない。",
+      "location": "REQ-CONTEXT-001／REQ-CONTEXT-004／REQ-CONTEXT-005",
+      "severity": "error",
+      "suggestion": "Execution Context identityに版付きReview Task入力定義、材料束、Scope contract、Composition記録を含め、いずれかの変更で旧結果をstaleとして拒否する。"
+    },
+    {
+      "document": "review-context-requirements.md",
+      "id": "SFB-002",
+      "issue": "handoff packageの固定・照合はReview Contextの責務に収まるが、再開操作、成果再利用、新Review Run開始はHarnessed ExecutionとWorkflow Controlの責務へ踏み込む。",
+      "location": "REQ-CONTEXT-006 再開引継ぎ",
+      "severity": "warning",
+      "suggestion": "Context側はhandoff packageの生成、完全性検査、照合可能性に限定し、再利用、新Run開始、状態遷移は所有機能へ分離する。"
+    },
+    {
+      "document": "feature-partition.json",
+      "id": "SFB-003",
+      "issue": "Evidence Evaluationは観測結果と解釈限界を分離して評価する一方、Harnessed ExecutionもESS-0029とESS-0046を専有し観測値を管理するため、収集・保存と評価・解釈の境界がない。",
+      "location": "FEAT-EVIDENCE-EVALUATION／FEAT-HARNESSED-EXECUTION",
+      "severity": "warning",
+      "suggestion": "Harnessed Executionは観測値・条件・raw結果の取得と不変記録、Evidence Evaluationは評価基準の適用と解釈限界の記録に限定する。"
+    }
+  ],
+  "material_digest": "ffdd8bae67dde65fc8681cf0a80f11356fb7cae365c39b80028f6211c44d9a48",
+  "reviewer_role": "scope_and_feature_boundary",
+  "summary": "material digest、直接artifact 9件、固定入力13件のSHA-256は一致した。47エッセンスは機械的には重複・欠落なく9機能へ割り当てられ、Review Contextには6要件が存在する。ただしContext identityの被覆不足、再開実行の責務越境、観測値責務の重複が残る。",
+  "verdict": "findings"
+}

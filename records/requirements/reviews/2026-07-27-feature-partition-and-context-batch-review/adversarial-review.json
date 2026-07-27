@@ -1,0 +1,96 @@
+{
+  "findings": [
+    {
+      "document": "feature_partition",
+      "id": "AT-REQ-001",
+      "issue": "47エッセンスの本文を持つ承認済みledgerが固定材料に含まれず、各ESS-IDの意味とfeature責務の整合性を検証できない。47件被覆はIDの全単射にすぎない。",
+      "location": "defined_essence_ids／features",
+      "severity": "error",
+      "suggestion": "47件のID、承認済みstatement、disposition、個別Digestを含むcanonical ledgerを固定材料へ追加する。"
+    },
+    {
+      "document": "feature_partition",
+      "id": "AT-REQ-002",
+      "issue": "機械契約が検査するのは全ESS-IDの一回限りの割当だけで、責務の意味的重複、欠落、過大統合を検査しないのにstatusをcompleteとしている。",
+      "location": "partition_result／validate_feature_partition",
+      "severity": "warning",
+      "suggestion": "結果をstructurally_completeへ限定し、意味的レビュー完了まで意味的completeとしない。"
+    },
+    {
+      "document": "mechanical_trace_contract",
+      "id": "AT-REQ-003",
+      "issue": "defined_requirement_idsの全件にsource recordがあること、参照ESS-IDが対象featureへ割り当てられたIDであることを検査しないため、見かけだけの由来被覆を許す。",
+      "location": "validate_requirement_sources",
+      "severity": "error",
+      "suggestion": "selected requirement IDsとdefined IDsの一致、feature一致、対象featureの全essence被覆を機械関門にする。"
+    },
+    {
+      "document": "trace_record",
+      "id": "AT-REQ-004",
+      "issue": "intent refsは節名風IDだけで承認intent本文内に安定IDやfragment Digestがなく、停止・復旧・保存・受け入れ条件それぞれの由来も示さない。",
+      "location": "source_trace",
+      "severity": "warning",
+      "suggestion": "intent意味単位を安定IDと本文Digestへ固定し、要件内の各義務を根拠fragmentへ結ぶ。"
+    },
+    {
+      "document": "requirements",
+      "id": "AT-REQ-005",
+      "issue": "Execution Context identityに版付きTask入力定義が含まれず、Goal、判定基準、Constraints、Expected Output、Context Requirements、Validation Policy、Provenanceが変わっても旧結果を再利用できる。",
+      "location": "REQ-CONTEXT-004",
+      "severity": "error",
+      "suggestion": "版付きReview Task入力定義、source universe identity、完全性判定結果をContext identityの必須入力にする。"
+    },
+    {
+      "document": "requirements",
+      "id": "AT-REQ-006",
+      "issue": "Review Task定義の入力一覧にValidation PolicyとProvenanceが明示されず、必須項目を1つ欠く試験の母集合も固定されない。",
+      "location": "REQ-CONTEXT-001",
+      "severity": "warning",
+      "suggestion": "必須フィールド集合と各フィールドの空・未解決・無効状態を列挙する。"
+    },
+    {
+      "document": "requirements",
+      "id": "AT-REQ-007",
+      "issue": "任意の本文変更をDigest不一致として検出する条件は本文と宣言Digestを同時に変更すれば成立せず、出所も文字列だけで条件を満たせる。",
+      "location": "REQ-CONTEXT-002",
+      "severity": "warning",
+      "suggestion": "固定済みprior identityとの比較で変更を検出し、出所に解決可能なidentity、内容Digest、取得結果を要求する。"
+    },
+    {
+      "document": "requirements",
+      "id": "AT-REQ-008",
+      "issue": "独立検査は期待分類との一致、不一致時の扱い、Scope基準と母集合identityを規定せず、誤ったexcludeやdeferを反証できない。",
+      "location": "REQ-CONTEXT-003",
+      "severity": "warning",
+      "suggestion": "母集合、Scope基準、分類結果を同じidentityへ固定し、期待結果、一致条件、相違時の停止とHuman裁定を定める。"
+    },
+    {
+      "document": "cross",
+      "id": "AT-REQ-009",
+      "issue": "保存対象は列挙されるが、書込み失敗、部分保存、クラッシュ、再起動後の耐久性、追記性、改変検出、保存自体の失敗時停止が規定されない。",
+      "location": "各要件の失敗時保存／REQ-CONTEXT-006",
+      "severity": "error",
+      "suggestion": "原子的保存、完了marker、再読込照合、旧版保持、保存失敗時停止、途中終了と再起動の試験を定める。"
+    },
+    {
+      "document": "requirements",
+      "id": "AT-REQ-010",
+      "issue": "確認済み成果の確認主体、確認結果、対象identity、freshnessが定義されず、handoff package自体のidentityと改変検査もない。",
+      "location": "REQ-CONTEXT-006",
+      "severity": "warning",
+      "suggestion": "確認主体、Validation結果、承認判断、元Review Run、Context identityを成果へ束縛し、package全体のDigestとfreshness再検査を必須にする。"
+    },
+    {
+      "document": "cross",
+      "id": "AT-REQ-011",
+      "issue": "拒否材料や失敗履歴を保存する一方、機微情報保護に対する伏字化、アクセス制御、保存期間、削除境界がない。",
+      "location": "REQ-CONTEXT-002・003・005・006",
+      "severity": "warning",
+      "suggestion": "保存前の機微情報検査、許可形式、アクセス境界、retention、削除時のDigest付き診断を定める。"
+    }
+  ],
+  "material_digest": "ffdd8bae67dde65fc8681cf0a80f11356fb7cae365c39b80028f6211c44d9a48",
+  "reviewer_role": "adversarial_traceability",
+  "summary": "全9 artifactのSHA-256とmaterial digestは一致した。しかし、意味的被覆を検証できない固定材料、要件identityの欠落、反証不能な受け入れ条件、保存・復旧保証の不足がある。",
+  "verdict": "findings"
+}

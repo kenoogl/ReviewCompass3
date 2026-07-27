@@ -1,0 +1,145 @@
+{
+  "inputs": [
+    {
+      "path": "records/requirements/reviews/2026-07-27-feature-partition-and-context-batch-review/scope-review.json",
+      "sha256": "e9289ea3f11bc134e2c26b2431477bcd82673ef3f6a40cfac8f6a43e9bf0e5f7"
+    },
+    {
+      "path": "records/requirements/reviews/2026-07-27-feature-partition-and-context-batch-review/task-runtime-review.json",
+      "sha256": "16bf1077c628c18fcfd973624bd33f079426a585fa84ca9008c66fad5a9ad0da"
+    },
+    {
+      "path": "records/requirements/reviews/2026-07-27-feature-partition-and-context-batch-review/adversarial-review.json",
+      "sha256": "c7ab622645fd756e0df6e0575440819a1de1e95b596adafd17f96821dca4aea0"
+    }
+  ],
+  "lifecycle": "provisional",
+  "material_digest": "ffdd8bae67dde65fc8681cf0a80f11356fb7cae365c39b80028f6211c44d9a48",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "summary": {
+    "applied_count": 12,
+    "conflict_count": 0,
+    "error_count": 5,
+    "raw_finding_count": 17,
+    "status": "complete",
+    "triaged_finding_count": 12,
+    "warning_count": 7
+  },
+  "triaged_findings": [
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-001",
+      "related": [
+        "AT-REQ-001"
+      ],
+      "resolution": "承認済み47項目の本文・判断・出所・個別Digestをcanonical ledgerへ固定する",
+      "severity": "error"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-002",
+      "related": [
+        "AT-REQ-002"
+      ],
+      "resolution": "構造的完了と意味的承認を別状態にする",
+      "severity": "warning"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-003",
+      "related": [
+        "AT-REQ-003"
+      ],
+      "resolution": "全requirement由来、feature内essence参照、feature essence被覆を機械関門にする",
+      "severity": "error"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-004",
+      "related": [
+        "AT-REQ-004"
+      ],
+      "resolution": "intent節を安定ID・本文Digestへ固定し、要件内義務の由来scopeを記録する",
+      "severity": "warning"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-005",
+      "related": [
+        "AT-REQ-005",
+        "SFB-001",
+        "TRQ-001"
+      ],
+      "resolution": "Context identityへTask定義・材料束・Scope・Composition・完全性状態を含める",
+      "severity": "error"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-006",
+      "related": [
+        "AT-REQ-006"
+      ],
+      "resolution": "Review Taskの必須フィールド集合と欠落試験を明記する",
+      "severity": "warning"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-007",
+      "related": [
+        "AT-REQ-007"
+      ],
+      "resolution": "材料変更をprior identity比較へ結び、解決可能な出所identityを要求する",
+      "severity": "warning"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-008",
+      "related": [
+        "AT-REQ-008",
+        "TRQ-002"
+      ],
+      "resolution": "Targetの母集合内許可分類と独立分類一致・競合時停止を明記する",
+      "severity": "warning"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-009",
+      "related": [
+        "AT-REQ-009"
+      ],
+      "resolution": "原子的保存、完了marker、再読込照合、旧版保持、保存失敗時停止を共通要件にする",
+      "severity": "error"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-010",
+      "related": [
+        "AT-REQ-010",
+        "SFB-002",
+        "TRQ-003"
+      ],
+      "resolution": "Contextはhandoff生成・照合に限定し、実行条件一致と状態遷移を所有機能へ分離する",
+      "severity": "error"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-011",
+      "related": [
+        "AT-REQ-011"
+      ],
+      "resolution": "失敗材料保存に機微情報検査、アクセス、retention、削除診断を要求する",
+      "severity": "warning"
+    },
+    {
+      "disposition": "apply",
+      "id": "REQ-REV-012",
+      "related": [
+        "SFB-003"
+      ],
+      "resolution": "Harnessは観測の取得・不変記録、Evaluationは基準適用・解釈限界を所有する",
+      "severity": "warning"
+    }
+  ]
+}
