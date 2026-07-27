@@ -668,8 +668,8 @@
       "oracle_type": "machine",
       "setup": "保存対象とそのidentity／機微情報検査結果／REQ-PORTABLE-002およびREQ-PORTABLE-004を満たす共有保存境界／許可された保存形式、アクセス境界およびretention policy",
       "stimulus": "システムはContext構成と検査で生じた確認済み成果、失敗履歴および診断を共有保存境界を介して部分書込みや機微情報の漏えいを防ぎ再起動後に照合できる形で保存しなければならない",
-      "expected": "クラッシュ後も確定済み版と未確定版を機械的に識別でき再読込Digestが一致する／削除時も対象identity、理由および削除結果のDigest付き診断が残る／書込み途中の強制終了後も直前の確認済み版が変わらない",
-      "negative_case": "保存先のアクセス境界を確認できない／原子的な確定または再読込照合に失敗する／機微情報検査が失敗する"
+      "expected": "Context保存境界が原子的書込み、再読込照合、部分失敗復旧、保存物分類、access policy、retention、削除契約、失敗診断を提供する／保存後の再読込値とContext digestが一致する",
+      "negative_case": "書込み、再読込、復旧、分類、access、retention、削除のいずれかを検証できない／保存後の再読込値が不一致である"
     },
     {
       "test_id": "AT-EXEC-001",
@@ -686,8 +686,8 @@
       "oracle_type": "machine",
       "setup": "candidate serialized payloadとDigest／Provider、model、endpoint、account、region、purpose、期限／機微情報検査／承認者identity、承認権限およびHuman承認",
       "stimulus": "システムは外部送信の内容、能力、論理送信先、承認者identity、権限およびHuman承認を同じ実行identityへ束縛しなければならない",
-      "expected": "candidate payload、送信先、承認者identityおよび権限が承認前に固定される／payload、Provider、endpoint、account、region、承認者、権限または期限の不一致時に送信されない",
-      "negative_case": "能力上限または機微情報検査に失敗する／Human承認がない、承認権限がない、期限切れ、または実送信条件が承認値と一致しない"
+      "expected": "初回と各retryのcandidate payload、Provider、model、endpoint、account、region、承認者identity・権限、Human承認、期限をAttemptへ束縛する／外部送信直前の再計算値が全項目一致する場合だけsendへ遷移する",
+      "negative_case": "初回またはretryでpayload、Provider、model、endpoint、account、region、承認者、権限、承認Digest、期限のいずれかが不一致である"
     },
     {
       "test_id": "AT-EXEC-003",
@@ -938,25 +938,25 @@
       "oracle_type": "hybrid",
       "setup": "feedback ledger、改善候補、検証結果",
       "stimulus": "システムは改善候補を検証し、Human承認を経た変更だけを次周期へ反映しなければならない",
-      "expected": "改善前後を固定条件で比較できる／Human承認前に現行方針を変更しない",
-      "negative_case": "検証不足、判断競合、Human承認なし"
+      "expected": "改善専用状態機械が評価受領、固定比較、Human承認、次周期提案の順序を検査する／Human承認前に現行方針を変更しない",
+      "negative_case": "評価package不足、固定比較不能、判断競合、Human承認なし、順序違反またはWorkflow開始eventの流用"
     }
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_contract",
-    "digest": "dd3e182aa866096c71fcac8955769c0023f3e3c6381827ebecdc3f8ec4bbf921",
+    "digest": "b5f00b4c47543937b83d28705a656afa59a3808d93436eef35f7624fc7c97496",
     "feature_count": 9,
     "requirement_count": 37,
     "acceptance_test_count": 37,
     "boundary_count": 23,
     "architecture_contract": "tools/design/design_contract.py:validate_design_architecture",
     "architecture_record": "records/design/stage-five-architecture-integrity.json",
-    "architecture_digest": "44a4e84b5901cdc2f6b1c36a2cf17f97384ca5b163c661c11f6febacb4cfa252",
-    "interface_count": 22,
-    "state_machine_count": 6,
+    "architecture_digest": "9db3e0bc0d62447821e38f68f761061661afdc1c8f149ab4fe6fdce7e6417234",
+    "interface_count": 25,
+    "state_machine_count": 7,
     "status": "complete",
-    "protocol_count": 3,
-    "event_route_count": 14
+    "protocol_count": 6,
+    "event_route_count": 21
   },
   "lifecycle": "provisional",
   "normative_status": "non-normative",

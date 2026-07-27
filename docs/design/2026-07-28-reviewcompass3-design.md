@@ -79,12 +79,14 @@ LLMによる意味評価を区別し、Humanが意味的競合を判断する。
 `records/design/stage-five-architecture-integrity.json`を段間契約の正本とする。
 Context、Harness、Workflowの開始要求・permit・結果返却、Harnessから
 TriageとEvaluation、各段からSemantic Trace、Evaluationから
-Self Improvement、Self Improvementから次周期Workflowへの22入力を、
+Self Improvement、Self Improvementから次周期Workflowへの25入力を、
 identity、payload、失敗verdict付きで定義する。23件の承認済み境界は
 各interfaceへ完全対応させる。
 
 Workflow、Run、Attempt、provider capture、Validationおよび
-Triage/Provenanceは閉じた状態・event・遷移表を持つ。各遷移はguardと、
+Triage/Provenance、Improvementは閉じた状態・event・遷移表を持つ。
+6本の正常・失敗・retry protocolは開始状態から期待終了状態まで各stepを
+実際の遷移として機械検証する。各遷移はguardと、
 結果を外部へ見せる前に何を耐久化するかを定義する。失敗、拒否、隔離、
 irrecoverable、retry枯渇、provenance不合格を耐久的終端へ伝播し、
 訂正版は旧失敗を保持した新しい版としてだけ再開する。
