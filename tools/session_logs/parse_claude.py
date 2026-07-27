@@ -23,6 +23,26 @@ class Event:
 
 
 @dataclasses.dataclass(frozen=True)
+class ToolCall:
+  event_id: str
+  call_id: str
+  name: str
+  arguments: object
+  line_no: int
+  block_index: int
+
+
+@dataclasses.dataclass(frozen=True)
+class ToolResult:
+  event_id: str
+  call_id: str
+  text: str
+  is_error: bool
+  line_no: int
+  block_index: int
+
+
+@dataclasses.dataclass(frozen=True)
 class ParseIssue:
   kind: str
   line_no: int
@@ -49,6 +69,55 @@ def _extract_text(content) -> str:
       )
     )
   return ""
+
+
+def _parse_content(event_id, role, content, line_no) -> tuple:
+  if isinstance(content, str):
+    return (Event(
+      event_id=event_id,
+      role=role,
+      text=content,
+      line_no=line_no,
+    ),)
+  if not isinstance(content, list):
+    return (Event(
+      event_id=event_id,
+      role=role,
+      text="",
+      line_no=line_no,
+    ),)
+
+  events = []
+  for block_index, block in enumerate(content):
+    if not isinstance(block, dict):
+      continue
+    block_type = block.get("type")
+    if block_type == "text":
+      events.append(Event(
+        event_id=event_id,
+        role=role,
+        text=block.get("text", ""),
+        line_no=line_no,
+      ))
+    elif block_type == "tool_use":
+      events.append(ToolCall(
+        event_id=event_id,
+        call_id=block.get("id"),
+        name=block.get("name"),
+        arguments=block.get("input"),
+        line_no=line_no,
+        block_index=block_index,
+      ))
+    elif block_type == "tool_result":
+      events.append(ToolResult(
+        event_id=event_id,
+        call_id=block.get("tool_use_id"),
+        text=_extract_text(block.get("content")),
+        is_error=bool(block.get("is_error")),
+        line_no=line_no,
+        block_index=block_index,
+      ))
+  return tuple(events)
 
 
 def _read_lines(path):
@@ -108,10 +177,10 @@ def parse_claude_log(path) -> ParseResult:
         detail="invalid_message",
       ))
       continue
-    events.append(Event(
+    events.extend(_parse_content(
       event_id=event_id,
       role=role,
-      text=_extract_text(message.get("content")),
+      content=message.get("content"),
       line_no=line_no,
     ))
   return ParseResult(events=tuple(events), issues=tuple(issues))
