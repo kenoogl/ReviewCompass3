@@ -65,6 +65,12 @@ _OBLIGATION_ID = re.compile(
   r"recovery_conditions|preserved_artifacts|"
   r"acceptance_criteria|non_goals)"
 )
+_ATOMIC_OBLIGATION_ID = re.compile(
+  r"(REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-[0-9]{3,})"
+  r"#(?:statement|(?:inputs|outputs|stop_conditions|"
+  r"recovery_conditions|preserved_artifacts|"
+  r"acceptance_criteria|non_goals)\.[0-9]{3})"
+)
 _DISPOSITIONS = {"selected", "not_selected"}
 _OBLIGATION_FIELDS = {
   "obligation_id",
@@ -73,6 +79,19 @@ _OBLIGATION_FIELDS = {
   "essence_ids",
   "rationale",
 }
+_ATOMIC_RELATION_FIELDS = {
+  "obligation_id",
+  "source_requirement_id",
+}
+_ATOMIC_LIST_FIELDS = (
+  "inputs",
+  "outputs",
+  "stop_conditions",
+  "recovery_conditions",
+  "preserved_artifacts",
+  "acceptance_criteria",
+  "non_goals",
+)
 
 
 def _text(value):
@@ -390,6 +409,168 @@ def validate_obligation_sources(
       for record in ordered
     ],
     "schema_version": 1,
+  }
+  digest = hashlib.sha256(
+    json.dumps(
+      document,
+      ensure_ascii=False,
+      separators=(",", ":"),
+      sort_keys=True,
+    ).encode("utf-8")
+  ).hexdigest()
+  return ObligationSourceTrace(
+    status="complete",
+    records=ordered,
+    digest=digest,
+  )
+
+
+def _atomic_obligations(requirement):
+  if (
+    not isinstance(requirement, dict)
+    or not _text(requirement.get("requirement_id"))
+    or _REQUIREMENT_ID.fullmatch(
+      requirement["requirement_id"]
+    ) is None
+    or not _text(requirement.get("statement"))
+  ):
+    raise RequirementSourceTraceError(
+      "atomic obligations require a valid requirement"
+    )
+  requirement_id = requirement["requirement_id"]
+  result = [(
+    f"{requirement_id}#statement",
+    requirement["statement"],
+  )]
+  for field in _ATOMIC_LIST_FIELDS:
+    values = requirement.get(field)
+    if (
+      not isinstance(values, (list, tuple))
+      or not values
+      or any(not _text(value) for value in values)
+    ):
+      raise RequirementSourceTraceError(
+        "atomic obligation fields must be non-empty"
+      )
+    result.extend(
+      (
+        f"{requirement_id}#{field}.{index:03d}",
+        value,
+      )
+      for index, value in enumerate(values, start=1)
+    )
+  return tuple(result)
+
+
+def validate_atomic_obligation_sources(
+  *,
+  requirements,
+  relations,
+  source_records,
+  defined_intent_ids,
+  defined_essence_ids,
+):
+  requirement_values = tuple(requirements)
+  requirement_ids = _defined(
+    (
+      value.get("requirement_id")
+      if isinstance(value, dict)
+      else None
+      for value in requirement_values
+    ),
+    _REQUIREMENT_ID,
+    "requirement",
+  )
+  intent_ids = _defined(
+    defined_intent_ids,
+    _INTENT_ID,
+    "intent",
+  )
+  essence_ids = _defined(
+    defined_essence_ids,
+    _ESSENCE_ID,
+    "essence",
+  )
+  sources = tuple(
+    _record(
+      value,
+      requirement_ids=requirement_ids,
+      intent_ids=intent_ids,
+      essence_ids=essence_ids,
+    )
+    for value in source_records
+  )
+  source_by_requirement = {
+    value.requirement_id: value
+    for value in sources
+    if value.requirement_id is not None
+  }
+  if set(source_by_requirement) != requirement_ids:
+    raise RequirementSourceTraceError(
+      "every requirement requires a source record"
+    )
+  atomic_values = dict(
+    item
+    for requirement in requirement_values
+    for item in _atomic_obligations(requirement)
+  )
+  parsed = []
+  relation_ids = []
+  for value in relations:
+    if (
+      not isinstance(value, dict)
+      or set(value) != _ATOMIC_RELATION_FIELDS
+    ):
+      raise RequirementSourceTraceError(
+        "atomic relations require fixed fields"
+      )
+    obligation_id = value["obligation_id"]
+    source_requirement_id = value[
+      "source_requirement_id"
+    ]
+    match = (
+      _ATOMIC_OBLIGATION_ID.fullmatch(obligation_id)
+      if _text(obligation_id)
+      else None
+    )
+    if (
+      match is None
+      or obligation_id not in atomic_values
+      or source_requirement_id not in source_by_requirement
+      or match.group(1) != source_requirement_id
+    ):
+      raise RequirementSourceTraceError(
+        "atomic obligation relation must resolve"
+      )
+    source = source_by_requirement[source_requirement_id]
+    relation_ids.append(obligation_id)
+    parsed.append(ObligationSourceRecord(
+      obligation_id=obligation_id,
+      requirement_id=source_requirement_id,
+      intent_refs=source.intent_refs,
+      essence_ids=source.essence_ids,
+      rationale=source.rationale,
+    ))
+  if (
+    len(set(relation_ids)) != len(relation_ids)
+    or set(relation_ids) != set(atomic_values)
+  ):
+    raise RequirementSourceTraceError(
+      "every atomic obligation requires one source relation"
+    )
+  ordered = tuple(sorted(
+    parsed,
+    key=lambda record: record.obligation_id,
+  ))
+  document = {
+    "records": [
+      {
+        **dataclasses.asdict(record),
+        "text": atomic_values[record.obligation_id],
+      }
+      for record in ordered
+    ],
+    "schema_version": 2,
   }
   digest = hashlib.sha256(
     json.dumps(
