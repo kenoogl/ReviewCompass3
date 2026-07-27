@@ -163,15 +163,23 @@ def _approved_request(path, runtime_platform):
   return request
 
 
-def _data_inventory(root):
+def _data_inventory(root, *, excluded_paths=()):
   path = Path(root)
   if not path.exists():
     return frozenset()
+  excluded = {
+    Path(item).resolve()
+    for item in excluded_paths
+  }
   try:
     return frozenset(
       item.relative_to(path).parts
       for item in path.rglob("*")
-      if item.is_file() and not item.is_symlink()
+      if (
+        item.is_file()
+        and not item.is_symlink()
+        and item.resolve() not in excluded
+      )
     )
   except OSError as error:
     raise LimitedDeploymentError(
@@ -246,7 +254,13 @@ def execute_limited_install(
     approval_path,
     selected_platform,
   )
-  before = _data_inventory(request.data_root)
+  inventory_arguments = {
+    "excluded_paths": (request.config_file,),
+  }
+  before = _data_inventory(
+    request.data_root,
+    **inventory_arguments,
+  )
   steps = (
     ("install_config", install_config),
     ("install_hooks", install_hooks),
@@ -270,14 +284,23 @@ def execute_limited_install(
       completed,
       callbacks,
     )
-    if _data_inventory(request.data_root) != before:
+    if (
+      _data_inventory(
+        request.data_root,
+        **inventory_arguments,
+      )
+      != before
+    ):
       rollback_status = "failed"
     raise LimitedDeploymentError(
       "Limited deployment install failed",
       rollback_status=rollback_status,
       rolled_back_step_count=rolled_back_count,
     ) from error
-  after = _data_inventory(request.data_root)
+  after = _data_inventory(
+    request.data_root,
+    **inventory_arguments,
+  )
   if not before.issubset(after):
     raise LimitedDeploymentError(
       "Limited deployment data was removed"
@@ -307,14 +330,23 @@ def execute_limited_uninstall(
     approval_path,
     selected_platform,
   )
-  before = _data_inventory(request.data_root)
+  inventory_arguments = {
+    "excluded_paths": (request.config_file,),
+  }
+  before = _data_inventory(
+    request.data_root,
+    **inventory_arguments,
+  )
   completed = _run_steps(request, (
     ("deactivate_schedule", deactivate_schedule),
     ("uninstall_schedule", uninstall_schedule),
     ("uninstall_hooks", uninstall_hooks),
     ("remove_config", remove_config),
   ))
-  after = _data_inventory(request.data_root)
+  after = _data_inventory(
+    request.data_root,
+    **inventory_arguments,
+  )
   if before != after:
     raise LimitedDeploymentError(
       "Limited deployment data was not preserved"
