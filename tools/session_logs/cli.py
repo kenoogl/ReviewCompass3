@@ -103,6 +103,7 @@ def run(argv=None) -> int:
   mode = parser.add_mutually_exclusive_group()
   mode.add_argument("--dry-run", action="store_true")
   mode.add_argument("--verify", action="store_true")
+  mode.add_argument("--preserve-only", action="store_true")
   args = parser.parse_args(argv)
   try:
     config = load_config(args.config)
@@ -118,6 +119,27 @@ def run(argv=None) -> int:
       _verify_saved_artifact(relative_path, config)
       for relative_path in relative_paths
     )
+
+  if args.preserve_only:
+    if (
+      not config.preservation_enabled
+      or config.backup_root is None
+    ):
+      return EXIT_FAILED
+    exit_value = EXIT_OK
+    for relative_path in relative_paths:
+      try:
+        preserve_raw_log(
+          config.raw_root / relative_path,
+          raw_root=config.raw_root,
+          backup_root=config.backup_root,
+        )
+      except Exception:
+        exit_value = max(
+          exit_value,
+          EXIT_PRESERVATION_FAILED,
+        )
+    return exit_value
 
   exit_value = EXIT_OK
 
