@@ -15,6 +15,17 @@ from pathlib import Path
 class LimitedDeploymentError(Exception):
   """承認されていないOSや配置先への操作を拒否する。"""
 
+  def __init__(
+    self,
+    message,
+    *,
+    rollback_status=None,
+    rolled_back_step_count=None,
+  ):
+    super().__init__(message)
+    self.rollback_status = rollback_status
+    self.rolled_back_step_count = rolled_back_step_count
+
 
 @dataclasses.dataclass(frozen=True)
 class LimitedDeploymentRequest:
@@ -188,6 +199,33 @@ def _run_steps(request, steps):
   return tuple(completed)
 
 
+def _rollback_completed(request, completed, callbacks):
+  rolled_back_count = 0
+  rollback_failed = False
+  for name in reversed(completed):
+    callback = callbacks.get(name)
+    if callback is None:
+      rollback_failed = True
+      continue
+    try:
+      result = callback(request)
+      if (
+        getattr(result, "action", None)
+        in ("failed", "preserved")
+        or getattr(result, "status", None)
+        in ("error", "failed")
+      ):
+        rollback_failed = True
+      else:
+        rolled_back_count += 1
+    except Exception:
+      rollback_failed = True
+  return (
+    "failed" if rollback_failed else "passed",
+    rolled_back_count,
+  )
+
+
 def execute_limited_install(
   approval_path,
   *,
@@ -196,6 +234,7 @@ def execute_limited_install(
   install_schedule,
   activate_schedule,
   inspect_schedule,
+  rollback_callbacks=None,
   runtime_platform=None,
 ) -> LimitedDeploymentResult:
   selected_platform = (
@@ -208,13 +247,36 @@ def execute_limited_install(
     selected_platform,
   )
   before = _data_inventory(request.data_root)
-  completed = _run_steps(request, (
+  steps = (
     ("install_config", install_config),
     ("install_hooks", install_hooks),
     ("install_schedule", install_schedule),
     ("activate_schedule", activate_schedule),
     ("inspect_schedule", inspect_schedule),
-  ))
+  )
+  completed = []
+  try:
+    for name, callback in steps:
+      _run_steps(request, ((name, callback),))
+      completed.append(name)
+  except Exception as error:
+    callbacks = (
+      {}
+      if rollback_callbacks is None
+      else rollback_callbacks
+    )
+    rollback_status, rolled_back_count = _rollback_completed(
+      request,
+      completed,
+      callbacks,
+    )
+    if _data_inventory(request.data_root) != before:
+      rollback_status = "failed"
+    raise LimitedDeploymentError(
+      "Limited deployment install failed",
+      rollback_status=rollback_status,
+      rolled_back_step_count=rolled_back_count,
+    ) from error
   after = _data_inventory(request.data_root)
   if not before.issubset(after):
     raise LimitedDeploymentError(
@@ -379,6 +441,21 @@ def _uninstall_callbacks(backend):
   }
 
 
+def _install_rollback_callbacks(backend):
+  return {
+    "activate_schedule": lambda request: backend.run(
+      "deactivate",
+      _schedule_request(request),
+    ),
+    "install_schedule": lambda request: backend.run(
+      "uninstall",
+      _schedule_request(request),
+    ),
+    "install_hooks": _uninstall_hooks,
+    "install_config": _remove_owned_config,
+  }
+
+
 def _plan_limited(
   approval_path,
   operation,
@@ -465,6 +542,7 @@ def run(
       result = execute_limited_install(
         args.approval,
         runtime_platform=selected_platform,
+        rollback_callbacks=_install_rollback_callbacks(backend),
         **_install_callbacks(backend),
       )
     else:
@@ -474,10 +552,16 @@ def run(
         **_uninstall_callbacks(backend),
       )
   except Exception as error:
-    print(json.dumps({
+    payload = {
       "reason": type(error).__name__,
       "status": "failed",
-    }, sort_keys=True))
+    }
+    if getattr(error, "rollback_status", None) is not None:
+      payload["rollback_status"] = error.rollback_status
+      payload["rolled_back_step_count"] = (
+        error.rolled_back_step_count
+      )
+    print(json.dumps(payload, sort_keys=True))
     return 5
   _print_result(
     result.action,
