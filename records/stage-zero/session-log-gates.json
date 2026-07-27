@@ -1,12 +1,19 @@
 {
   "external_checks": {
     "private_real_log_validation": {
-      "status": "pending"
+      "evidence_paths": [
+        "records/stage-zero/private-real-log-validation.json"
+      ],
+      "status": "passed"
     },
     "stage_zero_user_approval": {
       "status": "pending"
     },
     "user_environment_hook_schedule": {
+      "evidence_paths": [
+        "records/stage-zero/user-environment-preflight.json"
+      ],
+      "preflight_status": "passed",
       "status": "pending"
     }
   },

@@ -31,7 +31,6 @@ def test_stage_zero_gate_maps_evidence_and_blocks_pending_external_checks(
   assert result.required_gate_count == 8
   assert result.passed_gate_count == 8
   assert result.unresolved == (
-    "private_real_log_validation",
     "stage_zero_user_approval",
     "user_environment_hook_schedule",
   )

@@ -1,0 +1,19 @@
+{
+  "hook": {
+    "operation_exit_code": 0,
+    "planned_count": 586,
+    "preview_action": "installed",
+    "settings_mutated": false,
+    "status": "passed"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "schedule": {
+    "action": "planned",
+    "environment_mutated": false,
+    "status": "passed"
+  },
+  "status": "preflight_passed",
+  "validated_at": "2026-07-27"
+}

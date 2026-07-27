@@ -1,0 +1,15 @@
+{
+  "counts": {
+    "claude": 586,
+    "codex": 0,
+    "failed": 0,
+    "ignored": 65,
+    "unsupported": 0
+  },
+  "git_unchanged": true,
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "status": "passed",
+  "validated_at": "2026-07-27"
+}
