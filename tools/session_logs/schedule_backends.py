@@ -128,6 +128,50 @@ class SystemdUserBackend:
     )
 
 
+class WindowsTaskBackend:
+  backend_id = "windows_task"
+
+  def __init__(self, *, runner=None):
+    self.runner = runner
+
+  def run(self, operation, request, *, dry_run=False):
+    from tools.session_logs import windows_scheduler
+    arguments = [
+      operation,
+      "--definition",
+      str(request.schedule_path),
+      "--python",
+      str(request.python_executable),
+      "--config",
+      str(request.config_path),
+      "--interval",
+      str(request.interval_seconds),
+    ]
+    if dry_run:
+      arguments.append("--dry-run")
+    output = io.StringIO()
+    try:
+      with contextlib.redirect_stdout(output):
+        if self.runner is None:
+          windows_scheduler.run(tuple(arguments))
+        else:
+          windows_scheduler.run(
+            tuple(arguments),
+            runner=self.runner,
+          )
+      payload = json.loads(output.getvalue())
+    except Exception as error:
+      raise ScheduleBackendError(
+        "Schedule backend execution failed"
+      ) from error
+    return ScheduleBackendResult(
+      backend=self.backend_id,
+      action=payload["action"],
+      status=payload["status"],
+      reason=payload.get("reason"),
+    )
+
+
 _PLATFORM_BACKEND_IDS = {
   "darwin": "launchd",
   "linux": "systemd_user",
@@ -150,6 +194,7 @@ def select_schedule_backend(
     {
       "launchd": LaunchdBackend(),
       "systemd_user": SystemdUserBackend(),
+      "windows_task": WindowsTaskBackend(),
     }
     if registry is None
     else registry
