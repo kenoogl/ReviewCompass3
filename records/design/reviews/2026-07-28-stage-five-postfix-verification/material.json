@@ -1,0 +1,98 @@
+{
+  "material_digest": "35379bfba489202429f24edd555b70ccd3fa4f97d243a4407efeaf757ebbf207",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "records/requirements/requirement-boundary-relations.json",
+        "sha256": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e"
+      },
+      {
+        "path": "records/requirements/obligation-source-trace.json",
+        "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7"
+      },
+      {
+        "path": "docs/design/2026-07-28-reviewcompass3-design.md",
+        "sha256": "d4fc31453c8a2522805c27d157a64269a3b387fd01fb9b001099ece0d8a40bec"
+      },
+      {
+        "path": "records/design/stage-five-design.json",
+        "sha256": "24657ab91a7c87e5e9b3325d421863b14d3cf699a76ec4eeb9c440dcfdde722a"
+      },
+      {
+        "path": "records/design/stage-five-architecture-integrity.json",
+        "sha256": "ea4c9c2ea95674cab0ec069e0bf922e65719276cdce92390448b1bd37f95cbd5"
+      },
+      {
+        "path": "docs/design/2026-07-28-bootstrap-conformance-audit.md",
+        "sha256": "e63db43c07647961c8df9b370b521629aac26ac3ca8745408852f3648c5858d0"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-audit.json",
+        "sha256": "5f3cde65775ef1f80b234d2c599aae9b752f324d6e91ec0a5b2ce0d536f70219"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-integrity.json",
+        "sha256": "e0cb6a3382a45d41cf0f0f928a797549be6bda6488cf760f7ad0a5dc30da8220"
+      },
+      {
+        "path": "tools/design/design_contract.py",
+        "sha256": "e0651b06e3f8864ba1bb115dfe5fa7cfb8dd5a159e30c276f21fdf6b0430db25"
+      },
+      {
+        "path": "tools/design/bootstrap_conformance.py",
+        "sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+      },
+      {
+        "path": "tests/test_design_contract.py",
+        "sha256": "4f2e0d64a42a67b426114366cb7ad36799ad22adb621fa27e28cf7c9b53c0423"
+      },
+      {
+        "path": "tests/test_bootstrap_conformance.py",
+        "sha256": "2a282d032d26a2719832e650ccd605ba4e697eaf8226d79d7e010f7116faadbb"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-completion-verification/material.json",
+        "sha256": "4c17c7cf073e08ae027bc35557c9bfb809801c72c237adfd59b099255ce8f007"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-completion-verification/scope-review.json",
+        "sha256": "6b35eaa47d95093526c57ac8e6934829e0d31d2cd4a24217af2161dd191025f1"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-completion-verification/task-runtime-review.json",
+        "sha256": "f523536aa3ea4ce6042275e7c9636e9bd8d3710a2d6e868a87427baa9961f4e3"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-completion-verification/adversarial-review.json",
+        "sha256": "cc66fa9fdca9825aabe6686588d3c159cd09e56538a5e3301b725d9bcae3669d"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-completion-verification/triage.json",
+        "sha256": "7aabed503b8838008b38c74fdff113f83bc11765ab9c2a99c5ea19cd0cd7fcc4"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-completion-verification/review-resolution.json",
+        "sha256": "a9b12c31a518babfb317f50179c2fa2da628a7fa573801c7b22e9a8716c273af"
+      }
+    ],
+    "criteria": [
+      "completion verificationの6 findingが全件解決済みである",
+      "正常protocolはCapture結果、Validation候補、Validation結果を生成後に消費する",
+      "dispatch・Capture・Validation失敗はfailedまたはirrecoverable Run結果を介してWorkflow blockedへ伝播する",
+      "Capture失敗は診断保存可能、隔離、raw・診断保存不能を別protocolで分類する",
+      "validatorはproducer-before-consumerと失敗状態ベクトルを機械検証する",
+      "既承認23境界、29 interface、8状態機械、14 protocol、28 event routeが機械検証される",
+      "開始・retry失敗と成功Run結果が生成後にWorkflowへ渡る",
+      "内部生成必須interfaceをinitialへ偽装できない",
+      "Capture局所分類とRun終端分類の相関が機械検証される",
+      "strict監査と389現行テストが通過する"
+    ],
+    "review_roles": [
+      "design_scope_and_boundary",
+      "task_runtime_design",
+      "adversarial_conformance"
+    ]
+  },
+  "status": "fixed",
+  "record_version": 1
+}
