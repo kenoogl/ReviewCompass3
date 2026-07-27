@@ -20,6 +20,15 @@ class DesignContract:
   digest: str
 
 
+@dataclasses.dataclass(frozen=True)
+class DesignArchitecture:
+  status: str
+  boundary_count: int
+  interface_count: int
+  state_machine_count: int
+  digest: str
+
+
 _DESIGN_FIELDS = {
   "design_id",
   "feature_id",
@@ -70,7 +79,49 @@ _TEST_ID = re.compile(
   r"AT-[A-Z0-9]+(?:-[A-Z0-9]+)*-[0-9]{3,}"
 )
 _BOUNDARY_ID = re.compile(r"BOUNDARY-[0-9]{3,}")
+_INTERFACE_ID = re.compile(
+  r"IF-[A-Z0-9]+(?:-[A-Z0-9]+)*"
+)
+_STATE_MACHINE_ID = re.compile(
+  r"SM-[A-Z0-9]+(?:-[A-Z0-9]+)*"
+)
 _ORACLE_TYPES = {"machine", "human", "hybrid"}
+_BOUNDARY_FIELDS = {
+  "boundary_id",
+  "from",
+  "relation",
+  "to",
+  "contract",
+}
+_APPROVED_BOUNDARY_FIELDS = {
+  "from",
+  "relation",
+  "to",
+  "contract",
+}
+_INTERFACE_FIELDS = {
+  "interface_id",
+  "provider_design_id",
+  "consumer_design_id",
+  "identity_fields",
+  "payload_fields",
+  "failure_verdict",
+  "owner_design_id",
+}
+_STATE_MACHINE_FIELDS = {
+  "machine_id",
+  "owner_design_id",
+  "states",
+  "events",
+  "transitions",
+}
+_TRANSITION_FIELDS = {
+  "from",
+  "event",
+  "to",
+  "guard",
+  "persistence",
+}
 
 
 def _text(value):
@@ -273,5 +324,272 @@ def validate_design_contract(
     requirement_count=len(requirement_ids),
     acceptance_test_count=len(parsed_tests),
     boundary_count=len(boundary_ids),
+    digest=digest,
+  )
+
+
+def validate_design_architecture(
+  *,
+  designs,
+  boundary_catalog,
+  approved_boundary_relations,
+  requirement_feature_map,
+  interfaces,
+  state_machines,
+  defined_interface_ids,
+  defined_state_machine_ids,
+):
+  parsed_designs = tuple(designs)
+  if not parsed_designs:
+    raise DesignContractError(
+      "architecture requires designs"
+    )
+  design_ids = set()
+  design_feature_map = {}
+  boundary_owner_map = {}
+  for design in parsed_designs:
+    if (
+      not isinstance(design, dict)
+      or not _text(design.get("design_id"))
+      or not _text(design.get("feature_id"))
+      or not isinstance(
+        design.get("boundary_ids"),
+        (list, tuple),
+      )
+    ):
+      raise DesignContractError(
+        "architecture designs must resolve"
+      )
+    design_id = design["design_id"]
+    if design_id in design_ids:
+      raise DesignContractError(
+        "architecture design IDs must be unique"
+      )
+    design_ids.add(design_id)
+    design_feature_map[design_id] = design["feature_id"]
+    for boundary_id in design["boundary_ids"]:
+      if boundary_id in boundary_owner_map:
+        raise DesignContractError(
+          "boundary ownership must be unique"
+        )
+      boundary_owner_map[boundary_id] = design_id
+
+  approved = tuple(approved_boundary_relations)
+  if any(
+    not isinstance(value, dict)
+    or set(value) != _APPROVED_BOUNDARY_FIELDS
+    or any(not _text(value[field]) for field in value)
+    for value in approved
+  ):
+    raise DesignContractError(
+      "approved boundary relations are invalid"
+    )
+  approved_tuples = {
+    (
+      value["from"],
+      value["relation"],
+      value["to"],
+      value["contract"],
+    )
+    for value in approved
+  }
+  if len(approved_tuples) != len(approved):
+    raise DesignContractError(
+      "approved boundary relations must be unique"
+    )
+
+  parsed_boundaries = []
+  for value in boundary_catalog:
+    if (
+      not isinstance(value, dict)
+      or set(value) != _BOUNDARY_FIELDS
+      or not _text(value["boundary_id"])
+      or _BOUNDARY_ID.fullmatch(
+        value["boundary_id"]
+      ) is None
+      or any(
+        not _text(value[field])
+        for field in ("from", "relation", "to", "contract")
+      )
+    ):
+      raise DesignContractError(
+        "boundary catalog entries are invalid"
+      )
+    relation = (
+      value["from"],
+      value["relation"],
+      value["to"],
+      value["contract"],
+    )
+    owner_id = boundary_owner_map.get(
+      value["boundary_id"]
+    )
+    if (
+      relation not in approved_tuples
+      or value["from"] not in requirement_feature_map
+      or value["to"] not in requirement_feature_map
+      or owner_id is None
+      or design_feature_map[owner_id]
+      != requirement_feature_map[value["from"]]
+    ):
+      raise DesignContractError(
+        "boundary content and ownership must be approved"
+      )
+    parsed_boundaries.append(dict(value))
+  boundary_ids = [
+    value["boundary_id"] for value in parsed_boundaries
+  ]
+  if (
+    len(set(boundary_ids)) != len(boundary_ids)
+    or set(boundary_ids) != set(boundary_owner_map)
+    or {
+      (
+        value["from"],
+        value["relation"],
+        value["to"],
+        value["contract"],
+      )
+      for value in parsed_boundaries
+    } != approved_tuples
+  ):
+    raise DesignContractError(
+      "boundary catalog coverage must be exact"
+    )
+
+  interface_ids = _defined(
+    defined_interface_ids,
+    _INTERFACE_ID,
+    "interface",
+    empty=True,
+  )
+  parsed_interfaces = []
+  for value in interfaces:
+    if (
+      not isinstance(value, dict)
+      or set(value) != _INTERFACE_FIELDS
+      or value["interface_id"] not in interface_ids
+      or value["provider_design_id"] not in design_ids
+      or value["consumer_design_id"] not in design_ids
+      or value["owner_design_id"] not in design_ids
+      or not _text(value["failure_verdict"])
+    ):
+      raise DesignContractError(
+        "interfaces require fixed valid fields"
+      )
+    parsed = dict(value)
+    parsed["identity_fields"] = _texts(
+      value["identity_fields"],
+      "interface identity fields",
+    )
+    parsed["payload_fields"] = _texts(
+      value["payload_fields"],
+      "interface payload fields",
+    )
+    parsed_interfaces.append(parsed)
+  if (
+    len({
+      value["interface_id"]
+      for value in parsed_interfaces
+    }) != len(parsed_interfaces)
+    or {
+      value["interface_id"]
+      for value in parsed_interfaces
+    } != interface_ids
+  ):
+    raise DesignContractError(
+      "interface coverage must be exact"
+    )
+
+  machine_ids = _defined(
+    defined_state_machine_ids,
+    _STATE_MACHINE_ID,
+    "state machine",
+    empty=True,
+  )
+  parsed_machines = []
+  for value in state_machines:
+    if (
+      not isinstance(value, dict)
+      or set(value) != _STATE_MACHINE_FIELDS
+      or value["machine_id"] not in machine_ids
+      or value["owner_design_id"] not in design_ids
+    ):
+      raise DesignContractError(
+        "state machines require fixed valid fields"
+      )
+    states = _texts(
+      value["states"],
+      "state machine states",
+    )
+    events = _texts(
+      value["events"],
+      "state machine events",
+    )
+    transitions = []
+    for transition in value["transitions"]:
+      if (
+        not isinstance(transition, dict)
+        or set(transition) != _TRANSITION_FIELDS
+        or transition["from"] not in states
+        or transition["to"] not in states
+        or transition["event"] not in events
+        or not _text(transition["guard"])
+        or not _text(transition["persistence"])
+      ):
+        raise DesignContractError(
+          "state transitions must be closed"
+        )
+      transitions.append(dict(transition))
+    if not transitions:
+      raise DesignContractError(
+        "state machines require transitions"
+      )
+    parsed = dict(value)
+    parsed["states"] = states
+    parsed["events"] = events
+    parsed["transitions"] = tuple(transitions)
+    parsed_machines.append(parsed)
+  if (
+    len({
+      value["machine_id"]
+      for value in parsed_machines
+    }) != len(parsed_machines)
+    or {
+      value["machine_id"]
+      for value in parsed_machines
+    } != machine_ids
+  ):
+    raise DesignContractError(
+      "state machine coverage must be exact"
+    )
+
+  document = {
+    "boundaries": sorted(
+      parsed_boundaries,
+      key=lambda value: value["boundary_id"],
+    ),
+    "interfaces": sorted(
+      parsed_interfaces,
+      key=lambda value: value["interface_id"],
+    ),
+    "schema_version": 1,
+    "state_machines": sorted(
+      parsed_machines,
+      key=lambda value: value["machine_id"],
+    ),
+  }
+  digest = hashlib.sha256(
+    json.dumps(
+      document,
+      ensure_ascii=False,
+      separators=(",", ":"),
+      sort_keys=True,
+    ).encode("utf-8")
+  ).hexdigest()
+  return DesignArchitecture(
+    status="complete",
+    boundary_count=len(parsed_boundaries),
+    interface_count=len(parsed_interfaces),
+    state_machine_count=len(parsed_machines),
     digest=digest,
   )
