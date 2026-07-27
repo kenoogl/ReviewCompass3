@@ -148,6 +148,8 @@ def validate_requirement_sources(
   defined_requirement_ids,
   defined_intent_ids,
   defined_essence_ids,
+  allowed_essence_ids=None,
+  required_essence_ids=None,
 ):
   requirement_ids = _defined(
     defined_requirement_ids,
@@ -164,6 +166,31 @@ def validate_requirement_sources(
     _ESSENCE_ID,
     "essence",
   )
+  allowed_essences = (
+    essence_ids
+    if allowed_essence_ids is None
+    else _defined(
+      allowed_essence_ids,
+      _ESSENCE_ID,
+      "allowed essence",
+    )
+  )
+  required_essences = (
+    frozenset()
+    if required_essence_ids is None
+    else _defined(
+      required_essence_ids,
+      _ESSENCE_ID,
+      "required essence",
+    )
+  )
+  if (
+    not allowed_essences <= essence_ids
+    or not required_essences <= allowed_essences
+  ):
+    raise RequirementSourceTraceError(
+      "feature essence definitions must resolve"
+    )
   parsed = tuple(
     _record(
       value,
@@ -181,6 +208,22 @@ def validate_requirement_sources(
   if len(set(selected_ids)) != len(selected_ids):
     raise RequirementSourceTraceError(
       "requirement relations must be unique"
+    )
+  if set(selected_ids) != requirement_ids:
+    raise RequirementSourceTraceError(
+      "every defined requirement requires one source relation"
+    )
+  traced_essences = {
+    essence_id
+    for record in parsed
+    for essence_id in record.essence_ids
+  }
+  if (
+    not traced_essences <= allowed_essences
+    or not required_essences <= traced_essences
+  ):
+    raise RequirementSourceTraceError(
+      "feature essence trace is incomplete or out of scope"
     )
   ordered = tuple(sorted(
     parsed,
