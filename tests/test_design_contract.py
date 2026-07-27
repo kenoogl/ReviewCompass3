@@ -538,10 +538,20 @@ def _validate_stage_five(contract, architecture):
           "failed",
           "irrecoverable",
           "blocked",
-          "succeeded",
         ),
         "SM-WORKFLOW": ("blocked",),
       },
+    ),
+    required_failure_protocol_ids=(
+      "PROTOCOL-RUN-START-FAILURE",
+      "PROTOCOL-RETRY-FAILURE",
+      "PROTOCOL-DISPATCH-FAILURE",
+      "PROTOCOL-CAPTURE-DIAGNOSTIC-FAILURE",
+      "PROTOCOL-CAPTURE-QUARANTINE",
+      "PROTOCOL-CAPTURE-IRRECOVERABLE",
+      "PROTOCOL-VALIDATION-FAILURE",
+      "PROTOCOL-FINDING-PREFAIL",
+      "PROTOCOL-FINDING-FINALFAIL",
     ),
     required_failure_correlations=(
       {
@@ -570,6 +580,21 @@ def _validate_stage_five(contract, architecture):
       },
     ),
   )
+
+
+def test_validates_stage_five_architecture_baseline():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+  architecture, _, _, _ = _stage_five_inputs()
+
+  result = _validate_stage_five(
+    contract,
+    architecture,
+  )
+
+  assert result.status == "complete"
+  assert result.protocol_count == 14
 
 
 def test_rejects_required_generated_interface_as_initial_input():
@@ -632,6 +657,31 @@ def test_rejects_capture_and_run_failure_classification_mismatch():
     == "PROTOCOL-CAPTURE-IRRECOVERABLE"
   )
   protocol_value["steps"][0]["event"] = "diagnostic_failed"
+
+  with pytest.raises(contract.DesignContractError):
+    _validate_stage_five(contract, architecture)
+
+
+def test_rejects_nonterminal_failure_protocol_main_path():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+  architecture, _, _, _ = _stage_five_inputs()
+  architecture = copy.deepcopy(architecture)
+  protocol_value = next(
+    value
+    for value in architecture["protocols"]
+    if value["protocol_id"]
+    == "PROTOCOL-RUN-START-FAILURE"
+  )
+  protocol_value["steps"] = [
+    value
+    for value in protocol_value["steps"]
+    if value["state_machine_id"] != "SM-WORKFLOW"
+  ]
+  protocol_value["expected_states"]["SM-WORKFLOW"] = (
+    "running"
+  )
 
   with pytest.raises(contract.DesignContractError):
     _validate_stage_five(contract, architecture)
