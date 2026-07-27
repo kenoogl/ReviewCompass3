@@ -1152,7 +1152,8 @@ def validate_design_architecture(
         for transition in main_transitions
       ):
         raise DesignContractError(
-          "protocol failure classification must correlate"
+          "protocol failure classification must correlate: "
+          f"{value['protocol_id']}"
         )
       for transitions in failure_transition_vectors:
         if any(
@@ -1165,7 +1166,8 @@ def validate_design_architecture(
           for transition in transitions
         ):
           raise DesignContractError(
-            "protocol failure classification must correlate"
+            "protocol failure classification must correlate: "
+            f"{value['protocol_id']}"
           )
     if current_states != expected_states:
       raise DesignContractError(
