@@ -1,0 +1,43 @@
+{
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "scope": "material_payload"
+  },
+  "material_digest": "c70e540112023fc267aa0317c65fff6d14325027e0199e213f72fee6bf5b6feb",
+  "material_payload": {
+    "artifacts": [
+      {"path":"docs/intent/2026-07-27-reviewcompass3-intent-draft.md","role":"approved_intent","sha256":"5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"},
+      {"path":"records/requirements/stage-four-completion.json","role":"approved_requirements_completion","sha256":"c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"},
+      {"path":"records/design/stage-five-entry.json","role":"fixed_stage_input","sha256":"e6dc3abbb5ab6e33320ba7df81705ab61cce6afb9c77d5c38cc8d4fe3264beec"},
+      {"path":"docs/design/2026-07-28-stage-five-work-plan.md","role":"work_plan","sha256":"89b6e13f7ab37327ad32ae179bd55a3fa5822da706101539b27049e88e1742d0"},
+      {"path":"docs/design/2026-07-28-reviewcompass3-design.md","role":"design_summary","sha256":"d0b57da4348a6eabd9be62e3bfc1b673635ad505430f9750d8fbbcb1db7d69cf"},
+      {"path":"records/design/stage-five-design.json","role":"design_and_acceptance_source","sha256":"0754b0ef2ee54a9d9a9b4b0949d255640bc517ceeb1a79115369fec0e0450843"},
+      {"path":"docs/design/2026-07-28-bootstrap-conformance-audit.md","role":"conformance_summary","sha256":"91ffcd1c026af4185eae04989379f4ebd6bef26abd9910bcb5676c45eda53bf9"},
+      {"path":"records/design/bootstrap-conformance-audit.json","role":"conformance_source","sha256":"983b6f881f90bc0189a7c47ee936bda13dde4e725e51f9b40f6a875fbbfec8aa"},
+      {"path":"tools/design/design_contract.py","role":"design_contract","sha256":"4858c4625e57cdf7a72001ecf8ff47291835948ac583945e3c3ef3b4791ba660"},
+      {"path":"tools/design/bootstrap_conformance.py","role":"conformance_contract","sha256":"b124b37eb3ee2b33703cbd3897b3a8967de927c35baa10490db9d89f13f78cd0"},
+      {"path":"tests/test_design_contract.py","role":"design_contract_tests","sha256":"4218a9f31a71ef5ad93d9af3cc3a75a6c6b143711a1bd0fbcb142ec4ede4693c"},
+      {"path":"tests/test_bootstrap_conformance.py","role":"conformance_contract_tests","sha256":"e2affc0bb52567de4195c3770c99541f3c4f7b49730c16fb8a64469f600bacea"}
+    ],
+    "criteria": [
+      "全37要件に設計受け先と反証可能な受け入れ試験がある",
+      "23境界relationが設計componentの所有責務と一致する",
+      "LLM、機械処理、Humanの責務がintent原則と一致する",
+      "conformant 5件は固定commit上の実装・テスト証拠でそのまま昇格できる",
+      "adapt、replace、deferが未実装を隠さず分類定義と一致する",
+      "bootstrap挙動へrequirementsまたはdesignを合わせていない",
+      "第6段E2E実装へ進むための停止条件とgapが明確である"
+    ],
+    "review_roles": [
+      "design_scope_and_boundary",
+      "task_runtime_design",
+      "adversarial_conformance"
+    ]
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "fixed"
+}
