@@ -1,0 +1,26 @@
+{
+  "classification_digest": "4b4e9a012a5ec587bf8a07550cde9893d6cc1d277179c3374c318952c4092577",
+  "defer_count": 0,
+  "exclude_count": 0,
+  "include_count": 18692,
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "policy": "include_all_fixed_commit_regular_blobs",
+  "promotion_required": true,
+  "record_version": 1,
+  "sources": [
+    {
+      "inventory_entries": 18325,
+      "inventory_sha256": "34fe974552a1572d5f383e9cd8d461e2a1df8836f92b5f1135a22463fecd52b8",
+      "repository": "ReviewCompass"
+    },
+    {
+      "inventory_entries": 367,
+      "inventory_sha256": "6bfa12351cb274e384c607f4dd01b3e1f0997589db523d91237146150cb23d2b",
+      "repository": "ReviewCompass2"
+    }
+  ],
+  "status": "complete",
+  "total_count": 18692,
+  "unknown_count": 0
+}
