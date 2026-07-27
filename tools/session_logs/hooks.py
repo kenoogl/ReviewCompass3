@@ -34,10 +34,11 @@ def build_hook_commands(
   *,
   event_log_path=None,
 ) -> HookCommands:
+  entry_path = Path(__file__).with_name("entry.py").resolve()
   base = [
     str(python_executable),
-    "-m",
-    "tools.session_logs.hooks",
+    str(entry_path),
+    "hook",
   ]
   config_arguments = ["--config", str(config_path)]
   if event_log_path is not None:

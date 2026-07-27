@@ -43,6 +43,7 @@ def build_launchd_schedule(
   config = _absolute_path(config_path)
   standard_output = _absolute_path(stdout_path)
   standard_error = _absolute_path(stderr_path)
+  entry_path = Path(__file__).with_name("entry.py").resolve()
   if (
     isinstance(interval_seconds, bool)
     or not isinstance(interval_seconds, int)
@@ -53,12 +54,10 @@ def build_launchd_schedule(
     "Label": LABEL,
     "ProgramArguments": [
       str(python_path),
-      "-m",
-      "tools.session_logs.cli",
+      str(entry_path),
+      "preserve",
       "--config",
       str(config),
-      "--preserve-only",
-      "--json-lines",
     ],
     "RunAtLoad": True,
     "StandardErrorPath": str(standard_error),

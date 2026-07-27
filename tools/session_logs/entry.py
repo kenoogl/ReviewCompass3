@@ -1,0 +1,63 @@
+"""cwdに依存しないセッションログ固定実行入口。
+
+lifecycle: provisional
+normative_status: non-normative
+promotion_required: true
+"""
+
+import argparse
+import importlib
+import sys
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _load_module(name):
+  root = str(PROJECT_ROOT)
+  if root not in sys.path:
+    sys.path.insert(0, root)
+  return importlib.import_module(name)
+
+
+def run(argv=None) -> int:
+  parser = argparse.ArgumentParser()
+  subcommands = parser.add_subparsers(dest="command", required=True)
+  hook_parser = subcommands.add_parser("hook")
+  hook_parser.add_argument("phase", choices=("start", "end"))
+  hook_parser.add_argument("--config", required=True)
+  hook_parser.add_argument("--event-log")
+  preserve_parser = subcommands.add_parser("preserve")
+  preserve_parser.add_argument("--config", required=True)
+  args = parser.parse_args(argv)
+
+  if args.command == "hook":
+    hooks = _load_module("tools.session_logs.hooks")
+    hook_arguments = [
+      args.phase,
+      "--config",
+      args.config,
+    ]
+    if args.event_log is not None:
+      hook_arguments.extend([
+        "--event-log",
+        args.event_log,
+      ])
+    return hooks.run(tuple(hook_arguments))
+
+  cli = _load_module("tools.session_logs.cli")
+  return cli.run((
+    "--config",
+    args.config,
+    "--preserve-only",
+    "--json-lines",
+  ))
+
+
+def main():
+  raise SystemExit(run())
+
+
+if __name__ == "__main__":
+  main()
