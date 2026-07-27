@@ -69,6 +69,11 @@ def run(argv=None) -> int:
       "tools.session_logs.limited_approval"
     )
     return approval.run(tuple(arguments[1:]))
+  if arguments and arguments[0] == "limited-deployment":
+    deployment = _load_module(
+      "tools.session_logs.limited_deployment"
+    )
+    return deployment.run(tuple(arguments[1:]))
   parser = argparse.ArgumentParser()
   subcommands = parser.add_subparsers(dest="command", required=True)
   hook_parser = subcommands.add_parser("hook")

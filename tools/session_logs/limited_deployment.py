@@ -5,6 +5,7 @@ normative_status: non-normative
 promotion_required: true
 """
 
+import argparse
 import dataclasses
 import json
 import sys
@@ -261,3 +262,235 @@ def execute_limited_uninstall(
     completed_steps=completed,
     data_preserved=True,
   )
+
+
+def _portable_candidate(request):
+  from tools.session_logs.deployment_paths import DeploymentPaths
+  from tools.session_logs.portable_config import build_portable_config
+  paths = DeploymentPaths(
+    config_file=request.config_file,
+    data_root=request.data_root,
+    state_root=request.state_root,
+    log_root=request.log_root,
+    cache_root=request.data_root / "cache",
+  )
+  return build_portable_config(
+    request.raw_root,
+    deployment_paths=paths,
+    tool_version="0.0.1",
+    environment={},
+  )
+
+
+def _schedule_request(request):
+  from tools.session_logs.schedule_backends import (
+    PeriodicScheduleRequest,
+  )
+  return PeriodicScheduleRequest(
+    schedule_path=request.schedule_path,
+    python_executable=request.python_executable,
+    config_path=request.config_file,
+    interval_seconds=request.interval_seconds,
+    stdout_path=request.log_root / "stdout.log",
+    stderr_path=request.log_root / "stderr.log",
+    user_id=request.user_id,
+  )
+
+
+def _install_callbacks(backend):
+  from tools.session_logs.hook_installation import (
+    install_configured_claude_hooks,
+  )
+  from tools.session_logs.portable_config import (
+    install_portable_config,
+  )
+  return {
+    "install_config": lambda request: install_portable_config(
+      _portable_candidate(request)
+    ),
+    "install_hooks": lambda request: (
+      install_configured_claude_hooks(
+        request.hook_settings,
+        python_executable=request.python_executable,
+        config_path=request.config_file,
+      )
+    ),
+    "install_schedule": lambda request: backend.run(
+      "install",
+      _schedule_request(request),
+    ),
+    "activate_schedule": lambda request: backend.run(
+      "activate",
+      _schedule_request(request),
+    ),
+    "inspect_schedule": lambda request: backend.run(
+      "status",
+      _schedule_request(request),
+    ),
+  }
+
+
+def _uninstall_hooks(request):
+  from tools.session_logs.config import load_config
+  from tools.session_logs.hook_installation import (
+    uninstall_claude_hooks,
+  )
+  from tools.session_logs.hooks import build_hook_commands
+  config = load_config(request.config_file)
+  commands = build_hook_commands(
+    request.python_executable,
+    request.config_file,
+    event_log_path=config.hook_event_log_path,
+  )
+  return uninstall_claude_hooks(
+    request.hook_settings,
+    start_command=commands.start,
+    end_command=commands.end,
+  )
+
+
+def _remove_owned_config(request):
+  from tools.session_logs.deployment_lifecycle import (
+    ConfigMigrationResult,
+    _owned_config_bytes,
+  )
+  _owned_config_bytes(request.config_file)
+  try:
+    request.config_file.unlink()
+  except OSError as error:
+    raise LimitedDeploymentError(
+      "Cannot remove limited deployment config"
+    ) from error
+  return ConfigMigrationResult(action="uninstalled")
+
+
+def _uninstall_callbacks(backend):
+  return {
+    "deactivate_schedule": lambda request: backend.run(
+      "deactivate",
+      _schedule_request(request),
+    ),
+    "uninstall_schedule": lambda request: backend.run(
+      "uninstall",
+      _schedule_request(request),
+    ),
+    "uninstall_hooks": _uninstall_hooks,
+    "remove_config": _remove_owned_config,
+  }
+
+
+def _plan_limited(
+  approval_path,
+  operation,
+  *,
+  backend,
+  runtime_platform,
+):
+  request = _approved_request(
+    approval_path,
+    runtime_platform,
+  )
+  if operation == "install":
+    if not request.raw_root.is_dir():
+      raise LimitedDeploymentError(
+        "Limited deployment raw root is unavailable"
+      )
+    _portable_candidate(request)
+  elif not request.config_file.is_file():
+    raise LimitedDeploymentError(
+      "Limited deployment config is unavailable"
+    )
+  result = backend.run(
+    operation,
+    _schedule_request(request),
+    dry_run=True,
+  )
+  if result.action != "planned" or result.status != "ok":
+    raise LimitedDeploymentError(
+      "Limited deployment dry run failed"
+    )
+  return 5 if operation == "install" else 4
+
+
+def _print_result(action, status, step_count, data_preserved):
+  print(json.dumps({
+    "action": action,
+    "data_preserved": data_preserved,
+    "status": status,
+    "step_count": step_count,
+  }, sort_keys=True))
+
+
+def run(
+  argv=None,
+  *,
+  backend_registry=None,
+  runtime_platform=None,
+) -> int:
+  parser = argparse.ArgumentParser()
+  parser.add_argument(
+    "operation",
+    choices=("install", "uninstall"),
+  )
+  parser.add_argument("--approval", required=True)
+  parser.add_argument("--dry-run", action="store_true")
+  args = parser.parse_args(argv)
+  selected_platform = (
+    sys.platform
+    if runtime_platform is None
+    else runtime_platform
+  )
+  try:
+    from tools.session_logs.schedule_backends import (
+      select_schedule_backend,
+    )
+    request = _approved_request(
+      args.approval,
+      selected_platform,
+    )
+    backend = select_schedule_backend(
+      platform_name=request.platform,
+      registry=backend_registry,
+    )
+    if args.dry_run:
+      step_count = _plan_limited(
+        args.approval,
+        args.operation,
+        backend=backend,
+        runtime_platform=selected_platform,
+      )
+      _print_result("planned", "ok", step_count, True)
+      return 0
+    if args.operation == "install":
+      result = execute_limited_install(
+        args.approval,
+        runtime_platform=selected_platform,
+        **_install_callbacks(backend),
+      )
+    else:
+      result = execute_limited_uninstall(
+        args.approval,
+        runtime_platform=selected_platform,
+        **_uninstall_callbacks(backend),
+      )
+  except Exception as error:
+    print(json.dumps({
+      "reason": type(error).__name__,
+      "status": "failed",
+    }, sort_keys=True))
+    return 5
+  _print_result(
+    result.action,
+    "ok",
+    len(result.completed_steps),
+    result.data_preserved,
+  )
+  return 0
+
+
+def main():
+  raise SystemExit(run())
+
+
+if __name__ == "__main__":
+  main()
