@@ -29,6 +29,9 @@ from tools.session_logs.regeneration import (
   RegenerationError,
   regenerate_artifact,
 )
+from tools.session_logs.repository_context import (
+  collect_repository_context,
+)
 from tools.session_logs.storage import store_artifact
 
 
@@ -313,6 +316,24 @@ def run(argv=None) -> int:
     enabled=args.json_lines,
   )
   exit_value = EXIT_OK
+  commits = ()
+  changed_files = ()
+  if config.summary_revision_range is not None:
+    if config.repository_root is None:
+      return EXIT_FAILED
+    try:
+      repository_context = collect_repository_context(
+        config.repository_root,
+        config.summary_revision_range,
+        rules=config.redaction_rules,
+        allow_patterns=config.allow_patterns,
+      )
+    except SensitiveDataRemaining:
+      return EXIT_SENSITIVE_DATA
+    except Exception:
+      return EXIT_FAILED
+    commits = repository_context.commits
+    changed_files = repository_context.changed_files
 
   for relative_path in relative_paths:
     raw_log = config.raw_root / relative_path
@@ -346,6 +367,8 @@ def run(argv=None) -> int:
         rules=config.redaction_rules,
         tool_version=config.tool_version,
         allow_patterns=config.allow_patterns,
+        commits=commits,
+        changed_files=changed_files,
       )
     except UnsupportedSourceKind as error:
       exit_value = max(exit_value, EXIT_UNSUPPORTED)

@@ -26,6 +26,7 @@ class Config:
   sensitive_report_root: object
   backup_root: object
   preservation_ledger_path: object
+  summary_revision_range: object
   preservation_enabled: bool
   tool_version: str
   redaction_rules: tuple
@@ -111,6 +112,7 @@ def load_config(path) -> Config:
       if ledger_path is not None
       else None
     ),
+    summary_revision_range=data.get("summary_revision_range"),
     preservation_enabled=bool(
       data.get("preservation_enabled", False)
     ),
