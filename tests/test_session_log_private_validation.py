@@ -118,3 +118,95 @@ def test_private_validation_rejects_repository_paths_without_leaking_them(
   assert str(error.value) == "Unsafe private validation boundary"
   assert "private-name" not in repr(error.value)
   assert "secret-name" not in repr(error.value)
+
+
+def test_private_validation_fixed_cli_outputs_counts_only(
+  tmp_path,
+  capsys,
+):
+  repository_root = tmp_path / "repository"
+  repository_root.mkdir()
+  subprocess.run(
+    ["git", "init", str(repository_root)],
+    capture_output=True,
+    check=True,
+    text=True,
+  )
+  raw_root = tmp_path / "private" / "raw"
+  raw_root.mkdir(parents=True)
+  private_text = "Private fixed CLI sentence."
+  (raw_root / "session.jsonl").write_text(
+    json.dumps({
+      "uuid": "user-1",
+      "type": "user",
+      "sessionId": "session-1",
+      "message": {
+        "role": "user",
+        "content": private_text,
+      },
+    }) + "\n",
+    encoding="utf-8",
+  )
+  evidence_path = tmp_path / "private" / "validation.json"
+  config_path = tmp_path / "private" / "session-logs.json"
+  config_path.write_text(
+    json.dumps({
+      "raw_root": "unused-raw",
+      "transcript_root": "unused-transcripts",
+      "summary_root": "unused-summaries",
+      "provenance_root": "unused-provenance",
+      "tool_version": "0.0.1",
+      "redaction_rules": [],
+      "allow_patterns": [],
+    }),
+    encoding="utf-8",
+  )
+  entry = importlib.import_module("tools.session_logs.entry")
+
+  assert entry.run((
+    "validate-private",
+    "--raw-root",
+    str(raw_root),
+    "--repository-root",
+    str(repository_root),
+    "--evidence",
+    str(evidence_path),
+    "--config",
+    str(config_path),
+  )) == 0
+
+  output = capsys.readouterr().out
+  assert json.loads(output) == {
+    "counts": {
+      "claude": 1,
+      "codex": 0,
+      "failed": 0,
+      "unsupported": 0,
+    },
+    "git_unchanged": True,
+    "status": "passed",
+  }
+  assert private_text not in output
+  assert str(raw_root) not in output
+
+
+def test_private_validation_fixed_cli_rejects_relative_paths(capsys):
+  validation = importlib.import_module(
+    "tools.session_logs.private_validation"
+  )
+
+  assert validation.run((
+    "--raw-root",
+    "relative-raw",
+    "--repository-root",
+    "relative-repository",
+    "--evidence",
+    "relative-evidence.json",
+    "--config",
+    "relative-config.json",
+  )) == 5
+
+  assert json.loads(capsys.readouterr().out) == {
+    "reason": "PrivateValidationError",
+    "status": "failed",
+  }
