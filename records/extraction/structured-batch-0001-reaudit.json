@@ -1,0 +1,260 @@
+{
+  "audit": {
+    "approval_candidate": null,
+    "covered_count": 340,
+    "digest": "7f99836c1bd5697828d7a5c420bcb7b62bfeb8289fffdce34d6b0181f33ce5c3",
+    "newly_covered_count": 250,
+    "prior_covered_count": 90,
+    "status": "blocked",
+    "uncovered_count": 18352,
+    "unresolved_count": 18355
+  },
+  "batch": {
+    "candidate_count": 250,
+    "candidate_digest": "d53b95e0e8eae6400eded30abcae69ae68622b2e46d17885bbd4c0678c0eb354",
+    "classification_digest": "83269d56aa036e64c8c5e78922c1e99aa2f717e068ce98d3b7ae1e07823d2ff0",
+    "classification_kind_counts": {
+      "approval": 14,
+      "canonical_spec": 15,
+      "generated_evidence": 221
+    },
+    "classification_status": "complete",
+    "extracted": {
+      "ReviewCompass2:.reviewcompass/specs/units/intent.coverage.yaml": "ESS-0020",
+      "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/model-result-summary.yaml": "ESS-0027",
+      "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/parsed/claude-sonnet-4-6.round-1.yaml": "ESS-0022",
+      "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/rounds.yaml": "ESS-0024",
+      "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/target-manifest.yaml": "ESS-0025",
+      "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/triage.yaml": "ESS-0026",
+      "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-12-design-reopen-triad-review-run-r2/approval.yaml": "ESS-0021",
+      "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-07-12-requirements-review-wave-ce-prompt-quality-final-run/review-execution-spec.yaml": "ESS-0023"
+    },
+    "extracted_count": 8,
+    "identifier": "structured_materials-0001",
+    "merge_target_counts": {
+      "ESS-0020": 1,
+      "ESS-0021": 13,
+      "ESS-0022": 88,
+      "ESS-0023": 12,
+      "ESS-0024": 32,
+      "ESS-0025": 32,
+      "ESS-0026": 31,
+      "ESS-0027": 33
+    },
+    "merged_count": 242,
+    "not_selected_count": 0,
+    "resolution_digest": "0a9dd243629d9f3546bd12efd9b880aec42b699e7a01d2d7bfbe83bc56149d8f",
+    "status": "complete"
+  },
+  "empirical_revalidation": {
+    "digest": "f02915fb801c1e7ced10205dca4ffc66d56efa04c2efecdd2d9804b93ea3df0d",
+    "follow_up": [
+      "ESS-0012"
+    ],
+    "information": [],
+    "items": [
+      {
+        "identifier": "ESS-0011",
+        "observations": [
+          {
+            "evidence": "tests/test_session_log_mutation_assurance.py:test_claude_parser_uses_lf_only_boundaries",
+            "name": "lf_only_claude",
+            "rationale": "U+2028を埋めたfixtureでLFだけを行境界とすることを独立検査済み",
+            "status": "resolved"
+          },
+          {
+            "evidence": "tests/test_session_log_mutation_assurance.py:test_codex_parser_uses_lf_only_boundaries",
+            "name": "lf_only_codex",
+            "rationale": "Codex JSONLでもU+2028を構造境界にしないことを独立検査済み",
+            "status": "resolved"
+          },
+          {
+            "evidence": "tools/session_logs/transcript.py",
+            "name": "marker_spoof",
+            "rationale": "現転写は型付きevent列から生成しmarker文字列を構造として再解析しない",
+            "status": "information"
+          },
+          {
+            "evidence": "tests/test_session_log_provenance.py",
+            "name": "raw_range_integrity",
+            "rationale": "raw範囲・件数・digestと転写digestの完全一致を検査済み",
+            "status": "resolved"
+          }
+        ],
+        "status": "resolved"
+      },
+      {
+        "identifier": "ESS-0012",
+        "observations": [
+          {
+            "evidence": "ReviewCompass2:docs/design/2026-07-25-current-advantages-inventory.md",
+            "name": "A07_reviewer_count",
+            "rationale": "2名評価と3名評価の混同を訂正対象として分離できる",
+            "status": "resolved"
+          },
+          {
+            "evidence": "ReviewCompass2:docs/design/2026-07-25-current-advantages-inventory.md",
+            "name": "A08_missing_connection",
+            "rationale": "未接続機能に依存する条件付き優位点として扱える",
+            "status": "information"
+          },
+          {
+            "evidence": "ReviewCompass2:docs/design/2026-07-25-current-advantages-inventory.md",
+            "name": "A09_user_decision",
+            "rationale": "優位点ではなく利用者決定として別軸へ分類できる",
+            "status": "information"
+          },
+          {
+            "evidence": "ReviewCompass2:docs/design/2026-07-25-current-advantages-inventory.md",
+            "name": "A10_side_track_stack",
+            "rationale": "優位点と欠落の両判断が残り現行設計での採否判断が必要",
+            "status": "follow_up"
+          }
+        ],
+        "status": "follow_up"
+      }
+    ],
+    "resolved": [
+      "ESS-0011"
+    ],
+    "status": "follow_up"
+  },
+  "fixed_sources": [
+    {
+      "commit": "35ef8d4cc66b9a00aca9c6da10b645837b06564b",
+      "repository": "ReviewCompass"
+    },
+    {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "repository": "ReviewCompass2"
+    }
+  ],
+  "lifecycle": "provisional",
+  "new_essence_items": {
+    "digest": "c8d3bfa7c4627403c267f7493e19936b84ee5bc971e76f157dbbd5966da57191",
+    "item_count": 8,
+    "items": [
+      {
+        "dependencies": [],
+        "destination": "semantic_units.coverage_contract",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass2:.reviewcompass/specs/units/intent.coverage.yaml"
+        ],
+        "identifier": "ESS-0020",
+        "kind": "contract",
+        "rationale": "抽出対象と被覆状態を同じ版へ固定できる",
+        "related_tests": [],
+        "statement": "意味単位と被覆を版付き正本として機械照合する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.approval_decision_record",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-12-design-reopen-triad-review-run-r2/approval.yaml"
+        ],
+        "identifier": "ESS-0021",
+        "kind": "user_decision",
+        "rationale": "承認済み範囲を後続処理から機械照合できる",
+        "related_tests": [],
+        "statement": "利用者承認を対象と判断内容へ束縛して記録する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.parsed_result_record",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/parsed/claude-sonnet-4-6.round-1.yaml"
+        ],
+        "identifier": "ESS-0022",
+        "kind": "contract",
+        "rationale": "所見と解析失敗をraw応答へ追跡できる",
+        "related_tests": [],
+        "statement": "model応答の解析結果と試行履歴を構造化して保持する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.execution_spec",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-07-12-requirements-review-wave-ce-prompt-quality-final-run/review-execution-spec.yaml"
+        ],
+        "identifier": "ESS-0023",
+        "kind": "contract",
+        "rationale": "担当と対象の取り違えを実行前に拒否できる",
+        "related_tests": [],
+        "statement": "reviewの役割と対象を版付き実行仕様へ固定する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.round_record",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/rounds.yaml"
+        ],
+        "identifier": "ESS-0024",
+        "kind": "procedure",
+        "rationale": "複数roundの試行と採用結果を追跡できる",
+        "related_tests": [],
+        "statement": "roundごとのmodel結果と対象を結線して保持する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.target_manifest",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/target-manifest.yaml"
+        ],
+        "identifier": "ESS-0025",
+        "kind": "invariant",
+        "rationale": "対象漏れと実行途中のscope変化を検出できる",
+        "related_tests": [],
+        "statement": "review対象集合を実行runへ固定して改変を検出する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.triage_record",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/triage.yaml"
+        ],
+        "identifier": "ESS-0026",
+        "kind": "procedure",
+        "rationale": "一致と競合を区別して判断過程を保存できる",
+        "related_tests": [],
+        "statement": "複数modelの所見を重複と競合を保ってtriageする"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.result_summary",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-06-09-existing-system-sdd-design-all-features-review-run-r2/model-result-summary.yaml"
+        ],
+        "identifier": "ESS-0027",
+        "kind": "capability",
+        "rationale": "run全体の結果を個別証拠へ遡れる形で提示できる",
+        "related_tests": [],
+        "statement": "model別結果を件数と結論を失わず要約する"
+      }
+    ],
+    "status": "complete"
+  },
+  "normative_status": "non-normative",
+  "priority_plan_digest": "9c9374c2bc3eb74e8dda0ec046a624d5800398df1069aa870c11f6101ac78602",
+  "promotion_required": true,
+  "reassessment": {
+    "agreed_count": 250,
+    "conflict_count": 0,
+    "digest": "dc225b12b8e8fa6939da45ae41f07f3a8127103faca8d8a7a5d506ff21ac8811",
+    "material_digest": "83269d56aa036e64c8c5e78922c1e99aa2f717e068ce98d3b7ae1e07823d2ff0",
+    "paths": [
+      "main",
+      "independent"
+    ],
+    "status": "complete"
+  },
+  "record_version": 1,
+  "status": "blocked"
+}
