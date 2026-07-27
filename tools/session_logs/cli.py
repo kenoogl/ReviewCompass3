@@ -50,7 +50,65 @@ def _print_json(payload):
   ))
 
 
-def _verify_saved_artifact(relative_path, config) -> int:
+class _JsonLinesReporter:
+  def __init__(self, mode, *, enabled):
+    self.mode = mode
+    self.enabled = enabled
+    self.counts = {
+      "failed": 0,
+      "preserved": 0,
+      "succeeded": 0,
+    }
+
+  def result(
+    self,
+    source_path,
+    *,
+    action,
+    status="ok",
+    reason=None,
+  ):
+    if status == "error":
+      self.counts["failed"] += 1
+    elif action == "preserved":
+      self.counts["preserved"] += 1
+    else:
+      self.counts["succeeded"] += 1
+    if not self.enabled:
+      return
+    payload = {
+      "action": action,
+      "kind": "result",
+      "mode": self.mode,
+      "source_path": Path(source_path).as_posix(),
+      "status": status,
+    }
+    if reason is not None:
+      payload["reason"] = reason
+    _print_json(payload)
+
+  def finish(self):
+    if not self.enabled:
+      return
+    successful = (
+      self.counts["succeeded"]
+      + self.counts["preserved"]
+    )
+    if self.counts["failed"] and successful:
+      status = "partial"
+    elif self.counts["failed"]:
+      status = "error"
+    else:
+      status = "ok"
+    _print_json({
+      "counts": self.counts,
+      "kind": "summary",
+      "mode": self.mode,
+      "status": status,
+    })
+
+
+def _verify_saved_artifact(relative_path, config, reporter=None) -> int:
   source_path = Path(relative_path)
   transcript_path = (
     config.transcript_root / source_path.with_suffix(".md")
@@ -71,29 +129,56 @@ def _verify_saved_artifact(relative_path, config) -> int:
       tool_version=config.tool_version,
     )
   except RegenerationError as error:
-    _print_json({
-      "source_path": source_path.as_posix(),
-      "status": "regeneration_failed",
-      "reason": error.reason,
-    })
+    if reporter is None:
+      _print_json({
+        "source_path": source_path.as_posix(),
+        "status": "regeneration_failed",
+        "reason": error.reason,
+      })
+    else:
+      reporter.result(
+        source_path,
+        action="regeneration_failed",
+        status="error",
+        reason=error.reason,
+      )
     return EXIT_REGENERATION_FAILED
   except Exception as error:
-    _print_json({
-      "source_path": source_path.as_posix(),
-      "status": "regeneration_failed",
-      "reason": type(error).__name__,
-    })
+    if reporter is None:
+      _print_json({
+        "source_path": source_path.as_posix(),
+        "status": "regeneration_failed",
+        "reason": type(error).__name__,
+      })
+    else:
+      reporter.result(
+        source_path,
+        action="regeneration_failed",
+        status="error",
+        reason=type(error).__name__,
+      )
     return EXIT_REGENERATION_FAILED
 
-  _print_json({
-    "source_path": source_path.as_posix(),
-    "status": result.status,
-    "source_matches": result.source_matches,
-    "provenance_matches": result.provenance_matches,
-    "stored_matches": result.stored_matches,
-    "rules_match": result.rules_match,
-    "tool_version_matches": result.tool_version_matches,
-  })
+  if reporter is None:
+    _print_json({
+      "source_path": source_path.as_posix(),
+      "status": result.status,
+      "source_matches": result.source_matches,
+      "provenance_matches": result.provenance_matches,
+      "stored_matches": result.stored_matches,
+      "rules_match": result.rules_match,
+      "tool_version_matches": result.tool_version_matches,
+    })
+  else:
+    reporter.result(
+      source_path,
+      action=result.status,
+      status=(
+        "ok"
+        if result.status == "matches"
+        else "error"
+      ),
+    )
   return (
     EXIT_OK
     if result.status == "matches"
@@ -104,6 +189,7 @@ def _verify_saved_artifact(relative_path, config) -> int:
 def run(argv=None) -> int:
   parser = argparse.ArgumentParser()
   parser.add_argument("--config", required=True)
+  parser.add_argument("--json-lines", action="store_true")
   mode = parser.add_mutually_exclusive_group()
   mode.add_argument("--dry-run", action="store_true")
   mode.add_argument("--verify", action="store_true")
@@ -155,10 +241,20 @@ def run(argv=None) -> int:
     return EXIT_NO_TARGETS
 
   if args.verify:
-    return max(
-      _verify_saved_artifact(relative_path, config)
+    reporter = _JsonLinesReporter(
+      "verify",
+      enabled=args.json_lines,
+    )
+    exit_value = max(
+      _verify_saved_artifact(
+        relative_path,
+        config,
+        reporter=reporter if args.json_lines else None,
+      )
       for relative_path in relative_paths
     )
+    reporter.finish()
+    return exit_value
 
   if args.preserve_only:
     if (
@@ -166,21 +262,41 @@ def run(argv=None) -> int:
       or config.backup_root is None
     ):
       return EXIT_FAILED
+    reporter = _JsonLinesReporter(
+      "preserve",
+      enabled=args.json_lines,
+    )
     exit_value = EXIT_OK
     for relative_path in relative_paths:
       try:
-        preserve_raw_log(
+        result = preserve_raw_log(
           config.raw_root / relative_path,
           raw_root=config.raw_root,
           backup_root=config.backup_root,
         )
-      except Exception:
+      except Exception as error:
         exit_value = max(
           exit_value,
           EXIT_PRESERVATION_FAILED,
         )
+        reporter.result(
+          relative_path,
+          action="preservation_failed",
+          status="error",
+          reason=type(error).__name__,
+        )
+      else:
+        reporter.result(
+          relative_path,
+          action=result.action,
+        )
+    reporter.finish()
     return exit_value
 
+  reporter = _JsonLinesReporter(
+    "dry-run" if args.dry_run else "process",
+    enabled=args.json_lines,
+  )
   exit_value = EXIT_OK
 
   for relative_path in relative_paths:
@@ -196,10 +312,16 @@ def run(argv=None) -> int:
           raw_root=config.raw_root,
           backup_root=config.backup_root,
         )
-      except Exception:
+      except Exception as error:
         exit_value = max(
           exit_value,
           EXIT_PRESERVATION_FAILED,
+        )
+        reporter.result(
+          relative_path,
+          action="preservation_failed",
+          status="error",
+          reason=type(error).__name__,
         )
     try:
       artifact = prepare_artifact(
@@ -209,11 +331,23 @@ def run(argv=None) -> int:
         tool_version=config.tool_version,
         allow_patterns=config.allow_patterns,
       )
-    except UnsupportedSourceKind:
+    except UnsupportedSourceKind as error:
       exit_value = max(exit_value, EXIT_UNSUPPORTED)
+      reporter.result(
+        relative_path,
+        action="unsupported",
+        status="error",
+        reason=type(error).__name__,
+      )
       continue
     except SensitiveDataRemaining as error:
       exit_value = max(exit_value, EXIT_SENSITIVE_DATA)
+      reporter.result(
+        relative_path,
+        action="sensitive_data",
+        status="error",
+        reason=type(error).__name__,
+      )
       if (
         not args.dry_run
         and config.sensitive_report_root is not None
@@ -229,24 +363,45 @@ def run(argv=None) -> int:
           source_path=Path(relative_path).as_posix(),
         )
       continue
-    except Exception:
+    except Exception as error:
       exit_value = max(exit_value, EXIT_FAILED)
+      reporter.result(
+        relative_path,
+        action="failed",
+        status="error",
+        reason=type(error).__name__,
+      )
       continue
 
     if args.dry_run:
-      print("planned %s" % Path(relative_path).as_posix())
+      if args.json_lines:
+        reporter.result(relative_path, action="planned")
+      else:
+        print("planned %s" % Path(relative_path).as_posix())
       continue
 
     try:
-      store_artifact(
+      result = store_artifact(
         artifact,
         transcript_root=config.transcript_root,
         summary_root=config.summary_root,
         provenance_root=config.provenance_root,
       )
-    except Exception:
+    except Exception as error:
       exit_value = max(exit_value, EXIT_FAILED)
+      reporter.result(
+        relative_path,
+        action="failed",
+        status="error",
+        reason=type(error).__name__,
+      )
+    else:
+      reporter.result(
+        relative_path,
+        action=result.action,
+      )
 
+  reporter.finish()
   return exit_value
 
 
