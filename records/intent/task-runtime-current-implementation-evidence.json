@@ -234,15 +234,13 @@
   "verification": {
     "bootstrap_test_count": 60,
     "bootstrap_test_result": "passed",
-    "implementation_diff_from_source_commit": 0,
-    "implementation_diff_scope": [
-      "tools/bootstrap",
-      "tests/test_bootstrap_*.py"
-    ],
+    "isolation_method": "full_git_archive",
     "record": {
-      "path": "records/intent/task-runtime-current-implementation-verification.json",
-      "sha256": "1798c04c8c1f135c122e5e056bfe88d4041d821e3a5e1724dae61b185cb0044e"
+      "path": "records/intent/task-runtime-current-implementation-verification-2.json",
+      "sha256": "9b7080d3ebb701bcb7a78618013eee592eb812ce5318b5a29cf5923196040897"
     },
+    "source_commit_directly_tested": true,
+    "source_tree_git_sha1": "cc2fe78164225ea18a2bcc91bae0dd6089c8f357",
     "verified_on": "2026-07-27"
   }
 }

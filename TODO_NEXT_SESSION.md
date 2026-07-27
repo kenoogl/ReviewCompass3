@@ -132,7 +132,16 @@
 - 改訂版4artifact、revision 2、再レビュー解決記録をmaterial revision 3へ束縛済み
 - revision 3のmaterial digestは
   `e760d88dbd2830c84093854feb3ee43ac64f736068220ee162dd8d877bf565c9`
-- 第3段intentはrevision 3の再レビュー待ち
+- material revision 3を同じ3観点で独立再レビュー済み
+- 旧7件は解消6件、残存1件。新規2件を加え、統合後は計3件
+- revision 3 reviewはerror 1件、warning 2件、材料不一致・未対応0件
+- 利用者の「次へ」に基づき、revision 3 reviewの3件を推奨方針どおり反映済み
+- 固定source commitの全Git archiveを隔離展開し、bootstrapテスト60件を
+  直接実行して全件通過済み
+- 修正版4artifact、revision 3、レビュー解決記録をmaterial revision 4へ束縛済み
+- revision 4のmaterial digestは
+  `e718154a843dd3813602a43557c212a1c9487c1fccf4c1fa30b02388a307011d`
+- 第3段intentはrevision 4の最終再検証待ち
 - 全テスト結果：`302 passed`
 - 作業ツリーは本TODO更新前の時点でクリーン
 - intentは起草中、requirements、designは未着手
@@ -203,7 +212,10 @@ follow_up 0件、未解決0件の`ready`で、台帳47項目は固定source dige
 3担当再レビューでは旧13件のうち9件を解消、4件を残存と判定した。
 残存4件と新規3件はerror 2件、warning 5件へtriageした。利用者の「次へ」に
 基づき7件を推奨方針どおり反映し、material revision 3を作成した。
-現在はrevision 3の再レビュー待ちである。
+revision 3の3担当再レビューでは旧7件のうち6件を解消し、1件を残存と判定した。
+残存1件と新規2件はerror 1件、warning 2件へ統合した。利用者の「次へ」に
+基づき3件を推奨方針どおり反映し、固定commitを隔離archiveで直接試験した
+verificationとmaterial revision 4を作成した。現在は最終再検証待ちである。
 
 ## 完了済み
 
@@ -668,21 +680,23 @@ Task Runtimeの中核概念を反映した。3担当の独立レビューも完�
 指摘原文17件を13件へ統合して推奨方針どおり反映した。material revision 2の
 再レビューとtriageも完了し、旧9件を解消、残存4件と新規3件を確認した。
 7件は推奨方針どおり反映し、material revision 3へ束縛した。
+revision 3の再レビューとtriageも完了し、旧6件を解消、残存1件と
+新規2件を確認した。3件は推奨方針どおり反映し、material revision 4へ束縛した。
 
-### 1. material revision 3の再レビュー
+### 1. material revision 4の最終再検証
 
-- 再レビュー7件が解消したかを同じ3観点で検査する
-- intent、概念文書、evidence、verificationのSHA-256とmaterial digestを確認する
+- 直近3件の解消、材料SHA-256、material digestを同じ3観点で確認する
+- 隔離archive検証とevidenceの結線を確認する
 
-### 2. 再レビュー結果のtriage
+### 2. 最終結果のtriage
 
-- 残存、再発、新規を区別し、errorとwarningを統合する
-- 担当間競合、未対応、材料不一致を機械検証する
+- error、warning、担当間競合、材料不一致、未対応を統合する
+- 未解決があれば利用者へ示し、解消済みなら承認候補を作る
 
 ### 3. 必要な最終修正
 
-- errorまたは採用するwarningだけを反映する
-- 修正した場合は新しい材料revisionとしてrevision 3へ結線する
+- 最終再検証で残った指摘だけを反映する
+- 修正した場合は新しい材料revisionとしてrevision 4へ結線する
 
 ### 4. intent承認と第4段への移行
 
@@ -691,10 +705,10 @@ Task Runtimeの中核概念を反映した。3担当の独立レビューも完�
 
 ## 次の作業進行
 
-1. material revision 3のartifactとdigestを確認する。
-2. revision 3を同じ3観点で独立再レビューする。
-3. 結果をtriageし、残存指摘を利用者へ示す。
-4. 必要な最終修正と再検証を行う。
+1. material revision 4のartifactとdigestを確認する。
+2. revision 4を同じ3観点で最終再検証する。
+3. 結果をtriageし、未解決がなければ承認候補を作る。
+4. 必要な場合だけ最終修正を行う。
 5. 利用者承認後にだけ第4段へ進む。
 
 ## 完了条件

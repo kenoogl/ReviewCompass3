@@ -73,6 +73,9 @@ LLMを含む意味処理を呼び出すToolかを明示し、それぞれの責�
 決定性は責務とは別の属性として扱う。検索APIや時変データ取得などの
 非決定的なToolも、入力、版・環境、出力、Validation、Retry条件を
 Harness contractと来歴へ記録する。
+同一結果を要求するのは決定的であると契約した処理だけとする。
+非決定的な取得結果は不変の入力として保存し、その結果を受け取った後段の
+決定的処理に対して同一入力・同一結果を検証する。
 
 LLMは材料候補やRetry案を提示できるが、材料の採用、完全性の宣言、
 Validationの通過、Retryの開始、Review Runの完了を決定しない。
@@ -118,6 +121,8 @@ Execution Contextの内容を固定した識別を**Execution Context identity**
 Prompt、Harness contract、Validation、モデル条件まで含め、実行に有効な条件を
 固定した識別を**effective execution identity**とする。同じレビュー材料の比較は
 前者を、同じ実行条件の比較は後者を使う。
+外部送信を行うReview Runでは、承認されたserialized outbound payload Digestも
+effective execution identityへ含める。
 
 Digestが直接保証するのは、規定した直列化規則に基づく内容の同一性と
 改変検知である。材料の完全性、出所の真実性、実際の送信、モデルによる
@@ -163,6 +168,11 @@ Digestへ束縛する。Human承認はExecution Context、Prompt、Harness contr
 各Digestにも束縛する。payload、検査結果、承認判断、送信Attempt、
 実送信結果をOperational Provenanceへ記録する。
 
+各Attemptは、実際に送信するserialized payloadのDigestがReview Runで承認された
+payload Digestと一致することを送信前に検査する。不一致の場合は送信しない。
+接続先、request ID、時刻などAttempt固有のtransport metadataはpayload identityと
+分離し、Attemptの来歴として記録する。
+
 ## Review RunとOperational Provenance
 
 一つのReview Runは、一つのExecution Context identityとeffective execution
@@ -183,6 +193,7 @@ Review Runを開始し、変更理由と前Runへの関係を記録する。
 - 実行主体と実行トポロジ
 - Harness contractとeffective execution identity
 - 直列化した送信payload、機微情報検査、Human承認
+- Attempt固有のtransport metadataとpayload Digest一致検査
 - モデルまたはToolへの入力と出力
 - Validation結果
 - Retryと変更理由

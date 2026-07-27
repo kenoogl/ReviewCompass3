@@ -1,0 +1,39 @@
+{
+  "checks": [
+    {
+      "collected_test_count": 60,
+      "command": "python3 -m pytest -q tests/test_bootstrap_*.py",
+      "cwd_role": "isolated_git_archive_root",
+      "exit_code": 0,
+      "id": "TR-VERIFY2-001",
+      "result": "passed",
+      "scope": [
+        "tests/test_bootstrap_*.py"
+      ],
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "............................................................             [100%]\n60 passed in 0.41s\n",
+      "stdout_sha256": "03f226a0fe15c9f0dfa95c4ba1a95b2bdb9e797a23ff24e64c2310c597d1e94c"
+    }
+  ],
+  "environment": {
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "pytest": "pytest 8.4.2",
+    "python": "3.9.6"
+  },
+  "execution": {
+    "archive_sha256": "7a0f48bd58e1c6f4d923549075f2d22053595a88008e9e5115aec95214744d95",
+    "command_runner": "zsh -lc",
+    "isolation_method": "full_git_archive",
+    "preparation_command": "git archive --format=tar b453acedabb02064223004dbd34d9d906f42804d | tar -x -C <isolated_root>",
+    "source_commit": "b453acedabb02064223004dbd34d9d906f42804d",
+    "source_tree_git_sha1": "cc2fe78164225ea18a2bcc91bae0dd6089c8f357",
+    "untracked_files_included": false,
+    "verified_on": "2026-07-27"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 2,
+  "source_commit": "b453acedabb02064223004dbd34d9d906f42804d",
+  "status": "passed"
+}
