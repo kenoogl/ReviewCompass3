@@ -1,0 +1,46 @@
+{
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "scope": "material_payload"
+  },
+  "lifecycle": "provisional",
+  "material_digest": "4442988c1273a602843e12c3882ce8adfa3cbef86db841ac9bc388931f439567",
+  "material_payload": {
+    "artifacts": [
+      {"path":"docs/intent/2026-07-27-reviewcompass3-intent-draft.md","role":"approved_intent","sha256":"5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"},
+      {"path":"records/requirements/canonical-approved-essence-ledger.json","role":"canonical_approved_essence_ledger","sha256":"96b82e68583b415ce0d74a8791da112974c35f266cd8136ffc5fd1b6dee61ca3"},
+      {"path":"records/requirements/intent-source-catalog.json","role":"stable_intent_fragments","sha256":"bfaab933c4f75741b3304226f2ba25839779f7b23179ce2ab12eae79cbadd82a"},
+      {"path":"records/requirements/feature-partition.json","role":"feature_partition","sha256":"d2bc778f24101e7d2fce3257a9e427860c76962e45c7d6ccfd504931bb084167"},
+      {"path":"docs/requirements/review-context-requirements.md","role":"context_requirements","sha256":"0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"},
+      {"path":"records/requirements/review-context-batch-0001.json","role":"context_requirement_trace","sha256":"8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"},
+      {"path":"docs/requirements/remaining-feature-requirements.md","role":"remaining_requirements","sha256":"632d9f9cd1a6c04f8953d94efb8db8a5b97f2d964b450d493c2675c1d7e7141a"},
+      {"path":"records/requirements/remaining-batches-0002-0009.json","role":"remaining_requirement_trace","sha256":"c22928ac7961a8e9b6e6619a5fb52bb95c6b152779303f55d636128b103c5672"},
+      {"path":"records/requirements/obligation-trace-policy.json","role":"obligation_trace_policy","sha256":"9d0fe285000fbf8c92b6075e88610ebce8b2cc9f33be7a3888c1df604ad4e928"},
+      {"path":"records/requirements/obligation-source-trace.json","role":"obligation_source_trace","sha256":"dbc818e8bf4e7028c55a7d10ddd363a2d9bb73790f9b7322c9eb3750b5357e58"},
+      {"path":"records/requirements/requirement-boundary-relations.json","role":"requirement_boundary_relations","sha256":"99957e0fa3ae30abb5d1f2288a7a9f0750da0293779e7e762546137bd8c21dae"},
+      {"path":"records/requirements/requirements-coverage-audit.json","role":"mechanical_coverage_audit","sha256":"a8d6ce81aaa930483f1f421a62adf00f7777b3fe11c3eb310ed3322df60fb598"},
+      {"path":"tools/requirements/requirement_batch.py","role":"requirement_contract","sha256":"2e91889620ae18e2b49b856939d07102429b9d07d24b707fcd9d4b1ecb6f3986"},
+      {"path":"tools/requirements/source_trace.py","role":"trace_contract","sha256":"02e7ca7756dd5cd27cf7e1d304f2d56a0a21256992042a8621f4e77806d46f99"},
+      {"path":"records/requirements/reviews/2026-07-27-stage-four-final-review/review-resolution.json","role":"prior_review_resolution","sha256":"cb9038c51f4ced0661867e8deb7f383da34e4f84995379c8f8ac089cec757100"}
+    ],
+    "criteria": [
+      "9機能37要件がapproved intentと47エッセンスを意味的に満たす",
+      "296義務がintent fragmentまたはessence itemへ個別に結ばれ機械検査できる",
+      "影響候補母集合、Scope、Operational Provenance、機微情報保存、自己適用の契約が反証可能である",
+      "Human、LLM、機械処理の責務がintent原理Aと一致する",
+      "Context、Harness、Triage、Trace、Workflow、Portable、Evaluationの所有境界が重複しない",
+      "先行レビュー16 findingsが退行なく解決している",
+      "実装方法を不必要に固定せずdesignへ進める十分な契約になっている"
+    ],
+    "review_roles": [
+      "scope_and_feature_boundary_final",
+      "task_runtime_requirements_final",
+      "adversarial_traceability_final"
+    ]
+  },
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "fixed"
+}
