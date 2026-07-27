@@ -1,0 +1,101 @@
+{
+  "material_digest": "d03469d077888facde13313b2cb1c161873d69aef12964eb5a630376ce9cd7c8",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "records/requirements/requirement-boundary-relations.json",
+        "sha256": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e"
+      },
+      {
+        "path": "records/requirements/obligation-source-trace.json",
+        "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7"
+      },
+      {
+        "path": "docs/design/2026-07-28-reviewcompass3-design.md",
+        "sha256": "1e566f93eee28e0a73746c84392ac958d40bda638f4e056e41f69ed8042144a1"
+      },
+      {
+        "path": "records/design/stage-five-design.json",
+        "sha256": "4cee0892a3e6a2a20d99e1e44a37fd924c4c7cf20d0576792b033e0ab3212e3f"
+      },
+      {
+        "path": "records/design/stage-five-architecture-integrity.json",
+        "sha256": "66a0a52f0ef068133006ed0d4d1edfc40c582039a0231866820dcecdac8971b1"
+      },
+      {
+        "path": "docs/design/2026-07-28-bootstrap-conformance-audit.md",
+        "sha256": "e63db43c07647961c8df9b370b521629aac26ac3ca8745408852f3648c5858d0"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-audit.json",
+        "sha256": "5f3cde65775ef1f80b234d2c599aae9b752f324d6e91ec0a5b2ce0d536f70219"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-integrity.json",
+        "sha256": "e0cb6a3382a45d41cf0f0f928a797549be6bda6488cf760f7ad0a5dc30da8220"
+      },
+      {
+        "path": "tools/design/design_contract.py",
+        "sha256": "41ede28c9d87f44ac8950893ec96da696ea8cb3670d3f0bce4f5d172b8e528a2"
+      },
+      {
+        "path": "tools/design/bootstrap_conformance.py",
+        "sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+      },
+      {
+        "path": "tests/test_design_contract.py",
+        "sha256": "8fc221c7c8959d037b315c02653abe947bfa3211efa530e53818fa8282678f48"
+      },
+      {
+        "path": "tests/test_bootstrap_conformance.py",
+        "sha256": "2a282d032d26a2719832e650ccd605ba4e697eaf8226d79d7e010f7116faadbb"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-postfix-verification/material.json",
+        "sha256": "d13c613ee5a8cec2d695ef3e19571097746a11087926a73cb4a4527c5c5008ab"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-postfix-verification/scope-review.json",
+        "sha256": "9e038e1f2df838d08cea3d7e9e99854f4349e6d5686218ca952d576c0a49df98"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-postfix-verification/task-runtime-review.json",
+        "sha256": "83aa67f69578a9866b822be77870053cd0e6fd26086d20dd07702912de16a605"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-postfix-verification/adversarial-review.json",
+        "sha256": "efc6f2620fb3bd94947317b558f74e86aa615db01577917da9a39d20ab795448"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-postfix-verification/triage.json",
+        "sha256": "099f18743f34f94b200e17b271cae67e4e0787811604914663160149f2048da4"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-postfix-verification/review-resolution.json",
+        "sha256": "e79845044b938019c52168071196c3c764c112b965053e718e3c7f8d7fb1e71e"
+      }
+    ],
+    "criteria": [
+      "postfix verificationの9 findingが全件解決済みである",
+      "正常protocolはCapture結果、Validation候補、Validation結果を生成後に消費する",
+      "dispatch・Capture・Validation失敗はfailedまたはirrecoverable Run結果を介してWorkflow blockedへ伝播する",
+      "Capture失敗は診断保存可能、隔離、raw・診断保存不能を別protocolで分類する",
+      "validatorはproducer-before-consumerと失敗状態ベクトルを機械検証する",
+      "既承認23境界、29 interface、8状態機械、14 protocol、28 event routeが機械検証される",
+      "開始・retry失敗と成功Run結果が生成後にWorkflowへ渡る",
+      "内部生成必須interfaceをinitialへ偽装できない",
+      "Capture局所分類とRun終端分類の相関が機械検証される",
+      "失敗branch内でRun結果outputがWorkflow inputより先にある",
+      "失敗専用protocol主経路もRun・Workflow失敗終端へ到達する",
+      "成功Run結果生成失敗はRun failedへ到達する",
+      "strict監査と391現行テストが通過する"
+    ],
+    "review_roles": [
+      "design_scope_and_boundary",
+      "task_runtime_design",
+      "adversarial_conformance"
+    ]
+  },
+  "status": "fixed",
+  "record_version": 1
+}
