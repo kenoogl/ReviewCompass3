@@ -1,0 +1,286 @@
+{
+  "completion": {
+    "approval_candidate": null,
+    "audit_digest": "f1a7cc3b7a89f5a16dbaaf7a50d20f8b0e5ba0f62985235090a9dd66851050d9",
+    "conflict_count": 0,
+    "covered_count": 18692,
+    "extracted_count": 14,
+    "merged_count": 16227,
+    "not_selected_count": 1361,
+    "reassessment_digest": "dc2ac311af00e39ba1e00efacca564b58797205e5fde430276c96fe0b16097b8",
+    "status": "blocked",
+    "uncovered_count": 0,
+    "unresolved_count": 1
+  },
+  "decisions": {
+    "action_counts": {
+      "extract": 14,
+      "merge": 16227,
+      "not_selected": 1361
+    },
+    "decision_digest": "8b84651e0a00ec1d4e8d82be7697675d24922192c1974a4256b0a615b8076465",
+    "layer_action_counts": {
+      "empirical_records": {
+        "merge": 6063,
+        "not_selected": 249
+      },
+      "implementation": {
+        "extract": 8,
+        "merge": 267
+      },
+      "issues": {
+        "merge": 62
+      },
+      "other": {
+        "merge": 2830,
+        "not_selected": 1112
+      },
+      "sessions": {
+        "merge": 458
+      },
+      "specifications": {
+        "extract": 3,
+        "merge": 3462
+      },
+      "structured_materials": {
+        "extract": 1,
+        "merge": 2908
+      },
+      "tests": {
+        "extract": 2,
+        "merge": 177
+      }
+    },
+    "target_counts": {
+      "ESS-0034": 3753,
+      "ESS-0035": 9752,
+      "ESS-0036": 52,
+      "ESS-0037": 64,
+      "ESS-0038": 18,
+      "ESS-0039": 17,
+      "ESS-0040": 47,
+      "ESS-0041": 99,
+      "ESS-0042": 43,
+      "ESS-0043": 23,
+      "ESS-0044": 123,
+      "ESS-0045": 528,
+      "ESS-0046": 1188,
+      "ESS-0047": 534
+    }
+  },
+  "follow_up_resolution": {
+    "ESS-0001": {
+      "approval_candidate": {
+        "approved": false,
+        "material_digest": "a82bfb5b6a89a010e58d5ebac0759e2a4a7dbb5a3e68387d044632f6a7c945fc",
+        "target_ids": [
+          "ESS-0001"
+        ]
+      },
+      "status": "follow_up"
+    },
+    "ESS-0008": {
+      "disposition": "information",
+      "rationale": "第0段でより広い起動経路を実装・承認済みであり旧指示は履歴証拠として保持する",
+      "status": "resolved"
+    }
+  },
+  "lifecycle": "provisional",
+  "material": {
+    "digest": "f6eb09bef18b860b1f9fcfef83fc8782fb59dfc1b8e15631466485dec1ba1aa7",
+    "remaining_count": 17602
+  },
+  "new_essence_items": {
+    "digest": "c3f3206a03d737f1e7d74e92b2a53dec617c0dc7e7407886c7dc400121c953ef",
+    "item_count": 14,
+    "items": [
+      {
+        "dependencies": [],
+        "destination": "workflow.management",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tests/tools/test_check_workflow_action.py"
+        ],
+        "identifier": "ESS-0034",
+        "kind": "capability",
+        "rationale": "workflow managementの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "作業状態・遷移・関門を一貫したworkflowとして管理する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.protocol",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/api_providers/adjacent_interfaces.py"
+        ],
+        "identifier": "ESS-0035",
+        "kind": "procedure",
+        "rationale": "review protocolの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "材料準備から複数担当triageまでのreview protocolを実行する"
+      },
+      {
+        "dependencies": [],
+        "destination": "improvement.self_review",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/self-improvement-check.py"
+        ],
+        "identifier": "ESS-0036",
+        "kind": "procedure",
+        "rationale": "self improvementの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "実行結果を検証して改善候補を安全に次周期へ反映する"
+      },
+      {
+        "dependencies": [],
+        "destination": "evaluation.conformance",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/conformance-evaluation-check.py"
+        ],
+        "identifier": "ESS-0037",
+        "kind": "capability",
+        "rationale": "conformance evaluationの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "成果物と実装の規約適合性を証拠付きで評価する"
+      },
+      {
+        "dependencies": [],
+        "destination": "evaluation.general",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/evaluation/requirements.md"
+        ],
+        "identifier": "ESS-0038",
+        "kind": "capability",
+        "rationale": "evaluationの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "対象・基準・結果を分離して再現可能な評価を行う"
+      },
+      {
+        "dependencies": [],
+        "destination": "analysis.workflow",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/analysis/requirements.md"
+        ],
+        "identifier": "ESS-0039",
+        "kind": "capability",
+        "rationale": "analysisの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "固定材料から分析結果と限界を追跡可能に生成する"
+      },
+      {
+        "dependencies": [],
+        "destination": "foundation.validation",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/foundation_validators/check_completion.py"
+        ],
+        "identifier": "ESS-0040",
+        "kind": "invariant",
+        "rationale": "foundationの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "共有データ境界と基礎validatorを単一の保証として提供する"
+      },
+      {
+        "dependencies": [],
+        "destination": "runtime.execution",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/runtime/requirements.md"
+        ],
+        "identifier": "ESS-0041",
+        "kind": "capability",
+        "rationale": "runtimeの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "固定設定と安全な停止条件の下でruntime処理を実行する"
+      },
+      {
+        "dependencies": [],
+        "destination": "learning.feedback",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tests/learning/test_dogfooding_event_ledger_schema.py"
+        ],
+        "identifier": "ESS-0042",
+        "kind": "capability",
+        "rationale": "learningの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "実測結果を根拠付きの学習材料として蓄積・再利用する"
+      },
+      {
+        "dependencies": [],
+        "destination": "deployment.lifecycle",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/build-deploy-package.py"
+        ],
+        "identifier": "ESS-0043",
+        "kind": "procedure",
+        "rationale": "deploymentの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "配布物の生成・導入・検証・解除を所有境界付きで管理する"
+      },
+      {
+        "dependencies": [],
+        "destination": "operations.maintenance",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tests/operations/test_api_review_prompt_quality_self_check_docs.py"
+        ],
+        "identifier": "ESS-0044",
+        "kind": "procedure",
+        "rationale": "operationsの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "運用・保守操作を観測可能かつ復旧可能な手順として扱う"
+      },
+      {
+        "dependencies": [],
+        "destination": "session_records.lifecycle",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/session-log-converter.py"
+        ],
+        "identifier": "ESS-0045",
+        "kind": "capability",
+        "rationale": "session recordsの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "session記録を抽出・変換・来歴照合できる形で保持する"
+      },
+      {
+        "dependencies": [],
+        "destination": "experiments.harness",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/experiments/_experiment_n_model.py"
+        ],
+        "identifier": "ESS-0046",
+        "kind": "capability",
+        "rationale": "experiment harnessの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "実験入力・実行条件・結果を分離して再実行可能にする"
+      },
+      {
+        "dependencies": [],
+        "destination": "workflow.work_units",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:.reviewcompass/specs/review-protocol-execution/reviews/2026-07-16-review-protocol-execution-requirements-risk-centered-review-run/work-unit-checklist-instance-template.yaml"
+        ],
+        "identifier": "ESS-0047",
+        "kind": "contract",
+        "rationale": "work units and backlogの実装・仕様・テストを同一の意味族へ統合する",
+        "related_tests": [],
+        "statement": "作業単位・backlog・進行段階を一意IDと状態で結線する"
+      }
+    ],
+    "status": "complete"
+  },
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "blocked"
+}
