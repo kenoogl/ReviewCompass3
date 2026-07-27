@@ -7,9 +7,10 @@ promotion_required: true
 
 import dataclasses
 import os
-import time
 from contextlib import contextmanager
 from pathlib import Path
+
+from tools.session_logs.locking import LockError, LockHeld, exclusive_lock
 
 
 class PreservationError(Exception):
@@ -58,51 +59,17 @@ def _safe_relative_path(value) -> Path:
 
 @contextmanager
 def _preservation_lock(path, *, timeout_seconds):
-  lock_path = Path(path)
-  acquired = False
   try:
-    lock_path.parent.mkdir(parents=True, exist_ok=True)
-    for _attempt in range(2):
-      try:
-        descriptor = os.open(
-          str(lock_path),
-          os.O_CREAT | os.O_EXCL | os.O_WRONLY,
-        )
-      except FileExistsError:
-        try:
-          age = time.time() - lock_path.stat().st_mtime
-        except FileNotFoundError:
-          continue
-        if age <= timeout_seconds:
-          raise PreservationLocked(
-            "Raw log preservation is already locked"
-          )
-        try:
-          lock_path.unlink()
-        except FileNotFoundError:
-          pass
-        continue
-      except OSError as error:
-        raise PreservationError(
-          "Failed to acquire raw log preservation lock"
-        ) from error
-      else:
-        os.close(descriptor)
-        acquired = True
-        break
-    if not acquired:
-      raise PreservationLocked(
-        "Raw log preservation is already locked"
-      )
-    yield
-  finally:
-    if acquired:
-      try:
-        lock_path.unlink(missing_ok=True)
-      except OSError as error:
-        raise PreservationError(
-          "Failed to release raw log preservation lock"
-        ) from error
+    with exclusive_lock(path, timeout_seconds=timeout_seconds):
+      yield
+  except LockHeld as error:
+    raise PreservationLocked(
+      "Raw log preservation is already locked"
+    ) from error
+  except LockError as error:
+    raise PreservationError(
+      "Failed to manage raw log preservation lock"
+    ) from error
 
 
 def preserve_raw_log(
