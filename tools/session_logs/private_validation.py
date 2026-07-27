@@ -5,12 +5,14 @@ normative_status: non-normative
 promotion_required: true
 """
 
+import argparse
 import dataclasses
 import json
 import os
 import subprocess
 from pathlib import Path
 
+from tools.session_logs.config import load_config
 from tools.session_logs.discovery import discover_raw_logs
 from tools.session_logs.pipeline import (
   UnsupportedSourceKind,
@@ -40,9 +42,20 @@ def _within(path, root):
 
 
 def _validate_boundaries(raw_root, repository_root, evidence_path):
-  repository = Path(repository_root).resolve()
-  raw = Path(raw_root).resolve()
-  evidence = Path(evidence_path).resolve()
+  repository_value = Path(repository_root)
+  raw_value = Path(raw_root)
+  evidence_value = Path(evidence_path)
+  if (
+    not repository_value.is_absolute()
+    or not raw_value.is_absolute()
+    or not evidence_value.is_absolute()
+  ):
+    raise PrivateValidationError(
+      "Unsafe private validation boundary"
+    )
+  repository = repository_value.resolve()
+  raw = raw_value.resolve()
+  evidence = evidence_value.resolve()
   if (
     not (repository / ".git").exists()
     or _within(raw, repository)
@@ -167,3 +180,54 @@ def validate_private_logs(
     git_unchanged=git_unchanged,
     evidence_path=evidence,
   )
+
+
+def _print_result(payload):
+  print(json.dumps(
+    payload,
+    ensure_ascii=False,
+    sort_keys=True,
+  ))
+
+
+def run(argv=None) -> int:
+  parser = argparse.ArgumentParser()
+  parser.add_argument("--raw-root", required=True)
+  parser.add_argument("--repository-root", required=True)
+  parser.add_argument("--evidence", required=True)
+  parser.add_argument("--config", required=True)
+  args = parser.parse_args(argv)
+  try:
+    if not Path(args.config).is_absolute():
+      raise PrivateValidationError(
+        "Unsafe private validation boundary"
+      )
+    config = load_config(args.config)
+    result = validate_private_logs(
+      args.raw_root,
+      repository_root=args.repository_root,
+      evidence_path=args.evidence,
+      rules=config.redaction_rules,
+      tool_version=config.tool_version,
+      allow_patterns=config.allow_patterns,
+    )
+  except Exception as error:
+    _print_result({
+      "reason": type(error).__name__,
+      "status": "failed",
+    })
+    return 5
+  _print_result({
+    "counts": result.counts,
+    "git_unchanged": result.git_unchanged,
+    "status": result.status,
+  })
+  return 0 if result.status == "passed" else 5
+
+
+def main():
+  raise SystemExit(run())
+
+
+if __name__ == "__main__":
+  main()
