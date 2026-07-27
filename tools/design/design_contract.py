@@ -134,11 +134,17 @@ _PROTOCOL_STEP_FIELDS = {
   "step_id",
   "actor_design_id",
   "interface_id",
+  "interface_role",
   "state_machine_id",
   "from_state",
   "event",
   "to_state",
   "on_failure",
+}
+_INTERFACE_ROLES = {
+  "input",
+  "output",
+  "internal_evidence",
 }
 _FAILURE_BRANCH_FIELDS = {
   "machine_id",
@@ -843,6 +849,7 @@ def validate_design_architecture(
         or step["step_id"] in step_ids
         or step["actor_design_id"] not in design_ids
         or step["interface_id"] not in interface_ids
+        or step["interface_role"] not in _INTERFACE_ROLES
         or step["state_machine_id"] not in machine_ids
         or step["state_machine_id"]
         not in current_states
@@ -854,9 +861,11 @@ def validate_design_architecture(
         or step["to_state"] not in machine_by_id[
           step["state_machine_id"]
         ]["states"]
-        or not isinstance(step["on_failure"], dict)
-        or set(step["on_failure"])
-        != _FAILURE_BRANCH_FIELDS
+        or not isinstance(
+          step["on_failure"],
+          (list, tuple),
+        )
+        or not step["on_failure"]
       ):
         raise DesignContractError(
           "protocol step must resolve: "
@@ -871,6 +880,27 @@ def validate_design_architecture(
         raise DesignContractError(
           "protocol actor must participate in interface"
         )
+      machine_owner = machine_by_id[
+        step["state_machine_id"]
+      ]["owner_design_id"]
+      if (
+        step["interface_role"] == "input"
+        and interface["consumer_design_id"]
+        != machine_owner
+      ) or (
+        step["interface_role"] == "output"
+        and interface["provider_design_id"]
+        != machine_owner
+      ) or (
+        step["interface_role"] == "internal_evidence"
+        and machine_owner not in {
+          interface["provider_design_id"],
+          interface["consumer_design_id"],
+        }
+      ):
+        raise DesignContractError(
+          "protocol interface role must match owner"
+        )
       if not any(
         transition["from"] == step["from_state"]
         and transition["event"] == step["event"]
@@ -882,31 +912,33 @@ def validate_design_architecture(
         raise DesignContractError(
           "protocol step must match state transition"
         )
-      failure = step["on_failure"]
-      if (
-        failure["machine_id"] not in machine_ids
-        or failure["from_state"] not in machine_by_id[
-          failure["machine_id"]
-        ]["states"]
-        or failure["to_state"] not in machine_by_id[
-          failure["machine_id"]
-        ]["states"]
-        or failure["event"] not in machine_by_id[
-          failure["machine_id"]
-        ]["events"]
-        or not _text(failure["persistence"])
-        or not any(
-          transition["from"] == failure["from_state"]
-          and transition["event"] == failure["event"]
-          and transition["to"] == failure["to_state"]
-          for transition in machine_by_id[
+      for failure in step["on_failure"]:
+        if (
+          not isinstance(failure, dict)
+          or set(failure) != _FAILURE_BRANCH_FIELDS
+          or failure["machine_id"] not in machine_ids
+          or failure["from_state"] not in machine_by_id[
             failure["machine_id"]
-          ]["transitions"]
-        )
-      ):
-        raise DesignContractError(
-          "protocol failure branch must match transition"
-        )
+          ]["states"]
+          or failure["to_state"] not in machine_by_id[
+            failure["machine_id"]
+          ]["states"]
+          or failure["event"] not in machine_by_id[
+            failure["machine_id"]
+          ]["events"]
+          or not _text(failure["persistence"])
+          or not any(
+            transition["from"] == failure["from_state"]
+            and transition["event"] == failure["event"]
+            and transition["to"] == failure["to_state"]
+            for transition in machine_by_id[
+              failure["machine_id"]
+            ]["transitions"]
+          )
+        ):
+          raise DesignContractError(
+            "protocol failure branch must match transition"
+          )
       current_states[step["state_machine_id"]] = (
         step["to_state"]
       )
