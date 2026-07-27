@@ -1305,11 +1305,18 @@
     "contract": "tools/design/bootstrap_conformance.py:validate_strict_evidence_backed_bootstrap_conformance",
     "base_contract": "tools/design/bootstrap_conformance.py:validate_evidence_backed_bootstrap_conformance",
     "commit_contract": "tools/design/bootstrap_conformance.py:validate_commit_blob_claims",
-    "digest": "11be347dda961641968a3dec93548d388be867723419303f78266184ed027c8f",
+    "digest": "f2f4947b39f4de75009838f640d3026ebb1df4ed57d7c2c8aec5738f784b3d01",
     "approved_input_digests": {
-      "approved_obligations": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7",
-      "approved_boundaries": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e",
-      "approved_design": "9a300744e658f68bd2b9fdb014112c3922f2d5e2fd8f81b2baa5b0a54583c363"
+      "approved_dependencies": "d8d7e0bc9bb774028a1e200f621af97d8608513b29f35be07cedac2ec63aa1b6",
+      "approved_obligations": "de03baea36d69a893b7620c69f6b94acc35fc68a3bf94238be155a851895f725",
+      "design_components": "297119ee9f4ed434a089aa33ef026eff11549a6fe8353515b02b29ba6fdcdd3b",
+      "requirement_acceptance_tests": "5e8a6f3c0690846ed83fbfaf3e60d48517a40e42a1d474cdd4563551a22f997c"
+    },
+    "approved_input_counts": {
+      "approved_dependency_count": 11,
+      "approved_obligation_count": 464,
+      "design_count": 9,
+      "requirement_acceptance_test_count": 37
     },
     "counts": {
       "adapt": 28,
@@ -1331,17 +1338,17 @@
   "approved_inputs": {
     "obligation_source": {
       "path": "records/requirements/obligation-source-trace.json",
-      "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7",
+      "content_digest": "de03baea36d69a893b7620c69f6b94acc35fc68a3bf94238be155a851895f725",
       "obligation_count": 464
     },
     "boundary_relations": {
       "path": "records/requirements/requirement-boundary-relations.json",
-      "sha256": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e",
+      "content_digest": "d8d7e0bc9bb774028a1e200f621af97d8608513b29f35be07cedac2ec63aa1b6",
       "dependency_count": 11
     },
     "design": {
       "path": "records/design/stage-five-design.json",
-      "sha256": "9a300744e658f68bd2b9fdb014112c3922f2d5e2fd8f81b2baa5b0a54583c363",
+      "content_digest": "297119ee9f4ed434a089aa33ef026eff11549a6fe8353515b02b29ba6fdcdd3b",
       "design_count": 9
     }
   },

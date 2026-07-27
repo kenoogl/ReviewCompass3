@@ -567,7 +567,7 @@
     "requirement_count": 37,
     "integrity_contract": "tools/design/bootstrap_conformance.py:validate_strict_evidence_backed_bootstrap_conformance",
     "integrity_record": "records/design/bootstrap-conformance-integrity.json",
-    "integrity_digest": "11be347dda961641968a3dec93548d388be867723419303f78266184ed027c8f",
+    "integrity_digest": "f2f4947b39f4de75009838f640d3026ebb1df4ed57d7c2c8aec5738f784b3d01",
     "evidence_count": 61,
     "gap_count": 37,
     "status": "complete"
