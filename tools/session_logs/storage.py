@@ -9,6 +9,8 @@ import dataclasses
 import hashlib
 import json
 import os
+import time
+from contextlib import contextmanager
 from pathlib import Path
 
 from tools.session_logs.updates import merge_append_only
@@ -16,6 +18,10 @@ from tools.session_logs.updates import merge_append_only
 
 class StorageError(Exception):
   """成果物群の保存または復旧に失敗した。"""
+
+
+class StorageLocked(StorageError):
+  """別の処理が同じ成果物群を更新している。"""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -86,7 +92,56 @@ def _commit_outputs(outputs):
       temporary_path.unlink(missing_ok=True)
 
 
-def store_artifact(
+@contextmanager
+def _artifact_lock(path, *, timeout_seconds):
+  lock_path = Path(path)
+  acquired = False
+  try:
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    for _attempt in range(2):
+      try:
+        descriptor = os.open(
+          str(lock_path),
+          os.O_CREAT | os.O_EXCL | os.O_WRONLY,
+        )
+      except FileExistsError:
+        try:
+          age = time.time() - lock_path.stat().st_mtime
+        except FileNotFoundError:
+          continue
+        if age <= timeout_seconds:
+          raise StorageLocked(
+            "Session artifact storage is already locked"
+          )
+        try:
+          lock_path.unlink()
+        except FileNotFoundError:
+          pass
+        continue
+      except OSError as error:
+        raise StorageError(
+          "Failed to acquire session artifact lock"
+        ) from error
+      else:
+        os.close(descriptor)
+        acquired = True
+        break
+    if not acquired:
+      raise StorageLocked(
+        "Session artifact storage is already locked"
+      )
+    yield
+  finally:
+    if acquired:
+      try:
+        lock_path.unlink(missing_ok=True)
+      except OSError as error:
+        raise StorageError(
+          "Failed to release session artifact lock"
+        ) from error
+
+
+def _store_artifact_unlocked(
   artifact,
   *,
   transcript_root,
@@ -191,3 +246,30 @@ def store_artifact(
     provenance_path=provenance_path,
     summary_path=summary_path,
   )
+
+
+def store_artifact(
+  artifact,
+  *,
+  transcript_root,
+  provenance_root,
+  summary_root=None,
+  lock_timeout_seconds=300,
+) -> StorageResult:
+  source_path = Path(artifact.provenance.source_path)
+  provenance_path = (
+    Path(provenance_root) / source_path.with_suffix(".json")
+  )
+  lock_path = provenance_path.with_name(
+    provenance_path.name + ".lock"
+  )
+  with _artifact_lock(
+    lock_path,
+    timeout_seconds=lock_timeout_seconds,
+  ):
+    return _store_artifact_unlocked(
+      artifact,
+      transcript_root=transcript_root,
+      provenance_root=provenance_root,
+      summary_root=summary_root,
+    )
