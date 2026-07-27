@@ -132,3 +132,40 @@ def test_limited_install_and_uninstall_are_ordered_and_preserve_data(
   assert installed.data_preserved is True
   assert removed.data_preserved is True
   assert retained.read_text(encoding="utf-8") == "retain"
+
+
+def test_uninstall_excludes_owned_config_inside_data_root(tmp_path):
+  limited = importlib.import_module(
+    "tools.session_logs.limited_deployment"
+  )
+  payload = _approval_payload(tmp_path)
+  data_root = tmp_path / "data"
+  config_path = data_root / "session-logs.json"
+  payload["targets"]["config_file"] = str(config_path)
+  approval_path = _write_approval(tmp_path, payload)
+  data_root.mkdir()
+  retained = data_root / "retained.txt"
+  retained.write_text("retain", encoding="utf-8")
+  config_path.write_text(
+    json.dumps({
+      "deployment": {
+        "owner": "reviewcompass3",
+        "schema_version": 1,
+      },
+    }),
+    encoding="utf-8",
+  )
+
+  result = limited.execute_limited_uninstall(
+    approval_path,
+    runtime_platform="darwin",
+    deactivate_schedule=lambda _request: None,
+    uninstall_schedule=lambda _request: None,
+    uninstall_hooks=lambda _request: None,
+    remove_config=lambda _request: config_path.unlink(),
+  )
+
+  assert result.action == "uninstalled"
+  assert result.data_preserved is True
+  assert not config_path.exists()
+  assert retained.read_text(encoding="utf-8") == "retain"
