@@ -241,3 +241,77 @@ def test_parses_tool_call_and_result_as_linked_ordered_events(tmp_path):
     ),
   )
   assert result.issues == ()
+
+
+def test_reports_tool_events_without_call_ids_and_continues(tmp_path):
+  raw_log = tmp_path / "session.jsonl"
+  records = (
+    {
+      "uuid": "assistant-1",
+      "type": "assistant",
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "name": "Read",
+            "input": {},
+          },
+        ],
+      },
+    },
+    {
+      "uuid": "user-1",
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "content": "orphan result",
+          },
+        ],
+      },
+    },
+    {
+      "uuid": "assistant-2",
+      "type": "assistant",
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "tool-2",
+            "name": "Write",
+            "input": {},
+          },
+        ],
+      },
+    },
+  )
+  raw_log.write_text(
+    "".join(json.dumps(record) + "\n" for record in records),
+    encoding="utf-8",
+  )
+
+  parse_claude = importlib.import_module("tools.session_logs.parse_claude")
+
+  result = parse_claude.parse_claude_log(raw_log)
+
+  assert result.events == (
+    parse_claude.ToolCall(
+      event_id="assistant-2",
+      call_id="tool-2",
+      name="Write",
+      arguments={},
+      line_no=3,
+      block_index=0,
+    ),
+  )
+  assert tuple(
+    (issue.kind, issue.line_no, issue.block_index, issue.detail)
+    for issue in result.issues
+  ) == (
+    ("incomplete_tool_event", 1, 0, "missing_call_id"),
+    ("incomplete_tool_event", 2, 0, "missing_call_id"),
+  )
