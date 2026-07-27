@@ -31,6 +31,9 @@ def run(argv=None) -> int:
       "tools.session_logs.private_validation"
     )
     return validation.run(tuple(arguments[1:]))
+  if arguments and arguments[0] == "audit-stage-zero":
+    gate = _load_module("tools.session_logs.stage_gate")
+    return gate.run(tuple(arguments[1:]))
   parser = argparse.ArgumentParser()
   subcommands = parser.add_subparsers(dest="command", required=True)
   hook_parser = subcommands.add_parser("hook")

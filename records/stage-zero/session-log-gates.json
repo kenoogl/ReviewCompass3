@@ -1,0 +1,72 @@
+{
+  "external_checks": {
+    "private_real_log_validation": {
+      "status": "pending"
+    },
+    "stage_zero_user_approval": {
+      "status": "pending"
+    },
+    "user_environment_hook_schedule": {
+      "status": "pending"
+    }
+  },
+  "gates": {
+    "git_sensitive_data_absence": {
+      "evidence_paths": [
+        "tests/test_session_log_config_boundaries.py",
+        "tests/test_session_log_redaction.py"
+      ],
+      "status": "passed"
+    },
+    "hook_non_blocking": {
+      "evidence_paths": [
+        "tests/test_session_log_hooks.py"
+      ],
+      "status": "passed"
+    },
+    "idempotent_reingestion": {
+      "evidence_paths": [
+        "tests/test_session_log_storage.py",
+        "tests/test_session_log_updates.py"
+      ],
+      "status": "passed"
+    },
+    "periodic_preservation": {
+      "evidence_paths": [
+        "tests/test_session_log_scheduler.py"
+      ],
+      "status": "passed"
+    },
+    "raw_log_restore": {
+      "evidence_paths": [
+        "tests/test_session_log_e2e_fixtures.py",
+        "tests/test_session_log_preservation.py"
+      ],
+      "status": "passed"
+    },
+    "raw_to_summary_provenance": {
+      "evidence_paths": [
+        "tests/test_session_log_pipeline.py",
+        "tests/test_session_log_provenance.py"
+      ],
+      "status": "passed"
+    },
+    "real_data_mutation_validation": {
+      "evidence_paths": [
+        "tests/test_session_log_e2e_fixtures.py",
+        "tests/test_session_log_mutation_assurance.py"
+      ],
+      "status": "passed"
+    },
+    "transcript_summary_tamper_detection": {
+      "evidence_paths": [
+        "tests/test_session_log_regeneration.py"
+      ],
+      "status": "passed"
+    }
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "repository_root": "../.."
+}
