@@ -13,7 +13,7 @@
   "normative_status": "non-normative",
   "policy": {
     "exceptions": [],
-    "meaning": "各source_traceのintent_refs、essence_ids、rationaleはrequirement全体だけでなく列挙した全義務scopeの根拠として適用する",
+    "meaning": "各義務は{requirement_id}#{scope}の安定IDを持ち、obligation-source-trace.jsonでintent fragmentおよびessence itemへ個別に結ぶ",
     "required_scopes": [
       "statement",
       "inputs",
@@ -27,6 +27,11 @@
   },
   "promotion_required": true,
   "record_version": 1,
+  "obligation_source_trace": {
+    "path": "records/requirements/obligation-source-trace.json",
+    "required": true,
+    "sha256": "dbc818e8bf4e7028c55a7d10ddd363a2d9bb73790f9b7322c9eb3750b5357e58"
+  },
   "requirement_ids": [
     "REQ-CONTEXT-001",
     "REQ-CONTEXT-002",
@@ -47,15 +52,19 @@
     "REQ-TRACE-001",
     "REQ-TRACE-002",
     "REQ-TRACE-003",
+    "REQ-TRACE-004",
+    "REQ-TRACE-005",
     "REQ-SESSION-001",
     "REQ-SESSION-002",
     "REQ-SESSION-003",
     "REQ-WORKFLOW-001",
     "REQ-WORKFLOW-002",
     "REQ-WORKFLOW-003",
+    "REQ-WORKFLOW-004",
     "REQ-PORTABLE-001",
     "REQ-PORTABLE-002",
     "REQ-PORTABLE-003",
+    "REQ-PORTABLE-004",
     "REQ-EVAL-001",
     "REQ-EVAL-002",
     "REQ-EVAL-003",
@@ -65,11 +74,11 @@
   "source_trace_records": [
     {
       "path": "records/requirements/review-context-batch-0001.json",
-      "sha256": "2073a9e61f8dc9cf27c1f22584a76f8e6d13a8ad1128de68246b9674c23d8d32"
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
     },
     {
       "path": "records/requirements/remaining-batches-0002-0009.json",
-      "sha256": "da7b287a8ced4bc73155499d14af5e126c3d9dc920945a4646c40dbab813565a"
+      "sha256": "c22928ac7961a8e9b6e6619a5fb52bb95c6b152779303f55d636128b103c5672"
     }
   ],
   "status": "complete"

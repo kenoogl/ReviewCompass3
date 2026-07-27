@@ -3,7 +3,7 @@
     "batch_id": "REQ-BATCH-0001",
     "feature_id": "FEAT-REVIEW-CONTEXT",
     "requirements_path": "docs/requirements/review-context-requirements.md",
-    "requirements_sha256": "40d0fceb058c2d0a2762992bb8686ce5f4b1384f2f402857c47f6d53680f1afc",
+    "requirements_sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23",
     "status": "complete"
   },
   "fixed_inputs": [
@@ -34,8 +34,7 @@
         "Goal",
         "Provenance",
         "Validation Policy",
-        "一意に識別されたTarget",
-        "利用者が確認した必須フィールド集合"
+        "一意に識別されたTarget"
       ],
       "non_goals": [
         "LLMへ必須項目の採否を暗黙に委ねること",
@@ -94,12 +93,14 @@
       "acceptance_criteria": [
         "Targetが母集合内の許可分類へ入る",
         "全候補が重複なく許可された分類のいずれかに入る",
+        "固定変更単位、版付き意味グラフ、閉包規則から同じ候補母集合が再生成される",
         "母集合、Scope基準、期待分類を同じidentityへ固定し独立検査結果が全件一致する",
         "独立検査の相違時はScope確定を停止しHuman裁定へ戻す"
       ],
       "feature_id": "FEAT-REVIEW-CONTEXT",
       "inputs": [
-        "Review TaskのTarget",
+        "Review TaskのTargetと固定変更単位",
+        "版付き意味グラフと閉包規則",
         "include、exclude、deferの判定基準",
         "固定した候補母集合"
       ],
@@ -114,7 +115,7 @@
         "全分類判断、競合、未分類および母集合の変更記録"
       ],
       "recovery_conditions": [
-        "変更後の母集合を再固定して全件を再検査する",
+        "変更単位、意味関係または閉包規則を訂正して母集合を再生成する",
         "未分類または競合を解消し新しいScope版を作る"
       ],
       "requirement_id": "REQ-CONTEXT-003",
@@ -123,6 +124,8 @@
         "Targetが母集合に存在しないかReview Taskで許可されない分類に入る",
         "同じ候補に競合する分類がある",
         "分類中に母集合が変わる",
+        "母集合を変更単位、意味関係および閉包規則へ逆引きできない",
+        "必要材料がdeferまたは根拠不足のまま残る",
         "unknownまたは未分類が残る"
       ]
     },
@@ -230,7 +233,7 @@
     },
     {
       "acceptance_criteria": [
-        "完了markerのある成果だけが再利用され再読込Digestが一致する",
+        "クラッシュ後も確定済み版と未確定版を機械的に識別でき再読込Digestが一致する",
         "削除時も対象identity、理由および削除結果のDigest付き診断が残る",
         "書込み途中の強制終了後も直前の確認済み版が変わらない"
       ],
@@ -238,6 +241,7 @@
       "inputs": [
         "保存対象とそのidentity",
         "機微情報検査結果",
+        "REQ-PORTABLE-002およびREQ-PORTABLE-004を満たす共有保存境界",
         "許可された保存形式、アクセス境界およびretention policy"
       ],
       "non_goals": [
@@ -246,7 +250,7 @@
       ],
       "outputs": [
         "保存結果と再読込照合結果",
-        "原子的に確定した成果物と完了marker"
+        "耐久的に確定した成果物"
       ],
       "preserved_artifacts": [
         "直前の確認済み版と値を含まない失敗診断"
@@ -256,7 +260,7 @@
         "機微情報を除去し新しい保存試行として記録する"
       ],
       "requirement_id": "REQ-CONTEXT-007",
-      "statement": "システムはContext構成と検査で生じた確認済み成果、失敗履歴および診断を部分書込みや機微情報の漏えいを防ぎ再起動後に照合できる形で保存しなければならない",
+      "statement": "システムはContext構成と検査で生じた確認済み成果、失敗履歴および診断を共有保存境界を介して部分書込みや機微情報の漏えいを防ぎ再起動後に照合できる形で保存しなければならない",
       "stop_conditions": [
         "保存先のアクセス境界を確認できない",
         "原子的な確定または再読込照合に失敗する",
@@ -265,7 +269,7 @@
     }
   ],
   "results": {
-    "batch_digest": "01e2bcdcf95b893297fe4b7156b83480f29b442d60cbc7b9591300ab335b2e47",
+    "batch_digest": "e30f25874617ee64c49630d6ff4119adebb50e482d050c2d563563bbd338cf2a",
     "covered_feature_essence_count": 5,
     "missing_feature_essence_count": 0,
     "requirement_count": 7,

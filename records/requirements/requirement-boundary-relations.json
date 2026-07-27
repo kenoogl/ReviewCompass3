@@ -1,0 +1,22 @@
+{
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "relation_types": [
+    "depends_on",
+    "provides_to",
+    "returns_to"
+  ],
+  "relations": [
+    {"from":"REQ-TRACE-004","relation":"provides_to","to":"REQ-CONTEXT-003","contract":"影響候補母集合と生成根拠"},
+    {"from":"REQ-PORTABLE-002","relation":"provides_to","to":"REQ-CONTEXT-007","contract":"原子的書込み、再読込照合、部分失敗復旧"},
+    {"from":"REQ-PORTABLE-004","relation":"provides_to","to":"REQ-CONTEXT-007","contract":"機微情報、retention、削除の共有保存境界"},
+    {"from":"REQ-PORTABLE-004","relation":"provides_to","to":"REQ-EXEC-003","contract":"provider raw応答の隔離保存境界"},
+    {"from":"REQ-PORTABLE-004","relation":"provides_to","to":"REQ-SESSION-002","contract":"生ログ原本と伏字化派生物の分離保存境界"},
+    {"from":"REQ-WORKFLOW-002","relation":"provides_to","to":"REQ-EXEC-001","contract":"作業段階に束縛されたRun開始許可"},
+    {"from":"REQ-EXEC-001","relation":"returns_to","to":"REQ-WORKFLOW-002","contract":"Run完了、失敗または拒否結果"},
+    {"from":"REQ-EXEC-006","relation":"provides_to","to":"REQ-EVAL-002","contract":"観測値と測定条件の不変記録"}
+  ],
+  "status": "complete"
+}
