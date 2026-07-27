@@ -209,3 +209,66 @@ def test_cli_preserves_enabled_raw_logs_and_distinguishes_failure(
 
   assert cli.run(("--config", str(config_path))) == 6
   assert (tmp_path / "transcripts" / "nested" / "session.md").is_file()
+
+
+def test_cli_verifies_saved_transcript_and_reports_condition_change(
+  tmp_path,
+  capsys,
+):
+  raw_log = tmp_path / "raw" / "session.jsonl"
+  _write_event(raw_log)
+  config_path = _write_config(tmp_path)
+  cli = importlib.import_module("tools.session_logs.cli")
+  assert cli.run(("--config", str(config_path))) == 0
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--verify",
+  )) == 0
+  matched = json.loads(capsys.readouterr().out)
+  assert matched == {
+    "provenance_matches": True,
+    "rules_match": True,
+    "source_matches": True,
+    "source_path": "session.jsonl",
+    "status": "matches",
+    "stored_matches": True,
+    "tool_version_matches": True,
+  }
+
+  config = json.loads(config_path.read_text(encoding="utf-8"))
+  config["tool_version"] = "0.0.2"
+  config_path.write_text(json.dumps(config), encoding="utf-8")
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--verify",
+  )) == 7
+  changed = json.loads(capsys.readouterr().out)
+  assert changed["status"] == "conditions_changed"
+  assert changed["tool_version_matches"] is False
+
+
+def test_cli_verification_failure_report_is_safe(tmp_path, capsys):
+  raw_log = tmp_path / "raw" / "session.jsonl"
+  _write_event(raw_log)
+  config_path = _write_config(tmp_path)
+  cli = importlib.import_module("tools.session_logs.cli")
+  assert cli.run(("--config", str(config_path))) == 0
+  raw_log.write_bytes(b"\xffsecret-value-not-for-output\n")
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--verify",
+  )) == 8
+
+  report = capsys.readouterr().out
+  assert json.loads(report) == {
+    "reason": "UnicodeDecodeError",
+    "source_path": "session.jsonl",
+    "status": "regeneration_failed",
+  }
+  assert "secret-value-not-for-output" not in report
