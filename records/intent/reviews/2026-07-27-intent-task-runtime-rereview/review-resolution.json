@@ -1,0 +1,71 @@
+{
+  "artifacts_after_resolution": [
+    {
+      "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+      "sha256": "fc7f6142afbfb0105cf3660fa405aa6efe368f69f82d2b1ad000d0aaae7c81ac"
+    },
+    {
+      "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+      "sha256": "d11b17f6ba699d2d5ddada9f5c65e7ab827bd0d07bc9dc3ec6e7e5de84530e13"
+    },
+    {
+      "path": "records/intent/task-runtime-current-implementation-evidence.json",
+      "sha256": "76cdd90d5df67c553a4c17091abb1ad920530c4d84721541dc810bfe8a625132"
+    },
+    {
+      "path": "records/intent/task-runtime-current-implementation-verification.json",
+      "sha256": "1798c04c8c1f135c122e5e056bfe88d4041d821e3a5e1724dae61b185cb0044e"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "RR-001",
+      "resolution": "source universe identityと完全性判定結果をExecution Context identityへ含め、source universe変更を新Review Run開始条件へ追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "RR-002",
+      "resolution": "Toolの責務分類と決定性を分離し、非決定的Toolの入力・版・環境・出力・Validation・Retryを来歴対象にした",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "RR-003",
+      "resolution": "外部provenance referenceへ対象identity、内容Digest、解決規則、信頼境界、検証結果、失敗時停止を追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "RR-004",
+      "resolution": "serialized outbound payloadを確定した後、同じDigestを機微情報検査・Human承認・送信Attemptへ結ぶ順序へ修正した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "RR-005",
+      "resolution": "承認済み閉鎖payloadを承認フラグと対象Digestが一致する閉鎖payloadへ改め、Human承認証跡ではないことを明示した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "RR-006",
+      "resolution": "検証コマンド、対象範囲、環境、終了コード、収集数、出力Digestを独立verification記録へ固定した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "RR-007",
+      "resolution": "機械処理の決定性を同一の機械入力に限定し、LLM後段ではraw応答を入力へ含める表現へ修正した",
+      "status": "applied_pending_rereview"
+    }
+  ],
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "rereview_run": {
+    "material_digest": "7cf8ae638ab5af66377f09615a59938c8e3b4ce95ef47adc9a0779ac78ad38f5",
+    "path": "records/intent/reviews/2026-07-27-intent-task-runtime-rereview/rereview-run.json",
+    "sha256": "aab30d8c587ecd8a416780c15e2cccbc9d8497b6e23682d00d66cef771be2cd9"
+  },
+  "status": "awaiting_revision_3_rereview",
+  "user_instruction": {
+    "interpretation": "推奨した作業候補1から3の一括反映へ進む",
+    "text": "次へ"
+  }
+}

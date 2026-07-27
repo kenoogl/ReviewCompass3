@@ -1,0 +1,46 @@
+{
+  "checks": [
+    {
+      "collected_test_count": 60,
+      "command": "python3 -m pytest -q tests/test_bootstrap_*.py",
+      "exit_code": 0,
+      "id": "TR-VERIFY-001",
+      "result": "passed",
+      "scope": [
+        "tests/test_bootstrap_*.py"
+      ],
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "............................................................             [100%]\n60 passed in 0.38s\n",
+      "stdout_sha256": "613e6b6406e78303c261c14dd0df9cd7443cfc11e8f09739aaaa629cb53ef394"
+    },
+    {
+      "command": "git diff --exit-code b453acedabb02064223004dbd34d9d906f42804d -- tools/bootstrap tests/test_bootstrap_*.py",
+      "exit_code": 0,
+      "id": "TR-VERIFY-002",
+      "result": "no_difference",
+      "scope": [
+        "tools/bootstrap",
+        "tests/test_bootstrap_*.py"
+      ],
+      "source_commit": "b453acedabb02064223004dbd34d9d906f42804d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "environment": {
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "pytest": "pytest 8.4.2",
+    "python": "3.9.6"
+  },
+  "execution": {
+    "command_runner": "zsh -lc",
+    "repository_root": ".",
+    "verified_on": "2026-07-27"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "source_commit": "b453acedabb02064223004dbd34d9d906f42804d",
+  "status": "passed"
+}

@@ -1,0 +1,52 @@
+{
+  "approval_candidate": {
+    "approved": false,
+    "material_digest": "e760d88dbd2830c84093854feb3ee43ac64f736068220ee162dd8d877bf565c9",
+    "target": "reviewcompass3_intent_revision_3"
+  },
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "scope": "material_payload"
+  },
+  "lifecycle": "provisional",
+  "material_digest": "e760d88dbd2830c84093854feb3ee43ac64f736068220ee162dd8d877bf565c9",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+        "role": "non_normative_concept_detail",
+        "sha256": "d11b17f6ba699d2d5ddada9f5c65e7ab827bd0d07bc9dc3ec6e7e5de84530e13"
+      },
+      {
+        "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+        "role": "intent_revision",
+        "sha256": "fc7f6142afbfb0105cf3660fa405aa6efe368f69f82d2b1ad000d0aaae7c81ac"
+      },
+      {
+        "path": "records/intent/task-runtime-current-implementation-evidence.json",
+        "role": "current_implementation_evidence",
+        "sha256": "76cdd90d5df67c553a4c17091abb1ad920530c4d84721541dc810bfe8a625132"
+      },
+      {
+        "path": "records/intent/task-runtime-current-implementation-verification.json",
+        "role": "current_implementation_verification",
+        "sha256": "1798c04c8c1f135c122e5e056bfe88d4041d821e3a5e1724dae61b185cb0044e"
+      }
+    ],
+    "previous_material": {
+      "material_digest": "7cf8ae638ab5af66377f09615a59938c8e3b4ce95ef47adc9a0779ac78ad38f5",
+      "path": "records/intent/intent-draft-material-revision-2.json",
+      "sha256": "594fedc5a2afcf1f1533fff6c7d1b8ee1bc8bfe7c672d721dd164fc2c26c5749"
+    },
+    "review_resolution": {
+      "applied_finding_count": 7,
+      "path": "records/intent/reviews/2026-07-27-intent-task-runtime-rereview/review-resolution.json",
+      "sha256": "4b7574a74b3e842597a79316ae4d239d441cb332271e08a496199f2728bb7e52"
+    }
+  },
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 3,
+  "status": "awaiting_rereview"
+}

@@ -1,0 +1,228 @@
+{
+  "consolidated_findings": [
+    {
+      "document": "intent",
+      "id": "IR-001",
+      "recommendation": "intentには利用者価値と不変原則を残し、ID、Digest、記録項目、Runtime内部責務の具体化は概念文書と後続段へ寄せる。ただし、原理A、明示入力、追跡可能性など製品判断を拘束する境界はintentに残す。",
+      "severity": "warning",
+      "source_findings": [
+        "IS-001"
+      ],
+      "status": "recommended_partial_accept",
+      "summary": "intentに機構詳細が入り、requirementsとdesignの選択余地を狭めている"
+    },
+    {
+      "document": "intent",
+      "id": "IR-002",
+      "recommendation": "汎用エージェント基盤とLLMによる完全自律的な作業計画を対象外とする境界を、実装方式に踏み込まずintentへ追加する。",
+      "severity": "warning",
+      "source_findings": [
+        "IS-002"
+      ],
+      "status": "recommended_accept",
+      "summary": "Task Runtimeの製品範囲に関する重要な対象外が非規範文書にしかない"
+    },
+    {
+      "document": "cross",
+      "id": "IR-003",
+      "recommendation": "完全性の保証を、固定したsource universeとScope contractに対する完全性へ限定する。母集合、閉包、除外理由、未確定時の停止またはHuman判断を後続契約の必須事項にする。",
+      "severity": "error",
+      "source_findings": [
+        "AT-001"
+      ],
+      "status": "recommended_accept",
+      "summary": "未提示材料を検出できないのに、欠落のない入力と決定的な影響範囲を保証している"
+    },
+    {
+      "document": "cross",
+      "id": "IR-004",
+      "recommendation": "Findingの主張とHuman decisionから、Execution Context内の安定した証拠単位への参照、採否理由、参照先存在検査を必須の来歴辺として概念化する。",
+      "severity": "error",
+      "source_findings": [
+        "AT-002"
+      ],
+      "status": "recommended_accept",
+      "summary": "処理履歴は追えても、Findingの主張から一次証拠へたどる契約がない"
+    },
+    {
+      "document": "cross",
+      "id": "IR-005",
+      "recommendation": "Digestの保証を内容同一性と改変検知に限定して説明する。Execution Context identityと、Prompt、Harness、Validation、モデル条件を含むeffective execution identityを区別し、送信済みpayloadの証拠は別に記録する。",
+      "severity": "warning",
+      "source_findings": [
+        "AT-003",
+        "AT-007"
+      ],
+      "status": "recommended_accept",
+      "summary": "Digestが保証できる範囲と「同一入力」の境界が曖昧である"
+    },
+    {
+      "document": "concept",
+      "id": "IR-006",
+      "recommendation": "現行実装の能力を固定commit、実装箇所、テストへ結ぶevidence manifestを別記録として作る。「不変保存」は「write-once APIによる保存とDigest付与」へ訂正し、作成後の改変検出を不足へ追加する。",
+      "severity": "error",
+      "source_findings": [
+        "AT-004",
+        "TR-005"
+      ],
+      "status": "recommended_accept",
+      "summary": "現行実装の根拠が固定されず、不変保存という表現も実装保証を超えている"
+    },
+    {
+      "document": "concept",
+      "id": "IR-007",
+      "recommendation": "Runtime、コード、Provider、モデル、推論条件、Tool、Policy、Schema、実行者、時刻、承認対象payloadなど、出力に影響する要因をHarness contractで固定する候補として後続段へ送る。",
+      "severity": "warning",
+      "source_findings": [
+        "AT-005"
+      ],
+      "status": "recommended_accept",
+      "summary": "Attemptを再現・監査する実行条件の候補が不足している"
+    },
+    {
+      "document": "concept",
+      "id": "IR-008",
+      "recommendation": "Toolを機械処理または意味処理のどちらとして扱うかを実行単位ごとに分類し、最終判断を持たせない。材料提示、採用、完全性宣言、Validation、Retry、完了について提案権、決定権、承認記録の境界を示す。",
+      "severity": "warning",
+      "source_findings": [
+        "AT-006",
+        "TR-002"
+      ],
+      "status": "recommended_accept",
+      "summary": "Tool、呼出側、LLM、機械処理、Humanの判断権限が十分に分かれていない"
+    },
+    {
+      "document": "cross",
+      "id": "IR-009",
+      "recommendation": "Task Runtimeの範囲は広げず、Targetとsource materialsから上流のセッション・変更証跡へ接続する外部provenance referenceを境界契約へ加える。",
+      "severity": "warning",
+      "source_findings": [
+        "AT-008"
+      ],
+      "status": "recommended_accept",
+      "summary": "Operational ProvenanceがReview Taskから始まり、セッションと変更への上流経路が切れている"
+    },
+    {
+      "document": "concept",
+      "id": "IR-010",
+      "recommendation": "Task RunをReview Runへ統一し、Review Run、Attempt、Retryの包含関係と、新Runを開始する変更条件を概念レベルで定める。Review Task上のProvenanceと生成されるOperational Provenance、Finding集合と空集合の扱いも区別する。",
+      "severity": "warning",
+      "source_findings": [
+        "AT-009",
+        "TR-001"
+      ],
+      "status": "recommended_accept",
+      "summary": "Run、Attempt、Retry、Provenance、Findingの単位と境界が揺れている"
+    },
+    {
+      "document": "intent",
+      "id": "IR-011",
+      "recommendation": "intentには反証可能な成功の方向を残し、観測量、比較基準、閾値、試験条件はrequirementsで確定する旨を対応付ける。",
+      "severity": "warning",
+      "source_findings": [
+        "AT-010"
+      ],
+      "status": "recommended_accept",
+      "summary": "一部の成功条件に観測対象と失敗条件がなく、達成判定できない"
+    },
+    {
+      "document": "cross",
+      "id": "IR-012",
+      "recommendation": "外部送信前に、機微情報検査結果と、Execution Context、Prompt、Harness contractの各Digestへ束縛したHuman承認を置き、送信前判断としてOperational Provenanceへ記録する。",
+      "severity": "warning",
+      "source_findings": [
+        "TR-003"
+      ],
+      "status": "recommended_accept",
+      "summary": "外部API送信前の検査と承認が、正確な送信対象と来歴へ束縛されていない"
+    },
+    {
+      "document": "cross",
+      "id": "IR-013",
+      "recommendation": "来歴の各記録について、一意ID、内容Digest、限定された平文の関係種別を分離し、各辺の意味を検査可能にする。",
+      "severity": "warning",
+      "source_findings": [
+        "TR-004"
+      ],
+      "status": "recommended_accept",
+      "summary": "Digestと無名の矢印だけでは、記録間の関係の意味を表せない"
+    }
+  ],
+  "lifecycle": "provisional",
+  "material": {
+    "concept": {
+      "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+      "sha256": "1521c143cb591596370ee8183de7b91dab6cb00b44ba4fe9021540daddf801fa"
+    },
+    "intent": {
+      "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+      "sha256": "5f9cfd2b5c8a398159692e87d365fe85bd3a09d8dc58bac6cd2d4c446ef65bbe"
+    },
+    "material_digest": "44331a3d33a8a72ac9bd73c67bc0a0d51d016add5b0b1de486856ac74acf362c",
+    "record": "records/intent/intent-draft-material.json"
+  },
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "reviewers": [
+    {
+      "finding_count": 2,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-review/intent-scope.raw.json",
+      "raw_sha256": "e30a7d2ee77c3a3270090ca62f4047d30c6604da55b604270559b780a2da45af",
+      "role": "intent_scope",
+      "verdict": "findings"
+    },
+    {
+      "finding_count": 5,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-review/task-runtime.raw.json",
+      "raw_sha256": "0ed46b1902c2bc49a04e78c6fa96245dabf83d3ac3bcc85738446033560d9a37",
+      "role": "task_runtime",
+      "verdict": "findings"
+    },
+    {
+      "finding_count": 10,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-review/adversarial-traceability.raw.json",
+      "raw_sha256": "7ed935d384237582e27e2aa4c0438df2582d60a54ccde19866104b0761b24848",
+      "role": "adversarial_traceability",
+      "verdict": "findings"
+    }
+  ],
+  "source_commit": "b453acedabb02064223004dbd34d9d906f42804d",
+  "status": "awaiting_user_decision",
+  "summary": {
+    "consolidated_error": 3,
+    "consolidated_finding_count": 13,
+    "consolidated_warning": 10,
+    "reviewer_count": 3,
+    "source_error": 3,
+    "source_finding_count": 17,
+    "source_info": 0,
+    "source_warning": 14
+  },
+  "triage": {
+    "conflicting_source_findings": [],
+    "source_finding_coverage": {
+      "mapped": 17,
+      "unmapped": 0
+    },
+    "status": "completed",
+    "user_decision": "pending"
+  },
+  "validation": {
+    "allowed_document_values": [
+      "intent",
+      "concept",
+      "cross"
+    ],
+    "allowed_severity_values": [
+      "error",
+      "warning",
+      "info"
+    ],
+    "material_digest_match": true,
+    "raw_json_parse": "passed",
+    "reviewer_role_match": true,
+    "schema_version_match": true,
+    "unique_finding_ids": true
+  }
+}

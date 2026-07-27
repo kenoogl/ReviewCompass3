@@ -112,7 +112,27 @@
 - Task Runtime概念文書に現行ブートストラップ実装との対応と不足を記録済み
 - intentと概念文書の各SHA-256、利用者方向3件、台帳47項目を
   同一レビュー材料digestへ束縛済み
-- 第3段intentは利用者の方向性確認と複数担当レビュー前の暫定状態
+- intent範囲、Task Runtime、反証的追跡性の3担当で独立レビュー済み
+- レビュー原文17件はSchema、担当、材料digest、一意IDを機械検証済み
+- triageは重複を13件へ統合し、error 3件、warning 10件、競合0件、
+  未対応0件
+- 利用者の「次へ」に基づき、13件を推奨方針どおりintentとTask Runtime
+  概念文書へ反映済み
+- 現行実装の9能力を固定commit、実装symbol、テストへ結ぶevidenceを作成済み
+- 改訂版のintent、概念文書、現行実装evidence、レビュー解決記録を
+  material revision 2へ束縛済み
+- 改訂版material digestは
+  `7cf8ae638ab5af66377f09615a59938c8e3b4ce95ef47adc9a0779ac78ad38f5`
+- material revision 2を同じ3観点で独立再レビュー済み
+- 旧13件は解消9件、残存4件。再レビュー指摘は残存4件、新規3件の計7件
+- 再レビューtriageはerror 2件、warning 5件、未対応0件
+- 利用者の「次へ」に基づき、再レビュー7件を推奨方針どおり反映済み
+- 検証コマンド、対象範囲、環境、終了値、件数、出力digestを
+  現行実装verification記録へ固定済み
+- 改訂版4artifact、revision 2、再レビュー解決記録をmaterial revision 3へ束縛済み
+- revision 3のmaterial digestは
+  `e760d88dbd2830c84093854feb3ee43ac64f736068220ee162dd8d877bf565c9`
+- 第3段intentはrevision 3の再レビュー待ち
 - 全テスト結果：`302 passed`
 - 作業ツリーは本TODO更新前の時点でクリーン
 - intentは起草中、requirements、designは未着手
@@ -177,7 +197,13 @@ follow_up 0件、未解決0件の`ready`で、台帳47項目は固定source dige
 束縛して利用者承認済みである。第2段は完了した。第3段では承認済み台帳
 47項目と利用者の明示方向からintent初版候補を作成し、細かな規則と対応表を
 本文外へ分離した。Task Runtimeの詳細は非規範の概念文書へ整理し、現行実装との
-対応と不足を明示した。利用者の方向性確認と複数担当レビューは未完了である。
+対応と不足を明示した。3担当の独立レビューとtriageは完了し、17件の原指摘を
+13件へ統合した。利用者の「次へ」に基づき13件を推奨方針どおり反映し、
+固定commitへ結んだ現行実装evidenceと改訂材料を作成した。material revision 2の
+3担当再レビューでは旧13件のうち9件を解消、4件を残存と判定した。
+残存4件と新規3件はerror 2件、warning 5件へtriageした。利用者の「次へ」に
+基づき7件を推奨方針どおり反映し、material revision 3を作成した。
+現在はrevision 3の再レビュー待ちである。
 
 ## 完了済み
 
@@ -638,29 +664,37 @@ follow_up 0件、未解決0件の`ready`で、台帳47項目は固定source dige
 ## 次の作業候補
 
 第2段は完了し、第3段intentの初版候補へ利用者の方向性と
-Task Runtimeの中核概念を反映した。
+Task Runtimeの中核概念を反映した。3担当の独立レビューも完了し、
+指摘原文17件を13件へ統合して推奨方針どおり反映した。material revision 2の
+再レビューとtriageも完了し、旧9件を解消、残存4件と新規3件を確認した。
+7件は推奨方針どおり反映し、material revision 3へ束縛した。
 
-### 1. intent初版の方向性確認
+### 1. material revision 3の再レビュー
 
-- 利用者が目的、Task Runtimeの位置付け、対象外、優先順位を確認する
-- 修正が必要なら、複数担当レビューの前に初版へ反映する
+- 再レビュー7件が解消したかを同じ3観点で検査する
+- intent、概念文書、evidence、verificationのSHA-256とmaterial digestを確認する
 
-### 2. intentの複数担当レビュー
+### 2. 再レビュー結果のtriage
 
-- 固定した初版と台帳材料を同じdigestで各担当へ渡す
-- 材料不足、範囲逸脱、曖昧さ、衝突を統合して利用者へ提示する
+- 残存、再発、新規を区別し、errorとwarningを統合する
+- 担当間競合、未対応、材料不一致を機械検証する
 
-### 3. intent承認と第4段への移行
+### 3. 必要な最終修正
+
+- errorまたは採用するwarningだけを反映する
+- 修正した場合は新しい材料revisionとしてrevision 3へ結線する
+
+### 4. intent承認と第4段への移行
 
 - レビュー反映版を利用者が承認した時点で第3段を完了する
 - 第3段で承認されたintentとエッセンス台帳へ各要件を結線する
 
 ## 次の作業進行
 
-1. 再構築計画、承認済みエッセンス台帳、本TODOを確認する。
-2. 第3段intentの記載対象と対象外を整理する。
-3. 利用者との対話で目的・制約・成功条件を確定する。
-4. review材料を作り、複数担当レビューを実施する。
+1. material revision 3のartifactとdigestを確認する。
+2. revision 3を同じ3観点で独立再レビューする。
+3. 結果をtriageし、残存指摘を利用者へ示す。
+4. 必要な最終修正と再検証を行う。
 5. 利用者承認後にだけ第4段へ進む。
 
 ## 完了条件

@@ -1,0 +1,214 @@
+{
+  "consolidated_findings": [
+    {
+      "document": "cross",
+      "id": "RR-001",
+      "prior_finding": "IR-003",
+      "recommendation": "source universeの固定manifestまたはDigestと完全性判定結果をExecution Context identityへ含め、source universe変更を新Review Run開始条件へ追加する。",
+      "relation": "residual",
+      "severity": "error",
+      "source_findings": [
+        "ATR-001"
+      ],
+      "status": "recommended_accept",
+      "summary": "source universeと完全性判定がExecution Context identityおよび新Run条件へ束縛されていない"
+    },
+    {
+      "document": "concept",
+      "id": "RR-002",
+      "prior_finding": "IR-008",
+      "recommendation": "Toolの責務分類と決定性を別属性にし、非決定的かつ非LLMのToolにもHarness contract、Validation、Retry、来歴記録を適用する。",
+      "relation": "residual",
+      "severity": "warning",
+      "source_findings": [
+        "TRR-001"
+      ],
+      "status": "recommended_accept",
+      "summary": "外部Toolの二分法が非決定的かつ非LLMのToolを扱えない"
+    },
+    {
+      "document": "concept",
+      "id": "RR-003",
+      "prior_finding": "IR-009",
+      "recommendation": "外部provenance referenceへ対象identity、内容Digest、解決規則、検証結果を持たせ、解決不能または不一致時は来歴を検証済みにしない。",
+      "relation": "residual",
+      "severity": "warning",
+      "source_findings": [
+        "ATR-002"
+      ],
+      "status": "recommended_accept",
+      "summary": "外部証跡の存在と内容を検証するためのidentity、resolver、停止条件がない"
+    },
+    {
+      "document": "concept",
+      "id": "RR-004",
+      "prior_finding": "IR-012",
+      "recommendation": "serialized outbound payloadを先に確定し、同じpayload Digestに対する機微情報検査、Human承認、送信Attempt、実送信結果の順で来歴を構成する。",
+      "relation": "residual",
+      "severity": "warning",
+      "source_findings": [
+        "TRR-002"
+      ],
+      "status": "recommended_accept",
+      "summary": "送信payload生成と検査・Human承認の依存順序が逆転している"
+    },
+    {
+      "document": "cross",
+      "id": "RR-005",
+      "prior_finding": null,
+      "recommendation": "現行能力を「承認フラグと対象Digestが一致した閉鎖payload」へ限定し、Human承認の証跡ではないことを概念文書とevidence claimへ明記する。",
+      "relation": "new",
+      "severity": "warning",
+      "source_findings": [
+        "ATR-003"
+      ],
+      "status": "recommended_accept",
+      "summary": "「承認済み閉鎖payload」がHuman承認を証明するように読め、実装保証を超えている"
+    },
+    {
+      "document": "evidence",
+      "id": "RR-006",
+      "prior_finding": null,
+      "recommendation": "検証対象パス、コマンド、環境、終了コード、収集数、結果artifactのDigestを固定し、差分ゼロの対象範囲を明記する。",
+      "relation": "new",
+      "severity": "warning",
+      "source_findings": [
+        "ATR-004"
+      ],
+      "status": "recommended_accept",
+      "summary": "現行実装evidenceのテストと差分検証をmanifest単独で再現・監査できない"
+    },
+    {
+      "document": "intent",
+      "id": "RR-007",
+      "prior_finding": null,
+      "recommendation": "機械処理の決定性を「同一の機械入力には同一結果を返す」と表し、LLM後段ではraw応答を入力identityへ含める。LLM前段の材料生成だけを応答の揺らぎから独立させる。",
+      "relation": "new",
+      "severity": "error",
+      "source_findings": [
+        "ATR-005"
+      ],
+      "status": "recommended_accept",
+      "summary": "機械処理の決定性と、異なるLLM応答に対する出力不変性を混同している"
+    }
+  ],
+  "lifecycle": "provisional",
+  "material": {
+    "artifacts": [
+      {
+        "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+        "sha256": "727884f6b057170fc44f97857f4611a47f107227529118f028d2b1229069c5dc"
+      },
+      {
+        "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+        "sha256": "788c47b73222927386630486510a5646072a626a9238322246e08a546eec6f19"
+      },
+      {
+        "path": "records/intent/task-runtime-current-implementation-evidence.json",
+        "sha256": "4daf848228b5cced4089d30f1e48373d51e5803c8573b9d2ae0b68e322c0c98f"
+      }
+    ],
+    "material_digest": "7cf8ae638ab5af66377f09615a59938c8e3b4ce95ef47adc9a0779ac78ad38f5",
+    "record": "records/intent/intent-draft-material-revision-2.json",
+    "record_sha256": "594fedc5a2afcf1f1533fff6c7d1b8ee1bc8bfe7c672d721dd164fc2c26c5749"
+  },
+  "normative_status": "non-normative",
+  "prior_finding_status": {
+    "conflicting_reviewer_judgments": [
+      {
+        "final_status": "remaining",
+        "id": "IR-008",
+        "reviewer_statuses": [
+          "remaining",
+          "resolved"
+        ]
+      },
+      {
+        "final_status": "remaining",
+        "id": "IR-009",
+        "reviewer_statuses": [
+          "resolved",
+          "remaining"
+        ]
+      },
+      {
+        "final_status": "remaining",
+        "id": "IR-012",
+        "reviewer_statuses": [
+          "remaining",
+          "resolved"
+        ]
+      }
+    ],
+    "remaining": [
+      "IR-003",
+      "IR-008",
+      "IR-009",
+      "IR-012"
+    ],
+    "resolved": [
+      "IR-001",
+      "IR-002",
+      "IR-004",
+      "IR-005",
+      "IR-006",
+      "IR-007",
+      "IR-010",
+      "IR-011",
+      "IR-013"
+    ]
+  },
+  "promotion_required": true,
+  "record_version": 1,
+  "reviewers": [
+    {
+      "finding_count": 0,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-rereview/intent-scope.raw.json",
+      "raw_sha256": "64c580078eb4330eba8802b2b2c0f81bfb0df8b8bace367955031427f6b4f50a",
+      "role": "intent_scope_rereview",
+      "verdict": "pass"
+    },
+    {
+      "finding_count": 2,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-rereview/task-runtime.raw.json",
+      "raw_sha256": "c50d2bec17d274d944aedb517b4cd42e6138f5d002797e8f26d1f4eeebdf1209",
+      "role": "task_runtime_rereview",
+      "verdict": "findings"
+    },
+    {
+      "finding_count": 5,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-rereview/adversarial-traceability.raw.json",
+      "raw_sha256": "f2f19bc9bb8f7a0b9addd85b0772ace15f96731e5f8345eee95cf14e61a988ac",
+      "role": "adversarial_traceability_rereview",
+      "verdict": "findings"
+    }
+  ],
+  "status": "awaiting_user_decision",
+  "summary": {
+    "error": 2,
+    "finding_count": 7,
+    "new": 3,
+    "prior_remaining": 4,
+    "prior_resolved": 9,
+    "residual": 4,
+    "reviewer_count": 3,
+    "warning": 5
+  },
+  "triage": {
+    "source_finding_coverage": {
+      "mapped": 7,
+      "unmapped": 0
+    },
+    "status": "completed",
+    "user_decision": "pending"
+  },
+  "validation": {
+    "artifact_sha256_match": true,
+    "material_digest_match": true,
+    "prior_finding_coverage": 13,
+    "raw_json_parse": "passed",
+    "reviewer_role_match": true,
+    "schema_version_match": true,
+    "unique_finding_ids": true
+  }
+}

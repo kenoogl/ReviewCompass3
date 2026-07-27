@@ -1,0 +1,97 @@
+{
+  "artifacts_after_resolution": [
+    {
+      "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+      "sha256": "727884f6b057170fc44f97857f4611a47f107227529118f028d2b1229069c5dc"
+    },
+    {
+      "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+      "sha256": "788c47b73222927386630486510a5646072a626a9238322246e08a546eec6f19"
+    },
+    {
+      "path": "records/intent/task-runtime-current-implementation-evidence.json",
+      "sha256": "4daf848228b5cced4089d30f1e48373d51e5803c8573b9d2ae0b68e322c0c98f"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "IR-001",
+      "resolution": "intentを利用者価値と不変原則へ寄せ、詳細な記録候補と同一性境界は概念文書へ分離した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-002",
+      "resolution": "汎用エージェント基盤とLLMによる完全自律的な計画・完了判断を対象外へ追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-003",
+      "resolution": "完全性を固定source universeとScope contractに対する保証へ限定した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-004",
+      "resolution": "Findingの主張とHuman decisionからExecution Context内の証拠単位への参照と検査を追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-005",
+      "resolution": "Digestの保証範囲を限定し、Execution Context identityとeffective execution identityを分離した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-006",
+      "resolution": "固定commit、実装箇所、テストを結ぶevidenceを作成し、不変保存をwrite-once APIとDigest付与へ訂正した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-007",
+      "resolution": "Harness contractで固定する実行条件候補を追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-008",
+      "resolution": "Toolの分類と、LLM、機械処理、Humanの提案権・決定権・裁定境界を追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-009",
+      "resolution": "セッション、変更、成果物へ接続する外部provenance referenceを追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-010",
+      "resolution": "Review Run、Attempt、Retry、新Run条件、Finding集合と空集合を定義した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-011",
+      "resolution": "成功条件の未達状態を示し、観測量と閾値をrequirementsで定める境界を追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-012",
+      "resolution": "外部送信前の機微情報検査と、送信対象Digestに束縛したHuman承認を来歴へ追加した",
+      "status": "applied_pending_rereview"
+    },
+    {
+      "id": "IR-013",
+      "resolution": "一意ID、内容Digest、限定された平文の関係種別を分離した",
+      "status": "applied_pending_rereview"
+    }
+  ],
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "review_run": {
+    "material_digest": "44331a3d33a8a72ac9bd73c67bc0a0d51d016add5b0b1de486856ac74acf362c",
+    "path": "records/intent/reviews/2026-07-27-intent-task-runtime-review/review-run.json",
+    "sha256": "9f8b6ecca0bdaa70c03bb597076f42ccec35a0cf05dfa05acc80b2160d620edc"
+  },
+  "status": "awaiting_rereview",
+  "user_instruction": {
+    "interpretation": "直前に提示した13件の推奨反映へ進む",
+    "text": "次へ"
+  }
+}

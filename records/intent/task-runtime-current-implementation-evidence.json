@@ -1,0 +1,248 @@
+{
+  "claims": [
+    {
+      "claim": "source universeと材料役割を明示する",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/source_universe.py",
+          "symbols": [
+            "enumerate_source_universe"
+          ]
+        },
+        {
+          "path": "tools/bootstrap/review_materials.py",
+          "symbols": [
+            "MaterialRole",
+            "SelectionRoute",
+            "classify_materials"
+          ]
+        }
+      ],
+      "id": "TR-EV-001",
+      "tests": [
+        "tests/test_bootstrap_source_universe.py",
+        "tests/test_bootstrap_material_classification.py"
+      ]
+    },
+    {
+      "claim": "本文を含む材料束を決定的に生成し、Digestを付与する",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/material_bundle.py",
+          "symbols": [
+            "canonical_bundle_bytes",
+            "calculate_bundle_digest",
+            "build_material_bundle"
+          ]
+        }
+      ],
+      "id": "TR-EV-002",
+      "tests": [
+        "tests/test_bootstrap_material_bundle.py"
+      ]
+    },
+    {
+      "claim": "材料被覆、原文一致、staleを検査し、承認フラグと対象Digestが一致する閉鎖payloadを生成する。このフラグはHumanの識別、承認操作、理由を証明しない",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/bundle_verification.py",
+          "symbols": [
+            "verify_material_bundle"
+          ]
+        },
+        {
+          "path": "tools/bootstrap/evidence_closure.py",
+          "symbols": [
+            "assess_evidence_closure"
+          ]
+        },
+        {
+          "path": "tools/bootstrap/closed_payload.py",
+          "symbols": [
+            "PayloadApproval",
+            "build_closed_payload"
+          ]
+        }
+      ],
+      "id": "TR-EV-003",
+      "tests": [
+        "tests/test_bootstrap_bundle_verification.py",
+        "tests/test_bootstrap_evidence_closure.py",
+        "tests/test_bootstrap_closed_payload.py"
+      ]
+    },
+    {
+      "claim": "Prompt、出力Schema、閉鎖payloadを分離した固定レビュー契約を生成する",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/review_contract.py",
+          "symbols": [
+            "ContractedReviewPayload",
+            "materialize_review_contract"
+          ]
+        }
+      ],
+      "id": "TR-EV-004",
+      "tests": [
+        "tests/test_bootstrap_review_contract.py"
+      ]
+    },
+    {
+      "claim": "mainとindependentの担当へ同じcontracted payloadを渡す",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/review_execution.py",
+          "symbols": [
+            "ReviewAssignment",
+            "execute_review_assignments"
+          ]
+        }
+      ],
+      "id": "TR-EV-005",
+      "tests": [
+        "tests/test_bootstrap_review_execution.py"
+      ]
+    },
+    {
+      "claim": "新規attemptディレクトリだけにraw応答または失敗診断を書き、Digestを付与する",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/raw_review_store.py",
+          "symbols": [
+            "RawReviewRecord",
+            "store_raw_executions"
+          ]
+        }
+      ],
+      "id": "TR-EV-006",
+      "tests": [
+        "tests/test_bootstrap_raw_review_store.py"
+      ]
+    },
+    {
+      "claim": "成功raw応答を固定Schemaで厳格に解析し、rawとparsedのDigestを結ぶ",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/review_response_parser.py",
+          "symbols": [
+            "ParsedReview",
+            "parse_raw_review_record"
+          ]
+        }
+      ],
+      "id": "TR-EV-007",
+      "tests": [
+        "tests/test_bootstrap_review_response_parser.py"
+      ]
+    },
+    {
+      "claim": "同じcontracted payloadに対するmainとindependentのparsed結果をtriageする",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/review_triage.py",
+          "symbols": [
+            "ReviewTriage",
+            "triage_parsed_reviews"
+          ]
+        }
+      ],
+      "id": "TR-EV-008",
+      "tests": [
+        "tests/test_bootstrap_review_triage.py"
+      ]
+    },
+    {
+      "claim": "同じcontracted payloadの成功済み担当を保持し、未成功担当だけを再実行する",
+      "evidence": [
+        {
+          "path": "tools/bootstrap/review_resume.py",
+          "symbols": [
+            "ReviewResume",
+            "resume_review_assignments"
+          ]
+        }
+      ],
+      "id": "TR-EV-009",
+      "tests": [
+        "tests/test_bootstrap_review_resume.py"
+      ]
+    }
+  ],
+  "file_evidence": [
+    {
+      "git_blob_sha1": "9c53d934f829f6d7e1bfe7c5c48f561a9fb89bc8",
+      "path": "tools/bootstrap/bundle_verification.py"
+    },
+    {
+      "git_blob_sha1": "ef1dd5156ed742b9f05d24d67c213ced0352ee03",
+      "path": "tools/bootstrap/closed_payload.py"
+    },
+    {
+      "git_blob_sha1": "bbb938c4e293983a9af10dbad73ffc5a257f171b",
+      "path": "tools/bootstrap/evidence_closure.py"
+    },
+    {
+      "git_blob_sha1": "c831fd04503eac268579b1a0e5b724afc608eee9",
+      "path": "tools/bootstrap/material_bundle.py"
+    },
+    {
+      "git_blob_sha1": "86c15842f462feeecb14296e92f53745ebb36263",
+      "path": "tools/bootstrap/raw_review_store.py"
+    },
+    {
+      "git_blob_sha1": "2a035a460cdb4030332eb76828a40ca5bffe2a8d",
+      "path": "tools/bootstrap/review_contract.py"
+    },
+    {
+      "git_blob_sha1": "df7c8633385d11c9c5cb270ab32fb65de7c5daf0",
+      "path": "tools/bootstrap/review_execution.py"
+    },
+    {
+      "git_blob_sha1": "3807695ea3aa7729d72518a172a5ed7a3c01a610",
+      "path": "tools/bootstrap/review_materials.py"
+    },
+    {
+      "git_blob_sha1": "993f167e0782e0078b6ee3bcd8e08b111c352cc5",
+      "path": "tools/bootstrap/review_response_parser.py"
+    },
+    {
+      "git_blob_sha1": "596b6486340e843d2f762b41c424c9aec4215a57",
+      "path": "tools/bootstrap/review_resume.py"
+    },
+    {
+      "git_blob_sha1": "f6933e7dfffd3d20e9e761c828f97a65beb27309",
+      "path": "tools/bootstrap/review_triage.py"
+    },
+    {
+      "git_blob_sha1": "88866e5a30aac06a2449abfc2109ebb2abcaac09",
+      "path": "tools/bootstrap/source_universe.py"
+    }
+  ],
+  "lifecycle": "provisional",
+  "limitations": [
+    "現行実装は固定されたブートストラップreview pipelineであり、汎用Task Runtimeではない",
+    "閉鎖payloadの承認フラグはHumanによる承認操作と理由の証跡ではない",
+    "write-once APIは既存attemptの再作成を拒否するが、作成後のファイル改変を防止または再照合しない",
+    "Findingのmaterial_identifiersがExecution Context内に存在することを検査しない",
+    "HumanによるFinding採否と最終Finding集合を保存しない",
+    "送信直前payload、機微情報検査、Human承認、実送信結果を一続きに結ばない"
+  ],
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "source_commit": "b453acedabb02064223004dbd34d9d906f42804d",
+  "verification": {
+    "bootstrap_test_count": 60,
+    "bootstrap_test_result": "passed",
+    "implementation_diff_from_source_commit": 0,
+    "implementation_diff_scope": [
+      "tools/bootstrap",
+      "tests/test_bootstrap_*.py"
+    ],
+    "record": {
+      "path": "records/intent/task-runtime-current-implementation-verification.json",
+      "sha256": "1798c04c8c1f135c122e5e056bfe88d4041d821e3a5e1724dae61b185cb0044e"
+    },
+    "verified_on": "2026-07-27"
+  }
+}
