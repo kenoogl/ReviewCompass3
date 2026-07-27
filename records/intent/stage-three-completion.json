@@ -1,0 +1,40 @@
+{
+  "completion": {
+    "completed_at": "2026-07-27",
+    "completion_type": "planned_completion",
+    "intent_material_digest": "4bed543815e294ba9bc001e0dbea8e8ea8ba8f86e2314e134918853f623ee189",
+    "stage": "stage_three_intent",
+    "status": "completed"
+  },
+  "completion_gate": {
+    "intent_artifact_fixed": true,
+    "material_mismatch_count": 0,
+    "multi_perspective_review_completed": true,
+    "unresolved_error_count": 0,
+    "unresolved_warning_count": 0,
+    "user_approval_recorded": true
+  },
+  "evidence": [
+    {
+      "path": "records/intent/intent-draft-material-revision-5.json",
+      "sha256": "e1b8c265ec1083f25aac5aa2168d471a12fd9892048b0cb8bda5d1374e90d879"
+    },
+    {
+      "path": "records/intent/intent-revision-5-minimal-verification.json",
+      "sha256": "75aee9a193abc560414e625c8c1d69b349c665ee6a74f2b396c1dd177b2b6f5b"
+    },
+    {
+      "path": "records/intent/stage-three-user-approval.json",
+      "sha256": "6b1932b87bfa9b5c0cc52ca70e4d90a53a628c86d501f71fd8d7330cc936dd92"
+    }
+  ],
+  "lifecycle": "provisional",
+  "next_stage": {
+    "entry_allowed": true,
+    "stage": "stage_four_feature_partitioning_and_requirements"
+  },
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "completed"
+}
