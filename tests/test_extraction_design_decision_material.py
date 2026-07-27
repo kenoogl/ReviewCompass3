@@ -104,3 +104,78 @@ def test_rejects_incomplete_inconsistent_or_unsupported_options(
       current_disposition="follow_up",
       options=options,
     )
+
+
+def test_selects_redesign_only_with_matching_explicit_approval():
+  material = importlib.import_module(
+    "tools.extraction.design_decision_material"
+  )
+  decision = material.build_design_decision_material(
+    identifier="ESS-0012",
+    question="side-track stackをどう扱うか",
+    current_disposition="follow_up",
+    options=_options(),
+  )
+
+  result = material.select_design_decision(
+    decision,
+    {
+      "approved": True,
+      "material_digest": decision.digest,
+      "selected_disposition": "redesign",
+      "target_id": "ESS-0012",
+    },
+  )
+
+  assert result.status == "resolved"
+  assert result.identifier == "ESS-0012"
+  assert result.selected_disposition == "redesign"
+  assert result.destination == "workflow.interruption_recovery"
+  assert result.material_digest == decision.digest
+  assert len(result.digest) == 64
+
+
+@pytest.mark.parametrize(
+  "approval",
+  (
+    {
+      "approved": False,
+      "material_digest": "a" * 64,
+      "selected_disposition": "redesign",
+      "target_id": "ESS-0012",
+    },
+    {
+      "approved": True,
+      "material_digest": "b" * 64,
+      "selected_disposition": "redesign",
+      "target_id": "ESS-0012",
+    },
+    {
+      "approved": True,
+      "material_digest": "a" * 64,
+      "selected_disposition": "unknown",
+      "target_id": "ESS-0012",
+    },
+  ),
+)
+def test_rejects_unapproved_stale_or_unknown_selection(approval):
+  material = importlib.import_module(
+    "tools.extraction.design_decision_material"
+  )
+  decision = material.build_design_decision_material(
+    identifier="ESS-0012",
+    question="判断",
+    current_disposition="follow_up",
+    options=_options(),
+  )
+  approval = {
+    **approval,
+    "material_digest": (
+      decision.digest
+      if approval["material_digest"] == "a" * 64
+      else approval["material_digest"]
+    ),
+  }
+
+  with pytest.raises(material.DesignDecisionMaterialError):
+    material.select_design_decision(decision, approval)
