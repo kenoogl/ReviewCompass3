@@ -686,8 +686,8 @@
       "oracle_type": "machine",
       "setup": "candidate serialized payloadとDigest／Provider、model、endpoint、account、region、purpose、期限／機微情報検査／承認者identity、承認権限およびHuman承認",
       "stimulus": "システムは外部送信の内容、能力、論理送信先、承認者identity、権限およびHuman承認を同じ実行identityへ束縛しなければならない",
-      "expected": "初回と各retryのcandidate payload、Provider、model、endpoint、account、region、承認者identity・権限、Human承認、期限をAttemptへ束縛する／外部送信直前の再計算値が全項目一致する場合だけsendへ遷移する",
-      "negative_case": "初回またはretryでpayload、Provider、model、endpoint、account、region、承認者、権限、承認Digest、期限のいずれかが不一致である"
+      "expected": "初回と各retryでapproval requestがcandidate payloadと送信条件を承認前に固定する／別のdecisionがrequest digest、承認・拒否、actor、権限、期限を保持する／対象変更時は新requestと再承認を要する",
+      "negative_case": "request前にdecisionがある／承認前requestへapproval digestを要求する／対象変更後に旧decisionを再利用する／拒否または期限切れで送信する"
     },
     {
       "test_id": "AT-EXEC-003",
@@ -938,24 +938,24 @@
       "oracle_type": "hybrid",
       "setup": "feedback ledger、改善候補、検証結果",
       "stimulus": "システムは改善候補を検証し、Human承認を経た変更だけを次周期へ反映しなければならない",
-      "expected": "改善専用状態機械が評価受領、固定比較、Human承認、次周期提案の順序を検査する／Human承認前に現行方針を変更しない",
-      "negative_case": "評価package不足、固定比較不能、判断競合、Human承認なし、順序違反またはWorkflow開始eventの流用"
+      "expected": "改善状態機械が評価、比較、Human承認、提案を完了する／Workflow所有の設定状態機械が提案受領、検証、対象周期適用を順に行う／Human承認前またはWorkflow検証前に現行方針を変更しない",
+      "negative_case": "評価・比較・承認・提案・受領・検証・適用の順序違反／provider側だけで適用完了とする／対象周期またはrollback条件不一致"
     }
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_contract",
-    "digest": "b5f00b4c47543937b83d28705a656afa59a3808d93436eef35f7624fc7c97496",
+    "digest": "5aa239c88120751c7b3ec2724bb083df9f869f2acf3dfd9426cda5c0a0c3123b",
     "feature_count": 9,
     "requirement_count": 37,
     "acceptance_test_count": 37,
     "boundary_count": 23,
     "architecture_contract": "tools/design/design_contract.py:validate_design_architecture",
     "architecture_record": "records/design/stage-five-architecture-integrity.json",
-    "architecture_digest": "9db3e0bc0d62447821e38f68f761061661afdc1c8f149ab4fe6fdce7e6417234",
-    "interface_count": 25,
-    "state_machine_count": 7,
+    "architecture_digest": "77980b406fb02971fef8b5481791d005f6c07660ae0491159bad3a7b7be74082",
+    "interface_count": 26,
+    "state_machine_count": 8,
     "status": "complete",
-    "protocol_count": 6,
+    "protocol_count": 7,
     "event_route_count": 21
   },
   "lifecycle": "provisional",

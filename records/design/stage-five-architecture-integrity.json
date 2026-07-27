@@ -23,7 +23,13 @@
           "from_state": "idle",
           "event": "prepare",
           "to_state": "ready",
-          "on_failure": "開始要求を拒否しWorkflowをidleに保つ"
+          "on_failure": {
+            "machine_id": "SM-WORKFLOW",
+            "from_state": "idle",
+            "event": "prepare_failed",
+            "to_state": "blocked",
+            "persistence": "開始要求拒否を保存する"
+          }
         },
         {
           "step_id": "RUN-START-002",
@@ -33,7 +39,13 @@
           "from_state": "ready",
           "event": "permit",
           "to_state": "running",
-          "on_failure": "permitを発行せずblockedへ遷移する"
+          "on_failure": {
+            "machine_id": "SM-WORKFLOW",
+            "from_state": "ready",
+            "event": "invalidate",
+            "to_state": "blocked",
+            "persistence": "permit未発行と無効化を保存する"
+          }
         },
         {
           "step_id": "RUN-START-003",
@@ -43,27 +55,45 @@
           "from_state": "pending",
           "event": "authorize",
           "to_state": "permitted",
-          "on_failure": "外部送信なしでRunをblocked終端にする"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "pending",
+            "event": "authorization_failed",
+            "to_state": "blocked",
+            "persistence": "未送信blocked終端を保存する"
+          }
         },
         {
           "step_id": "RUN-START-004",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-SEND-APPROVAL",
+          "interface_id": "IF-HARNESS-SEND-APPROVAL-REQUEST",
           "state_machine_id": "SM-RUN",
           "from_state": "permitted",
           "event": "prepare_send",
           "to_state": "awaiting_send_approval",
-          "on_failure": "candidate payloadを外部送信しない"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "permitted",
+            "event": "prepare_send_failed",
+            "to_state": "failed",
+            "persistence": "候補固定失敗を保存する"
+          }
         },
         {
           "step_id": "RUN-START-005",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-SEND-APPROVAL",
+          "interface_id": "IF-HARNESS-SEND-APPROVAL-DECISION",
           "state_machine_id": "SM-RUN",
           "from_state": "awaiting_send_approval",
           "event": "approve_send",
           "to_state": "send_approved",
-          "on_failure": "未送信failed終端と不一致項目を保存する"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "awaiting_send_approval",
+            "event": "send_approval_failed",
+            "to_state": "failed",
+            "persistence": "拒否または不一致を保存する"
+          }
         },
         {
           "step_id": "RUN-START-006",
@@ -73,7 +103,13 @@
           "from_state": "send_approved",
           "event": "send",
           "to_state": "executing",
-          "on_failure": "capture予約失敗を未送信失敗として保存する"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "send_approved",
+            "event": "send_failed",
+            "to_state": "failed",
+            "persistence": "capture予約失敗を保存する"
+          }
         }
       ]
     },
@@ -89,32 +125,50 @@
         {
           "step_id": "RETRY-001",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-SEND-APPROVAL",
+          "interface_id": "IF-HARNESS-SEND-APPROVAL-REQUEST",
           "state_machine_id": "SM-RUN",
           "from_state": "validating",
           "event": "validation_retryable",
           "to_state": "retry_pending",
-          "on_failure": "復旧不能ならfailed終端にする"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "validating",
+            "event": "validation_failed",
+            "to_state": "failed",
+            "persistence": "復旧不能Validationを保存する"
+          }
         },
         {
           "step_id": "RETRY-002",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-SEND-APPROVAL",
+          "interface_id": "IF-HARNESS-SEND-APPROVAL-REQUEST",
           "state_machine_id": "SM-RUN",
           "from_state": "retry_pending",
           "event": "prepare_retry",
           "to_state": "awaiting_send_approval",
-          "on_failure": "子Attemptを開始しない"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "retry_pending",
+            "event": "prepare_retry_failed",
+            "to_state": "failed",
+            "persistence": "子Attempt準備失敗を保存する"
+          }
         },
         {
           "step_id": "RETRY-003",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
-          "interface_id": "IF-HARNESS-SEND-APPROVAL",
+          "interface_id": "IF-HARNESS-SEND-APPROVAL-DECISION",
           "state_machine_id": "SM-RUN",
           "from_state": "awaiting_send_approval",
           "event": "approve_send",
           "to_state": "send_approved",
-          "on_failure": "変更payloadを送信せずfailed終端にする"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "awaiting_send_approval",
+            "event": "send_approval_failed",
+            "to_state": "failed",
+            "persistence": "再承認拒否を保存する"
+          }
         },
         {
           "step_id": "RETRY-004",
@@ -124,7 +178,13 @@
           "from_state": "send_approved",
           "event": "send",
           "to_state": "executing",
-          "on_failure": "capture予約失敗を未送信失敗として保存する"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "send_approved",
+            "event": "send_failed",
+            "to_state": "failed",
+            "persistence": "retry capture予約失敗を保存する"
+          }
         }
       ]
     },
@@ -149,7 +209,13 @@
           "from_state": "candidate",
           "event": "freeze",
           "to_state": "candidate_frozen",
-          "on_failure": "候補を生成せずRunをfailedにする"
+          "on_failure": {
+            "machine_id": "SM-TRIAGE-PROVENANCE",
+            "from_state": "candidate",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "候補固定失敗を保存する"
+          }
         },
         {
           "step_id": "FINDING-002",
@@ -159,7 +225,13 @@
           "from_state": "candidate_frozen",
           "event": "prevalidate",
           "to_state": "prevalidated",
-          "on_failure": "Humanへ提示せずpre失敗protocolへ分岐する"
+          "on_failure": {
+            "machine_id": "SM-TRIAGE-PROVENANCE",
+            "from_state": "candidate_frozen",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "pre不合格を保存する"
+          }
         },
         {
           "step_id": "FINDING-003",
@@ -169,7 +241,13 @@
           "from_state": "prevalidated",
           "event": "human_decide",
           "to_state": "decided",
-          "on_failure": "判断なしとして候補を未確定に保つ"
+          "on_failure": {
+            "machine_id": "SM-TRIAGE-PROVENANCE",
+            "from_state": "prevalidated",
+            "event": "decision_missing",
+            "to_state": "blocked",
+            "persistence": "判断欠落を保存する"
+          }
         },
         {
           "step_id": "FINDING-004",
@@ -179,7 +257,13 @@
           "from_state": "decided",
           "event": "record_final",
           "to_state": "final_recorded",
-          "on_failure": "Final Findingを未確定に保つ"
+          "on_failure": {
+            "machine_id": "SM-TRIAGE-PROVENANCE",
+            "from_state": "decided",
+            "event": "record_failed",
+            "to_state": "blocked",
+            "persistence": "Final Finding保存失敗を保存する"
+          }
         },
         {
           "step_id": "FINDING-005",
@@ -189,7 +273,13 @@
           "from_state": "final_recorded",
           "event": "final_validate",
           "to_state": "completed",
-          "on_failure": "final失敗protocolへ分岐する"
+          "on_failure": {
+            "machine_id": "SM-TRIAGE-PROVENANCE",
+            "from_state": "final_recorded",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "final不合格を保存する"
+          }
         },
         {
           "step_id": "FINDING-006",
@@ -199,7 +289,13 @@
           "from_state": "awaiting_triage",
           "event": "final_provenance_passed",
           "to_state": "succeeded",
-          "on_failure": "Runをfailed終端にする"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "awaiting_triage",
+            "event": "provenance_failed",
+            "to_state": "failed",
+            "persistence": "Runのfinal不合格を保存する"
+          }
         },
         {
           "step_id": "FINDING-007",
@@ -209,7 +305,13 @@
           "from_state": "running",
           "event": "execution_finished",
           "to_state": "awaiting_final_provenance",
-          "on_failure": "Workflowをblocked終端にする"
+          "on_failure": {
+            "machine_id": "SM-WORKFLOW",
+            "from_state": "running",
+            "event": "execution_failed",
+            "to_state": "blocked",
+            "persistence": "Run結果返却失敗を保存する"
+          }
         },
         {
           "step_id": "FINDING-008",
@@ -219,7 +321,13 @@
           "from_state": "awaiting_final_provenance",
           "event": "provenance_passed",
           "to_state": "completed",
-          "on_failure": "段階を完了せずblockedにする"
+          "on_failure": {
+            "machine_id": "SM-WORKFLOW",
+            "from_state": "awaiting_final_provenance",
+            "event": "provenance_failed",
+            "to_state": "blocked",
+            "persistence": "Workflowのfinal不合格を保存する"
+          }
         }
       ]
     },
@@ -244,7 +352,13 @@
           "from_state": "candidate_frozen",
           "event": "reject",
           "to_state": "blocked",
-          "on_failure": "不合格診断を失わず再配送する"
+          "on_failure": {
+            "machine_id": "SM-TRIAGE-PROVENANCE",
+            "from_state": "candidate_frozen",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "pre不合格を保存する"
+          }
         },
         {
           "step_id": "PREFAIL-002",
@@ -254,7 +368,13 @@
           "from_state": "awaiting_triage",
           "event": "provenance_failed",
           "to_state": "failed",
-          "on_failure": "Runを成功へ昇格しない"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "awaiting_triage",
+            "event": "provenance_failed",
+            "to_state": "failed",
+            "persistence": "Runのpre不合格を保存する"
+          }
         },
         {
           "step_id": "PREFAIL-003",
@@ -264,7 +384,13 @@
           "from_state": "running",
           "event": "provenance_failed",
           "to_state": "blocked",
-          "on_failure": "段階を完了しない"
+          "on_failure": {
+            "machine_id": "SM-WORKFLOW",
+            "from_state": "running",
+            "event": "provenance_failed",
+            "to_state": "blocked",
+            "persistence": "Workflowのpre不合格を保存する"
+          }
         }
       ]
     },
@@ -289,7 +415,13 @@
           "from_state": "final_recorded",
           "event": "reject",
           "to_state": "blocked",
-          "on_failure": "Final Findingを確定しない"
+          "on_failure": {
+            "machine_id": "SM-TRIAGE-PROVENANCE",
+            "from_state": "final_recorded",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "final不合格を保存する"
+          }
         },
         {
           "step_id": "FINALFAIL-002",
@@ -299,7 +431,13 @@
           "from_state": "awaiting_triage",
           "event": "provenance_failed",
           "to_state": "failed",
-          "on_failure": "Runを成功へ昇格しない"
+          "on_failure": {
+            "machine_id": "SM-RUN",
+            "from_state": "awaiting_triage",
+            "event": "provenance_failed",
+            "to_state": "failed",
+            "persistence": "Runのfinal不合格を保存する"
+          }
         },
         {
           "step_id": "FINALFAIL-003",
@@ -309,17 +447,25 @@
           "from_state": "running",
           "event": "provenance_failed",
           "to_state": "blocked",
-          "on_failure": "段階を完了しない"
+          "on_failure": {
+            "machine_id": "SM-WORKFLOW",
+            "from_state": "running",
+            "event": "provenance_failed",
+            "to_state": "blocked",
+            "persistence": "Workflowのfinal不合格を保存する"
+          }
         }
       ]
     },
     {
       "protocol_id": "PROTOCOL-IMPROVEMENT-CYCLE",
       "initial_states": {
-        "SM-IMPROVEMENT": "awaiting_evaluation"
+        "SM-IMPROVEMENT": "awaiting_evaluation",
+        "SM-CONFIGURATION": "awaiting_change"
       },
       "expected_states": {
-        "SM-IMPROVEMENT": "completed"
+        "SM-IMPROVEMENT": "completed",
+        "SM-CONFIGURATION": "applied"
       },
       "steps": [
         {
@@ -330,7 +476,13 @@
           "from_state": "awaiting_evaluation",
           "event": "receive_evaluation",
           "to_state": "hypothesis_ready",
-          "on_failure": "評価packageを不採用にしてblockedにする"
+          "on_failure": {
+            "machine_id": "SM-IMPROVEMENT",
+            "from_state": "awaiting_evaluation",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "評価package拒否を保存する"
+          }
         },
         {
           "step_id": "IMPROVEMENT-002",
@@ -340,7 +492,13 @@
           "from_state": "hypothesis_ready",
           "event": "validate_hypothesis",
           "to_state": "validated",
-          "on_failure": "現行policyを維持してblockedにする"
+          "on_failure": {
+            "machine_id": "SM-IMPROVEMENT",
+            "from_state": "hypothesis_ready",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "固定比較失敗を保存する"
+          }
         },
         {
           "step_id": "IMPROVEMENT-003",
@@ -350,7 +508,13 @@
           "from_state": "validated",
           "event": "human_approve",
           "to_state": "approved",
-          "on_failure": "拒否または保留を保存してblockedにする"
+          "on_failure": {
+            "machine_id": "SM-IMPROVEMENT",
+            "from_state": "validated",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "Human拒否を保存する"
+          }
         },
         {
           "step_id": "IMPROVEMENT-004",
@@ -360,7 +524,204 @@
           "from_state": "approved",
           "event": "propose_change",
           "to_state": "completed",
-          "on_failure": "次周期へ適用せず現行policyを維持する"
+          "on_failure": {
+            "machine_id": "SM-IMPROVEMENT",
+            "from_state": "approved",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "提案生成失敗を保存する"
+          }
+        },
+        {
+          "step_id": "CONFIGURATION-001",
+          "actor_design_id": "DES-WORKFLOW-CONTROL",
+          "interface_id": "IF-IMPROVEMENT-WORKFLOW-CHANGE",
+          "state_machine_id": "SM-CONFIGURATION",
+          "from_state": "awaiting_change",
+          "event": "receive_change",
+          "to_state": "change_received",
+          "on_failure": {
+            "machine_id": "SM-CONFIGURATION",
+            "from_state": "awaiting_change",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "不完全変更提案を拒否して保存する"
+          }
+        },
+        {
+          "step_id": "CONFIGURATION-002",
+          "actor_design_id": "DES-WORKFLOW-CONTROL",
+          "interface_id": "IF-IMPROVEMENT-WORKFLOW-CHANGE",
+          "state_machine_id": "SM-CONFIGURATION",
+          "from_state": "change_received",
+          "event": "validate_change",
+          "to_state": "validated",
+          "on_failure": {
+            "machine_id": "SM-CONFIGURATION",
+            "from_state": "change_received",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "変更検証不合格を保存する"
+          }
+        },
+        {
+          "step_id": "CONFIGURATION-003",
+          "actor_design_id": "DES-WORKFLOW-CONTROL",
+          "interface_id": "IF-IMPROVEMENT-WORKFLOW-CHANGE",
+          "state_machine_id": "SM-CONFIGURATION",
+          "from_state": "validated",
+          "event": "apply_change",
+          "to_state": "applied",
+          "on_failure": {
+            "machine_id": "SM-CONFIGURATION",
+            "from_state": "validated",
+            "event": "reject",
+            "to_state": "blocked",
+            "persistence": "適用前条件不一致を保存する"
+          }
+        }
+      ]
+    },
+    {
+      "protocol_id": "PROTOCOL-ATTEMPT-CAPTURE-VALIDATION",
+      "initial_states": {
+        "SM-ATTEMPT": "prepared",
+        "SM-PROVIDER-CAPTURE": "reserved",
+        "SM-VALIDATION": "pending"
+      },
+      "expected_states": {
+        "SM-ATTEMPT": "validated",
+        "SM-PROVIDER-CAPTURE": "sealed",
+        "SM-VALIDATION": "passed"
+      },
+      "steps": [
+        {
+          "step_id": "ATTEMPT-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-SEND-APPROVAL-DECISION",
+          "state_machine_id": "SM-ATTEMPT",
+          "from_state": "prepared",
+          "event": "dispatch",
+          "to_state": "sent",
+          "on_failure": {
+            "machine_id": "SM-ATTEMPT",
+            "from_state": "prepared",
+            "event": "fail",
+            "to_state": "failed",
+            "persistence": "未送信Attempt失敗を保存する"
+          }
+        },
+        {
+          "step_id": "CAPTURE-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-PORTABLE-HARNESS-STORE",
+          "state_machine_id": "SM-PROVIDER-CAPTURE",
+          "from_state": "reserved",
+          "event": "open",
+          "to_state": "receiving",
+          "on_failure": {
+            "machine_id": "SM-PROVIDER-CAPTURE",
+            "from_state": "reserved",
+            "event": "fail",
+            "to_state": "failed",
+            "persistence": "capture領域確保失敗を保存する"
+          }
+        },
+        {
+          "step_id": "CAPTURE-002",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-PORTABLE-HARNESS-STORE",
+          "state_machine_id": "SM-PROVIDER-CAPTURE",
+          "from_state": "receiving",
+          "event": "seal",
+          "to_state": "sealed",
+          "on_failure": {
+            "machine_id": "SM-PROVIDER-CAPTURE",
+            "from_state": "receiving",
+            "event": "fail",
+            "to_state": "failed",
+            "persistence": "受信中capture失敗を保存する"
+          }
+        },
+        {
+          "step_id": "ATTEMPT-002",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-PORTABLE-HARNESS-STORE",
+          "state_machine_id": "SM-ATTEMPT",
+          "from_state": "sent",
+          "event": "capture",
+          "to_state": "response_captured",
+          "on_failure": {
+            "machine_id": "SM-ATTEMPT",
+            "from_state": "sent",
+            "event": "fail",
+            "to_state": "failed",
+            "persistence": "Attempt capture失敗を保存する"
+          }
+        },
+        {
+          "step_id": "VALIDATION-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "state_machine_id": "SM-VALIDATION",
+          "from_state": "pending",
+          "event": "schema_passed",
+          "to_state": "schema_validated",
+          "on_failure": {
+            "machine_id": "SM-VALIDATION",
+            "from_state": "pending",
+            "event": "reject",
+            "to_state": "failed",
+            "persistence": "Schema不合格を保存する"
+          }
+        },
+        {
+          "step_id": "VALIDATION-002",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "state_machine_id": "SM-VALIDATION",
+          "from_state": "schema_validated",
+          "event": "evidence_passed",
+          "to_state": "evidence_validated",
+          "on_failure": {
+            "machine_id": "SM-VALIDATION",
+            "from_state": "schema_validated",
+            "event": "reject",
+            "to_state": "failed",
+            "persistence": "Evidence不合格を保存する"
+          }
+        },
+        {
+          "step_id": "VALIDATION-003",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "state_machine_id": "SM-VALIDATION",
+          "from_state": "evidence_validated",
+          "event": "scope_passed",
+          "to_state": "passed",
+          "on_failure": {
+            "machine_id": "SM-VALIDATION",
+            "from_state": "evidence_validated",
+            "event": "reject",
+            "to_state": "failed",
+            "persistence": "Scope不合格を保存する"
+          }
+        },
+        {
+          "step_id": "ATTEMPT-003",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "state_machine_id": "SM-ATTEMPT",
+          "from_state": "response_captured",
+          "event": "validate",
+          "to_state": "validated",
+          "on_failure": {
+            "machine_id": "SM-ATTEMPT",
+            "from_state": "response_captured",
+            "event": "fail",
+            "to_state": "failed",
+            "persistence": "Attempt Validation失敗を保存する"
+          }
         }
       ]
     }
@@ -445,29 +806,48 @@
       "owner_design_id": "DES-HARNESSED-EXECUTION"
     },
     {
-      "interface_id": "IF-HARNESS-SEND-APPROVAL",
+      "interface_id": "IF-HARNESS-SEND-APPROVAL-DECISION",
       "provider_design_id": "DES-HARNESSED-EXECUTION",
       "consumer_design_id": "DES-HARNESSED-EXECUTION",
       "identity_fields": [
+        "approval_request_id",
+        "approval_request_digest",
+        "decision_status",
+        "approval_actor_id",
+        "approval_authority_digest",
+        "decision_digest",
+        "expires_at"
+      ],
+      "payload_fields": [
+        "decision_rationale",
+        "approved_payload_digest",
+        "approved_destination_digest"
+      ],
+      "failure_verdict": "承認対象、判断、権限または期限が不一致なら送信せずfailedにする",
+      "owner_design_id": "DES-HARNESSED-EXECUTION"
+    },
+    {
+      "interface_id": "IF-HARNESS-SEND-APPROVAL-REQUEST",
+      "provider_design_id": "DES-HARNESSED-EXECUTION",
+      "consumer_design_id": "DES-HARNESSED-EXECUTION",
+      "identity_fields": [
+        "approval_request_id",
         "attempt_id",
         "payload_digest",
         "provider_id",
         "model_id",
         "endpoint_id",
         "account_id",
-        "region_id",
-        "approval_actor_id",
-        "approval_authority_digest",
-        "approval_digest",
-        "expires_at"
+        "region_id"
       ],
       "payload_fields": [
         "purpose",
+        "required_authority",
         "sensitive_information_verdict",
         "candidate_payload_ref",
         "retry_parent_attempt_id"
       ],
-      "failure_verdict": "各Attemptでpayload、送信先、承認者、権限、期限が一致しなければ送信しない",
+      "failure_verdict": "候補条件を完全固定できなければHuman判断を要求せず未送信failedにする",
       "owner_design_id": "DES-HARNESSED-EXECUTION"
     },
     {
@@ -932,6 +1312,67 @@
       ]
     },
     {
+      "machine_id": "SM-CONFIGURATION",
+      "owner_design_id": "DES-WORKFLOW-CONTROL",
+      "states": [
+        "awaiting_change",
+        "change_received",
+        "validated",
+        "blocked",
+        "applied"
+      ],
+      "events": [
+        "receive_change",
+        "validate_change",
+        "apply_change",
+        "reject"
+      ],
+      "transitions": [
+        {
+          "from": "awaiting_change",
+          "event": "receive_change",
+          "to": "change_received",
+          "guard": "change、approval、target cycle、scope、rollback条件が揃う",
+          "persistence": "変更提案を検証開始前に保存する"
+        },
+        {
+          "from": "awaiting_change",
+          "event": "reject",
+          "to": "blocked",
+          "guard": "変更提案が不完全または未承認である",
+          "persistence": "拒否理由と現行policy維持を保存する"
+        },
+        {
+          "from": "change_received",
+          "event": "validate_change",
+          "to": "validated",
+          "guard": "版、Digest、承認、適用範囲、rollback条件が一致する",
+          "persistence": "検証verdictを適用前に保存する"
+        },
+        {
+          "from": "change_received",
+          "event": "reject",
+          "to": "blocked",
+          "guard": "検証が不合格である",
+          "persistence": "不合格理由と現行policy維持を保存する"
+        },
+        {
+          "from": "validated",
+          "event": "apply_change",
+          "to": "applied",
+          "guard": "target cycle開始時点と適用範囲が一致する",
+          "persistence": "適用版と旧版rollback参照を原子的に保存する"
+        },
+        {
+          "from": "validated",
+          "event": "reject",
+          "to": "blocked",
+          "guard": "対象周期が不一致または適用前条件が変化した",
+          "persistence": "適用拒否と現行policy維持を保存する"
+        }
+      ]
+    },
+    {
       "machine_id": "SM-IMPROVEMENT",
       "owner_design_id": "DES-SELF-IMPROVEMENT",
       "states": [
@@ -998,6 +1439,13 @@
           "to": "completed",
           "guard": "変更提案が対象周期、policy版、範囲、rollback条件を持つ",
           "persistence": "提案DigestをWorkflow通知前に保存する"
+        },
+        {
+          "from": "approved",
+          "event": "reject",
+          "to": "blocked",
+          "guard": "次周期変更提案を構成または保存できない",
+          "persistence": "承認済み候補と未適用診断を保存する"
         }
       ]
     },
@@ -1088,7 +1536,10 @@
         "prepare_retry",
         "retry_exhausted",
         "final_provenance_passed",
-        "provenance_failed"
+        "provenance_failed",
+        "prepare_send_failed",
+        "prepare_retry_failed",
+        "send_failed"
       ],
       "transitions": [
         {
@@ -1202,6 +1653,27 @@
           "to": "failed",
           "guard": "preまたはfinal provenanceが不合格である",
           "persistence": "不合格段階とfailed終端を同一更新で保存する"
+        },
+        {
+          "from": "permitted",
+          "event": "prepare_send_failed",
+          "to": "failed",
+          "guard": "候補固定、子Attempt準備またはcapture予約に失敗した",
+          "persistence": "未送信failed終端と診断を保存する"
+        },
+        {
+          "from": "retry_pending",
+          "event": "prepare_retry_failed",
+          "to": "failed",
+          "guard": "候補固定、子Attempt準備またはcapture予約に失敗した",
+          "persistence": "未送信failed終端と診断を保存する"
+        },
+        {
+          "from": "send_approved",
+          "event": "send_failed",
+          "to": "failed",
+          "guard": "候補固定、子Attempt準備またはcapture予約に失敗した",
+          "persistence": "未送信failed終端と診断を保存する"
         }
       ]
     },
@@ -1224,7 +1696,9 @@
         "record_final",
         "final_validate",
         "reject",
-        "reopen"
+        "reopen",
+        "decision_missing",
+        "record_failed"
       ],
       "transitions": [
         {
@@ -1282,6 +1756,27 @@
           "to": "candidate",
           "guard": "訂正版を新しい候補版として構成した",
           "persistence": "旧候補と不合格を保持し新candidate IDを保存する"
+        },
+        {
+          "from": "candidate",
+          "event": "reject",
+          "to": "blocked",
+          "guard": "候補を固定できない",
+          "persistence": "未確定対象とblocked状態を保存する"
+        },
+        {
+          "from": "prevalidated",
+          "event": "decision_missing",
+          "to": "blocked",
+          "guard": "Human判断がない",
+          "persistence": "未確定対象とblocked状態を保存する"
+        },
+        {
+          "from": "decided",
+          "event": "record_failed",
+          "to": "blocked",
+          "guard": "Final Findingを保存できない",
+          "persistence": "未確定対象とblocked状態を保存する"
         }
       ]
     },
@@ -1366,7 +1861,8 @@
         "provenance_passed",
         "provenance_failed",
         "invalidate",
-        "reopen"
+        "reopen",
+        "prepare_failed"
       ],
       "transitions": [
         {
@@ -1438,17 +1934,24 @@
           "to": "ready",
           "guard": "訂正済みContext、Spec、candidateまたはprovenanceを新しいidentityと版で承認した",
           "persistence": "旧失敗を保持し新しい開始要求を別版として保存する"
+        },
+        {
+          "from": "idle",
+          "event": "prepare_failed",
+          "to": "blocked",
+          "guard": "開始要求、Context、Specまたはactive workを検証できない",
+          "persistence": "拒否理由とblocked状態を保存する"
         }
       ]
     }
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_architecture",
-    "digest": "9db3e0bc0d62447821e38f68f761061661afdc1c8f149ab4fe6fdce7e6417234",
+    "digest": "77980b406fb02971fef8b5481791d005f6c07660ae0491159bad3a7b7be74082",
     "boundary_count": 23,
-    "interface_count": 25,
-    "state_machine_count": 7,
-    "protocol_count": 6,
+    "interface_count": 26,
+    "state_machine_count": 8,
+    "protocol_count": 7,
     "event_route_count": 21,
     "status": "complete"
   },
@@ -1538,24 +2041,6 @@
       "source_interface_id": "IF-WORKFLOW-HARNESS-PERMIT",
       "target_state_machine_id": "SM-RUN",
       "event": "authorize"
-    },
-    {
-      "route_id": "ROUTE-SEND-APPROVAL-PREPARE",
-      "source_interface_id": "IF-HARNESS-SEND-APPROVAL",
-      "target_state_machine_id": "SM-RUN",
-      "event": "prepare_send"
-    },
-    {
-      "route_id": "ROUTE-SEND-APPROVAL-PASS",
-      "source_interface_id": "IF-HARNESS-SEND-APPROVAL",
-      "target_state_machine_id": "SM-RUN",
-      "event": "approve_send"
-    },
-    {
-      "route_id": "ROUTE-SEND-APPROVAL-FAIL",
-      "source_interface_id": "IF-HARNESS-SEND-APPROVAL",
-      "target_state_machine_id": "SM-RUN",
-      "event": "send_approval_failed"
     },
     {
       "route_id": "ROUTE-RUN-RESULT-SUCCESS",
@@ -1648,10 +2133,28 @@
       "event": "receive_evaluation"
     },
     {
+      "route_id": "ROUTE-SEND-APPROVAL-REQUEST",
+      "source_interface_id": "IF-HARNESS-SEND-APPROVAL-REQUEST",
+      "target_state_machine_id": "SM-RUN",
+      "event": "prepare_send"
+    },
+    {
+      "route_id": "ROUTE-SEND-APPROVAL-DECISION-PASS",
+      "source_interface_id": "IF-HARNESS-SEND-APPROVAL-DECISION",
+      "target_state_machine_id": "SM-RUN",
+      "event": "approve_send"
+    },
+    {
+      "route_id": "ROUTE-SEND-APPROVAL-DECISION-FAIL",
+      "source_interface_id": "IF-HARNESS-SEND-APPROVAL-DECISION",
+      "target_state_machine_id": "SM-RUN",
+      "event": "send_approval_failed"
+    },
+    {
       "route_id": "ROUTE-IMPROVEMENT-WORKFLOW",
       "source_interface_id": "IF-IMPROVEMENT-WORKFLOW-CHANGE",
-      "target_state_machine_id": "SM-IMPROVEMENT",
-      "event": "propose_change"
+      "target_state_machine_id": "SM-CONFIGURATION",
+      "event": "receive_change"
     }
   ],
   "required_interface_fields": {
@@ -1699,19 +2202,6 @@
       "execution_condition_digest",
       "observation_digest"
     ],
-    "IF-HARNESS-SEND-APPROVAL": [
-      "attempt_id",
-      "payload_digest",
-      "provider_id",
-      "model_id",
-      "endpoint_id",
-      "account_id",
-      "region_id",
-      "approval_actor_id",
-      "approval_authority_digest",
-      "approval_digest",
-      "expires_at"
-    ],
     "IF-TRACE-RUN-PREVERDICT": [
       "run_id",
       "candidate_digest",
@@ -1722,6 +2212,25 @@
       "active_work_id",
       "candidate_digest",
       "pre_verdict_digest"
+    ],
+    "IF-HARNESS-SEND-APPROVAL-REQUEST": [
+      "approval_request_id",
+      "attempt_id",
+      "payload_digest",
+      "provider_id",
+      "model_id",
+      "endpoint_id",
+      "account_id",
+      "region_id"
+    ],
+    "IF-HARNESS-SEND-APPROVAL-DECISION": [
+      "approval_request_id",
+      "approval_request_digest",
+      "decision_status",
+      "approval_actor_id",
+      "approval_authority_digest",
+      "decision_digest",
+      "expires_at"
     ]
   },
   "required_boundary_fields": {
@@ -1747,5 +2256,15 @@
       "retention_class",
       "deletion_contract"
     ]
-  }
+  },
+  "required_protocol_machine_ids": [
+    "SM-ATTEMPT",
+    "SM-CONFIGURATION",
+    "SM-IMPROVEMENT",
+    "SM-PROVIDER-CAPTURE",
+    "SM-RUN",
+    "SM-TRIAGE-PROVENANCE",
+    "SM-VALIDATION",
+    "SM-WORKFLOW"
+  ]
 }

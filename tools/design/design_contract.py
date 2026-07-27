@@ -859,7 +859,8 @@ def validate_design_architecture(
         != _FAILURE_BRANCH_FIELDS
       ):
         raise DesignContractError(
-          "protocol steps must resolve"
+          "protocol step must resolve: "
+          f"{step.get('step_id', '<unknown>')}"
         )
       interface = interface_by_id[step["interface_id"]]
       if step["actor_design_id"] not in {
