@@ -75,6 +75,8 @@ def prepare_artifact(
       rules,
       allow_patterns=allow_patterns,
     ),
+    summary_commits=commits,
+    summary_changed_files=changed_files,
   )
   return PreparedArtifact(
     source_kind=source_kind,

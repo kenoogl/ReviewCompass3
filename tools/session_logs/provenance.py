@@ -20,6 +20,8 @@ class Provenance:
   tool_version: str
   summary_sha256: str = ""
   redaction_rules_sha256: str = ""
+  summary_commits: tuple = ()
+  summary_changed_files: tuple = ()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -55,6 +57,8 @@ def build_provenance(
   tool_version,
   summary_text="",
   redaction_rules_sha256="",
+  summary_commits=(),
+  summary_changed_files=(),
 ) -> Provenance:
   raw_path = Path(raw_log)
   root_path = Path(raw_root)
@@ -71,6 +75,8 @@ def build_provenance(
       summary_text.encode("utf-8")
     ).hexdigest() if summary_text else "",
     redaction_rules_sha256=redaction_rules_sha256,
+    summary_commits=tuple(summary_commits),
+    summary_changed_files=tuple(summary_changed_files),
   )
 
 

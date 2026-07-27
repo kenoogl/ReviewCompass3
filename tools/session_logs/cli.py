@@ -26,7 +26,7 @@ from tools.session_logs.redaction import (
 )
 from tools.session_logs.regeneration import (
   RegenerationError,
-  regenerate_transcript,
+  regenerate_artifact,
 )
 from tools.session_logs.storage import store_artifact
 
@@ -116,14 +116,19 @@ def _verify_saved_artifact(relative_path, config, reporter=None) -> int:
   provenance_path = (
     config.provenance_root / source_path.with_suffix(".json")
   )
+  summary_path = (
+    config.summary_root / source_path.with_suffix(".md")
+  )
   try:
     state = json.loads(provenance_path.read_text(encoding="utf-8"))
     record = Provenance(**state["provenance"])
     stored_text = transcript_path.read_text(encoding="utf-8")
-    result = regenerate_transcript(
+    stored_summary = summary_path.read_text(encoding="utf-8")
+    result = regenerate_artifact(
       record,
       raw_root=config.raw_root,
       stored_text=stored_text,
+      stored_summary=stored_summary,
       rules=config.redaction_rules,
       allow_patterns=config.allow_patterns,
       tool_version=config.tool_version,
@@ -166,6 +171,10 @@ def _verify_saved_artifact(relative_path, config, reporter=None) -> int:
       "source_matches": result.source_matches,
       "provenance_matches": result.provenance_matches,
       "stored_matches": result.stored_matches,
+      "summary_provenance_matches": (
+        result.summary_provenance_matches
+      ),
+      "summary_stored_matches": result.summary_stored_matches,
       "rules_match": result.rules_match,
       "tool_version_matches": result.tool_version_matches,
     })

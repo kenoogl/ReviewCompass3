@@ -17,6 +17,7 @@ from tools.session_logs.redaction import (
   redact_text_strict,
   redaction_rules_digest,
 )
+from tools.session_logs.summary import render_summary
 from tools.session_logs.transcript import render_transcript
 
 
@@ -37,6 +38,9 @@ class RegenerationResult:
   rules_match: bool = True
   tool_version_matches: bool = True
   status: str = "matches"
+  summary_text: str = ""
+  summary_provenance_matches: bool = True
+  summary_stored_matches: bool = True
 
 
 def _parse_source_bytes(data):
@@ -115,4 +119,64 @@ def regenerate_transcript(
     rules_match=rules_match,
     tool_version_matches=tool_version_matches,
     status=status,
+  )
+
+
+def regenerate_artifact(
+  record,
+  *,
+  raw_root,
+  stored_text,
+  stored_summary,
+  rules,
+  allow_patterns=(),
+  tool_version=None,
+) -> RegenerationResult:
+  transcript_result = regenerate_transcript(
+    record,
+    raw_root=raw_root,
+    stored_text=stored_text,
+    rules=rules,
+    allow_patterns=allow_patterns,
+    tool_version=tool_version,
+  )
+  raw_log = Path(raw_root) / record.source_path
+  try:
+    source_bytes = read_recorded_range(raw_log, record)
+    parsed = _parse_source_bytes(source_bytes)
+    summary = render_summary(
+      parsed.events,
+      commits=getattr(record, "summary_commits", ()),
+      changed_files=getattr(
+        record,
+        "summary_changed_files",
+        (),
+      ),
+      rules=rules,
+      allow_patterns=allow_patterns,
+    )
+  except Exception as error:
+    raise RegenerationError(type(error).__name__) from error
+  summary_sha256 = hashlib.sha256(
+    summary.text.encode("utf-8")
+  ).hexdigest()
+  summary_provenance_matches = (
+    summary_sha256 == record.summary_sha256
+  )
+  summary_stored_matches = summary.text == stored_summary
+  if transcript_result.status != "matches":
+    status = transcript_result.status
+  elif (
+    not summary_provenance_matches
+    or not summary_stored_matches
+  ):
+    status = "summary_changed"
+  else:
+    status = "matches"
+  return dataclasses.replace(
+    transcript_result,
+    status=status,
+    summary_text=summary.text,
+    summary_provenance_matches=summary_provenance_matches,
+    summary_stored_matches=summary_stored_matches,
   )
