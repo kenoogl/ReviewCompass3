@@ -44,6 +44,11 @@ def run(argv=None) -> int:
       "tools.session_logs.portable_config"
     )
     return portable.run(tuple(arguments[1:]))
+  if arguments and arguments[0] == "deployment":
+    lifecycle = _load_module(
+      "tools.session_logs.deployment_lifecycle"
+    )
+    return lifecycle.run(tuple(arguments[1:]))
   parser = argparse.ArgumentParser()
   subcommands = parser.add_subparsers(dest="command", required=True)
   hook_parser = subcommands.add_parser("hook")
