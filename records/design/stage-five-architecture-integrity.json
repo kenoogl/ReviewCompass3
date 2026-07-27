@@ -30,9 +30,20 @@
               "event": "prepare_failed",
               "to_state": "blocked",
               "persistence": "開始要求拒否を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "pending",
+              "event": "authorization_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RUN-START-002",
@@ -49,9 +60,20 @@
               "event": "invalidate",
               "to_state": "blocked",
               "persistence": "permit未発行と無効化を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "pending",
+              "event": "authorization_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
             }
           ],
-          "interface_role": "output"
+          "interface_role": "output",
+          "failure_expected_states": {
+            "SM-RUN": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RUN-START-003",
@@ -68,9 +90,20 @@
               "event": "authorization_failed",
               "to_state": "blocked",
               "persistence": "未送信blocked終端を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RUN-START-004",
@@ -87,9 +120,20 @@
               "event": "prepare_send_failed",
               "to_state": "failed",
               "persistence": "候補固定失敗を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "output"
+          "interface_role": "output",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RUN-START-005",
@@ -106,9 +150,20 @@
               "event": "send_approval_failed",
               "to_state": "failed",
               "persistence": "拒否または不一致を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RUN-START-006",
@@ -125,9 +180,20 @@
               "event": "send_failed",
               "to_state": "failed",
               "persistence": "capture予約失敗を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ],
       "initial_interfaces": [
@@ -139,12 +205,54 @@
     {
       "protocol_id": "PROTOCOL-RETRY-SEND",
       "initial_states": {
-        "SM-RUN": "validating"
+        "SM-RUN": "validating",
+        "SM-VALIDATION": "failed",
+        "SM-WORKFLOW": "running"
       },
       "expected_states": {
-        "SM-RUN": "executing"
+        "SM-RUN": "executing",
+        "SM-VALIDATION": "retry_result_published",
+        "SM-WORKFLOW": "running"
       },
       "steps": [
+        {
+          "step_id": "RETRY-RESULT-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-VALIDATION-RESULT",
+          "interface_role": "output",
+          "state_machine_id": "SM-VALIDATION",
+          "from_state": "failed",
+          "event": "publish_retry_result",
+          "to_state": "retry_result_published",
+          "on_failure": [
+            {
+              "machine_id": "SM-VALIDATION",
+              "from_state": "failed",
+              "event": "publish_retry_result",
+              "to_state": "retry_result_published",
+              "persistence": "retryable結果生成失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
+            }
+          ],
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-VALIDATION": "retry_result_published",
+            "SM-WORKFLOW": "blocked"
+          }
+        },
         {
           "step_id": "RETRY-001",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
@@ -160,9 +268,21 @@
               "event": "validation_failed",
               "to_state": "failed",
               "persistence": "復旧不能Validationを保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-VALIDATION": "retry_result_published",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RETRY-002",
@@ -179,9 +299,21 @@
               "event": "prepare_retry_failed",
               "to_state": "failed",
               "persistence": "子Attempt準備失敗を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "output"
+          "interface_role": "output",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-VALIDATION": "retry_result_published",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RETRY-003",
@@ -198,9 +330,21 @@
               "event": "send_approval_failed",
               "to_state": "failed",
               "persistence": "再承認拒否を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-VALIDATION": "retry_result_published",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RETRY-004",
@@ -217,14 +361,25 @@
               "event": "send_failed",
               "to_state": "failed",
               "persistence": "retry capture予約失敗を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-VALIDATION": "retry_result_published",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ],
       "initial_interfaces": [
         "IF-HARNESS-SEND-APPROVAL-DECISION",
-        "IF-HARNESS-VALIDATION-RESULT",
         "IF-PORTABLE-HARNESS-STORE"
       ]
     },
@@ -236,7 +391,7 @@
         "SM-WORKFLOW": "running"
       },
       "expected_states": {
-        "SM-RUN": "succeeded",
+        "SM-RUN": "result_published",
         "SM-TRIAGE-PROVENANCE": "completed",
         "SM-WORKFLOW": "completed"
       },
@@ -272,7 +427,12 @@
               "persistence": "Triage障害をWorkflow blockedへ伝播する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINDING-002",
@@ -305,7 +465,12 @@
               "persistence": "Triage障害をWorkflow blockedへ伝播する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINDING-003",
@@ -338,7 +503,12 @@
               "persistence": "Triage障害をWorkflow blockedへ伝播する"
             }
           ],
-          "interface_role": "internal_evidence"
+          "interface_role": "internal_evidence",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINDING-004",
@@ -371,7 +541,12 @@
               "persistence": "Triage障害をWorkflow blockedへ伝播する"
             }
           ],
-          "interface_role": "output"
+          "interface_role": "output",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINDING-005",
@@ -404,7 +579,12 @@
               "persistence": "Triage障害をWorkflow blockedへ伝播する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINDING-006",
@@ -421,9 +601,52 @@
               "event": "provenance_failed",
               "to_state": "failed",
               "persistence": "Runのfinal不合格を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "completed",
+            "SM-WORKFLOW": "blocked"
+          }
+        },
+        {
+          "step_id": "FINDING-RESULT-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
+          "interface_role": "output",
+          "state_machine_id": "SM-RUN",
+          "from_state": "succeeded",
+          "event": "publish_result",
+          "to_state": "result_published",
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "succeeded",
+              "event": "publish_result",
+              "to_state": "result_published",
+              "persistence": "結果生成失敗をRun failedへ保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
+            }
+          ],
+          "failure_expected_states": {
+            "SM-RUN": "result_published",
+            "SM-TRIAGE-PROVENANCE": "completed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINDING-007",
@@ -442,7 +665,12 @@
               "persistence": "Run結果返却失敗を保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "result_published",
+            "SM-TRIAGE-PROVENANCE": "completed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINDING-008",
@@ -461,12 +689,16 @@
               "persistence": "Workflowのfinal不合格を保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "result_published",
+            "SM-TRIAGE-PROVENANCE": "completed",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ],
       "initial_interfaces": [
         "IF-HARNESS-TRIAGE-RESULTS",
-        "IF-HARNESS-WORKFLOW-RUN-RESULT",
         "IF-TRACE-RUN-FINALVERDICT",
         "IF-TRACE-TRIAGE-FINALVERDICT",
         "IF-TRACE-TRIAGE-PREVERDICT",
@@ -501,9 +733,28 @@
               "event": "reject",
               "to_state": "blocked",
               "persistence": "pre不合格を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "PREFAIL-002",
@@ -520,9 +771,21 @@
               "event": "provenance_failed",
               "to_state": "failed",
               "persistence": "Runのpre不合格を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "PREFAIL-003",
@@ -541,7 +804,12 @@
               "persistence": "Workflowのpre不合格を保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ],
       "initial_interfaces": [
@@ -578,9 +846,28 @@
               "event": "reject",
               "to_state": "blocked",
               "persistence": "final不合格を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_triage",
+              "event": "provenance_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINALFAIL-002",
@@ -597,9 +884,21 @@
               "event": "provenance_failed",
               "to_state": "failed",
               "persistence": "Runのfinal不合格を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "FINALFAIL-003",
@@ -618,7 +917,12 @@
               "persistence": "Workflowのfinal不合格を保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-TRIAGE-PROVENANCE": "blocked",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ],
       "initial_interfaces": [
@@ -655,7 +959,11 @@
               "persistence": "評価package拒否を保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-IMPROVEMENT": "blocked",
+            "SM-CONFIGURATION": "awaiting_change"
+          }
         },
         {
           "step_id": "IMPROVEMENT-002",
@@ -674,7 +982,11 @@
               "persistence": "固定比較失敗を保存する"
             }
           ],
-          "interface_role": "internal_evidence"
+          "interface_role": "internal_evidence",
+          "failure_expected_states": {
+            "SM-IMPROVEMENT": "blocked",
+            "SM-CONFIGURATION": "awaiting_change"
+          }
         },
         {
           "step_id": "IMPROVEMENT-003",
@@ -693,7 +1005,11 @@
               "persistence": "Human拒否を保存する"
             }
           ],
-          "interface_role": "output"
+          "interface_role": "output",
+          "failure_expected_states": {
+            "SM-IMPROVEMENT": "blocked",
+            "SM-CONFIGURATION": "awaiting_change"
+          }
         },
         {
           "step_id": "IMPROVEMENT-004",
@@ -712,7 +1028,11 @@
               "persistence": "提案生成失敗を保存する"
             }
           ],
-          "interface_role": "output"
+          "interface_role": "output",
+          "failure_expected_states": {
+            "SM-IMPROVEMENT": "blocked",
+            "SM-CONFIGURATION": "awaiting_change"
+          }
         },
         {
           "step_id": "CONFIGURATION-001",
@@ -731,7 +1051,11 @@
               "persistence": "不完全変更提案を拒否して保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-IMPROVEMENT": "completed",
+            "SM-CONFIGURATION": "blocked"
+          }
         },
         {
           "step_id": "CONFIGURATION-002",
@@ -750,7 +1074,11 @@
               "persistence": "変更検証不合格を保存する"
             }
           ],
-          "interface_role": "internal_evidence"
+          "interface_role": "internal_evidence",
+          "failure_expected_states": {
+            "SM-IMPROVEMENT": "completed",
+            "SM-CONFIGURATION": "blocked"
+          }
         },
         {
           "step_id": "CONFIGURATION-003",
@@ -769,7 +1097,11 @@
               "persistence": "適用前条件不一致を保存する"
             }
           ],
-          "interface_role": "internal_evidence"
+          "interface_role": "internal_evidence",
+          "failure_expected_states": {
+            "SM-IMPROVEMENT": "completed",
+            "SM-CONFIGURATION": "blocked"
+          }
         }
       ],
       "initial_interfaces": [
@@ -824,7 +1156,14 @@
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
           ],
-          "interface_role": "internal_evidence"
+          "interface_role": "internal_evidence",
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "reserved",
+            "SM-VALIDATION": "pending",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-001",
@@ -864,7 +1203,14 @@
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-VALIDATION": "pending",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-002",
@@ -904,7 +1250,14 @@
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
           ],
-          "interface_role": "output"
+          "interface_role": "output",
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-VALIDATION": "pending",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "ATTEMPT-002",
@@ -937,7 +1290,14 @@
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "sealed",
+            "SM-VALIDATION": "pending",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RUN-CAPTURE-001",
@@ -963,7 +1323,14 @@
               "to_state": "blocked",
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-ATTEMPT": "response_captured",
+            "SM-PROVIDER-CAPTURE": "sealed",
+            "SM-VALIDATION": "pending",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "ATTEMPT-PARSE-001",
@@ -996,7 +1363,14 @@
               "to_state": "blocked",
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "sealed",
+            "SM-VALIDATION": "pending",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "VALIDATION-001",
@@ -1036,7 +1410,14 @@
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "sealed",
+            "SM-VALIDATION": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "VALIDATION-002",
@@ -1076,7 +1457,14 @@
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
           ],
-          "interface_role": "internal_evidence"
+          "interface_role": "internal_evidence",
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "sealed",
+            "SM-VALIDATION": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "VALIDATION-003",
@@ -1116,7 +1504,14 @@
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
           ],
-          "interface_role": "output"
+          "interface_role": "output",
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "sealed",
+            "SM-VALIDATION": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "ATTEMPT-003",
@@ -1149,7 +1544,14 @@
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
           ],
-          "interface_role": "input"
+          "interface_role": "input",
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-PROVIDER-CAPTURE": "sealed",
+            "SM-VALIDATION": "passed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "RUN-VALIDATION-001",
@@ -1175,7 +1577,14 @@
               "to_state": "blocked",
               "persistence": "failed Run結果とWorkflow blockedを原子的に保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-ATTEMPT": "validated",
+            "SM-PROVIDER-CAPTURE": "sealed",
+            "SM-VALIDATION": "passed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ],
       "initial_interfaces": [
@@ -1215,8 +1624,27 @@
               "event": "fail",
               "to_state": "failed",
               "persistence": "dispatch失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "execution_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "DISPATCH-FAIL-002",
@@ -1234,8 +1662,20 @@
               "event": "execution_failed",
               "to_state": "failed",
               "persistence": "failed Run結果を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "DISPATCH-FAIL-003",
@@ -1254,15 +1694,18 @@
               "to_state": "blocked",
               "persistence": "Workflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ]
     },
     {
       "protocol_id": "PROTOCOL-CAPTURE-DIAGNOSTIC-FAILURE",
-      "initial_interfaces": [
-        "IF-HARNESS-CAPTURE-RESULT"
-      ],
+      "initial_interfaces": [],
       "initial_states": {
         "SM-PROVIDER-CAPTURE": "receiving",
         "SM-ATTEMPT": "sent",
@@ -1280,7 +1723,7 @@
           "step_id": "CAPTURE-DIAG-FAIL-001",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
           "interface_id": "IF-HARNESS-CAPTURE-RESULT",
-          "interface_role": "input",
+          "interface_role": "output",
           "state_machine_id": "SM-PROVIDER-CAPTURE",
           "from_state": "receiving",
           "event": "diagnostic_failed",
@@ -1292,8 +1735,28 @@
               "event": "diagnostic_failed",
               "to_state": "failed",
               "persistence": "値なし診断を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "capture_diagnostic_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-ATTEMPT": "sent",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-DIAG-FAIL-002",
@@ -1311,8 +1774,28 @@
               "event": "fail",
               "to_state": "failed",
               "persistence": "Attempt failedを保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "execution_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-DIAG-FAIL-003",
@@ -1330,8 +1813,21 @@
               "event": "capture_diagnostic_failed",
               "to_state": "failed",
               "persistence": "診断参照付きRun failedを保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-DIAG-FAIL-004",
@@ -1350,15 +1846,19 @@
               "to_state": "blocked",
               "persistence": "Workflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ]
     },
     {
       "protocol_id": "PROTOCOL-CAPTURE-QUARANTINE",
-      "initial_interfaces": [
-        "IF-HARNESS-CAPTURE-RESULT"
-      ],
+      "initial_interfaces": [],
       "initial_states": {
         "SM-PROVIDER-CAPTURE": "receiving",
         "SM-ATTEMPT": "sent",
@@ -1376,7 +1876,7 @@
           "step_id": "CAPTURE-QUARANTINE-001",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
           "interface_id": "IF-HARNESS-CAPTURE-RESULT",
-          "interface_role": "input",
+          "interface_role": "output",
           "state_machine_id": "SM-PROVIDER-CAPTURE",
           "from_state": "receiving",
           "event": "quarantine",
@@ -1388,8 +1888,28 @@
               "event": "quarantine",
               "to_state": "quarantined",
               "persistence": "隔離参照と理由を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "capture_quarantined",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "quarantined",
+            "SM-ATTEMPT": "sent",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-QUARANTINE-002",
@@ -1407,8 +1927,28 @@
               "event": "capture_quarantined",
               "to_state": "quarantined",
               "persistence": "Attempt隔離を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "execution_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "quarantined",
+            "SM-ATTEMPT": "quarantined",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-QUARANTINE-003",
@@ -1426,8 +1966,21 @@
               "event": "capture_quarantined",
               "to_state": "failed",
               "persistence": "隔離参照付きRun failedを保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "quarantined",
+            "SM-ATTEMPT": "quarantined",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-QUARANTINE-004",
@@ -1446,15 +1999,19 @@
               "to_state": "blocked",
               "persistence": "Workflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "quarantined",
+            "SM-ATTEMPT": "quarantined",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ]
     },
     {
       "protocol_id": "PROTOCOL-CAPTURE-IRRECOVERABLE",
-      "initial_interfaces": [
-        "IF-HARNESS-CAPTURE-RESULT"
-      ],
+      "initial_interfaces": [],
       "initial_states": {
         "SM-PROVIDER-CAPTURE": "receiving",
         "SM-ATTEMPT": "sent",
@@ -1472,7 +2029,7 @@
           "step_id": "CAPTURE-IRRECOVERABLE-001",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
           "interface_id": "IF-HARNESS-CAPTURE-RESULT",
-          "interface_role": "input",
+          "interface_role": "output",
           "state_machine_id": "SM-PROVIDER-CAPTURE",
           "from_state": "receiving",
           "event": "fail",
@@ -1484,8 +2041,28 @@
               "event": "fail",
               "to_state": "failed",
               "persistence": "保存不能分類を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "capture_failed",
+              "to_state": "irrecoverable",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-ATTEMPT": "sent",
+            "SM-RUN": "irrecoverable",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-IRRECOVERABLE-002",
@@ -1503,8 +2080,28 @@
               "event": "fail",
               "to_state": "failed",
               "persistence": "Attempt失敗を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "executing",
+              "event": "execution_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-IRRECOVERABLE-003",
@@ -1522,8 +2119,21 @@
               "event": "capture_failed",
               "to_state": "irrecoverable",
               "persistence": "値なしRun結果を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "irrecoverable",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "CAPTURE-IRRECOVERABLE-004",
@@ -1542,15 +2152,19 @@
               "to_state": "blocked",
               "persistence": "Workflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-PROVIDER-CAPTURE": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "irrecoverable",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ]
     },
     {
       "protocol_id": "PROTOCOL-VALIDATION-FAILURE",
-      "initial_interfaces": [
-        "IF-HARNESS-VALIDATION-RESULT"
-      ],
+      "initial_interfaces": [],
       "initial_states": {
         "SM-VALIDATION": "pending",
         "SM-ATTEMPT": "parsed_candidate",
@@ -1568,7 +2182,7 @@
           "step_id": "VALIDATION-FAIL-001",
           "actor_design_id": "DES-HARNESSED-EXECUTION",
           "interface_id": "IF-HARNESS-VALIDATION-RESULT",
-          "interface_role": "input",
+          "interface_role": "output",
           "state_machine_id": "SM-VALIDATION",
           "from_state": "pending",
           "event": "reject",
@@ -1580,8 +2194,28 @@
               "event": "reject",
               "to_state": "failed",
               "persistence": "Validation不合格を保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-VALIDATION": "failed",
+            "SM-ATTEMPT": "parsed_candidate",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "VALIDATION-FAIL-002",
@@ -1599,8 +2233,28 @@
               "event": "fail",
               "to_state": "failed",
               "persistence": "Attempt failedを保存する"
+            },
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "validating",
+              "event": "validation_failed",
+              "to_state": "failed",
+              "persistence": "失敗Run結果をWorkflow返却前に保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-VALIDATION": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "VALIDATION-FAIL-003",
@@ -1618,8 +2272,21 @@
               "event": "validation_failed",
               "to_state": "failed",
               "persistence": "Validation不合格付きRun failedを保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-VALIDATION": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         },
         {
           "step_id": "VALIDATION-FAIL-004",
@@ -1638,7 +2305,147 @@
               "to_state": "blocked",
               "persistence": "Workflow blockedを保存する"
             }
-          ]
+          ],
+          "failure_expected_states": {
+            "SM-VALIDATION": "failed",
+            "SM-ATTEMPT": "failed",
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
+        }
+      ]
+    },
+    {
+      "protocol_id": "PROTOCOL-RUN-START-FAILURE",
+      "initial_interfaces": [],
+      "initial_states": {
+        "SM-RUN": "awaiting_send_approval",
+        "SM-WORKFLOW": "running"
+      },
+      "expected_states": {
+        "SM-RUN": "failed",
+        "SM-WORKFLOW": "blocked"
+      },
+      "steps": [
+        {
+          "step_id": "RUN-START-FAIL-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
+          "interface_role": "output",
+          "state_machine_id": "SM-RUN",
+          "from_state": "awaiting_send_approval",
+          "event": "send_approval_failed",
+          "to_state": "failed",
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "awaiting_send_approval",
+              "event": "send_approval_failed",
+              "to_state": "failed",
+              "persistence": "開始失敗Run結果を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
+            }
+          ],
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
+        },
+        {
+          "step_id": "RUN-START-FAIL-002",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
+          "interface_role": "input",
+          "state_machine_id": "SM-WORKFLOW",
+          "from_state": "running",
+          "event": "execution_failed",
+          "to_state": "blocked",
+          "on_failure": [
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "開始失敗でWorkflow blockedを保存する"
+            }
+          ],
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
+        }
+      ]
+    },
+    {
+      "protocol_id": "PROTOCOL-RETRY-FAILURE",
+      "initial_interfaces": [],
+      "initial_states": {
+        "SM-RUN": "retry_pending",
+        "SM-WORKFLOW": "running"
+      },
+      "expected_states": {
+        "SM-RUN": "failed",
+        "SM-WORKFLOW": "blocked"
+      },
+      "steps": [
+        {
+          "step_id": "RETRY-FAIL-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
+          "interface_role": "output",
+          "state_machine_id": "SM-RUN",
+          "from_state": "retry_pending",
+          "event": "prepare_retry_failed",
+          "to_state": "failed",
+          "on_failure": [
+            {
+              "machine_id": "SM-RUN",
+              "from_state": "retry_pending",
+              "event": "prepare_retry_failed",
+              "to_state": "failed",
+              "persistence": "retry失敗Run結果を保存する"
+            },
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "失敗Run結果とWorkflow blockedを保存する"
+            }
+          ],
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
+        },
+        {
+          "step_id": "RETRY-FAIL-002",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
+          "interface_role": "input",
+          "state_machine_id": "SM-WORKFLOW",
+          "from_state": "running",
+          "event": "execution_failed",
+          "to_state": "blocked",
+          "on_failure": [
+            {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "running",
+              "event": "execution_failed",
+              "to_state": "blocked",
+              "persistence": "retry失敗でWorkflow blockedを保存する"
+            }
+          ],
+          "failure_expected_states": {
+            "SM-RUN": "failed",
+            "SM-WORKFLOW": "blocked"
+          }
         }
       ]
     }
@@ -2511,6 +3318,7 @@
         "retry_pending",
         "awaiting_triage",
         "succeeded",
+        "result_published",
         "failed",
         "irrecoverable",
         "blocked"
@@ -2536,7 +3344,9 @@
         "prepare_retry_failed",
         "send_failed",
         "execution_failed",
-        "capture_diagnostic_failed"
+        "capture_diagnostic_failed",
+        "publish_result",
+        "result_delivery_failed"
       ],
       "transitions": [
         {
@@ -2685,6 +3495,20 @@
           "to": "failed",
           "guard": "rawは未確定だが値なし診断を保存できた",
           "persistence": "診断参照とfailed Run結果をWorkflow返却前に保存する"
+        },
+        {
+          "from": "succeeded",
+          "event": "publish_result",
+          "to": "result_published",
+          "guard": "成功終端とFinal FindingをRun結果へ固定できる",
+          "persistence": "成功Run結果をWorkflow通知前に保存する"
+        },
+        {
+          "from": "succeeded",
+          "event": "result_delivery_failed",
+          "to": "failed",
+          "guard": "成功Run結果を固定または返却できない",
+          "persistence": "結果返却失敗とfailed終端を保存する"
         }
       ]
     },
@@ -2799,13 +3623,15 @@
         "schema_validated",
         "evidence_validated",
         "passed",
-        "failed"
+        "failed",
+        "retry_result_published"
       ],
       "events": [
         "schema_passed",
         "evidence_passed",
         "scope_passed",
-        "reject"
+        "reject",
+        "publish_retry_result"
       ],
       "transitions": [
         {
@@ -2849,6 +3675,13 @@
           "to": "failed",
           "guard": "Scope検証が不合格である",
           "persistence": "失敗段階と理由を保存する"
+        },
+        {
+          "from": "failed",
+          "event": "publish_retry_result",
+          "to": "retry_result_published",
+          "guard": "復旧可能なValidation不合格とretry根拠を固定できる",
+          "persistence": "retryable Validation結果をRun通知前に保存する"
         }
       ]
     },
@@ -2958,11 +3791,11 @@
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_architecture",
-    "digest": "0acebc148a585fe73314d6683d1c65b4b85c96cdc858bf35d6f24565f9cfc38b",
+    "digest": "5ab5c0bbffeb1020703c741bfb657a91b0cf730007fcdb6908a6993e7fd9f9a5",
     "boundary_count": 23,
     "interface_count": 29,
     "state_machine_count": 8,
-    "protocol_count": 12,
+    "protocol_count": 14,
     "event_route_count": 28,
     "status": "complete"
   },
@@ -3335,5 +4168,50 @@
     "SM-TRIAGE-PROVENANCE",
     "SM-VALIDATION",
     "SM-WORKFLOW"
+  ],
+  "required_generated_interface_ids": [
+    "IF-HARNESS-CAPTURE-RESULT",
+    "IF-HARNESS-VALIDATION-CANDIDATE",
+    "IF-HARNESS-VALIDATION-RESULT",
+    "IF-HARNESS-WORKFLOW-RUN-RESULT"
+  ],
+  "required_failure_state_groups": [
+    {
+      "SM-RUN": [
+        "failed",
+        "irrecoverable",
+        "blocked",
+        "result_published"
+      ],
+      "SM-WORKFLOW": [
+        "blocked"
+      ]
+    }
+  ],
+  "required_failure_correlations": [
+    {
+      "source_machine_id": "SM-PROVIDER-CAPTURE",
+      "source_from_state": "receiving",
+      "source_event": "diagnostic_failed",
+      "target_machine_id": "SM-RUN",
+      "target_event": "capture_diagnostic_failed",
+      "target_state": "failed"
+    },
+    {
+      "source_machine_id": "SM-PROVIDER-CAPTURE",
+      "source_from_state": "receiving",
+      "source_event": "quarantine",
+      "target_machine_id": "SM-RUN",
+      "target_event": "capture_quarantined",
+      "target_state": "failed"
+    },
+    {
+      "source_machine_id": "SM-PROVIDER-CAPTURE",
+      "source_from_state": "receiving",
+      "source_event": "fail",
+      "target_machine_id": "SM-RUN",
+      "target_event": "capture_failed",
+      "target_state": "irrecoverable"
+    }
   ]
 }

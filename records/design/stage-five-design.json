@@ -695,8 +695,8 @@
       "oracle_type": "machine",
       "setup": "Attempt identity、request identityおよび送信条件／provider response stream／REQ-PORTABLE-002とREQ-PORTABLE-004を満たすwrite-ahead隔離保存境界",
       "stimulus": "システムはprovider responseの受領とrawの耐久的captureを別状態として管理し、解析前に共有隔離保存境界へwrite-ahead captureしなければならない",
-      "expected": "Capture結果、Validation候補、Validation結果を生成後に消費し、Runをawaiting_triageまで進める／診断保存可能、隔離、保存不能、Validation不合格、dispatch失敗を別protocolでfailedまたはirrecoverable Run結果とWorkflow blockedへ伝播する",
-      "negative_case": "未生成interfaceを消費する／局所machineだけを終端にする／診断保存可能なcapture失敗をirrecoverableに分類する／failed Run結果なしでWorkflowを完了または継続する"
+      "expected": "内部生成必須interfaceは初期入力へ偽装できず、Capture・Validation・成功／失敗Run結果を生成後に消費する／Capture分類は対応するRun終端へ固定し、全失敗stepが明示したRun・Workflow終端へ到達する",
+      "negative_case": "内部生成interfaceをinitialへ追加する／Capture診断失敗をirrecoverableへ結ぶ／失敗状態ベクトルからRunまたはWorkflowを省く"
     },
     {
       "test_id": "AT-EXEC-004",
@@ -839,8 +839,8 @@
       "oracle_type": "machine",
       "setup": "現在の作業段階、要求action、関門結果／Harnessからの開始要求またはRun結果／REQ-TRACE-005のOperational Provenance verdict／REQ-PORTABLE-002を満たす状態保存境界",
       "stimulus": "システムは作業段階とRun開始・完了許可の正本として許可遷移および関門を一貫した状態機械で管理しなければならない",
-      "expected": "Run正常結果をfinal provenance待ちへ、dispatch・Capture・Validation・Triageのfailedまたはirrecoverable Run結果をexecution_failedでWorkflow blockedへ伝播して耐久保存する",
-      "negative_case": "局所障害後もWorkflowをrunningに残す／Run結果を介さず状態を変更する／failedまたはirrecoverable結果をcompletedへ進める"
+      "expected": "開始、retry、dispatch、Capture、Validation、Triageの全失敗がfailedまたはirrecoverable Run結果を生成後、Workflow blockedへ伝播し、成功Run結果もRun成功後に生成してから受け取る",
+      "negative_case": "開始またはretry失敗後もWorkflowをrunningに残す／成功Run結果を初期入力扱いする／全状態ベクトル未到達を受理する"
     },
     {
       "test_id": "AT-WORKFLOW-003",
@@ -944,18 +944,18 @@
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_contract",
-    "digest": "1b2dcc42ac72b1d9ac95c86534519615abf2970473cb26838ee5395e5f732a7e",
+    "digest": "6adfa4a0aa2eeb1136ed783cd9cc3b2221e8ef617113213d631a2c25fefef9f1",
     "feature_count": 9,
     "requirement_count": 37,
     "acceptance_test_count": 37,
     "boundary_count": 23,
     "architecture_contract": "tools/design/design_contract.py:validate_design_architecture",
     "architecture_record": "records/design/stage-five-architecture-integrity.json",
-    "architecture_digest": "0acebc148a585fe73314d6683d1c65b4b85c96cdc858bf35d6f24565f9cfc38b",
+    "architecture_digest": "5ab5c0bbffeb1020703c741bfb657a91b0cf730007fcdb6908a6993e7fd9f9a5",
     "interface_count": 29,
     "state_machine_count": 8,
     "status": "complete",
-    "protocol_count": 12,
+    "protocol_count": 14,
     "event_route_count": 28
   },
   "lifecycle": "provisional",

@@ -85,16 +85,18 @@ identity、payload、失敗verdict付きで定義する。23件の承認済み�
 
 Workflow、Run、Attempt、provider capture、Validationおよび
 Triage/Provenance、Improvementは閉じた状態・event・遷移表を持つ。
-12本の正常・失敗・retry protocolは8状態機械をすべて被覆し、開始状態から
+14本の正常・失敗・retry protocolは8状態機械をすべて被覆し、開始状態から
 期待終了状態まで正常stepと構造化失敗分岐を実際の遷移として機械検証する。
 外部送信は承認要求とHuman判断を別interfaceに分け、改善提案はWorkflow所有の
 設定状態機械が受領・検証・適用する。Capture結果、Validation候補、
 Validation結果はTriage結果と分離し、Runを`executing`から
 `awaiting_triage`まで同じprotocol内で接続する。各stepはinterfaceを
 `input`、`output`、`internal_evidence`として生成時点と所有者へ結び付け、
-未生成interfaceの消費を拒否する。Capture失敗は診断保存可能、隔離、
+内部生成必須interfaceの初期入力化と未生成消費を拒否する。Capture失敗は診断保存可能、隔離、
 raw・診断保存不能を区別し、Validation・dispatch失敗とともにfailedまたは
 irrecoverable Run結果を介してWorkflow `blocked`まで伝播する。
+各失敗stepは全machineの期待状態ベクトルを宣言し、開始・retry失敗も
+Run結果を生成後にWorkflowへ返す。成功Run結果も成功終端後に生成する。
 各遷移はguardと、
 結果を外部へ見せる前に何を耐久化するかを定義する。失敗、拒否、隔離、
 irrecoverable、retry枯渇、provenance不合格を耐久的終端へ伝播し、
