@@ -49,6 +49,18 @@ _CLASSIFICATIONS = {
   "replace",
   "defer",
 }
+_GAP_CATEGORY_BY_CLASSIFICATION = {
+  "adapt": {
+    "adaptation",
+    "missing_boundary",
+    "missing_gate",
+  },
+  "replace": {
+    "incompatible_boundary",
+    "replacement",
+  },
+  "defer": {"deferred"},
+}
 _EVIDENCE_FIELDS = {
   "path",
   "blob_sha256",
@@ -418,6 +430,41 @@ def validate_evidence_backed_bootstrap_conformance(
       raise BootstrapConformanceError(
         "record gaps must resolve to requirement"
       )
+    classification = record["classification"]
+    if classification in ("adapt", "replace") and (
+      not record["implementation_evidence"]
+      or not record["test_evidence"]
+    ):
+      raise BootstrapConformanceError(
+        "adapt and replace require comparison evidence"
+      )
+    if classification == "defer" and (
+      record["implementation_evidence"]
+      or record["test_evidence"]
+    ):
+      raise BootstrapConformanceError(
+        "defer cannot claim bootstrap evidence"
+      )
+    expected_category = (
+      _GAP_CATEGORY_BY_CLASSIFICATION.get(
+        classification
+      )
+    )
+    for gap_id in record_gap_ids:
+      gap = gap_by_id[gap_id]
+      if (
+        gap["category"] not in expected_category
+        or any(
+          not obligation_id.startswith(
+            f"{requirement_id}#"
+          )
+          for obligation_id
+          in gap["atomic_obligation_ids"]
+        )
+      ):
+        raise BootstrapConformanceError(
+          "gap semantics must match classification"
+        )
   used_gap_ids = {
     gap_id
     for record in parsed_records
@@ -454,6 +501,25 @@ def validate_evidence_backed_bootstrap_conformance(
       raise BootstrapConformanceError(
         "conformant record requires conformant dependencies"
       )
+    if (
+      provider["classification"] != "conformant"
+      and consumer["classification"] != "conformant"
+    ):
+      provider_gap_ids = set(provider["gaps"])
+      consumer_gap_dependencies = {
+        gap_id
+        for consumer_gap_id in consumer["gaps"]
+        for gap_id in gap_by_id[
+          consumer_gap_id
+        ]["depends_on_gap_ids"]
+      }
+      if not (
+        provider_gap_ids
+        <= consumer_gap_dependencies
+      ):
+        raise BootstrapConformanceError(
+          "nonconformant dependency gaps must be linked"
+        )
     parsed_dependencies.append(dict(value))
 
   document = {

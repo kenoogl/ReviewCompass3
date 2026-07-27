@@ -1,0 +1,1257 @@
+{
+  "record_version": 1,
+  "status": "validated",
+  "bootstrap_commit": "a26630ac614809d2bcf43ff3b4fc2eb4d7a12452",
+  "requirement_design_map": {
+    "REQ-EVAL-001": "DES-EVIDENCE-EVALUATION",
+    "REQ-EVAL-002": "DES-EVIDENCE-EVALUATION",
+    "REQ-EVAL-003": "DES-EVIDENCE-EVALUATION",
+    "REQ-EXEC-001": "DES-HARNESSED-EXECUTION",
+    "REQ-EXEC-002": "DES-HARNESSED-EXECUTION",
+    "REQ-EXEC-003": "DES-HARNESSED-EXECUTION",
+    "REQ-EXEC-004": "DES-HARNESSED-EXECUTION",
+    "REQ-EXEC-005": "DES-HARNESSED-EXECUTION",
+    "REQ-EXEC-006": "DES-HARNESSED-EXECUTION",
+    "REQ-PORTABLE-001": "DES-PORTABLE-LIFECYCLE",
+    "REQ-PORTABLE-002": "DES-PORTABLE-LIFECYCLE",
+    "REQ-PORTABLE-003": "DES-PORTABLE-LIFECYCLE",
+    "REQ-PORTABLE-004": "DES-PORTABLE-LIFECYCLE",
+    "REQ-CONTEXT-001": "DES-REVIEW-CONTEXT",
+    "REQ-CONTEXT-002": "DES-REVIEW-CONTEXT",
+    "REQ-CONTEXT-003": "DES-REVIEW-CONTEXT",
+    "REQ-CONTEXT-004": "DES-REVIEW-CONTEXT",
+    "REQ-CONTEXT-005": "DES-REVIEW-CONTEXT",
+    "REQ-CONTEXT-006": "DES-REVIEW-CONTEXT",
+    "REQ-CONTEXT-007": "DES-REVIEW-CONTEXT",
+    "REQ-TRIAGE-001": "DES-REVIEW-TRIAGE",
+    "REQ-TRIAGE-002": "DES-REVIEW-TRIAGE",
+    "REQ-TRIAGE-003": "DES-REVIEW-TRIAGE",
+    "REQ-TRACE-001": "DES-SEMANTIC-TRACE",
+    "REQ-TRACE-002": "DES-SEMANTIC-TRACE",
+    "REQ-TRACE-003": "DES-SEMANTIC-TRACE",
+    "REQ-TRACE-004": "DES-SEMANTIC-TRACE",
+    "REQ-TRACE-005": "DES-SEMANTIC-TRACE",
+    "REQ-IMPROVE-001": "DES-SELF-IMPROVEMENT",
+    "REQ-IMPROVE-002": "DES-SELF-IMPROVEMENT",
+    "REQ-SESSION-001": "DES-SESSION-RECORDS",
+    "REQ-SESSION-002": "DES-SESSION-RECORDS",
+    "REQ-SESSION-003": "DES-SESSION-RECORDS",
+    "REQ-WORKFLOW-001": "DES-WORKFLOW-CONTROL",
+    "REQ-WORKFLOW-002": "DES-WORKFLOW-CONTROL",
+    "REQ-WORKFLOW-003": "DES-WORKFLOW-CONTROL",
+    "REQ-WORKFLOW-004": "DES-WORKFLOW-CONTROL"
+  },
+  "evidence_manifest": [
+    {
+      "path": "tests/test_bootstrap_bundle_verification.py",
+      "blob_sha256": "67f57e3d68b59f2e58bed1f50f0011e57d0797a1d69a2de777fe7d6e17abc727",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-CONTEXT-004"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_closed_payload.py",
+      "blob_sha256": "019fd1b9e400efaef8271952d7568ff501b85cb9ebcc5d06b407bf7d9ee61cb9",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-EXEC-002"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_evidence_closure.py",
+      "blob_sha256": "aa7a39d11bb704c8a9d433d81012335c663706d756191c4d1f2cc5a4e91d6bd5",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-TRACE-001",
+        "REQ-TRACE-005"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_material_bundle.py",
+      "blob_sha256": "1be4573c96f5f5136e84b0857ecc30ae17d2cb9078f42b4ceee3c7a24ae5fd6f",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-CONTEXT-002"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_material_classification.py",
+      "blob_sha256": "ba32ef0b9e4050dc74d6cccceadba3d5b9d26ca27e1d008d2e519f3f3e7d7b6f",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-CONTEXT-003",
+        "REQ-CONTEXT-005"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_raw_review_store.py",
+      "blob_sha256": "e096f0969bdb6afef530eae7a5a46a743576020165268f097f3da9f28985bcf7",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-CONTEXT-007",
+        "REQ-EXEC-003"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_review_assurance.py",
+      "blob_sha256": "606c5ee30bbe69c50f86878dbacd6ef3631244c9a2f10d44154ae29b00f63bd1",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-EXEC-006"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_review_contract.py",
+      "blob_sha256": "10f39cf8ef0b61a3d64b00f5d300d2305a1f4bbe27daf1975d1c069eddb34bcc",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-CONTEXT-001"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_review_execution.py",
+      "blob_sha256": "754f92c2a835f6b55078e0b77d5d4dd9ea0c6c28ffe9de01dc98c9add54ca257",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-EXEC-004"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_review_pipeline.py",
+      "blob_sha256": "27ee847e7807868694bd8afb14abd2a26046588a0f0081e111e2f4de99a9003d",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-EXEC-001"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_review_response_parser.py",
+      "blob_sha256": "efab0479696fd2cf04e0b0d9ab9c5268f9c815eb9721b67917a404b7610b91c7",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-EXEC-005"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_review_resume.py",
+      "blob_sha256": "4e3890870599344fd2ae0244e4317c78a1366a8867d3c91fa258ceb57f4c3fd4",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-CONTEXT-006",
+        "REQ-EXEC-006"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_review_triage.py",
+      "blob_sha256": "c06cc8ce0f84a9a642efddebf70d98459271708d18a0446a49e30b4c1982dd96",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-TRIAGE-001",
+        "REQ-TRIAGE-002",
+        "REQ-TRIAGE-003"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_source_universe.py",
+      "blob_sha256": "e6d224cb66596f24b41984c6bab2e2adad73061182d8da90733bd265cbbd11b1",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-TRACE-004"
+      ]
+    },
+    {
+      "path": "tests/test_bootstrap_stage_one_gate.py",
+      "blob_sha256": "9ac759cd2044eb9f34a353708d6c86fcae1f09022808039abc46f6b956665957",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-WORKFLOW-004"
+      ]
+    },
+    {
+      "path": "tests/test_requirement_boundary_relations.py",
+      "blob_sha256": "00cbd919baf8c98d295e45007b136b48dda13596d78daeace262b638c30fb50d",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-TRACE-003"
+      ]
+    },
+    {
+      "path": "tests/test_requirements_source_trace.py",
+      "blob_sha256": "9f04b748882ade1626e125cc78700850d0f1eeeb92c6202e0234de06e0f978c5",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-TRACE-002",
+        "REQ-TRACE-003"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_deployment_lifecycle.py",
+      "blob_sha256": "5bdb30c257a7f76f4ba619023ce699e58bba83189c3fe483d30b333c6ade0e8b",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-PORTABLE-003"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_discovery.py",
+      "blob_sha256": "7b9d55eb24418a302948b978d6e9ba8e643de5d05290e70c5a0db38a3ce9ead5",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-SESSION-001"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_native_distribution_ci.py",
+      "blob_sha256": "c6af02a41cd7bf95bd33df3f06995d0f8a52057ccf4fcff0d2dc989a0e14316d",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-PORTABLE-001"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_native_paths.py",
+      "blob_sha256": "2fb060bd57af98d372928144a337fc0147a2c2b12a17ff57b03665d3279e65b5",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-PORTABLE-001"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_pipeline.py",
+      "blob_sha256": "007903f49d00b426578eb12106afe09dcda425ae8adb215779be67a4f35930f6",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-SESSION-001",
+        "REQ-SESSION-002"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_preservation.py",
+      "blob_sha256": "abacb268c3e4092117b82cc0ac29665b35e291e1549b7d8eb5aa8d5a242785fd",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-SESSION-003"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_provenance.py",
+      "blob_sha256": "620429fd4104b5cb5b37a8f6da45c0c543fe2d6eff551f809398c8121acd0426",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-SESSION-002"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_redaction.py",
+      "blob_sha256": "662a715fccf4dba4c71587cecee9fb3751d5b102f9053199ef81aa386463621c",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-PORTABLE-004",
+        "REQ-SESSION-002"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_regeneration.py",
+      "blob_sha256": "81c1b4e6ae27e3456e6bc277723734e2a4ba0c3df14e134fc358d90838f3dc61",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-SESSION-003"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_repository_context.py",
+      "blob_sha256": "beaac19fbf4427a1a5c4547374d45d9121470f278d4976cfb57b6b4b689368e9",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-WORKFLOW-003"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_stage_gate.py",
+      "blob_sha256": "3ddf6f036dcb5db3c089567096ec1d60ed14da5f74ce55dffd6929abad76ea24",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-WORKFLOW-001",
+        "REQ-WORKFLOW-002"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_storage.py",
+      "blob_sha256": "34d4cf9e2104a88d8d2673a2f314892c3303b73f8b1d49a1614c07491938d7a5",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-PORTABLE-002",
+        "REQ-PORTABLE-004"
+      ]
+    },
+    {
+      "path": "tests/test_session_log_updates.py",
+      "blob_sha256": "4ca2e7afc0d31a3f35c127ad16abae85712bbea5965f71755ea93a86f288b0f3",
+      "role": "test",
+      "requirement_ids": [
+        "REQ-SESSION-003"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/bundle_verification.py",
+      "blob_sha256": "fa36f9bc206c3b2f6e2f5c2652312b55f96d16f9e130640518e5f2b9e79e0e11",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-CONTEXT-004"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/closed_payload.py",
+      "blob_sha256": "80ee6a4ebf10cececd5c356ba3e629f72418bb3aa551104722a6d6b5613d2c79",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-EXEC-002"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/evidence_closure.py",
+      "blob_sha256": "018b56f1ce8cfb7e8125c06bca4c6a0053a01b9e2cde3665604f3f2dbf284f77",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-TRACE-001",
+        "REQ-TRACE-005"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/material_bundle.py",
+      "blob_sha256": "8a7c5d3d1b967d15ac27dbb3d91c5778a9a3ebf96e7b8ec2b030b3545ac91a85",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-CONTEXT-002"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/raw_review_store.py",
+      "blob_sha256": "32f4202e82d2971ff936773e509e80a520052bd54187205d6863b9edda1559af",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-CONTEXT-007",
+        "REQ-EXEC-003"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/review_assurance.py",
+      "blob_sha256": "cbe476854f48ea0d37922a1ed091750c80aeb6c37a18ace7d22737aacca122a1",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-EXEC-006"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/review_contract.py",
+      "blob_sha256": "831f7a560d98bebcc08dc8d85880e355851752af668335d157b8019fdc6dac9d",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-CONTEXT-001"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/review_execution.py",
+      "blob_sha256": "e33b0190f2e42ddadcb88770700de07252f652fbac5df005e0852475924a5612",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-EXEC-004"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/review_materials.py",
+      "blob_sha256": "341bf9e5f9a3c60c0488b21334cc9b07d2e503e54e53106a423db74c7a837982",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-CONTEXT-003",
+        "REQ-CONTEXT-005"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/review_pipeline.py",
+      "blob_sha256": "fdac25af2a8f721fc595cdf869139417d733fd9b0e46f470d2fcd22042d49ae4",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-EXEC-001"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/review_response_parser.py",
+      "blob_sha256": "74d103f5a3291e48701f59f77d8fea16570dda7a7b0497888fbc13a5e4267736",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-EXEC-005"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/review_resume.py",
+      "blob_sha256": "16ee6cbb439385270901d867b09441f455bd2dc3a345794df5a033554c376677",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-CONTEXT-006",
+        "REQ-EXEC-006"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/review_triage.py",
+      "blob_sha256": "1734603b318b7197e480c681835ea8956b01c99f6993d72ec4e3fc706ab291b8",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-TRIAGE-001",
+        "REQ-TRIAGE-002",
+        "REQ-TRIAGE-003"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/source_universe.py",
+      "blob_sha256": "341486ce36c1b52df19ead5eb956a81473c1434fc2dc4ac495e350b7baee544b",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-TRACE-004"
+      ]
+    },
+    {
+      "path": "tools/bootstrap/stage_one_gate.py",
+      "blob_sha256": "629f790357dd3532b3168fe4f0b8fedaa8dcde6594059fd2119cb02ce06eb66a",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-WORKFLOW-004"
+      ]
+    },
+    {
+      "path": "tools/requirements/boundary_relations.py",
+      "blob_sha256": "31ae6b8edfde022300a817ec3d9d553ddb3f64d71a92a3d95c35e01a8e40e869",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-TRACE-003"
+      ]
+    },
+    {
+      "path": "tools/requirements/source_trace.py",
+      "blob_sha256": "7919f0baac5eabac3bb937fbb9264193c4ad31735a78cba4b07207f52fd282b3",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-TRACE-002",
+        "REQ-TRACE-003"
+      ]
+    },
+    {
+      "path": "tools/session_logs/deployment_lifecycle.py",
+      "blob_sha256": "d17edf96fc9dba471a5847bc9f828ab22e4148abb43c11f3f7418db251433905",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-PORTABLE-003"
+      ]
+    },
+    {
+      "path": "tools/session_logs/deployment_paths.py",
+      "blob_sha256": "6913f428a42a1474c5c522ce119e7f3e31f981b5d1ed731c3f4f4b517b234578",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-PORTABLE-001"
+      ]
+    },
+    {
+      "path": "tools/session_logs/discovery.py",
+      "blob_sha256": "890bd854dcdc8e2adeecbf4fde3812757d375c13b68a06af391cc9d75ff269e2",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-SESSION-001"
+      ]
+    },
+    {
+      "path": "tools/session_logs/entry.py",
+      "blob_sha256": "dc34c905fd598363ac67406d4474d8d5da41b33555189169331b518f9ea9e809",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-SESSION-001"
+      ]
+    },
+    {
+      "path": "tools/session_logs/native_validation.py",
+      "blob_sha256": "fbde4bc32fd15f6e3fdd1c3c0666c85a5a90e30e1412f1ab58c9544eef324d77",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-PORTABLE-001"
+      ]
+    },
+    {
+      "path": "tools/session_logs/pipeline.py",
+      "blob_sha256": "7fb746ea136deebdd23360b490d7165f1167f71981c6ceb7165d702598b222f3",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-SESSION-002"
+      ]
+    },
+    {
+      "path": "tools/session_logs/preservation.py",
+      "blob_sha256": "1bf5b19e0a75b162945ef82424e6905de8684f675149fb42fd175fcfc4d75bf9",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-SESSION-003"
+      ]
+    },
+    {
+      "path": "tools/session_logs/provenance.py",
+      "blob_sha256": "7fe4f8163a7822f8027764dbf3038bdd315b6040d5bfbc67f58f2ea5e35d1cdc",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-SESSION-002"
+      ]
+    },
+    {
+      "path": "tools/session_logs/redaction.py",
+      "blob_sha256": "300e41bb5d756f79863f1cf31fc6631d989bc0c06ed4986d1eee448cfd72f7c0",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-PORTABLE-004",
+        "REQ-SESSION-002"
+      ]
+    },
+    {
+      "path": "tools/session_logs/regeneration.py",
+      "blob_sha256": "a974a291593387f927ba8f3c204074b38812da251d269f952e70a758fee31154",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-SESSION-003"
+      ]
+    },
+    {
+      "path": "tools/session_logs/repository_context.py",
+      "blob_sha256": "00836c7bc1c9e126f6b244ee1034a436346f896045d830cc178ac460a459d684",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-WORKFLOW-003"
+      ]
+    },
+    {
+      "path": "tools/session_logs/stage_gate.py",
+      "blob_sha256": "5a1b6c2a6b5b99377aa17db12181a062590298d9f9ca743c3d9851c9d50550ea",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-WORKFLOW-001",
+        "REQ-WORKFLOW-002"
+      ]
+    },
+    {
+      "path": "tools/session_logs/storage.py",
+      "blob_sha256": "856f5fcdda85d02696a53bc5f372580f22e6117b2389b95a32c6fefa4842e924",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-PORTABLE-002",
+        "REQ-PORTABLE-004"
+      ]
+    },
+    {
+      "path": "tools/session_logs/updates.py",
+      "blob_sha256": "9f2c0e1256578c4ac2175d9c5e7b4effb0d212d2a283f2a33941b4219c00e3db",
+      "role": "implementation",
+      "requirement_ids": [
+        "REQ-SESSION-003"
+      ]
+    }
+  ],
+  "commit_blob_map": {
+    "tests/test_bootstrap_bundle_verification.py": "67f57e3d68b59f2e58bed1f50f0011e57d0797a1d69a2de777fe7d6e17abc727",
+    "tests/test_bootstrap_closed_payload.py": "019fd1b9e400efaef8271952d7568ff501b85cb9ebcc5d06b407bf7d9ee61cb9",
+    "tests/test_bootstrap_evidence_closure.py": "aa7a39d11bb704c8a9d433d81012335c663706d756191c4d1f2cc5a4e91d6bd5",
+    "tests/test_bootstrap_material_bundle.py": "1be4573c96f5f5136e84b0857ecc30ae17d2cb9078f42b4ceee3c7a24ae5fd6f",
+    "tests/test_bootstrap_material_classification.py": "ba32ef0b9e4050dc74d6cccceadba3d5b9d26ca27e1d008d2e519f3f3e7d7b6f",
+    "tests/test_bootstrap_raw_review_store.py": "e096f0969bdb6afef530eae7a5a46a743576020165268f097f3da9f28985bcf7",
+    "tests/test_bootstrap_review_assurance.py": "606c5ee30bbe69c50f86878dbacd6ef3631244c9a2f10d44154ae29b00f63bd1",
+    "tests/test_bootstrap_review_contract.py": "10f39cf8ef0b61a3d64b00f5d300d2305a1f4bbe27daf1975d1c069eddb34bcc",
+    "tests/test_bootstrap_review_execution.py": "754f92c2a835f6b55078e0b77d5d4dd9ea0c6c28ffe9de01dc98c9add54ca257",
+    "tests/test_bootstrap_review_pipeline.py": "27ee847e7807868694bd8afb14abd2a26046588a0f0081e111e2f4de99a9003d",
+    "tests/test_bootstrap_review_response_parser.py": "efab0479696fd2cf04e0b0d9ab9c5268f9c815eb9721b67917a404b7610b91c7",
+    "tests/test_bootstrap_review_resume.py": "4e3890870599344fd2ae0244e4317c78a1366a8867d3c91fa258ceb57f4c3fd4",
+    "tests/test_bootstrap_review_triage.py": "c06cc8ce0f84a9a642efddebf70d98459271708d18a0446a49e30b4c1982dd96",
+    "tests/test_bootstrap_source_universe.py": "e6d224cb66596f24b41984c6bab2e2adad73061182d8da90733bd265cbbd11b1",
+    "tests/test_bootstrap_stage_one_gate.py": "9ac759cd2044eb9f34a353708d6c86fcae1f09022808039abc46f6b956665957",
+    "tests/test_requirement_boundary_relations.py": "00cbd919baf8c98d295e45007b136b48dda13596d78daeace262b638c30fb50d",
+    "tests/test_requirements_source_trace.py": "9f04b748882ade1626e125cc78700850d0f1eeeb92c6202e0234de06e0f978c5",
+    "tests/test_session_log_deployment_lifecycle.py": "5bdb30c257a7f76f4ba619023ce699e58bba83189c3fe483d30b333c6ade0e8b",
+    "tests/test_session_log_discovery.py": "7b9d55eb24418a302948b978d6e9ba8e643de5d05290e70c5a0db38a3ce9ead5",
+    "tests/test_session_log_native_distribution_ci.py": "c6af02a41cd7bf95bd33df3f06995d0f8a52057ccf4fcff0d2dc989a0e14316d",
+    "tests/test_session_log_native_paths.py": "2fb060bd57af98d372928144a337fc0147a2c2b12a17ff57b03665d3279e65b5",
+    "tests/test_session_log_pipeline.py": "007903f49d00b426578eb12106afe09dcda425ae8adb215779be67a4f35930f6",
+    "tests/test_session_log_preservation.py": "abacb268c3e4092117b82cc0ac29665b35e291e1549b7d8eb5aa8d5a242785fd",
+    "tests/test_session_log_provenance.py": "620429fd4104b5cb5b37a8f6da45c0c543fe2d6eff551f809398c8121acd0426",
+    "tests/test_session_log_redaction.py": "662a715fccf4dba4c71587cecee9fb3751d5b102f9053199ef81aa386463621c",
+    "tests/test_session_log_regeneration.py": "81c1b4e6ae27e3456e6bc277723734e2a4ba0c3df14e134fc358d90838f3dc61",
+    "tests/test_session_log_repository_context.py": "beaac19fbf4427a1a5c4547374d45d9121470f278d4976cfb57b6b4b689368e9",
+    "tests/test_session_log_stage_gate.py": "3ddf6f036dcb5db3c089567096ec1d60ed14da5f74ce55dffd6929abad76ea24",
+    "tests/test_session_log_storage.py": "34d4cf9e2104a88d8d2673a2f314892c3303b73f8b1d49a1614c07491938d7a5",
+    "tests/test_session_log_updates.py": "4ca2e7afc0d31a3f35c127ad16abae85712bbea5965f71755ea93a86f288b0f3",
+    "tools/bootstrap/bundle_verification.py": "fa36f9bc206c3b2f6e2f5c2652312b55f96d16f9e130640518e5f2b9e79e0e11",
+    "tools/bootstrap/closed_payload.py": "80ee6a4ebf10cececd5c356ba3e629f72418bb3aa551104722a6d6b5613d2c79",
+    "tools/bootstrap/evidence_closure.py": "018b56f1ce8cfb7e8125c06bca4c6a0053a01b9e2cde3665604f3f2dbf284f77",
+    "tools/bootstrap/material_bundle.py": "8a7c5d3d1b967d15ac27dbb3d91c5778a9a3ebf96e7b8ec2b030b3545ac91a85",
+    "tools/bootstrap/raw_review_store.py": "32f4202e82d2971ff936773e509e80a520052bd54187205d6863b9edda1559af",
+    "tools/bootstrap/review_assurance.py": "cbe476854f48ea0d37922a1ed091750c80aeb6c37a18ace7d22737aacca122a1",
+    "tools/bootstrap/review_contract.py": "831f7a560d98bebcc08dc8d85880e355851752af668335d157b8019fdc6dac9d",
+    "tools/bootstrap/review_execution.py": "e33b0190f2e42ddadcb88770700de07252f652fbac5df005e0852475924a5612",
+    "tools/bootstrap/review_materials.py": "341bf9e5f9a3c60c0488b21334cc9b07d2e503e54e53106a423db74c7a837982",
+    "tools/bootstrap/review_pipeline.py": "fdac25af2a8f721fc595cdf869139417d733fd9b0e46f470d2fcd22042d49ae4",
+    "tools/bootstrap/review_response_parser.py": "74d103f5a3291e48701f59f77d8fea16570dda7a7b0497888fbc13a5e4267736",
+    "tools/bootstrap/review_resume.py": "16ee6cbb439385270901d867b09441f455bd2dc3a345794df5a033554c376677",
+    "tools/bootstrap/review_triage.py": "1734603b318b7197e480c681835ea8956b01c99f6993d72ec4e3fc706ab291b8",
+    "tools/bootstrap/source_universe.py": "341486ce36c1b52df19ead5eb956a81473c1434fc2dc4ac495e350b7baee544b",
+    "tools/bootstrap/stage_one_gate.py": "629f790357dd3532b3168fe4f0b8fedaa8dcde6594059fd2119cb02ce06eb66a",
+    "tools/requirements/boundary_relations.py": "31ae6b8edfde022300a817ec3d9d553ddb3f64d71a92a3d95c35e01a8e40e869",
+    "tools/requirements/source_trace.py": "7919f0baac5eabac3bb937fbb9264193c4ad31735a78cba4b07207f52fd282b3",
+    "tools/session_logs/deployment_lifecycle.py": "d17edf96fc9dba471a5847bc9f828ab22e4148abb43c11f3f7418db251433905",
+    "tools/session_logs/deployment_paths.py": "6913f428a42a1474c5c522ce119e7f3e31f981b5d1ed731c3f4f4b517b234578",
+    "tools/session_logs/discovery.py": "890bd854dcdc8e2adeecbf4fde3812757d375c13b68a06af391cc9d75ff269e2",
+    "tools/session_logs/entry.py": "dc34c905fd598363ac67406d4474d8d5da41b33555189169331b518f9ea9e809",
+    "tools/session_logs/native_validation.py": "fbde4bc32fd15f6e3fdd1c3c0666c85a5a90e30e1412f1ab58c9544eef324d77",
+    "tools/session_logs/pipeline.py": "7fb746ea136deebdd23360b490d7165f1167f71981c6ceb7165d702598b222f3",
+    "tools/session_logs/preservation.py": "1bf5b19e0a75b162945ef82424e6905de8684f675149fb42fd175fcfc4d75bf9",
+    "tools/session_logs/provenance.py": "7fe4f8163a7822f8027764dbf3038bdd315b6040d5bfbc67f58f2ea5e35d1cdc",
+    "tools/session_logs/redaction.py": "300e41bb5d756f79863f1cf31fc6631d989bc0c06ed4986d1eee448cfd72f7c0",
+    "tools/session_logs/regeneration.py": "a974a291593387f927ba8f3c204074b38812da251d269f952e70a758fee31154",
+    "tools/session_logs/repository_context.py": "00836c7bc1c9e126f6b244ee1034a436346f896045d830cc178ac460a459d684",
+    "tools/session_logs/stage_gate.py": "5a1b6c2a6b5b99377aa17db12181a062590298d9f9ca743c3d9851c9d50550ea",
+    "tools/session_logs/storage.py": "856f5fcdda85d02696a53bc5f372580f22e6117b2389b95a32c6fefa4842e924",
+    "tools/session_logs/updates.py": "9f2c0e1256578c4ac2175d9c5e7b4effb0d212d2a283f2a33941b4219c00e3db"
+  },
+  "test_run": {
+    "bootstrap_commit": "a26630ac614809d2bcf43ff3b4fc2eb4d7a12452",
+    "command": "python3 -m pytest -q",
+    "status": "passed",
+    "passed_count": 361,
+    "output_digest": "dee6bdbfd93a725f0e82454d5c54e197d752ee87e5ff829514dc5c2bcb36d926"
+  },
+  "test_observation": {
+    "normalized_output": "361 passed\n",
+    "method": "git archiveで固定commitを展開し、repository存在検査用の空.git markerを加えて実行した",
+    "observed_output": "361 passed in 1.59s",
+    "archive_contains_only_fixed_commit": true
+  },
+  "gaps": [
+    {
+      "gap_id": "GAP-CONTEXT-001",
+      "requirement_id": "REQ-CONTEXT-001",
+      "category": "adaptation",
+      "component": "review_task_definition",
+      "atomic_obligation_ids": [
+        "REQ-CONTEXT-001#statement",
+        "REQ-CONTEXT-001#acceptance-01",
+        "REQ-CONTEXT-001#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-CONTEXT-001"
+      ],
+      "stop_condition": "Targetが一意に定まらない／必須項目が欠けるか未解決である"
+    },
+    {
+      "gap_id": "GAP-CONTEXT-003",
+      "requirement_id": "REQ-CONTEXT-003",
+      "category": "adaptation",
+      "component": "review_task_definition",
+      "atomic_obligation_ids": [
+        "REQ-CONTEXT-003#statement",
+        "REQ-CONTEXT-003#acceptance-01",
+        "REQ-CONTEXT-003#acceptance-02",
+        "REQ-CONTEXT-003#acceptance-03",
+        "REQ-CONTEXT-003#acceptance-04",
+        "REQ-CONTEXT-003#acceptance-05"
+      ],
+      "depends_on_gap_ids": [
+        "GAP-TRACE-004"
+      ],
+      "acceptance_test_ids": [
+        "AT-CONTEXT-003"
+      ],
+      "stop_condition": "Targetが母集合に存在しないかReview Taskで許可されない分類に入る／同じ候補に競合する分類がある／分類中に母集合が変わる／母集合を変更単位、意味関係および閉包規則へ逆引きできない／必要材料がdeferまたは根拠不足のまま残る／unknownまたは未分類が残る"
+    },
+    {
+      "gap_id": "GAP-CONTEXT-004",
+      "requirement_id": "REQ-CONTEXT-004",
+      "category": "adaptation",
+      "component": "review_task_definition",
+      "atomic_obligation_ids": [
+        "REQ-CONTEXT-004#statement",
+        "REQ-CONTEXT-004#acceptance-01",
+        "REQ-CONTEXT-004#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-CONTEXT-004"
+      ],
+      "stop_condition": "Context確定後に参照元が変わる／入力Digestが固定値と一致しない"
+    },
+    {
+      "gap_id": "GAP-CONTEXT-005",
+      "requirement_id": "REQ-CONTEXT-005",
+      "category": "adaptation",
+      "component": "review_task_definition",
+      "atomic_obligation_ids": [
+        "REQ-CONTEXT-005#statement",
+        "REQ-CONTEXT-005#acceptance-01",
+        "REQ-CONTEXT-005#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-CONTEXT-005"
+      ],
+      "stop_condition": "候補の採否が未解決である／採用材料の出所または採用主体を追跡できない"
+    },
+    {
+      "gap_id": "GAP-CONTEXT-006",
+      "requirement_id": "REQ-CONTEXT-006",
+      "category": "adaptation",
+      "component": "review_task_definition",
+      "atomic_obligation_ids": [
+        "REQ-CONTEXT-006#statement",
+        "REQ-CONTEXT-006#acceptance-01",
+        "REQ-CONTEXT-006#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-CONTEXT-006"
+      ],
+      "stop_condition": "再開対象または変更方針が一意に定まらない／確認済み成果のDigestが欠けるか一致しない"
+    },
+    {
+      "gap_id": "GAP-CONTEXT-007",
+      "requirement_id": "REQ-CONTEXT-007",
+      "category": "adaptation",
+      "component": "review_task_definition",
+      "atomic_obligation_ids": [
+        "REQ-CONTEXT-007#statement",
+        "REQ-CONTEXT-007#acceptance-01",
+        "REQ-CONTEXT-007#acceptance-02",
+        "REQ-CONTEXT-007#acceptance-03"
+      ],
+      "depends_on_gap_ids": [
+        "GAP-PORTABLE-002",
+        "GAP-PORTABLE-004"
+      ],
+      "acceptance_test_ids": [
+        "AT-CONTEXT-007"
+      ],
+      "stop_condition": "保存先のアクセス境界を確認できない／原子的な確定または再読込照合に失敗する／機微情報検査が失敗する"
+    },
+    {
+      "gap_id": "GAP-EVAL-001",
+      "requirement_id": "REQ-EVAL-001",
+      "category": "deferred",
+      "component": "evidence_evaluator",
+      "atomic_obligation_ids": [
+        "REQ-EVAL-001#statement",
+        "REQ-EVAL-001#acceptance-01",
+        "REQ-EVAL-001#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-EVAL-001"
+      ],
+      "stop_condition": "対象、基準、証拠が欠ける"
+    },
+    {
+      "gap_id": "GAP-EVAL-002",
+      "requirement_id": "REQ-EVAL-002",
+      "category": "deferred",
+      "component": "evidence_evaluator",
+      "atomic_obligation_ids": [
+        "REQ-EVAL-002#statement",
+        "REQ-EVAL-002#acceptance-01",
+        "REQ-EVAL-002#acceptance-02"
+      ],
+      "depends_on_gap_ids": [
+        "GAP-EXEC-006"
+      ],
+      "acceptance_test_ids": [
+        "AT-EVAL-002"
+      ],
+      "stop_condition": "観測値の出所または母数を確認できない"
+    },
+    {
+      "gap_id": "GAP-EVAL-003",
+      "requirement_id": "REQ-EVAL-003",
+      "category": "deferred",
+      "component": "evidence_evaluator",
+      "atomic_obligation_ids": [
+        "REQ-EVAL-003#statement",
+        "REQ-EVAL-003#acceptance-01",
+        "REQ-EVAL-003#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-EVAL-003"
+      ],
+      "stop_condition": "入力または基準identityが不一致である"
+    },
+    {
+      "gap_id": "GAP-EXEC-001",
+      "requirement_id": "REQ-EXEC-001",
+      "category": "adaptation",
+      "component": "run_controller",
+      "atomic_obligation_ids": [
+        "REQ-EXEC-001#statement",
+        "REQ-EXEC-001#acceptance-01",
+        "REQ-EXEC-001#acceptance-02",
+        "REQ-EXEC-001#acceptance-03"
+      ],
+      "depends_on_gap_ids": [
+        "GAP-WORKFLOW-002"
+      ],
+      "acceptance_test_ids": [
+        "AT-EXEC-001"
+      ],
+      "stop_condition": "Workflowの開始許可がないか要求と一致しない／必須実行条件が欠ける／未定義または順序違反のRun内部状態遷移がある"
+    },
+    {
+      "gap_id": "GAP-EXEC-002",
+      "requirement_id": "REQ-EXEC-002",
+      "category": "adaptation",
+      "component": "run_controller",
+      "atomic_obligation_ids": [
+        "REQ-EXEC-002#statement",
+        "REQ-EXEC-002#acceptance-01",
+        "REQ-EXEC-002#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-EXEC-002"
+      ],
+      "stop_condition": "能力上限または機微情報検査に失敗する／Human承認がない、承認権限がない、期限切れ、または実送信条件が承認値と一致しない"
+    },
+    {
+      "gap_id": "GAP-EXEC-003",
+      "requirement_id": "REQ-EXEC-003",
+      "category": "adaptation",
+      "component": "run_controller",
+      "atomic_obligation_ids": [
+        "REQ-EXEC-003#statement",
+        "REQ-EXEC-003#acceptance-01",
+        "REQ-EXEC-003#acceptance-02",
+        "REQ-EXEC-003#acceptance-03",
+        "REQ-EXEC-003#acceptance-04"
+      ],
+      "depends_on_gap_ids": [
+        "GAP-PORTABLE-002",
+        "GAP-PORTABLE-004"
+      ],
+      "acceptance_test_ids": [
+        "AT-EXEC-003"
+      ],
+      "stop_condition": "request、Attemptまたは送信条件へ結線できない／raw captureと値なし診断の双方を耐久保存できない"
+    },
+    {
+      "gap_id": "GAP-EXEC-005",
+      "requirement_id": "REQ-EXEC-005",
+      "category": "adaptation",
+      "component": "run_controller",
+      "atomic_obligation_ids": [
+        "REQ-EXEC-005#statement",
+        "REQ-EXEC-005#acceptance-01",
+        "REQ-EXEC-005#acceptance-02",
+        "REQ-EXEC-005#acceptance-03"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-EXEC-005"
+      ],
+      "stop_condition": "Schema、Evidence、Scope要件に違反する／復旧が閉じた機械変換でなくHuman裁定もない"
+    },
+    {
+      "gap_id": "GAP-EXEC-006",
+      "requirement_id": "REQ-EXEC-006",
+      "category": "adaptation",
+      "component": "run_controller",
+      "atomic_obligation_ids": [
+        "REQ-EXEC-006#statement",
+        "REQ-EXEC-006#acceptance-01",
+        "REQ-EXEC-006#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-EXEC-006"
+      ],
+      "stop_condition": "実行条件identityが欠ける／再利用対象のContextまたは実行条件が一致しない"
+    },
+    {
+      "gap_id": "GAP-IMPROVE-001",
+      "requirement_id": "REQ-IMPROVE-001",
+      "category": "deferred",
+      "component": "feedback_ledger",
+      "atomic_obligation_ids": [
+        "REQ-IMPROVE-001#statement",
+        "REQ-IMPROVE-001#acceptance-01",
+        "REQ-IMPROVE-001#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-IMPROVE-001"
+      ],
+      "stop_condition": "元Runまたは条件identityへ結線できない"
+    },
+    {
+      "gap_id": "GAP-IMPROVE-002",
+      "requirement_id": "REQ-IMPROVE-002",
+      "category": "deferred",
+      "component": "feedback_ledger",
+      "atomic_obligation_ids": [
+        "REQ-IMPROVE-002#statement",
+        "REQ-IMPROVE-002#acceptance-01",
+        "REQ-IMPROVE-002#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-IMPROVE-002"
+      ],
+      "stop_condition": "検証不足、判断競合、Human承認なし"
+    },
+    {
+      "gap_id": "GAP-PORTABLE-001",
+      "requirement_id": "REQ-PORTABLE-001",
+      "category": "adaptation",
+      "component": "platform_matrix",
+      "atomic_obligation_ids": [
+        "REQ-PORTABLE-001#statement",
+        "REQ-PORTABLE-001#acceptance-01",
+        "REQ-PORTABLE-001#acceptance-02",
+        "REQ-PORTABLE-001#acceptance-03"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-PORTABLE-001"
+      ],
+      "stop_condition": "matrixが未固定または対象環境を一意に定めない／配置が所有境界外または未許可絶対パスを含む"
+    },
+    {
+      "gap_id": "GAP-PORTABLE-002",
+      "requirement_id": "REQ-PORTABLE-002",
+      "category": "adaptation",
+      "component": "platform_matrix",
+      "atomic_obligation_ids": [
+        "REQ-PORTABLE-002#statement",
+        "REQ-PORTABLE-002#acceptance-01",
+        "REQ-PORTABLE-002#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-PORTABLE-002"
+      ],
+      "stop_condition": "parse、Schema、原子的保存に失敗する"
+    },
+    {
+      "gap_id": "GAP-PORTABLE-004",
+      "requirement_id": "REQ-PORTABLE-004",
+      "category": "adaptation",
+      "component": "platform_matrix",
+      "atomic_obligation_ids": [
+        "REQ-PORTABLE-004#statement",
+        "REQ-PORTABLE-004#acceptance-01",
+        "REQ-PORTABLE-004#acceptance-02",
+        "REQ-PORTABLE-004#acceptance-03"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-PORTABLE-004"
+      ],
+      "stop_condition": "保存物分類、アクセス境界、retentionまたは削除方針が欠ける／改変検出または権限検査に失敗する"
+    },
+    {
+      "gap_id": "GAP-SESSION-001",
+      "requirement_id": "REQ-SESSION-001",
+      "category": "adaptation",
+      "component": "session_ingestion",
+      "atomic_obligation_ids": [
+        "REQ-SESSION-001#statement",
+        "REQ-SESSION-001#acceptance-01",
+        "REQ-SESSION-001#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-SESSION-001"
+      ],
+      "stop_condition": "探索範囲が不正または未承認である"
+    },
+    {
+      "gap_id": "GAP-SESSION-002",
+      "requirement_id": "REQ-SESSION-002",
+      "category": "adaptation",
+      "component": "session_ingestion",
+      "atomic_obligation_ids": [
+        "REQ-SESSION-002#statement",
+        "REQ-SESSION-002#acceptance-01",
+        "REQ-SESSION-002#acceptance-02",
+        "REQ-SESSION-002#acceptance-03"
+      ],
+      "depends_on_gap_ids": [
+        "GAP-PORTABLE-004"
+      ],
+      "acceptance_test_ids": [
+        "AT-SESSION-002"
+      ],
+      "stop_condition": "機微情報検査、アクセス境界、retention、削除方針または来歴照合に失敗する"
+    },
+    {
+      "gap_id": "GAP-TRACE-001",
+      "requirement_id": "REQ-TRACE-001",
+      "category": "adaptation",
+      "component": "semantic_graph",
+      "atomic_obligation_ids": [
+        "REQ-TRACE-001#statement",
+        "REQ-TRACE-001#acceptance-01",
+        "REQ-TRACE-001#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-TRACE-001"
+      ],
+      "stop_condition": "未定義IDまたは辺種別がある／自己参照または禁止循環がある"
+    },
+    {
+      "gap_id": "GAP-TRACE-002",
+      "requirement_id": "REQ-TRACE-002",
+      "category": "adaptation",
+      "component": "semantic_graph",
+      "atomic_obligation_ids": [
+        "REQ-TRACE-002#statement",
+        "REQ-TRACE-002#acceptance-01",
+        "REQ-TRACE-002#acceptance-02",
+        "REQ-TRACE-002#acceptance-03"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-TRACE-002"
+      ],
+      "stop_condition": "必須義務の未被覆がある／重複受け先がある／非採用種別、Human判断または対象Digestが欠ける"
+    },
+    {
+      "gap_id": "GAP-TRACE-003",
+      "requirement_id": "REQ-TRACE-003",
+      "category": "adaptation",
+      "component": "semantic_graph",
+      "atomic_obligation_ids": [
+        "REQ-TRACE-003#statement",
+        "REQ-TRACE-003#acceptance-01",
+        "REQ-TRACE-003#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-TRACE-003"
+      ],
+      "stop_condition": "Schema、参照、被覆またはDigest検査に失敗する"
+    },
+    {
+      "gap_id": "GAP-TRACE-004",
+      "requirement_id": "REQ-TRACE-004",
+      "category": "adaptation",
+      "component": "semantic_graph",
+      "atomic_obligation_ids": [
+        "REQ-TRACE-004#statement",
+        "REQ-TRACE-004#acceptance-01",
+        "REQ-TRACE-004#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-TRACE-004"
+      ],
+      "stop_condition": "変更単位または関係参照が未解決である／閉包規則にない関係を暗黙採用する"
+    },
+    {
+      "gap_id": "GAP-TRACE-005",
+      "requirement_id": "REQ-TRACE-005",
+      "category": "adaptation",
+      "component": "semantic_graph",
+      "atomic_obligation_ids": [
+        "REQ-TRACE-005#statement",
+        "REQ-TRACE-005#acceptance-01",
+        "REQ-TRACE-005#acceptance-02",
+        "REQ-TRACE-005#acceptance-03"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-TRACE-005"
+      ],
+      "stop_condition": "必須nodeまたは辺が欠ける／参照または内容Digestが不一致である"
+    },
+    {
+      "gap_id": "GAP-TRIAGE-001",
+      "requirement_id": "REQ-TRIAGE-001",
+      "category": "adaptation",
+      "component": "result_summarizer",
+      "atomic_obligation_ids": [
+        "REQ-TRIAGE-001#statement",
+        "REQ-TRIAGE-001#acceptance-01"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-TRIAGE-001"
+      ],
+      "stop_condition": "元結果へ逆引きできない／件数または結論が一致しない"
+    },
+    {
+      "gap_id": "GAP-TRIAGE-002",
+      "requirement_id": "REQ-TRIAGE-002",
+      "category": "adaptation",
+      "component": "result_summarizer",
+      "atomic_obligation_ids": [
+        "REQ-TRIAGE-002#statement",
+        "REQ-TRIAGE-002#acceptance-01",
+        "REQ-TRIAGE-002#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-TRIAGE-002"
+      ],
+      "stop_condition": "統合元を追跡できない／競合が未表示のまま確定される"
+    },
+    {
+      "gap_id": "GAP-TRIAGE-003",
+      "requirement_id": "REQ-TRIAGE-003",
+      "category": "adaptation",
+      "component": "result_summarizer",
+      "atomic_obligation_ids": [
+        "REQ-TRIAGE-003#statement",
+        "REQ-TRIAGE-003#acceptance-01",
+        "REQ-TRIAGE-003#acceptance-02",
+        "REQ-TRIAGE-003#acceptance-03"
+      ],
+      "depends_on_gap_ids": [
+        "GAP-TRACE-005"
+      ],
+      "acceptance_test_ids": [
+        "AT-TRIAGE-003"
+      ],
+      "stop_condition": "Human判断がない／判断対象が変更または不一致である／Operational Provenance verdictが不合格である"
+    },
+    {
+      "gap_id": "GAP-WORKFLOW-001",
+      "requirement_id": "REQ-WORKFLOW-001",
+      "category": "replacement",
+      "component": "active_work_selector",
+      "atomic_obligation_ids": [
+        "REQ-WORKFLOW-001#statement",
+        "REQ-WORKFLOW-001#acceptance-01",
+        "REQ-WORKFLOW-001#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-WORKFLOW-001"
+      ],
+      "stop_condition": "現在対象が0件または複数件になる"
+    },
+    {
+      "gap_id": "GAP-WORKFLOW-002",
+      "requirement_id": "REQ-WORKFLOW-002",
+      "category": "replacement",
+      "component": "active_work_selector",
+      "atomic_obligation_ids": [
+        "REQ-WORKFLOW-002#statement",
+        "REQ-WORKFLOW-002#acceptance-01",
+        "REQ-WORKFLOW-002#acceptance-02",
+        "REQ-WORKFLOW-002#acceptance-03"
+      ],
+      "depends_on_gap_ids": [
+        "GAP-PORTABLE-002",
+        "GAP-TRACE-005"
+      ],
+      "acceptance_test_ids": [
+        "AT-WORKFLOW-002"
+      ],
+      "stop_condition": "未定義遷移または関門未通過である／Harnessの開始要求またはRun結果がactive workと一致しない／Operational Provenance verdictが不合格である"
+    },
+    {
+      "gap_id": "GAP-WORKFLOW-003",
+      "requirement_id": "REQ-WORKFLOW-003",
+      "category": "replacement",
+      "component": "active_work_selector",
+      "atomic_obligation_ids": [
+        "REQ-WORKFLOW-003#statement",
+        "REQ-WORKFLOW-003#acceptance-01",
+        "REQ-WORKFLOW-003#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-WORKFLOW-003"
+      ],
+      "stop_condition": "active workまたは対象が一致しない"
+    },
+    {
+      "gap_id": "GAP-WORKFLOW-004",
+      "requirement_id": "REQ-WORKFLOW-004",
+      "category": "replacement",
+      "component": "active_work_selector",
+      "atomic_obligation_ids": [
+        "REQ-WORKFLOW-004#statement",
+        "REQ-WORKFLOW-004#acceptance-01",
+        "REQ-WORKFLOW-004#acceptance-02"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-WORKFLOW-004"
+      ],
+      "stop_condition": "自己対象を理由に必須契約または関門を迂回する"
+    }
+  ],
+  "requirement_dependencies": [
+    {
+      "provider_requirement_id": "REQ-TRACE-004",
+      "consumer_requirement_id": "REQ-CONTEXT-003"
+    },
+    {
+      "provider_requirement_id": "REQ-PORTABLE-002",
+      "consumer_requirement_id": "REQ-CONTEXT-007"
+    },
+    {
+      "provider_requirement_id": "REQ-PORTABLE-004",
+      "consumer_requirement_id": "REQ-CONTEXT-007"
+    },
+    {
+      "provider_requirement_id": "REQ-PORTABLE-002",
+      "consumer_requirement_id": "REQ-EXEC-003"
+    },
+    {
+      "provider_requirement_id": "REQ-PORTABLE-004",
+      "consumer_requirement_id": "REQ-EXEC-003"
+    },
+    {
+      "provider_requirement_id": "REQ-PORTABLE-004",
+      "consumer_requirement_id": "REQ-SESSION-002"
+    },
+    {
+      "provider_requirement_id": "REQ-PORTABLE-002",
+      "consumer_requirement_id": "REQ-WORKFLOW-002"
+    },
+    {
+      "provider_requirement_id": "REQ-WORKFLOW-002",
+      "consumer_requirement_id": "REQ-EXEC-001"
+    },
+    {
+      "provider_requirement_id": "REQ-EXEC-006",
+      "consumer_requirement_id": "REQ-EVAL-002"
+    },
+    {
+      "provider_requirement_id": "REQ-TRACE-005",
+      "consumer_requirement_id": "REQ-WORKFLOW-002"
+    },
+    {
+      "provider_requirement_id": "REQ-TRACE-005",
+      "consumer_requirement_id": "REQ-TRIAGE-003"
+    }
+  ],
+  "validation": {
+    "contract": "tools/design/bootstrap_conformance.py:validate_evidence_backed_bootstrap_conformance",
+    "digest": "a0e303d7d192364a9c34f756efba24031b62f807234ac9f920dbccbf917e22be",
+    "counts": {
+      "adapt": 24,
+      "conformant": 4,
+      "defer": 5,
+      "replace": 4
+    },
+    "requirement_count": 37,
+    "evidence_count": 61,
+    "gap_count": 33,
+    "status": "complete"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true
+}

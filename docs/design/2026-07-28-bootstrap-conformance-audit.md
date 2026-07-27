@@ -12,12 +12,16 @@ promotion_required: true
 構造化正本：
 `records/design/bootstrap-conformance-audit.json`
 
+固定commitの実体Digest、要件別Evidence role、固定時点テスト結果、
+要件別gap、依存gapおよび設計対応は
+`records/design/bootstrap-conformance-integrity.json`に固定する。
+
 ## 結果
 
 | 分類 | 件数 | 意味 |
 |---|---:|---|
-| conformant | 5 | 実装・テスト両証拠がありgapなし |
-| adapt | 23 | 類似責務はあるが正式設計の関門が不足 |
+| conformant | 4 | 実装・テスト両証拠があり依存先も適合、gapなし |
+| adapt | 24 | 類似責務はあるが正式設計の関門または依存境界が不足 |
 | replace | 4 | 既存責務境界が設計と異なり置換が必要 |
 | defer | 5 | 初期bootstrap範囲外で後段実装 |
 
@@ -27,7 +31,6 @@ promotion_required: true
 
 - `REQ-CONTEXT-002`：本文とDigestを持つ材料束
 - `REQ-EXEC-004`：複数担当と結果の結線
-- `REQ-SESSION-002`：rawから伏字化転写・要約・来歴への変換
 - `REQ-SESSION-003`：追記・改変・消失・転写変異の検出
 - `REQ-PORTABLE-003`：所有境界付き配置ライフサイクル
 
@@ -39,6 +42,17 @@ promotion_required: true
 - Traceはruntime意味グラフ、影響閉包、Operational Provenanceを追加する。
 - Session取込は利用者承認identityと共有保存境界へ接続する。
 - Portableはsupported-platform matrixと共有機微情報vaultを追加する。
+
+`REQ-SESSION-002`の変換処理自体は実装・試験済みだが、依存する
+`REQ-PORTABLE-004`の共有隔離保存境界が未適合である。このため単独の
+conformantとはせず、依存gapを明示したadaptとして扱う。
+
+## 証拠の固定方法
+
+61件の実装・テストEvidenceは、パスだけでなく監査対象commitから読み出した
+blob内容のSHA-256へ結び付けた。監査対象commitのarchiveに対する全試験は
+361件通過した。33件の非適合要件は、それぞれstatement・受け入れ条件、
+対象component、受け入れ試験、停止条件および直接依存gapへ結び付けた。
 
 ## 置換対象
 

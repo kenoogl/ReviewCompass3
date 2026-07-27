@@ -13,7 +13,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+        "GAP-CONTEXT-001"
       ]
     },
     {
@@ -41,7 +41,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+        "GAP-CONTEXT-003"
       ]
     },
     {
@@ -56,7 +56,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+        "GAP-CONTEXT-004"
       ]
     },
     {
@@ -71,7 +71,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+        "GAP-CONTEXT-005"
       ]
     },
     {
@@ -86,7 +86,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+        "GAP-CONTEXT-006"
       ]
     },
     {
@@ -101,7 +101,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+        "GAP-CONTEXT-007"
       ]
     },
     {
@@ -116,7 +116,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+        "GAP-EXEC-001"
       ]
     },
     {
@@ -131,7 +131,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+        "GAP-EXEC-002"
       ]
     },
     {
@@ -146,7 +146,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+        "GAP-EXEC-003"
       ]
     },
     {
@@ -174,7 +174,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+        "GAP-EXEC-005"
       ]
     },
     {
@@ -191,7 +191,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+        "GAP-EXEC-006"
       ]
     },
     {
@@ -206,7 +206,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "件数照合、Trace verdict、対象Digest付きHuman最終判断が不足"
+        "GAP-TRIAGE-001"
       ]
     },
     {
@@ -221,7 +221,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "件数照合、Trace verdict、対象Digest付きHuman最終判断が不足"
+        "GAP-TRIAGE-002"
       ]
     },
     {
@@ -236,7 +236,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "件数照合、Trace verdict、対象Digest付きHuman最終判断が不足"
+        "GAP-TRIAGE-003"
       ]
     },
     {
@@ -251,7 +251,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+        "GAP-TRACE-001"
       ]
     },
     {
@@ -266,7 +266,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+        "GAP-TRACE-002"
       ]
     },
     {
@@ -283,7 +283,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+        "GAP-TRACE-003"
       ]
     },
     {
@@ -298,7 +298,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+        "GAP-TRACE-004"
       ]
     },
     {
@@ -313,7 +313,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+        "GAP-TRACE-005"
       ]
     },
     {
@@ -330,12 +330,12 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "取込開始時の利用者承認identityと共有保存境界への接続が不足"
+        "GAP-SESSION-001"
       ]
     },
     {
       "requirement_id": "REQ-SESSION-002",
-      "classification": "conformant",
+      "classification": "adapt",
       "target_design_id": "DES-SESSION-RECORDS",
       "implementation_evidence": [
         "tools/session_logs/pipeline.py",
@@ -347,8 +347,10 @@
         "tests/test_session_log_redaction.py",
         "tests/test_session_log_provenance.py"
       ],
-      "rationale": "rawから伏字化転写・要約・来歴を分離生成し機微情報残存を拒否する",
-      "gaps": []
+      "rationale": "raw、伏字化転写、要約、来歴は実装済みだが、依存するREQ-PORTABLE-004の共有隔離保存境界が未適合なため単独ではconformantにできない",
+      "gaps": [
+        "GAP-SESSION-002"
+      ]
     },
     {
       "requirement_id": "REQ-SESSION-003",
@@ -379,7 +381,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "既存stage gateはactive workとRun開始・完了状態機械ではない"
+        "GAP-WORKFLOW-001"
       ]
     },
     {
@@ -394,7 +396,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "既存stage gateはactive workとRun開始・完了状態機械ではない"
+        "GAP-WORKFLOW-002"
       ]
     },
     {
@@ -409,7 +411,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "既存stage gateはactive workとRun開始・完了状態機械ではない"
+        "GAP-WORKFLOW-003"
       ]
     },
     {
@@ -424,7 +426,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "既存stage gateはactive workとRun開始・完了状態機械ではない"
+        "GAP-WORKFLOW-004"
       ]
     },
     {
@@ -441,7 +443,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "版付きsupported-platform matrixまたは全機能共通の機微情報vaultが不足"
+        "GAP-PORTABLE-001"
       ]
     },
     {
@@ -456,7 +458,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "版付きsupported-platform matrixまたは全機能共通の機微情報vaultが不足"
+        "GAP-PORTABLE-002"
       ]
     },
     {
@@ -486,7 +488,7 @@
       ],
       "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
       "gaps": [
-        "版付きsupported-platform matrixまたは全機能共通の機微情報vaultが不足"
+        "GAP-PORTABLE-004"
       ]
     },
     {
@@ -497,7 +499,7 @@
       "test_evidence": [],
       "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
       "gaps": [
-        "正式Review Runの評価機能は初期bootstrap実装対象外"
+        "GAP-EVAL-001"
       ]
     },
     {
@@ -508,7 +510,7 @@
       "test_evidence": [],
       "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
       "gaps": [
-        "正式Review Runの評価機能は初期bootstrap実装対象外"
+        "GAP-EVAL-002"
       ]
     },
     {
@@ -519,7 +521,7 @@
       "test_evidence": [],
       "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
       "gaps": [
-        "正式Review Runの評価機能は初期bootstrap実装対象外"
+        "GAP-EVAL-003"
       ]
     },
     {
@@ -530,7 +532,7 @@
       "test_evidence": [],
       "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
       "gaps": [
-        "正式feedback ledgerと改善反映関門は初期bootstrap実装対象外"
+        "GAP-IMPROVE-001"
       ]
     },
     {
@@ -541,20 +543,25 @@
       "test_evidence": [],
       "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
       "gaps": [
-        "正式feedback ledgerと改善反映関門は初期bootstrap実装対象外"
+        "GAP-IMPROVE-002"
       ]
     }
   ],
   "validation": {
     "contract": "tools/design/bootstrap_conformance.py:validate_bootstrap_conformance",
     "counts": {
-      "adapt": 23,
-      "conformant": 5,
+      "adapt": 24,
+      "conformant": 4,
       "defer": 5,
       "replace": 4
     },
-    "digest": "e3439e1eb718a4ee3cd56ec0b5610701936af9242f16b7ae0780acd493220ffe",
+    "digest": "2c2cde6f31703a636a6e7804e6e570f665e29fd01efdd3f8049976068dadde6f",
     "requirement_count": 37,
+    "integrity_contract": "tools/design/bootstrap_conformance.py:validate_evidence_backed_bootstrap_conformance",
+    "integrity_record": "records/design/bootstrap-conformance-integrity.json",
+    "integrity_digest": "a0e303d7d192364a9c34f756efba24031b62f807234ac9f920dbccbf917e22be",
+    "evidence_count": 61,
+    "gap_count": 33,
     "status": "complete"
   },
   "policy": {
