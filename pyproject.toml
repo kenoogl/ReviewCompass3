@@ -1,3 +1,10 @@
+[build-system]
+requires = [
+  "setuptools>=58",
+  "wheel>=0.37",
+]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "reviewcompass3"
 version = "0.0.1"
@@ -6,6 +13,9 @@ requires-python = ">=3.9"
 dependencies = [
   "platformdirs>=4,<5",
 ]
+
+[project.scripts]
+reviewcompass3-session-logs = "tools.session_logs.entry:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
