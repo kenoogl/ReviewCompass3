@@ -38,7 +38,7 @@
   "passed_gate_count": 8,
   "promotion_required": true,
   "record_version": 1,
-  "status": "candidate",
+  "status": "ready",
   "unresolved_gate_count": 0,
-  "user_approved": false
+  "user_approved": true
 }

@@ -1,0 +1,12 @@
+{
+  "approval": "explicit",
+  "approved_at": "2026-07-27",
+  "approved_gate_count": 8,
+  "execution_boundary": "injected_runner",
+  "external_provider_execution": "not_performed",
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "stage": "stage_one",
+  "status": "passed"
+}
