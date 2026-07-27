@@ -1,0 +1,43 @@
+record_version = 1
+recorded_at = "2026-07-27T08:48:00+09:00"
+lifecycle = "provisional"
+normative_status = "non-normative"
+promotion_required = true
+scope = "committed Git trees only"
+worktree_changes_policy = "exclude"
+inventory_format = "git ls-tree -r --full-tree <commit>"
+inventory_digest_algorithm = "sha256"
+
+[sources.reviewcompass]
+repository = "ReviewCompass"
+reference_status = "fixed"
+observed_branch = "llmgp"
+commit = "35ef8d4cc66b9a00aca9c6da10b645837b06564b"
+tree = "3ed415ccce6da39bf0edf8713714ec6ce68323f9"
+git_object_format = "sha1"
+commit_authored_at = "2026-07-23T13:49:47+09:00"
+commit_committed_at = "2026-07-23T13:49:47+09:00"
+commit_subject = "通常Git契約reopenを完結"
+inventory_file = "reviewcompass-35ef8d4.git-tree.txt"
+inventory_entries = 18325
+inventory_sha256 = "34fe974552a1572d5f383e9cd8d461e2a1df8836f92b5f1135a22463fecd52b8"
+worktree_clean_at_recording = false
+excluded_tracked_changes = 0
+excluded_untracked_entries = 6
+
+[sources.reviewcompass2]
+repository = "ReviewCompass2"
+reference_status = "frozen"
+observed_branch = "dev"
+commit = "d6bbb01500002872c713412bfbd63b702a291c99"
+tree = "93401fe3448aff263078297a92e4998c4e519270"
+git_object_format = "sha1"
+commit_authored_at = "2026-07-26T20:27:38+09:00"
+commit_committed_at = "2026-07-26T20:27:38+09:00"
+commit_subject = "第12回セッションの記録を保存（ツールの完成と、リポジトリの凍結）"
+inventory_file = "reviewcompass2-d6bbb015.git-tree.txt"
+inventory_entries = 367
+inventory_sha256 = "6bfa12351cb274e384c607f4dd01b3e1f0997589db523d91237146150cb23d2b"
+worktree_clean_at_recording = false
+excluded_tracked_changes = 1
+excluded_untracked_entries = 0
