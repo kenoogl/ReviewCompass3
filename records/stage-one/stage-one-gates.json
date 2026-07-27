@@ -1,0 +1,44 @@
+{
+  "gates": [
+    {
+      "id": "source_universe",
+      "status": "passed"
+    },
+    {
+      "id": "known_candidates",
+      "status": "passed"
+    },
+    {
+      "id": "material_insufficiency",
+      "status": "passed"
+    },
+    {
+      "id": "selection_routes",
+      "status": "passed"
+    },
+    {
+      "id": "stale_rejection",
+      "status": "passed"
+    },
+    {
+      "id": "digest_chain",
+      "status": "passed"
+    },
+    {
+      "id": "approval_binding",
+      "status": "passed"
+    },
+    {
+      "id": "immutable_resume",
+      "status": "passed"
+    }
+  ],
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "passed_gate_count": 8,
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "candidate",
+  "unresolved_gate_count": 0,
+  "user_approved": false
+}
