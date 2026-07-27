@@ -1,0 +1,572 @@
+{
+  "bootstrap_commit": "a26630ac614809d2bcf43ff3b4fc2eb4d7a12452",
+  "records": [
+    {
+      "requirement_id": "REQ-CONTEXT-001",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-CONTEXT",
+      "implementation_evidence": [
+        "tools/bootstrap/review_contract.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_contract.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-CONTEXT-002",
+      "classification": "conformant",
+      "target_design_id": "DES-REVIEW-CONTEXT",
+      "implementation_evidence": [
+        "tools/bootstrap/material_bundle.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_material_bundle.py"
+      ],
+      "rationale": "本文、役割、source identity、Digestを持つ決定的材料束を実装・試験済み",
+      "gaps": []
+    },
+    {
+      "requirement_id": "REQ-CONTEXT-003",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-CONTEXT",
+      "implementation_evidence": [
+        "tools/bootstrap/review_materials.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_material_classification.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-CONTEXT-004",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-CONTEXT",
+      "implementation_evidence": [
+        "tools/bootstrap/bundle_verification.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_bundle_verification.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-CONTEXT-005",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-CONTEXT",
+      "implementation_evidence": [
+        "tools/bootstrap/review_materials.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_material_classification.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-CONTEXT-006",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-CONTEXT",
+      "implementation_evidence": [
+        "tools/bootstrap/review_resume.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_resume.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-CONTEXT-007",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-CONTEXT",
+      "implementation_evidence": [
+        "tools/bootstrap/raw_review_store.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_raw_review_store.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Review Taskの7入力、影響閉包Scope、Composition、完全Context identityの統合が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-EXEC-001",
+      "classification": "adapt",
+      "target_design_id": "DES-HARNESSED-EXECUTION",
+      "implementation_evidence": [
+        "tools/bootstrap/review_pipeline.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_pipeline.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-EXEC-002",
+      "classification": "adapt",
+      "target_design_id": "DES-HARNESSED-EXECUTION",
+      "implementation_evidence": [
+        "tools/bootstrap/closed_payload.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_closed_payload.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-EXEC-003",
+      "classification": "adapt",
+      "target_design_id": "DES-HARNESSED-EXECUTION",
+      "implementation_evidence": [
+        "tools/bootstrap/raw_review_store.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_raw_review_store.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-EXEC-004",
+      "classification": "conformant",
+      "target_design_id": "DES-HARNESSED-EXECUTION",
+      "implementation_evidence": [
+        "tools/bootstrap/review_execution.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_execution.py"
+      ],
+      "rationale": "main・independent担当と結果を対象payloadへ結線し欠落を拒否する",
+      "gaps": []
+    },
+    {
+      "requirement_id": "REQ-EXEC-005",
+      "classification": "adapt",
+      "target_design_id": "DES-HARNESSED-EXECUTION",
+      "implementation_evidence": [
+        "tools/bootstrap/review_response_parser.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_response_parser.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-EXEC-006",
+      "classification": "adapt",
+      "target_design_id": "DES-HARNESSED-EXECUTION",
+      "implementation_evidence": [
+        "tools/bootstrap/review_assurance.py",
+        "tools/bootstrap/review_resume.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_assurance.py",
+        "tests/test_bootstrap_review_resume.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "Workflow許可、承認者identity、write-ahead capture、正式Attempt状態が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-TRIAGE-001",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-TRIAGE",
+      "implementation_evidence": [
+        "tools/bootstrap/review_triage.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_triage.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "件数照合、Trace verdict、対象Digest付きHuman最終判断が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-TRIAGE-002",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-TRIAGE",
+      "implementation_evidence": [
+        "tools/bootstrap/review_triage.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_triage.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "件数照合、Trace verdict、対象Digest付きHuman最終判断が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-TRIAGE-003",
+      "classification": "adapt",
+      "target_design_id": "DES-REVIEW-TRIAGE",
+      "implementation_evidence": [
+        "tools/bootstrap/review_triage.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_review_triage.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "件数照合、Trace verdict、対象Digest付きHuman最終判断が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-TRACE-001",
+      "classification": "adapt",
+      "target_design_id": "DES-SEMANTIC-TRACE",
+      "implementation_evidence": [
+        "tools/bootstrap/evidence_closure.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_evidence_closure.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-TRACE-002",
+      "classification": "adapt",
+      "target_design_id": "DES-SEMANTIC-TRACE",
+      "implementation_evidence": [
+        "tools/requirements/source_trace.py"
+      ],
+      "test_evidence": [
+        "tests/test_requirements_source_trace.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-TRACE-003",
+      "classification": "adapt",
+      "target_design_id": "DES-SEMANTIC-TRACE",
+      "implementation_evidence": [
+        "tools/requirements/source_trace.py",
+        "tools/requirements/boundary_relations.py"
+      ],
+      "test_evidence": [
+        "tests/test_requirements_source_trace.py",
+        "tests/test_requirement_boundary_relations.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-TRACE-004",
+      "classification": "adapt",
+      "target_design_id": "DES-SEMANTIC-TRACE",
+      "implementation_evidence": [
+        "tools/bootstrap/source_universe.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_source_universe.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-TRACE-005",
+      "classification": "adapt",
+      "target_design_id": "DES-SEMANTIC-TRACE",
+      "implementation_evidence": [
+        "tools/bootstrap/evidence_closure.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_evidence_closure.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "runtime意味グラフ、影響閉包、TaskからFindingまでの必須来歴辺が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-SESSION-001",
+      "classification": "adapt",
+      "target_design_id": "DES-SESSION-RECORDS",
+      "implementation_evidence": [
+        "tools/session_logs/discovery.py",
+        "tools/session_logs/entry.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_discovery.py",
+        "tests/test_session_log_pipeline.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "取込開始時の利用者承認identityと共有保存境界への接続が不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-SESSION-002",
+      "classification": "conformant",
+      "target_design_id": "DES-SESSION-RECORDS",
+      "implementation_evidence": [
+        "tools/session_logs/pipeline.py",
+        "tools/session_logs/redaction.py",
+        "tools/session_logs/provenance.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_pipeline.py",
+        "tests/test_session_log_redaction.py",
+        "tests/test_session_log_provenance.py"
+      ],
+      "rationale": "rawから伏字化転写・要約・来歴を分離生成し機微情報残存を拒否する",
+      "gaps": []
+    },
+    {
+      "requirement_id": "REQ-SESSION-003",
+      "classification": "conformant",
+      "target_design_id": "DES-SESSION-RECORDS",
+      "implementation_evidence": [
+        "tools/session_logs/updates.py",
+        "tools/session_logs/preservation.py",
+        "tools/session_logs/regeneration.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_updates.py",
+        "tests/test_session_log_preservation.py",
+        "tests/test_session_log_regeneration.py"
+      ],
+      "rationale": "追記、非追記変更、消失、転写再生成不一致を独立検査する",
+      "gaps": []
+    },
+    {
+      "requirement_id": "REQ-WORKFLOW-001",
+      "classification": "replace",
+      "target_design_id": "DES-WORKFLOW-CONTROL",
+      "implementation_evidence": [
+        "tools/session_logs/stage_gate.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_stage_gate.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "既存stage gateはactive workとRun開始・完了状態機械ではない"
+      ]
+    },
+    {
+      "requirement_id": "REQ-WORKFLOW-002",
+      "classification": "replace",
+      "target_design_id": "DES-WORKFLOW-CONTROL",
+      "implementation_evidence": [
+        "tools/session_logs/stage_gate.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_stage_gate.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "既存stage gateはactive workとRun開始・完了状態機械ではない"
+      ]
+    },
+    {
+      "requirement_id": "REQ-WORKFLOW-003",
+      "classification": "replace",
+      "target_design_id": "DES-WORKFLOW-CONTROL",
+      "implementation_evidence": [
+        "tools/session_logs/repository_context.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_repository_context.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "既存stage gateはactive workとRun開始・完了状態機械ではない"
+      ]
+    },
+    {
+      "requirement_id": "REQ-WORKFLOW-004",
+      "classification": "replace",
+      "target_design_id": "DES-WORKFLOW-CONTROL",
+      "implementation_evidence": [
+        "tools/bootstrap/stage_one_gate.py"
+      ],
+      "test_evidence": [
+        "tests/test_bootstrap_stage_one_gate.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "既存stage gateはactive workとRun開始・完了状態機械ではない"
+      ]
+    },
+    {
+      "requirement_id": "REQ-PORTABLE-001",
+      "classification": "adapt",
+      "target_design_id": "DES-PORTABLE-LIFECYCLE",
+      "implementation_evidence": [
+        "tools/session_logs/deployment_paths.py",
+        "tools/session_logs/native_validation.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_native_paths.py",
+        "tests/test_session_log_native_distribution_ci.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "版付きsupported-platform matrixまたは全機能共通の機微情報vaultが不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-PORTABLE-002",
+      "classification": "adapt",
+      "target_design_id": "DES-PORTABLE-LIFECYCLE",
+      "implementation_evidence": [
+        "tools/session_logs/storage.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_storage.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "版付きsupported-platform matrixまたは全機能共通の機微情報vaultが不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-PORTABLE-003",
+      "classification": "conformant",
+      "target_design_id": "DES-PORTABLE-LIFECYCLE",
+      "implementation_evidence": [
+        "tools/session_logs/deployment_lifecycle.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_deployment_lifecycle.py"
+      ],
+      "rationale": "所有設定だけを移行・解除し利用者データを保持する補償境界を試験済み",
+      "gaps": []
+    },
+    {
+      "requirement_id": "REQ-PORTABLE-004",
+      "classification": "adapt",
+      "target_design_id": "DES-PORTABLE-LIFECYCLE",
+      "implementation_evidence": [
+        "tools/session_logs/redaction.py",
+        "tools/session_logs/storage.py"
+      ],
+      "test_evidence": [
+        "tests/test_session_log_redaction.py",
+        "tests/test_session_log_storage.py"
+      ],
+      "rationale": "固定commitの類似責務を証拠として比較したが正式設計の全関門を満たさない",
+      "gaps": [
+        "版付きsupported-platform matrixまたは全機能共通の機微情報vaultが不足"
+      ]
+    },
+    {
+      "requirement_id": "REQ-EVAL-001",
+      "classification": "defer",
+      "target_design_id": "DES-EVIDENCE-EVALUATION",
+      "implementation_evidence": [],
+      "test_evidence": [],
+      "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
+      "gaps": [
+        "正式Review Runの評価機能は初期bootstrap実装対象外"
+      ]
+    },
+    {
+      "requirement_id": "REQ-EVAL-002",
+      "classification": "defer",
+      "target_design_id": "DES-EVIDENCE-EVALUATION",
+      "implementation_evidence": [],
+      "test_evidence": [],
+      "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
+      "gaps": [
+        "正式Review Runの評価機能は初期bootstrap実装対象外"
+      ]
+    },
+    {
+      "requirement_id": "REQ-EVAL-003",
+      "classification": "defer",
+      "target_design_id": "DES-EVIDENCE-EVALUATION",
+      "implementation_evidence": [],
+      "test_evidence": [],
+      "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
+      "gaps": [
+        "正式Review Runの評価機能は初期bootstrap実装対象外"
+      ]
+    },
+    {
+      "requirement_id": "REQ-IMPROVE-001",
+      "classification": "defer",
+      "target_design_id": "DES-SELF-IMPROVEMENT",
+      "implementation_evidence": [],
+      "test_evidence": [],
+      "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
+      "gaps": [
+        "正式feedback ledgerと改善反映関門は初期bootstrap実装対象外"
+      ]
+    },
+    {
+      "requirement_id": "REQ-IMPROVE-002",
+      "classification": "defer",
+      "target_design_id": "DES-SELF-IMPROVEMENT",
+      "implementation_evidence": [],
+      "test_evidence": [],
+      "rationale": "初期bootstrap範囲外として設計だけを確定し正式実装を後段へ送る",
+      "gaps": [
+        "正式feedback ledgerと改善反映関門は初期bootstrap実装対象外"
+      ]
+    }
+  ],
+  "validation": {
+    "contract": "tools/design/bootstrap_conformance.py:validate_bootstrap_conformance",
+    "counts": {
+      "adapt": 23,
+      "conformant": 5,
+      "defer": 5,
+      "replace": 4
+    },
+    "digest": "e3439e1eb718a4ee3cd56ec0b5610701936af9242f16b7ae0780acd493220ffe",
+    "requirement_count": 37,
+    "status": "complete"
+  },
+  "policy": {
+    "conformant": "実装・テスト両証拠がありgapがない",
+    "adapt": "類似実装があるが修正後に昇格する",
+    "replace": "既存責務境界がdesignと異なり置換する",
+    "defer": "初期bootstrap実装対象外として後段へ送る",
+    "prohibition": "bootstrap挙動へrequirementsまたはdesignを合わせない"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "validated"
+}
