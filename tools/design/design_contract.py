@@ -26,6 +26,8 @@ class DesignArchitecture:
   boundary_count: int
   interface_count: int
   state_machine_count: int
+  protocol_count: int
+  event_route_count: int
   digest: str
 
 
@@ -121,6 +123,24 @@ _TRANSITION_FIELDS = {
   "to",
   "guard",
   "persistence",
+}
+_PROTOCOL_FIELDS = {
+  "protocol_id",
+  "steps",
+}
+_PROTOCOL_STEP_FIELDS = {
+  "step_id",
+  "actor_design_id",
+  "interface_id",
+  "state_machine_id",
+  "event",
+  "on_failure",
+}
+_EVENT_ROUTE_FIELDS = {
+  "route_id",
+  "source_interface_id",
+  "target_state_machine_id",
+  "event",
 }
 
 
@@ -338,6 +358,10 @@ def validate_design_architecture(
   state_machines,
   defined_interface_ids,
   defined_state_machine_ids,
+  protocols=(),
+  boundary_interface_map=None,
+  event_routes=(),
+  required_interface_fields=None,
 ):
   parsed_designs = tuple(designs)
   if not parsed_designs:
@@ -346,6 +370,7 @@ def validate_design_architecture(
     )
   design_ids = set()
   design_feature_map = {}
+  design_by_feature = {}
   boundary_owner_map = {}
   for design in parsed_designs:
     if (
@@ -367,6 +392,7 @@ def validate_design_architecture(
       )
     design_ids.add(design_id)
     design_feature_map[design_id] = design["feature_id"]
+    design_by_feature[design["feature_id"]] = design_id
     for boundary_id in design["boundary_ids"]:
       if boundary_id in boundary_owner_map:
         raise DesignContractError(
@@ -499,6 +525,86 @@ def validate_design_architecture(
     raise DesignContractError(
       "interface coverage must be exact"
     )
+  interface_by_id = {
+    value["interface_id"]: value
+    for value in parsed_interfaces
+  }
+  if required_interface_fields is not None:
+    if (
+      not isinstance(required_interface_fields, dict)
+      or set(required_interface_fields)
+      - interface_ids
+    ):
+      raise DesignContractError(
+        "required interface fields must resolve"
+      )
+    for interface_id, fields in (
+      required_interface_fields.items()
+    ):
+      required = set(_texts(
+        fields,
+        "required interface fields",
+      ))
+      if not required <= set(
+        interface_by_id[interface_id][
+          "identity_fields"
+        ]
+      ):
+        raise DesignContractError(
+          "required interface identity is missing"
+        )
+
+  parsed_boundary_map = {}
+  if boundary_interface_map is not None:
+    if (
+      not isinstance(boundary_interface_map, dict)
+      or set(boundary_interface_map)
+      != set(boundary_ids)
+    ):
+      raise DesignContractError(
+        "boundary interface coverage must be exact"
+      )
+    boundary_by_id = {
+      value["boundary_id"]: value
+      for value in parsed_boundaries
+    }
+    for boundary_id, mapped_ids in (
+      boundary_interface_map.items()
+    ):
+      resolved_ids = _texts(
+        mapped_ids,
+        "boundary interface IDs",
+      )
+      if not set(resolved_ids) <= interface_ids:
+        raise DesignContractError(
+          "boundary interfaces must resolve"
+        )
+      boundary = boundary_by_id[boundary_id]
+      if boundary["relation"] == "depends_on":
+        provider_requirement = boundary["to"]
+        consumer_requirement = boundary["from"]
+      else:
+        provider_requirement = boundary["from"]
+        consumer_requirement = boundary["to"]
+      provider_design = design_by_feature[
+        requirement_feature_map[provider_requirement]
+      ]
+      consumer_design = design_by_feature[
+        requirement_feature_map[consumer_requirement]
+      ]
+      if not any(
+        interface_by_id[interface_id][
+          "provider_design_id"
+        ] == provider_design
+        and interface_by_id[interface_id][
+          "consumer_design_id"
+        ] == consumer_design
+        for interface_id in resolved_ids
+      ):
+        raise DesignContractError(
+          "boundary interface endpoints must match"
+        )
+      parsed_boundary_map[boundary_id] = resolved_ids
 
   machine_ids = _defined(
     defined_state_machine_ids,
@@ -526,6 +632,7 @@ def validate_design_architecture(
       "state machine events",
     )
     transitions = []
+    transition_keys = set()
     for transition in value["transitions"]:
       if (
         not isinstance(transition, dict)
@@ -539,10 +646,53 @@ def validate_design_architecture(
         raise DesignContractError(
           "state transitions must be closed"
         )
+      transition_key = (
+        transition["from"],
+        transition["event"],
+      )
+      if transition_key in transition_keys:
+        raise DesignContractError(
+          "state transitions must be deterministic"
+        )
+      transition_keys.add(transition_key)
       transitions.append(dict(transition))
     if not transitions:
       raise DesignContractError(
         "state machines require transitions"
+      )
+    initial_state = states[0]
+    reachable = {initial_state}
+    while True:
+      expanded = reachable | {
+        transition["to"]
+        for transition in transitions
+        if transition["from"] in reachable
+      }
+      if expanded == reachable:
+        break
+      reachable = expanded
+    outgoing_states = {
+      transition["from"]
+      for transition in transitions
+    }
+    terminal_states = set(states) - outgoing_states
+    can_reach_terminal = set(terminal_states)
+    while True:
+      expanded = can_reach_terminal | {
+        transition["from"]
+        for transition in transitions
+        if transition["to"] in can_reach_terminal
+      }
+      if expanded == can_reach_terminal:
+        break
+      can_reach_terminal = expanded
+    if (
+      reachable != set(states)
+      or not terminal_states
+      or can_reach_terminal != set(states)
+    ):
+      raise DesignContractError(
+        "all states must reach a terminal state"
       )
     parsed = dict(value)
     parsed["states"] = states
@@ -562,8 +712,78 @@ def validate_design_architecture(
     raise DesignContractError(
       "state machine coverage must be exact"
     )
+  machine_by_id = {
+    value["machine_id"]: value
+    for value in parsed_machines
+  }
+
+  parsed_routes = []
+  route_ids = set()
+  for value in event_routes:
+    if (
+      not isinstance(value, dict)
+      or set(value) != _EVENT_ROUTE_FIELDS
+      or not _text(value["route_id"])
+      or value["route_id"] in route_ids
+      or value["source_interface_id"]
+      not in interface_ids
+      or value["target_state_machine_id"]
+      not in machine_ids
+      or value["event"] not in machine_by_id[
+        value["target_state_machine_id"]
+      ]["events"]
+    ):
+      raise DesignContractError(
+        "event routes must resolve"
+      )
+    route_ids.add(value["route_id"])
+    parsed_routes.append(dict(value))
+
+  parsed_protocols = []
+  protocol_ids = set()
+  step_ids = set()
+  for value in protocols:
+    if (
+      not isinstance(value, dict)
+      or set(value) != _PROTOCOL_FIELDS
+      or not _text(value["protocol_id"])
+      or value["protocol_id"] in protocol_ids
+      or not isinstance(value["steps"], (list, tuple))
+      or not value["steps"]
+    ):
+      raise DesignContractError(
+        "protocols require ordered steps"
+      )
+    protocol_ids.add(value["protocol_id"])
+    steps = []
+    for step in value["steps"]:
+      if (
+        not isinstance(step, dict)
+        or set(step) != _PROTOCOL_STEP_FIELDS
+        or not _text(step["step_id"])
+        or step["step_id"] in step_ids
+        or step["actor_design_id"] not in design_ids
+        or step["interface_id"] not in interface_ids
+        or step["state_machine_id"] not in machine_ids
+        or step["event"] not in machine_by_id[
+          step["state_machine_id"]
+        ]["events"]
+        or not _text(step["on_failure"])
+      ):
+        raise DesignContractError(
+          "protocol steps must resolve"
+        )
+      step_ids.add(step["step_id"])
+      steps.append(dict(step))
+    parsed_protocols.append({
+      "protocol_id": value["protocol_id"],
+      "steps": tuple(steps),
+    })
 
   document = {
+    "boundary_interface_map": dict(sorted(
+      parsed_boundary_map.items()
+    )),
     "boundaries": sorted(
       parsed_boundaries,
       key=lambda value: value["boundary_id"],
@@ -571,6 +791,14 @@ def validate_design_architecture(
     "interfaces": sorted(
       parsed_interfaces,
       key=lambda value: value["interface_id"],
+    ),
+    "event_routes": sorted(
+      parsed_routes,
+      key=lambda value: value["route_id"],
+    ),
+    "protocols": sorted(
+      parsed_protocols,
+      key=lambda value: value["protocol_id"],
     ),
     "schema_version": 1,
     "state_machines": sorted(
@@ -591,5 +819,7 @@ def validate_design_architecture(
     boundary_count=len(parsed_boundaries),
     interface_count=len(parsed_interfaces),
     state_machine_count=len(parsed_machines),
+    protocol_count=len(parsed_protocols),
+    event_route_count=len(parsed_routes),
     digest=digest,
   )

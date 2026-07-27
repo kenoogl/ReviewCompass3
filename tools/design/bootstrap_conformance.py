@@ -4,6 +4,8 @@ import dataclasses
 import hashlib
 import json
 import re
+import subprocess
+from pathlib import Path
 
 
 class BootstrapConformanceError(Exception):
@@ -270,6 +272,12 @@ def validate_evidence_backed_bootstrap_conformance(
   gaps,
   requirement_dependencies,
   bootstrap_commit,
+  approved_obligation_map=None,
+  design_component_map=None,
+  requirement_acceptance_test_map=None,
+  approved_requirement_dependencies=None,
+  normalized_test_output=None,
+  expected_passed_count=None,
 ):
   if (
     not isinstance(requirement_design_map, dict)
@@ -344,6 +352,18 @@ def validate_evidence_backed_bootstrap_conformance(
     raise BootstrapConformanceError(
       "fixed bootstrap test run must pass"
     )
+  if normalized_test_output is not None:
+    if (
+      not isinstance(normalized_test_output, str)
+      or hashlib.sha256(
+        normalized_test_output.encode("utf-8")
+      ).hexdigest() != test_run["output_digest"]
+      or test_run["passed_count"]
+      != expected_passed_count
+    ):
+      raise BootstrapConformanceError(
+        "test output and count must match observation"
+      )
 
   parsed_gaps = []
   gap_by_id = {}
@@ -371,6 +391,36 @@ def validate_evidence_backed_bootstrap_conformance(
         value[field],
         field,
         empty=field == "depends_on_gap_ids",
+      )
+    if approved_obligation_map is not None and any(
+      approved_obligation_map.get(obligation_id)
+      != value["requirement_id"]
+      for obligation_id
+      in parsed["atomic_obligation_ids"]
+    ):
+      raise BootstrapConformanceError(
+        "gap obligations must resolve to approved IDs"
+      )
+    if (
+      design_component_map is not None
+      and value["component"] not in design_component_map.get(
+        requirement_design_map[value["requirement_id"]],
+        (),
+      )
+    ):
+      raise BootstrapConformanceError(
+        "gap component must belong to target design"
+      )
+    if (
+      requirement_acceptance_test_map is not None
+      and parsed["acceptance_test_ids"] != (
+        requirement_acceptance_test_map[
+          value["requirement_id"]
+        ],
+      )
+    ):
+      raise BootstrapConformanceError(
+        "gap acceptance test must match requirement"
       )
     parsed_gaps.append(parsed)
     gap_by_id[value["gap_id"]] = parsed
@@ -521,6 +571,25 @@ def validate_evidence_backed_bootstrap_conformance(
           "nonconformant dependency gaps must be linked"
         )
     parsed_dependencies.append(dict(value))
+  if approved_requirement_dependencies is not None:
+    actual_dependencies = {
+      (
+        value["provider_requirement_id"],
+        value["consumer_requirement_id"],
+      )
+      for value in parsed_dependencies
+    }
+    approved_dependencies = {
+      (
+        value["provider_requirement_id"],
+        value["consumer_requirement_id"],
+      )
+      for value in approved_requirement_dependencies
+    }
+    if actual_dependencies != approved_dependencies:
+      raise BootstrapConformanceError(
+        "requirement dependency coverage must be exact"
+      )
 
   document = {
     "bootstrap_commit": bootstrap_commit,
@@ -564,3 +633,53 @@ def validate_evidence_backed_bootstrap_conformance(
     evidence_count=len(parsed_evidence),
     digest=digest,
   )
+
+
+def validate_commit_blob_claims(
+  *,
+  repository_root,
+  bootstrap_commit,
+  commit_blob_map,
+):
+  root = Path(repository_root)
+  if (
+    not root.is_dir()
+    or _COMMIT.fullmatch(bootstrap_commit) is None
+    or not isinstance(commit_blob_map, dict)
+    or not commit_blob_map
+  ):
+    raise BootstrapConformanceError(
+      "commit blob verification inputs are invalid"
+    )
+  for path, declared_digest in commit_blob_map.items():
+    if (
+      not _text(path)
+      or _DIGEST.fullmatch(declared_digest) is None
+    ):
+      raise BootstrapConformanceError(
+        "commit blob claims are invalid"
+      )
+    try:
+      content = subprocess.run(
+        (
+          "git",
+          "show",
+          f"{bootstrap_commit}:{path}",
+        ),
+        cwd=root,
+        check=True,
+        capture_output=True,
+      ).stdout
+    except (OSError, subprocess.CalledProcessError) as error:
+      raise BootstrapConformanceError(
+        "commit blob cannot be resolved"
+      ) from error
+    if hashlib.sha256(content).hexdigest() != declared_digest:
+      raise BootstrapConformanceError(
+        "commit blob digest does not match"
+      )
+  return {
+    "bootstrap_commit": bootstrap_commit,
+    "evidence_count": len(commit_blob_map),
+    "status": "complete",
+  }
