@@ -8,6 +8,9 @@ promotion_required: true
 import importlib
 import json
 import shlex
+import subprocess
+import sys
+from pathlib import Path
 
 
 def _write_setup(tmp_path):
@@ -99,11 +102,12 @@ def test_builds_installable_commands_and_runs_fixed_phase_entry(
     "/usr/bin/python3",
     config_path,
   )
+  entry_path = Path(hooks.__file__).with_name("entry.py").resolve()
 
   assert shlex.split(commands.start) == [
     "/usr/bin/python3",
-    "-m",
-    "tools.session_logs.hooks",
+    str(entry_path),
+    "hook",
     "start",
     "--config",
     str(config_path),
@@ -131,6 +135,28 @@ def test_builds_installable_commands_and_runs_fixed_phase_entry(
     "--config",
     str(config_path),
   )) == 0
+
+
+def test_fixed_hook_command_runs_outside_repository_cwd(tmp_path):
+  config_path = _write_setup(tmp_path)
+  hooks = importlib.import_module("tools.session_logs.hooks")
+  commands = hooks.build_hook_commands(
+    sys.executable,
+    config_path,
+  )
+  outside_cwd = tmp_path / "outside-cwd"
+  outside_cwd.mkdir()
+
+  completed = subprocess.run(
+    shlex.split(commands.end),
+    cwd=outside_cwd,
+    capture_output=True,
+    check=False,
+    text=True,
+  )
+
+  assert completed.returncode == 0
+  assert (tmp_path / "transcripts" / "session.md").is_file()
 
 
 def test_hook_records_safe_outcomes_without_propagating_failures(

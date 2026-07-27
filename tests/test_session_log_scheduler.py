@@ -7,6 +7,9 @@ promotion_required: true
 
 import importlib
 import plistlib
+import subprocess
+import sys
+from pathlib import Path
 
 
 def test_installs_and_uninstalls_owned_launchd_schedule_idempotently(
@@ -39,16 +42,15 @@ def test_installs_and_uninstalls_owned_launchd_schedule_idempotently(
   assert repeated.action == "unchanged"
   with plist_path.open("rb") as source:
     settings = plistlib.load(source)
+  entry_path = Path(scheduler.__file__).with_name("entry.py").resolve()
   assert settings == {
     "Label": "com.reviewcompass.session-log-preservation",
     "ProgramArguments": [
       "/usr/bin/python3",
-      "-m",
-      "tools.session_logs.cli",
+      str(entry_path),
+      "preserve",
       "--config",
       str(config_path),
-      "--preserve-only",
-      "--json-lines",
     ],
     "RunAtLoad": True,
     "StandardErrorPath": str(stderr_path),
@@ -118,3 +120,45 @@ def test_scheduler_preserves_unowned_target_and_rejects_unsafe_inputs(
     assert str(error) == "Unsafe launchd schedule inputs"
   else:
     raise AssertionError("unsafe schedule inputs must be rejected")
+
+
+def test_scheduled_command_runs_outside_repository_cwd(tmp_path):
+  scheduler = importlib.import_module("tools.session_logs.scheduler")
+  raw_log = tmp_path / "raw" / "session.jsonl"
+  raw_log.parent.mkdir()
+  raw_log.write_text(
+    '{"uuid":"user-1","type":"user","sessionId":"session-1",'
+    '"message":{"role":"user","content":"Preserve."}}\n',
+    encoding="utf-8",
+  )
+  config_path = tmp_path / "session-logs.json"
+  config_path.write_text(
+    '{"raw_root":"raw","transcript_root":"transcripts",'
+    '"summary_root":"summaries","provenance_root":"provenance",'
+    '"backup_root":"private-backup","preservation_enabled":true,'
+    '"tool_version":"0.0.1","redaction_rules":[]}\n',
+    encoding="utf-8",
+  )
+  schedule = scheduler.build_launchd_schedule(
+    python_executable=sys.executable,
+    config_path=config_path,
+    interval_seconds=60,
+    stdout_path=tmp_path / "stdout.jsonl",
+    stderr_path=tmp_path / "stderr.log",
+  )
+  settings = plistlib.loads(schedule)
+  outside_cwd = tmp_path / "outside-cwd"
+  outside_cwd.mkdir()
+
+  completed = subprocess.run(
+    settings["ProgramArguments"],
+    cwd=outside_cwd,
+    capture_output=True,
+    check=False,
+    text=True,
+  )
+
+  assert completed.returncode == 0
+  assert (
+    tmp_path / "private-backup" / "session.jsonl"
+  ).read_bytes() == raw_log.read_bytes()
