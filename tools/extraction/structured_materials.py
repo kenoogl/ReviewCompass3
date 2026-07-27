@@ -69,6 +69,8 @@ def _semantic_kind(path, value):
   if "approved_by" in keys and (
     "approved_action" in keys
     or "decision" in keys
+    or "approval_utterance" in keys
+    or any(key.startswith("approved_") for key in keys)
   ):
     return "approval"
   if (
@@ -127,6 +129,8 @@ def _semantic_kind(path, value):
     and "target_files" in keys
   ):
     return "canonical_spec"
+  if "/reviews/" in path and "schema_version" in keys:
+    return "generated_evidence"
   if (
     ("/specs/" in path or path.startswith("specs/"))
     and ("schema_version" in keys or "version" in keys)
