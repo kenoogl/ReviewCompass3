@@ -18,12 +18,13 @@ class NativeValidationError(Exception):
   """ネイティブ配布検証を安全に完了できない。"""
 
 
-def _platform_family():
-  if sys.platform == "darwin":
+def _platform_family(platform_name=None):
+  selected = sys.platform if platform_name is None else platform_name
+  if selected == "darwin":
     return "macos"
-  if sys.platform.startswith("linux"):
+  if selected.startswith("linux"):
     return "linux"
-  if sys.platform == "win32":
+  if selected == "win32":
     return "windows"
   raise NativeValidationError("Unsupported native platform")
 
@@ -172,6 +173,96 @@ def validate_native_paths(
   }
 
 
+def validate_native_schedule(
+  raw_root,
+  validation_root,
+  *,
+  platform_name=None,
+  platform_dirs_factory=None,
+):
+  from tools.session_logs.deployment_paths import (
+    resolve_deployment_paths,
+  )
+  from tools.session_logs.portable_config import (
+    build_portable_config,
+  )
+  from tools.session_logs.schedule_backends import (
+    PeriodicScheduleRequest,
+    select_schedule_backend,
+  )
+  selected_platform = (
+    sys.platform
+    if platform_name is None
+    else platform_name
+  )
+  suffixes = {
+    "darwin": ".plist",
+    "linux": ".timer",
+    "win32": ".xml",
+  }
+  suffix = suffixes.get(selected_platform)
+  raw = Path(raw_root)
+  validation = Path(validation_root)
+  if (
+    suffix is None
+    or not raw.is_absolute()
+    or not validation.is_absolute()
+    or validation.exists()
+  ):
+    raise NativeValidationError(
+      "Unsafe native schedule inputs"
+    )
+  paths = resolve_deployment_paths(
+    platform_dirs_factory=platform_dirs_factory,
+  )
+  candidate = build_portable_config(
+    raw,
+    deployment_paths=paths,
+    tool_version="native-validation",
+    environment={},
+  )
+  schedule_path = validation / ("schedule" + suffix)
+  request = PeriodicScheduleRequest(
+    schedule_path=schedule_path,
+    python_executable=Path(sys.executable).resolve(),
+    config_path=candidate.config_file,
+    interval_seconds=300,
+    stdout_path=paths.log_root / "stdout.log",
+    stderr_path=paths.log_root / "stderr.log",
+    user_id=0,
+  )
+  backend = select_schedule_backend(
+    platform_name=selected_platform,
+  )
+  result = backend.run(
+    "install",
+    request,
+    dry_run=True,
+  )
+  artifact_written = (
+    schedule_path.exists()
+    or schedule_path.with_suffix(".service").exists()
+  )
+  if (
+    result.action != "planned"
+    or result.status != "ok"
+    or artifact_written
+  ):
+    raise NativeValidationError(
+      "Native schedule dry run failed"
+    )
+  return {
+    "action": result.action,
+    "artifact_written": artifact_written,
+    "backend": result.backend,
+    "check": "schedule",
+    "commands_executed": False,
+    "ownership_checked": True,
+    "platform": _platform_family(selected_platform),
+    "status": "passed",
+  }
+
+
 def _write_evidence(path, payload):
   evidence_path = Path(path)
   if not evidence_path.is_absolute():
@@ -201,16 +292,17 @@ def run(argv=None) -> int:
   parser.add_argument(
     "--check",
     required=True,
-    choices=("package", "paths"),
+    choices=("package", "paths", "schedule"),
   )
   parser.add_argument("--evidence", required=True)
   parser.add_argument("--project-root")
   parser.add_argument("--raw-root")
+  parser.add_argument("--validation-root")
   args = parser.parse_args(argv)
   try:
     if args.check == "package":
       result = validate_installed_package()
-    else:
+    elif args.check == "paths":
       if args.project_root is None or args.raw_root is None:
         raise NativeValidationError(
           "Native path inputs are required"
@@ -218,6 +310,15 @@ def run(argv=None) -> int:
       result = validate_native_paths(
         args.project_root,
         args.raw_root,
+      )
+    else:
+      if args.raw_root is None or args.validation_root is None:
+        raise NativeValidationError(
+          "Native schedule inputs are required"
+        )
+      result = validate_native_schedule(
+        args.raw_root,
+        args.validation_root,
       )
     _write_evidence(args.evidence, result)
   except Exception as error:

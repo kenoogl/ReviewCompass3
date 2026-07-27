@@ -34,6 +34,9 @@ jobs:
       - name: Validate native deployment paths
         shell: bash
         run: reviewcompass3-session-logs validate-native --check paths --project-root "${{ github.workspace }}" --raw-root "${{ runner.temp }}/raw" --evidence "${{ runner.temp }}/native-paths.json"
+      - name: Validate native periodic schedule
+        shell: bash
+        run: reviewcompass3-session-logs validate-native --check schedule --raw-root "${{ runner.temp }}/raw" --validation-root "${{ runner.temp }}/native-schedule" --evidence "${{ runner.temp }}/native-schedule.json"
       - name: Upload value-free evidence
         uses: actions/upload-artifact@v4
         with:
@@ -41,4 +44,5 @@ jobs:
           path: |
             ${{ runner.temp }}/native-package.json
             ${{ runner.temp }}/native-paths.json
+            ${{ runner.temp }}/native-schedule.json
           if-no-files-found: error
