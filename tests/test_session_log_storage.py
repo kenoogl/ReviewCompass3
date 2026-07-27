@@ -8,6 +8,8 @@ promotion_required: true
 import importlib
 import json
 
+import pytest
+
 
 def _record(event_id, role, text):
   return {
@@ -135,3 +137,70 @@ def test_stores_idempotently_appends_and_preserves_on_change(tmp_path):
   assert preserved.summary_path.read_text(encoding="utf-8") == (
     appended_artifact.summary_text
   )
+
+
+def test_restores_all_artifacts_when_atomic_replace_fails(tmp_path, monkeypatch):
+  raw_root = tmp_path / "raw"
+  raw_log = raw_root / "session.jsonl"
+  raw_root.mkdir()
+  transcript_root = tmp_path / "transcripts"
+  summary_root = tmp_path / "summaries"
+  provenance_root = tmp_path / "provenance"
+
+  pipeline = importlib.import_module("tools.session_logs.pipeline")
+  storage = importlib.import_module("tools.session_logs.storage")
+
+  _write_records(raw_log, (_record("user-1", "user", "First."),))
+  first_artifact = pipeline.prepare_artifact(
+    raw_log,
+    raw_root=raw_root,
+    rules=(),
+    tool_version="0.0.1",
+  )
+  stored = storage.store_artifact(
+    first_artifact,
+    transcript_root=transcript_root,
+    summary_root=summary_root,
+    provenance_root=provenance_root,
+  )
+  before = {
+    path: path.read_bytes()
+    for path in (
+      stored.transcript_path,
+      stored.summary_path,
+      stored.provenance_path,
+    )
+  }
+
+  _write_records(raw_log, (
+    _record("user-1", "user", "First."),
+    _record("assistant-1", "assistant", "Second."),
+  ))
+  appended_artifact = pipeline.prepare_artifact(
+    raw_log,
+    raw_root=raw_root,
+    rules=(),
+    tool_version="0.0.1",
+  )
+
+  original_replace = storage._replace_file
+  calls = {"count": 0}
+
+  def fail_second_replace(source, target):
+    calls["count"] += 1
+    if calls["count"] == 2:
+      raise OSError("injected replace failure")
+    original_replace(source, target)
+
+  monkeypatch.setattr(storage, "_replace_file", fail_second_replace)
+
+  with pytest.raises(storage.StorageError):
+    storage.store_artifact(
+      appended_artifact,
+      transcript_root=transcript_root,
+      summary_root=summary_root,
+      provenance_root=provenance_root,
+    )
+
+  assert {path: path.read_bytes() for path in before} == before
+  assert tuple(tmp_path.rglob("*.tmp")) == ()
