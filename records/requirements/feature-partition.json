@@ -1,0 +1,276 @@
+{
+  "defined_essence_ids": [
+    "ESS-0001",
+    "ESS-0002",
+    "ESS-0003",
+    "ESS-0004",
+    "ESS-0005",
+    "ESS-0006",
+    "ESS-0007",
+    "ESS-0008",
+    "ESS-0009",
+    "ESS-0010",
+    "ESS-0011",
+    "ESS-0012",
+    "ESS-0013",
+    "ESS-0014",
+    "ESS-0015",
+    "ESS-0016",
+    "ESS-0017",
+    "ESS-0018",
+    "ESS-0019",
+    "ESS-0020",
+    "ESS-0021",
+    "ESS-0022",
+    "ESS-0023",
+    "ESS-0024",
+    "ESS-0025",
+    "ESS-0026",
+    "ESS-0027",
+    "ESS-0028",
+    "ESS-0029",
+    "ESS-0030",
+    "ESS-0031",
+    "ESS-0032",
+    "ESS-0033",
+    "ESS-0034",
+    "ESS-0035",
+    "ESS-0036",
+    "ESS-0037",
+    "ESS-0038",
+    "ESS-0039",
+    "ESS-0040",
+    "ESS-0041",
+    "ESS-0042",
+    "ESS-0043",
+    "ESS-0044",
+    "ESS-0045",
+    "ESS-0046",
+    "ESS-0047"
+  ],
+  "defined_intent_ids": [
+    "INT-PURPOSE",
+    "INT-USERS",
+    "INT-PRODUCT",
+    "INT-NON-GOALS",
+    "INT-CONSTRAINTS",
+    "INT-SUCCESS",
+    "INT-CONFLICT"
+  ],
+  "features": [
+    {
+      "essence_ids": [
+        "ESS-0007",
+        "ESS-0037",
+        "ESS-0038",
+        "ESS-0039"
+      ],
+      "feature_id": "FEAT-EVIDENCE-EVALUATION",
+      "intent_refs": [
+        "INT-PURPOSE",
+        "INT-SUCCESS"
+      ],
+      "name": "証拠付き評価と分析",
+      "non_goals": [
+        "根拠のない評価結果を確定すること",
+        "観測値と解釈を同じ事実として扱うこと"
+      ],
+      "responsibility": "固定材料、評価基準、観測結果および解釈限界を分離して追跡可能に評価する"
+    },
+    {
+      "essence_ids": [
+        "ESS-0003",
+        "ESS-0010",
+        "ESS-0015",
+        "ESS-0018",
+        "ESS-0022",
+        "ESS-0023",
+        "ESS-0024",
+        "ESS-0028",
+        "ESS-0029",
+        "ESS-0031",
+        "ESS-0033",
+        "ESS-0035",
+        "ESS-0041",
+        "ESS-0046"
+      ],
+      "feature_id": "FEAT-HARNESSED-EXECUTION",
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-NON-GOALS",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS",
+        "INT-CONFLICT"
+      ],
+      "name": "Harnessed review execution",
+      "non_goals": [
+        "Humanの最終判断を自動化すること",
+        "汎用エージェント実行基盤を作ること"
+      ],
+      "responsibility": "版付き実行仕様、外部送信関門、複数担当、raw応答、検証、観測値および再試行をReview Runとして管理する"
+    },
+    {
+      "essence_ids": [
+        "ESS-0004",
+        "ESS-0014",
+        "ESS-0019",
+        "ESS-0043",
+        "ESS-0044"
+      ],
+      "feature_id": "FEAT-PORTABLE-LIFECYCLE",
+      "intent_refs": [
+        "INT-NON-GOALS",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "name": "ポータブルな配置と運用",
+      "non_goals": [
+        "特定OSや利用者固有パスへ固定すること",
+        "所有していない利用者データを上書きまたは削除すること"
+      ],
+      "responsibility": "安全な構造化I/O、標準配置、配布、導入、運用、復旧および解除を所有境界付きで扱う"
+    },
+    {
+      "essence_ids": [
+        "ESS-0005",
+        "ESS-0006",
+        "ESS-0017",
+        "ESS-0025",
+        "ESS-0032"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-NON-GOALS",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "name": "Review Task入力構成",
+      "non_goals": [
+        "LLMだけに材料採用を委ねること",
+        "プロジェクト全体を暗黙の入力にすること"
+      ],
+      "responsibility": "Task criteria、Target、source materials、Scopeおよび引継ぎ材料を固定・検証し、入力変更をstaleとして検出する"
+    },
+    {
+      "essence_ids": [
+        "ESS-0021",
+        "ESS-0026",
+        "ESS-0027"
+      ],
+      "feature_id": "FEAT-REVIEW-TRIAGE",
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS",
+        "INT-CONFLICT"
+      ],
+      "name": "所見統合とHuman判断",
+      "non_goals": [
+        "競合する所見を黙って消すこと",
+        "LLMへ承認権限を与えること"
+      ],
+      "responsibility": "複数モデルの所見を重複と競合を保って統合し、利用者判断を対象と内容へ束縛して記録する"
+    },
+    {
+      "essence_ids": [
+        "ESS-0001",
+        "ESS-0009",
+        "ESS-0016",
+        "ESS-0020",
+        "ESS-0040"
+      ],
+      "feature_id": "FEAT-SEMANTIC-TRACE",
+      "intent_refs": [
+        "INT-PURPOSE",
+        "INT-PRODUCT",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "name": "意味単位と来歴追跡",
+      "non_goals": [
+        "Digestだけで内容の真実性を保証すること",
+        "平文で追跡不能な専用データ基盤を必須にすること"
+      ],
+      "responsibility": "意味単位、関係、義務、被覆および一次証拠への参照を閉じた語彙とIDで双方向に検査する"
+    },
+    {
+      "essence_ids": [
+        "ESS-0036",
+        "ESS-0042"
+      ],
+      "feature_id": "FEAT-SELF-IMPROVEMENT",
+      "intent_refs": [
+        "INT-USERS",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "name": "実測に基づく自己改善",
+      "non_goals": [
+        "成功例だけを学習材料にすること",
+        "利用者判断なしに方針を変更すること"
+      ],
+      "responsibility": "成功と失敗の実測を改善候補へ結び、検証と利用者判断を経て次周期へ反映する"
+    },
+    {
+      "essence_ids": [
+        "ESS-0002",
+        "ESS-0008",
+        "ESS-0011",
+        "ESS-0045"
+      ],
+      "feature_id": "FEAT-SESSION-RECORDS",
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-NON-GOALS",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "name": "セッション記録ライフサイクル",
+      "non_goals": [
+        "会話履歴全体を暗黙のTask入力にすること",
+        "利用者固有の保存場所へ固定すること"
+      ],
+      "responsibility": "セッション生ログを安全に発見・解析・保全し、伏字化した転写、要約および来歴へ結ぶ"
+    },
+    {
+      "essence_ids": [
+        "ESS-0012",
+        "ESS-0013",
+        "ESS-0030",
+        "ESS-0034",
+        "ESS-0047"
+      ],
+      "feature_id": "FEAT-WORKFLOW-CONTROL",
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-NON-GOALS",
+        "INT-CONSTRAINTS",
+        "INT-CONFLICT"
+      ],
+      "name": "Workflowと作業単位の制御",
+      "non_goals": [
+        "Prompt内だけで状態を管理すること",
+        "LLMが作業の完了を単独で決めること"
+      ],
+      "responsibility": "現在の作業対象、作業単位、状態、遷移、関門および書込み権限を一意に管理する"
+    }
+  ],
+  "fixed_input_verification": {
+    "path": "records/requirements/fixed-input-verification.json",
+    "sha256": "d8b1739aa647beec3eddef7afd727d19c5027a1d3df3ba9c5ac7ee9aaba7ecaf"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "partition_result": {
+    "covered_essence_count": 47,
+    "duplicate_essence_count": 0,
+    "feature_count": 9,
+    "partition_digest": "7e123844a6e92cea05f81a0eb06965389a79962d459ee53470ae45aceff8de63",
+    "status": "complete",
+    "uncovered_essence_count": 0
+  },
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "complete"
+}
