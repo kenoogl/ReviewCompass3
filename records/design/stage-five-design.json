@@ -1,0 +1,959 @@
+{
+  "boundary_catalog": [
+    {
+      "boundary_id": "BOUNDARY-001",
+      "from": "REQ-TRACE-004",
+      "relation": "provides_to",
+      "to": "REQ-CONTEXT-003",
+      "contract": "影響候補母集合と生成根拠"
+    },
+    {
+      "boundary_id": "BOUNDARY-002",
+      "from": "REQ-CONTEXT-003",
+      "relation": "depends_on",
+      "to": "REQ-TRACE-004",
+      "contract": "影響候補母集合と生成根拠"
+    },
+    {
+      "boundary_id": "BOUNDARY-003",
+      "from": "REQ-PORTABLE-002",
+      "relation": "provides_to",
+      "to": "REQ-CONTEXT-007",
+      "contract": "原子的書込み、再読込照合、部分失敗復旧"
+    },
+    {
+      "boundary_id": "BOUNDARY-004",
+      "from": "REQ-CONTEXT-007",
+      "relation": "depends_on",
+      "to": "REQ-PORTABLE-002",
+      "contract": "原子的書込み、再読込照合、部分失敗復旧"
+    },
+    {
+      "boundary_id": "BOUNDARY-005",
+      "from": "REQ-PORTABLE-004",
+      "relation": "provides_to",
+      "to": "REQ-CONTEXT-007",
+      "contract": "機微情報、retention、削除の共有保存境界"
+    },
+    {
+      "boundary_id": "BOUNDARY-006",
+      "from": "REQ-CONTEXT-007",
+      "relation": "depends_on",
+      "to": "REQ-PORTABLE-004",
+      "contract": "機微情報、retention、削除の共有保存境界"
+    },
+    {
+      "boundary_id": "BOUNDARY-007",
+      "from": "REQ-PORTABLE-002",
+      "relation": "provides_to",
+      "to": "REQ-EXEC-003",
+      "contract": "write-ahead captureと耐久的終端状態"
+    },
+    {
+      "boundary_id": "BOUNDARY-008",
+      "from": "REQ-EXEC-003",
+      "relation": "depends_on",
+      "to": "REQ-PORTABLE-002",
+      "contract": "write-ahead captureと耐久的終端状態"
+    },
+    {
+      "boundary_id": "BOUNDARY-009",
+      "from": "REQ-PORTABLE-004",
+      "relation": "provides_to",
+      "to": "REQ-EXEC-003",
+      "contract": "provider raw応答の隔離保存境界"
+    },
+    {
+      "boundary_id": "BOUNDARY-010",
+      "from": "REQ-EXEC-003",
+      "relation": "depends_on",
+      "to": "REQ-PORTABLE-004",
+      "contract": "provider raw応答の隔離保存境界"
+    },
+    {
+      "boundary_id": "BOUNDARY-011",
+      "from": "REQ-PORTABLE-004",
+      "relation": "provides_to",
+      "to": "REQ-SESSION-002",
+      "contract": "生ログ原本と伏字化派生物の分離保存境界"
+    },
+    {
+      "boundary_id": "BOUNDARY-012",
+      "from": "REQ-SESSION-002",
+      "relation": "depends_on",
+      "to": "REQ-PORTABLE-004",
+      "contract": "生ログ原本と伏字化派生物の分離保存境界"
+    },
+    {
+      "boundary_id": "BOUNDARY-013",
+      "from": "REQ-PORTABLE-002",
+      "relation": "provides_to",
+      "to": "REQ-WORKFLOW-002",
+      "contract": "作業状態の原子的保存と再読込照合"
+    },
+    {
+      "boundary_id": "BOUNDARY-014",
+      "from": "REQ-WORKFLOW-002",
+      "relation": "depends_on",
+      "to": "REQ-PORTABLE-002",
+      "contract": "作業状態の原子的保存と再読込照合"
+    },
+    {
+      "boundary_id": "BOUNDARY-015",
+      "from": "REQ-WORKFLOW-002",
+      "relation": "provides_to",
+      "to": "REQ-EXEC-001",
+      "contract": "作業段階に束縛されたRun開始許可"
+    },
+    {
+      "boundary_id": "BOUNDARY-016",
+      "from": "REQ-EXEC-001",
+      "relation": "depends_on",
+      "to": "REQ-WORKFLOW-002",
+      "contract": "作業段階に束縛されたRun開始許可"
+    },
+    {
+      "boundary_id": "BOUNDARY-017",
+      "from": "REQ-EXEC-001",
+      "relation": "returns_to",
+      "to": "REQ-WORKFLOW-002",
+      "contract": "Run完了、失敗または拒否結果"
+    },
+    {
+      "boundary_id": "BOUNDARY-018",
+      "from": "REQ-EXEC-006",
+      "relation": "provides_to",
+      "to": "REQ-EVAL-002",
+      "contract": "観測値と測定条件の不変記録"
+    },
+    {
+      "boundary_id": "BOUNDARY-019",
+      "from": "REQ-EVAL-002",
+      "relation": "depends_on",
+      "to": "REQ-EXEC-006",
+      "contract": "観測値と測定条件の不変記録"
+    },
+    {
+      "boundary_id": "BOUNDARY-020",
+      "from": "REQ-TRACE-005",
+      "relation": "provides_to",
+      "to": "REQ-WORKFLOW-002",
+      "contract": "Run完了関門用Operational Provenance verdict"
+    },
+    {
+      "boundary_id": "BOUNDARY-021",
+      "from": "REQ-WORKFLOW-002",
+      "relation": "depends_on",
+      "to": "REQ-TRACE-005",
+      "contract": "Run完了関門用Operational Provenance verdict"
+    },
+    {
+      "boundary_id": "BOUNDARY-022",
+      "from": "REQ-TRACE-005",
+      "relation": "provides_to",
+      "to": "REQ-TRIAGE-003",
+      "contract": "Finding確定関門用Operational Provenance verdict"
+    },
+    {
+      "boundary_id": "BOUNDARY-023",
+      "from": "REQ-TRIAGE-003",
+      "relation": "depends_on",
+      "to": "REQ-TRACE-005",
+      "contract": "Finding確定関門用Operational Provenance verdict"
+    }
+  ],
+  "designs": [
+    {
+      "design_id": "DES-EVIDENCE-EVALUATION",
+      "title": "証拠付き適合性評価と解釈限界",
+      "decisions": [
+        "固定対象、基準、証拠、観測値、解釈、限界を別フィールドにする",
+        "Harnessの観測値を変更せず版付き評価packageを作る"
+      ],
+      "alternatives": [
+        "LLMの総合印象だけを評価結果にする",
+        "失敗例または解釈限界を除外する"
+      ],
+      "rationale": "評価の再現性と意味判断の限界を同時に追跡するため",
+      "components": [
+        "evidence_evaluator",
+        "observation_interpreter",
+        "evaluation_package"
+      ],
+      "machine_responsibilities": [
+        "固定入力、基準、証拠参照、数値計算、package Digestを検証する"
+      ],
+      "llm_responsibilities": [
+        "文章成果物の意味的適合性と解釈候補を根拠付きで評価する"
+      ],
+      "human_responsibilities": [
+        "評価基準と意味的競合の最終判断を行う"
+      ],
+      "failure_strategy": [
+        "不足証拠と限界を保持し未確定評価として停止する"
+      ],
+      "feature_id": "FEAT-EVIDENCE-EVALUATION",
+      "requirement_ids": [
+        "REQ-EVAL-001",
+        "REQ-EVAL-002",
+        "REQ-EVAL-003"
+      ],
+      "acceptance_test_ids": [
+        "AT-EVAL-001",
+        "AT-EVAL-002",
+        "AT-EVAL-003"
+      ],
+      "boundary_ids": [
+        "BOUNDARY-019"
+      ]
+    },
+    {
+      "design_id": "DES-HARNESSED-EXECUTION",
+      "title": "Workflow許可付きHarnessed Execution",
+      "decisions": [
+        "Workflow許可後にRun controllerがAttempt状態機械を開始する",
+        "送信候補、承認者、Provider identityを送信関門で固定する",
+        "response受領とwrite-ahead raw captureを別状態として解析前に保存する",
+        "形式復旧は閉じた機械変換またはHuman裁定だけを許す"
+      ],
+      "alternatives": [
+        "LLM agentへ状態遷移、外部送信、再試行を一任する",
+        "解析結果だけを保存してprovider raw応答を捨てる"
+      ],
+      "rationale": "実行経路と失敗を再現し外部送信をHuman承認へ束縛するため",
+      "components": [
+        "run_controller",
+        "external_send_gate",
+        "attempt_store",
+        "provider_capture",
+        "validation_pipeline"
+      ],
+      "machine_responsibilities": [
+        "状態遷移、送信identity、Schema、capture、再利用条件を検証する"
+      ],
+      "llm_responsibilities": [
+        "固定Contextに基づくレビューと意味的な形式復旧候補を生成する"
+      ],
+      "human_responsibilities": [
+        "外部送信と意味を変え得る復旧候補を承認または拒否する"
+      ],
+      "failure_strategy": [
+        "成功Attemptを保持しfailedまたはirrecoverable終端を外部提示する"
+      ],
+      "feature_id": "FEAT-HARNESSED-EXECUTION",
+      "requirement_ids": [
+        "REQ-EXEC-001",
+        "REQ-EXEC-002",
+        "REQ-EXEC-003",
+        "REQ-EXEC-004",
+        "REQ-EXEC-005",
+        "REQ-EXEC-006"
+      ],
+      "acceptance_test_ids": [
+        "AT-EXEC-001",
+        "AT-EXEC-002",
+        "AT-EXEC-003",
+        "AT-EXEC-004",
+        "AT-EXEC-005",
+        "AT-EXEC-006"
+      ],
+      "boundary_ids": [
+        "BOUNDARY-008",
+        "BOUNDARY-010",
+        "BOUNDARY-016",
+        "BOUNDARY-017",
+        "BOUNDARY-018"
+      ]
+    },
+    {
+      "design_id": "DES-PORTABLE-LIFECYCLE",
+      "title": "ポータブル配置と共有保存境界",
+      "decisions": [
+        "版付きsupported-platform matrixから論理配置を解決する",
+        "原子的構造化I/Oと機微情報隔離を全機能へ提供する",
+        "導入・解除は所有対象だけを補償可能な操作として実行する"
+      ],
+      "alternatives": [
+        "macOS固定パスまたはリポジトリ直下へ全データを保存する",
+        "各機能が独自の保存機構を持つ"
+      ],
+      "rationale": "主要OSで同じ論理境界と利用者データ保護を維持するため",
+      "components": [
+        "platform_matrix",
+        "path_resolver",
+        "atomic_artifact_store",
+        "sensitive_record_vault",
+        "install_lifecycle"
+      ],
+      "machine_responsibilities": [
+        "platform、所有権、Schema、権限、retention、原子的保存を検証する"
+      ],
+      "llm_responsibilities": [
+        "保存物の意味的分類候補を提示する"
+      ],
+      "human_responsibilities": [
+        "配置上書きと機微情報例外を承認する"
+      ],
+      "failure_strategy": [
+        "部分成功を逆順補償し確認済み版と利用者データを保持する"
+      ],
+      "feature_id": "FEAT-PORTABLE-LIFECYCLE",
+      "requirement_ids": [
+        "REQ-PORTABLE-001",
+        "REQ-PORTABLE-002",
+        "REQ-PORTABLE-003",
+        "REQ-PORTABLE-004"
+      ],
+      "acceptance_test_ids": [
+        "AT-PORTABLE-001",
+        "AT-PORTABLE-002",
+        "AT-PORTABLE-003",
+        "AT-PORTABLE-004"
+      ],
+      "boundary_ids": [
+        "BOUNDARY-003",
+        "BOUNDARY-005",
+        "BOUNDARY-007",
+        "BOUNDARY-009",
+        "BOUNDARY-011",
+        "BOUNDARY-013"
+      ]
+    },
+    {
+      "design_id": "DES-REVIEW-CONTEXT",
+      "title": "Review Task入力とExecution Context構成",
+      "decisions": [
+        "Review Task定義、材料束、Scope、Composition、identity、handoffを別の版付きcomponentとして構成する",
+        "Traceが生成した影響候補母集合だけをScope分類の入力にする",
+        "確定済みContextは内容Digestと完全性状態の組で識別する"
+      ],
+      "alternatives": [
+        "Prompt文字列へ全入力と状態を埋め込む",
+        "会話履歴またはプロジェクト全体を暗黙のContextにする"
+      ],
+      "rationale": "材料変更、Prompt変更、Scope判断、再利用判断を独立に検証するため",
+      "components": [
+        "review_task_definition",
+        "material_bundle",
+        "scope_composer",
+        "context_identity",
+        "handoff_builder"
+      ],
+      "machine_responsibilities": [
+        "必須項目、参照、Digest、全件分類、freshness、保存境界を検証する",
+        "未分類、stale、不一致時にfail-closed verdictを返す"
+      ],
+      "llm_responsibilities": [
+        "候補材料の意味的関連性とinclude、exclude、defer理由を提案する"
+      ],
+      "human_responsibilities": [
+        "Task目的、Target、採用材料および判断競合を確定する"
+      ],
+      "failure_strategy": [
+        "未解決材料と旧確定版を保持し新identityで再構成する"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "requirement_ids": [
+        "REQ-CONTEXT-001",
+        "REQ-CONTEXT-002",
+        "REQ-CONTEXT-003",
+        "REQ-CONTEXT-004",
+        "REQ-CONTEXT-005",
+        "REQ-CONTEXT-006",
+        "REQ-CONTEXT-007"
+      ],
+      "acceptance_test_ids": [
+        "AT-CONTEXT-001",
+        "AT-CONTEXT-002",
+        "AT-CONTEXT-003",
+        "AT-CONTEXT-004",
+        "AT-CONTEXT-005",
+        "AT-CONTEXT-006",
+        "AT-CONTEXT-007"
+      ],
+      "boundary_ids": [
+        "BOUNDARY-002",
+        "BOUNDARY-004",
+        "BOUNDARY-006"
+      ]
+    },
+    {
+      "design_id": "DES-REVIEW-TRIAGE",
+      "title": "競合保持triageとHuman Finding判断",
+      "decisions": [
+        "担当別結果、重複群、競合群、Human判断を別レコードで保持する",
+        "Trace verdict通過後だけFindingを確定する"
+      ],
+      "alternatives": [
+        "多数決または単一LLMで所見を自動採否する"
+      ],
+      "rationale": "少数意見と競合を失わず最終責任をHumanに残すため",
+      "components": [
+        "result_summarizer",
+        "finding_merger",
+        "human_decision_gate"
+      ],
+      "machine_responsibilities": [
+        "件数、元Finding参照、対象Digest、Trace verdictを照合する"
+      ],
+      "llm_responsibilities": [
+        "重複候補、競合理由、採否候補を意味的に提案する"
+      ],
+      "human_responsibilities": [
+        "Findingを採用、拒否または保留として確定する"
+      ],
+      "failure_strategy": [
+        "競合または来歴不一致時は全候補を保持して確定を停止する"
+      ],
+      "feature_id": "FEAT-REVIEW-TRIAGE",
+      "requirement_ids": [
+        "REQ-TRIAGE-001",
+        "REQ-TRIAGE-002",
+        "REQ-TRIAGE-003"
+      ],
+      "acceptance_test_ids": [
+        "AT-TRIAGE-001",
+        "AT-TRIAGE-002",
+        "AT-TRIAGE-003"
+      ],
+      "boundary_ids": [
+        "BOUNDARY-023"
+      ]
+    },
+    {
+      "design_id": "DES-SEMANTIC-TRACE",
+      "title": "意味グラフ、影響閉包、Operational Provenance",
+      "decisions": [
+        "閉じたnode・edge語彙の平文グラフを正本にする",
+        "変更単位と版付き閉包規則から影響候補母集合を決定的に生成する",
+        "TaskからFindingまでの必須辺を検査しverdictだけを所有機能へ渡す"
+      ],
+      "alternatives": [
+        "専用DBまたはLLM内部推論を唯一の来歴正本にする"
+      ],
+      "rationale": "双方向追跡とfail-closed検査を同じ固定材料から再現するため",
+      "components": [
+        "semantic_graph",
+        "impact_closure",
+        "coverage_validator",
+        "provenance_validator"
+      ],
+      "machine_responsibilities": [
+        "ID、辺種別、閉包、被覆、Digestおよび必須来歴辺を検証する"
+      ],
+      "llm_responsibilities": [
+        "意味単位候補と意味関係候補を根拠付きで提案する"
+      ],
+      "human_responsibilities": [
+        "意味関係競合と限定された非採用義務を裁定する"
+      ],
+      "failure_strategy": [
+        "未解決参照または被覆不足を局所診断してverdictを不合格にする"
+      ],
+      "feature_id": "FEAT-SEMANTIC-TRACE",
+      "requirement_ids": [
+        "REQ-TRACE-001",
+        "REQ-TRACE-002",
+        "REQ-TRACE-003",
+        "REQ-TRACE-004",
+        "REQ-TRACE-005"
+      ],
+      "acceptance_test_ids": [
+        "AT-TRACE-001",
+        "AT-TRACE-002",
+        "AT-TRACE-003",
+        "AT-TRACE-004",
+        "AT-TRACE-005"
+      ],
+      "boundary_ids": [
+        "BOUNDARY-001",
+        "BOUNDARY-020",
+        "BOUNDARY-022"
+      ]
+    },
+    {
+      "design_id": "DES-SELF-IMPROVEMENT",
+      "title": "実測feedback ledgerと承認付き改善",
+      "decisions": [
+        "成功、失敗、未確定の実測を条件identity付きledgerへ保存する",
+        "改善候補は固定比較とHuman承認後だけ次周期へ反映する"
+      ],
+      "alternatives": [
+        "成功例だけを学習する",
+        "LLMが検証なしに方針を自動変更する"
+      ],
+      "rationale": "自己改善を反証可能にし現行方針の無断変更を防ぐため",
+      "components": [
+        "feedback_ledger",
+        "improvement_experiment",
+        "policy_change_gate"
+      ],
+      "machine_responsibilities": [
+        "比較条件、元Run、測定値、承認対象Digestを検証する"
+      ],
+      "llm_responsibilities": [
+        "失敗と成功から改善仮説を理由付きで提案する"
+      ],
+      "human_responsibilities": [
+        "改善候補の採否と次周期への反映を承認する"
+      ],
+      "failure_strategy": [
+        "検証不足または未承認候補を現行方針から隔離する"
+      ],
+      "feature_id": "FEAT-SELF-IMPROVEMENT",
+      "requirement_ids": [
+        "REQ-IMPROVE-001",
+        "REQ-IMPROVE-002"
+      ],
+      "acceptance_test_ids": [
+        "AT-IMPROVE-001",
+        "AT-IMPROVE-002"
+      ],
+      "boundary_ids": []
+    },
+    {
+      "design_id": "DES-SESSION-RECORDS",
+      "title": "明示範囲のセッション記録ライフサイクル",
+      "decisions": [
+        "利用者が指定した探索範囲だけを取込対象にする",
+        "raw原本、伏字化転写、要約、来歴を別identityで保存する",
+        "追記、非追記変更、消失を独立検査する"
+      ],
+      "alternatives": [
+        "会話履歴全体を自動収集する",
+        "転写でraw原本を置換する"
+      ],
+      "rationale": "通常作業を妨げず監査可能な最小記録だけを安全に保持するため",
+      "components": [
+        "session_ingestion",
+        "raw_preserver",
+        "redacted_transcript",
+        "mutation_detector"
+      ],
+      "machine_responsibilities": [
+        "探索境界、伏字化、Digest、追記性、来歴を検証する"
+      ],
+      "llm_responsibilities": [
+        "伏字化済み転写から意味的要約候補を作る"
+      ],
+      "human_responsibilities": [
+        "取込範囲と機微情報の例外を明示する"
+      ],
+      "failure_strategy": [
+        "rawを隔離保持し不正派生物の通常保存を停止する"
+      ],
+      "feature_id": "FEAT-SESSION-RECORDS",
+      "requirement_ids": [
+        "REQ-SESSION-001",
+        "REQ-SESSION-002",
+        "REQ-SESSION-003"
+      ],
+      "acceptance_test_ids": [
+        "AT-SESSION-001",
+        "AT-SESSION-002",
+        "AT-SESSION-003"
+      ],
+      "boundary_ids": [
+        "BOUNDARY-012"
+      ]
+    },
+    {
+      "design_id": "DES-WORKFLOW-CONTROL",
+      "title": "active workと段階関門の状態機械",
+      "decisions": [
+        "active work、backlog、段階、actionを一意IDで結ぶ",
+        "Run開始・完了許可と成果物書込みを状態機械の関門にする",
+        "ReviewCompass3自身にも同じ状態契約を適用する"
+      ],
+      "alternatives": [
+        "Promptまたは会話だけで現在状態を保持する"
+      ],
+      "rationale": "複数案件と再開時にも現在対象と許可操作を一意にするため",
+      "components": [
+        "active_work_selector",
+        "workflow_state_machine",
+        "run_gate",
+        "artifact_write_gate"
+      ],
+      "machine_responsibilities": [
+        "許可遷移、関門、active work、書込み範囲を検証する"
+      ],
+      "llm_responsibilities": [
+        "候補作業の意味的優先理由を提示する"
+      ],
+      "human_responsibilities": [
+        "競合時のactive workと段階完了を承認する"
+      ],
+      "failure_strategy": [
+        "不正actionを状態変更なしで拒否し旧状態を保持する"
+      ],
+      "feature_id": "FEAT-WORKFLOW-CONTROL",
+      "requirement_ids": [
+        "REQ-WORKFLOW-001",
+        "REQ-WORKFLOW-002",
+        "REQ-WORKFLOW-003",
+        "REQ-WORKFLOW-004"
+      ],
+      "acceptance_test_ids": [
+        "AT-WORKFLOW-001",
+        "AT-WORKFLOW-002",
+        "AT-WORKFLOW-003",
+        "AT-WORKFLOW-004"
+      ],
+      "boundary_ids": [
+        "BOUNDARY-014",
+        "BOUNDARY-015",
+        "BOUNDARY-021"
+      ]
+    }
+  ],
+  "acceptance_tests": [
+    {
+      "test_id": "AT-CONTEXT-001",
+      "requirement_id": "REQ-CONTEXT-001",
+      "oracle_type": "machine",
+      "setup": "Constraints／Context Requirements／Expected Output／Goal／Provenance／Validation Policy／一意に識別されたTarget",
+      "stimulus": "Review Taskを開始する前に利用者はGoal、Target、Constraints、Expected Output、Context Requirements、Validation PolicyおよびProvenanceを確認できなければならない",
+      "expected": "7つの必須入力をそれぞれ欠落、空、未解決、無効にした入力はContext生成前に拒否される／同一入力から同一のTask入力Digestが得られる",
+      "negative_case": "Targetが一意に定まらない／必須項目が欠けるか未解決である"
+    },
+    {
+      "test_id": "AT-CONTEXT-002",
+      "requirement_id": "REQ-CONTEXT-002",
+      "oracle_type": "machine",
+      "setup": "Targetとsource materialの参照／各材料の本文、役割、解決可能な出所identityおよび取得結果／固定済みprior material identity",
+      "stimulus": "システムはTargetとsource materialsを役割、内容、出所およびDigestを持つ一つの材料束として実体化しなければならない",
+      "expected": "Targetを含みすべてのentryに本文と出所がある／本文と宣言Digestを同時に変更してもprior identityとの不一致を検出する",
+      "negative_case": "参照先が存在しない／宣言したDigestと本文が一致しない／本文または出所が欠ける"
+    },
+    {
+      "test_id": "AT-CONTEXT-003",
+      "requirement_id": "REQ-CONTEXT-003",
+      "oracle_type": "hybrid",
+      "setup": "Review TaskのTargetと固定変更単位／版付き意味グラフと閉包規則／include、exclude、deferの判定基準／固定した候補母集合",
+      "stimulus": "システムはレビュー母集合、対象範囲、除外条件および分類結果をScope contractとして固定し対象漏れと判断競合を検出しなければならない",
+      "expected": "Targetが母集合内の許可分類へ入る／全候補が重複なく許可された分類のいずれかに入る／固定変更単位、版付き意味グラフ、閉包規則から同じ候補母集合が再生成される／母集合、Scope基準、期待分類を同じidentityへ固定し独立検査結果が全件一致する／独立検査の相違時はScope確定を停止しHuman裁定へ戻す",
+      "negative_case": "Targetが母集合に存在しないかReview Taskで許可されない分類に入る／同じ候補に競合する分類がある／分類中に母集合が変わる／母集合を変更単位、意味関係および閉包規則へ逆引きできない／必要材料がdeferまたは根拠不足のまま残る／unknownまたは未分類が残る"
+    },
+    {
+      "test_id": "AT-CONTEXT-004",
+      "requirement_id": "REQ-CONTEXT-004",
+      "oracle_type": "machine",
+      "setup": "Composition記録／Scope contract／source universe identity／任意のhandoff package identity／各入力の完全性、取得状態およびDigest／固定済みExecution Context材料束／版付きReview Task入力定義のDigest",
+      "stimulus": "システムはExecution Contextの内容をDigestで固定し入力変更後に旧結果を再利用せずstaleとして停止しなければならない",
+      "expected": "Task定義、材料束、Scope、Composition、source universe、完全性状態、handoffの各構成要素を1つずつ変更すると旧identityと旧結果の再利用が拒否される／同じ正規化入力から同じidentityが得られる",
+      "negative_case": "Context確定後に参照元が変わる／入力Digestが固定値と一致しない"
+    },
+    {
+      "test_id": "AT-CONTEXT-005",
+      "requirement_id": "REQ-CONTEXT-005",
+      "oracle_type": "machine",
+      "setup": "任意の候補材料と候補生成条件／呼び出し側が指定した採用材料／材料の採用目的",
+      "stimulus": "システムは呼び出し側が指定した材料と採用目的を明示的に構成し暗黙の資料をExecution Contextへ追加してはならない",
+      "expected": "全採用材料を明示指定または決定的な採用規則へたどれる／指定されていない材料をLLMが暗黙に追加できない",
+      "negative_case": "候補の採否が未解決である／採用材料の出所または採用主体を追跡できない"
+    },
+    {
+      "test_id": "AT-CONTEXT-006",
+      "requirement_id": "REQ-CONTEXT-006",
+      "oracle_type": "machine",
+      "setup": "再開対象のReview TaskとContext identity／未解決事項と変更方針／元Review Runとeffective execution identity／確認主体、Validation結果および承認判断／確認済み成果とそのDigest",
+      "stimulus": "システムは確認済み成果、未解決事項、変更方針および再開地点をDigest付きhandoff packageへ固定し受け取り側が完全性とfreshnessを検査できる形で引き渡さなければならない",
+      "expected": "packageの再構成が確認済み成果の内容とDigestを変更しない／受け取り時にpackage全体のDigest、Context identityおよびfreshnessを再検査できる",
+      "negative_case": "再開対象または変更方針が一意に定まらない／確認済み成果のDigestが欠けるか一致しない"
+    },
+    {
+      "test_id": "AT-CONTEXT-007",
+      "requirement_id": "REQ-CONTEXT-007",
+      "oracle_type": "machine",
+      "setup": "保存対象とそのidentity／機微情報検査結果／REQ-PORTABLE-002およびREQ-PORTABLE-004を満たす共有保存境界／許可された保存形式、アクセス境界およびretention policy",
+      "stimulus": "システムはContext構成と検査で生じた確認済み成果、失敗履歴および診断を共有保存境界を介して部分書込みや機微情報の漏えいを防ぎ再起動後に照合できる形で保存しなければならない",
+      "expected": "クラッシュ後も確定済み版と未確定版を機械的に識別でき再読込Digestが一致する／削除時も対象identity、理由および削除結果のDigest付き診断が残る／書込み途中の強制終了後も直前の確認済み版が変わらない",
+      "negative_case": "保存先のアクセス境界を確認できない／原子的な確定または再読込照合に失敗する／機微情報検査が失敗する"
+    },
+    {
+      "test_id": "AT-EXEC-001",
+      "requirement_id": "REQ-EXEC-001",
+      "oracle_type": "machine",
+      "setup": "Review TaskとExecution Context identity／Workflowが発行したRun開始許可identity／役割、対象、順序、停止関門を持つ版付き実行仕様",
+      "stimulus": "システムはWorkflowが開始を許可した固定実行仕様について許可された状態順序に従うReview Runだけを開始しなければならない",
+      "expected": "Workflowの許可後だけHarnessのRun内部状態が開始される／未定義状態遷移と不完全な実行仕様が送信前に拒否される／同じ固定仕様から同じ実行計画identityが得られる",
+      "negative_case": "Workflowの開始許可がないか要求と一致しない／必須実行条件が欠ける／未定義または順序違反のRun内部状態遷移がある"
+    },
+    {
+      "test_id": "AT-EXEC-002",
+      "requirement_id": "REQ-EXEC-002",
+      "oracle_type": "machine",
+      "setup": "candidate serialized payloadとDigest／Provider、model、endpoint、account、region、purpose、期限／機微情報検査／承認者identity、承認権限およびHuman承認",
+      "stimulus": "システムは外部送信の内容、能力、論理送信先、承認者identity、権限およびHuman承認を同じ実行identityへ束縛しなければならない",
+      "expected": "candidate payload、送信先、承認者identityおよび権限が承認前に固定される／payload、Provider、endpoint、account、region、承認者、権限または期限の不一致時に送信されない",
+      "negative_case": "能力上限または機微情報検査に失敗する／Human承認がない、承認権限がない、期限切れ、または実送信条件が承認値と一致しない"
+    },
+    {
+      "test_id": "AT-EXEC-003",
+      "requirement_id": "REQ-EXEC-003",
+      "oracle_type": "machine",
+      "setup": "Attempt identity、request identityおよび送信条件／provider response stream／REQ-PORTABLE-002とREQ-PORTABLE-004を満たすwrite-ahead隔離保存境界",
+      "stimulus": "システムはprovider responseの受領とrawの耐久的captureを別状態として管理し、解析前に共有隔離保存境界へwrite-ahead captureしなければならない",
+      "expected": "request identityを耐久保存してから送信しresponse受領時点を明示記録する／受領したresponseは解析前にwrite-ahead captureされ送信条件とAttemptへ結線される／capture前後のクラッシュ注入でsuccess、failedまたはirrecoverableのいずれか一意な終端状態になる／通常保存と診断保存の双方が不能なら値を含まないirrecoverable状態を外部へ提示する",
+      "negative_case": "request、Attemptまたは送信条件へ結線できない／raw captureと値なし診断の双方を耐久保存できない"
+    },
+    {
+      "test_id": "AT-EXEC-004",
+      "requirement_id": "REQ-EXEC-004",
+      "oracle_type": "machine",
+      "setup": "実行トポロジとround定義／担当別model結果",
+      "stimulus": "システムは複数担当の実行トポロジとroundごとの結果を欠落なく記録しなければならない",
+      "expected": "各roundの対象、役割、model結果が一意に結線される／欠落model結果を成功roundとして扱わない",
+      "negative_case": "必須担当または対象が欠ける／同じ担当結果が競合する"
+    },
+    {
+      "test_id": "AT-EXEC-005",
+      "requirement_id": "REQ-EXEC-005",
+      "oracle_type": "hybrid",
+      "setup": "raw・解析結果とValidation Policy／形式復旧候補／閉じた機械変換規則またはHuman裁定",
+      "stimulus": "システムは出力検証と形式復旧を版付き記録として管理し、閉じた機械変換またはHuman裁定なしに意味を変え得る復旧を確定してはならない",
+      "expected": "Validation入力、結果、verdictが版付きで残る／閉じた機械変換規則だけが自動適用される／意味同一性の判断が必要な候補は対象Digest、理由、競合およびHuman裁定なしに確定されない",
+      "negative_case": "Schema、Evidence、Scope要件に違反する／復旧が閉じた機械変換でなくHuman裁定もない"
+    },
+    {
+      "test_id": "AT-EXEC-006",
+      "requirement_id": "REQ-EXEC-006",
+      "oracle_type": "machine",
+      "setup": "Review RunのAttempt列／実行条件、観測値、費用、関門結果／handoff packageとeffective execution identity",
+      "stimulus": "システムは実行条件と観測値を不変記録し、再試行または再利用の根拠を監査可能にしなければならない",
+      "expected": "実行経路、条件、費用、関門、観測結果がRunへ固定される／同一Contextでもeffective execution identity変更時は旧成果を再利用しない",
+      "negative_case": "実行条件identityが欠ける／再利用対象のContextまたは実行条件が一致しない"
+    },
+    {
+      "test_id": "AT-TRIAGE-001",
+      "requirement_id": "REQ-TRIAGE-001",
+      "oracle_type": "machine",
+      "setup": "担当別解析結果",
+      "stimulus": "システムは担当別結果を件数と結論を失わず要約しなければならない",
+      "expected": "model別件数と結論がraw解析結果と一致する",
+      "negative_case": "元結果へ逆引きできない／件数または結論が一致しない"
+    },
+    {
+      "test_id": "AT-TRIAGE-002",
+      "requirement_id": "REQ-TRIAGE-002",
+      "oracle_type": "hybrid",
+      "setup": "担当別FindingとEvidence",
+      "stimulus": "システムは複数modelの所見を重複と競合を保ったまま統合しなければならない",
+      "expected": "重複元と競合する全主張を逆引きできる／未解決競合がHumanへ提示される",
+      "negative_case": "統合元を追跡できない／競合が未表示のまま確定される"
+    },
+    {
+      "test_id": "AT-TRIAGE-003",
+      "requirement_id": "REQ-TRIAGE-003",
+      "oracle_type": "human",
+      "setup": "triage結果と判断候補／Humanの採用、拒否、保留判断／REQ-TRACE-005のOperational Provenance verdict",
+      "stimulus": "システムはFindingの最終採否をHuman判断として対象と内容へ束縛し、来歴関門通過後だけ確定しなければならない",
+      "expected": "判断recordが承認対象の内容Digestを保持し再計算値と一致する／採用、拒否、保留のHuman判断内容が対象Digestとは別フィールドで残る／Operational Provenance verdictが不合格ならFinding確定を拒否する",
+      "negative_case": "Human判断がない／判断対象が変更または不一致である／Operational Provenance verdictが不合格である"
+    },
+    {
+      "test_id": "AT-TRACE-001",
+      "requirement_id": "REQ-TRACE-001",
+      "oracle_type": "machine",
+      "setup": "意味単位、型付き関係、一次証拠参照",
+      "stimulus": "システムは意味単位と関係を閉じた語彙とID参照で決定的にたどれる形へ固定しなければならない",
+      "expected": "閉じた辺種別と存在するIDだけを保存できる／任意Findingから一次証拠へ決定的に到達できる",
+      "negative_case": "未定義IDまたは辺種別がある／自己参照または禁止循環がある"
+    },
+    {
+      "test_id": "AT-TRACE-002",
+      "requirement_id": "REQ-TRACE-002",
+      "oracle_type": "machine",
+      "setup": "上流義務と下流成果物／被覆対象母集合／非採用可能義務の閉じた種別とHuman判断",
+      "stimulus": "システムは上流義務と下流成果物を順逆追跡し、必須義務またはHumanが非採用を明示していない義務に受け先がなければ拒否しなければならない",
+      "expected": "必須義務は下流受け先なしを理由の有無にかかわらず拒否する／限定された非採用可能義務だけがHuman判断と対象Digest付きで非採用になる／順方向と逆方向の被覆結果が一致する",
+      "negative_case": "必須義務の未被覆がある／重複受け先がある／非採用種別、Human判断または対象Digestが欠ける"
+    },
+    {
+      "test_id": "AT-TRACE-003",
+      "requirement_id": "REQ-TRACE-003",
+      "oracle_type": "machine",
+      "setup": "共有Schemaと検査対象",
+      "stimulus": "システムは共有データ境界を決定的validatorでfail-closedに検査しなければならない",
+      "expected": "同一不正入力から同一診断が得られる／validator失敗後に成果を確定しない",
+      "negative_case": "Schema、参照、被覆またはDigest検査に失敗する"
+    },
+    {
+      "test_id": "AT-TRACE-004",
+      "requirement_id": "REQ-TRACE-004",
+      "oracle_type": "machine",
+      "setup": "固定した変更単位／版付き意味グラフ／関係種別ごとの閉じた影響閉包規則",
+      "stimulus": "システムは固定した変更単位、版付き意味関係および閉包規則からレビューの影響候補母集合を決定的に生成しなければならない",
+      "expected": "同じ変更単位、意味グラフおよび閉包規則から同じ影響候補母集合が得られる／未解決関係または閉包不能時にScopeへ母集合を渡さない",
+      "negative_case": "変更単位または関係参照が未解決である／閉包規則にない関係を暗黙採用する"
+    },
+    {
+      "test_id": "AT-TRACE-005",
+      "requirement_id": "REQ-TRACE-005",
+      "oracle_type": "machine",
+      "setup": "Review Taskから最終Findingまでの各段階identityと内容Digest／閉じたOperational Provenance辺種別",
+      "stimulus": "システムはReview Task入力から最終FindingまでのOperational Provenanceを必須の型付き辺と内容Digestで一続きに固定し検証verdictを生成しなければならない",
+      "expected": "Task、Context、effective execution、承認、Attempt、raw、Validation、Triage、Human判断、最終Findingの全段階がID、内容Digestおよび閉じた辺種別で結ばれる／任意の必須辺の欠落、不一致または未解決参照からfail-closed verdictが得られる／失敗Attemptと拒否・保留Findingもグラフに保持する",
+      "negative_case": "必須nodeまたは辺が欠ける／参照または内容Digestが不一致である"
+    },
+    {
+      "test_id": "AT-SESSION-001",
+      "requirement_id": "REQ-SESSION-001",
+      "oracle_type": "machine",
+      "setup": "利用者指示と探索範囲",
+      "stimulus": "システムは利用者が明示した範囲からセッション取込を安全に起動しなければならない",
+      "expected": "利用者が指定した範囲だけを取込む／取込なしでも通常作業を妨げない",
+      "negative_case": "探索範囲が不正または未承認である"
+    },
+    {
+      "test_id": "AT-SESSION-002",
+      "requirement_id": "REQ-SESSION-002",
+      "oracle_type": "machine",
+      "setup": "生ログと取込範囲／伏字化規則／REQ-PORTABLE-004を満たす分類別保存境界",
+      "stimulus": "システムは生ログ原本を共有隔離保存境界で保全し、伏字化した転写・要約・来歴へ一続きに変換しなければならない",
+      "expected": "raw範囲から転写を再生成し一致確認できる／raw原本と伏字化派生物へ別々のアクセス、retention、削除方針が適用される／機微情報残存時に派生物が通常境界へ保存されない",
+      "negative_case": "機微情報検査、アクセス境界、retention、削除方針または来歴照合に失敗する"
+    },
+    {
+      "test_id": "AT-SESSION-003",
+      "requirement_id": "REQ-SESSION-003",
+      "oracle_type": "machine",
+      "setup": "前回raw identityと現在ログ／転写・来歴",
+      "stimulus": "システムはセッション記録の追記と改変を区別し、転写変異を検出しなければならない",
+      "expected": "追記、非追記変更、消失を区別して検出する／既知変異で検査が失敗する",
+      "negative_case": "非追記変更または検証不能な消失がある"
+    },
+    {
+      "test_id": "AT-WORKFLOW-001",
+      "requirement_id": "REQ-WORKFLOW-001",
+      "oracle_type": "machine",
+      "setup": "open作業単位、選択規則、現在状態",
+      "stimulus": "システムは現在の作業対象、作業単位、backlogおよび進行段階を一意IDで結線しなければならない",
+      "expected": "複数open案件でも現在対象が一意になる／状態と作業単位をIDで逆引きできる",
+      "negative_case": "現在対象が0件または複数件になる"
+    },
+    {
+      "test_id": "AT-WORKFLOW-002",
+      "requirement_id": "REQ-WORKFLOW-002",
+      "oracle_type": "machine",
+      "setup": "現在の作業段階、要求action、関門結果／Harnessからの開始要求またはRun結果／REQ-TRACE-005のOperational Provenance verdict／REQ-PORTABLE-002を満たす状態保存境界",
+      "stimulus": "システムは作業段階とRun開始・完了許可の正本として許可遷移および関門を一貫した状態機械で管理しなければならない",
+      "expected": "許可遷移だけが状態を変更する／WorkflowのRun開始許可なしにHarnessが開始されない／Harnessから返るRun結果とOperational Provenance verdictを検証するまで完了段へ進まない",
+      "negative_case": "未定義遷移または関門未通過である／Harnessの開始要求またはRun結果がactive workと一致しない／Operational Provenance verdictが不合格である"
+    },
+    {
+      "test_id": "AT-WORKFLOW-003",
+      "requirement_id": "REQ-WORKFLOW-003",
+      "oracle_type": "machine",
+      "setup": "active work identity、書込み対象、承認action",
+      "stimulus": "システムは成果物書込みを進行中作業単位と承認actionへ束縛しなければならない",
+      "expected": "書込み対象がactive workの許可範囲と完全一致する／拒否書込みが成果物を変更しない",
+      "negative_case": "active workまたは対象が一致しない"
+    },
+    {
+      "test_id": "AT-WORKFLOW-004",
+      "requirement_id": "REQ-WORKFLOW-004",
+      "oracle_type": "machine",
+      "setup": "ReviewCompass3自身の固定成果物Target／通常のReview Task定義と関門",
+      "stimulus": "システムはReviewCompass3自身の成果物にも通常と同じReview Task契約、関門および来歴を適用できなければならない",
+      "expected": "ReviewCompass3自身の要求、設計、Taskまたは実装をTargetとして通常と同じContext、Harness、Triage、TraceおよびWorkflow契約でReview Taskを完了できる／自己対象を理由に関門、Validationまたは来歴を迂回できない",
+      "negative_case": "自己対象を理由に必須契約または関門を迂回する"
+    },
+    {
+      "test_id": "AT-PORTABLE-001",
+      "requirement_id": "REQ-PORTABLE-001",
+      "oracle_type": "machine",
+      "setup": "版、対象OS、最低version、filesystem特性、権限環境を持つsupported-platform matrix／利用者設定と成果物",
+      "stimulus": "システムは版付きsupported-platform matrixの全対象でリポジトリ、設定、データ、成果物の配置を移植可能に解決しなければならない",
+      "expected": "matrixの全環境で標準配置または明示設定から同じ論理区画を解決する／matrixに固定したfilesystem特性と権限条件で配置検査を再現できる／成果物内の未許可絶対パスを検出する",
+      "negative_case": "matrixが未固定または対象環境を一意に定めない／配置が所有境界外または未許可絶対パスを含む"
+    },
+    {
+      "test_id": "AT-PORTABLE-002",
+      "requirement_id": "REQ-PORTABLE-002",
+      "oracle_type": "machine",
+      "setup": "構造化成果物とSchema",
+      "stimulus": "システムは構造化成果物を共有境界で安全に読書きし、部分失敗から復旧できなければならない",
+      "expected": "部分書込み後も旧版が読める／不正構造を局所診断して上書きしない",
+      "negative_case": "parse、Schema、原子的保存に失敗する"
+    },
+    {
+      "test_id": "AT-PORTABLE-003",
+      "requirement_id": "REQ-PORTABLE-003",
+      "oracle_type": "machine",
+      "setup": "配布物、配置計画、所有対象一覧",
+      "stimulus": "システムは配布、導入、運用、解除を所有境界と利用者データ保護の下で実行しなければならない",
+      "expected": "導入前後と解除後の利用者データDigestが不変である／所有した設定・hook・schedulerだけを解除する",
+      "negative_case": "所有対象が曖昧または利用者データ変更を検出する"
+    },
+    {
+      "test_id": "AT-PORTABLE-004",
+      "requirement_id": "REQ-PORTABLE-004",
+      "oracle_type": "machine",
+      "setup": "保存物の分類と機微情報検査結果／主体identityとアクセス権限／保存形式、retentionおよび削除方針",
+      "stimulus": "システムは全機能の構造化成果物とraw記録に共通する機微情報保存境界を提供しなければならない",
+      "expected": "raw原本、伏字化派生物および値なし診断に別々のアクセス、retention、削除方針が適用される／未許可主体は機微情報を含む保存物を再読込できない／改変、期限切れおよび削除失敗を検出し診断する",
+      "negative_case": "保存物分類、アクセス境界、retentionまたは削除方針が欠ける／改変検出または権限検査に失敗する"
+    },
+    {
+      "test_id": "AT-EVAL-001",
+      "requirement_id": "REQ-EVAL-001",
+      "oracle_type": "hybrid",
+      "setup": "固定評価対象、基準、証拠",
+      "stimulus": "システムは固定対象へ明示基準を適用し、成果物と実装の適合性を証拠付きで評価しなければならない",
+      "expected": "対象、基準、入力identity、結果を相互に逆引きできる／固定材料変更時に旧評価をstaleとする",
+      "negative_case": "対象、基準、証拠が欠ける"
+    },
+    {
+      "test_id": "AT-EVAL-002",
+      "requirement_id": "REQ-EVAL-002",
+      "oracle_type": "hybrid",
+      "setup": "Harnessが不変記録した観測値／既知の母数と測定限界",
+      "stimulus": "システムは観測値へ評価基準を適用し、結果と解釈限界を分けて記録しなければならない",
+      "expected": "観測値、評価結果、解釈、限界が別フィールドで記録される／訂正済み実測値を旧要約より優先する",
+      "negative_case": "観測値の出所または母数を確認できない"
+    },
+    {
+      "test_id": "AT-EVAL-003",
+      "requirement_id": "REQ-EVAL-003",
+      "oracle_type": "hybrid",
+      "setup": "固定材料、評価基準、既知失敗例",
+      "stimulus": "システムは評価と分析を再現可能なpackageとして固定し、結果の限界を失ってはならない",
+      "expected": "同じ固定入力と基準から同じ機械評価が得られる／失敗例と限界を除外せず保存する",
+      "negative_case": "入力または基準identityが不一致である"
+    },
+    {
+      "test_id": "AT-IMPROVE-001",
+      "requirement_id": "REQ-IMPROVE-001",
+      "oracle_type": "machine",
+      "setup": "Review Runと運用の実測記録",
+      "stimulus": "システムは成功と失敗の実測を条件付き学習材料として蓄積しなければならない",
+      "expected": "成功と失敗の実測を元Runへ逆引きできる／入力条件の異なる測定を同一比較群にしない",
+      "negative_case": "元Runまたは条件identityへ結線できない"
+    },
+    {
+      "test_id": "AT-IMPROVE-002",
+      "requirement_id": "REQ-IMPROVE-002",
+      "oracle_type": "human",
+      "setup": "feedback ledger、改善候補、検証結果",
+      "stimulus": "システムは改善候補を検証し、Human承認を経た変更だけを次周期へ反映しなければならない",
+      "expected": "改善前後を固定条件で比較できる／Human承認前に現行方針を変更しない",
+      "negative_case": "検証不足、判断競合、Human承認なし"
+    }
+  ],
+  "validation": {
+    "contract": "tools/design/design_contract.py:validate_design_contract",
+    "digest": "1659d73f0725e3d7048968290aab1fd143faf66fa2b53f8a193ae0a828346c82",
+    "feature_count": 9,
+    "requirement_count": 37,
+    "acceptance_test_count": 37,
+    "boundary_count": 23,
+    "status": "complete"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "validated"
+}
