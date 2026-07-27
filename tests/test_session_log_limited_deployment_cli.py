@@ -71,6 +71,22 @@ class FakeBackend:
     )
 
 
+class FailingInstallBackend(FakeBackend):
+  def run(self, operation, request, *, dry_run=False):
+    if operation == "install" and not dry_run:
+      self.calls.append((operation, dry_run))
+      return self.result_type(
+        backend="launchd",
+        action="failed",
+        status="error",
+      )
+    return super().run(
+      operation,
+      request,
+      dry_run=dry_run,
+    )
+
+
 def test_limited_deployment_cli_dry_run_then_install_and_uninstall(
   tmp_path,
   capsys,
@@ -179,3 +195,46 @@ def test_limited_deployment_cli_rejects_unapproved_before_backend(
     "status": "failed",
   }
   assert backend.calls == []
+
+
+def test_limited_deployment_cli_rolls_back_completed_steps(
+  tmp_path,
+  capsys,
+):
+  raw_root = tmp_path / "raw"
+  raw_root.mkdir()
+  data_root = tmp_path / "data"
+  data_root.mkdir()
+  retained = data_root / "retained.txt"
+  retained.write_text("retain", encoding="utf-8")
+  approval_path = _write_approval(tmp_path)
+  backends = importlib.import_module(
+    "tools.session_logs.schedule_backends"
+  )
+  backend = FailingInstallBackend(
+    backends.ScheduleBackendResult
+  )
+  limited = importlib.import_module(
+    "tools.session_logs.limited_deployment"
+  )
+
+  assert limited.run(
+    ("install", "--approval", str(approval_path)),
+    backend_registry={"launchd": backend},
+    runtime_platform="darwin",
+  ) == 5
+
+  assert json.loads(capsys.readouterr().out) == {
+    "reason": "LimitedDeploymentError",
+    "rollback_status": "passed",
+    "rolled_back_step_count": 2,
+    "status": "failed",
+  }
+  assert backend.calls == [("install", False)]
+  assert not (
+    tmp_path / "config" / "session-logs.json"
+  ).exists()
+  assert json.loads((
+    tmp_path / "claude" / "settings.json"
+  ).read_text(encoding="utf-8")) == {}
+  assert retained.read_text(encoding="utf-8") == "retain"
