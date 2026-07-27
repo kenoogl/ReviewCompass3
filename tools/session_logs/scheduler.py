@@ -8,6 +8,7 @@ promotion_required: true
 import dataclasses
 import os
 import plistlib
+import subprocess
 from pathlib import Path
 
 
@@ -22,6 +23,13 @@ class ScheduleError(Exception):
 class ScheduleResult:
   action: str
   plist_path: Path
+
+
+@dataclasses.dataclass(frozen=True)
+class ActivationResult:
+  action: str
+  status: str
+  reason: object = None
 
 
 def _absolute_path(value):
@@ -151,3 +159,125 @@ def uninstall_launchd_schedule(
   except OSError as error:
     raise ScheduleError("Cannot uninstall launchd schedule") from error
   return ScheduleResult(action="uninstalled", plist_path=path)
+
+
+def _launchd_domain(uid):
+  if (
+    isinstance(uid, bool)
+    or not isinstance(uid, int)
+    or uid < 0
+  ):
+    raise ScheduleError("Unsafe launchd activation inputs")
+  return "gui/%d" % uid
+
+
+def _validate_owned_schedule(path):
+  plist_path = _absolute_path(path)
+  try:
+    settings = plistlib.loads(plist_path.read_bytes())
+  except (OSError, ValueError) as error:
+    raise ScheduleError("Cannot read launchd schedule") from error
+  arguments = settings.get("ProgramArguments")
+  expected_entry = str(
+    Path(__file__).with_name("entry.py").resolve()
+  )
+  if (
+    settings.get("Label") != LABEL
+    or not isinstance(arguments, list)
+    or len(arguments) < 3
+    or arguments[1:3] != [expected_entry, "preserve"]
+  ):
+    raise ScheduleError("Unowned launchd schedule")
+  return plist_path
+
+
+def _run_launchctl(runner, command):
+  try:
+    return runner(
+      command,
+      capture_output=True,
+      check=False,
+      text=True,
+    )
+  except Exception as error:
+    raise ScheduleError("Cannot execute launchctl") from error
+
+
+def _is_running(domain, runner):
+  result = _run_launchctl(
+    runner,
+    [
+      "/bin/launchctl",
+      "print",
+      "%s/%s" % (domain, LABEL),
+    ],
+  )
+  return result.returncode == 0
+
+
+def activate_launchd_schedule(
+  plist_path,
+  *,
+  uid,
+  runner=subprocess.run,
+) -> ActivationResult:
+  path = _validate_owned_schedule(plist_path)
+  domain = _launchd_domain(uid)
+  if _is_running(domain, runner):
+    return ActivationResult(
+      action="unchanged",
+      status="running",
+    )
+  result = _run_launchctl(
+    runner,
+    [
+      "/bin/launchctl",
+      "bootstrap",
+      domain,
+      str(path),
+    ],
+  )
+  if result.returncode != 0:
+    return ActivationResult(
+      action="failed",
+      status="stopped",
+      reason="exit_code_%d" % result.returncode,
+    )
+  return ActivationResult(
+    action="activated",
+    status="running",
+  )
+
+
+def deactivate_launchd_schedule(
+  plist_path,
+  *,
+  uid,
+  runner=subprocess.run,
+) -> ActivationResult:
+  path = _validate_owned_schedule(plist_path)
+  domain = _launchd_domain(uid)
+  if not _is_running(domain, runner):
+    return ActivationResult(
+      action="unchanged",
+      status="stopped",
+    )
+  result = _run_launchctl(
+    runner,
+    [
+      "/bin/launchctl",
+      "bootout",
+      domain,
+      str(path),
+    ],
+  )
+  if result.returncode != 0:
+    return ActivationResult(
+      action="failed",
+      status="running",
+      reason="exit_code_%d" % result.returncode,
+    )
+  return ActivationResult(
+    action="deactivated",
+    status="stopped",
+  )
