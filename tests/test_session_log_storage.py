@@ -7,6 +7,8 @@ promotion_required: true
 
 import importlib
 import json
+import os
+import time
 
 import pytest
 
@@ -204,3 +206,52 @@ def test_restores_all_artifacts_when_atomic_replace_fails(tmp_path, monkeypatch)
 
   assert {path: path.read_bytes() for path in before} == before
   assert tuple(tmp_path.rglob("*.tmp")) == ()
+
+
+def test_storage_lock_preserves_active_work_and_reclaims_stale_lock(
+  tmp_path,
+):
+  raw_root = tmp_path / "raw"
+  raw_log = raw_root / "session.jsonl"
+  raw_root.mkdir()
+  transcript_root = tmp_path / "transcripts"
+  summary_root = tmp_path / "summaries"
+  provenance_root = tmp_path / "provenance"
+  _write_records(raw_log, (_record("user-1", "user", "First."),))
+
+  pipeline = importlib.import_module("tools.session_logs.pipeline")
+  storage = importlib.import_module("tools.session_logs.storage")
+  artifact = pipeline.prepare_artifact(
+    raw_log,
+    raw_root=raw_root,
+    rules=(),
+    tool_version="0.0.1",
+  )
+  lock_path = provenance_root / "session.json.lock"
+  lock_path.parent.mkdir(parents=True)
+  lock_path.write_text("active\n", encoding="utf-8")
+
+  with pytest.raises(storage.StorageLocked):
+    storage.store_artifact(
+      artifact,
+      transcript_root=transcript_root,
+      summary_root=summary_root,
+      provenance_root=provenance_root,
+      lock_timeout_seconds=60,
+    )
+
+  assert lock_path.is_file()
+  assert not (transcript_root / "session.md").exists()
+
+  stale_time = time.time() - 120
+  os.utime(lock_path, (stale_time, stale_time))
+  stored = storage.store_artifact(
+    artifact,
+    transcript_root=transcript_root,
+    summary_root=summary_root,
+    provenance_root=provenance_root,
+    lock_timeout_seconds=60,
+  )
+
+  assert stored.action == "created"
+  assert not lock_path.exists()
