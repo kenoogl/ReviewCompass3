@@ -119,3 +119,55 @@ def test_blocks_unknown_shape_parse_failure_and_stale_provenance():
       "unknown_semantic_shape",
     ),
   )
+
+
+def test_classifies_versioned_review_observations_and_scoped_approvals():
+  structured = importlib.import_module(
+    "tools.extraction.structured_materials"
+  )
+  documents = {
+    "source:.reviewcompass/specs/f/reviews/run/sensitivity-check.yaml": (
+      "schema_version: v1\n"
+      "check_mode: independent\n"
+      "results: []\n"
+      "verdict: pass\n"
+    ),
+    "source:.reviewcompass/specs/f/reviews/run/observation.yaml": (
+      "schema_version: v1\n"
+      "status: complete\n"
+      "method_findings: []\n"
+      "triage: []\n"
+    ),
+    "source:.reviewcompass/specs/f/reviews/run/exception-approval.yaml": (
+      "schema_version: v1\n"
+      "approved_by: user\n"
+      "approved_deviation: append_record\n"
+      "approval_scope: one_run\n"
+    ),
+  }
+
+  result = structured.classify_structured_materials(
+    documents,
+    _provenance(documents),
+  )
+
+  assert result.status == "complete"
+  assert tuple(
+    (item.identifier, item.kind)
+    for item in result.items
+  ) == (
+    (
+      "source:.reviewcompass/specs/f/reviews/run/"
+      "exception-approval.yaml",
+      "approval",
+    ),
+    (
+      "source:.reviewcompass/specs/f/reviews/run/observation.yaml",
+      "generated_evidence",
+    ),
+    (
+      "source:.reviewcompass/specs/f/reviews/run/"
+      "sensitivity-check.yaml",
+      "generated_evidence",
+    ),
+  )
