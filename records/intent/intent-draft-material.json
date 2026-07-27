@@ -1,20 +1,37 @@
 {
   "approval_candidate": {
     "approved": false,
-    "material_digest": "5ad49ff24cd8d0285f60767f10a47bbab809a0a0dc6c0db38b032fdaf914aca6",
+    "material_digest": "d3983a4f74014b5c4185524dd8b49e354f47315c0173ae5878a2f198e9785ae8",
     "target": "reviewcompass3_intent"
   },
   "draft": {
     "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
-    "sha256": "593d7bc205a0d7b35c8ad07d4c80df7f78eb8941f3a2966d604eaaa5372587f3"
+    "sha256": "68c7c8088c442c0b2d743b1b061af0473f5c98ffbbf64311c7cb75575d2722c5"
   },
   "input": {
     "approved_item_count": 47,
+    "human_direction": [
+      {
+        "identifier": "INT-DIR-001",
+        "statement": "LLMは意味判断と文章読解に限定し、その他の処理は機械が担う",
+        "status": "confirmed"
+      },
+      {
+        "identifier": "INT-DIR-002",
+        "statement": "主な利用者はSDDを行う単独の開発者とする",
+        "status": "confirmed"
+      }
+    ],
     "ledger_audit_digest": "26ec3986a8b2717fc12ce6e7b9bdb20ef6c27c4eb138a45b553814a218194ec8",
-    "ledger_digest": "6b6b4220117b6426be67b273ac151684579e0baa11041d19f37ff440d165849e"
+    "ledger_digest": "6b6b4220117b6426be67b273ac151684579e0baa11041d19f37ff440d165849e",
+    "reference_review": {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "path": ".reviewcompass/specs/intent.md",
+      "role": "non_normative_candidate_source"
+    }
   },
   "lifecycle": "provisional",
-  "material_digest": "5ad49ff24cd8d0285f60767f10a47bbab809a0a0dc6c0db38b032fdaf914aca6",
+  "material_digest": "d3983a4f74014b5c4185524dd8b49e354f47315c0173ae5878a2f198e9785ae8",
   "normative_status": "non-normative",
   "promotion_required": true,
   "record_version": 1,
