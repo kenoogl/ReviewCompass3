@@ -131,3 +131,91 @@ def test_builds_installable_commands_and_runs_fixed_phase_entry(
     "--config",
     str(config_path),
   )) == 0
+
+
+def test_hook_records_safe_outcomes_without_propagating_failures(
+  tmp_path,
+):
+  missing_config = tmp_path / "missing-secret-config.json"
+  event_log = tmp_path / "private-events" / "hooks.jsonl"
+  hooks = importlib.import_module("tools.session_logs.hooks")
+
+  start_result = hooks.run_start_hook(
+    missing_config,
+    event_log_path=event_log,
+  )
+  end_result = hooks.run_end_hook(
+    missing_config,
+    event_log_path=event_log,
+  )
+
+  assert start_result == hooks.HookResult(
+    action="failed",
+    exit_code=0,
+    operation_exit_code=5,
+  )
+  assert end_result == hooks.HookResult(
+    action="failed",
+    exit_code=0,
+    operation_exit_code=5,
+  )
+  events = tuple(
+    json.loads(line)
+    for line in event_log.read_text(encoding="utf-8").splitlines()
+  )
+  assert events == (
+    {
+      "action": "failed",
+      "phase": "start",
+      "reason": "exit_code_5",
+      "status": "failed",
+    },
+    {
+      "action": "failed",
+      "phase": "end",
+      "reason": "exit_code_5",
+      "status": "failed",
+    },
+  )
+  assert "missing-secret-config" not in event_log.read_text(
+    encoding="utf-8"
+  )
+
+
+def test_hook_records_completed_only_after_success(tmp_path, capsys):
+  config_path = _write_setup(tmp_path)
+  event_log = tmp_path / "private-events" / "hooks.jsonl"
+  hooks = importlib.import_module("tools.session_logs.hooks")
+
+  assert hooks.run((
+    "start",
+    "--config",
+    str(config_path),
+    "--event-log",
+    str(event_log),
+  )) == 0
+  capsys.readouterr()
+  assert hooks.run((
+    "end",
+    "--config",
+    str(config_path),
+    "--event-log",
+    str(event_log),
+  )) == 0
+
+  events = tuple(
+    json.loads(line)
+    for line in event_log.read_text(encoding="utf-8").splitlines()
+  )
+  assert events == (
+    {
+      "action": "checked",
+      "phase": "start",
+      "status": "completed",
+    },
+    {
+      "action": "stored",
+      "phase": "end",
+      "status": "completed",
+    },
+  )
