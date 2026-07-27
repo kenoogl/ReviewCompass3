@@ -1,0 +1,42 @@
+{
+  "audit": {
+    "approval_candidate": null,
+    "covered_count": 1090,
+    "digest": "acd2b1b3352dbd31fc683c22129d4e1bc30599ac4618dea47170c47466ca8848",
+    "newly_covered_count": 0,
+    "prior_covered_count": 1090,
+    "status": "blocked",
+    "uncovered_count": 17602,
+    "unresolved_count": 17604
+  },
+  "decision": {
+    "approval": {
+      "approved": true,
+      "material_digest": "f95a1d3485e86ac8e7f239012dba738492387c44476d6b132e9641b275213745",
+      "selected_disposition": "redesign",
+      "target_id": "ESS-0012"
+    },
+    "destination": "workflow.active_work_selection",
+    "digest": "24e37df4e45c1940a734a45fb6c3d4711f3c6625a7e5ab291ae2895c8b3d57df",
+    "evidence": [
+      "ReviewCompass2:docs/design/2026-07-25-current-advantages-inventory.md#L71-L83",
+      "ReviewCompass2:docs/design/2026-07-25-user-decisions-inventory.md#L214"
+    ],
+    "identifier": "ESS-0012",
+    "material_digest": "f95a1d3485e86ac8e7f239012dba738492387c44476d6b132e9641b275213745",
+    "rationale": "旧stack実装へ固定せず複数open案件でも決定性を保てる",
+    "selected_disposition": "redesign",
+    "statement": "現在の作業対象を決定する規則として再設計する",
+    "status": "resolved"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "prior_audit_digest": "3b3cbd267cc427a874a39af74d356915fca3f64de5eab07e2a6e793343725bd8",
+  "promotion_required": true,
+  "record_version": 1,
+  "remaining_follow_up_ids": [
+    "ESS-0001",
+    "ESS-0008"
+  ],
+  "status": "blocked"
+}
