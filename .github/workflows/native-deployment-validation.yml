@@ -31,9 +31,14 @@ jobs:
       - name: Validate installed entry
         shell: bash
         run: reviewcompass3-session-logs validate-native --check package --evidence "${{ runner.temp }}/native-package.json"
+      - name: Validate native deployment paths
+        shell: bash
+        run: reviewcompass3-session-logs validate-native --check paths --project-root "${{ github.workspace }}" --raw-root "${{ runner.temp }}/raw" --evidence "${{ runner.temp }}/native-paths.json"
       - name: Upload value-free evidence
         uses: actions/upload-artifact@v4
         with:
           name: native-package-${{ runner.os }}-${{ matrix.python-version }}
-          path: ${{ runner.temp }}/native-package.json
+          path: |
+            ${{ runner.temp }}/native-package.json
+            ${{ runner.temp }}/native-paths.json
           if-no-files-found: error
