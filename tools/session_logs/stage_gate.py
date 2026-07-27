@@ -25,8 +25,9 @@ REQUIRED_GATES = (
 
 REQUIRED_EXTERNAL_CHECKS = (
   "private_real_log_validation",
-  "stage_zero_user_approval",
+  "native_three_os_deployment_validation",
   "user_environment_hook_schedule",
+  "stage_zero_user_approval",
 )
 
 

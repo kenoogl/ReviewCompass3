@@ -6,6 +6,12 @@
       ],
       "status": "passed"
     },
+    "native_three_os_deployment_validation": {
+      "evidence_paths": [
+        "records/stage-zero/native-deployment-validation.json"
+      ],
+      "status": "pending"
+    },
     "stage_zero_user_approval": {
       "status": "pending"
     },
