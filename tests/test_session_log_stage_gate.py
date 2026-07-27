@@ -19,7 +19,7 @@ EVIDENCE_PATH = (
 )
 
 
-def test_stage_zero_gate_maps_evidence_and_blocks_pending_external_checks(
+def test_stage_zero_gate_maps_evidence_and_is_ready(
   tmp_path,
   capsys,
 ):
@@ -27,12 +27,10 @@ def test_stage_zero_gate_maps_evidence_and_blocks_pending_external_checks(
 
   result = gate.audit_stage_zero(EVIDENCE_PATH)
 
-  assert result.status == "blocked"
+  assert result.status == "ready"
   assert result.required_gate_count == 8
   assert result.passed_gate_count == 8
-  assert result.unresolved == (
-    "stage_zero_user_approval",
-  )
+  assert result.unresolved == ()
   assert tuple(result.gates) == gate.REQUIRED_GATES
   for gate_result in result.gates.values():
     assert gate_result["status"] == "passed"
@@ -48,10 +46,10 @@ def test_stage_zero_gate_maps_evidence_and_blocks_pending_external_checks(
     str(EVIDENCE_PATH),
     "--report",
     str(report_path),
-  )) == 11
+  )) == 0
   output = json.loads(capsys.readouterr().out)
   assert output == json.loads(report_path.read_text(encoding="utf-8"))
-  assert output["status"] == "blocked"
+  assert output["status"] == "ready"
   assert output["passed_gate_count"] == 8
   assert output["required_gate_count"] == 8
   assert output["unresolved"] == list(result.unresolved)
@@ -91,6 +89,24 @@ def test_stage_zero_gate_maps_evidence_and_blocks_pending_external_checks(
     "after_file_count": 652,
     "before_file_count": 652,
     "digest_match": True,
+    "status": "passed",
+  }
+
+  approval_check = evidence["external_checks"][
+    "stage_zero_user_approval"
+  ]
+  assert approval_check["status"] == "passed"
+  approval_evidence = json.loads((
+    REPOSITORY_ROOT
+    / approval_check["evidence_paths"][0]
+  ).read_text(encoding="utf-8"))
+  assert approval_evidence == {
+    "approval": "explicit",
+    "approved_at": "2026-07-27",
+    "lifecycle": "provisional",
+    "normative_status": "non-normative",
+    "promotion_required": True,
+    "stage": "stage_zero",
     "status": "passed",
   }
 
