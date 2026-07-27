@@ -9,6 +9,13 @@ import importlib
 import json
 
 
+def _read_json_lines(capsys):
+  return tuple(
+    json.loads(line)
+    for line in capsys.readouterr().out.splitlines()
+  )
+
+
 def _write_config(tmp_path):
   config_path = tmp_path / "session-logs.json"
   config_path.write_text(
@@ -353,3 +360,98 @@ def test_cli_lists_and_restores_only_explicit_safe_backup_path(
     "../escape.jsonl",
   )) == 5
   assert not (tmp_path / "escape.jsonl").exists()
+
+
+def test_cli_json_lines_unifies_processing_modes_without_log_values(
+  tmp_path,
+  capsys,
+):
+  raw_log = tmp_path / "raw" / "session.jsonl"
+  secret_text = "Review text must not appear in CLI output."
+  _write_event(raw_log, text=secret_text)
+  config_path = _write_config(tmp_path)
+  config = json.loads(config_path.read_text(encoding="utf-8"))
+  config.update({
+    "backup_root": "private-backup",
+    "preservation_enabled": True,
+  })
+  config_path.write_text(json.dumps(config), encoding="utf-8")
+  cli = importlib.import_module("tools.session_logs.cli")
+
+  invocations = (
+    ((), "process", "created"),
+    (("--dry-run",), "dry-run", "planned"),
+    (("--preserve-only",), "preserve", "unchanged"),
+    (("--verify",), "verify", "matches"),
+  )
+  for mode_args, mode_name, action in invocations:
+    assert cli.run((
+      "--config",
+      str(config_path),
+      "--json-lines",
+      *mode_args,
+    )) == 0
+    result, summary = _read_json_lines(capsys)
+    assert result == {
+      "action": action,
+      "kind": "result",
+      "mode": mode_name,
+      "source_path": "session.jsonl",
+      "status": "ok",
+    }
+    assert summary == {
+      "counts": {
+        "failed": 0,
+        "preserved": 0,
+        "succeeded": 1,
+      },
+      "kind": "summary",
+      "mode": mode_name,
+      "status": "ok",
+    }
+    assert secret_text not in json.dumps((result, summary))
+
+
+def test_cli_json_lines_aggregates_success_and_failure_safely(
+  tmp_path,
+  capsys,
+):
+  _write_event(tmp_path / "raw" / "accepted.jsonl")
+  unsupported = tmp_path / "raw" / "unsupported.jsonl"
+  unsupported.write_text("{}\n", encoding="utf-8")
+  config_path = _write_config(tmp_path)
+  cli = importlib.import_module("tools.session_logs.cli")
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--dry-run",
+    "--json-lines",
+  )) == 4
+
+  accepted, rejected, summary = _read_json_lines(capsys)
+  assert accepted == {
+    "action": "planned",
+    "kind": "result",
+    "mode": "dry-run",
+    "source_path": "accepted.jsonl",
+    "status": "ok",
+  }
+  assert rejected == {
+    "action": "unsupported",
+    "kind": "result",
+    "mode": "dry-run",
+    "reason": "UnsupportedSourceKind",
+    "source_path": "unsupported.jsonl",
+    "status": "error",
+  }
+  assert summary == {
+    "counts": {
+      "failed": 1,
+      "preserved": 0,
+      "succeeded": 1,
+    },
+    "kind": "summary",
+    "mode": "dry-run",
+    "status": "partial",
+  }
