@@ -9,6 +9,40 @@ import importlib
 import json
 
 
+def _write_config(tmp_path):
+  config_path = tmp_path / "session-logs.json"
+  config_path.write_text(
+    json.dumps({
+      "raw_root": "raw",
+      "transcript_root": "transcripts",
+      "summary_root": "summaries",
+      "provenance_root": "provenance",
+      "sensitive_report_root": "sensitive-reports",
+      "tool_version": "0.0.1",
+      "redaction_rules": [],
+      "allow_patterns": [],
+    }),
+    encoding="utf-8",
+  )
+  return config_path
+
+
+def _write_event(path, event_id="user-1", text="Review this."):
+  path.parent.mkdir(parents=True, exist_ok=True)
+  path.write_text(
+    json.dumps({
+      "uuid": event_id,
+      "type": "user",
+      "sessionId": "session-1",
+      "message": {
+        "role": "user",
+        "content": text,
+      },
+    }) + "\n",
+    encoding="utf-8",
+  )
+
+
 def test_cli_loads_config_and_stores_all_discovered_logs(tmp_path):
   raw_log = tmp_path / "raw" / "nested" / "session.jsonl"
   raw_log.parent.mkdir(parents=True)
@@ -98,3 +132,52 @@ def test_cli_writes_safe_report_and_no_artifacts_on_sensitive_data(tmp_path):
   report_path = tmp_path / "sensitive-reports" / "session.json"
   assert report_path.is_file()
   assert secret not in report_path.read_text(encoding="utf-8")
+
+
+def test_cli_dry_run_reports_plan_without_writing_artifacts(
+  tmp_path,
+  capsys,
+):
+  raw_log = tmp_path / "raw" / "nested" / "session.jsonl"
+  _write_event(raw_log)
+  config_path = _write_config(tmp_path)
+  cli = importlib.import_module("tools.session_logs.cli")
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--dry-run",
+  )) == 0
+
+  assert capsys.readouterr().out == "planned nested/session.jsonl\n"
+  assert not (tmp_path / "transcripts").exists()
+  assert not (tmp_path / "summaries").exists()
+  assert not (tmp_path / "provenance").exists()
+
+
+def test_cli_distinguishes_no_targets_and_general_failure(tmp_path):
+  raw_root = tmp_path / "raw"
+  raw_root.mkdir()
+  config_path = _write_config(tmp_path)
+  cli = importlib.import_module("tools.session_logs.cli")
+
+  assert cli.run(("--config", str(config_path))) == 3
+
+  raw_root.rmdir()
+
+  assert cli.run(("--config", str(config_path))) == 5
+
+
+def test_cli_continues_after_unsupported_log_and_reports_exit_value(
+  tmp_path,
+):
+  _write_event(tmp_path / "raw" / "accepted.jsonl")
+  unsupported = tmp_path / "raw" / "unsupported.jsonl"
+  unsupported.write_text("{}\n", encoding="utf-8")
+  config_path = _write_config(tmp_path)
+  cli = importlib.import_module("tools.session_logs.cli")
+
+  assert cli.run(("--config", str(config_path))) == 4
+
+  assert (tmp_path / "transcripts" / "accepted.md").is_file()
+  assert not (tmp_path / "transcripts" / "unsupported.md").exists()
