@@ -194,3 +194,62 @@ def test_rejects_out_of_feature_or_uncovered_essence():
       allowed_essence_ids=("ESS-0003", "ESS-0005"),
       required_essence_ids=("ESS-0003",),
     )
+
+
+def _obligation_record(**overrides):
+  value = {
+    "obligation_id": "REQ-RUNTIME-001#statement",
+    "requirement_id": "REQ-RUNTIME-001",
+    "intent_refs": ("INT-PRODUCT",),
+    "essence_ids": ("ESS-0003",),
+    "rationale": "要件本文をTask Runtimeの目的へ結ぶため",
+  }
+  value.update(overrides)
+  return value
+
+
+def test_requires_source_relation_for_every_obligation_scope():
+  source_trace = importlib.import_module(
+    "tools.requirements.source_trace"
+  )
+
+  with pytest.raises(source_trace.RequirementSourceTraceError):
+    source_trace.validate_obligation_sources(
+      records=(_obligation_record(),),
+      required_obligation_ids=(
+        "REQ-RUNTIME-001#statement",
+        "REQ-RUNTIME-001#inputs",
+      ),
+      defined_requirement_ids=("REQ-RUNTIME-001",),
+      defined_intent_ids=("INT-PRODUCT",),
+      defined_essence_ids=("ESS-0003",),
+    )
+
+
+@pytest.mark.parametrize(
+  "record",
+  (
+    _obligation_record(
+      obligation_id="REQ-RUNTIME-001#unknown",
+    ),
+    _obligation_record(requirement_id="REQ-UNKNOWN-001"),
+    _obligation_record(intent_refs=("INT-UNKNOWN",)),
+    _obligation_record(essence_ids=("ESS-9999",)),
+    _obligation_record(rationale=""),
+  ),
+)
+def test_rejects_unresolved_obligation_source(record):
+  source_trace = importlib.import_module(
+    "tools.requirements.source_trace"
+  )
+
+  with pytest.raises(source_trace.RequirementSourceTraceError):
+    source_trace.validate_obligation_sources(
+      records=(record,),
+      required_obligation_ids=(
+        "REQ-RUNTIME-001#statement",
+      ),
+      defined_requirement_ids=("REQ-RUNTIME-001",),
+      defined_intent_ids=("INT-PRODUCT",),
+      defined_essence_ids=("ESS-0003",),
+    )
