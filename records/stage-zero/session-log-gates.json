@@ -13,7 +13,10 @@
       "status": "passed"
     },
     "stage_zero_user_approval": {
-      "status": "pending"
+      "evidence_paths": [
+        "records/stage-zero/stage-zero-user-approval.json"
+      ],
+      "status": "passed"
     },
     "user_environment_hook_schedule": {
       "evidence_paths": [
