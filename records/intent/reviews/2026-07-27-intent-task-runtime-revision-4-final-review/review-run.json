@@ -1,0 +1,143 @@
+{
+  "approval_assessment": {
+    "eligible": false,
+    "reason": "外部送信のHuman承認境界に未解決warningが2件ある",
+    "target": "reviewcompass3_intent_revision_4"
+  },
+  "consolidated_findings": [
+    {
+      "document": "cross",
+      "id": "R4-001",
+      "prior_finding": "R3-002",
+      "recommendation": "Provider、API endpoint、account、regionなどの論理的な送信先identityをHarness contract、effective execution identity、Human承認へ束縛し、各Attemptで実接続先との一致を送信前検査する。request ID、時刻、一時的network addressだけをAttempt固有metadataとして扱う。",
+      "relation": "residual",
+      "severity": "warning",
+      "source_findings": [
+        "AT4F-002",
+        "TR4F-001"
+      ],
+      "source_relations": [
+        "regression",
+        "residual"
+      ],
+      "status": "recommended_accept",
+      "summary": "承認済み送信先identityと各Attemptの実接続先の一致関門がない"
+    },
+    {
+      "document": "concept",
+      "id": "R4-002",
+      "prior_finding": null,
+      "recommendation": "承認前にcandidate serialized payload Digestをeffective execution identityへ含め、機微情報検査結果とHumanの承認・拒否を状態付き来歴として束縛する。承認済みの場合だけAttemptを許可する。",
+      "relation": "new",
+      "severity": "warning",
+      "source_findings": [
+        "AT4F-001"
+      ],
+      "source_relations": [
+        "new"
+      ],
+      "status": "recommended_accept",
+      "summary": "承認前または拒否時のcandidate payload identityと来歴単位がない"
+    }
+  ],
+  "lifecycle": "provisional",
+  "material": {
+    "artifacts": [
+      {
+        "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+        "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+      },
+      {
+        "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+        "sha256": "69a20ce0b59179c4d6757fa88e8d75bf53a4c2dac19472f5d4e333945c364308"
+      },
+      {
+        "path": "records/intent/task-runtime-current-implementation-evidence.json",
+        "sha256": "0d7def6b0c58cd176bd2e2c75ea574d69095acc7aa00f71e9b6683dbba79fb82"
+      },
+      {
+        "path": "records/intent/task-runtime-current-implementation-verification-2.json",
+        "sha256": "9b7080d3ebb701bcb7a78618013eee592eb812ce5318b5a29cf5923196040897"
+      }
+    ],
+    "material_digest": "e718154a843dd3813602a43557c212a1c9487c1fccf4c1fa30b02388a307011d",
+    "record": "records/intent/intent-draft-material-revision-4.json",
+    "record_sha256": "9dddcaea7b8777b19d832465850fe5c451eb6dc6fbed6979c6589a62755d98da"
+  },
+  "normative_status": "non-normative",
+  "prior_finding_status": {
+    "conflicting_reviewer_judgments": [
+      {
+        "final_status": "remaining",
+        "id": "R3-002",
+        "reviewer_statuses": [
+          "remaining",
+          "resolved"
+        ]
+      }
+    ],
+    "remaining": [
+      "R3-002"
+    ],
+    "resolved": [
+      "R3-001",
+      "R3-003"
+    ]
+  },
+  "promotion_required": true,
+  "record_version": 1,
+  "reviewers": [
+    {
+      "finding_count": 0,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-revision-4-final-review/intent-scope.raw.json",
+      "raw_sha256": "e3be271b98115c58d7e16b07e7a16c79118ddc9fc84ef1f3ffcf0f2d7c95162c",
+      "role": "intent_scope_revision_4_final",
+      "verdict": "pass"
+    },
+    {
+      "finding_count": 1,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-revision-4-final-review/task-runtime.raw.json",
+      "raw_sha256": "df31dc2dc499c9c265345b68a42db414975fe22c163bf6815a3f5b3922dde9ac",
+      "role": "task_runtime_revision_4_final",
+      "verdict": "findings"
+    },
+    {
+      "finding_count": 2,
+      "raw_path": "records/intent/reviews/2026-07-27-intent-task-runtime-revision-4-final-review/adversarial-traceability.raw.json",
+      "raw_sha256": "3f174039995b937802cbcab1d5ecddb2ed9836394e5a420e7393bdde9c93faa1",
+      "role": "adversarial_traceability_revision_4_final",
+      "verdict": "findings"
+    }
+  ],
+  "status": "awaiting_user_decision",
+  "summary": {
+    "consolidated_error": 0,
+    "consolidated_finding_count": 2,
+    "consolidated_warning": 2,
+    "new": 1,
+    "prior_remaining": 1,
+    "prior_resolved": 2,
+    "residual": 1,
+    "reviewer_count": 3,
+    "source_error": 0,
+    "source_finding_count": 3,
+    "source_warning": 3
+  },
+  "triage": {
+    "source_finding_coverage": {
+      "mapped": 3,
+      "unmapped": 0
+    },
+    "status": "completed",
+    "user_decision": "pending"
+  },
+  "validation": {
+    "artifact_sha256_match": true,
+    "material_digest_match": true,
+    "prior_finding_coverage": 3,
+    "raw_json_parse": "passed",
+    "reviewer_role_match": true,
+    "schema_version_match": true,
+    "unique_finding_ids": true
+  }
+}
