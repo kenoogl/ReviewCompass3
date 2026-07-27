@@ -113,6 +113,98 @@ def _parse_item(record_type, item, line_no, issues) -> tuple:
       block_index=0,
     ),)
 
+  if item_type == "mcp_tool_call":
+    name = "mcp:%s/%s" % (
+      item.get("server", ""),
+      item.get("tool", ""),
+    )
+    if record_type == "item.started":
+      return (ToolCall(
+        event_id=item_id,
+        call_id=item_id,
+        name=name,
+        arguments=item.get("arguments", {}),
+        line_no=line_no,
+        block_index=0,
+      ),)
+    if record_type == "item.completed":
+      error = item.get("error")
+      return (ToolResult(
+        event_id=item_id,
+        call_id=item_id,
+        text=_output_text(
+          error if error is not None else item.get("result")
+        ),
+        is_error=(
+          item.get("status") != "completed"
+          or error is not None
+        ),
+        line_no=line_no,
+        block_index=0,
+      ),)
+
+  if (
+    record_type == "item.completed"
+    and item_type == "file_change"
+  ):
+    changes = item.get("changes", [])
+    status = item.get("status")
+    return (
+      ToolCall(
+        event_id=item_id,
+        call_id=item_id,
+        name="file_change",
+        arguments={"changes": changes},
+        line_no=line_no,
+        block_index=0,
+      ),
+      ToolResult(
+        event_id=item_id,
+        call_id=item_id,
+        text=str(status),
+        is_error=status != "completed",
+        line_no=line_no,
+        block_index=1,
+      ),
+    )
+
+  if item_type == "web_search":
+    if record_type == "item.started":
+      return (ToolCall(
+        event_id=item_id,
+        call_id=item_id,
+        name="web_search",
+        arguments={
+          "query": item.get("query", ""),
+          "action": item.get("action"),
+        },
+        line_no=line_no,
+        block_index=0,
+      ),)
+    if record_type == "item.completed":
+      return (ToolResult(
+        event_id=item_id,
+        call_id=item_id,
+        text=_output_text(item.get("action")),
+        is_error=False,
+        line_no=line_no,
+        block_index=0,
+      ),)
+
+  if item_type == "todo_list":
+    todo_lines = []
+    for todo in item.get("items", []):
+      if not isinstance(todo, dict):
+        continue
+      marker = "x" if todo.get("completed") else " "
+      todo_lines.append("[%s] %s" % (marker, todo.get("text", "")))
+    return (Event(
+      event_id=item_id,
+      role="plan",
+      text="\n".join(todo_lines),
+      line_no=line_no,
+    ),)
+
   issues.append(ParseIssue(
     kind="unsupported_item",
     line_no=line_no,
@@ -151,7 +243,11 @@ def _parse_lines(lines) -> ParseResult:
       "turn.failed",
     ):
       continue
-    if record_type in ("item.started", "item.completed"):
+    if record_type in (
+      "item.started",
+      "item.updated",
+      "item.completed",
+    ):
       events.extend(_parse_item(
         record_type,
         record.get("item"),
