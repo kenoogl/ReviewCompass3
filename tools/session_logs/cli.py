@@ -15,7 +15,10 @@ from tools.session_logs.pipeline import (
   UnsupportedSourceKind,
   prepare_artifact,
 )
-from tools.session_logs.preservation import preserve_raw_log
+from tools.session_logs.preservation import (
+  preserve_raw_log,
+  restore_raw_log,
+)
 from tools.session_logs.provenance import Provenance
 from tools.session_logs.redaction import (
   SensitiveDataRemaining,
@@ -36,6 +39,7 @@ EXIT_FAILED = 5
 EXIT_PRESERVATION_FAILED = 6
 EXIT_VERIFICATION_MISMATCH = 7
 EXIT_REGENERATION_FAILED = 8
+EXIT_RESTORE_PRESERVED = 9
 
 
 def _print_json(payload):
@@ -104,9 +108,45 @@ def run(argv=None) -> int:
   mode.add_argument("--dry-run", action="store_true")
   mode.add_argument("--verify", action="store_true")
   mode.add_argument("--preserve-only", action="store_true")
+  mode.add_argument("--list-backups", action="store_true")
+  mode.add_argument("--restore")
   args = parser.parse_args(argv)
   try:
     config = load_config(args.config)
+  except Exception:
+    return EXIT_FAILED
+
+  if args.list_backups:
+    if config.backup_root is None:
+      return EXIT_FAILED
+    try:
+      backup_paths = discover_raw_logs(config.backup_root)
+    except Exception:
+      return EXIT_FAILED
+    if not backup_paths:
+      return EXIT_NO_TARGETS
+    for backup_path in backup_paths:
+      print(Path(backup_path).as_posix())
+    return EXIT_OK
+
+  if args.restore is not None:
+    if config.backup_root is None:
+      return EXIT_FAILED
+    try:
+      restored = restore_raw_log(
+        args.restore,
+        raw_root=config.raw_root,
+        backup_root=config.backup_root,
+      )
+    except Exception:
+      return EXIT_FAILED
+    return (
+      EXIT_RESTORE_PRESERVED
+      if restored.action == "preserved"
+      else EXIT_OK
+    )
+
+  try:
     relative_paths = discover_raw_logs(config.raw_root)
   except Exception:
     return EXIT_FAILED
