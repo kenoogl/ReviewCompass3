@@ -1,0 +1,27 @@
+{
+  "entered_at": "2026-07-28",
+  "stage": "stage_five_design_and_bootstrap_conformance",
+  "bootstrap_audit_commit": "a26630ac614809d2bcf43ff3b4fc2eb4d7a12452",
+  "fixed_inputs": [
+    {"path":"docs/intent/2026-07-27-reviewcompass3-intent-draft.md","sha256":"5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"},
+    {"path":"records/intent/stage-three-user-approval.json","sha256":"6b1932b87bfa9b5c0cc52ca70e4d90a53a628c86d501f71fd8d7330cc936dd92"},
+    {"path":"records/requirements/stage-four-completion.json","sha256":"c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"},
+    {"path":"records/requirements/stage-four-user-approval.json","sha256":"48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"},
+    {"path":"records/requirements/review-context-batch-0001.json","sha256":"8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"},
+    {"path":"records/requirements/remaining-batches-0002-0009.json","sha256":"71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"},
+    {"path":"records/requirements/obligation-source-trace.json","sha256":"7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7"},
+    {"path":"records/requirements/requirement-boundary-relations.json","sha256":"eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e"},
+    {"path":"records/requirements/reviews/2026-07-27-stage-four-minimal-final-verification/verification-summary.json","sha256":"a6bb1a9fb72f156e0897916cf5209bdd77378ae5eb4cf22f7fe240c119764208"}
+  ],
+  "expected": {
+    "feature_count": 9,
+    "requirement_count": 37,
+    "atomic_obligation_count": 464,
+    "boundary_relation_count": 23
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "entered"
+}
