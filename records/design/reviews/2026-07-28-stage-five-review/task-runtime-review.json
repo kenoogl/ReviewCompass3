@@ -1,0 +1,12 @@
+{
+  "reviewer_role": "task_runtime_design",
+  "material_digest": "c70e540112023fc267aa0317c65fff6d14325027e0199e213f72fee6bf5b6feb",
+  "verdict": "findings",
+  "summary": "固定材料は一致したが、TriageとTraceの循環、ContextをRun許可へ束縛する契約、閉じた状態遷移仕様が不足する。",
+  "findings": [
+    {"id":"TDR-001","severity":"error","document":"stage-five-design.json","location":"BOUNDARY-022〜023、AT-TRIAGE-003、AT-TRACE-005","issue":"Triage確定前にTrace verdictが必要だがTraceはHuman判断と最終Findingを要求し、正規経路が循環する。","suggestion":"Finding候補固定、事前Trace、Triage確定、最終Trace、Workflow完了の二段階protocolを定義する。"},
+    {"id":"TDR-002","severity":"error","document":"stage-five-design.json","location":"Workflow／AT-WORKFLOW-002／AT-EXEC-001","issue":"Context identity、freshness、実行仕様をRun開始要求と許可へ束縛する契約がない。","suggestion":"開始要求・許可recordへTask、active work、Context、実行仕様、発行者、期限を固定し両側で検査する。"},
+    {"id":"TDR-003","severity":"error","document":"stage-five-design.json","location":"Harness／Workflow／関連acceptance tests","issue":"Workflow、Run、Attempt、response、capture、Validationの閉じた状態・event・guard・保存点がない。","suggestion":"閉じた状態遷移表とクラッシュ・重複event・再試行試験を追加する。"},
+    {"id":"TDR-004","severity":"warning","document":"stage-five-design.json","location":"AT-TRIAGE-003.oracle_type","issue":"機械関門を含むのにHuman oracleだけである。","suggestion":"hybridへ変更し機械assertionとHuman判断を分離する。"}
+  ]
+}

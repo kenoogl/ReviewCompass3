@@ -1,0 +1,11 @@
+{
+  "reviewer_role": "design_scope_and_boundary",
+  "material_digest": "c70e540112023fc267aa0317c65fff6d14325027e0199e213f72fee6bf5b6feb",
+  "verdict": "findings",
+  "summary": "material digestと12 artifact SHAは一致した。構造被覆と原理Aは概ね成立するが、E2E interface、複合oracle、機微情報例外境界が不足する。",
+  "findings": [
+    {"id":"DSB-001","severity":"error","document":"stage-five-design.json","location":"boundary_catalog／全9 designs","issue":"Context→Harness、Harness→Triage、各段階→Trace、Evaluation→Self Improvement、改善→WorkflowのE2E interfaceがなく、Self Improvementは孤立する。","suggestion":"設計component間interface catalogへ提供側、利用側、identity、payload、failure verdict、所有責務を固定する。"},
+    {"id":"DSB-002","severity":"warning","document":"stage-five-design.json","location":"AT-TRIAGE-003／AT-IMPROVE-002","issue":"Human oracleだけではDigest・関門・不変性の機械責務を検査できない。","suggestion":"hybridへ変更し機械oracleとHuman oracleを分離する。"},
+    {"id":"DSB-003","severity":"warning","document":"stage-five-design.json","location":"Portable／Session human responsibilities","issue":"機微情報例外の対象、期限、隔離先、再検査がなくfail-closed関門を迂回できる。","suggestion":"例外を版付きpolicy inputへ束縛するか例外権限を削除する。"}
+  ]
+}

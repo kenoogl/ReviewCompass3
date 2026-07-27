@@ -1,0 +1,14 @@
+{
+  "reviewer_role": "adversarial_conformance",
+  "material_digest": "c70e540112023fc267aa0317c65fff6d14325027e0199e213f72fee6bf5b6feb",
+  "verdict": "findings",
+  "summary": "固定材料とvalidator digestは一致したが、証拠commit、分類意味、境界内容をvalidatorが検証せずconformant 5件を立証できない。",
+  "findings": [
+    {"id":"ACF-001","severity":"error","document":"bootstrap-conformance-audit.json／bootstrap_conformance.py","location":"bootstrap_commit／evidence","issue":"証拠はパスだけでcommit上のblob、試験結果、要件対応を検証しない。","suggestion":"blob SHAと試験command・結果digestをmanifestへ固定し検証する。"},
+    {"id":"ACF-002","severity":"error","document":"bootstrap_conformance.py","location":"validate_bootstrap_conformance","issue":"非conformant分類は非空gapだけで成立し、要件とdesign所属も照合しない。","suggestion":"正しいdesign写像、分類固有証拠、gap種別を検証する。"},
+    {"id":"ACF-003","severity":"error","document":"stage-five-design.json／design_contract.py","location":"boundary_catalog","issue":"validatorはboundary IDだけを見てtuple、相互relation、component所有をdigestへ含めない。","suggestion":"承認済みtuple完全一致、endpoint所有、相互relationを検証する。"},
+    {"id":"ACF-004","severity":"error","document":"conformance audit／stage-five-design.json","location":"REQ-SESSION-002／REQ-PORTABLE-004","issue":"未適合依存REQ-PORTABLE-004に依存するREQ-SESSION-002をconformantとしている。","suggestion":"依存先未適合なら利用側をconformantにしない。"},
+    {"id":"ACF-005","severity":"warning","document":"bootstrap-conformance-audit.json","location":"gaps","issue":"gapがfeature定型文で原子的義務、component、依存gap、閉鎖試験へ結線されない。","suggestion":"gap ID、対象義務、component、依存、閉鎖試験、停止条件を記録する。"},
+    {"id":"ACF-006","severity":"warning","document":"stage-five-design.json","location":"AT-TRIAGE-003／AT-IMPROVE-002","issue":"機械判定を含むのにHuman oracleだけである。","suggestion":"hybridへ変更し機械拒否条件をHumanが上書きできない形にする。"}
+  ]
+}
