@@ -60,6 +60,24 @@ def test_private_validation_records_counts_without_values_or_git_changes(
     '"type":"agent_message","text":"Private Codex sentence."}}\n',
     encoding="utf-8",
   )
+  (raw_root / "queue.jsonl").write_text(
+    json.dumps({
+      "content": "private queued content",
+      "operation": "enqueue",
+      "sessionId": "session-1",
+      "timestamp": "2026-07-27T00:00:00Z",
+      "type": "queue-operation",
+    }) + "\n",
+    encoding="utf-8",
+  )
+  (raw_root / "agent.jsonl").write_text(
+    json.dumps({
+      "agentId": "agent-1",
+      "key": "private-agent-key",
+      "type": "started",
+    }) + "\n",
+    encoding="utf-8",
+  )
   evidence_path = (
     tmp_path / "private" / "evidence" / "validation.json"
   )
@@ -82,6 +100,7 @@ def test_private_validation_records_counts_without_values_or_git_changes(
     "claude": 1,
     "codex": 1,
     "failed": 0,
+    "ignored": 2,
     "unsupported": 0,
   }
   evidence = evidence_path.read_text(encoding="utf-8")
@@ -181,6 +200,7 @@ def test_private_validation_fixed_cli_outputs_counts_only(
       "claude": 1,
       "codex": 0,
       "failed": 0,
+      "ignored": 0,
       "unsupported": 0,
     },
     "git_unchanged": True,
