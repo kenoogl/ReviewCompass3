@@ -7,6 +7,7 @@ promotion_required: true
 
 import importlib
 import json
+import shlex
 
 
 def test_installs_idempotently_and_uninstalls_only_owned_hooks(tmp_path):
@@ -104,3 +105,49 @@ def test_install_creates_missing_settings_without_touching_other_files(
   assert result.action == "installed"
   assert settings_path.is_file()
   assert unrelated.read_text(encoding="utf-8") == '{"keep": true}\n'
+
+
+def test_installs_configured_hooks_with_private_observation_path(
+  tmp_path,
+):
+  config_path = tmp_path / "session-logs.json"
+  event_log = tmp_path / "private" / "hooks.jsonl"
+  config_path.write_text(
+    json.dumps({
+      "raw_root": "raw",
+      "transcript_root": "transcripts",
+      "summary_root": "summaries",
+      "provenance_root": "provenance",
+      "hook_event_log_path": "private/hooks.jsonl",
+      "tool_version": "0.0.1",
+      "redaction_rules": [],
+    }),
+    encoding="utf-8",
+  )
+  settings_path = tmp_path / ".claude" / "settings.local.json"
+  installation = importlib.import_module(
+    "tools.session_logs.hook_installation"
+  )
+
+  result = installation.install_configured_claude_hooks(
+    settings_path,
+    python_executable="/usr/bin/python3",
+    config_path=config_path,
+  )
+
+  assert result.action == "installed"
+  settings = json.loads(settings_path.read_text(encoding="utf-8"))
+  start_command = (
+    settings["hooks"]["SessionStart"][0]["hooks"][0]["command"]
+  )
+  end_command = (
+    settings["hooks"]["SessionEnd"][0]["hooks"][0]["command"]
+  )
+  assert shlex.split(start_command)[-2:] == [
+    "--event-log",
+    str(event_log),
+  ]
+  assert shlex.split(end_command)[-2:] == [
+    "--event-log",
+    str(event_log),
+  ]

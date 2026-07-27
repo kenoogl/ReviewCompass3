@@ -245,3 +245,23 @@ def test_hook_records_completed_only_after_success(tmp_path, capsys):
       "status": "completed",
     },
   )
+
+
+def test_hook_observation_failure_uses_safe_stderr(tmp_path, capsys):
+  config_path = _write_setup(tmp_path)
+  blocked = tmp_path / "private-secret-path"
+  blocked.write_text("not a directory", encoding="utf-8")
+  hooks = importlib.import_module("tools.session_logs.hooks")
+
+  result = hooks.run_start_hook(
+    config_path,
+    event_log_path=blocked / "hooks.jsonl",
+  )
+
+  assert result == hooks.HookResult(
+    action="checked",
+    exit_code=0,
+  )
+  output = capsys.readouterr()
+  assert output.err == "session hook observation failed\n"
+  assert "private-secret-path" not in output.err
