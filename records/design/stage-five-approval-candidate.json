@@ -1,0 +1,43 @@
+{
+  "candidate": {
+    "created_at": "2026-07-28",
+    "decision_maker": "human_user",
+    "decision_required": true,
+    "material_digest": "c4983794f2e7cc7aa4603ac94a4eeeeef52a73a51f9e938ed6d86b89cdd57588",
+    "target": "stage_five_design_and_bootstrap_conformance"
+  },
+  "approved_material_candidate": {
+    "path": "records/design/reviews/2026-07-28-stage-five-terminal-minimal-verification/material.json",
+    "sha256": "246aca9c8e17965515f3f40f167ab0f852ddd08b9d4b7b30223fbf6eeb2b8630"
+  },
+  "classification_counts": {
+    "adapt": 28,
+    "conformant": 0,
+    "defer": 5,
+    "replace": 4
+  },
+  "design_contract": {
+    "acceptance_tests": 37,
+    "boundaries": 23,
+    "event_routes": 28,
+    "features": 9,
+    "interfaces": 29,
+    "protocols": 14,
+    "requirements": 37,
+    "state_machines": 8
+  },
+  "final_verification": {
+    "approval_eligible": true,
+    "path": "records/design/reviews/2026-07-28-stage-five-terminal-minimal-verification/verification-summary.json",
+    "pass_count": 3,
+    "sha256": "b238bb7c895d6fca2be5ffc36f9f0cbcbf27081fac18265b70877572faa2c00d",
+    "tests": "392 passed",
+    "unresolved_count": 0
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "stage": "stage_five_design_and_bootstrap_conformance",
+  "status": "awaiting_human_approval"
+}
