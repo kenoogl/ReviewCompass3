@@ -1,0 +1,95 @@
+{
+  "material_digest": "9d720ace1f19b2cad5fb9c4677e6151b342ebdb565ef243cd0c6a9e685018ff1",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "records/requirements/requirement-boundary-relations.json",
+        "sha256": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e"
+      },
+      {
+        "path": "records/requirements/obligation-source-trace.json",
+        "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7"
+      },
+      {
+        "path": "docs/design/2026-07-28-reviewcompass3-design.md",
+        "sha256": "2ffdd81b10a4644f48d4fb8addb3e2e072f8ba3f2ce1991b79196c818e584c1c"
+      },
+      {
+        "path": "records/design/stage-five-design.json",
+        "sha256": "90a4a1febb203023690c7becd356a350f339b0187598c72582e0197c8ff7a1ce"
+      },
+      {
+        "path": "records/design/stage-five-architecture-integrity.json",
+        "sha256": "27b8267af5306c4934c6259283e31c2a006da9b7d14435731c2361a572937c27"
+      },
+      {
+        "path": "docs/design/2026-07-28-bootstrap-conformance-audit.md",
+        "sha256": "e63db43c07647961c8df9b370b521629aac26ac3ca8745408852f3648c5858d0"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-audit.json",
+        "sha256": "5f3cde65775ef1f80b234d2c599aae9b752f324d6e91ec0a5b2ce0d536f70219"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-integrity.json",
+        "sha256": "e0cb6a3382a45d41cf0f0f928a797549be6bda6488cf760f7ad0a5dc30da8220"
+      },
+      {
+        "path": "tools/design/design_contract.py",
+        "sha256": "70bf6cda76c75eeb068c6833c9849b2f9f3bb0a944fd45072f692cf2e4bc9d13"
+      },
+      {
+        "path": "tools/design/bootstrap_conformance.py",
+        "sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+      },
+      {
+        "path": "tests/test_design_contract.py",
+        "sha256": "5880d970ccac0df28e086893ddc14cedd58d223529c874789043dcfb25663791"
+      },
+      {
+        "path": "tests/test_bootstrap_conformance.py",
+        "sha256": "2a282d032d26a2719832e650ccd605ba4e697eaf8226d79d7e010f7116faadbb"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-pass-check/material.json",
+        "sha256": "04f62c4ac4fa1510916c5adf68254424e2b9c160f9ea5ece8fd349022e518f20"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-pass-check/scope-review.json",
+        "sha256": "d08d61858cbcda2dc1ed1f84a14ca294555630d9998f0f5356469965fb078fec"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-pass-check/task-runtime-review.json",
+        "sha256": "f1ad43b8d4de659c125839170a09f47b5edfe6155e2005df2342a22cbab8ea75"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-pass-check/adversarial-review.json",
+        "sha256": "c3e216f57a4cf328d4d55897c050ab7947d0afc9c9625f39fab8c5446559b5a3"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-pass-check/triage.json",
+        "sha256": "ffce09f40bd24420d2207c31e8647d096824c008596b3d94048cb8c1d6bd1e6e"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-final-pass-check/review-resolution.json",
+        "sha256": "a23f5183371de5dbd9701a48050370a5fb2aa33fe522f1e64286749460e5ed0d"
+      }
+    ],
+    "criteria": [
+      "全51 review findingが解決済みである",
+      "Run開始からAttempt・Capture・Validation・Run awaiting_triage・Triage・Run成功・Workflow完了まで正常系が接続する",
+      "Capture・Validation・Triageの局所障害が関連machineとRun・Workflowの耐久的終端へ伝播する",
+      "Validation候補・結果interfaceがTriage結果と分離され循環しない",
+      "全protocol stepのinput・output・internal evidence roleがmachine ownerと一致する",
+      "既承認23境界、29 interface、8状態機械、7 protocol、23 event routeが機械検証される",
+      "strict監査と386現行テストが通過する"
+    ],
+    "review_roles": [
+      "design_scope_and_boundary",
+      "task_runtime_design",
+      "adversarial_conformance"
+    ]
+  },
+  "status": "fixed",
+  "record_version": 1
+}
