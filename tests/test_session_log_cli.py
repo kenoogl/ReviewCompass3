@@ -298,3 +298,58 @@ def test_cli_preserve_only_is_safe_for_scheduled_execution(tmp_path):
   assert not (tmp_path / "transcripts").exists()
   assert not (tmp_path / "summaries").exists()
   assert not (tmp_path / "provenance").exists()
+
+
+def test_cli_lists_and_restores_only_explicit_safe_backup_path(
+  tmp_path,
+  capsys,
+):
+  raw_log = tmp_path / "raw" / "nested" / "session.jsonl"
+  _write_event(raw_log)
+  original = raw_log.read_bytes()
+  config_path = _write_config(tmp_path)
+  config = json.loads(config_path.read_text(encoding="utf-8"))
+  config.update({
+    "backup_root": "private-backup",
+    "preservation_enabled": True,
+  })
+  config_path.write_text(json.dumps(config), encoding="utf-8")
+  cli = importlib.import_module("tools.session_logs.cli")
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--preserve-only",
+  )) == 0
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--list-backups",
+  )) == 0
+  assert capsys.readouterr().out == "nested/session.jsonl\n"
+
+  raw_log.unlink()
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--restore",
+    "nested/session.jsonl",
+  )) == 0
+  assert raw_log.read_bytes() == original
+
+  raw_log.write_bytes(b"existing divergent data\n")
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--restore",
+    "nested/session.jsonl",
+  )) == 9
+  assert raw_log.read_bytes() == b"existing divergent data\n"
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--restore",
+    "../escape.jsonl",
+  )) == 5
+  assert not (tmp_path / "escape.jsonl").exists()
