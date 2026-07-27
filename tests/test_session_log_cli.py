@@ -480,3 +480,34 @@ def test_cli_json_lines_aggregates_success_and_failure_safely(
     "mode": "dry-run",
     "status": "partial",
   }
+
+
+def test_cli_distinguishes_preserved_log_integrity_failure(tmp_path):
+  raw_log = tmp_path / "raw" / "session.jsonl"
+  _write_event(raw_log)
+  config_path = _write_config(tmp_path)
+  config = json.loads(config_path.read_text(encoding="utf-8"))
+  config.update({
+    "backup_root": "private-backup",
+    "preservation_enabled": True,
+    "preservation_ledger_path": "safe-records/preservation.json",
+  })
+  config_path.write_text(json.dumps(config), encoding="utf-8")
+  cli = importlib.import_module("tools.session_logs.cli")
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--preserve-only",
+  )) == 0
+
+  raw_log.unlink()
+  backup_path = tmp_path / "private-backup" / "session.jsonl"
+  backup_path.write_bytes(b"tampered private backup\n")
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--restore",
+    "session.jsonl",
+  )) == 10
+  assert not raw_log.exists()

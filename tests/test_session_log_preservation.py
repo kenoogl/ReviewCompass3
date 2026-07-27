@@ -6,6 +6,8 @@ promotion_required: true
 """
 
 import importlib
+import hashlib
+import json
 import os
 import time
 
@@ -150,3 +152,51 @@ def test_preservation_lock_rejects_active_and_reclaims_stale_lock(
 
   assert result.action == "created"
   assert not lock_path.exists()
+
+
+def test_integrity_ledger_blocks_restore_of_tampered_backup(tmp_path):
+  raw_root = tmp_path / "raw"
+  raw_log = raw_root / "nested" / "session.jsonl"
+  raw_log.parent.mkdir(parents=True)
+  raw_bytes = b'{"event": "original"}\n'
+  raw_log.write_bytes(raw_bytes)
+  backup_root = tmp_path / "private-backup"
+  ledger_path = tmp_path / "safe-records" / "preservation.json"
+  preservation = importlib.import_module(
+    "tools.session_logs.preservation"
+  )
+
+  preservation.preserve_raw_log(
+    raw_log,
+    raw_root=raw_root,
+    backup_root=backup_root,
+    ledger_path=ledger_path,
+  )
+
+  assert json.loads(ledger_path.read_text(encoding="utf-8")) == {
+    "entries": {
+      "nested/session.jsonl": {
+        "action": "created",
+        "sha256": hashlib.sha256(raw_bytes).hexdigest(),
+        "size": len(raw_bytes),
+      },
+    },
+    "version": 1,
+  }
+
+  raw_log.unlink()
+  backup_path = backup_root / "nested" / "session.jsonl"
+  backup_path.write_bytes(b'{"event": "tampered private value"}\n')
+  with pytest.raises(
+    preservation.PreservationIntegrityError
+  ) as error:
+    preservation.restore_raw_log(
+      "nested/session.jsonl",
+      raw_root=raw_root,
+      backup_root=backup_root,
+      ledger_path=ledger_path,
+    )
+
+  assert str(error.value) == "Preserved raw log integrity mismatch"
+  assert "tampered private value" not in repr(error.value)
+  assert not raw_log.exists()
