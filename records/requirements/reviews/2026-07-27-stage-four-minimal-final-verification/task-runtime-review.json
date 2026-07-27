@@ -1,0 +1,7 @@
+{
+  "reviewer_role": "task_runtime_requirements_final",
+  "material_digest": "5901a3c54c9b6ab935a44a4c026ab46727dfe80e6442455c90c56deb359201d3",
+  "verdict": "pass",
+  "summary": "固定材料16件のSHA-256とmaterial digestの整合を確認した。Task Runtime／Operational Provenanceに退行はない。停止権限が分離され、provider response受領とraw capture、保存不能時の終端状態、値なし診断まで反証可能に定義されている。",
+  "findings": []
+}

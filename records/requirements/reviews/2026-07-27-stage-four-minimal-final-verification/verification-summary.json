@@ -1,0 +1,16 @@
+{
+  "material_digest": "5901a3c54c9b6ab935a44a4c026ab46727dfe80e6442455c90c56deb359201d3",
+  "review_count": 3,
+  "pass_count": 3,
+  "finding_count": 0,
+  "unresolved_count": 0,
+  "mechanical_results": {
+    "feature_count": 9,
+    "requirement_count": 37,
+    "essence_count": 47,
+    "atomic_obligation_count": 464,
+    "boundary_relation_count": 23,
+    "test_result": "361 passed"
+  },
+  "status": "pass"
+}

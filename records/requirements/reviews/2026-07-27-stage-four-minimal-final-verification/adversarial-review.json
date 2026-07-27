@@ -1,0 +1,7 @@
+{
+  "reviewer_role": "adversarial_traceability_final",
+  "material_digest": "5901a3c54c9b6ab935a44a4c026ab46727dfe80e6442455c90c56deb359201d3",
+  "verdict": "pass",
+  "summary": "列挙16 artifactのSHA-256とmaterial digestは全件一致した。ATFR-001〜006の解消を確認し、37要件から464原子的義務と23境界relationを固定入力・指定validatorで再現でき、宣言digestとも一致した。重大な退行または新規重大問題は認められない。",
+  "findings": []
+}

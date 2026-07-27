@@ -1,0 +1,7 @@
+{
+  "reviewer_role": "scope_and_feature_boundary_final",
+  "material_digest": "5901a3c54c9b6ab935a44a4c026ab46727dfe80e6442455c90c56deb359201d3",
+  "verdict": "pass",
+  "summary": "material digestと列挙16 artifactのSHA-256はすべて一致した。Traceは検証verdict生成、WorkflowはRun完了関門、TriageはFinding確定関門を所有し、双方向の境界relationも明記された。SFBFR-001は解消し、周辺責務境界の退行は認められない。",
+  "findings": []
+}
