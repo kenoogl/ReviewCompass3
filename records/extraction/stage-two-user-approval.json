@@ -1,0 +1,83 @@
+{
+  "audit": {
+    "approval_candidate": null,
+    "audit_digest": "26ec3986a8b2717fc12ce6e7b9bdb20ef6c27c4eb138a45b553814a218194ec8",
+    "conflict_count": 0,
+    "covered_count": 18692,
+    "extracted_count": 14,
+    "merged_count": 16227,
+    "not_selected_count": 1361,
+    "reassessment_digest": "dc2ac311af00e39ba1e00efacca564b58797205e5fde430276c96fe0b16097b8",
+    "status": "ready",
+    "uncovered_count": 0,
+    "unresolved_count": 0
+  },
+  "decision": {
+    "approval": {
+      "approved": true,
+      "material_digest": "a82bfb5b6a89a010e58d5ebac0759e2a4a7dbb5a3e68387d044632f6a7c945fc",
+      "selected_disposition": "transfer",
+      "target_id": "ESS-0001"
+    },
+    "destination": "semantic_relationships.decision_evidence",
+    "digest": "38503fd4533868cbbe06459673b6a9ead017a7a8bd52a24341ea43ca70ba9c16",
+    "evidence": [
+      "ReviewCompass2:.reviewcompass/backlog/issues/issue-2026-07-23-semantic-unit-schema-and-decision-inventory.yaml#L15-L21",
+      "ReviewCompass2:.reviewcompass/evidence/sessions/2026-07-23-claude-session-02-rebuild-upstream-specs.md#L19",
+      "ReviewCompass2:docs/design/2026-07-25-user-decisions-inventory.md#L108-L115"
+    ],
+    "identifier": "ESS-0001",
+    "material_digest": "a82bfb5b6a89a010e58d5ebac0759e2a4a7dbb5a3e68387d044632f6a7c945fc",
+    "rationale": "閉じた辺種別とID参照は決定的な追跡と平文監査を保つため現システムへ引き継ぐ",
+    "selected_disposition": "transfer",
+    "statement": "意味関係は閉じた辺種別語彙とID参照の平文レコードで決定的にたどれる形とする",
+    "status": "resolved"
+  },
+  "ledger_approval": {
+    "approval": "explicit",
+    "approved_at": "2026-07-27",
+    "audit_digest": "26ec3986a8b2717fc12ce6e7b9bdb20ef6c27c4eb138a45b553814a218194ec8",
+    "item_count": 47,
+    "ledger_digest": "6b6b4220117b6426be67b273ac151684579e0baa11041d19f37ff440d165849e",
+    "sources": [
+      {
+        "path": "records/extraction/initial-essence-ledger.json",
+        "sha256": "24c28d1891cc4c9db2ebbacaa6649ea92f4fefc4f3a623dd8c904e2e93f5a231"
+      },
+      {
+        "path": "records/extraction/expanded-extraction-pass.json",
+        "sha256": "bfb3b4bdfbaeda80b11e00584f5012925d1b7da69e37cc2eb433d7290860a693"
+      },
+      {
+        "path": "records/extraction/dependency-priority-reaudit.json",
+        "sha256": "fba154423dfb1d5964c763a049ed066d55f8a6fe65802a6c007f0875a04acf91"
+      },
+      {
+        "path": "records/extraction/structured-batch-0001-reaudit.json",
+        "sha256": "e6dbb6e70a095e697db9ddc9a8169c7849b539f2629e5cb395c41dd687ea9441"
+      },
+      {
+        "path": "records/extraction/structured-batches-0002-0003-reaudit.json",
+        "sha256": "d4a7e229087ec4a462b989f79271ebfeabe63819439a6c9bb2d60b5845a9ae2f"
+      },
+      {
+        "path": "records/extraction/structured-batch-0004-reaudit.json",
+        "sha256": "8763fb365b59e5f4f0a898db860cb3adfd540102bcef46f1a80f093b640d2854"
+      },
+      {
+        "path": "records/extraction/ess-0012-redesign-reaudit.json",
+        "sha256": "ba12a0861d00693ba87a24ed55b65042ff14ba65cd073cba3cac34107ad9dad1"
+      },
+      {
+        "path": "records/extraction/stage-two-bulk-completion.json",
+        "sha256": "5d3a3127771ed2223afd0899618e31116fa30a9096f43871ad3fe655e2491a77"
+      }
+    ],
+    "status": "passed"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "ready"
+}
