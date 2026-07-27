@@ -1,0 +1,7 @@
+{
+  "reviewer_role": "task_runtime_requirements_final",
+  "material_digest": "4442988c1273a602843e12c3882ce8adfa3cbef86db841ac9bc388931f439567",
+  "verdict": "pass",
+  "summary": "固定材料15件のSHA-256とmaterial_digestの整合を確認した。TRF-001〜004は解消され、Task RuntimeおよびOperational Provenanceの観点で回帰または新規の指摘事項はない。",
+  "findings": []
+}

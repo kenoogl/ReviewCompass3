@@ -1,0 +1,56 @@
+{
+  "reviewer_role": "adversarial_traceability_final",
+  "material_digest": "4442988c1273a602843e12c3882ce8adfa3cbef86db841ac9bc388931f439567",
+  "verdict": "findings",
+  "summary": "15 artifactのSHA-256とmaterial digestはすべて一致した。Scope、共有保存、形式復旧、非採用判断、完了marker固定は改善されたが、義務被覆の件数と機械契約が実データに一致せず、所有境界と一部受け入れ条件にも穴が残る。",
+  "findings": [
+    {
+      "id": "ATFR-001",
+      "severity": "error",
+      "document": "obligation_source_trace",
+      "location": "relations／validate_obligation_sources",
+      "issue": "obligation-source-trace.jsonは37件のrelationsにobligation_ids配列を持つ形式だが、source_trace.pyのvalidatorは1義務1recordを要求する。実データにはrationaleもなく296関係を機械契約で検証できない。",
+      "suggestion": "実データをvalidator Schemaへ合わせ、固定材料上の入力、出力、Digestをauditへ結ぶ。"
+    },
+    {
+      "id": "ATFR-002",
+      "severity": "error",
+      "document": "cross",
+      "location": "obligation_trace_policy／obligation_source_trace／requirement batches",
+      "issue": "296は37要件×8フィールドscopeで、各リスト内の個別義務を数えていない。固定要件にはstatementを含む449の原子的な文があり、個別由来のない義務を隠せる。",
+      "suggestion": "各list entryへ安定義務IDを付け、原子的義務を全件列挙して個別source relationを要求する。"
+    },
+    {
+      "id": "ATFR-003",
+      "severity": "warning",
+      "document": "requirement_boundary_relations",
+      "location": "relations／status",
+      "issue": "8件の境界relationに母集合、完全性規則、validatorがなくstatus=completeは自己申告である。",
+      "suggestion": "relation完全性を検査し、対応するdepends_on、未解決依存、循環、複数所有を拒否するvalidatorを追加する。"
+    },
+    {
+      "id": "ATFR-004",
+      "severity": "warning",
+      "document": "remaining_requirement_trace",
+      "location": "REQ-EXEC-003",
+      "issue": "外部providerからの受信とローカル耐久保存を原子的に束縛できず、同じ保存障害で診断も残せない場合がある。",
+      "suggestion": "受領時点、capture、request/response identity、保存不能時の外部提示可能な終端状態を定める。"
+    },
+    {
+      "id": "ATFR-005",
+      "severity": "warning",
+      "document": "remaining_requirement_trace",
+      "location": "REQ-PORTABLE-001",
+      "issue": "受け入れ条件の3主要OSは対象、最低version、filesystem特性、権限環境が定義されず反証できない。",
+      "suggestion": "版付きsupported-platform matrixを入力として固定し、その全対象で検証する。"
+    },
+    {
+      "id": "ATFR-006",
+      "severity": "warning",
+      "document": "remaining_requirement_trace",
+      "location": "REQ-TRIAGE-003 acceptance_criteria",
+      "issue": "承認対象Digestと判断内容が完全一致するという異なる値の一致を要求し、合格oracleとして解釈できない。",
+      "suggestion": "対象Digestの再計算一致とHuman判断内容の別フィールド保持へ分ける。"
+    }
+  ]
+}
