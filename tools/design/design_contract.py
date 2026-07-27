@@ -179,6 +179,11 @@ _FAILURE_CORRELATION_FIELDS = {
   "target_event",
   "target_state",
 }
+_FAILURE_HANDOFF_FIELDS = {
+  "producer_machine_id",
+  "consumer_machine_id",
+  "interface_id",
+}
 
 
 def _text(value):
@@ -404,6 +409,7 @@ def validate_design_architecture(
   required_generated_interface_ids=(),
   required_failure_state_groups=(),
   required_failure_protocol_ids=(),
+  required_failure_handoffs=(),
   required_failure_correlations=(),
 ):
   parsed_designs = tuple(designs)
@@ -874,6 +880,39 @@ def validate_design_architecture(
     parsed_failure_correlations.append(
       dict(correlation)
     )
+  parsed_failure_handoffs = []
+  for handoff in required_failure_handoffs:
+    if (
+      not isinstance(handoff, dict)
+      or set(handoff) != _FAILURE_HANDOFF_FIELDS
+      or handoff["producer_machine_id"]
+      not in machine_ids
+      or handoff["consumer_machine_id"]
+      not in machine_ids
+      or handoff["interface_id"] not in interface_ids
+    ):
+      raise DesignContractError(
+        "required failure handoffs must resolve"
+      )
+    producer_owner = machine_by_id[
+      handoff["producer_machine_id"]
+    ]["owner_design_id"]
+    consumer_owner = machine_by_id[
+      handoff["consumer_machine_id"]
+    ]["owner_design_id"]
+    handoff_interface = interface_by_id[
+      handoff["interface_id"]
+    ]
+    if (
+      handoff_interface["provider_design_id"]
+      != producer_owner
+      or handoff_interface["consumer_design_id"]
+      != consumer_owner
+    ):
+      raise DesignContractError(
+        "required failure handoff owners must match"
+      )
+    parsed_failure_handoffs.append(dict(handoff))
 
   parsed_routes = []
   route_ids = set()
@@ -968,6 +1007,7 @@ def validate_design_architecture(
     available_interfaces = set(initial_interfaces)
     current_states = dict(initial_states)
     main_transitions = []
+    main_interface_actions = []
     steps = []
     for step in value["steps"]:
       if (
@@ -1207,6 +1247,54 @@ def validate_design_architecture(
             raise DesignContractError(
               "protocol failure group must terminate"
             )
+      failure_interface_actions = [
+        (
+          failure["machine_id"],
+          failure["interface_id"],
+          failure["interface_role"],
+        )
+        for failure in normalized_failures
+        if failure["interface_role"] != "state_only"
+      ]
+      combined_interface_actions = [
+        *main_interface_actions,
+        *failure_interface_actions,
+      ]
+      for handoff in parsed_failure_handoffs:
+        handoff_machines = {
+          handoff["producer_machine_id"],
+          handoff["consumer_machine_id"],
+        }
+        if handoff_machines <= set(current_states):
+          producer_indexes = [
+            index
+            for index, action
+            in enumerate(combined_interface_actions)
+            if action == (
+              handoff["producer_machine_id"],
+              handoff["interface_id"],
+              "output",
+            )
+          ]
+          consumer_indexes = [
+            index
+            for index, action
+            in enumerate(combined_interface_actions)
+            if action == (
+              handoff["consumer_machine_id"],
+              handoff["interface_id"],
+              "input",
+            )
+          ]
+          if not any(
+            producer_index < consumer_index
+            for producer_index in producer_indexes
+            for consumer_index in consumer_indexes
+          ):
+            raise DesignContractError(
+              "protocol failure handoff is missing: "
+              f"{value['protocol_id']}:{step['step_id']}"
+            )
       combined_failure_transitions = (
         *main_transitions,
         *failure_transitions,
@@ -1246,6 +1334,11 @@ def validate_design_architecture(
       ))
       if step["interface_role"] == "output":
         available_interfaces.add(step["interface_id"])
+      main_interface_actions.append((
+        step["state_machine_id"],
+        step["interface_id"],
+        step["interface_role"],
+      ))
       step_ids.add(step["step_id"])
       parsed_step = dict(step)
       parsed_step["on_failure"] = tuple(
@@ -1280,6 +1373,37 @@ def validate_design_architecture(
       raise DesignContractError(
       "protocol must reach expected states"
       )
+    if value["protocol_id"] in required_failure_protocols:
+      for handoff in parsed_failure_handoffs:
+        producer_indexes = [
+          index
+          for index, action
+          in enumerate(main_interface_actions)
+          if action == (
+            handoff["producer_machine_id"],
+            handoff["interface_id"],
+            "output",
+          )
+        ]
+        consumer_indexes = [
+          index
+          for index, action
+          in enumerate(main_interface_actions)
+          if action == (
+            handoff["consumer_machine_id"],
+            handoff["interface_id"],
+            "input",
+          )
+        ]
+        if not any(
+          producer_index < consumer_index
+          for producer_index in producer_indexes
+          for consumer_index in consumer_indexes
+        ):
+          raise DesignContractError(
+            "failure protocol handoff is missing: "
+            f"{value['protocol_id']}"
+          )
     parsed_protocols.append({
       "expected_states": dict(sorted(
         expected_states.items()
@@ -1407,6 +1531,14 @@ def validate_design_architecture(
     ),
     "required_failure_protocol_ids": tuple(sorted(
       required_failure_protocols
+    )),
+    "required_failure_handoffs": tuple(sorted(
+      parsed_failure_handoffs,
+      key=lambda value: (
+        value["producer_machine_id"],
+        value["consumer_machine_id"],
+        value["interface_id"],
+      ),
     )),
     "required_failure_correlations": tuple(sorted(
       parsed_failure_correlations,
