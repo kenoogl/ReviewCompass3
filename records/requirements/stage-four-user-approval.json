@@ -1,0 +1,29 @@
+{
+  "approval": {
+    "approved": true,
+    "approved_at": "2026-07-27",
+    "decision_maker": "human_user",
+    "evidence": {
+      "instruction": "1から5を実行",
+      "meaning": "第4段のレビュー、指摘反映、全機能requirements、最終検証および完了承認を一括して明示指示"
+    },
+    "material_digest": "5901a3c54c9b6ab935a44a4c026ab46727dfe80e6442455c90c56deb359201d3",
+    "target": "stage_four_requirements"
+  },
+  "approved_material": {
+    "path": "records/requirements/reviews/2026-07-27-stage-four-minimal-final-verification/material.json",
+    "sha256": "e19ac835c1e1c0893addec13400dc99649f94978aa01c19fb5defcac5203e578"
+  },
+  "final_verification": {
+    "path": "records/requirements/reviews/2026-07-27-stage-four-minimal-final-verification/verification-summary.json",
+    "sha256": "a6bb1a9fb72f156e0897916cf5209bdd77378ae5eb4cf22f7fe240c119764208",
+    "pass_count": 3,
+    "unresolved_count": 0
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "stage": "stage_four_requirements",
+  "status": "passed"
+}
