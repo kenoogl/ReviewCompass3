@@ -6,6 +6,7 @@ promotion_required: true
 """
 
 import dataclasses
+import hashlib
 import json
 import math
 import re
@@ -52,6 +53,26 @@ class HighEntropyFinding:
   end: int
   length: int
   entropy: float
+
+
+def redaction_rules_digest(rules, *, allow_patterns=()) -> str:
+  payload = {
+    "rules": [
+      {
+        "label": rule.label,
+        "pattern": rule.pattern,
+      }
+      for rule in rules
+    ],
+    "allow_patterns": list(allow_patterns),
+  }
+  encoded = json.dumps(
+    payload,
+    ensure_ascii=False,
+    sort_keys=True,
+    separators=(",", ":"),
+  ).encode("utf-8")
+  return hashlib.sha256(encoded).hexdigest()
 
 
 def _entropy(value) -> float:

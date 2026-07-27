@@ -9,7 +9,10 @@ import dataclasses
 
 from tools.session_logs import parse_claude
 from tools.session_logs.provenance import build_provenance
-from tools.session_logs.redaction import redact_text_strict
+from tools.session_logs.redaction import (
+  redact_text_strict,
+  redaction_rules_digest,
+)
 from tools.session_logs.source_kind import identify_source_kind
 from tools.session_logs.summary import render_summary
 from tools.session_logs.transcript import render_transcript
@@ -65,6 +68,10 @@ def prepare_artifact(
     transcript_text=redacted.text,
     tool_version=tool_version,
     summary_text=summary.text,
+    redaction_rules_sha256=redaction_rules_digest(
+      rules,
+      allow_patterns=allow_patterns,
+    ),
   )
   return PreparedArtifact(
     source_kind=source_kind,
