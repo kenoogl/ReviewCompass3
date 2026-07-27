@@ -25,6 +25,7 @@ class Config:
   provenance_root: Path
   sensitive_report_root: object
   backup_root: object
+  preservation_ledger_path: object
   preservation_enabled: bool
   tool_version: str
   redaction_rules: tuple
@@ -84,6 +85,7 @@ def load_config(path) -> Config:
   repository_root = data.get("repository_root")
   report_root = data.get("sensitive_report_root")
   backup_root = data.get("backup_root")
+  ledger_path = data.get("preservation_ledger_path")
   config = Config(
     repository_root=(
       _resolve(base, repository_root).resolve()
@@ -102,6 +104,11 @@ def load_config(path) -> Config:
     backup_root=(
       _resolve(base, backup_root)
       if backup_root is not None
+      else None
+    ),
+    preservation_ledger_path=(
+      _resolve(base, ledger_path)
+      if ledger_path is not None
       else None
     ),
     preservation_enabled=bool(

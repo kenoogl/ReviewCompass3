@@ -16,6 +16,7 @@ from tools.session_logs.pipeline import (
   prepare_artifact,
 )
 from tools.session_logs.preservation import (
+  PreservationIntegrityError,
   preserve_raw_log,
   restore_raw_log,
 )
@@ -40,6 +41,7 @@ EXIT_PRESERVATION_FAILED = 6
 EXIT_VERIFICATION_MISMATCH = 7
 EXIT_REGENERATION_FAILED = 8
 EXIT_RESTORE_PRESERVED = 9
+EXIT_RESTORE_INTEGRITY_FAILED = 10
 
 
 def _print_json(payload):
@@ -232,7 +234,10 @@ def run(argv=None) -> int:
         args.restore,
         raw_root=config.raw_root,
         backup_root=config.backup_root,
+        ledger_path=config.preservation_ledger_path,
       )
+    except PreservationIntegrityError:
+      return EXIT_RESTORE_INTEGRITY_FAILED
     except Exception:
       return EXIT_FAILED
     return (
@@ -282,6 +287,7 @@ def run(argv=None) -> int:
           config.raw_root / relative_path,
           raw_root=config.raw_root,
           backup_root=config.backup_root,
+          ledger_path=config.preservation_ledger_path,
         )
       except Exception as error:
         exit_value = max(
@@ -320,6 +326,7 @@ def run(argv=None) -> int:
           raw_log,
           raw_root=config.raw_root,
           backup_root=config.backup_root,
+          ledger_path=config.preservation_ledger_path,
         )
       except Exception as error:
         exit_value = max(
