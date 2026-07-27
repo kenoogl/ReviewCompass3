@@ -25,4 +25,12 @@ def identify_source_kind(path):
   if isinstance(uuid, str) and uuid and isinstance(session_id, str) and session_id:
     return "claude"
 
+  thread_id = first_event.get("thread_id")
+  if (
+    first_event.get("type") == "thread.started"
+    and isinstance(thread_id, str)
+    and thread_id
+  ):
+    return "codex"
+
   return None

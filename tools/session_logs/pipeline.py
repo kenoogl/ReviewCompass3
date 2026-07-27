@@ -7,7 +7,7 @@ promotion_required: true
 
 import dataclasses
 
-from tools.session_logs import parse_claude
+from tools.session_logs import parse_claude, parse_codex
 from tools.session_logs.provenance import build_provenance
 from tools.session_logs.redaction import (
   redact_text_strict,
@@ -45,10 +45,13 @@ def prepare_artifact(
   allow_patterns=(),
 ) -> PreparedArtifact:
   source_kind = identify_source_kind(raw_log)
-  if source_kind != "claude":
+  if source_kind == "claude":
+    parsed = parse_claude.parse_claude_log(raw_log)
+  elif source_kind == "codex":
+    parsed = parse_codex.parse_codex_log(raw_log)
+  else:
     raise UnsupportedSourceKind(str(source_kind))
 
-  parsed = parse_claude.parse_claude_log(raw_log)
   transcript_text = render_transcript(parsed)
   redacted = redact_text_strict(
     transcript_text,
