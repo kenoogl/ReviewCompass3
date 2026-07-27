@@ -96,7 +96,7 @@ Validation結果はTriage結果と分離し、Runを`executing`から
 raw・診断保存不能を区別し、Validation・dispatch失敗とともにfailedまたは
 irrecoverable Run結果を介してWorkflow `blocked`まで伝播する。
 各失敗stepは全machineの期待状態ベクトルとbranch内interface roleを宣言し、
-開始・retryを含む全失敗でRun結果を生成後にWorkflowへ返す。失敗専用
+開始・retryを含む全失敗でRun結果`output`を生成後にWorkflow `input`へ返し、このhandoff自体を必須検証する。失敗専用
 protocolの主経路も同じ終端を要求する。成功Run結果は成功終端後に生成し、
 生成失敗はRun failedとして保存する。
 各遷移はguardと、

@@ -4111,7 +4111,7 @@
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_architecture",
-    "digest": "f3bbc271caf1d462afa14f292b8ab0c15709aa82dac1a72d27d56308a85db890",
+    "digest": "1937b1f7923f20d030ebd328215eccd927ffea4ae1293e2b5cadc8f7e6d80f93",
     "boundary_count": 23,
     "interface_count": 29,
     "state_machine_count": 8,
@@ -4543,5 +4543,12 @@
     "PROTOCOL-VALIDATION-FAILURE",
     "PROTOCOL-FINDING-PREFAIL",
     "PROTOCOL-FINDING-FINALFAIL"
+  ],
+  "required_failure_handoffs": [
+    {
+      "producer_machine_id": "SM-RUN",
+      "consumer_machine_id": "SM-WORKFLOW",
+      "interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT"
+    }
   ]
 }
