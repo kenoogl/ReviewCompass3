@@ -1,0 +1,76 @@
+{
+  "artifacts": [
+    {
+      "path": "records/requirements/fixed-input-verification.json",
+      "sha256": "d8b1739aa647beec3eddef7afd727d19c5027a1d3df3ba9c5ac7ee9aaba7ecaf"
+    },
+    {
+      "path": "records/requirements/feature-partition.json",
+      "sha256": "03bbeaf61d42e18f680c98595a08f5231c375f36db2a5797204c73edcd3efe25"
+    },
+    {
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "99309e02a0b5a61ce84c37db897c38872090126223708a196c875562dcde8fbf"
+    },
+    {
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "755db382c3f263f5736eadf20ef33dfba4bc80ea77116d5acd1baa4b987e9c90"
+    }
+  ],
+  "lifecycle": "provisional",
+  "next_work_unit": {
+    "id": "REQ-INDEPENDENT-REVIEW-0001",
+    "scope": [
+      "feature partition responsibility boundaries",
+      "review context requirements batch 0001",
+      "intent and essence bidirectional trace"
+    ],
+    "status": "ready"
+  },
+  "normative_status": "non-normative",
+  "progress": {
+    "feature_count": 9,
+    "first_batch_feature_id": "FEAT-REVIEW-CONTEXT",
+    "first_batch_requirement_count": 6,
+    "fixed_input_count": 13,
+    "fixed_input_mismatch_count": 0,
+    "mapped_essence_count": 47,
+    "mapping_duplicate_count": 0,
+    "mapping_uncovered_count": 0,
+    "stage": "stage_four_feature_partitioning_and_requirements",
+    "status": "in_progress"
+  },
+  "promotion_required": true,
+  "record_version": 1,
+  "test_result": {
+    "command": "python3 -m pytest",
+    "passed_count": 346,
+    "status": "passed"
+  },
+  "trigger": {
+    "instruction": "1から5、自律実行。",
+    "issued_at": "2026-07-27"
+  },
+  "work_units": [
+    {
+      "id": "requirement_source_trace_contract",
+      "status": "completed"
+    },
+    {
+      "id": "fixed_input_verification",
+      "status": "completed"
+    },
+    {
+      "id": "feature_partition",
+      "status": "completed"
+    },
+    {
+      "id": "essence_destination_allocation",
+      "status": "completed"
+    },
+    {
+      "id": "requirements_batch_0001",
+      "status": "completed"
+    }
+  ]
+}
