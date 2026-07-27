@@ -1,0 +1,254 @@
+{
+  "audit": {
+    "approval_candidate": null,
+    "covered_count": 840,
+    "digest": "901a7750b68171a7967e081453243086760920960332bdb03640391fc6f2ff9f",
+    "newly_covered_count": 500,
+    "prior_covered_count": 340,
+    "status": "blocked",
+    "uncovered_count": 17852,
+    "unresolved_count": 17855
+  },
+  "batches": [
+    {
+      "candidate_count": 250,
+      "candidate_digest": "483f634b1d0f3d499a30419bf04cfcd5ac009fac336496c351b064b7b0132d72",
+      "classification_digest": "015d1f4e452f0b41cdf039749debee38a4817e9b6cc55f24c844fc778ca68a07",
+      "classification_kind_counts": {
+        "approval": 10,
+        "canonical_spec": 29,
+        "generated_evidence": 211
+      },
+      "classification_status": "complete",
+      "extracted": {
+        "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-07-12-requirements-review-wave-run/prompt-quality-adjudication.yaml": "ESS-0028",
+        "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-07-14-requirements-review-wave-risk-centered-observation.yaml": "ESS-0029"
+      },
+      "extracted_count": 2,
+      "identifier": "structured_materials-0002",
+      "merge_target_counts": {
+        "ESS-0005": 1,
+        "ESS-0010": 1,
+        "ESS-0017": 2,
+        "ESS-0018": 7,
+        "ESS-0021": 10,
+        "ESS-0022": 76,
+        "ESS-0023": 29,
+        "ESS-0024": 29,
+        "ESS-0025": 29,
+        "ESS-0026": 33,
+        "ESS-0027": 28,
+        "ESS-0028": 2,
+        "ESS-0029": 1
+      },
+      "merged_count": 248,
+      "not_selected_count": 0,
+      "resolution_digest": "42963b1904db94adc7ade7a0362371bc75e92cdfbcf60304678976ed923f13d1",
+      "status": "complete"
+    },
+    {
+      "candidate_count": 250,
+      "candidate_digest": "7212f0a5ceb7f4624e9e68a9dd522e33b6b70cdbc11aad15e9fb052d18a34647",
+      "classification_digest": "9885af54f9955413a23f4d4452e770dedd75112256ea92ece60f9fe2c826ac03",
+      "classification_kind_counts": {
+        "approval": 19,
+        "canonical_spec": 19,
+        "generated_evidence": 207,
+        "raw_response": 1,
+        "state": 4
+      },
+      "classification_status": "complete",
+      "extracted": {
+        "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-07-20-requirements-review-wave-risk-centered-subagent-run/formal-results/adversarial-execution.yaml": "ESS-0031",
+        "ReviewCompass:.reviewcompass/specs/analysis/spec.json": "ESS-0030",
+        "ReviewCompass:.reviewcompass/specs/conformance-evaluation/conformance/2026-06-12-reopen-handoff-package.yaml": "ESS-0032",
+        "ReviewCompass:.reviewcompass/specs/conformance-evaluation/reviews/2026-06-04-conformance-evaluation-implementation-review-run/proxy-decisions/CE-IMPL-all.raw.yaml": "ESS-0033"
+      },
+      "extracted_count": 4,
+      "identifier": "structured_materials-0003",
+      "merge_target_counts": {
+        "ESS-0005": 10,
+        "ESS-0009": 4,
+        "ESS-0017": 10,
+        "ESS-0021": 19,
+        "ESS-0022": 68,
+        "ESS-0023": 21,
+        "ESS-0024": 18,
+        "ESS-0025": 11,
+        "ESS-0026": 27,
+        "ESS-0027": 25,
+        "ESS-0028": 19,
+        "ESS-0030": 3,
+        "ESS-0031": 11
+      },
+      "merged_count": 246,
+      "not_selected_count": 0,
+      "resolution_digest": "e223f6e65ec66c39a84641217a27de477778db49d560d4cb69778edc4470a434",
+      "status": "complete"
+    }
+  ],
+  "design_decision_material": {
+    "approval_candidate": {
+      "approved": false,
+      "material_digest": "f95a1d3485e86ac8e7f239012dba738492387c44476d6b132e9641b275213745",
+      "selected_disposition": null,
+      "target_id": "ESS-0012"
+    },
+    "digest": "f95a1d3485e86ac8e7f239012dba738492387c44476d6b132e9641b275213745",
+    "identifier": "ESS-0012",
+    "options": [
+      {
+        "destination": "workflow.active_work_selection",
+        "disposition": "redesign",
+        "evidence": [
+          "ReviewCompass2:docs/design/2026-07-25-current-advantages-inventory.md#L71-L83",
+          "ReviewCompass2:docs/design/2026-07-25-user-decisions-inventory.md#L214"
+        ],
+        "rationale": "旧stack実装へ固定せず複数open案件でも決定性を保てる",
+        "statement": "現在の作業対象を決定する規則として再設計する"
+      },
+      {
+        "destination": null,
+        "disposition": "reject",
+        "evidence": [
+          "ReviewCompass2:docs/design/2026-07-25-current-advantages-inventory.md#L71-L83",
+          "ReviewCompass2:docs/design/2026-07-25-user-decisions-inventory.md#L214"
+        ],
+        "rationale": "状態機構を増やさず明示選択だけで運用する案",
+        "statement": "専用規則を持たず毎回利用者が対象を明示する"
+      },
+      {
+        "destination": "workflow.side_track_stack",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass2:.reviewcompass/evidence/reviews/2026-07-25-impl-coverage-groupFGH.yaml#L126-L132"
+        ],
+        "rationale": "脇道へ入る前の作業位置を明示的に退避できる",
+        "statement": "旧side-track stackを同じ形で移す"
+      }
+    ],
+    "question": "同時に開いた案件の作業対象をどう決定するか",
+    "selected_disposition": null,
+    "status": "awaiting_user_review"
+  },
+  "fixed_sources": [
+    {
+      "commit": "35ef8d4cc66b9a00aca9c6da10b645837b06564b",
+      "repository": "ReviewCompass"
+    },
+    {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "repository": "ReviewCompass2"
+    }
+  ],
+  "lifecycle": "provisional",
+  "new_essence_items": {
+    "structured_materials-0002": {
+      "digest": "99596a23b7ddc74e864179784a53ff982ad8cccb60f0c999ac0782fedf4c2c26",
+      "items": [
+        {
+          "dependencies": [],
+          "destination": "review.verification_record",
+          "disposition": "transfer",
+          "evidence": [
+            "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-07-12-requirements-review-wave-run/prompt-quality-adjudication.yaml"
+          ],
+          "identifier": "ESS-0028",
+          "kind": "contract",
+          "rationale": "検証結果を対象runと検査条件へ追跡できる",
+          "related_tests": [],
+          "statement": "review検査の入力・結果・verdictを版付き記録として保持する"
+        },
+        {
+          "dependencies": [],
+          "destination": "review.empirical_measurement_record",
+          "disposition": "transfer",
+          "evidence": [
+            "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-07-14-requirements-review-wave-risk-centered-observation.yaml"
+          ],
+          "identifier": "ESS-0029",
+          "kind": "empirical_finding",
+          "rationale": "測定値から未計測の結論が伝播することを防げる",
+          "related_tests": [],
+          "statement": "review実行の観測値と解釈限界を分けて保持する"
+        }
+      ],
+      "status": "complete"
+    },
+    "structured_materials-0003": {
+      "digest": "9a455e050098913298e7a6c8f58b2a6bd92915fe6b79b41ed8621f3e396b57c6",
+      "items": [
+        {
+          "dependencies": [],
+          "destination": "workflow.feature_state",
+          "disposition": "transfer",
+          "evidence": [
+            "ReviewCompass:.reviewcompass/specs/analysis/spec.json"
+          ],
+          "identifier": "ESS-0030",
+          "kind": "invariant",
+          "rationale": "実行対象の段階と再開位置を機械照合できる",
+          "related_tests": [],
+          "statement": "feature workflowの現在段階を版付き状態として保持する"
+        },
+        {
+          "dependencies": [],
+          "destination": "review.execution_audit",
+          "disposition": "transfer",
+          "evidence": [
+            "ReviewCompass:.reviewcompass/specs/_cross_feature/reviews/2026-07-20-requirements-review-wave-risk-centered-subagent-run/formal-results/adversarial-execution.yaml"
+          ],
+          "identifier": "ESS-0031",
+          "kind": "empirical_finding",
+          "rationale": "手作業と機械経路を区別して実行事実を検証できる",
+          "related_tests": [],
+          "statement": "reviewの実行経路・費用・関門結果を監査記録へ固定する"
+        },
+        {
+          "dependencies": [],
+          "destination": "review.handoff_package",
+          "disposition": "transfer",
+          "evidence": [
+            "ReviewCompass:.reviewcompass/specs/conformance-evaluation/conformance/2026-06-12-reopen-handoff-package.yaml"
+          ],
+          "identifier": "ESS-0032",
+          "kind": "recovery",
+          "rationale": "再開時に古い指示や材料を採用することを防げる",
+          "related_tests": [],
+          "statement": "再開に必要なpackageと変更方針を照合値付きで引き渡す"
+        },
+        {
+          "dependencies": [],
+          "destination": "review.raw_response_record",
+          "disposition": "transfer",
+          "evidence": [
+            "ReviewCompass:.reviewcompass/specs/conformance-evaluation/reviews/2026-06-04-conformance-evaluation-implementation-review-run/proxy-decisions/CE-IMPL-all.raw.yaml"
+          ],
+          "identifier": "ESS-0033",
+          "kind": "contract",
+          "rationale": "解析結果を元応答へ追跡し再解析できる",
+          "related_tests": [],
+          "statement": "providerのraw応答を送信条件と分離して不変保存する"
+        }
+      ],
+      "status": "complete"
+    }
+  },
+  "normative_status": "non-normative",
+  "priority_plan_digest": "9c9374c2bc3eb74e8dda0ec046a624d5800398df1069aa870c11f6101ac78602",
+  "promotion_required": true,
+  "reassessment": {
+    "agreed_count": 250,
+    "batch_identifier": "structured_materials-0002",
+    "conflict_count": 0,
+    "digest": "877984e3db45312b704c47f44df075a0c2873236842dfb458d1e37a531e18f41",
+    "material_digest": "015d1f4e452f0b41cdf039749debee38a4817e9b6cc55f24c844fc778ca68a07",
+    "paths": [
+      "main",
+      "independent"
+    ],
+    "status": "complete"
+  },
+  "record_version": 1,
+  "status": "blocked"
+}
