@@ -1,0 +1,9 @@
+{"type":"thread.started","thread_id":"codex-thread-safe"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"codex-user-1","type":"user_message","text":"Check the public fixture."}}
+{"type":"item.started","item":{"id":"codex-mcp-1","type":"mcp_tool_call","server":"docs","tool":"search","arguments":{"query":"public fixture"},"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"codex-mcp-1","type":"mcp_tool_call","server":"docs","tool":"search","arguments":{"query":"public fixture"},"result":{"content":[{"type":"text","text":"fixture documentation found"}],"structured_content":null},"error":null,"status":"completed"}}
+{"type":"item.completed","item":{"id":"codex-file-1","type":"file_change","changes":[{"path":"sample.txt","kind":"update"}],"status":"completed"}}
+{"type":"item.updated","item":{"id":"codex-todo-1","type":"todo_list","items":[{"text":"Inspect fixture","completed":true},{"text":"Verify output","completed":false}]}}
+{"type":"item.completed","item":{"id":"codex-agent-1","type":"agent_message","text":"The public fixture is valid."}}
+{"type":"turn.completed","usage":{"input_tokens":10,"cached_input_tokens":0,"output_tokens":5}}

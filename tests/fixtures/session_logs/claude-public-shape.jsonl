@@ -1,0 +1,4 @@
+{"uuid":"claude-user-1","type":"user","sessionId":"claude-session-safe","message":{"role":"user","content":"Inspect the sample project."}}
+{"uuid":"claude-assistant-1","type":"assistant","sessionId":"claude-session-safe","message":{"role":"assistant","content":[{"type":"text","text":"I will inspect the status."},{"type":"tool_use","id":"claude-tool-1","name":"Bash","input":{"command":"git status --short"}}]}}
+{"uuid":"claude-user-2","type":"user","sessionId":"claude-session-safe","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"claude-tool-1","content":[{"type":"text","text":"working tree clean"}],"is_error":false}]}}
+{"uuid":"claude-assistant-2","type":"assistant","sessionId":"claude-session-safe","message":{"role":"assistant","content":[{"type":"text","text":"The sample project is clean."}]}}

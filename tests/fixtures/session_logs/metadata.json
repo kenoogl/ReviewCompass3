@@ -1,0 +1,11 @@
+{
+  "excluded_fields": [
+    "credentials",
+    "machine-specific paths",
+    "raw reasoning"
+  ],
+  "fixtures": {
+    "claude-public-shape.jsonl": "Claude Code JSONL event shape",
+    "codex-exec-public-shape.jsonl": "codex exec --json public shape"
+  }
+}
