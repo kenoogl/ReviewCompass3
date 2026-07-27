@@ -1,15 +1,20 @@
 {
   "approval_candidate": {
     "approved": false,
-    "material_digest": "d3983a4f74014b5c4185524dd8b49e354f47315c0173ae5878a2f198e9785ae8",
+    "material_digest": "44331a3d33a8a72ac9bd73c67bc0a0d51d016add5b0b1de486856ac74acf362c",
     "target": "reviewcompass3_intent"
   },
   "draft": {
     "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
-    "sha256": "68c7c8088c442c0b2d743b1b061af0473f5c98ffbbf64311c7cb75575d2722c5"
+    "sha256": "5f9cfd2b5c8a398159692e87d365fe85bd3a09d8dc58bac6cd2d4c446ef65bbe"
   },
   "input": {
     "approved_item_count": 47,
+    "concept_document": {
+      "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+      "role": "non_normative_concept_detail",
+      "sha256": "1521c143cb591596370ee8183de7b91dab6cb00b44ba4fe9021540daddf801fa"
+    },
     "human_direction": [
       {
         "identifier": "INT-DIR-001",
@@ -19,6 +24,11 @@
       {
         "identifier": "INT-DIR-002",
         "statement": "主な利用者はSDDを行う単独の開発者とする",
+        "status": "confirmed"
+      },
+      {
+        "identifier": "INT-DIR-003",
+        "statement": "ReviewCompassへTask Runtimeを実装し、Review RunのOperational Provenanceを構成する",
         "status": "confirmed"
       }
     ],
@@ -31,7 +41,7 @@
     }
   },
   "lifecycle": "provisional",
-  "material_digest": "d3983a4f74014b5c4185524dd8b49e354f47315c0173ae5878a2f198e9785ae8",
+  "material_digest": "44331a3d33a8a72ac9bd73c67bc0a0d51d016add5b0b1de486856ac74acf362c",
   "normative_status": "non-normative",
   "promotion_required": true,
   "record_version": 1,
