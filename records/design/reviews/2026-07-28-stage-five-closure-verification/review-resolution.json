@@ -1,0 +1,1 @@
+{"material_digest":"9d720ace1f19b2cad5fb9c4677e6151b342ebdb565ef243cd0c6a9e685018ff1","resolved_finding_count":6,"remaining_count":0,"verification":{"interfaces":29,"state_machines":8,"protocols":12,"event_routes":28,"tests":"386 passed","status":"ready_for_final_verification"},"resolution_commits":["08eb1ed","1c1002b","c6ade2d"],"status":"resolved"}

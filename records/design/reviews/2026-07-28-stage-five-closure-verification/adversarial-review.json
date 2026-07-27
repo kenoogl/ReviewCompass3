@@ -1,0 +1,1 @@
+{"reviewer_role":"adversarial_conformance","material_digest":"9d720ace1f19b2cad5fb9c4677e6151b342ebdb565ef243cd0c6a9e685018ff1","verdict":"fail","summary":"局所失敗後にWorkflowがrunningへ残る反例が1件成立する。","findings":[{"id":"ACF-CV-001","severity":"error","issue":"Capture・Validation・dispatch失敗後もWorkflowをrunningへ残せる。"}]}
