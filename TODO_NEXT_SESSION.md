@@ -7,7 +7,7 @@
 
 - `main` は `origin/main` より先行しており、未pushのコミットがある
 - 本TODO更新前の最新機能コミットは
-  `453cf75 Add approved closed review payloads`
+  `4064830 Add deterministic review triage`
 - 最小リポジトリ骨格を作成済み
 - ReviewCompass と ReviewCompass2 の参照コミット、ファイル一覧、照合値を記録済み
 - セッションログ基盤の移植候補と既存テストを棚卸し済み
@@ -43,7 +43,8 @@
 - 第1段のsource universe機械列挙契約をTDDで実装済み
 - 固定commit treeからの既知移植候補発見保証をTDDで実装済み
 - 材料区分、本文束、stale検査、証拠閉包、閉鎖payloadをTDDで実装済み
-- 全テスト結果：`169 passed`
+- 固定契約、担当別実行、raw保存、厳格解析、triageをTDDで実装済み
+- 全テスト結果：`188 passed`
 - 作業ツリーは本TODO更新前の時点でクリーン
 - intent、requirements、design は未着手
 
@@ -68,7 +69,8 @@ macOS・Linux・Windowsの定期実行バックエンドを実装した。
 最初の単独責務であるsource universeの機械列挙契約をTDDで実装した。
 固定commit treeから計画6.3の既知正例11件をすべて発見する保証も実装した。
 材料区分から承認済み閉鎖payloadまでの5責務をTDDで接続した。
-次はプロンプトと出力schemaの固定を単独責務としてTDDで実装する。
+固定レビュー契約からtriageまでの5責務もTDDで接続した。
+次は中断再開と成功成果の温存を単独責務としてTDDで実装する。
 intent、requirements、designは後続段まで作成しない。
 
 ## 完了済み
@@ -175,6 +177,11 @@ intent、requirements、designは後続段まで作成しない。
 - 束内部改変と原文staleの独立検査
 - 必須材料・source被覆・選定経路を扱う証拠閉包判定
 - 原文再検証と承認digest束縛を備えた閉鎖payload
+- 固定プロンプト版と厳格出力schemaを持つ契約済みpayload
+- 同一payload digestに束縛したmain・independent担当別実行
+- 成功応答と失敗診断を保持するattempt単位のraw不変保存
+- raw改変・schema逸脱を拒否する厳格応答解析
+- 重複・競合・単独所見を区別する決定的triage
 
 ## TDD分割コミット
 
@@ -263,6 +270,11 @@ intent、requirements、designは後続段まで作成しない。
 | stale・原文一致検査 | `7692437` | `14cc213` |
 | 証拠閉包と材料被覆 | `d9b17ca` | `2c5cfda` |
 | 閉鎖payloadの生成 | `c8a5e5d` | `453cf75` |
+| プロンプトと出力schema固定 | `859ccf2` | `676fc15` |
+| 複数担当レビュー実行 | `9436d7d` | `b4f771d` |
+| raw応答の不変保存 | `c903d15` | `c365cca` |
+| 厳格な応答解析 | `6c19b1d` | `4e50782` |
+| 所見統合とtriage | `72d7725` | `4064830` |
 
 ## 現在の実装境界
 
@@ -330,40 +342,48 @@ intent、requirements、designは後続段まで作成しない。
   満たす場合だけ`complete`を返す
 - 閉鎖payloadは原文一致、完全な閉包、明示承認、束・対象digest一致を必須とし、
   payload生成自体は外部送信もファイル保存も行わない
+- レビュー契約は固定プロンプト版`bootstrap-review-v1`と出力schema版1だけを
+  受理し、閉鎖payload digestを含む決定的contentを生成する
+- 担当実行はmain・independent両経路を必須とし、runnerは注入境界に留め、
+  現段階では外部providerへの実送信を行わない
+- raw保存は安全なattempt IDの新規ディレクトリだけを使い、既存attemptを
+  上書きせず、失敗診断もdigest付き不変証拠として保持する
+- parsed応答は固定schemaの完全一致だけを受理し、raw・parsed・triageの
+  各digestと契約payload digestを連結する
 
 ## 次の作業候補
 
 次回は先頭から1つを選び、複数の責務を同時に実装しない。
 
-### 1. プロンプトと出力schemaの固定
+### 1. 中断再開と成功成果の温存
 
-- 閉鎖payloadに埋め込む固定プロンプト版を定義する
-- 機械解析できる出力schemaと必須項目を固定する
-- 未知版・schema不一致を送信前に拒否する
+- attempt状態から未完了担当だけを再開する
+- 成功済みraw・parsed・triageを上書きしない
+- 失敗履歴を保持したまま再試行結果を追加する
 
-### 2. 複数モデルまたは複数担当の実行
+### 2. ブートストラップreview pipeline統括
 
-- mainと独立担当の実行単位を分離する
-- 同一payload digestへの実行を束縛する
-- 一部失敗時も成功済み実行を温存する
+- 材料束からtriageまでの固定順序を一入口へ接続する
+- 段階別状態と停止理由を構造化して返す
+- 外部送信前の承認・stale再検証を再利用する
 
-### 3. raw応答の不変保存
+### 3. 固定CLIと成果物配置境界
 
-- providerのraw応答を上書きせず保存する
-- payload・実行担当・raw digestを連結する
-- 失敗応答も診断証拠として残す
+- cwd非依存の固定CLI入口を追加する
+- raw・parsed・triageのGit／非Git保存区分を固定する
+- dry-runで送信・保存予定を値なし確認できるようにする
 
-### 4. 厳格な応答解析
+### 4. 独立変異・障害注入検査
 
-- 固定schemaに一致する応答だけを受理する
-- 欠落・未知キー・型不一致をfail-closedで拒否する
-- raw digestとparsed digestを連結する
+- digest、schema、担当経路、途中保存を独立に変異させる
+- provider失敗・保存失敗・再開失敗で成功成果が残ることを検証する
+- 検査対象と検出結果を値なし証拠へ記録する
 
-### 5. 所見の統合とtriage
+### 5. 第1段完了関門監査
 
-- 複数担当の所見を決定的に統合する
-- 重複所見と競合判断を明示的に残す
-- raw・parsed・triageのdigest連結を完成させる
+- 計画6.4の8関門と実装証拠を機械対応づけする
+- 未解決・未検証項目があればfail-closedで停止する
+- 利用者承認前の候補状態までを値なしで記録する
 
 ## 次のTDDサイクル
 
