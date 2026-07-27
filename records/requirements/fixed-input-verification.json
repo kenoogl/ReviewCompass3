@@ -1,0 +1,111 @@
+{
+  "inputs": [
+    {
+      "assertions": [],
+      "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+      "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+    },
+    {
+      "assertions": [
+        {
+          "expected": true,
+          "pointer": "/approval/approved"
+        },
+        {
+          "expected": "4bed543815e294ba9bc001e0dbea8e8ea8ba8f86e2314e134918853f623ee189",
+          "pointer": "/approval/material_digest"
+        },
+        {
+          "expected": "passed",
+          "pointer": "/status"
+        }
+      ],
+      "path": "records/intent/stage-three-user-approval.json",
+      "sha256": "6b1932b87bfa9b5c0cc52ca70e4d90a53a628c86d501f71fd8d7330cc936dd92"
+    },
+    {
+      "assertions": [
+        {
+          "expected": 47,
+          "pointer": "/ledger_approval/item_count"
+        },
+        {
+          "expected": "6b6b4220117b6426be67b273ac151684579e0baa11041d19f37ff440d165849e",
+          "pointer": "/ledger_approval/ledger_digest"
+        },
+        {
+          "expected": "passed",
+          "pointer": "/ledger_approval/status"
+        }
+      ],
+      "path": "records/extraction/stage-two-user-approval.json",
+      "sha256": "ad04291ac9e76beef6d97078a791d0b4ea7dec73a621433135f33075dde76b1b"
+    },
+    {
+      "assertions": [],
+      "path": "records/extraction/initial-essence-ledger.json",
+      "sha256": "24c28d1891cc4c9db2ebbacaa6649ea92f4fefc4f3a623dd8c904e2e93f5a231"
+    },
+    {
+      "assertions": [],
+      "path": "records/extraction/expanded-extraction-pass.json",
+      "sha256": "bfb3b4bdfbaeda80b11e00584f5012925d1b7da69e37cc2eb433d7290860a693"
+    },
+    {
+      "assertions": [],
+      "path": "records/extraction/dependency-priority-reaudit.json",
+      "sha256": "fba154423dfb1d5964c763a049ed066d55f8a6fe65802a6c007f0875a04acf91"
+    },
+    {
+      "assertions": [],
+      "path": "records/extraction/structured-batch-0001-reaudit.json",
+      "sha256": "e6dbb6e70a095e697db9ddc9a8169c7849b539f2629e5cb395c41dd687ea9441"
+    },
+    {
+      "assertions": [],
+      "path": "records/extraction/structured-batches-0002-0003-reaudit.json",
+      "sha256": "d4a7e229087ec4a462b989f79271ebfeabe63819439a6c9bb2d60b5845a9ae2f"
+    },
+    {
+      "assertions": [],
+      "path": "records/extraction/structured-batch-0004-reaudit.json",
+      "sha256": "8763fb365b59e5f4f0a898db860cb3adfd540102bcef46f1a80f093b640d2854"
+    },
+    {
+      "assertions": [],
+      "path": "records/extraction/ess-0012-redesign-reaudit.json",
+      "sha256": "ba12a0861d00693ba87a24ed55b65042ff14ba65cd073cba3cac34107ad9dad1"
+    },
+    {
+      "assertions": [],
+      "path": "records/extraction/stage-two-bulk-completion.json",
+      "sha256": "5d3a3127771ed2223afd0899618e31116fa30a9096f43871ad3fe655e2491a77"
+    },
+    {
+      "assertions": [],
+      "path": "docs/plan/2026-07-27-reviewcompass3-rebuild-plan.md",
+      "sha256": "87da13798b9af229ea304b5fb973c8a6ed41300a117f6356007e0dae4f17604e"
+    },
+    {
+      "assertions": [
+        {
+          "expected": "completed",
+          "pointer": "/status"
+        }
+      ],
+      "path": "records/intent/stage-three-completion.json",
+      "sha256": "8d26e1929e08d4cdfd0a9c43bd798bce2afb4ce46085f9a22e38220386f6d4d3"
+    }
+  ],
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "result": {
+    "input_count": 13,
+    "mismatch_count": 0,
+    "status": "ready",
+    "verification_digest": "0a3eeba8c43ac80a700ffb7fee902f7428e7ee817eccae917b5f6866437c55a0"
+  },
+  "status": "ready"
+}
