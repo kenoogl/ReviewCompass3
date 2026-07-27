@@ -7,67 +7,132 @@
     {
       "protocol_id": "PROTOCOL-RUN-START",
       "steps": [
-        "Review ContextをTask、active work、Context digest、freshness verdictおよびExecution Spec digestへ束縛する",
-        "Workflowが束縛値を含む単回Run permitを耐久化する",
-        "Harnessが外部送信直前にpermitと全束縛値を再検証する",
-        "不一致、期限切れまたは再利用をblockedとして保存し外部送信しない"
+        {
+          "step_id": "RUN-START-001",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-HARNESS-WORKFLOW-START-REQUEST",
+          "state_machine_id": "SM-WORKFLOW",
+          "event": "prepare",
+          "on_failure": "開始要求を拒否してWorkflowをidleに保つ"
+        },
+        {
+          "step_id": "RUN-START-002",
+          "actor_design_id": "DES-WORKFLOW-CONTROL",
+          "interface_id": "IF-WORKFLOW-HARNESS-PERMIT",
+          "state_machine_id": "SM-WORKFLOW",
+          "event": "permit",
+          "on_failure": "permitを発行せずblockedへ遷移する"
+        },
+        {
+          "step_id": "RUN-START-003",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-WORKFLOW-HARNESS-PERMIT",
+          "state_machine_id": "SM-RUN",
+          "event": "authorize",
+          "on_failure": "外部送信なしでRunをblocked終端にする"
+        },
+        {
+          "step_id": "RUN-START-004",
+          "actor_design_id": "DES-HARNESSED-EXECUTION",
+          "interface_id": "IF-PORTABLE-HARNESS-STORE",
+          "state_machine_id": "SM-RUN",
+          "event": "send",
+          "on_failure": "capture予約失敗を未送信失敗として保存する"
+        }
       ]
     },
     {
       "protocol_id": "PROTOCOL-FINDING-FINALIZATION",
       "steps": [
-        "Harnessの検証済み結果からFinding候補を構成し内容Digestで凍結する",
-        "Semantic Traceが凍結候補と入力・Attempt・Validationの来歴を検証してpre-provenance verdictを保存する",
-        "pre-provenance合格後にだけHumanが採用、拒否または保留を判断する",
-        "Human判断を候補Digestへ束縛してFinal Finding候補を保存する",
-        "Semantic TraceがFinal Findingまでの来歴を再検証してfinal provenance verdictを保存する",
-        "Workflowはfinal provenance合格後にだけRunと段階を完了する"
+        {
+          "step_id": "FINDING-001",
+          "actor_design_id": "DES-REVIEW-TRIAGE",
+          "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+          "state_machine_id": "SM-TRIAGE-PROVENANCE",
+          "event": "freeze",
+          "on_failure": "候補を生成せずRunをfailedにする"
+        },
+        {
+          "step_id": "FINDING-002",
+          "actor_design_id": "DES-SEMANTIC-TRACE",
+          "interface_id": "IF-TRACE-TRIAGE-PREVERDICT",
+          "state_machine_id": "SM-TRIAGE-PROVENANCE",
+          "event": "prevalidate",
+          "on_failure": "Humanへ提示せずRunとWorkflowをblockedにする"
+        },
+        {
+          "step_id": "FINDING-003",
+          "actor_design_id": "DES-REVIEW-TRIAGE",
+          "interface_id": "IF-TRACE-TRIAGE-PREVERDICT",
+          "state_machine_id": "SM-TRIAGE-PROVENANCE",
+          "event": "human_decide",
+          "on_failure": "判断なしとして候補を未確定に保つ"
+        },
+        {
+          "step_id": "FINDING-004",
+          "actor_design_id": "DES-REVIEW-TRIAGE",
+          "interface_id": "IF-TRIAGE-TRACE-FINAL",
+          "state_machine_id": "SM-TRIAGE-PROVENANCE",
+          "event": "record_final",
+          "on_failure": "Final Findingを未確定に保つ"
+        },
+        {
+          "step_id": "FINDING-005",
+          "actor_design_id": "DES-SEMANTIC-TRACE",
+          "interface_id": "IF-TRACE-TRIAGE-FINALVERDICT",
+          "state_machine_id": "SM-TRIAGE-PROVENANCE",
+          "event": "final_validate",
+          "on_failure": "RunとWorkflowへprovenance_failedを通知する"
+        },
+        {
+          "step_id": "FINDING-006",
+          "actor_design_id": "DES-WORKFLOW-CONTROL",
+          "interface_id": "IF-TRACE-WORKFLOW-FINALVERDICT",
+          "state_machine_id": "SM-WORKFLOW",
+          "event": "provenance_passed",
+          "on_failure": "段階を完了せずblockedにする"
+        }
       ]
     },
     {
       "protocol_id": "PROTOCOL-IMPROVEMENT-CYCLE",
       "steps": [
-        "Evidence Evaluationが固定測定条件と観測値を評価Packageへ固定する",
-        "Self Improvementが評価Packageから改善仮説を生成し固定条件で比較する",
-        "Human承認済みのpolicy changeだけを版付き変更提案としてWorkflowへ渡す",
-        "Workflowが次周期の開始時に変更提案の版、Digestおよび適用範囲を検証する"
+        {
+          "step_id": "IMPROVEMENT-001",
+          "actor_design_id": "DES-SELF-IMPROVEMENT",
+          "interface_id": "IF-EVALUATION-IMPROVEMENT-PACKAGE",
+          "state_machine_id": "SM-WORKFLOW",
+          "event": "prepare",
+          "on_failure": "改善候補を次周期へ渡さない"
+        },
+        {
+          "step_id": "IMPROVEMENT-002",
+          "actor_design_id": "DES-WORKFLOW-CONTROL",
+          "interface_id": "IF-IMPROVEMENT-WORKFLOW-CHANGE",
+          "state_machine_id": "SM-WORKFLOW",
+          "event": "prepare",
+          "on_failure": "現行policyを維持する"
+        }
       ]
     }
   ],
   "interfaces": [
     {
-      "interface_id": "IF-PORTABLE-CONTEXT-STORE",
-      "provider_design_id": "DES-PORTABLE-LIFECYCLE",
-      "consumer_design_id": "DES-REVIEW-CONTEXT",
+      "interface_id": "IF-CONTEXT-TRACE-IDENTITY",
+      "provider_design_id": "DES-REVIEW-CONTEXT",
+      "consumer_design_id": "DES-SEMANTIC-TRACE",
       "identity_fields": [
-        "artifact_id",
-        "artifact_digest",
-        "storage_policy_version"
+        "task_id",
+        "context_id",
+        "context_digest"
       ],
       "payload_fields": [
-        "resolved_location",
-        "integrity_verdict",
-        "retention_class"
+        "material_identities",
+        "scope_contract",
+        "requirement_relations"
       ],
-      "failure_verdict": "保存位置、Digestまたはpolicyが不一致ならContext確定をblockedにする",
-      "owner_design_id": "DES-PORTABLE-LIFECYCLE"
-    },
-    {
-      "interface_id": "IF-SESSION-CONTEXT-MATERIAL",
-      "provider_design_id": "DES-SESSION-RECORDS",
-      "consumer_design_id": "DES-REVIEW-CONTEXT",
-      "identity_fields": [
-        "raw_record_id",
-        "raw_record_digest",
-        "derived_record_digest"
-      ],
-      "payload_fields": [
-        "redacted_material",
-        "redaction_policy_version",
-        "mutation_verdict"
-      ],
-      "failure_verdict": "原本、派生物または伏字policyを検証できなければ材料を不採用にする",
-      "owner_design_id": "DES-SESSION-RECORDS"
+      "failure_verdict": "Context identityまたは関係集合の欠落をprovenance不合格にする",
+      "owner_design_id": "DES-REVIEW-CONTEXT"
     },
     {
       "interface_id": "IF-CONTEXT-WORKFLOW-REQUEST",
@@ -78,40 +143,75 @@
         "active_work_id",
         "context_id",
         "context_digest",
-        "freshness_verdict",
-        "execution_spec_digest"
+        "context_ref",
+        "freshness_verdict_digest"
       ],
       "payload_fields": [
         "goal",
         "target",
         "constraints",
         "expected_output",
-        "scope_contract"
+        "scope_contract",
+        "context_requirements"
       ],
       "failure_verdict": "完全性、scope、freshnessまたはDigestの不一致をblockedにする",
       "owner_design_id": "DES-REVIEW-CONTEXT"
     },
     {
-      "interface_id": "IF-WORKFLOW-HARNESS-PERMIT",
-      "provider_design_id": "DES-WORKFLOW-CONTROL",
-      "consumer_design_id": "DES-HARNESSED-EXECUTION",
+      "interface_id": "IF-EVALUATION-IMPROVEMENT-PACKAGE",
+      "provider_design_id": "DES-EVIDENCE-EVALUATION",
+      "consumer_design_id": "DES-SELF-IMPROVEMENT",
       "identity_fields": [
-        "permit_id",
-        "task_id",
-        "active_work_id",
-        "context_digest",
-        "execution_spec_digest",
-        "issuer_id",
-        "expires_at"
+        "evaluation_id",
+        "evaluation_digest",
+        "measurement_policy_version"
       ],
       "payload_fields": [
-        "allowed_topology",
-        "allowed_providers",
-        "validation_policy",
-        "retry_policy"
+        "fixed_conditions",
+        "observations",
+        "interpretations",
+        "uncertainties"
       ],
-      "failure_verdict": "permitの不一致、期限切れまたは再利用をblockedとして外部送信前に保存する",
-      "owner_design_id": "DES-WORKFLOW-CONTROL"
+      "failure_verdict": "測定条件、観測値または解釈の由来が欠ければ改善仮説を生成しない",
+      "owner_design_id": "DES-EVIDENCE-EVALUATION"
+    },
+    {
+      "interface_id": "IF-HARNESS-EVALUATION-OBSERVATION",
+      "provider_design_id": "DES-HARNESSED-EXECUTION",
+      "consumer_design_id": "DES-EVIDENCE-EVALUATION",
+      "identity_fields": [
+        "run_id",
+        "attempt_id",
+        "execution_condition_digest",
+        "observation_digest"
+      ],
+      "payload_fields": [
+        "measurement_conditions",
+        "observed_values",
+        "costs",
+        "gate_results",
+        "measurement_limits"
+      ],
+      "failure_verdict": "Run、Attempt、条件または観測Digestが欠ければ評価へ採用しない",
+      "owner_design_id": "DES-HARNESSED-EXECUTION"
+    },
+    {
+      "interface_id": "IF-HARNESS-TRACE-CAPTURES",
+      "provider_design_id": "DES-HARNESSED-EXECUTION",
+      "consumer_design_id": "DES-SEMANTIC-TRACE",
+      "identity_fields": [
+        "run_id",
+        "attempt_id",
+        "provider_capture_digest"
+      ],
+      "payload_fields": [
+        "input_digest",
+        "raw_output_digest",
+        "validation_trace",
+        "retry_parent_attempt_id"
+      ],
+      "failure_verdict": "入力、capture、ValidationまたはRetry鎖の欠落をprovenance不合格にする",
+      "owner_design_id": "DES-HARNESSED-EXECUTION"
     },
     {
       "interface_id": "IF-HARNESS-TRIAGE-RESULTS",
@@ -133,39 +233,239 @@
       "owner_design_id": "DES-HARNESSED-EXECUTION"
     },
     {
-      "interface_id": "IF-CONTEXT-TRACE-IDENTITY",
-      "provider_design_id": "DES-REVIEW-CONTEXT",
-      "consumer_design_id": "DES-SEMANTIC-TRACE",
-      "identity_fields": [
-        "task_id",
-        "context_id",
-        "context_digest"
-      ],
-      "payload_fields": [
-        "material_identities",
-        "scope_contract",
-        "requirement_relations"
-      ],
-      "failure_verdict": "Context identityまたは関係集合の欠落をprovenance不合格にする",
-      "owner_design_id": "DES-REVIEW-CONTEXT"
-    },
-    {
-      "interface_id": "IF-HARNESS-TRACE-CAPTURES",
+      "interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
       "provider_design_id": "DES-HARNESSED-EXECUTION",
-      "consumer_design_id": "DES-SEMANTIC-TRACE",
+      "consumer_design_id": "DES-WORKFLOW-CONTROL",
       "identity_fields": [
         "run_id",
-        "attempt_id",
-        "provider_capture_digest"
+        "permit_id",
+        "active_work_id",
+        "terminal_kind",
+        "result_digest",
+        "failure_digest"
       ],
       "payload_fields": [
-        "input_digest",
-        "raw_output_digest",
-        "validation_trace",
-        "retry_parent_attempt_id"
+        "attempt_ids",
+        "validation_verdicts",
+        "candidate_finding_digest",
+        "diagnostic_refs"
       ],
-      "failure_verdict": "入力、capture、ValidationまたはRetry鎖の欠落をprovenance不合格にする",
+      "failure_verdict": "Runとactive workが不一致なら完了せずblockedとして保存する",
       "owner_design_id": "DES-HARNESSED-EXECUTION"
+    },
+    {
+      "interface_id": "IF-HARNESS-WORKFLOW-START-REQUEST",
+      "provider_design_id": "DES-HARNESSED-EXECUTION",
+      "consumer_design_id": "DES-WORKFLOW-CONTROL",
+      "identity_fields": [
+        "start_request_id",
+        "run_id",
+        "task_id",
+        "active_work_id",
+        "context_id",
+        "context_digest",
+        "context_ref",
+        "execution_spec_id",
+        "execution_spec_digest",
+        "execution_spec_ref"
+      ],
+      "payload_fields": [
+        "requested_topology",
+        "requested_providers",
+        "validation_policy",
+        "retry_policy"
+      ],
+      "failure_verdict": "要求、ContextまたはExecution Specが不完全ならpermitを発行しない",
+      "owner_design_id": "DES-HARNESSED-EXECUTION"
+    },
+    {
+      "interface_id": "IF-IMPROVEMENT-WORKFLOW-CHANGE",
+      "provider_design_id": "DES-SELF-IMPROVEMENT",
+      "consumer_design_id": "DES-WORKFLOW-CONTROL",
+      "identity_fields": [
+        "change_id",
+        "change_digest",
+        "approval_digest",
+        "target_cycle_id"
+      ],
+      "payload_fields": [
+        "policy_version",
+        "applicability_scope",
+        "comparison_evidence",
+        "rollback_condition"
+      ],
+      "failure_verdict": "検証またはHuman承認が欠ける変更を次周期へ適用しない",
+      "owner_design_id": "DES-SELF-IMPROVEMENT"
+    },
+    {
+      "interface_id": "IF-PORTABLE-CONTEXT-STORE",
+      "provider_design_id": "DES-PORTABLE-LIFECYCLE",
+      "consumer_design_id": "DES-REVIEW-CONTEXT",
+      "identity_fields": [
+        "artifact_id",
+        "artifact_digest",
+        "storage_policy_version"
+      ],
+      "payload_fields": [
+        "resolved_location",
+        "integrity_verdict",
+        "retention_class"
+      ],
+      "failure_verdict": "保存位置、Digestまたはpolicyが不一致ならContext確定をblockedにする",
+      "owner_design_id": "DES-PORTABLE-LIFECYCLE"
+    },
+    {
+      "interface_id": "IF-PORTABLE-HARNESS-STORE",
+      "provider_design_id": "DES-PORTABLE-LIFECYCLE",
+      "consumer_design_id": "DES-HARNESSED-EXECUTION",
+      "identity_fields": [
+        "store_id",
+        "storage_policy_version",
+        "access_policy_digest"
+      ],
+      "payload_fields": [
+        "write_ahead_location",
+        "atomic_write_contract",
+        "raw_isolation_contract",
+        "recovery_contract"
+      ],
+      "failure_verdict": "write-aheadまたは隔離保存を保証できなければ外部送信しない",
+      "owner_design_id": "DES-PORTABLE-LIFECYCLE"
+    },
+    {
+      "interface_id": "IF-PORTABLE-SESSION-STORE",
+      "provider_design_id": "DES-PORTABLE-LIFECYCLE",
+      "consumer_design_id": "DES-SESSION-RECORDS",
+      "identity_fields": [
+        "store_id",
+        "storage_policy_version",
+        "access_policy_digest"
+      ],
+      "payload_fields": [
+        "raw_location",
+        "derived_location",
+        "retention_contract",
+        "deletion_contract"
+      ],
+      "failure_verdict": "原本と派生物を分離できなければ取込をblockedにする",
+      "owner_design_id": "DES-PORTABLE-LIFECYCLE"
+    },
+    {
+      "interface_id": "IF-PORTABLE-WORKFLOW-STORE",
+      "provider_design_id": "DES-PORTABLE-LIFECYCLE",
+      "consumer_design_id": "DES-WORKFLOW-CONTROL",
+      "identity_fields": [
+        "store_id",
+        "storage_policy_version",
+        "state_record_digest"
+      ],
+      "payload_fields": [
+        "atomic_update_contract",
+        "reload_verification",
+        "recovery_contract"
+      ],
+      "failure_verdict": "状態を原子的に保存・再読込照合できなければ遷移しない",
+      "owner_design_id": "DES-PORTABLE-LIFECYCLE"
+    },
+    {
+      "interface_id": "IF-SESSION-CONTEXT-MATERIAL",
+      "provider_design_id": "DES-SESSION-RECORDS",
+      "consumer_design_id": "DES-REVIEW-CONTEXT",
+      "identity_fields": [
+        "raw_record_id",
+        "raw_record_digest",
+        "derived_record_digest"
+      ],
+      "payload_fields": [
+        "redacted_material",
+        "redaction_policy_version",
+        "mutation_verdict"
+      ],
+      "failure_verdict": "原本、派生物または伏字policyを検証できなければ材料を不採用にする",
+      "owner_design_id": "DES-SESSION-RECORDS"
+    },
+    {
+      "interface_id": "IF-TRACE-CONTEXT-SCOPE",
+      "provider_design_id": "DES-SEMANTIC-TRACE",
+      "consumer_design_id": "DES-REVIEW-CONTEXT",
+      "identity_fields": [
+        "change_set_id",
+        "trace_snapshot_digest",
+        "scope_candidate_digest"
+      ],
+      "payload_fields": [
+        "impact_candidate_ids",
+        "generation_edges",
+        "closure_rule_version"
+      ],
+      "failure_verdict": "母集合または生成根拠が欠ければScope構成をblockedにする",
+      "owner_design_id": "DES-SEMANTIC-TRACE"
+    },
+    {
+      "interface_id": "IF-TRACE-RUN-FINALVERDICT",
+      "provider_design_id": "DES-SEMANTIC-TRACE",
+      "consumer_design_id": "DES-HARNESSED-EXECUTION",
+      "identity_fields": [
+        "run_id",
+        "final_finding_digest",
+        "final_verdict_digest"
+      ],
+      "payload_fields": [
+        "final_provenance_status",
+        "validated_operational_edges",
+        "unresolved_operational_edges"
+      ],
+      "failure_verdict": "final provenance不合格ならRunをfailed終端へ進める",
+      "owner_design_id": "DES-SEMANTIC-TRACE"
+    },
+    {
+      "interface_id": "IF-TRACE-TRIAGE-FINALVERDICT",
+      "provider_design_id": "DES-SEMANTIC-TRACE",
+      "consumer_design_id": "DES-REVIEW-TRIAGE",
+      "identity_fields": [
+        "final_finding_digest",
+        "final_verdict_digest"
+      ],
+      "payload_fields": [
+        "final_provenance_status",
+        "validated_operational_edges",
+        "unresolved_operational_edges"
+      ],
+      "failure_verdict": "final provenance不合格ならFindingを未確定のblockedにする",
+      "owner_design_id": "DES-SEMANTIC-TRACE"
+    },
+    {
+      "interface_id": "IF-TRACE-TRIAGE-PREVERDICT",
+      "provider_design_id": "DES-SEMANTIC-TRACE",
+      "consumer_design_id": "DES-REVIEW-TRIAGE",
+      "identity_fields": [
+        "candidate_digest",
+        "pre_verdict_digest"
+      ],
+      "payload_fields": [
+        "pre_provenance_status",
+        "validated_edges",
+        "unresolved_edges"
+      ],
+      "failure_verdict": "pre-provenance不合格または未解決ならHuman判断を開始しない",
+      "owner_design_id": "DES-SEMANTIC-TRACE"
+    },
+    {
+      "interface_id": "IF-TRACE-WORKFLOW-FINALVERDICT",
+      "provider_design_id": "DES-SEMANTIC-TRACE",
+      "consumer_design_id": "DES-WORKFLOW-CONTROL",
+      "identity_fields": [
+        "run_id",
+        "final_finding_digest",
+        "final_verdict_digest"
+      ],
+      "payload_fields": [
+        "final_provenance_status",
+        "validated_operational_edges",
+        "unresolved_operational_edges"
+      ],
+      "failure_verdict": "final provenance不合格または未解決ならRunと段階を完了しない",
+      "owner_design_id": "DES-SEMANTIC-TRACE"
     },
     {
       "interface_id": "IF-TRIAGE-TRACE-CANDIDATE",
@@ -183,22 +483,6 @@
       ],
       "failure_verdict": "候補が凍結されていないか結果集合へ閉じなければpre-provenance不合格にする",
       "owner_design_id": "DES-REVIEW-TRIAGE"
-    },
-    {
-      "interface_id": "IF-TRACE-TRIAGE-PREVERDICT",
-      "provider_design_id": "DES-SEMANTIC-TRACE",
-      "consumer_design_id": "DES-REVIEW-TRIAGE",
-      "identity_fields": [
-        "candidate_digest",
-        "pre_verdict_digest"
-      ],
-      "payload_fields": [
-        "pre_provenance_status",
-        "validated_edges",
-        "unresolved_edges"
-      ],
-      "failure_verdict": "pre-provenance不合格または未解決ならHuman判断を開始しない",
-      "owner_design_id": "DES-SEMANTIC-TRACE"
     },
     {
       "interface_id": "IF-TRIAGE-TRACE-FINAL",
@@ -219,58 +503,35 @@
       "owner_design_id": "DES-REVIEW-TRIAGE"
     },
     {
-      "interface_id": "IF-TRACE-WORKFLOW-FINALVERDICT",
-      "provider_design_id": "DES-SEMANTIC-TRACE",
-      "consumer_design_id": "DES-WORKFLOW-CONTROL",
+      "interface_id": "IF-WORKFLOW-HARNESS-PERMIT",
+      "provider_design_id": "DES-WORKFLOW-CONTROL",
+      "consumer_design_id": "DES-HARNESSED-EXECUTION",
       "identity_fields": [
+        "permit_id",
+        "start_request_id",
         "run_id",
-        "final_finding_digest",
-        "final_verdict_digest"
+        "task_id",
+        "active_work_id",
+        "context_id",
+        "context_digest",
+        "context_ref",
+        "freshness_verdict_digest",
+        "freshness_checked_at",
+        "freshness_validator_version",
+        "execution_spec_id",
+        "execution_spec_digest",
+        "execution_spec_ref",
+        "issuer_id",
+        "expires_at"
       ],
       "payload_fields": [
-        "final_provenance_status",
-        "validated_operational_edges",
-        "unresolved_operational_edges"
+        "allowed_topology",
+        "allowed_providers",
+        "validation_policy",
+        "retry_policy"
       ],
-      "failure_verdict": "final provenance不合格または未解決ならRunと段階を完了しない",
-      "owner_design_id": "DES-SEMANTIC-TRACE"
-    },
-    {
-      "interface_id": "IF-EVALUATION-IMPROVEMENT-PACKAGE",
-      "provider_design_id": "DES-EVIDENCE-EVALUATION",
-      "consumer_design_id": "DES-SELF-IMPROVEMENT",
-      "identity_fields": [
-        "evaluation_id",
-        "evaluation_digest",
-        "measurement_policy_version"
-      ],
-      "payload_fields": [
-        "fixed_conditions",
-        "observations",
-        "interpretations",
-        "uncertainties"
-      ],
-      "failure_verdict": "測定条件、観測値または解釈の由来が欠ければ改善仮説を生成しない",
-      "owner_design_id": "DES-EVIDENCE-EVALUATION"
-    },
-    {
-      "interface_id": "IF-IMPROVEMENT-WORKFLOW-CHANGE",
-      "provider_design_id": "DES-SELF-IMPROVEMENT",
-      "consumer_design_id": "DES-WORKFLOW-CONTROL",
-      "identity_fields": [
-        "change_id",
-        "change_digest",
-        "approval_digest",
-        "target_cycle_id"
-      ],
-      "payload_fields": [
-        "policy_version",
-        "applicability_scope",
-        "comparison_evidence",
-        "rollback_condition"
-      ],
-      "failure_verdict": "検証またはHuman承認が欠ける変更を次周期へ適用しない",
-      "owner_design_id": "DES-SELF-IMPROVEMENT"
+      "failure_verdict": "permitの不一致、期限切れまたは再利用をblockedとして外部送信前に保存する",
+      "owner_design_id": "DES-WORKFLOW-CONTROL"
     }
   ],
   "state_machines": [
@@ -282,44 +543,75 @@
         "ready",
         "running",
         "awaiting_final_provenance",
-        "completed",
-        "blocked"
+        "blocked",
+        "completed"
       ],
       "events": [
         "prepare",
         "permit",
         "execution_finished",
+        "execution_failed",
+        "execution_rejected",
         "provenance_passed",
         "provenance_failed",
-        "invalidate"
+        "invalidate",
+        "reopen"
       ],
       "transitions": [
         {
           "from": "idle",
           "event": "prepare",
           "to": "ready",
-          "guard": "active workとContext identityが確定している",
-          "persistence": "ready stateと束縛値をpermit発行前に耐久化する"
+          "guard": "開始要求、Context、Specおよびactive workが一致する",
+          "persistence": "検査済み開始要求をpermit発行前に保存する"
         },
         {
           "from": "ready",
           "event": "permit",
           "to": "running",
-          "guard": "単回permitが全束縛値と一致する",
-          "persistence": "permit消費を外部送信前に耐久化する"
+          "guard": "単回permitが承認済み開始要求へ完全に束縛される",
+          "persistence": "permitと消費前状態を外部送信前に保存する"
+        },
+        {
+          "from": "ready",
+          "event": "invalidate",
+          "to": "blocked",
+          "guard": "Context、Specまたはactive workが変更された",
+          "persistence": "permit無効化と理由を保存する"
         },
         {
           "from": "running",
           "event": "execution_finished",
           "to": "awaiting_final_provenance",
-          "guard": "Runが検証済み終端状態にある",
-          "persistence": "Run終端とFinal Finding待ちを同一更新で保存する"
+          "guard": "Harness結果がrun、permit、active workへ一致する",
+          "persistence": "Run結果をfinal verdict待ちより先に保存する"
+        },
+        {
+          "from": "running",
+          "event": "execution_failed",
+          "to": "blocked",
+          "guard": "Harnessがfailedまたはirrecoverableを返した",
+          "persistence": "失敗結果とblocked状態を原子的に保存する"
+        },
+        {
+          "from": "running",
+          "event": "execution_rejected",
+          "to": "blocked",
+          "guard": "開始後の関門がRunを拒否した",
+          "persistence": "拒否理由とblocked状態を原子的に保存する"
+        },
+        {
+          "from": "running",
+          "event": "provenance_failed",
+          "to": "blocked",
+          "guard": "pre-provenanceが不合格である",
+          "persistence": "pre不合格とRun停止を原子的に保存する"
         },
         {
           "from": "awaiting_final_provenance",
           "event": "provenance_passed",
           "to": "completed",
-          "guard": "Final Finding digestへ束縛されたfinal verdictが合格である",
+          "guard": "Final Findingへ束縛されたfinal verdictが合格である",
           "persistence": "final verdictを完了状態より先に保存する"
         },
         {
@@ -327,14 +619,14 @@
           "event": "provenance_failed",
           "to": "blocked",
           "guard": "final verdictが不合格または未解決である",
-          "persistence": "不合格理由をblocked状態と原子的に保存する"
+          "persistence": "不合格理由とblocked状態を原子的に保存する"
         },
         {
-          "from": "ready",
-          "event": "invalidate",
-          "to": "blocked",
-          "guard": "Context、Specまたはactive workが変更された",
-          "persistence": "permit無効化を次回発行前に保存する"
+          "from": "blocked",
+          "event": "reopen",
+          "to": "ready",
+          "guard": "訂正済みContextまたはSpecを新しい版で承認した",
+          "persistence": "旧失敗を保持し新しい開始要求を別版として保存する"
         }
       ]
     },
@@ -346,69 +638,119 @@
         "permitted",
         "executing",
         "validating",
+        "retry_pending",
         "awaiting_triage",
         "succeeded",
         "failed",
+        "irrecoverable",
         "blocked"
       ],
       "events": [
         "authorize",
+        "authorization_failed",
         "send",
         "capture_complete",
+        "capture_quarantined",
+        "capture_failed",
         "validation_passed",
+        "validation_retryable",
         "validation_failed",
-        "triage_complete",
-        "authorization_failed"
+        "retry_authorized",
+        "retry_exhausted",
+        "final_provenance_passed",
+        "provenance_failed"
       ],
       "transitions": [
         {
           "from": "pending",
           "event": "authorize",
           "to": "permitted",
-          "guard": "Workflow permitとContext・Spec束縛が一致する",
-          "persistence": "permit identityをRun recordへ送信前に保存する"
+          "guard": "開始要求とpermitの全束縛値を再計算して一致する",
+          "persistence": "permit identityとfreshness検査を送信前に保存する"
         },
         {
           "from": "pending",
           "event": "authorization_failed",
           "to": "blocked",
-          "guard": "permit検証が不合格である",
-          "persistence": "外部送信なしのblocked終端を保存する"
+          "guard": "permitが不一致、期限切れまたは再利用である",
+          "persistence": "未送信blocked終端を保存する"
         },
         {
           "from": "permitted",
           "event": "send",
           "to": "executing",
           "guard": "Attemptとcapture予約が耐久化済みである",
-          "persistence": "送信開始時刻をAttemptへ保存する"
+          "persistence": "送信開始をprovider呼出し前に保存する"
         },
         {
           "from": "executing",
           "event": "capture_complete",
           "to": "validating",
-          "guard": "raw response captureがsealedである",
+          "guard": "raw captureがsealedである",
           "persistence": "capture digestをValidation開始前に保存する"
+        },
+        {
+          "from": "executing",
+          "event": "capture_quarantined",
+          "to": "failed",
+          "guard": "部分応答またはpolicy違反でcaptureが隔離された",
+          "persistence": "隔離参照とfailed終端を保存する"
+        },
+        {
+          "from": "executing",
+          "event": "capture_failed",
+          "to": "irrecoverable",
+          "guard": "raw captureと値なし診断の双方を保存できない",
+          "persistence": "値を含まないirrecoverable終端を外部提示前に保存する"
         },
         {
           "from": "validating",
           "event": "validation_passed",
           "to": "awaiting_triage",
           "guard": "Schema、Evidence、Scopeの全検証が合格である",
-          "persistence": "全verdictを結果公開前に保存する"
+          "persistence": "全verdictをTriage公開前に保存する"
+        },
+        {
+          "from": "validating",
+          "event": "validation_retryable",
+          "to": "retry_pending",
+          "guard": "閉じた復旧規則またはHuman裁定とretry budgetがある",
+          "persistence": "失敗AttemptとRetry根拠を子Attempt開始前に保存する"
         },
         {
           "from": "validating",
           "event": "validation_failed",
           "to": "failed",
-          "guard": "再試行不能またはretry budgetを消費済みである",
-          "persistence": "失敗理由と終端状態を原子的に保存する"
+          "guard": "復旧不能またはretry budgetがない",
+          "persistence": "Validation失敗とfailed終端を保存する"
+        },
+        {
+          "from": "retry_pending",
+          "event": "retry_authorized",
+          "to": "executing",
+          "guard": "新しい子Attemptとcapture予約が耐久化済みである",
+          "persistence": "親子Attempt結線を再送信前に保存する"
+        },
+        {
+          "from": "retry_pending",
+          "event": "retry_exhausted",
+          "to": "failed",
+          "guard": "retry budgetを消費し次Attemptを開始できない",
+          "persistence": "枯渇理由とfailed終端を保存する"
         },
         {
           "from": "awaiting_triage",
-          "event": "triage_complete",
+          "event": "final_provenance_passed",
           "to": "succeeded",
-          "guard": "final provenance合格済みである",
-          "persistence": "Final Finding参照とRun成功を同一更新で保存する"
+          "guard": "Final Findingとfinal verdictがRunへ一致する",
+          "persistence": "Final Finding参照と成功終端を同一更新で保存する"
+        },
+        {
+          "from": "awaiting_triage",
+          "event": "provenance_failed",
+          "to": "failed",
+          "guard": "preまたはfinal provenanceが不合格である",
+          "persistence": "不合格段階とfailed終端を同一更新で保存する"
         }
       ]
     },
@@ -419,13 +761,15 @@
         "prepared",
         "sent",
         "response_captured",
-        "validated",
         "failed",
+        "validated",
+        "quarantined",
         "abandoned"
       ],
       "events": [
         "dispatch",
         "capture",
+        "capture_quarantined",
         "validate",
         "fail",
         "supersede"
@@ -439,11 +783,32 @@
           "persistence": "送信宣言をprovider呼出し前に保存する"
         },
         {
+          "from": "prepared",
+          "event": "fail",
+          "to": "failed",
+          "guard": "送信前の機械検証が失敗した",
+          "persistence": "未送信失敗を保存する"
+        },
+        {
           "from": "sent",
           "event": "capture",
           "to": "response_captured",
-          "guard": "captureがsealedまたはquarantinedである",
+          "guard": "captureがsealedである",
           "persistence": "capture identityをAttemptへ保存する"
+        },
+        {
+          "from": "sent",
+          "event": "capture_quarantined",
+          "to": "quarantined",
+          "guard": "captureがquarantinedである",
+          "persistence": "隔離identityと理由を保存する"
+        },
+        {
+          "from": "sent",
+          "event": "fail",
+          "to": "failed",
+          "guard": "provider失敗またはcapture不能である",
+          "persistence": "観測済み情報と失敗分類を保存する"
         },
         {
           "from": "response_captured",
@@ -453,18 +818,11 @@
           "persistence": "Validation digestを結果採用前に保存する"
         },
         {
-          "from": "prepared",
+          "from": "response_captured",
           "event": "fail",
           "to": "failed",
-          "guard": "送信前の機械検証が失敗した",
-          "persistence": "未送信失敗を終端状態として保存する"
-        },
-        {
-          "from": "sent",
-          "event": "fail",
-          "to": "failed",
-          "guard": "provider失敗またはcapture不能である",
-          "persistence": "観測済み情報と失敗分類を保存する"
+          "guard": "Validationがfailedまたは復旧候補を要求した",
+          "persistence": "Validation失敗とraw参照を保存する"
         },
         {
           "from": "failed",
@@ -500,6 +858,13 @@
           "persistence": "capture開始をprovider受信前に保存する"
         },
         {
+          "from": "reserved",
+          "event": "fail",
+          "to": "failed",
+          "guard": "capture領域を確保できない",
+          "persistence": "外部送信禁止理由を保存する"
+        },
+        {
           "from": "receiving",
           "event": "seal",
           "to": "sealed",
@@ -514,11 +879,11 @@
           "persistence": "隔離位置と理由を可視化前に保存する"
         },
         {
-          "from": "reserved",
+          "from": "receiving",
           "event": "fail",
           "to": "failed",
-          "guard": "capture領域を確保できない",
-          "persistence": "外部送信禁止理由を保存する"
+          "guard": "受信中断かつrawまたは値なし診断を確定できない",
+          "persistence": "capture失敗と保存可否をRun通知前に保存する"
         }
       ]
     },
@@ -547,20 +912,6 @@
           "persistence": "Schema verdictとvalidator版を保存する"
         },
         {
-          "from": "schema_validated",
-          "event": "evidence_passed",
-          "to": "evidence_validated",
-          "guard": "全Evidence参照が入力材料へ解決する",
-          "persistence": "Evidence verdictと解決結果を保存する"
-        },
-        {
-          "from": "evidence_validated",
-          "event": "scope_passed",
-          "to": "passed",
-          "guard": "FindingがScope contract内にある",
-          "persistence": "最終Validation digestを結果公開前に保存する"
-        },
-        {
           "from": "pending",
           "event": "reject",
           "to": "failed",
@@ -569,10 +920,24 @@
         },
         {
           "from": "schema_validated",
+          "event": "evidence_passed",
+          "to": "evidence_validated",
+          "guard": "全Evidence参照が入力材料へ解決する",
+          "persistence": "Evidence verdictと解決結果を保存する"
+        },
+        {
+          "from": "schema_validated",
           "event": "reject",
           "to": "failed",
           "guard": "Evidence検証が不合格である",
           "persistence": "失敗段階と理由を保存する"
+        },
+        {
+          "from": "evidence_validated",
+          "event": "scope_passed",
+          "to": "passed",
+          "guard": "FindingがScope contract内にある",
+          "persistence": "最終Validation digestを結果公開前に保存する"
         },
         {
           "from": "evidence_validated",
@@ -592,8 +957,8 @@
         "prevalidated",
         "decided",
         "final_recorded",
-        "completed",
-        "blocked"
+        "blocked",
+        "completed"
       ],
       "events": [
         "freeze",
@@ -601,7 +966,8 @@
         "human_decide",
         "record_final",
         "final_validate",
-        "reject"
+        "reject",
+        "reopen"
       ],
       "transitions": [
         {
@@ -617,6 +983,13 @@
           "to": "prevalidated",
           "guard": "pre-provenance verdictが合格である",
           "persistence": "pre-verdictをHuman提示前に保存する"
+        },
+        {
+          "from": "candidate_frozen",
+          "event": "reject",
+          "to": "blocked",
+          "guard": "pre-provenance verdictが不合格である",
+          "persistence": "不合格理由をRun・Workflow停止通知前に保存する"
         },
         {
           "from": "prevalidated",
@@ -637,14 +1010,7 @@
           "event": "final_validate",
           "to": "completed",
           "guard": "final provenance verdictが合格である",
-          "persistence": "final verdictをWorkflow通知前に保存する"
-        },
-        {
-          "from": "candidate_frozen",
-          "event": "reject",
-          "to": "blocked",
-          "guard": "pre-provenance verdictが不合格である",
-          "persistence": "不合格理由をHuman提示禁止とともに保存する"
+          "persistence": "final verdictをRun・Workflow通知前に保存する"
         },
         {
           "from": "final_recorded",
@@ -652,19 +1018,231 @@
           "to": "blocked",
           "guard": "final provenance verdictが不合格である",
           "persistence": "不合格理由をFinding未確定状態とともに保存する"
+        },
+        {
+          "from": "blocked",
+          "event": "reopen",
+          "to": "candidate",
+          "guard": "訂正版を新しい候補版として構成した",
+          "persistence": "旧候補と不合格を保持し新candidate IDを保存する"
         }
       ]
     }
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_architecture",
-    "digest": "b87d3e65bcdeb0b6135f2dde719bf6477c5bb41cfdf6afa18c09b910417c78ea",
+    "digest": "44a4e84b5901cdc2f6b1c36a2cf17f97384ca5b163c661c11f6febacb4cfa252",
     "boundary_count": 23,
-    "interface_count": 13,
+    "interface_count": 22,
     "state_machine_count": 6,
+    "protocol_count": 3,
+    "event_route_count": 14,
     "status": "complete"
   },
   "lifecycle": "provisional",
   "normative_status": "non-normative",
-  "promotion_required": true
+  "promotion_required": true,
+  "boundary_interface_map": {
+    "BOUNDARY-001": [
+      "IF-TRACE-CONTEXT-SCOPE"
+    ],
+    "BOUNDARY-002": [
+      "IF-TRACE-CONTEXT-SCOPE"
+    ],
+    "BOUNDARY-003": [
+      "IF-PORTABLE-CONTEXT-STORE"
+    ],
+    "BOUNDARY-004": [
+      "IF-PORTABLE-CONTEXT-STORE"
+    ],
+    "BOUNDARY-005": [
+      "IF-PORTABLE-CONTEXT-STORE"
+    ],
+    "BOUNDARY-006": [
+      "IF-PORTABLE-CONTEXT-STORE"
+    ],
+    "BOUNDARY-007": [
+      "IF-PORTABLE-HARNESS-STORE"
+    ],
+    "BOUNDARY-008": [
+      "IF-PORTABLE-HARNESS-STORE"
+    ],
+    "BOUNDARY-009": [
+      "IF-PORTABLE-HARNESS-STORE"
+    ],
+    "BOUNDARY-010": [
+      "IF-PORTABLE-HARNESS-STORE"
+    ],
+    "BOUNDARY-011": [
+      "IF-PORTABLE-SESSION-STORE"
+    ],
+    "BOUNDARY-012": [
+      "IF-PORTABLE-SESSION-STORE"
+    ],
+    "BOUNDARY-013": [
+      "IF-PORTABLE-WORKFLOW-STORE"
+    ],
+    "BOUNDARY-014": [
+      "IF-PORTABLE-WORKFLOW-STORE"
+    ],
+    "BOUNDARY-015": [
+      "IF-WORKFLOW-HARNESS-PERMIT"
+    ],
+    "BOUNDARY-016": [
+      "IF-WORKFLOW-HARNESS-PERMIT"
+    ],
+    "BOUNDARY-017": [
+      "IF-HARNESS-WORKFLOW-RUN-RESULT"
+    ],
+    "BOUNDARY-018": [
+      "IF-HARNESS-EVALUATION-OBSERVATION"
+    ],
+    "BOUNDARY-019": [
+      "IF-HARNESS-EVALUATION-OBSERVATION"
+    ],
+    "BOUNDARY-020": [
+      "IF-TRACE-WORKFLOW-FINALVERDICT"
+    ],
+    "BOUNDARY-021": [
+      "IF-TRACE-WORKFLOW-FINALVERDICT"
+    ],
+    "BOUNDARY-022": [
+      "IF-TRACE-TRIAGE-PREVERDICT"
+    ],
+    "BOUNDARY-023": [
+      "IF-TRACE-TRIAGE-PREVERDICT"
+    ]
+  },
+  "event_routes": [
+    {
+      "route_id": "ROUTE-START-REQUEST",
+      "source_interface_id": "IF-HARNESS-WORKFLOW-START-REQUEST",
+      "target_state_machine_id": "SM-WORKFLOW",
+      "event": "prepare"
+    },
+    {
+      "route_id": "ROUTE-PERMIT-AUTHORIZE",
+      "source_interface_id": "IF-WORKFLOW-HARNESS-PERMIT",
+      "target_state_machine_id": "SM-RUN",
+      "event": "authorize"
+    },
+    {
+      "route_id": "ROUTE-RUN-RESULT-SUCCESS",
+      "source_interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
+      "target_state_machine_id": "SM-WORKFLOW",
+      "event": "execution_finished"
+    },
+    {
+      "route_id": "ROUTE-RUN-RESULT-FAILED",
+      "source_interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
+      "target_state_machine_id": "SM-WORKFLOW",
+      "event": "execution_failed"
+    },
+    {
+      "route_id": "ROUTE-RUN-RESULT-REJECTED",
+      "source_interface_id": "IF-HARNESS-WORKFLOW-RUN-RESULT",
+      "target_state_machine_id": "SM-WORKFLOW",
+      "event": "execution_rejected"
+    },
+    {
+      "route_id": "ROUTE-PRE-PROVENANCE-FAILED-RUN",
+      "source_interface_id": "IF-TRACE-RUN-FINALVERDICT",
+      "target_state_machine_id": "SM-RUN",
+      "event": "provenance_failed"
+    },
+    {
+      "route_id": "ROUTE-PRE-PROVENANCE-FAILED-WORKFLOW",
+      "source_interface_id": "IF-TRACE-WORKFLOW-FINALVERDICT",
+      "target_state_machine_id": "SM-WORKFLOW",
+      "event": "provenance_failed"
+    },
+    {
+      "route_id": "ROUTE-FINAL-PROVENANCE-PASSED-RUN",
+      "source_interface_id": "IF-TRACE-RUN-FINALVERDICT",
+      "target_state_machine_id": "SM-RUN",
+      "event": "final_provenance_passed"
+    },
+    {
+      "route_id": "ROUTE-FINAL-PROVENANCE-PASSED-WORKFLOW",
+      "source_interface_id": "IF-TRACE-WORKFLOW-FINALVERDICT",
+      "target_state_machine_id": "SM-WORKFLOW",
+      "event": "provenance_passed"
+    },
+    {
+      "route_id": "ROUTE-TRIAGE-FREEZE",
+      "source_interface_id": "IF-HARNESS-TRIAGE-RESULTS",
+      "target_state_machine_id": "SM-TRIAGE-PROVENANCE",
+      "event": "freeze"
+    },
+    {
+      "route_id": "ROUTE-TRIAGE-PRE-PASS",
+      "source_interface_id": "IF-TRACE-TRIAGE-PREVERDICT",
+      "target_state_machine_id": "SM-TRIAGE-PROVENANCE",
+      "event": "prevalidate"
+    },
+    {
+      "route_id": "ROUTE-TRIAGE-PRE-FAIL",
+      "source_interface_id": "IF-TRACE-TRIAGE-PREVERDICT",
+      "target_state_machine_id": "SM-TRIAGE-PROVENANCE",
+      "event": "reject"
+    },
+    {
+      "route_id": "ROUTE-TRIAGE-FINAL-PASS",
+      "source_interface_id": "IF-TRACE-TRIAGE-FINALVERDICT",
+      "target_state_machine_id": "SM-TRIAGE-PROVENANCE",
+      "event": "final_validate"
+    },
+    {
+      "route_id": "ROUTE-TRIAGE-FINAL-FAIL",
+      "source_interface_id": "IF-TRACE-TRIAGE-FINALVERDICT",
+      "target_state_machine_id": "SM-TRIAGE-PROVENANCE",
+      "event": "reject"
+    }
+  ],
+  "required_interface_fields": {
+    "IF-HARNESS-WORKFLOW-START-REQUEST": [
+      "start_request_id",
+      "run_id",
+      "task_id",
+      "active_work_id",
+      "context_id",
+      "context_digest",
+      "context_ref",
+      "execution_spec_id",
+      "execution_spec_digest",
+      "execution_spec_ref"
+    ],
+    "IF-WORKFLOW-HARNESS-PERMIT": [
+      "permit_id",
+      "start_request_id",
+      "run_id",
+      "task_id",
+      "active_work_id",
+      "context_id",
+      "context_digest",
+      "context_ref",
+      "freshness_verdict_digest",
+      "freshness_checked_at",
+      "freshness_validator_version",
+      "execution_spec_id",
+      "execution_spec_digest",
+      "execution_spec_ref",
+      "issuer_id",
+      "expires_at"
+    ],
+    "IF-HARNESS-WORKFLOW-RUN-RESULT": [
+      "run_id",
+      "permit_id",
+      "active_work_id",
+      "terminal_kind",
+      "result_digest",
+      "failure_digest"
+    ],
+    "IF-HARNESS-EVALUATION-OBSERVATION": [
+      "run_id",
+      "attempt_id",
+      "execution_condition_digest",
+      "observation_digest"
+    ]
+  }
 }

@@ -677,8 +677,8 @@
       "oracle_type": "machine",
       "setup": "Review TaskとExecution Context identity／Workflowが発行したRun開始許可identity／役割、対象、順序、停止関門を持つ版付き実行仕様",
       "stimulus": "システムはWorkflowが開始を許可した固定実行仕様について許可された状態順序に従うReview Runだけを開始しなければならない",
-      "expected": "Workflowの許可後だけHarnessのRun内部状態が開始される／未定義状態遷移と不完全な実行仕様が送信前に拒否される／同じ固定仕様から同じ実行計画identityが得られる",
-      "negative_case": "Workflowの開始許可がないか要求と一致しない／必須実行条件が欠ける／未定義または順序違反のRun内部状態遷移がある"
+      "expected": "Harness開始要求がrequest、Run、Task、active work、Context ID・Digest・不変参照、Execution Spec ID・Digest・不変参照を保持する／Workflow permitが開始要求、freshness verdict、検査時点、validator版、発行者、期限へ束縛される／Harnessが外部送信直前に全値を再計算して一致させる",
+      "negative_case": "開始要求またはpermitの各束縛値が変更される／期限切れまたは再利用である／未定義状態遷移または不完全実行仕様がある"
     },
     {
       "test_id": "AT-EXEC-002",
@@ -695,8 +695,8 @@
       "oracle_type": "machine",
       "setup": "Attempt identity、request identityおよび送信条件／provider response stream／REQ-PORTABLE-002とREQ-PORTABLE-004を満たすwrite-ahead隔離保存境界",
       "stimulus": "システムはprovider responseの受領とrawの耐久的captureを別状態として管理し、解析前に共有隔離保存境界へwrite-ahead captureしなければならない",
-      "expected": "request identityを耐久保存してから送信しresponse受領時点を明示記録する／受領したresponseは解析前にwrite-ahead captureされ送信条件とAttemptへ結線される／capture前後のクラッシュ注入でsuccess、failedまたはirrecoverableのいずれか一意な終端状態になる／通常保存と診断保存の双方が不能なら値を含まないirrecoverable状態を外部へ提示する",
-      "negative_case": "request、Attemptまたは送信条件へ結線できない／raw captureと値なし診断の双方を耐久保存できない"
+      "expected": "送信前予約、receiving、sealed、quarantined、failedを区別する／rawと値なし診断の双方が保存不能ならirrecoverable終端にする／Validation失敗は親子Attemptを保存してretryするかfailedで閉じる",
+      "negative_case": "受信中障害、隔離、診断保存不能、retry枯渇またはクラッシュ後に状態が非終端のまま残る"
     },
     {
       "test_id": "AT-EXEC-004",
@@ -749,8 +749,8 @@
       "oracle_type": "hybrid",
       "setup": "triage結果と判断候補／Humanの採用、拒否、保留判断／REQ-TRACE-005のOperational Provenance verdict",
       "stimulus": "システムはFindingの最終採否をHuman判断として対象と内容へ束縛し、来歴関門通過後だけ確定しなければならない",
-      "expected": "判断recordが承認対象の内容Digestを保持し再計算値と一致する／採用、拒否、保留のHuman判断内容が対象Digestとは別フィールドで残る／Operational Provenance verdictが不合格ならFinding確定を拒否する",
-      "negative_case": "Human判断がない／判断対象が変更または不一致である／Operational Provenance verdictが不合格である"
+      "expected": "候補Digest凍結、pre-provenance合格、Human判断、Final Finding保存、final provenance合格の順序を機械検査する／preまたはfinal不合格はTriage、Run、Workflowをblockedまたはfailed終端へ伝播する／訂正版は旧失敗を保持した新しい版として再開する",
+      "negative_case": "順序を迂回する／候補または判断対象Digestが変わる／preまたはfinal不合格後にFinding、Runまたは段階を完了する"
     },
     {
       "test_id": "AT-TRACE-001",
@@ -794,8 +794,8 @@
       "oracle_type": "machine",
       "setup": "Review Taskから最終Findingまでの各段階identityと内容Digest／閉じたOperational Provenance辺種別",
       "stimulus": "システムはReview Task入力から最終FindingまでのOperational Provenanceを必須の型付き辺と内容Digestで一続きに固定し検証verdictを生成しなければならない",
-      "expected": "Task、Context、effective execution、承認、Attempt、raw、Validation、Triage、Human判断、最終Findingの全段階がID、内容Digestおよび閉じた辺種別で結ばれる／任意の必須辺の欠落、不一致または未解決参照からfail-closed verdictが得られる／失敗Attemptと拒否・保留Findingもグラフに保持する",
-      "negative_case": "必須nodeまたは辺が欠ける／参照または内容Digestが不一致である"
+      "expected": "凍結Finding候補までのpre-provenanceとHuman判断後Final Findingまでのfinal provenanceを別verdictとして生成する／各不合格をTriage、Run、Workflowへ同じ対象Digest付きで配送する",
+      "negative_case": "preまたはfinalの必須node・辺が欠ける／参照または内容Digestが不一致である／不合格eventが各状態機械へ到達しない"
     },
     {
       "test_id": "AT-SESSION-001",
@@ -839,8 +839,8 @@
       "oracle_type": "machine",
       "setup": "現在の作業段階、要求action、関門結果／Harnessからの開始要求またはRun結果／REQ-TRACE-005のOperational Provenance verdict／REQ-PORTABLE-002を満たす状態保存境界",
       "stimulus": "システムは作業段階とRun開始・完了許可の正本として許可遷移および関門を一貫した状態機械で管理しなければならない",
-      "expected": "許可遷移だけが状態を変更する／WorkflowのRun開始許可なしにHarnessが開始されない／Harnessから返るRun結果とOperational Provenance verdictを検証するまで完了段へ進まない",
-      "negative_case": "未定義遷移または関門未通過である／Harnessの開始要求またはRun結果がactive workと一致しない／Operational Provenance verdictが不合格である"
+      "expected": "Harness開始要求とpermitをactive workへ束縛する／Harnessのsuccess、failed、irrecoverable、rejected結果をrun、permit、active workへ照合する／preまたはfinal provenance不合格をblocked終端へ保存し、訂正版だけを新しい版として再開する",
+      "negative_case": "開始要求、Run結果またはverdictがactive workと一致しない／失敗・拒否・provenance不合格後に完了する／旧失敗を上書きして再開する"
     },
     {
       "test_id": "AT-WORKFLOW-003",
@@ -911,8 +911,8 @@
       "oracle_type": "hybrid",
       "setup": "Harnessが不変記録した観測値／既知の母数と測定限界",
       "stimulus": "システムは観測値へ評価基準を適用し、結果と解釈限界を分けて記録しなければならない",
-      "expected": "観測値、評価結果、解釈、限界が別フィールドで記録される／訂正済み実測値を旧要約より優先する",
-      "negative_case": "観測値の出所または母数を確認できない"
+      "expected": "Harness観測packageがRun、Attempt、実行条件、観測Digestへ束縛される／観測値、評価結果、解釈、限界を別フィールドで記録する／訂正済み実測値を旧要約より優先する",
+      "negative_case": "Run、Attempt、実行条件、観測Digest、出所または母数を確認できない"
     },
     {
       "test_id": "AT-EVAL-003",
@@ -944,17 +944,19 @@
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_contract",
-    "digest": "e15792caa9588a3ed4c388b7cb9557756f2a6418933a2188808ef74d18c389f9",
+    "digest": "dd3e182aa866096c71fcac8955769c0023f3e3c6381827ebecdc3f8ec4bbf921",
     "feature_count": 9,
     "requirement_count": 37,
     "acceptance_test_count": 37,
     "boundary_count": 23,
     "architecture_contract": "tools/design/design_contract.py:validate_design_architecture",
     "architecture_record": "records/design/stage-five-architecture-integrity.json",
-    "architecture_digest": "b87d3e65bcdeb0b6135f2dde719bf6477c5bb41cfdf6afa18c09b910417c78ea",
-    "interface_count": 13,
+    "architecture_digest": "44a4e84b5901cdc2f6b1c36a2cf17f97384ca5b163c661c11f6febacb4cfa252",
+    "interface_count": 22,
     "state_machine_count": 6,
-    "status": "complete"
+    "status": "complete",
+    "protocol_count": 3,
+    "event_route_count": 14
   },
   "lifecycle": "provisional",
   "normative_status": "non-normative",
