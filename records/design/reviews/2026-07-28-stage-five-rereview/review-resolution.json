@@ -1,0 +1,37 @@
+{
+  "material_digest": "920fab4761df8187e552bc88dce43f8837d11cbf19b4fed21f51a470ad013e55",
+  "resolved_finding_count": 13,
+  "remaining_count": 0,
+  "changed_artifacts": [
+    "records/design/stage-five-design.json",
+    "records/design/stage-five-architecture-integrity.json",
+    "records/design/bootstrap-conformance-audit.json",
+    "records/design/bootstrap-conformance-integrity.json",
+    "tools/design/design_contract.py",
+    "tools/design/bootstrap_conformance.py",
+    "tests/test_design_contract.py",
+    "tests/test_bootstrap_conformance.py"
+  ],
+  "verification": {
+    "interfaces": 22,
+    "state_machines": 6,
+    "protocols": 3,
+    "event_routes": 14,
+    "approved_obligations": 464,
+    "bootstrap_counts": {
+      "adapt": 27,
+      "conformant": 1,
+      "defer": 5,
+      "replace": 4
+    },
+    "tests": "383 passed",
+    "status": "ready_for_second_rereview"
+  },
+  "resolution_commits": [
+    "9479e6f",
+    "7b65a25",
+    "a1ac867",
+    "dbe017a"
+  ],
+  "status": "resolved"
+}

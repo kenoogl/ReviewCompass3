@@ -1,0 +1,40 @@
+{
+  "reviewer_role": "task_runtime_design",
+  "material_digest": "920fab4761df8187e552bc88dce43f8837d11cbf19b4fed21f51a470ad013e55",
+  "verdict": "fail",
+  "summary": "TDR-004と二段階provenance正常系は解決したが、freshness束縛、失敗終端、capture・retry状態機械、反証試験が未完了である。",
+  "findings": [
+    {
+      "id": "TDRR-001",
+      "severity": "error",
+      "document": "records/design/stage-five-architecture-integrity.json",
+      "location": "Run permit",
+      "issue": "permitにfreshness_verdictがなく送信直前に再照合できない。",
+      "suggestion": "Context、freshness、検査時点、validator版をpermitへ含め反証試験を追加する。"
+    },
+    {
+      "id": "TDRR-002",
+      "severity": "error",
+      "document": "records/design/stage-five-architecture-integrity.json",
+      "location": "Triage、Run、Workflow",
+      "issue": "preまたはfinal provenance失敗がRunとWorkflowの耐久的終端へ到達しない。",
+      "suggestion": "不合格eventを伝播し、訂正版の版付き回復遷移を定義する。"
+    },
+    {
+      "id": "TDRR-003",
+      "severity": "error",
+      "document": "records/design/stage-five-architecture-integrity.json",
+      "location": "Run、Attempt、Capture、Validation",
+      "issue": "irrecoverable、受信中fail、quarantine、retryの状態語彙と遷移が揃わない。",
+      "suggestion": "失敗語彙と交差機械遷移を統一する。"
+    },
+    {
+      "id": "TDRR-004",
+      "severity": "error",
+      "document": "records/design/stage-five-design.json",
+      "location": "受け入れ試験とprotocol",
+      "issue": "核心protocolがvalidator Digestと反証可能な受け入れ試験に入らない。",
+      "suggestion": "protocolを構造化検証し正常・改変・不合格・再起動試験を定義する。"
+    }
+  ]
+}

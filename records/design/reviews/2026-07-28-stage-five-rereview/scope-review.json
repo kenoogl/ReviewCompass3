@@ -1,0 +1,32 @@
+{
+  "reviewer_role": "design_scope_and_boundary",
+  "material_digest": "920fab4761df8187e552bc88dce43f8837d11cbf19b4fed21f51a470ad013e55",
+  "verdict": "fail",
+  "summary": "固定資料と全23成果物SHAは一致した。DSB-002と003は解決したが、Run開始要求と結果返却経路が閉じていない。",
+  "findings": [
+    {
+      "id": "DSB-RR-001",
+      "severity": "error",
+      "document": "records/design/stage-five-architecture-integrity.json",
+      "location": "Run開始interface",
+      "issue": "HarnessからWorkflowへの開始要求がなく、permitでcontext_idも失われる。",
+      "suggestion": "Harness開始要求と完全に束縛されたWorkflow permitを追加する。"
+    },
+    {
+      "id": "DSB-RR-002",
+      "severity": "error",
+      "document": "records/design/stage-five-architecture-integrity.json",
+      "location": "BOUNDARY-017とRun結果",
+      "issue": "HarnessからWorkflowへの完了・失敗・拒否結果interfaceと失敗終端がない。",
+      "suggestion": "Run結果interface、失敗・拒否遷移、Runへのfinal verdict配送を追加する。"
+    },
+    {
+      "id": "DSB-RR-003",
+      "severity": "warning",
+      "document": "tools/design/design_contract.py",
+      "location": "validate_design_architecture",
+      "issue": "承認済みboundaryのinterface実現とevent供給・終端到達を検査しない。",
+      "suggestion": "boundary-interface対応、event route、終端到達性を機械検査する。"
+    }
+  ]
+}

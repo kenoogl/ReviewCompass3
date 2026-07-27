@@ -1,0 +1,39 @@
+{
+  "material_digest": "920fab4761df8187e552bc88dce43f8837d11cbf19b4fed21f51a470ad013e55",
+  "finding_count": 13,
+  "adopted_count": 13,
+  "rejected_count": 0,
+  "groups": [
+    {
+      "resolution_id": "STAGE5-RR-RES-001",
+      "finding_ids": ["DSB-RR-001", "TDRR-001"],
+      "disposition": "adopted",
+      "reason": "Harness開始要求と完全なfreshness束縛permitを追加する"
+    },
+    {
+      "resolution_id": "STAGE5-RR-RES-002",
+      "finding_ids": ["DSB-RR-002", "TDRR-002", "TDRR-003", "ACF-RR-005"],
+      "disposition": "adopted",
+      "reason": "Run結果返却と全失敗・隔離・irrecoverable・retry・provenance終端を閉じる"
+    },
+    {
+      "resolution_id": "STAGE5-RR-RES-003",
+      "finding_ids": ["DSB-RR-003", "TDRR-004", "ACF-RR-006"],
+      "disposition": "adopted",
+      "reason": "boundary-interface、protocol、event route、状態到達性をDigest付きで機械検証する"
+    },
+    {
+      "resolution_id": "STAGE5-RR-RES-004",
+      "finding_ids": ["ACF-RR-001", "ACF-RR-002", "ACF-RR-003"],
+      "disposition": "adopted",
+      "reason": "承認済み義務・component・commit実体・試験観測・完全依存集合へ監査を結ぶ"
+    },
+    {
+      "resolution_id": "STAGE5-RR-RES-005",
+      "finding_ids": ["ACF-RR-004"],
+      "disposition": "adopted",
+      "reason": "HarnessからEvaluationへの観測package interfaceを追加する"
+    }
+  ],
+  "status": "complete"
+}
