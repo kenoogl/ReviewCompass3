@@ -168,3 +168,76 @@ def test_reports_incomplete_events_and_continues_parsing(tmp_path):
     ("incomplete_event", 1, "missing_uuid"),
     ("incomplete_event", 2, "invalid_message"),
   )
+
+
+def test_parses_tool_call_and_result_as_linked_ordered_events(tmp_path):
+  raw_log = tmp_path / "session.jsonl"
+  records = (
+    {
+      "uuid": "assistant-1",
+      "type": "assistant",
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "tool-1",
+            "name": "Read",
+            "input": {
+              "file_path": "README.md",
+            },
+          },
+        ],
+      },
+    },
+    {
+      "uuid": "user-1",
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "tool-1",
+            "content": [
+              {
+                "type": "text",
+                "text": "Permission denied.",
+              },
+            ],
+            "is_error": True,
+          },
+        ],
+      },
+    },
+  )
+  raw_log.write_text(
+    "".join(json.dumps(record) + "\n" for record in records),
+    encoding="utf-8",
+  )
+
+  parse_claude = importlib.import_module("tools.session_logs.parse_claude")
+
+  result = parse_claude.parse_claude_log(raw_log)
+
+  assert result.events == (
+    parse_claude.ToolCall(
+      event_id="assistant-1",
+      call_id="tool-1",
+      name="Read",
+      arguments={
+        "file_path": "README.md",
+      },
+      line_no=1,
+      block_index=0,
+    ),
+    parse_claude.ToolResult(
+      event_id="user-1",
+      call_id="tool-1",
+      text="Permission denied.",
+      is_error=True,
+      line_no=2,
+      block_index=0,
+    ),
+  )
+  assert result.issues == ()
