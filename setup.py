@@ -15,7 +15,9 @@ setup(
   entry_points={
     "console_scripts": (
       "reviewcompass3-session-logs="
-      "tools.session_logs.entry:main"
+      "tools.session_logs.entry:main",
+      "reviewcompass3-bootstrap-review="
+      "tools.bootstrap.review_cli:main",
     ),
   },
 )
