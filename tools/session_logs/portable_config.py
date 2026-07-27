@@ -5,6 +5,7 @@ normative_status: non-normative
 promotion_required: true
 """
 
+import argparse
 import dataclasses
 import json
 import os
@@ -27,6 +28,11 @@ class PortableConfig:
       indent=2,
       sort_keys=True,
     ) + "\n"
+
+
+@dataclasses.dataclass(frozen=True)
+class ConfigInstallResult:
+  action: str
 
 
 _ROOT_ENVIRONMENT = {
@@ -128,3 +134,91 @@ def build_portable_config(
     config_file=config_file,
     payload=payload,
   )
+
+
+def install_portable_config(candidate) -> ConfigInstallResult:
+  path = Path(candidate.config_file)
+  encoded = candidate.render().encode("utf-8")
+  if path.exists():
+    try:
+      existing = path.read_bytes()
+    except OSError as error:
+      raise PortableConfigError(
+        "Cannot inspect portable config"
+      ) from error
+    return ConfigInstallResult(
+      action=(
+        "unchanged"
+        if existing == encoded
+        else "preserved"
+      ),
+    )
+  temporary_path = path.with_name(path.name + ".tmp")
+  try:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path.write_bytes(encoded)
+    os.replace(temporary_path, path)
+  except OSError as error:
+    raise PortableConfigError(
+      "Cannot install portable config"
+    ) from error
+  finally:
+    temporary_path.unlink(missing_ok=True)
+  return ConfigInstallResult(action="installed")
+
+
+def _print_result(action, status):
+  print(json.dumps({
+    "action": action,
+    "status": status,
+  }, sort_keys=True))
+
+
+def run(argv=None) -> int:
+  parser = argparse.ArgumentParser()
+  parser.add_argument("--raw-root", required=True)
+  parser.add_argument("--tool-version", required=True)
+  parser.add_argument("--config-file")
+  parser.add_argument("--data-root")
+  parser.add_argument("--state-root")
+  parser.add_argument("--log-root")
+  parser.add_argument("--dry-run", action="store_true")
+  args = parser.parse_args(argv)
+  overrides = {
+    name: value
+    for name, value in {
+      "config_file": args.config_file,
+      "data_root": args.data_root,
+      "state_root": args.state_root,
+      "log_root": args.log_root,
+    }.items()
+    if value is not None
+  }
+  try:
+    from tools.session_logs.deployment_paths import (
+      resolve_deployment_paths,
+    )
+    paths = resolve_deployment_paths()
+    candidate = build_portable_config(
+      args.raw_root,
+      deployment_paths=paths,
+      tool_version=args.tool_version,
+      overrides=overrides,
+    )
+    if args.dry_run:
+      _print_result("planned", "ok")
+      return 0
+    result = install_portable_config(candidate)
+  except Exception as error:
+    print(json.dumps({
+      "reason": type(error).__name__,
+      "status": "failed",
+    }, sort_keys=True))
+    return 5
+  status = (
+    "error"
+    if result.action == "preserved"
+    else "ok"
+  )
+  _print_result(result.action, status)
+  return 5 if result.action == "preserved" else 0
