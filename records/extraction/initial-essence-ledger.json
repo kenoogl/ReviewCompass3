@@ -1,0 +1,210 @@
+{
+  "alternate_independent_candidates": {
+    "candidate_count": 7,
+    "evidence": [
+      "ReviewCompass2:docs/sessions/2026-07-25-claude-1bdcbb1d-c5b7-4562-bdf0-345f0806dadf.md#L27-L45",
+      "ReviewCompass2:tools/session_capture/sources.py#L81-L130",
+      "ReviewCompass:tools/api_providers/run_risk_review.py#L623-L644",
+      "ReviewCompass2:tools/lint/deployment_independence_lint.py#L13-L20,L35-L53",
+      "ReviewCompass:tools/api_providers/risk_review_contracts.py#L106-L127",
+      "ReviewCompass:tools/api_providers/run_format_recovery.py#L316-L331,L389-L423",
+      "ReviewCompass2:.reviewcompass/evidence/tests/2026-07-26-w6-transcript-green.txt#L28-L38"
+    ],
+    "handling": "preserved_for_follow_up_extraction",
+    "selection_status": "different_from_main_initial_candidates"
+  },
+  "classification": {
+    "digest": "b720de33c109f263b5245cac7572ecaf63d706054d7625c06ce0948bce5d9d8f",
+    "follow_up_count": 2,
+    "redesign_count": 1,
+    "reject_count": 0,
+    "status": "complete",
+    "transfer_count": 4,
+    "unclassified_count": 0
+  },
+  "dependencies": {
+    "digest": "bc70fb187239a367ed307072c130b8b08ba4979beb076e6d6513328642ee709e",
+    "edges": [
+      {
+        "relation": "validated_by",
+        "source": "ESS-0002",
+        "target": "ESS-0004"
+      },
+      {
+        "relation": "references",
+        "source": "ESS-0003",
+        "target": "ESS-0005"
+      },
+      {
+        "relation": "references",
+        "source": "ESS-0003",
+        "target": "ESS-0006"
+      }
+    ],
+    "roots": [
+      "ESS-0001",
+      "ESS-0002",
+      "ESS-0003",
+      "ESS-0007"
+    ],
+    "status": "complete",
+    "unexpanded_edge_count": 0
+  },
+  "extraction": {
+    "accepted_count": 7,
+    "axis_count": 7,
+    "digest": "921bfbe7c3d7170dcce877c0127ae99fa1d2d830ea3abdf60d7d58c658843b2a",
+    "missing_axis_count": 0,
+    "rejected_count": 0,
+    "status": "complete"
+  },
+  "items": [
+    {
+      "axis": "user_decision",
+      "dependencies": [],
+      "destination": "semantic_relationships.decision_evidence",
+      "disposition": "follow_up",
+      "evidence": [
+        "ReviewCompass2:docs/design/2026-07-25-user-decisions-inventory.md#L108-L115"
+      ],
+      "identifier": "ESS-0001",
+      "rationale": "旧台帳の二次記録であり、原発言との再照合と現利用者による再確認が必要",
+      "statement": "意味関係は閉じた辺種別語彙とID参照の平文レコードで決定的にたどれる形とする"
+    },
+    {
+      "axis": "capability",
+      "dependencies": [
+        "ESS-0004"
+      ],
+      "destination": "session_logs.application_service",
+      "disposition": "transfer",
+      "evidence": [
+        "ReviewCompass2:tools/session_capture/capture.py#L1-L23"
+      ],
+      "identifier": "ESS-0002",
+      "rationale": "統括入口と道具依存の限定は移植価値がある",
+      "statement": "生ログの発見、解析、伏字化、転写、要約、来歴、変更判定、検証を単一入口から統括する"
+    },
+    {
+      "axis": "procedure",
+      "dependencies": [
+        "ESS-0005",
+        "ESS-0006"
+      ],
+      "destination": "review.workflow_state_order",
+      "disposition": "transfer",
+      "evidence": [
+        "ReviewCompass:tools/api_providers/run_risk_review.py#L46-L54"
+      ],
+      "identifier": "ESS-0003",
+      "rationale": "後段が前段成果へ依存する順序は状態機械の核である",
+      "statement": "リスクレビューはprepare、scope、quality、primary、adversarial、judgment、integrateの順で進める"
+    },
+    {
+      "axis": "invariant",
+      "dependencies": [],
+      "destination": "artifact_portability.path_lint",
+      "disposition": "redesign",
+      "evidence": [
+        "ReviewCompass2:tools/lint/deployment_independence_lint.py#L13-L20,L35-L53"
+      ],
+      "identifier": "ESS-0004",
+      "rationale": "固定Unix一時パスをOS横断配置へ一般化する必要がある",
+      "statement": "Markdown、YAML、JSON成果物のローカル絶対パスをURLと明示一時領域を除いて検出する"
+    },
+    {
+      "axis": "contract",
+      "dependencies": [],
+      "destination": "review.material_bundle",
+      "disposition": "transfer",
+      "evidence": [
+        "ReviewCompass:tools/api_providers/source_bundle.py#L20-L31,L79-L98"
+      ],
+      "identifier": "ESS-0005",
+      "rationale": "本文とdigestのfail-closed契約を直接再利用できる",
+      "statement": "レビュー材料束はtargetを含み、全entryが本文を持ち、SHA-256と本文が一致しなければならない"
+    },
+    {
+      "axis": "recovery",
+      "dependencies": [],
+      "destination": "review.input_bound_recovery",
+      "disposition": "transfer",
+      "evidence": [
+        "ReviewCompass:tools/api_providers/risk_review_store.py#L65-L76"
+      ],
+      "identifier": "ESS-0006",
+      "rationale": "入力変更後の古い成功成果の再利用を防止できる",
+      "statement": "成功成果は同一入力digest時だけ再利用し、入力変更時はstaleとして拒否する"
+    },
+    {
+      "axis": "empirical_finding",
+      "dependencies": [],
+      "destination": "extraction.reference_rule_remeasurement",
+      "disposition": "follow_up",
+      "evidence": [
+        "ReviewCompass2:docs/design/2026-07-25-reference-impl-guarantees.md#L22-L44,L131-L145,L420-L426"
+      ],
+      "identifier": "ESS-0007",
+      "rationale": "母数と強制性と被覆を独立再計測する必要がある",
+      "statement": "149実装の生2,207規則は断片と重複の除去後1,416で、母数、強制性、網羅性に限界が残る"
+    }
+  ],
+  "ledger": {
+    "digest": "fd0f8e53216d4a4457797f231cb246a1d080a844688ef5d8bc4388c380161b09",
+    "item_count": 7,
+    "status": "complete"
+  },
+  "lifecycle": "provisional",
+  "material_digest": "6032e464c6d5271e25ec1700b8ade90b32f79e35e739b231682ffc17ddd2425e",
+  "materials": [
+    {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "identifier": "ReviewCompass2:docs/design/2026-07-25-user-decisions-inventory.md",
+      "sha256": "8ef25d5584ee8033136d2848ea8c84ab8cbec8b2af14246fdec0f99504ee5e64"
+    },
+    {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "identifier": "ReviewCompass2:tools/session_capture/capture.py",
+      "sha256": "f6b93b152d6223cba9ce68c0f328ba6ccc1df3f1680479cadc1a5d4f626e2420"
+    },
+    {
+      "commit": "35ef8d4cc66b9a00aca9c6da10b645837b06564b",
+      "identifier": "ReviewCompass:tools/api_providers/run_risk_review.py",
+      "sha256": "198e21d7da4e22cf5463cb5413ee9333d0a9acd50d20c6aac6b3886a8897d1ca"
+    },
+    {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "identifier": "ReviewCompass2:tools/lint/deployment_independence_lint.py",
+      "sha256": "02625b9c30cf571a8282c07beec189c2ccf611474f2d7ddd8a30cb2dd01799b5"
+    },
+    {
+      "commit": "35ef8d4cc66b9a00aca9c6da10b645837b06564b",
+      "identifier": "ReviewCompass:tools/api_providers/source_bundle.py",
+      "sha256": "b9df8b4d0ff0fcf0c5733840cfcd583d6d923259ade0ac38bae6b3cfd7ad4226"
+    },
+    {
+      "commit": "35ef8d4cc66b9a00aca9c6da10b645837b06564b",
+      "identifier": "ReviewCompass:tools/api_providers/risk_review_store.py",
+      "sha256": "b8d5ed46385ce551dfe6796dbdeb6b32db9e814dceb6118d3a91fc7b7688b489"
+    },
+    {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "identifier": "ReviewCompass2:docs/design/2026-07-25-reference-impl-guarantees.md",
+      "sha256": "72a1e389011ac1b5b15f33cfec92d75ff4e6f01e8402608612acfba1642d9b58"
+    }
+  ],
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "reassessment": {
+    "agreed_count": 7,
+    "conflict_count": 0,
+    "digest": "9d323b4298b14b7de392176108fa40c54f1b28b4f0e196cbe294e4d8a867c271",
+    "material_paths": [
+      "main",
+      "independent"
+    ],
+    "status": "complete"
+  },
+  "record_version": 1,
+  "status": "complete"
+}
