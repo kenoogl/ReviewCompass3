@@ -18,6 +18,19 @@ class Event:
   line_no: int
 
 
+@dataclasses.dataclass(frozen=True)
+class ParseIssue:
+  kind: str
+  line_no: int
+  detail: str
+
+
+@dataclasses.dataclass(frozen=True)
+class ParseResult:
+  events: tuple
+  issues: tuple
+
+
 def _extract_text(content) -> str:
   if isinstance(content, str):
     return content
@@ -34,13 +47,36 @@ def _extract_text(content) -> str:
   return ""
 
 
-def parse_claude_events(path) -> tuple:
+def parse_claude_log(path) -> ParseResult:
   events = []
+  issues = []
   with Path(path).open(encoding="utf-8") as raw_log:
     for line_no, line in enumerate(raw_log, start=1):
-      record = json.loads(line)
+      if not line.strip():
+        continue
+      try:
+        record = json.loads(line)
+      except json.JSONDecodeError as error:
+        issues.append(ParseIssue(
+          kind="invalid_json",
+          line_no=line_no,
+          detail=error.msg,
+        ))
+        continue
+      if not isinstance(record, dict):
+        issues.append(ParseIssue(
+          kind="unsupported_event",
+          line_no=line_no,
+          detail=type(record).__name__,
+        ))
+        continue
       role = record.get("type")
       if role not in ("user", "assistant"):
+        issues.append(ParseIssue(
+          kind="unsupported_event",
+          line_no=line_no,
+          detail=str(role),
+        ))
         continue
       message = record.get("message") or {}
       events.append(Event(
@@ -49,4 +85,8 @@ def parse_claude_events(path) -> tuple:
         text=_extract_text(message.get("content")),
         line_no=line_no,
       ))
-  return tuple(events)
+  return ParseResult(events=tuple(events), issues=tuple(issues))
+
+
+def parse_claude_events(path) -> tuple:
+  return parse_claude_log(path).events
