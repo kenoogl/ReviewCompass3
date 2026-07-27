@@ -6,6 +6,8 @@ promotion_required: true
 """
 
 import importlib
+import json
+import re
 
 import pytest
 
@@ -60,3 +62,35 @@ def test_strict_redaction_fails_closed_without_leaking_secret():
 
   safe = "repeated=%s" % ("a" * 40)
   assert redaction.redact_text_strict(safe, ()).text == safe
+
+
+def test_allowlist_skips_exact_candidate_and_report_never_contains_value(
+  tmp_path,
+):
+  redaction = importlib.import_module("tools.session_logs.redaction")
+  allowed = "A9fK2mQ7xR4vT8pL3nC6sW1yH5jD0bZ"
+
+  result = redaction.redact_text_strict(
+    "token=%s" % allowed,
+    (),
+    allow_patterns=(re.escape(allowed),),
+  )
+
+  assert result.text == "token=%s" % allowed
+
+  secret = "B8gL3nR6yS1wU9qM4pD7tX2zJ5kF0cV"
+  with pytest.raises(redaction.SensitiveDataRemaining) as error:
+    redaction.redact_text_strict("token=%s" % secret, ())
+
+  report_path = tmp_path / "reports" / "session.json"
+  redaction.write_sensitive_report(
+    report_path,
+    error.value,
+    source_path="nested/session.jsonl",
+  )
+  report_text = report_path.read_text(encoding="utf-8")
+  report = json.loads(report_text)
+  assert report["source_path"] == "nested/session.jsonl"
+  assert report["count"] == 1
+  assert report["findings"][0]["length"] == len(secret)
+  assert secret not in report_text
