@@ -1,0 +1,158 @@
+{
+  "audit": {
+    "approval_candidate": null,
+    "covered_count": 61,
+    "digest": "59a04bbdebcd0bff1672545bee5157d466c1f102b70ac96bd16e50e0cfd5fcae",
+    "status": "blocked",
+    "uncovered_count": 18631,
+    "unresolved_count": 18661
+  },
+  "candidate_integration": {
+    "added": {
+      "ALT-001": "ESS-0008",
+      "ALT-005": "ESS-0009",
+      "ALT-006": "ESS-0010",
+      "ALT-007": "ESS-0011"
+    },
+    "added_items": [
+      {
+        "axis": "user_decision",
+        "destination": "session_logs.invocation_contract",
+        "disposition": "follow_up",
+        "evidence": "ReviewCompass2:docs/sessions/2026-07-25-claude-1bdcbb1d-c5b7-4562-bdf0-345f0806dadf.md#L27-L45",
+        "identifier": "ESS-0008",
+        "statement": "利用者指示でセッション取込を起動する"
+      },
+      {
+        "axis": "contract",
+        "destination": "essence_ledger.coverage_contract",
+        "disposition": "transfer",
+        "evidence": "ReviewCompass:tools/api_providers/risk_review_contracts.py#L106-L127",
+        "identifier": "ESS-0009",
+        "statement": "対象被覆と証拠参照をfail-closedで検査する"
+      },
+      {
+        "axis": "recovery",
+        "destination": "review_response.format_recovery",
+        "disposition": "transfer",
+        "evidence": "ReviewCompass:tools/api_providers/run_format_recovery.py#L316-L331,L389-L423",
+        "identifier": "ESS-0010",
+        "statement": "意味を変えない形式復旧だけを許可する"
+      },
+      {
+        "axis": "empirical_finding",
+        "destination": "quality_assurance.transcript_mutation",
+        "disposition": "follow_up",
+        "evidence": "ReviewCompass2:.reviewcompass/evidence/tests/2026-07-26-w6-transcript-green.txt#L28-L38",
+        "identifier": "ESS-0011",
+        "statement": "転写変異検査に3種類のテスト穴があった"
+      }
+    ],
+    "deferred_count": 0,
+    "digest": "e0ef1d8ea912948b72270eb475f0fadf795b24fcf6e218cc6d001d70d6916153",
+    "merged": {
+      "ALT-002": "ESS-0002",
+      "ALT-003": "ESS-0003",
+      "ALT-004": "ESS-0004"
+    },
+    "status": "complete"
+  },
+  "file_edges": {
+    "digest": "fbf1ac0145ae2afb618f8781b58215b649d812d6cec4bb5c03148075b3140523",
+    "edge_count": 91,
+    "status": "blocked",
+    "unresolved_count": 25,
+    "unresolved_kind_counts": {
+      "missing_internal_import": 25
+    },
+    "unresolved_references": [
+      "ReviewCompass2:tests/test_session_capture_command.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_config.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_hooks.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_layout.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_parse.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_provenance.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_redact.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_registration.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_sourcekind.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_sources.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_summary.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_transcript.py -> tools.paths.repo_root",
+      "ReviewCompass2:tests/test_session_capture_verify.py -> tools.paths.repo_root",
+      "ReviewCompass2:tools/session_capture/capture.py -> tools.paths.repo_root",
+      "ReviewCompass2:tools/session_capture/config.py -> tools.paths.app_dir",
+      "ReviewCompass2:tools/session_capture/config.py -> tools.paths.repo_root",
+      "ReviewCompass:tools/api_providers/assurance_pipeline.py -> tools.api_providers.model_capabilities.canonical_digest",
+      "ReviewCompass:tools/api_providers/assurance_pipeline.py -> tools.api_providers.model_capabilities.prepare_initial_assurance_call",
+      "ReviewCompass:tools/api_providers/assurance_pipeline.py -> tools.api_providers.model_capabilities.resolve_variant_capabilities",
+      "ReviewCompass:tools/api_providers/assurance_pipeline.py -> tools.api_providers.phase_trace.validate_phase_trace",
+      "ReviewCompass:tools/api_providers/assurance_pipeline.py -> tools.api_providers.scope_assurance.freeze_scope_assurance",
+      "ReviewCompass:tools/api_providers/tests/test_assurance_pipeline.py -> tools.api_providers.model_capabilities.HIGH_RISK_ATTRIBUTES",
+      "ReviewCompass:tools/api_providers/trusted_review_send.py -> tools.api_providers.external_api_approval.external_api_approval_claim",
+      "ReviewCompass:tools/api_providers/trusted_review_send.py -> tools.api_providers.external_api_approval.prompt_material_findings",
+      "ReviewCompass:tools/api_providers/trusted_review_send.py -> tools.check_workflow_action.project_yaml"
+    ]
+  },
+  "followups": {
+    "ESS-0001": {
+      "primary_evidence": [
+        "ReviewCompass2:.reviewcompass/backlog/issues/issue-2026-07-23-semantic-unit-schema-and-decision-inventory.yaml#L17-L23",
+        "ReviewCompass2:.reviewcompass/evidence/sessions/2026-07-23-claude-session-02-rebuild-upstream-specs.md#L17-L22"
+      ],
+      "required_action": "user_reconfirmation",
+      "status": "follow_up"
+    },
+    "ESS-0007": {
+      "actual_source_count": 150,
+      "claimed_source_count": 149,
+      "discrepancies": [
+        "source_count",
+        "raw_partition"
+      ],
+      "fragment_count": 617,
+      "kept_count": 1416,
+      "raw_count": 2207,
+      "status": "follow_up",
+      "substring_count": 169,
+      "uncategorized_count": 5
+    }
+  },
+  "group_coverage": {
+    "candidate_count": 61,
+    "covered_group_count": 7,
+    "digest": "26a9313d51acaa19c23b224d522cd6d92e0a66f4d3b8e1e3f38755c8018f1e16",
+    "group_candidate_counts": {
+      "absolute_path_contamination_lint": 2,
+      "current_advantages_inventory": 1,
+      "extracted_1416_rules": 5,
+      "known_failures_and_mutation_knowledge": 3,
+      "review_material_lifecycle": 22,
+      "session_log_implementation_and_tests": 26,
+      "user_decisions_ud_001_093": 2
+    },
+    "new_group_items": [
+      {
+        "axis": "empirical_finding",
+        "destination": "extraction.advantages_revalidation",
+        "disposition": "follow_up",
+        "evidence": "ReviewCompass2:docs/design/2026-07-25-current-advantages-inventory.md#L8-L21,L154-L165",
+        "identifier": "ESS-0012",
+        "statement": "優位点総括12件のうち4件に訂正が必要で、総括だけでは誤りが伝播する"
+      },
+      {
+        "axis": "invariant",
+        "destination": "workflow.mutation_gate",
+        "disposition": "transfer",
+        "evidence": "ReviewCompass:tools/check_workflow_action/mutation_gate.py#L1-L8,L17-L27,L78-L90",
+        "identifier": "ESS-0013",
+        "statement": "workflow成果物への書込みを進行中作業単位との紐づけで機械検査する"
+      }
+    ],
+    "status": "complete"
+  },
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "blocked"
+}
