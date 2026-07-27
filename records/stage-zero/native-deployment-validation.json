@@ -2,23 +2,23 @@
   "checks": {
     "native_package_install": {
       "expected_result_count": 6,
-      "passed_result_count": 0,
-      "status": "pending"
+      "passed_result_count": 6,
+      "status": "passed"
     },
     "native_periodic_schedule_dry_run": {
       "expected_platform_count": 3,
-      "passed_platform_count": 0,
-      "status": "pending"
+      "passed_platform_count": 3,
+      "status": "passed"
     },
     "native_standard_paths": {
       "expected_platform_count": 3,
-      "passed_platform_count": 0,
-      "status": "pending"
+      "passed_platform_count": 3,
+      "status": "passed"
     }
   },
   "lifecycle": "provisional",
   "normative_status": "non-normative",
   "promotion_required": true,
-  "status": "pending",
-  "validated_at": null
+  "status": "passed",
+  "validated_at": "2026-07-27"
 }
