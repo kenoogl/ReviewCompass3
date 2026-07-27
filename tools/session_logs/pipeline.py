@@ -39,6 +39,7 @@ def prepare_artifact(
   tool_version,
   commits=(),
   changed_files=(),
+  allow_patterns=(),
 ) -> PreparedArtifact:
   source_kind = identify_source_kind(raw_log)
   if source_kind != "claude":
@@ -46,12 +47,17 @@ def prepare_artifact(
 
   parsed = parse_claude.parse_claude_log(raw_log)
   transcript_text = render_transcript(parsed)
-  redacted = redact_text_strict(transcript_text, rules)
+  redacted = redact_text_strict(
+    transcript_text,
+    rules,
+    allow_patterns=allow_patterns,
+  )
   summary = render_summary(
     parsed.events,
     commits=commits,
     changed_files=changed_files,
     rules=rules,
+    allow_patterns=allow_patterns,
   )
   artifact_provenance = build_provenance(
     raw_log,

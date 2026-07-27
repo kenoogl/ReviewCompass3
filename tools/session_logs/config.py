@@ -18,8 +18,10 @@ class Config:
   transcript_root: Path
   summary_root: Path
   provenance_root: Path
+  sensitive_report_root: object
   tool_version: str
   redaction_rules: tuple
+  allow_patterns: tuple
 
 
 def _resolve(base, value):
@@ -31,14 +33,21 @@ def load_config(path) -> Config:
   config_path = Path(path)
   data = json.loads(config_path.read_text(encoding="utf-8"))
   base = config_path.parent
+  report_root = data.get("sensitive_report_root")
   return Config(
     raw_root=_resolve(base, data["raw_root"]),
     transcript_root=_resolve(base, data["transcript_root"]),
     summary_root=_resolve(base, data["summary_root"]),
     provenance_root=_resolve(base, data["provenance_root"]),
+    sensitive_report_root=(
+      _resolve(base, report_root)
+      if report_root is not None
+      else None
+    ),
     tool_version=data["tool_version"],
     redaction_rules=tuple(
       Rule(label=item["label"], pattern=item["pattern"])
       for item in data.get("redaction_rules", ())
     ),
+    allow_patterns=tuple(data.get("allow_patterns", ())),
   )

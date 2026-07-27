@@ -30,6 +30,7 @@ def render_summary(
   commits,
   changed_files,
   rules,
+  allow_patterns=(),
 ) -> Summary:
   user_messages = tuple(
     event.text
@@ -45,7 +46,11 @@ def render_summary(
     ),
     "## Decisions\n\n- Not inferred automatically.",
   )) + "\n"
-  redacted = redact_text_strict(text, rules)
+  redacted = redact_text_strict(
+    text,
+    rules,
+    allow_patterns=allow_patterns,
+  )
   return Summary(
     text=redacted.text,
     redaction_findings=redacted.findings,
