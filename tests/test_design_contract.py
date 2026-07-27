@@ -254,6 +254,9 @@ def test_validates_protocol_boundary_map_and_event_routes():
     protocols=(
       {
         "protocol_id": "PROTOCOL-RUN-START",
+        "initial_interfaces": (
+          "IF-CONTEXT-EXEC",
+        ),
         "initial_states": {
           "SM-WORKFLOW": "ready",
         },
@@ -368,6 +371,7 @@ def test_rejects_protocol_state_sequence_mismatch():
       protocols=(
         {
           "protocol_id": "PROTOCOL-RUN-START",
+          "initial_interfaces": (),
           "initial_states": {
             "SM-WORKFLOW": "ready",
           },
