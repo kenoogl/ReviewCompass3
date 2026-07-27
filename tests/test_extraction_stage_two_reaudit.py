@@ -73,3 +73,42 @@ def test_generates_candidate_only_after_full_coverage_and_zero_unresolved():
     "approved": False,
     "audit_digest": result.digest,
   }
+
+
+def test_counts_structured_batch_merges_as_incremental_coverage():
+  reaudit = importlib.import_module(
+    "tools.extraction.stage_two_reaudit"
+  )
+
+  result = reaudit.reaudit_stage_two(
+    population=(
+      "source:prior.yaml",
+      "source:new.yaml",
+      "source:merged.yaml",
+      "source:pending.yaml",
+    ),
+    prior_extracted=("source:prior.yaml",),
+    prior_not_selected=(),
+    batch_resolutions=(
+      {
+        "extracted": ("source:new.yaml",),
+        "merged": ("source:merged.yaml",),
+        "not_selected": (),
+      },
+    ),
+    unresolved_dependencies=0,
+    reassessment_conflicts=0,
+    unclassified_items=0,
+    missing_destinations=0,
+    unreasoned_rejections=0,
+    follow_up_items=1,
+    user_approved=False,
+  )
+
+  assert result.status == "blocked"
+  assert result.prior_covered_count == 1
+  assert result.newly_covered_count == 2
+  assert result.covered_count == 3
+  assert result.uncovered_count == 1
+  assert result.unresolved_count == 2
+  assert result.approval_candidate is None
