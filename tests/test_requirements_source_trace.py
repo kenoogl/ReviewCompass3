@@ -208,6 +208,37 @@ def _obligation_record(**overrides):
   return value
 
 
+def test_builds_deterministic_obligation_source_trace():
+  source_trace = importlib.import_module(
+    "tools.requirements.source_trace"
+  )
+
+  result = source_trace.validate_obligation_sources(
+    records=(
+      _obligation_record(
+        obligation_id="REQ-RUNTIME-001#inputs",
+      ),
+      _obligation_record(),
+    ),
+    required_obligation_ids=(
+      "REQ-RUNTIME-001#statement",
+      "REQ-RUNTIME-001#inputs",
+    ),
+    defined_requirement_ids=("REQ-RUNTIME-001",),
+    defined_intent_ids=("INT-PRODUCT",),
+    defined_essence_ids=("ESS-0003",),
+  )
+
+  assert result.status == "complete"
+  assert tuple(
+    record.obligation_id for record in result.records
+  ) == (
+    "REQ-RUNTIME-001#inputs",
+    "REQ-RUNTIME-001#statement",
+  )
+  assert len(result.digest) == 64
+
+
 def test_requires_source_relation_for_every_obligation_scope():
   source_trace = importlib.import_module(
     "tools.requirements.source_trace"
