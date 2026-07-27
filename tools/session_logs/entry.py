@@ -22,6 +22,10 @@ def _load_module(name):
 
 
 def run(argv=None) -> int:
+  arguments = list(sys.argv[1:] if argv is None else argv)
+  if arguments and arguments[0] == "schedule":
+    scheduler = _load_module("tools.session_logs.scheduler")
+    return scheduler.run(tuple(arguments[1:]))
   parser = argparse.ArgumentParser()
   subcommands = parser.add_subparsers(dest="command", required=True)
   hook_parser = subcommands.add_parser("hook")
@@ -30,7 +34,7 @@ def run(argv=None) -> int:
   hook_parser.add_argument("--event-log")
   preserve_parser = subcommands.add_parser("preserve")
   preserve_parser.add_argument("--config", required=True)
-  args = parser.parse_args(argv)
+  args = parser.parse_args(arguments)
 
   if args.command == "hook":
     hooks = _load_module("tools.session_logs.hooks")

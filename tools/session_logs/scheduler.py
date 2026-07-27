@@ -5,7 +5,9 @@ normative_status: non-normative
 promotion_required: true
 """
 
+import argparse
 import dataclasses
+import json
 import os
 import plistlib
 import subprocess
@@ -281,3 +283,147 @@ def deactivate_launchd_schedule(
     action="deactivated",
     status="stopped",
   )
+
+
+def inspect_launchd_schedule(
+  plist_path,
+  *,
+  uid,
+  runner=subprocess.run,
+) -> ActivationResult:
+  _validate_owned_schedule(plist_path)
+  domain = _launchd_domain(uid)
+  return ActivationResult(
+    action="inspected",
+    status=(
+      "running"
+      if _is_running(domain, runner)
+      else "stopped"
+    ),
+  )
+
+
+def _print_cli_result(operation, action, status, reason=None):
+  payload = {
+    "action": action,
+    "operation": operation,
+    "status": status,
+  }
+  if reason is not None:
+    payload["reason"] = reason
+  print(json.dumps(
+    payload,
+    ensure_ascii=False,
+    sort_keys=True,
+  ))
+
+
+def _prepare_log_directories(stdout_path, stderr_path):
+  try:
+    Path(stdout_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(stderr_path).parent.mkdir(parents=True, exist_ok=True)
+  except OSError as error:
+    raise ScheduleError(
+      "Cannot prepare launchd log directories"
+    ) from error
+
+
+def run(argv=None, *, runner=subprocess.run) -> int:
+  parser = argparse.ArgumentParser()
+  parser.add_argument(
+    "operation",
+    choices=(
+      "install",
+      "activate",
+      "status",
+      "deactivate",
+      "uninstall",
+    ),
+  )
+  parser.add_argument("--plist", required=True)
+  parser.add_argument("--python", required=True)
+  parser.add_argument("--config", required=True)
+  parser.add_argument("--interval", required=True, type=int)
+  parser.add_argument("--stdout", required=True)
+  parser.add_argument("--stderr", required=True)
+  parser.add_argument("--uid", required=True, type=int)
+  parser.add_argument("--dry-run", action="store_true")
+  args = parser.parse_args(argv)
+  schedule_arguments = {
+    "python_executable": args.python,
+    "config_path": args.config,
+    "interval_seconds": args.interval,
+    "stdout_path": args.stdout,
+    "stderr_path": args.stderr,
+  }
+  try:
+    build_launchd_schedule(**schedule_arguments)
+    if args.dry_run:
+      _print_cli_result(
+        args.operation,
+        "planned",
+        "ok",
+      )
+      return 0
+    if args.operation == "install":
+      _prepare_log_directories(args.stdout, args.stderr)
+      result = install_launchd_schedule(
+        args.plist,
+        **schedule_arguments,
+      )
+      status = "error" if result.action == "preserved" else "ok"
+    elif args.operation == "activate":
+      result = activate_launchd_schedule(
+        args.plist,
+        uid=args.uid,
+        runner=runner,
+      )
+      status = result.status
+    elif args.operation == "status":
+      result = inspect_launchd_schedule(
+        args.plist,
+        uid=args.uid,
+        runner=runner,
+      )
+      status = result.status
+    elif args.operation == "deactivate":
+      result = deactivate_launchd_schedule(
+        args.plist,
+        uid=args.uid,
+        runner=runner,
+      )
+      status = result.status
+    else:
+      result = uninstall_launchd_schedule(
+        args.plist,
+        **schedule_arguments,
+      )
+      status = "error" if result.action == "preserved" else "ok"
+  except Exception as error:
+    _print_cli_result(
+      args.operation,
+      "failed",
+      "error",
+      reason=type(error).__name__,
+    )
+    return 5
+  reason = getattr(result, "reason", None)
+  _print_cli_result(
+    args.operation,
+    result.action,
+    status,
+    reason=reason,
+  )
+  return (
+    5
+    if result.action in ("failed", "preserved")
+    else 0
+  )
+
+
+def main():
+  raise SystemExit(run())
+
+
+if __name__ == "__main__":
+  main()
