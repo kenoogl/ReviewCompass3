@@ -208,7 +208,7 @@ def _parse_lines(lines) -> ParseResult:
 
 def parse_claude_bytes(data) -> ParseResult:
   return _parse_lines(
-    data.decode("utf-8").splitlines(keepends=True)
+    data.decode("utf-8").split("\n")
   )
 
 

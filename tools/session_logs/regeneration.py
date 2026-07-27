@@ -42,7 +42,7 @@ class RegenerationResult:
 def _parse_source_bytes(data):
   first_line = next((
     line
-    for line in data.splitlines()
+    for line in data.split(b"\n")
     if line.strip()
   ), b"")
   first_record = json.loads(first_line) if first_line else {}
