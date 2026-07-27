@@ -1,0 +1,95 @@
+{
+  "material_digest": "3f43572ef1ae89208dae1cf6d5ae32ff49d40aa3e04adc1c7a9caa7840a42f6c",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "records/requirements/requirement-boundary-relations.json",
+        "sha256": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e"
+      },
+      {
+        "path": "records/requirements/obligation-source-trace.json",
+        "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7"
+      },
+      {
+        "path": "docs/design/2026-07-28-reviewcompass3-design.md",
+        "sha256": "b5348164ab23effbe3b5aee31eb8c9e2cbd5196f808f0f675a0b246d292d63dd"
+      },
+      {
+        "path": "records/design/stage-five-design.json",
+        "sha256": "9551c4ee49935349ea04f15946717660d3d2d1b88849b77e4edfe43daf6b5b4e"
+      },
+      {
+        "path": "records/design/stage-five-architecture-integrity.json",
+        "sha256": "1e00bd16d7b8b8373635b1cfe6a5a1320286082fbf15eb9c68f8327eb382bc56"
+      },
+      {
+        "path": "docs/design/2026-07-28-bootstrap-conformance-audit.md",
+        "sha256": "e63db43c07647961c8df9b370b521629aac26ac3ca8745408852f3648c5858d0"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-audit.json",
+        "sha256": "5f3cde65775ef1f80b234d2c599aae9b752f324d6e91ec0a5b2ce0d536f70219"
+      },
+      {
+        "path": "records/design/bootstrap-conformance-integrity.json",
+        "sha256": "e0cb6a3382a45d41cf0f0f928a797549be6bda6488cf760f7ad0a5dc30da8220"
+      },
+      {
+        "path": "tools/design/design_contract.py",
+        "sha256": "8a756814e04695b77461e4bfb0f846794b08527882fe1da713074c0164d13c2b"
+      },
+      {
+        "path": "tools/design/bootstrap_conformance.py",
+        "sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+      },
+      {
+        "path": "tests/test_design_contract.py",
+        "sha256": "7796090a9ad2cdf88cb5377a76e9f31748b32aa0660e292a7cf8e2d311acc8d9"
+      },
+      {
+        "path": "tests/test_bootstrap_conformance.py",
+        "sha256": "2a282d032d26a2719832e650ccd605ba4e697eaf8226d79d7e010f7116faadbb"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-closure-verification/material.json",
+        "sha256": "2aeff3a76eb02e959df4ab6126679f6017cfa81c5445a6d04a75c693ad078192"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-closure-verification/scope-review.json",
+        "sha256": "644ad5dcfa1ae06ebb591280c16d3ee1ab86dbdbec0d8fd97e88f5db0a59777b"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-closure-verification/task-runtime-review.json",
+        "sha256": "070f6002bad30628ddc571e08bbef74d9c53838128093f3151ba188c2a7a43e5"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-closure-verification/adversarial-review.json",
+        "sha256": "73ad568f3d98ab3ac6c854e0a10ad25f89cf4ad735e1848a5c083e8312c81080"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-closure-verification/triage.json",
+        "sha256": "33f7666c16ce8f24ad2286014d70133dbe8a3e304fc57f62c209ec29c77b415b"
+      },
+      {
+        "path": "records/design/reviews/2026-07-28-stage-five-closure-verification/review-resolution.json",
+        "sha256": "6ca6d46cb069673775dfd54f4b5f09277657859bdbf20de0715f03d19d0434ba"
+      }
+    ],
+    "criteria": [
+      "closure verificationの6 findingが全件解決済みである",
+      "正常protocolはCapture結果、Validation候補、Validation結果を生成後に消費する",
+      "dispatch・Capture・Validation失敗はfailedまたはirrecoverable Run結果を介してWorkflow blockedへ伝播する",
+      "Capture失敗は診断保存可能、隔離、raw・診断保存不能を別protocolで分類する",
+      "validatorはproducer-before-consumerと失敗状態ベクトルを機械検証する",
+      "既承認23境界、29 interface、8状態機械、12 protocol、28 event routeが機械検証される",
+      "strict監査と386現行テストが通過する"
+    ],
+    "review_roles": [
+      "design_scope_and_boundary",
+      "task_runtime_design",
+      "adversarial_conformance"
+    ]
+  },
+  "status": "fixed",
+  "record_version": 1
+}
