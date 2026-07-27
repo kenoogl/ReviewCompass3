@@ -7,7 +7,7 @@
 
 - `main` は `origin/main` より先行しており、未pushのコミットがある
 - 本TODO更新前の最新実データコミットは
-  `f48763e Refine intent principles and audience`
+  `b27fc22 Integrate Task Runtime into intent`
 - 最小リポジトリ骨格を作成済み
 - ReviewCompass と ReviewCompass2 の参照コミット、ファイル一覧、照合値を記録済み
 - セッションログ基盤の移植候補と既存テストを棚卸し済み
@@ -106,6 +106,12 @@
 - 主な利用者を「SDDを行う単独の開発者」と利用者確認済み
 - 原理Aの役割分離、原理Bの実測、変更規模に応じたレビュー、
   意味単位、自己適用、外部API送信境界を初版候補へ反映済み
+- Task RuntimeをReviewCompass3の中核能力としてintent初版へ統合済み
+- Review Task、Execution Context、Context Composition、Harnessed Execution、
+  Review Run、Operational Provenanceを非規範の概念文書へ整理済み
+- Task Runtime概念文書に現行ブートストラップ実装との対応と不足を記録済み
+- intentと概念文書の各SHA-256、利用者方向3件、台帳47項目を
+  同一レビュー材料digestへ束縛済み
 - 第3段intentは利用者の方向性確認と複数担当レビュー前の暫定状態
 - 全テスト結果：`302 passed`
 - 作業ツリーは本TODO更新前の時点でクリーン
@@ -169,8 +175,9 @@ transfer、作業対象決定規則へのredesign、専用規則のrejectを一�
 ESS-0001の`transfer`を明示選択した。最終監査は被覆18,692件、未被覆0件、
 follow_up 0件、未解決0件の`ready`で、台帳47項目は固定source digestへ
 束縛して利用者承認済みである。第2段は完了した。第3段では承認済み台帳
-47項目だけからintent初版候補を作成し、細かな規則と対応表を本文外へ分離した。
-利用者の方向性確認と複数担当レビューは未完了である。
+47項目と利用者の明示方向からintent初版候補を作成し、細かな規則と対応表を
+本文外へ分離した。Task Runtimeの詳細は非規範の概念文書へ整理し、現行実装との
+対応と不足を明示した。利用者の方向性確認と複数担当レビューは未完了である。
 
 ## 完了済み
 
@@ -630,11 +637,12 @@ follow_up 0件、未解決0件の`ready`で、台帳47項目は固定source dige
 
 ## 次の作業候補
 
-第2段は完了し、第3段intentの初版候補へ利用者の方向性を反映した。
+第2段は完了し、第3段intentの初版候補へ利用者の方向性と
+Task Runtimeの中核概念を反映した。
 
 ### 1. intent初版の方向性確認
 
-- 利用者が目的、対象外、優先順位を確認する
+- 利用者が目的、Task Runtimeの位置付け、対象外、優先順位を確認する
 - 修正が必要なら、複数担当レビューの前に初版へ反映する
 
 ### 2. intentの複数担当レビュー
