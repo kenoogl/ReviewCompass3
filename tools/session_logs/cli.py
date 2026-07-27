@@ -32,6 +32,7 @@ from tools.session_logs.regeneration import (
 from tools.session_logs.repository_context import (
   collect_repository_context,
 )
+from tools.session_logs.source_kind import identify_auxiliary_kind
 from tools.session_logs.storage import store_artifact
 
 
@@ -361,6 +362,8 @@ def run(argv=None) -> int:
           reason=type(error).__name__,
         )
     try:
+      if identify_auxiliary_kind(raw_log) is not None:
+        continue
       artifact = prepare_artifact(
         raw_log,
         raw_root=config.raw_root,
