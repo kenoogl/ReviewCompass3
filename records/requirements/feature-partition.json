@@ -75,7 +75,7 @@
         "根拠のない評価結果を確定すること",
         "観測値と解釈を同じ事実として扱うこと"
       ],
-      "responsibility": "固定材料、評価基準、観測結果および解釈限界を分離して追跡可能に評価する"
+      "responsibility": "Harnessが不変記録した観測値へ評価基準を適用し、評価結果と解釈限界を追跡可能に記録する"
     },
     {
       "essence_ids": [
@@ -107,7 +107,7 @@
         "Humanの最終判断を自動化すること",
         "汎用エージェント実行基盤を作ること"
       ],
-      "responsibility": "版付き実行仕様、外部送信関門、複数担当、raw応答、検証、観測値および再試行をReview Runとして管理する"
+      "responsibility": "版付き実行仕様、外部送信関門、複数担当、raw応答、検証、実行条件・観測値の取得と不変記録および再試行をReview Runとして管理する"
     },
     {
       "essence_ids": [
@@ -266,11 +266,21 @@
     "covered_essence_count": 47,
     "duplicate_essence_count": 0,
     "feature_count": 9,
-    "partition_digest": "7e123844a6e92cea05f81a0eb06965389a79962d459ee53470ae45aceff8de63",
-    "status": "complete",
+    "partition_digest": "ff39d306df8ca41622d73fc39cbbb5fcf7bc0bab52c44e232978930acca93cd7",
+    "status": "structurally_complete",
     "uncovered_essence_count": 0
   },
   "promotion_required": true,
   "record_version": 1,
-  "status": "complete"
+  "source_catalogs": [
+    {
+      "path": "records/requirements/canonical-approved-essence-ledger.json",
+      "sha256": "96b82e68583b415ce0d74a8791da112974c35f266cd8136ffc5fd1b6dee61ca3"
+    },
+    {
+      "path": "records/requirements/intent-source-catalog.json",
+      "sha256": "bfaab933c4f75741b3304226f2ba25839779f7b23179ce2ab12eae79cbadd82a"
+    }
+  ],
+  "status": "review_findings_applied"
 }

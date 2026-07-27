@@ -1,0 +1,18 @@
+{
+  "intent_path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+  "intent_sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91",
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "sections": [
+    {"heading":"何のために作るか","identifier":"INT-PURPOSE","sha256":"3bdafc9fd612d255d90fdfc57c18b41fb093bee0699c8573d3f2a24e6cbc8023"},
+    {"heading":"誰が使うか","identifier":"INT-USERS","sha256":"afd3fd56d878a02cbf85df3a612496e022fe3bb9c1a24235733ef6c3114c59d2"},
+    {"heading":"どのようなものを作るか","identifier":"INT-PRODUCT","sha256":"5620af2df330dba262f9d4bb0d7449a0ed2b200e1d357bdb2c5c547282e3f182"},
+    {"heading":"何をしないか","identifier":"INT-NON-GOALS","sha256":"377b80990f0bb7c4b77facc4309d90bdac6cc9377b2f09ce618d1273ca8272a8"},
+    {"heading":"前提・制約","identifier":"INT-CONSTRAINTS","sha256":"46e645b8601ee8fcb773a1775606356aa6737f4230957aa564ff4375a7237d59"},
+    {"heading":"成功の判定基準","identifier":"INT-SUCCESS","sha256":"f0aeb83a6e57b92bb71581f3b7cf2fb919137c36e7cc109f561989ae10605420"},
+    {"heading":"意図や制約が衝突したときの判断","identifier":"INT-CONFLICT","sha256":"17bb7f9026d01bdebc3e97c84c5add5396dc787e3cdef57d3f119f8169f38ccc"}
+  ],
+  "status": "fixed"
+}

@@ -1,0 +1,52 @@
+{
+  "applied_findings": [
+    "REQ-REV-001",
+    "REQ-REV-002",
+    "REQ-REV-003",
+    "REQ-REV-004",
+    "REQ-REV-005",
+    "REQ-REV-006",
+    "REQ-REV-007",
+    "REQ-REV-008",
+    "REQ-REV-009",
+    "REQ-REV-010",
+    "REQ-REV-011",
+    "REQ-REV-012"
+  ],
+  "artifacts_after_resolution": [
+    {
+      "path": "records/requirements/canonical-approved-essence-ledger.json",
+      "sha256": "96b82e68583b415ce0d74a8791da112974c35f266cd8136ffc5fd1b6dee61ca3"
+    },
+    {
+      "path": "records/requirements/intent-source-catalog.json",
+      "sha256": "bfaab933c4f75741b3304226f2ba25839779f7b23179ce2ab12eae79cbadd82a"
+    },
+    {
+      "path": "records/requirements/feature-partition.json",
+      "sha256": "d2bc778f24101e7d2fce3257a9e427860c76962e45c7d6ccfd504931bb084167"
+    },
+    {
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "40d0fceb058c2d0a2762992bb8686ce5f4b1384f2f402857c47f6d53680f1afc"
+    },
+    {
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "2073a9e61f8dc9cf27c1f22584a76f8e6d13a8ad1128de68246b9674c23d8d32"
+    }
+  ],
+  "lifecycle": "provisional",
+  "material_digest": "ffdd8bae67dde65fc8681cf0a80f11356fb7cae365c39b80028f6211c44d9a48",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "applied",
+  "summary": {
+    "applied_count": 12,
+    "remaining_count": 0
+  },
+  "triage": {
+    "path": "records/requirements/reviews/2026-07-27-feature-partition-and-context-batch-review/triage.json",
+    "sha256": "9e32dbd9e90b66c15ccf0ef0c1c26c54f1ddaba2cacf073cf9c7085d255bfbda"
+  }
+}

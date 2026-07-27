@@ -3,7 +3,7 @@
     "batch_id": "REQ-BATCH-0001",
     "feature_id": "FEAT-REVIEW-CONTEXT",
     "requirements_path": "docs/requirements/review-context-requirements.md",
-    "requirements_sha256": "755db382c3f263f5736eadf20ef33dfba4bc80ea77116d5acd1baa4b987e9c90",
+    "requirements_sha256": "40d0fceb058c2d0a2762992bb8686ce5f4b1384f2f402857c47f6d53680f1afc",
     "status": "complete"
   },
   "fixed_inputs": [
@@ -13,7 +13,7 @@
     },
     {
       "path": "records/requirements/feature-partition.json",
-      "sha256": "03bbeaf61d42e18f680c98595a08f5231c375f36db2a5797204c73edcd3efe25"
+      "sha256": "d2bc778f24101e7d2fce3257a9e427860c76962e45c7d6ccfd504931bb084167"
     }
   ],
   "lifecycle": "provisional",
@@ -23,15 +23,19 @@
   "requirements": [
     {
       "acceptance_criteria": [
-        "必須項目を1つ欠く入力はContext生成前に拒否される",
+        "7つの必須入力をそれぞれ欠落、空、未解決、無効にした入力はContext生成前に拒否される",
         "同一入力から同一のTask入力Digestが得られる"
       ],
       "feature_id": "FEAT-REVIEW-CONTEXT",
       "inputs": [
-        "Review Taskの目的と判定基準",
+        "Constraints",
+        "Context Requirements",
+        "Expected Output",
+        "Goal",
+        "Provenance",
+        "Validation Policy",
         "一意に識別されたTarget",
-        "実行上の制約と期待出力",
-        "必要なContext材料の種別"
+        "利用者が確認した必須フィールド集合"
       ],
       "non_goals": [
         "LLMへ必須項目の採否を暗黙に委ねること",
@@ -57,12 +61,13 @@
     {
       "acceptance_criteria": [
         "Targetを含みすべてのentryに本文と出所がある",
-        "任意の本文変更をDigest不一致として検出する"
+        "本文と宣言Digestを同時に変更してもprior identityとの不一致を検出する"
       ],
       "feature_id": "FEAT-REVIEW-CONTEXT",
       "inputs": [
         "Targetとsource materialの参照",
-        "各材料の本文、役割および出所"
+        "各材料の本文、役割、解決可能な出所identityおよび取得結果",
+        "固定済みprior material identity"
       ],
       "non_goals": [
         "Digestだけで材料内容の真実性を保証すること",
@@ -87,8 +92,10 @@
     },
     {
       "acceptance_criteria": [
+        "Targetが母集合内の許可分類へ入る",
         "全候補が重複なく許可された分類のいずれかに入る",
-        "独立検査が同じ材料Digestから全件を再判定できる"
+        "母集合、Scope基準、期待分類を同じidentityへ固定し独立検査結果が全件一致する",
+        "独立検査の相違時はScope確定を停止しHuman裁定へ戻す"
       ],
       "feature_id": "FEAT-REVIEW-CONTEXT",
       "inputs": [
@@ -113,6 +120,7 @@
       "requirement_id": "REQ-CONTEXT-003",
       "statement": "システムはレビュー母集合、対象範囲、除外条件および分類結果をScope contractとして固定し対象漏れと判断競合を検出しなければならない",
       "stop_conditions": [
+        "Targetが母集合に存在しないかReview Taskで許可されない分類に入る",
         "同じ候補に競合する分類がある",
         "分類中に母集合が変わる",
         "unknownまたは未分類が残る"
@@ -120,14 +128,18 @@
     },
     {
       "acceptance_criteria": [
-        "1つの入力変更で旧結果の再利用が拒否される",
+        "Task定義、材料束、Scope、Composition、source universe、完全性状態、handoffの各構成要素を1つずつ変更すると旧identityと旧結果の再利用が拒否される",
         "同じ正規化入力から同じidentityが得られる"
       ],
       "feature_id": "FEAT-REVIEW-CONTEXT",
       "inputs": [
+        "Composition記録",
         "Scope contract",
-        "各入力の取得状態とDigest",
-        "固定済みExecution Context材料束"
+        "source universe identity",
+        "任意のhandoff package identity",
+        "各入力の完全性、取得状態およびDigest",
+        "固定済みExecution Context材料束",
+        "版付きReview Task入力定義のDigest"
       ],
       "non_goals": [
         "Digestで意味的正しさを保証すること",
@@ -185,43 +197,79 @@
     },
     {
       "acceptance_criteria": [
-        "再開操作が確認済み成果の内容とDigestを変更しない",
-        "同一入力だけを再利用し変更入力では新しいRunを作る"
+        "packageの再構成が確認済み成果の内容とDigestを変更しない",
+        "受け取り時にpackage全体のDigest、Context identityおよびfreshnessを再検査できる"
       ],
       "feature_id": "FEAT-REVIEW-CONTEXT",
       "inputs": [
         "再開対象のReview TaskとContext identity",
         "未解決事項と変更方針",
+        "元Review Runとeffective execution identity",
+        "確認主体、Validation結果および承認判断",
         "確認済み成果とそのDigest"
       ],
       "non_goals": [
-        "staleな成果から処理を継続すること",
+        "成果再利用、新Review Run開始、再開状態遷移を決定すること",
         "再開のために失敗履歴を削除すること"
       ],
       "outputs": [
-        "照合可能なhandoff package"
+        "package全体のDigestを持つ照合可能なhandoff package"
       ],
       "preserved_artifacts": [
         "既存の確認済み成果、失敗履歴および不一致診断"
       ],
       "recovery_conditions": [
-        "保存済みの確認済み成果からpackageを再構成する",
-        "入力変更時は新しいReview Runとして再開する"
+        "保存済みの確認済み成果からpackageを再構成する"
       ],
       "requirement_id": "REQ-CONTEXT-006",
-      "statement": "システムは確認済み成果、未解決事項、変更方針および再開地点をDigest付きhandoff packageへ固定し確認済み成果を壊さず再開できなければならない",
+      "statement": "システムは確認済み成果、未解決事項、変更方針および再開地点をDigest付きhandoff packageへ固定し受け取り側が完全性とfreshnessを検査できる形で引き渡さなければならない",
       "stop_conditions": [
         "再開対象または変更方針が一意に定まらない",
         "確認済み成果のDigestが欠けるか一致しない"
       ]
+    },
+    {
+      "acceptance_criteria": [
+        "完了markerのある成果だけが再利用され再読込Digestが一致する",
+        "削除時も対象identity、理由および削除結果のDigest付き診断が残る",
+        "書込み途中の強制終了後も直前の確認済み版が変わらない"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "inputs": [
+        "保存対象とそのidentity",
+        "機微情報検査結果",
+        "許可された保存形式、アクセス境界およびretention policy"
+      ],
+      "non_goals": [
+        "保存失敗を無視して後続処理を続けること",
+        "未検査の失敗材料を恒久保存すること"
+      ],
+      "outputs": [
+        "保存結果と再読込照合結果",
+        "原子的に確定した成果物と完了marker"
+      ],
+      "preserved_artifacts": [
+        "直前の確認済み版と値を含まない失敗診断"
+      ],
+      "recovery_conditions": [
+        "不完全な一時成果を確定扱いせず直前の確認済み版から再試行する",
+        "機微情報を除去し新しい保存試行として記録する"
+      ],
+      "requirement_id": "REQ-CONTEXT-007",
+      "statement": "システムはContext構成と検査で生じた確認済み成果、失敗履歴および診断を部分書込みや機微情報の漏えいを防ぎ再起動後に照合できる形で保存しなければならない",
+      "stop_conditions": [
+        "保存先のアクセス境界を確認できない",
+        "原子的な確定または再読込照合に失敗する",
+        "機微情報検査が失敗する"
+      ]
     }
   ],
   "results": {
-    "batch_digest": "169a3bf76c551323f3792577e147d6d457f6f0d93aabf9a68903fa70fb27f590",
+    "batch_digest": "01e2bcdcf95b893297fe4b7156b83480f29b442d60cbc7b9591300ab335b2e47",
     "covered_feature_essence_count": 5,
     "missing_feature_essence_count": 0,
-    "requirement_count": 6,
-    "source_trace_digest": "c86432616a187809ec05698c1bfb323a65e38d6936adcfef3a6dc990423c8669",
+    "requirement_count": 7,
+    "source_trace_digest": "1c18040ff52c01243642a1a34c406d7bb071b86206c9bfa261cc4ca2fd21f915",
     "status": "complete"
   },
   "source_trace": [
@@ -304,6 +352,19 @@
       ],
       "rationale": "確認済み成果を保ったまま同一入力だけを安全に再利用する",
       "requirement_id": "REQ-CONTEXT-006"
+    },
+    {
+      "disposition": "selected",
+      "essence_ids": [
+        "ESS-0006",
+        "ESS-0032"
+      ],
+      "intent_refs": [
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "rationale": "失敗時にも確認済み成果を保ち機微情報を安全に扱う",
+      "requirement_id": "REQ-CONTEXT-007"
     }
   ],
   "status": "complete"
