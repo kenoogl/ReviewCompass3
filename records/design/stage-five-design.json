@@ -292,7 +292,7 @@
         "保存物の意味的分類候補を提示する"
       ],
       "human_responsibilities": [
-        "配置上書きと機微情報例外を承認する"
+        "配置上書きと版付き機微情報policyを承認する。ただし機械関門の免除は承認できない"
       ],
       "failure_strategy": [
         "部分成功を逆順補償し確認済み版と利用者データを保持する"
@@ -537,7 +537,7 @@
         "伏字化済み転写から意味的要約候補を作る"
       ],
       "human_responsibilities": [
-        "取込範囲と機微情報の例外を明示する"
+        "取込範囲と版付き伏字policyを確定する。ただし原本隔離と機械関門の免除はできない"
       ],
       "failure_strategy": [
         "rawを隔離保持し不正派生物の通常保存を停止する"
@@ -746,7 +746,7 @@
     {
       "test_id": "AT-TRIAGE-003",
       "requirement_id": "REQ-TRIAGE-003",
-      "oracle_type": "human",
+      "oracle_type": "hybrid",
       "setup": "triage結果と判断候補／Humanの採用、拒否、保留判断／REQ-TRACE-005のOperational Provenance verdict",
       "stimulus": "システムはFindingの最終採否をHuman判断として対象と内容へ束縛し、来歴関門通過後だけ確定しなければならない",
       "expected": "判断recordが承認対象の内容Digestを保持し再計算値と一致する／採用、拒否、保留のHuman判断内容が対象Digestとは別フィールドで残る／Operational Provenance verdictが不合格ならFinding確定を拒否する",
@@ -935,7 +935,7 @@
     {
       "test_id": "AT-IMPROVE-002",
       "requirement_id": "REQ-IMPROVE-002",
-      "oracle_type": "human",
+      "oracle_type": "hybrid",
       "setup": "feedback ledger、改善候補、検証結果",
       "stimulus": "システムは改善候補を検証し、Human承認を経た変更だけを次周期へ反映しなければならない",
       "expected": "改善前後を固定条件で比較できる／Human承認前に現行方針を変更しない",
@@ -944,11 +944,16 @@
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_contract",
-    "digest": "1659d73f0725e3d7048968290aab1fd143faf66fa2b53f8a193ae0a828346c82",
+    "digest": "e15792caa9588a3ed4c388b7cb9557756f2a6418933a2188808ef74d18c389f9",
     "feature_count": 9,
     "requirement_count": 37,
     "acceptance_test_count": 37,
     "boundary_count": 23,
+    "architecture_contract": "tools/design/design_contract.py:validate_design_architecture",
+    "architecture_record": "records/design/stage-five-architecture-integrity.json",
+    "architecture_digest": "b87d3e65bcdeb0b6135f2dde719bf6477c5bb41cfdf6afa18c09b910417c78ea",
+    "interface_count": 13,
+    "state_machine_count": 6,
     "status": "complete"
   },
   "lifecycle": "provisional",
