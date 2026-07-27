@@ -16,8 +16,8 @@ promotion_required: true
 - `REQ-EXEC-002`：外部送信の内容、能力、論理送信先、承認者identity・権限、
   Human承認を同じ
   実行identityへ束縛する。
-- `REQ-EXEC-003`：provider raw応答と解析試行を分離し、共有隔離保存境界を介して
-  送信条件から追跡する。
+- `REQ-EXEC-003`：provider responseの受領とraw captureを別状態にし、解析前に
+  write-ahead隔離保存する。
 - `REQ-EXEC-004`：複数担当の実行トポロジとround結果を欠落なく記録する。
 - `REQ-EXEC-005`：形式復旧を閉じた機械変換またはHuman裁定に限定する。
 - `REQ-EXEC-006`：実行条件と観測値を不変記録し、再試行・再利用根拠を監査可能にする。
@@ -29,7 +29,8 @@ Evidence Evaluationへ渡す。
 
 - `REQ-TRIAGE-001`：担当別結果を件数と結論を失わず要約する。
 - `REQ-TRIAGE-002`：複数modelの所見を重複と競合を保って統合する。
-- `REQ-TRIAGE-003`：Findingの最終採否をHuman判断として対象と内容へ束縛する。
+- `REQ-TRIAGE-003`：Findingの最終採否をHuman判断として対象Digestへ束縛し、
+  来歴関門通過後だけ確定する。
 
 ## 意味単位と来歴追跡
 
@@ -37,7 +38,8 @@ Evidence Evaluationへ渡す。
 - `REQ-TRACE-002`：上流義務と下流成果物を順逆追跡し、受け先なしを拒否する。
 - `REQ-TRACE-003`：共有データ境界を決定的validatorでfail-closedに検査する。
 - `REQ-TRACE-004`：変更単位、意味関係、閉包規則から影響候補母集合を生成する。
-- `REQ-TRACE-005`：Task入力から最終FindingまでをOperational Provenanceで結ぶ。
+- `REQ-TRACE-005`：Task入力から最終FindingまでをOperational Provenanceで結び、
+  検証verdictを所有機能へ渡す。
 
 Traceは影響候補母集合の生成と関係検査を所有し、Review Contextはその母集合の
 include、exclude、defer分類とScope固定を所有する。
@@ -51,7 +53,7 @@ include、exclude、defer分類とScope固定を所有する。
 ## Workflowと作業単位の制御
 
 - `REQ-WORKFLOW-001`：現在対象、作業単位、backlog、進行段階を一意IDで結線する。
-- `REQ-WORKFLOW-002`：作業段階とRun開始許可を状態機械で管理する。
+- `REQ-WORKFLOW-002`：作業段階とRun開始・完了許可を状態機械で管理する。
 - `REQ-WORKFLOW-003`：成果物書込みを進行中作業単位と承認actionへ束縛する。
 - `REQ-WORKFLOW-004`：ReviewCompass3自身にも通常のReview Task契約を適用する。
 
@@ -60,7 +62,7 @@ Workflowは作業段階とRun開始許可の正本、Harnessは許可後のRun�
 
 ## ポータブルな配置と運用
 
-- `REQ-PORTABLE-001`：設定、データ、成果物の配置を主要OSで移植可能に解決する。
+- `REQ-PORTABLE-001`：版付きsupported-platform matrixの全対象で配置を解決する。
 - `REQ-PORTABLE-002`：構造化成果物を安全に読書きし、部分失敗から復旧する。
 - `REQ-PORTABLE-003`：配布、導入、運用、解除を所有境界と利用者データ保護の下で行う。
 - `REQ-PORTABLE-004`：全保存機能へ共通の機微情報、retention、削除境界を提供する。

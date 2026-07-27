@@ -13,7 +13,7 @@
   "normative_status": "non-normative",
   "policy": {
     "exceptions": [],
-    "meaning": "各義務は{requirement_id}#{scope}の安定IDを持ち、obligation-source-trace.jsonでintent fragmentおよびessence itemへ個別に結ぶ",
+    "meaning": "statementと各list entryを原子的義務とし、statementは{requirement_id}#statement、list entryは{requirement_id}#{scope}.{1-based-index:03d}の安定IDでsource relationへ個別に結ぶ",
     "required_scopes": [
       "statement",
       "inputs",
@@ -30,7 +30,7 @@
   "obligation_source_trace": {
     "path": "records/requirements/obligation-source-trace.json",
     "required": true,
-    "sha256": "dbc818e8bf4e7028c55a7d10ddd363a2d9bb73790f9b7322c9eb3750b5357e58"
+    "sha256": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7"
   },
   "requirement_ids": [
     "REQ-CONTEXT-001",
@@ -78,7 +78,7 @@
     },
     {
       "path": "records/requirements/remaining-batches-0002-0009.json",
-      "sha256": "c22928ac7961a8e9b6e6619a5fb52bb95c6b152779303f55d636128b103c5672"
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
     }
   ],
   "status": "complete"

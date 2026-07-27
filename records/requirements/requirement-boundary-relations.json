@@ -10,13 +10,34 @@
   ],
   "relations": [
     {"from":"REQ-TRACE-004","relation":"provides_to","to":"REQ-CONTEXT-003","contract":"影響候補母集合と生成根拠"},
+    {"from":"REQ-CONTEXT-003","relation":"depends_on","to":"REQ-TRACE-004","contract":"影響候補母集合と生成根拠"},
     {"from":"REQ-PORTABLE-002","relation":"provides_to","to":"REQ-CONTEXT-007","contract":"原子的書込み、再読込照合、部分失敗復旧"},
+    {"from":"REQ-CONTEXT-007","relation":"depends_on","to":"REQ-PORTABLE-002","contract":"原子的書込み、再読込照合、部分失敗復旧"},
     {"from":"REQ-PORTABLE-004","relation":"provides_to","to":"REQ-CONTEXT-007","contract":"機微情報、retention、削除の共有保存境界"},
+    {"from":"REQ-CONTEXT-007","relation":"depends_on","to":"REQ-PORTABLE-004","contract":"機微情報、retention、削除の共有保存境界"},
+    {"from":"REQ-PORTABLE-002","relation":"provides_to","to":"REQ-EXEC-003","contract":"write-ahead captureと耐久的終端状態"},
+    {"from":"REQ-EXEC-003","relation":"depends_on","to":"REQ-PORTABLE-002","contract":"write-ahead captureと耐久的終端状態"},
     {"from":"REQ-PORTABLE-004","relation":"provides_to","to":"REQ-EXEC-003","contract":"provider raw応答の隔離保存境界"},
+    {"from":"REQ-EXEC-003","relation":"depends_on","to":"REQ-PORTABLE-004","contract":"provider raw応答の隔離保存境界"},
     {"from":"REQ-PORTABLE-004","relation":"provides_to","to":"REQ-SESSION-002","contract":"生ログ原本と伏字化派生物の分離保存境界"},
+    {"from":"REQ-SESSION-002","relation":"depends_on","to":"REQ-PORTABLE-004","contract":"生ログ原本と伏字化派生物の分離保存境界"},
+    {"from":"REQ-PORTABLE-002","relation":"provides_to","to":"REQ-WORKFLOW-002","contract":"作業状態の原子的保存と再読込照合"},
+    {"from":"REQ-WORKFLOW-002","relation":"depends_on","to":"REQ-PORTABLE-002","contract":"作業状態の原子的保存と再読込照合"},
     {"from":"REQ-WORKFLOW-002","relation":"provides_to","to":"REQ-EXEC-001","contract":"作業段階に束縛されたRun開始許可"},
+    {"from":"REQ-EXEC-001","relation":"depends_on","to":"REQ-WORKFLOW-002","contract":"作業段階に束縛されたRun開始許可"},
     {"from":"REQ-EXEC-001","relation":"returns_to","to":"REQ-WORKFLOW-002","contract":"Run完了、失敗または拒否結果"},
-    {"from":"REQ-EXEC-006","relation":"provides_to","to":"REQ-EVAL-002","contract":"観測値と測定条件の不変記録"}
+    {"from":"REQ-EXEC-006","relation":"provides_to","to":"REQ-EVAL-002","contract":"観測値と測定条件の不変記録"},
+    {"from":"REQ-EVAL-002","relation":"depends_on","to":"REQ-EXEC-006","contract":"観測値と測定条件の不変記録"},
+    {"from":"REQ-TRACE-005","relation":"provides_to","to":"REQ-WORKFLOW-002","contract":"Run完了関門用Operational Provenance verdict"},
+    {"from":"REQ-WORKFLOW-002","relation":"depends_on","to":"REQ-TRACE-005","contract":"Run完了関門用Operational Provenance verdict"},
+    {"from":"REQ-TRACE-005","relation":"provides_to","to":"REQ-TRIAGE-003","contract":"Finding確定関門用Operational Provenance verdict"},
+    {"from":"REQ-TRIAGE-003","relation":"depends_on","to":"REQ-TRACE-005","contract":"Finding確定関門用Operational Provenance verdict"}
   ],
-  "status": "complete"
+  "validation": {
+    "contract": "tools/requirements/boundary_relations.py:validate_boundary_relations",
+    "digest": "129555411efb457f995cf5a6fd49e5aa6b5d7ddf324114470c0e355ed28c9494",
+    "relation_count": 23,
+    "status": "complete"
+  },
+  "status": "validated"
 }
