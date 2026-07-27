@@ -18,6 +18,7 @@ class Provenance:
   source_sha256: str
   transcript_sha256: str
   tool_version: str
+  summary_sha256: str = ""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -51,6 +52,7 @@ def build_provenance(
   raw_root,
   transcript_text,
   tool_version,
+  summary_text="",
 ) -> Provenance:
   raw_path = Path(raw_log)
   root_path = Path(raw_root)
@@ -63,6 +65,9 @@ def build_provenance(
     source_sha256=hashlib.sha256(raw_bytes).hexdigest(),
     transcript_sha256=hashlib.sha256(transcript_bytes).hexdigest(),
     tool_version=tool_version,
+    summary_sha256=hashlib.sha256(
+      summary_text.encode("utf-8")
+    ).hexdigest() if summary_text else "",
   )
 
 
