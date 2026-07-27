@@ -150,10 +150,10 @@ def _read_lines(path):
     ) from error
 
 
-def parse_claude_log(path) -> ParseResult:
+def _parse_lines(lines) -> ParseResult:
   events = []
   issues = []
-  for line_no, line in enumerate(_read_lines(path), start=1):
+  for line_no, line in enumerate(lines, start=1):
     if not line.strip():
       continue
     try:
@@ -204,6 +204,16 @@ def parse_claude_log(path) -> ParseResult:
       issues=issues,
     ))
   return ParseResult(events=tuple(events), issues=tuple(issues))
+
+
+def parse_claude_bytes(data) -> ParseResult:
+  return _parse_lines(
+    data.decode("utf-8").splitlines(keepends=True)
+  )
+
+
+def parse_claude_log(path) -> ParseResult:
+  return _parse_lines(_read_lines(path))
 
 
 def parse_claude_events(path) -> tuple:
