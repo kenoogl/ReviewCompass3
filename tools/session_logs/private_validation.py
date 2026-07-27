@@ -18,6 +18,7 @@ from tools.session_logs.pipeline import (
   UnsupportedSourceKind,
   prepare_artifact,
 )
+from tools.session_logs.source_kind import identify_auxiliary_kind
 
 
 class PrivateValidationError(Exception):
@@ -141,10 +142,14 @@ def validate_private_logs(
     "claude": 0,
     "codex": 0,
     "failed": 0,
+    "ignored": 0,
     "unsupported": 0,
   }
   for relative_path in relative_paths:
     try:
+      if identify_auxiliary_kind(raw / relative_path) is not None:
+        counts["ignored"] += 1
+        continue
       artifact = prepare_artifact(
         raw / relative_path,
         raw_root=raw,

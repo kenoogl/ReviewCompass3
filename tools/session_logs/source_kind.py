@@ -34,3 +34,35 @@ def identify_source_kind(path):
     return "codex"
 
   return None
+
+
+def identify_auxiliary_kind(path):
+  with Path(path).open(encoding="utf-8") as raw_log:
+    first_line = raw_log.readline()
+
+  if not first_line:
+    return None
+
+  first_event = json.loads(first_line)
+  if not isinstance(first_event, dict):
+    return None
+
+  if (
+    first_event.get("type") == "queue-operation"
+    and first_event.get("operation") in ("enqueue", "dequeue")
+    and isinstance(first_event.get("sessionId"), str)
+    and first_event.get("sessionId")
+    and "content" in first_event
+  ):
+    return "claude_queue"
+
+  if (
+    first_event.get("type") == "started"
+    and isinstance(first_event.get("agentId"), str)
+    and first_event.get("agentId")
+    and isinstance(first_event.get("key"), str)
+    and first_event.get("key")
+  ):
+    return "claude_agent"
+
+  return None
