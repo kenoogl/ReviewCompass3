@@ -358,7 +358,7 @@
     },
     {
       "requirement_id": "REQ-SESSION-003",
-      "classification": "conformant",
+      "classification": "adapt",
       "target_design_id": "DES-SESSION-RECORDS",
       "implementation_evidence": [
         "tools/session_logs/updates.py",
@@ -370,8 +370,10 @@
         "tests/test_session_log_preservation.py",
         "tests/test_session_log_regeneration.py"
       ],
-      "rationale": "追記、非追記変更、消失、転写再生成不一致を独立検査する",
-      "gaps": []
+      "rationale": "追記と変異は検出するが、消失と非追記変更の別分類および変更前後identity・変異診断の耐久保存を全義務で反証していない",
+      "gaps": [
+        "GAP-SESSION-003"
+      ]
     },
     {
       "requirement_id": "REQ-WORKFLOW-001",
@@ -556,18 +558,18 @@
   "validation": {
     "contract": "tools/design/bootstrap_conformance.py:validate_bootstrap_conformance",
     "counts": {
-      "adapt": 27,
-      "conformant": 1,
+      "adapt": 28,
+      "conformant": 0,
       "defer": 5,
       "replace": 4
     },
-    "digest": "23dc3997185d9f0e4cb649c75535f343a895d5571cb11fe280ffc2d36469eb2c",
+    "digest": "8176f0b84fec3b66e6f298b57e929cc628ef6aef3c52f770b40723940129252a",
     "requirement_count": 37,
-    "integrity_contract": "tools/design/bootstrap_conformance.py:validate_evidence_backed_bootstrap_conformance",
+    "integrity_contract": "tools/design/bootstrap_conformance.py:validate_strict_evidence_backed_bootstrap_conformance",
     "integrity_record": "records/design/bootstrap-conformance-integrity.json",
-    "integrity_digest": "16d04c2fec1874c4edcdec2849da526add052c5bc49f4d7f1cdd697a88c0c36c",
+    "integrity_digest": "11be347dda961641968a3dec93548d388be867723419303f78266184ed027c8f",
     "evidence_count": 61,
-    "gap_count": 36,
+    "gap_count": 37,
     "status": "complete"
   },
   "policy": {

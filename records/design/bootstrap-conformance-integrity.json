@@ -1039,6 +1039,22 @@
       "stop_condition": "機微情報検査、アクセス境界、retention、削除方針または来歴照合に失敗する"
     },
     {
+      "gap_id": "GAP-SESSION-003",
+      "requirement_id": "REQ-SESSION-003",
+      "category": "adaptation",
+      "component": "mutation_detector",
+      "atomic_obligation_ids": [
+        "REQ-SESSION-003#acceptance_criteria.001",
+        "REQ-SESSION-003#acceptance_criteria.002",
+        "REQ-SESSION-003#statement"
+      ],
+      "depends_on_gap_ids": [],
+      "acceptance_test_ids": [
+        "AT-SESSION-003"
+      ],
+      "stop_condition": "非追記変更または検証不能な消失がある"
+    },
+    {
       "gap_id": "GAP-TRACE-001",
       "requirement_id": "REQ-TRACE-001",
       "category": "adaptation",
@@ -1286,20 +1302,27 @@
     }
   ],
   "validation": {
-    "contract": "tools/design/bootstrap_conformance.py:validate_evidence_backed_bootstrap_conformance",
+    "contract": "tools/design/bootstrap_conformance.py:validate_strict_evidence_backed_bootstrap_conformance",
+    "base_contract": "tools/design/bootstrap_conformance.py:validate_evidence_backed_bootstrap_conformance",
     "commit_contract": "tools/design/bootstrap_conformance.py:validate_commit_blob_claims",
-    "digest": "16d04c2fec1874c4edcdec2849da526add052c5bc49f4d7f1cdd697a88c0c36c",
+    "digest": "11be347dda961641968a3dec93548d388be867723419303f78266184ed027c8f",
+    "approved_input_digests": {
+      "approved_obligations": "7a7aeab92bd50b4848c48d311ecccf540e0ed58a25e433cb7c9640992d4481d7",
+      "approved_boundaries": "eb1e607a648f98a4884ef319a8e496620e8eaaa8566248bc4198f690ad86d96e",
+      "approved_design": "9a300744e658f68bd2b9fdb014112c3922f2d5e2fd8f81b2baa5b0a54583c363"
+    },
     "counts": {
-      "adapt": 27,
-      "conformant": 1,
+      "adapt": 28,
+      "conformant": 0,
       "defer": 5,
       "replace": 4
     },
     "requirement_count": 37,
     "approved_obligation_count": 464,
     "evidence_count": 61,
-    "gap_count": 36,
+    "gap_count": 37,
     "dependency_count": 11,
+    "test_output_digest": "dee6bdbfd93a725f0e82454d5c54e197d752ee87e5ff829514dc5c2bcb36d926",
     "status": "complete"
   },
   "lifecycle": "provisional",
@@ -1318,8 +1341,9 @@
     },
     "design": {
       "path": "records/design/stage-five-design.json",
-      "sha256": "d1f8424214a0662d18c6df9e529a077da4553cbe420c79b7294fa31f53a691dd",
+      "sha256": "9a300744e658f68bd2b9fdb014112c3922f2d5e2fd8f81b2baa5b0a54583c363",
       "design_count": 9
     }
-  }
+  },
+  "conformant_evidence_obligation_map": {}
 }
