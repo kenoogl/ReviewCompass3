@@ -31,6 +31,8 @@ def _write_setup(tmp_path):
       "transcript_root": "transcripts",
       "summary_root": "summaries",
       "provenance_root": "provenance",
+      "backup_root": "private-backup",
+      "preservation_enabled": True,
       "tool_version": "0.0.1",
       "redaction_rules": [],
     }),
@@ -74,3 +76,8 @@ def test_start_hook_checks_without_writes_and_end_hook_stores(
   assert (tmp_path / "transcripts" / "session.md").is_file()
   assert (tmp_path / "summaries" / "session.md").is_file()
   assert (tmp_path / "provenance" / "session.json").is_file()
+  assert (
+    tmp_path / "private-backup" / "session.jsonl"
+  ).read_bytes() == (
+    tmp_path / "raw" / "session.jsonl"
+  ).read_bytes()

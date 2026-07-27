@@ -181,3 +181,31 @@ def test_cli_continues_after_unsupported_log_and_reports_exit_value(
 
   assert (tmp_path / "transcripts" / "accepted.md").is_file()
   assert not (tmp_path / "transcripts" / "unsupported.md").exists()
+
+
+def test_cli_preserves_enabled_raw_logs_and_distinguishes_failure(
+  tmp_path,
+):
+  raw_log = tmp_path / "raw" / "nested" / "session.jsonl"
+  _write_event(raw_log)
+  config_path = _write_config(tmp_path)
+  config = json.loads(config_path.read_text(encoding="utf-8"))
+  config.update({
+    "backup_root": "private-backup",
+    "preservation_enabled": True,
+  })
+  config_path.write_text(json.dumps(config), encoding="utf-8")
+  cli = importlib.import_module("tools.session_logs.cli")
+
+  assert cli.run(("--config", str(config_path))) == 0
+  assert (
+    tmp_path / "private-backup" / "nested" / "session.jsonl"
+  ).read_bytes() == raw_log.read_bytes()
+
+  blocked_root = tmp_path / "blocked-backup"
+  blocked_root.write_text("not a directory", encoding="utf-8")
+  config["backup_root"] = "blocked-backup"
+  config_path.write_text(json.dumps(config), encoding="utf-8")
+
+  assert cli.run(("--config", str(config_path))) == 6
+  assert (tmp_path / "transcripts" / "nested" / "session.md").is_file()
