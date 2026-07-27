@@ -284,3 +284,88 @@ def test_rejects_unresolved_obligation_source(record):
       defined_intent_ids=("INT-PRODUCT",),
       defined_essence_ids=("ESS-0003",),
     )
+
+
+def test_expands_and_validates_every_atomic_obligation():
+  source_trace = importlib.import_module(
+    "tools.requirements.source_trace"
+  )
+  requirement = {
+    "requirement_id": "REQ-RUNTIME-001",
+    "statement": "実行条件を固定する",
+    "inputs": ["Task", "Context"],
+    "outputs": ["Run"],
+    "stop_conditions": ["Context不一致"],
+    "recovery_conditions": ["Contextを再固定する"],
+    "preserved_artifacts": ["拒否診断"],
+    "acceptance_criteria": ["同一入力で同一identity"],
+    "non_goals": ["Human判断の代替"],
+  }
+  expected_ids = (
+    "REQ-RUNTIME-001#acceptance_criteria.001",
+    "REQ-RUNTIME-001#inputs.001",
+    "REQ-RUNTIME-001#inputs.002",
+    "REQ-RUNTIME-001#non_goals.001",
+    "REQ-RUNTIME-001#outputs.001",
+    "REQ-RUNTIME-001#preserved_artifacts.001",
+    "REQ-RUNTIME-001#recovery_conditions.001",
+    "REQ-RUNTIME-001#statement",
+    "REQ-RUNTIME-001#stop_conditions.001",
+  )
+
+  result = source_trace.validate_atomic_obligation_sources(
+    requirements=(requirement,),
+    relations=tuple(
+      {
+        "obligation_id": obligation_id,
+        "source_requirement_id": "REQ-RUNTIME-001",
+      }
+      for obligation_id in expected_ids
+    ),
+    source_records=(_record(
+      essence_ids=("ESS-0003",),
+      intent_refs=("INT-PRODUCT",),
+    ),),
+    defined_intent_ids=("INT-PRODUCT",),
+    defined_essence_ids=("ESS-0003",),
+  )
+
+  assert result.status == "complete"
+  assert tuple(
+    record.obligation_id for record in result.records
+  ) == expected_ids
+  assert len(result.digest) == 64
+
+
+def test_rejects_missing_atomic_list_entry_relation():
+  source_trace = importlib.import_module(
+    "tools.requirements.source_trace"
+  )
+  requirement = {
+    "requirement_id": "REQ-RUNTIME-001",
+    "statement": "実行条件を固定する",
+    "inputs": ["Task", "Context"],
+    "outputs": ["Run"],
+    "stop_conditions": ["Context不一致"],
+    "recovery_conditions": ["Contextを再固定する"],
+    "preserved_artifacts": ["拒否診断"],
+    "acceptance_criteria": ["同一入力で同一identity"],
+    "non_goals": ["Human判断の代替"],
+  }
+
+  with pytest.raises(source_trace.RequirementSourceTraceError):
+    source_trace.validate_atomic_obligation_sources(
+      requirements=(requirement,),
+      relations=(
+        {
+          "obligation_id": "REQ-RUNTIME-001#statement",
+          "source_requirement_id": "REQ-RUNTIME-001",
+        },
+      ),
+      source_records=(_record(
+        essence_ids=("ESS-0003",),
+        intent_refs=("INT-PRODUCT",),
+      ),),
+      defined_intent_ids=("INT-PRODUCT",),
+      defined_essence_ids=("ESS-0003",),
+    )
