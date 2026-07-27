@@ -8,9 +8,14 @@ promotion_required: true
 import dataclasses
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from tools.session_logs.updates import merge_append_only
+
+
+class StorageError(Exception):
+  """成果物群の保存または復旧に失敗した。"""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -42,16 +47,43 @@ def _state(artifact, fingerprints):
   }
 
 
-def _write_state(path, artifact, fingerprints):
-  path.write_text(
+def _state_bytes(artifact, fingerprints):
+  return (
     json.dumps(
       _state(artifact, fingerprints),
       ensure_ascii=False,
       indent=2,
       sort_keys=True,
-    ) + "\n",
-    encoding="utf-8",
-  )
+    ) + "\n"
+  ).encode("utf-8")
+
+
+def _replace_file(source, target):
+  os.replace(source, target)
+
+
+def _commit_outputs(outputs):
+  snapshots = {}
+  temporary_paths = {}
+  try:
+    for path, data in outputs.items():
+      path.parent.mkdir(parents=True, exist_ok=True)
+      snapshots[path] = path.read_bytes() if path.exists() else None
+      temporary_path = path.with_name(path.name + ".tmp")
+      temporary_path.write_bytes(data)
+      temporary_paths[path] = temporary_path
+    for path, temporary_path in temporary_paths.items():
+      _replace_file(temporary_path, path)
+  except OSError as error:
+    for path, snapshot in snapshots.items():
+      if snapshot is None:
+        path.unlink(missing_ok=True)
+      else:
+        path.write_bytes(snapshot)
+    raise StorageError("Failed to commit session artifacts") from error
+  finally:
+    for temporary_path in temporary_paths.values():
+      temporary_path.unlink(missing_ok=True)
 
 
 def store_artifact(
@@ -86,14 +118,13 @@ def store_artifact(
     and not provenance_exists
     and (summary_path is None or not summary_path.exists())
   ):
-    transcript_path.parent.mkdir(parents=True, exist_ok=True)
-    provenance_path.parent.mkdir(parents=True, exist_ok=True)
+    outputs = {
+      transcript_path: artifact.text.encode("utf-8"),
+      provenance_path: _state_bytes(artifact, fingerprints),
+    }
     if summary_path is not None:
-      summary_path.parent.mkdir(parents=True, exist_ok=True)
-    transcript_path.write_text(artifact.text, encoding="utf-8")
-    if summary_path is not None:
-      summary_path.write_text(artifact.summary_text, encoding="utf-8")
-    _write_state(provenance_path, artifact, fingerprints)
+      outputs[summary_path] = artifact.summary_text.encode("utf-8")
+    _commit_outputs(outputs)
     return StorageResult(
       action="created",
       transcript_path=transcript_path,
@@ -143,11 +174,13 @@ def store_artifact(
       else "preserved"
     )
   elif update.action == "updated" and artifact.text.startswith(existing_text):
-    with transcript_path.open("a", encoding="utf-8") as transcript_file:
-      transcript_file.write(artifact.text[len(existing_text):])
+    outputs = {
+      transcript_path: artifact.text.encode("utf-8"),
+      provenance_path: _state_bytes(artifact, fingerprints),
+    }
     if summary_path is not None:
-      summary_path.write_text(artifact.summary_text, encoding="utf-8")
-    _write_state(provenance_path, artifact, fingerprints)
+      outputs[summary_path] = artifact.summary_text.encode("utf-8")
+    _commit_outputs(outputs)
     action = "updated"
   else:
     action = "preserved"
