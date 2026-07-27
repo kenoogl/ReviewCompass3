@@ -1,0 +1,310 @@
+{
+  "batch": {
+    "batch_id": "REQ-BATCH-0001",
+    "feature_id": "FEAT-REVIEW-CONTEXT",
+    "requirements_path": "docs/requirements/review-context-requirements.md",
+    "requirements_sha256": "755db382c3f263f5736eadf20ef33dfba4bc80ea77116d5acd1baa4b987e9c90",
+    "status": "complete"
+  },
+  "fixed_inputs": [
+    {
+      "path": "records/requirements/fixed-input-verification.json",
+      "sha256": "d8b1739aa647beec3eddef7afd727d19c5027a1d3df3ba9c5ac7ee9aaba7ecaf"
+    },
+    {
+      "path": "records/requirements/feature-partition.json",
+      "sha256": "03bbeaf61d42e18f680c98595a08f5231c375f36db2a5797204c73edcd3efe25"
+    }
+  ],
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "requirements": [
+    {
+      "acceptance_criteria": [
+        "必須項目を1つ欠く入力はContext生成前に拒否される",
+        "同一入力から同一のTask入力Digestが得られる"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "inputs": [
+        "Review Taskの目的と判定基準",
+        "一意に識別されたTarget",
+        "実行上の制約と期待出力",
+        "必要なContext材料の種別"
+      ],
+      "non_goals": [
+        "LLMへ必須項目の採否を暗黙に委ねること",
+        "Task内部の実行経路をこの定義へ固定すること"
+      ],
+      "outputs": [
+        "版付きのReview Task入力定義"
+      ],
+      "preserved_artifacts": [
+        "拒否された入力候補と項目別の診断"
+      ],
+      "recovery_conditions": [
+        "Targetを訂正し参照先を再検証する",
+        "不足項目を補い新しい版として再検証する"
+      ],
+      "requirement_id": "REQ-CONTEXT-001",
+      "statement": "Review Taskを開始する前に利用者はGoal、Target、Constraints、Expected Output、Context Requirements、Validation PolicyおよびProvenanceを確認できなければならない",
+      "stop_conditions": [
+        "Targetが一意に定まらない",
+        "必須項目が欠けるか未解決である"
+      ]
+    },
+    {
+      "acceptance_criteria": [
+        "Targetを含みすべてのentryに本文と出所がある",
+        "任意の本文変更をDigest不一致として検出する"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "inputs": [
+        "Targetとsource materialの参照",
+        "各材料の本文、役割および出所"
+      ],
+      "non_goals": [
+        "Digestだけで材料内容の真実性を保証すること",
+        "Promptの文章表現を固定すること"
+      ],
+      "outputs": [
+        "Targetを含むExecution Context材料束"
+      ],
+      "preserved_artifacts": [
+        "拒否された材料束、宣言値、実測値および診断"
+      ],
+      "recovery_conditions": [
+        "正しい出所から材料を再取得し新しい材料束を作る"
+      ],
+      "requirement_id": "REQ-CONTEXT-002",
+      "statement": "システムはTargetとsource materialsを役割、内容、出所およびDigestを持つ一つの材料束として実体化しなければならない",
+      "stop_conditions": [
+        "参照先が存在しない",
+        "宣言したDigestと本文が一致しない",
+        "本文または出所が欠ける"
+      ]
+    },
+    {
+      "acceptance_criteria": [
+        "全候補が重複なく許可された分類のいずれかに入る",
+        "独立検査が同じ材料Digestから全件を再判定できる"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "inputs": [
+        "Review TaskのTarget",
+        "include、exclude、deferの判定基準",
+        "固定した候補母集合"
+      ],
+      "non_goals": [
+        "LLMの非公開推論だけで対象範囲を確定すること",
+        "常にプロジェクト全体をレビュー対象にすること"
+      ],
+      "outputs": [
+        "全候補の分類を含む版付きScope contract"
+      ],
+      "preserved_artifacts": [
+        "全分類判断、競合、未分類および母集合の変更記録"
+      ],
+      "recovery_conditions": [
+        "変更後の母集合を再固定して全件を再検査する",
+        "未分類または競合を解消し新しいScope版を作る"
+      ],
+      "requirement_id": "REQ-CONTEXT-003",
+      "statement": "システムはレビュー母集合、対象範囲、除外条件および分類結果をScope contractとして固定し対象漏れと判断競合を検出しなければならない",
+      "stop_conditions": [
+        "同じ候補に競合する分類がある",
+        "分類中に母集合が変わる",
+        "unknownまたは未分類が残る"
+      ]
+    },
+    {
+      "acceptance_criteria": [
+        "1つの入力変更で旧結果の再利用が拒否される",
+        "同じ正規化入力から同じidentityが得られる"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "inputs": [
+        "Scope contract",
+        "各入力の取得状態とDigest",
+        "固定済みExecution Context材料束"
+      ],
+      "non_goals": [
+        "Digestで意味的正しさを保証すること",
+        "staleな履歴を新しい結果で上書きすること"
+      ],
+      "outputs": [
+        "Execution Context identityとfreshness検査結果"
+      ],
+      "preserved_artifacts": [
+        "旧identity、実測Digest、不一致箇所および検出時刻"
+      ],
+      "recovery_conditions": [
+        "変更後の材料から新しいContext identityを作る",
+        "旧結果を残したまま新しいReview Runを開始する"
+      ],
+      "requirement_id": "REQ-CONTEXT-004",
+      "statement": "システムはExecution Contextの内容をDigestで固定し入力変更後に旧結果を再利用せずstaleとして停止しなければならない",
+      "stop_conditions": [
+        "Context確定後に参照元が変わる",
+        "入力Digestが固定値と一致しない"
+      ]
+    },
+    {
+      "acceptance_criteria": [
+        "全採用材料を明示指定または決定的な採用規則へたどれる",
+        "指定されていない材料をLLMが暗黙に追加できない"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "inputs": [
+        "任意の候補材料と候補生成条件",
+        "呼び出し側が指定した採用材料",
+        "材料の採用目的"
+      ],
+      "non_goals": [
+        "Context候補探索から採用までを完全自律化すること",
+        "会話履歴全体を既定のContextとして扱うこと"
+      ],
+      "outputs": [
+        "材料の採否と根拠を含むComposition記録",
+        "検証済みExecution Context"
+      ],
+      "preserved_artifacts": [
+        "候補一覧、採否、判断主体、目的および未解決事項"
+      ],
+      "recovery_conditions": [
+        "呼び出し側または利用者が採用材料を訂正する",
+        "訂正後の材料から新しいComposition記録を作る"
+      ],
+      "requirement_id": "REQ-CONTEXT-005",
+      "statement": "システムは呼び出し側が指定した材料と採用目的を明示的に構成し暗黙の資料をExecution Contextへ追加してはならない",
+      "stop_conditions": [
+        "候補の採否が未解決である",
+        "採用材料の出所または採用主体を追跡できない"
+      ]
+    },
+    {
+      "acceptance_criteria": [
+        "再開操作が確認済み成果の内容とDigestを変更しない",
+        "同一入力だけを再利用し変更入力では新しいRunを作る"
+      ],
+      "feature_id": "FEAT-REVIEW-CONTEXT",
+      "inputs": [
+        "再開対象のReview TaskとContext identity",
+        "未解決事項と変更方針",
+        "確認済み成果とそのDigest"
+      ],
+      "non_goals": [
+        "staleな成果から処理を継続すること",
+        "再開のために失敗履歴を削除すること"
+      ],
+      "outputs": [
+        "照合可能なhandoff package"
+      ],
+      "preserved_artifacts": [
+        "既存の確認済み成果、失敗履歴および不一致診断"
+      ],
+      "recovery_conditions": [
+        "保存済みの確認済み成果からpackageを再構成する",
+        "入力変更時は新しいReview Runとして再開する"
+      ],
+      "requirement_id": "REQ-CONTEXT-006",
+      "statement": "システムは確認済み成果、未解決事項、変更方針および再開地点をDigest付きhandoff packageへ固定し確認済み成果を壊さず再開できなければならない",
+      "stop_conditions": [
+        "再開対象または変更方針が一意に定まらない",
+        "確認済み成果のDigestが欠けるか一致しない"
+      ]
+    }
+  ],
+  "results": {
+    "batch_digest": "169a3bf76c551323f3792577e147d6d457f6f0d93aabf9a68903fa70fb27f590",
+    "covered_feature_essence_count": 5,
+    "missing_feature_essence_count": 0,
+    "requirement_count": 6,
+    "source_trace_digest": "c86432616a187809ec05698c1bfb323a65e38d6936adcfef3a6dc990423c8669",
+    "status": "complete"
+  },
+  "source_trace": [
+    {
+      "disposition": "selected",
+      "essence_ids": [
+        "ESS-0005"
+      ],
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-CONSTRAINTS"
+      ],
+      "rationale": "Task入力と材料束を作る前提を利用者が確認できるようにする",
+      "requirement_id": "REQ-CONTEXT-001"
+    },
+    {
+      "disposition": "selected",
+      "essence_ids": [
+        "ESS-0005",
+        "ESS-0025"
+      ],
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "rationale": "Targetを含む材料の本文とDigestを実行runへ固定する",
+      "requirement_id": "REQ-CONTEXT-002"
+    },
+    {
+      "disposition": "selected",
+      "essence_ids": [
+        "ESS-0017",
+        "ESS-0025"
+      ],
+      "intent_refs": [
+        "INT-PURPOSE",
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "rationale": "明示母集合の全件分類と独立照合で対象漏れを防ぐ",
+      "requirement_id": "REQ-CONTEXT-003"
+    },
+    {
+      "disposition": "selected",
+      "essence_ids": [
+        "ESS-0006",
+        "ESS-0025"
+      ],
+      "intent_refs": [
+        "INT-CONSTRAINTS",
+        "INT-SUCCESS"
+      ],
+      "rationale": "入力変更後に旧成果を誤って再利用しない",
+      "requirement_id": "REQ-CONTEXT-004"
+    },
+    {
+      "disposition": "selected",
+      "essence_ids": [
+        "ESS-0005",
+        "ESS-0017"
+      ],
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-NON-GOALS",
+        "INT-CONSTRAINTS"
+      ],
+      "rationale": "材料採用をPrompt内の暗黙判断から分離する",
+      "requirement_id": "REQ-CONTEXT-005"
+    },
+    {
+      "disposition": "selected",
+      "essence_ids": [
+        "ESS-0006",
+        "ESS-0032"
+      ],
+      "intent_refs": [
+        "INT-PRODUCT",
+        "INT-SUCCESS"
+      ],
+      "rationale": "確認済み成果を保ったまま同一入力だけを安全に再利用する",
+      "requirement_id": "REQ-CONTEXT-006"
+    }
+  ],
+  "status": "complete"
+}
