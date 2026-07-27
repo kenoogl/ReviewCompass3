@@ -162,6 +162,42 @@ def test_cli_dry_run_reports_plan_without_writing_artifacts(
   assert not (tmp_path / "provenance").exists()
 
 
+def test_cli_ignores_known_auxiliary_logs(tmp_path, capsys):
+  _write_event(tmp_path / "raw" / "session.jsonl")
+  (tmp_path / "raw" / "queue.jsonl").write_text(
+    json.dumps({
+      "content": "private queued content",
+      "operation": "enqueue",
+      "sessionId": "session-1",
+      "timestamp": "2026-07-27T00:00:00Z",
+      "type": "queue-operation",
+    }) + "\n",
+    encoding="utf-8",
+  )
+  (tmp_path / "raw" / "agent.jsonl").write_text(
+    json.dumps({
+      "agentId": "agent-1",
+      "key": "private-agent-key",
+      "type": "started",
+    }) + "\n",
+    encoding="utf-8",
+  )
+  config_path = _write_config(tmp_path)
+  cli = importlib.import_module("tools.session_logs.cli")
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--dry-run",
+  )) == 0
+  assert capsys.readouterr().out == "planned session.jsonl\n"
+
+  assert cli.run(("--config", str(config_path))) == 0
+  assert (tmp_path / "transcripts" / "session.md").is_file()
+  assert not (tmp_path / "transcripts" / "queue.md").exists()
+  assert not (tmp_path / "transcripts" / "agent.md").exists()
+
+
 def test_cli_distinguishes_no_targets_and_general_failure(tmp_path):
   raw_root = tmp_path / "raw"
   raw_root.mkdir()
