@@ -1,0 +1,1 @@
+{"reviewer_role":"design_scope_and_boundary","material_digest":"d03469d077888facde13313b2cb1c161873d69aef12964eb5a630376ce9cd7c8","verdict":"fail","summary":"旧実体反例は解消したが失敗branchのRun結果handoff必須性に1件残る。","findings":[{"id":"DSB-FA-001","severity":"error","issue":"validatorが各失敗branchにRun結果outputとWorkflow inputの存在を要求しない。"}]}

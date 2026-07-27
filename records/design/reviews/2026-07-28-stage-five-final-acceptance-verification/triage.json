@@ -1,0 +1,1 @@
+{"material_digest":"d03469d077888facde13313b2cb1c161873d69aef12964eb5a630376ce9cd7c8","finding_count":1,"adopted_count":1,"rejected_count":0,"groups":[{"resolution_id":"STAGE5-FA-RES-001","finding_ids":["DSB-FA-001"],"disposition":"adopted","reason":"失敗branchと失敗protocol主経路にRun結果output→Workflow inputの必須handoff検査を追加する"}],"status":"complete"}

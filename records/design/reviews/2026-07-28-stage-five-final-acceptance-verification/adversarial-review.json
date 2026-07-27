@@ -1,0 +1,1 @@
+{"reviewer_role":"adversarial_conformance","material_digest":"d03469d077888facde13313b2cb1c161873d69aef12964eb5a630376ce9cd7c8","verdict":"pass","summary":"initial偽装、Workflow分岐削除、Capture分類差替え、結果生成失敗差替えの全反例が拒否された。","findings":[]}
