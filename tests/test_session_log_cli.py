@@ -241,6 +241,8 @@ def test_cli_verifies_saved_transcript_and_reports_condition_change(
     "source_path": "session.jsonl",
     "status": "matches",
     "stored_matches": True,
+    "summary_provenance_matches": True,
+    "summary_stored_matches": True,
     "tool_version_matches": True,
   }
 
@@ -256,6 +258,29 @@ def test_cli_verifies_saved_transcript_and_reports_condition_change(
   changed = json.loads(capsys.readouterr().out)
   assert changed["status"] == "conditions_changed"
   assert changed["tool_version_matches"] is False
+
+
+def test_cli_detects_summary_only_change(tmp_path, capsys):
+  raw_log = tmp_path / "raw" / "session.jsonl"
+  _write_event(raw_log)
+  config_path = _write_config(tmp_path)
+  cli = importlib.import_module("tools.session_logs.cli")
+  assert cli.run(("--config", str(config_path))) == 0
+  summary_path = tmp_path / "summaries" / "session.md"
+  summary_path.write_text("# altered summary\n", encoding="utf-8")
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--verify",
+  )) == 7
+
+  report = json.loads(capsys.readouterr().out)
+  assert report["status"] == "summary_changed"
+  assert report["provenance_matches"] is True
+  assert report["stored_matches"] is True
+  assert report["summary_provenance_matches"] is True
+  assert report["summary_stored_matches"] is False
 
 
 def test_cli_verification_failure_report_is_safe(tmp_path, capsys):
