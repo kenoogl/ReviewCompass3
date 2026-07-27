@@ -31,7 +31,6 @@ def test_stage_zero_gate_maps_evidence_and_blocks_pending_external_checks(
   assert result.required_gate_count == 8
   assert result.passed_gate_count == 8
   assert result.unresolved == (
-    "user_environment_hook_schedule",
     "stage_zero_user_approval",
   )
   assert tuple(result.gates) == gate.REQUIRED_GATES
@@ -76,6 +75,24 @@ def test_stage_zero_gate_maps_evidence_and_blocks_pending_external_checks(
     / native_check["evidence_paths"][0]
   ).read_text(encoding="utf-8"))
   assert native_evidence["status"] == "passed"
+
+  environment_check = evidence["external_checks"][
+    "user_environment_hook_schedule"
+  ]
+  assert environment_check["status"] == "passed"
+  environment_evidence = json.loads((
+    REPOSITORY_ROOT
+    / environment_check["evidence_paths"][0]
+  ).read_text(encoding="utf-8"))
+  assert environment_evidence["status"] == (
+    "limited_deployment_passed"
+  )
+  assert environment_evidence["retention"] == {
+    "after_file_count": 652,
+    "before_file_count": 652,
+    "digest_match": True,
+    "status": "passed",
+  }
 
 
 def test_stage_zero_gate_fails_closed_when_required_gate_is_missing(
