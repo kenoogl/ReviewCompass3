@@ -1,0 +1,76 @@
+{
+  "catalogs": [
+    {
+      "path": "records/requirements/intent-source-catalog.json",
+      "sha256": "bfaab933c4f75741b3304226f2ba25839779f7b23179ce2ab12eae79cbadd82a"
+    },
+    {
+      "path": "records/requirements/canonical-approved-essence-ledger.json",
+      "sha256": "96b82e68583b415ce0d74a8791da112974c35f266cd8136ffc5fd1b6dee61ca3"
+    }
+  ],
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "policy": {
+    "exceptions": [],
+    "meaning": "各source_traceのintent_refs、essence_ids、rationaleはrequirement全体だけでなく列挙した全義務scopeの根拠として適用する",
+    "required_scopes": [
+      "statement",
+      "inputs",
+      "outputs",
+      "stop_conditions",
+      "recovery_conditions",
+      "preserved_artifacts",
+      "acceptance_criteria",
+      "non_goals"
+    ]
+  },
+  "promotion_required": true,
+  "record_version": 1,
+  "requirement_ids": [
+    "REQ-CONTEXT-001",
+    "REQ-CONTEXT-002",
+    "REQ-CONTEXT-003",
+    "REQ-CONTEXT-004",
+    "REQ-CONTEXT-005",
+    "REQ-CONTEXT-006",
+    "REQ-CONTEXT-007",
+    "REQ-EXEC-001",
+    "REQ-EXEC-002",
+    "REQ-EXEC-003",
+    "REQ-EXEC-004",
+    "REQ-EXEC-005",
+    "REQ-EXEC-006",
+    "REQ-TRIAGE-001",
+    "REQ-TRIAGE-002",
+    "REQ-TRIAGE-003",
+    "REQ-TRACE-001",
+    "REQ-TRACE-002",
+    "REQ-TRACE-003",
+    "REQ-SESSION-001",
+    "REQ-SESSION-002",
+    "REQ-SESSION-003",
+    "REQ-WORKFLOW-001",
+    "REQ-WORKFLOW-002",
+    "REQ-WORKFLOW-003",
+    "REQ-PORTABLE-001",
+    "REQ-PORTABLE-002",
+    "REQ-PORTABLE-003",
+    "REQ-EVAL-001",
+    "REQ-EVAL-002",
+    "REQ-EVAL-003",
+    "REQ-IMPROVE-001",
+    "REQ-IMPROVE-002"
+  ],
+  "source_trace_records": [
+    {
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "2073a9e61f8dc9cf27c1f22584a76f8e6d13a8ad1128de68246b9674c23d8d32"
+    },
+    {
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "da7b287a8ced4bc73155499d14af5e126c3d9dc920945a4646c40dbab813565a"
+    }
+  ],
+  "status": "complete"
+}
