@@ -190,3 +190,151 @@ def test_rejects_boundary_content_not_approved():
       defined_interface_ids=(),
       defined_state_machine_ids=(),
     )
+
+
+def test_validates_protocol_boundary_map_and_event_routes():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+  result = contract.validate_design_architecture(
+    designs=(_design(),),
+    boundary_catalog=(
+      {
+        "boundary_id": "BOUNDARY-001",
+        "from": "REQ-CONTEXT-001",
+        "relation": "provides_to",
+        "to": "REQ-CONTEXT-001",
+        "contract": "self test boundary",
+      },
+    ),
+    approved_boundary_relations=(
+      {
+        "from": "REQ-CONTEXT-001",
+        "relation": "provides_to",
+        "to": "REQ-CONTEXT-001",
+        "contract": "self test boundary",
+      },
+    ),
+    requirement_feature_map={
+      "REQ-CONTEXT-001": "FEAT-CONTEXT",
+    },
+    interfaces=(
+      {
+        "interface_id": "IF-CONTEXT-EXEC",
+        "provider_design_id": "DES-CONTEXT",
+        "consumer_design_id": "DES-CONTEXT",
+        "identity_fields": (
+          "context_id",
+          "freshness_verdict",
+        ),
+        "payload_fields": ("task",),
+        "failure_verdict": "blocked",
+        "owner_design_id": "DES-CONTEXT",
+      },
+    ),
+    state_machines=(
+      {
+        "machine_id": "SM-WORKFLOW",
+        "owner_design_id": "DES-CONTEXT",
+        "states": ("ready", "blocked"),
+        "events": ("fail",),
+        "transitions": (
+          {
+            "from": "ready",
+            "event": "fail",
+            "to": "blocked",
+            "guard": "validation failed",
+            "persistence": "before visibility",
+          },
+        ),
+      },
+    ),
+    defined_interface_ids=("IF-CONTEXT-EXEC",),
+    defined_state_machine_ids=("SM-WORKFLOW",),
+    protocols=(
+      {
+        "protocol_id": "PROTOCOL-RUN-START",
+        "steps": (
+          {
+            "step_id": "RUN-START-001",
+            "actor_design_id": "DES-CONTEXT",
+            "interface_id": "IF-CONTEXT-EXEC",
+            "state_machine_id": "SM-WORKFLOW",
+            "event": "fail",
+            "on_failure": "blocked",
+          },
+        ),
+      },
+    ),
+    boundary_interface_map={
+      "BOUNDARY-001": ("IF-CONTEXT-EXEC",),
+    },
+    event_routes=(
+      {
+        "route_id": "ROUTE-RUN-FAIL",
+        "source_interface_id": "IF-CONTEXT-EXEC",
+        "target_state_machine_id": "SM-WORKFLOW",
+        "event": "fail",
+      },
+    ),
+    required_interface_fields={
+      "IF-CONTEXT-EXEC": (
+        "context_id",
+        "freshness_verdict",
+      ),
+    },
+  )
+
+  assert result.protocol_count == 1
+  assert result.event_route_count == 1
+
+
+def test_rejects_unreachable_state():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+
+  with pytest.raises(contract.DesignContractError):
+    contract.validate_design_architecture(
+      designs=(_design(),),
+      boundary_catalog=(
+        {
+          "boundary_id": "BOUNDARY-001",
+          "from": "REQ-CONTEXT-001",
+          "relation": "provides_to",
+          "to": "REQ-CONTEXT-001",
+          "contract": "self test boundary",
+        },
+      ),
+      approved_boundary_relations=(
+        {
+          "from": "REQ-CONTEXT-001",
+          "relation": "provides_to",
+          "to": "REQ-CONTEXT-001",
+          "contract": "self test boundary",
+        },
+      ),
+      requirement_feature_map={
+        "REQ-CONTEXT-001": "FEAT-CONTEXT",
+      },
+      interfaces=(),
+      state_machines=(
+        {
+          "machine_id": "SM-WORKFLOW",
+          "owner_design_id": "DES-CONTEXT",
+          "states": ("ready", "orphan", "blocked"),
+          "events": ("fail",),
+          "transitions": (
+            {
+              "from": "ready",
+              "event": "fail",
+              "to": "blocked",
+              "guard": "validation failed",
+              "persistence": "before visibility",
+            },
+          ),
+        },
+      ),
+      defined_interface_ids=(),
+      defined_state_machine_ids=("SM-WORKFLOW",),
+    )
