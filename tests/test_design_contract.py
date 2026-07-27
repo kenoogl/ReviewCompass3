@@ -254,13 +254,21 @@ def test_validates_protocol_boundary_map_and_event_routes():
     protocols=(
       {
         "protocol_id": "PROTOCOL-RUN-START",
+        "initial_states": {
+          "SM-WORKFLOW": "ready",
+        },
+        "expected_states": {
+          "SM-WORKFLOW": "blocked",
+        },
         "steps": (
           {
             "step_id": "RUN-START-001",
             "actor_design_id": "DES-CONTEXT",
             "interface_id": "IF-CONTEXT-EXEC",
             "state_machine_id": "SM-WORKFLOW",
+            "from_state": "ready",
             "event": "fail",
+            "to_state": "blocked",
             "on_failure": "blocked",
           },
         ),
@@ -287,6 +295,90 @@ def test_validates_protocol_boundary_map_and_event_routes():
 
   assert result.protocol_count == 1
   assert result.event_route_count == 1
+
+
+def test_rejects_protocol_state_sequence_mismatch():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+
+  with pytest.raises(contract.DesignContractError):
+    contract.validate_design_architecture(
+      designs=(_design(),),
+      boundary_catalog=(
+        {
+          "boundary_id": "BOUNDARY-001",
+          "from": "REQ-CONTEXT-001",
+          "relation": "provides_to",
+          "to": "REQ-CONTEXT-001",
+          "contract": "self test boundary",
+        },
+      ),
+      approved_boundary_relations=(
+        {
+          "from": "REQ-CONTEXT-001",
+          "relation": "provides_to",
+          "to": "REQ-CONTEXT-001",
+          "contract": "self test boundary",
+        },
+      ),
+      requirement_feature_map={
+        "REQ-CONTEXT-001": "FEAT-CONTEXT",
+      },
+      interfaces=(
+        {
+          "interface_id": "IF-CONTEXT-EXEC",
+          "provider_design_id": "DES-CONTEXT",
+          "consumer_design_id": "DES-CONTEXT",
+          "identity_fields": ("context_id",),
+          "payload_fields": ("task",),
+          "failure_verdict": "blocked",
+          "owner_design_id": "DES-CONTEXT",
+        },
+      ),
+      state_machines=(
+        {
+          "machine_id": "SM-WORKFLOW",
+          "owner_design_id": "DES-CONTEXT",
+          "states": ("ready", "blocked"),
+          "events": ("fail",),
+          "transitions": (
+            {
+              "from": "ready",
+              "event": "fail",
+              "to": "blocked",
+              "guard": "validation failed",
+              "persistence": "before visibility",
+            },
+          ),
+        },
+      ),
+      defined_interface_ids=("IF-CONTEXT-EXEC",),
+      defined_state_machine_ids=("SM-WORKFLOW",),
+      protocols=(
+        {
+          "protocol_id": "PROTOCOL-RUN-START",
+          "initial_states": {
+            "SM-WORKFLOW": "ready",
+          },
+          "expected_states": {
+            "SM-WORKFLOW": "ready",
+          },
+          "steps": (
+            {
+              "step_id": "RUN-START-001",
+              "actor_design_id": "DES-CONTEXT",
+              "interface_id": "IF-CONTEXT-EXEC",
+              "state_machine_id": "SM-WORKFLOW",
+              "from_state": "ready",
+              "event": "fail",
+              "to_state": "ready",
+              "on_failure": "blocked",
+            },
+          ),
+        },
+      ),
+    )
 
 
 def test_rejects_unreachable_state():

@@ -367,3 +367,15 @@ def test_rejects_blob_claim_not_backed_by_commit(
         "tools/context.py": "0" * 64,
       },
     )
+
+
+def test_strict_integrity_validator_requires_inputs():
+  conformance = importlib.import_module(
+    "tools.design.bootstrap_conformance"
+  )
+
+  with pytest.raises(TypeError):
+    (
+      conformance
+      .validate_strict_evidence_backed_bootstrap_conformance()
+    )
