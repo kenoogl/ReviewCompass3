@@ -6,6 +6,7 @@ promotion_required: true
 """
 
 import importlib
+import json
 import plistlib
 import subprocess
 import sys
@@ -275,3 +276,75 @@ def test_launchd_activation_failure_is_safe_and_value_free(tmp_path):
     reason="exit_code_5",
   )
   assert "private launchctl" not in repr(result)
+
+
+def _schedule_arguments(tmp_path, operation, *extra):
+  return (
+    operation,
+    "--plist",
+    str(tmp_path / "LaunchAgents" / "session-logs.plist"),
+    "--python",
+    sys.executable,
+    "--config",
+    str(tmp_path / "session-logs.json"),
+    "--interval",
+    "60",
+    "--stdout",
+    str(tmp_path / "private-logs" / "stdout.jsonl"),
+    "--stderr",
+    str(tmp_path / "private-logs" / "stderr.log"),
+    "--uid",
+    "501",
+    *extra,
+  )
+
+
+def test_schedule_cli_dry_run_and_install_prepare_only_explicit_paths(
+  tmp_path,
+  capsys,
+):
+  scheduler = importlib.import_module("tools.session_logs.scheduler")
+  entry = importlib.import_module("tools.session_logs.entry")
+  dry_arguments = _schedule_arguments(tmp_path, "install", "--dry-run")
+
+  assert entry.run(("schedule", *dry_arguments)) == 0
+  assert json.loads(capsys.readouterr().out) == {
+    "action": "planned",
+    "operation": "install",
+    "status": "ok",
+  }
+  assert not (tmp_path / "LaunchAgents").exists()
+  assert not (tmp_path / "private-logs").exists()
+
+  assert scheduler.run(_schedule_arguments(tmp_path, "install")) == 0
+  assert json.loads(capsys.readouterr().out) == {
+    "action": "installed",
+    "operation": "install",
+    "status": "ok",
+  }
+  assert (
+    tmp_path / "LaunchAgents" / "session-logs.plist"
+  ).is_file()
+  assert (tmp_path / "private-logs").is_dir()
+
+
+def test_schedule_cli_reports_injected_launchd_status(
+  tmp_path,
+  capsys,
+):
+  scheduler = importlib.import_module("tools.session_logs.scheduler")
+  scheduler.run(_schedule_arguments(tmp_path, "install"))
+  capsys.readouterr()
+
+  def running(_command, **_kwargs):
+    return SimpleNamespace(returncode=0)
+
+  assert scheduler.run(
+    _schedule_arguments(tmp_path, "status"),
+    runner=running,
+  ) == 0
+  assert json.loads(capsys.readouterr().out) == {
+    "action": "inspected",
+    "operation": "status",
+    "status": "running",
+  }
