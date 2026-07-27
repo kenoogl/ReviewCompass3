@@ -1,0 +1,1 @@
+{"reviewer_role":"adversarial_conformance","material_digest":"c4983794f2e7cc7aa4603ac94a4eeeeef52a73a51f9e938ed6d86b89cdd57588","verdict":"pass","summary":"Run・Workflow両branchのstate_only化を含む既知反例がすべて拒否され、固定材料と392テストに不一致なし。","findings":[]}
