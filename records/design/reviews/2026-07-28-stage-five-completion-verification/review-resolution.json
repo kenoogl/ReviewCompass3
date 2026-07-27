@@ -1,0 +1,1 @@
+{"material_digest":"3f43572ef1ae89208dae1cf6d5ae32ff49d40aa3e04adc1c7a9caa7840a42f6c","resolved_finding_count":6,"remaining_count":0,"verification":{"interfaces":29,"state_machines":8,"protocols":14,"event_routes":28,"tests":"389 passed","status":"ready_for_postfix_verification"},"resolution_commits":["5f70478","6ae1945","c5254d8","5766384"],"status":"resolved"}
