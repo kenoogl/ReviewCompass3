@@ -6,6 +6,8 @@ promotion_required: true
 """
 
 import importlib
+import os
+import time
 
 import pytest
 
@@ -109,3 +111,42 @@ def test_preservation_failure_keeps_existing_backup(tmp_path, monkeypatch):
   backup_path = backup_root / "session.jsonl"
   assert backup_path.read_bytes() == first
   assert tuple(backup_root.rglob("*.tmp")) == ()
+
+
+def test_preservation_lock_rejects_active_and_reclaims_stale_lock(
+  tmp_path,
+):
+  raw_root = tmp_path / "raw"
+  raw_log = raw_root / "session.jsonl"
+  raw_root.mkdir()
+  raw_log.write_bytes(b'{"event": 1}\n')
+  backup_root = tmp_path / "private-backup"
+  lock_path = backup_root / "session.jsonl.lock"
+  lock_path.parent.mkdir(parents=True)
+  lock_path.write_text("active\n", encoding="utf-8")
+  preservation = importlib.import_module(
+    "tools.session_logs.preservation"
+  )
+
+  with pytest.raises(preservation.PreservationLocked):
+    preservation.preserve_raw_log(
+      raw_log,
+      raw_root=raw_root,
+      backup_root=backup_root,
+      lock_timeout_seconds=60,
+    )
+
+  assert lock_path.is_file()
+  assert not (backup_root / "session.jsonl").exists()
+
+  stale_time = time.time() - 120
+  os.utime(lock_path, (stale_time, stale_time))
+  result = preservation.preserve_raw_log(
+    raw_log,
+    raw_root=raw_root,
+    backup_root=backup_root,
+    lock_timeout_seconds=60,
+  )
+
+  assert result.action == "created"
+  assert not lock_path.exists()

@@ -272,3 +272,29 @@ def test_cli_verification_failure_report_is_safe(tmp_path, capsys):
     "status": "regeneration_failed",
   }
   assert "secret-value-not-for-output" not in report
+
+
+def test_cli_preserve_only_is_safe_for_scheduled_execution(tmp_path):
+  raw_log = tmp_path / "raw" / "session.jsonl"
+  _write_event(raw_log)
+  config_path = _write_config(tmp_path)
+  config = json.loads(config_path.read_text(encoding="utf-8"))
+  config.update({
+    "backup_root": "private-backup",
+    "preservation_enabled": True,
+  })
+  config_path.write_text(json.dumps(config), encoding="utf-8")
+  cli = importlib.import_module("tools.session_logs.cli")
+
+  assert cli.run((
+    "--config",
+    str(config_path),
+    "--preserve-only",
+  )) == 0
+
+  assert (
+    tmp_path / "private-backup" / "session.jsonl"
+  ).read_bytes() == raw_log.read_bytes()
+  assert not (tmp_path / "transcripts").exists()
+  assert not (tmp_path / "summaries").exists()
+  assert not (tmp_path / "provenance").exists()
