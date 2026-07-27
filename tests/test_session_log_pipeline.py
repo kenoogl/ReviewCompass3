@@ -43,6 +43,8 @@ def test_prepares_redacted_transcript_with_provenance(tmp_path):
       ),
     ),
     tool_version="0.0.1",
+    commits=("abc1234 Add feature",),
+    changed_files=("z.py", "a.py"),
   )
 
   assert artifact.source_kind == "claude"
@@ -58,6 +60,21 @@ def test_prepares_redacted_transcript_with_provenance(tmp_path):
   assert artifact.provenance.source_path == "session.jsonl"
   assert artifact.provenance.transcript_sha256 == hashlib.sha256(
     artifact.text.encode("utf-8")
+  ).hexdigest()
+  assert artifact.summary_text == (
+    "# Session summary\n\n"
+    "## User messages\n\n"
+    "- key=[REDACTED:anthropic_key]\n\n"
+    "## Commits\n\n"
+    "- abc1234 Add feature\n\n"
+    "## Changed files\n\n"
+    "- a.py\n"
+    "- z.py\n\n"
+    "## Decisions\n\n"
+    "- Not inferred automatically.\n"
+  )
+  assert artifact.provenance.summary_sha256 == hashlib.sha256(
+    artifact.summary_text.encode("utf-8")
   ).hexdigest()
   assert len(artifact.events) == 1
 

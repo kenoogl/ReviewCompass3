@@ -33,6 +33,7 @@ def test_stores_idempotently_appends_and_preserves_on_change(tmp_path):
   raw_log = raw_root / "nested" / "session.jsonl"
   raw_log.parent.mkdir(parents=True)
   transcript_root = tmp_path / "transcripts"
+  summary_root = tmp_path / "summaries"
   provenance_root = tmp_path / "provenance"
 
   pipeline = importlib.import_module("tools.session_logs.pipeline")
@@ -52,11 +53,13 @@ def test_stores_idempotently_appends_and_preserves_on_change(tmp_path):
   created = storage.store_artifact(
     first_artifact,
     transcript_root=transcript_root,
+    summary_root=summary_root,
     provenance_root=provenance_root,
   )
   repeated = storage.store_artifact(
     first_artifact,
     transcript_root=transcript_root,
+    summary_root=summary_root,
     provenance_root=provenance_root,
   )
 
@@ -68,8 +71,14 @@ def test_stores_idempotently_appends_and_preserves_on_change(tmp_path):
   assert created.provenance_path == (
     provenance_root / "nested" / "session.json"
   )
+  assert created.summary_path == (
+    summary_root / "nested" / "session.md"
+  )
   assert created.transcript_path.read_text(encoding="utf-8") == (
     first_artifact.text
+  )
+  assert created.summary_path.read_text(encoding="utf-8") == (
+    first_artifact.summary_text
   )
   state = json.loads(created.provenance_path.read_text(encoding="utf-8"))
   assert state["provenance"]["source_path"] == "nested/session.jsonl"
@@ -88,12 +97,16 @@ def test_stores_idempotently_appends_and_preserves_on_change(tmp_path):
   updated = storage.store_artifact(
     appended_artifact,
     transcript_root=transcript_root,
+    summary_root=summary_root,
     provenance_root=provenance_root,
   )
 
   assert updated.action == "updated"
   assert updated.transcript_path.read_text(encoding="utf-8") == (
     appended_artifact.text
+  )
+  assert updated.summary_path.read_text(encoding="utf-8") == (
+    appended_artifact.summary_text
   )
   assert appended_artifact.text.startswith(first_artifact.text)
 
@@ -111,10 +124,14 @@ def test_stores_idempotently_appends_and_preserves_on_change(tmp_path):
   preserved = storage.store_artifact(
     changed_artifact,
     transcript_root=transcript_root,
+    summary_root=summary_root,
     provenance_root=provenance_root,
   )
 
   assert preserved.action == "preserved"
   assert preserved.transcript_path.read_text(encoding="utf-8") == (
     appended_artifact.text
+  )
+  assert preserved.summary_path.read_text(encoding="utf-8") == (
+    appended_artifact.summary_text
   )
