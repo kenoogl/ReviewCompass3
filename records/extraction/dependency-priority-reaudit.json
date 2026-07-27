@@ -1,0 +1,305 @@
+{
+  "audit": {
+    "approval_candidate": null,
+    "covered_count": 90,
+    "digest": "64dbc74fb8c977d47169a918c641d856764249a0f5b77222878531e35297068c",
+    "newly_covered_count": 29,
+    "prior_covered_count": 61,
+    "status": "blocked",
+    "uncovered_count": 18602,
+    "unresolved_count": 18606
+  },
+  "decision_review": {
+    "approval_candidate": {
+      "approved": false,
+      "material_digest": "a82bfb5b6a89a010e58d5ebac0759e2a4a7dbb5a3e68387d044632f6a7c945fc",
+      "target_ids": [
+        "ESS-0001"
+      ]
+    },
+    "approval_targets": [
+      "ESS-0001"
+    ],
+    "digest": "a82bfb5b6a89a010e58d5ebac0759e2a4a7dbb5a3e68387d044632f6a7c945fc",
+    "information_targets": [
+      "ESS-0008"
+    ],
+    "status": "awaiting_user_review"
+  },
+  "dependency_expansion": {
+    "added_material_count": 29,
+    "added_materials": [
+      "ReviewCompass2:tools/paths.py",
+      "ReviewCompass2:tools/session-capture.py",
+      "ReviewCompass:tests/tools/test_review_input_guard.py",
+      "ReviewCompass:tests/tools/test_run_risk_review.py",
+      "ReviewCompass:tests/tools/test_source_scope_guard.py",
+      "ReviewCompass:tools/api_providers/external_api_approval.py",
+      "ReviewCompass:tools/api_providers/model_capabilities.py",
+      "ReviewCompass:tools/api_providers/phase_trace.py",
+      "ReviewCompass:tools/api_providers/post_write_prompt_builder.py",
+      "ReviewCompass:tools/api_providers/post_write_review_flow.py",
+      "ReviewCompass:tools/api_providers/post_write_subagent_intake.py",
+      "ReviewCompass:tools/api_providers/prepare_post_write_review.py",
+      "ReviewCompass:tools/api_providers/scope_assurance.py",
+      "ReviewCompass:tools/api_providers/tests/test_model_capabilities.py",
+      "ReviewCompass:tools/api_providers/tests/test_post_write_prompt_audit.py",
+      "ReviewCompass:tools/api_providers/tests/test_post_write_prompt_builder.py",
+      "ReviewCompass:tools/api_providers/tests/test_post_write_review_flow.py",
+      "ReviewCompass:tools/api_providers/tests/test_post_write_subagent_intake.py",
+      "ReviewCompass:tools/api_providers/tests/test_ppwm7_integration.py",
+      "ReviewCompass:tools/api_providers/tests/test_prepare_post_write_review.py",
+      "ReviewCompass:tools/api_providers/tests/test_run_review.py",
+      "ReviewCompass:tools/build-source-scope-delta-patch.py",
+      "ReviewCompass:tools/build-source-scope-freeze-patch.py",
+      "ReviewCompass:tools/check-review-inputs.py",
+      "ReviewCompass:tools/check-source-scope-response.py",
+      "ReviewCompass:tools/check_workflow_action/project_yaml.py",
+      "ReviewCompass:tools/post-write-subagent-intake.py",
+      "ReviewCompass:tools/prepare-trusted-review-send.py",
+      "ReviewCompass:tools/trusted-review-send.py"
+    ],
+    "digest": "7c4ebc9d0206d89029fbca0610e134a4afd38a72e957e18eb2eb42ac7e2841f4",
+    "edge_count": 145,
+    "external_modules": [
+      "__future__",
+      "argparse",
+      "ast",
+      "check_workflow_action",
+      "collections",
+      "contextlib",
+      "copy",
+      "dataclasses",
+      "datetime",
+      "fnmatch",
+      "glob",
+      "hashlib",
+      "importlib",
+      "json",
+      "jsonschema",
+      "os",
+      "pathlib",
+      "pytest",
+      "re",
+      "stat",
+      "subprocess",
+      "sys",
+      "tempfile",
+      "types",
+      "typing",
+      "unittest",
+      "yaml"
+    ],
+    "forward_material_count": 62,
+    "reverse_material_count": 80,
+    "root_count": 56,
+    "status": "complete",
+    "unresolved_count": 0
+  },
+  "fixed_sources": [
+    {
+      "commit": "35ef8d4cc66b9a00aca9c6da10b645837b06564b",
+      "repository": "ReviewCompass"
+    },
+    {
+      "commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "repository": "ReviewCompass2"
+    }
+  ],
+  "lifecycle": "provisional",
+  "new_essence_items": {
+    "digest": "77493bddf51b79e608c98a754f75037713dc03deda13df6bae925bdae0c635cc",
+    "item_count": 6,
+    "items": [
+      {
+        "dependencies": [],
+        "destination": "deployment.portable_paths",
+        "disposition": "redesign",
+        "evidence": [
+          "ReviewCompass2:tools/paths.py"
+        ],
+        "identifier": "ESS-0014",
+        "kind": "invariant",
+        "rationale": "固定リポジトリ起点をOS標準配置と明示設定へ一般化する必要がある",
+        "related_tests": [],
+        "statement": "リポジトリ起点とアプリ区画のパス解決を単一モジュールへ集約する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.model_capability_preflight",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/api_providers/model_capabilities.py"
+        ],
+        "identifier": "ESS-0015",
+        "kind": "contract",
+        "rationale": "実行variantと能力・承認・payloadの取り違えをfail-closedにできる",
+        "related_tests": [
+          "ReviewCompass:tools/api_providers/tests/test_model_capabilities.py"
+        ],
+        "statement": "モデル能力をvariant定義digestへ束縛して初回送信前に上限と承認を検査する"
+      },
+      {
+        "dependencies": [],
+        "destination": "traceability.phase_obligations",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/api_providers/phase_trace.py"
+        ],
+        "identifier": "ESS-0016",
+        "kind": "invariant",
+        "rationale": "上流義務から実装・テストへの被覆と逆引きを同時に保証できる",
+        "related_tests": [],
+        "statement": "必須義務を実装各段へ順逆追跡し高リスク選定の欠落を拒否する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.scope_assurance",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/api_providers/scope_assurance.py"
+        ],
+        "identifier": "ESS-0017",
+        "kind": "contract",
+        "rationale": "scope漏れと独立担当への本流提案漏洩を機械的に拒否できる",
+        "related_tests": [],
+        "statement": "mainとindependentの全件scope分類を固定材料digest上で独立に照合する"
+      },
+      {
+        "dependencies": [],
+        "destination": "review.external_send_approval",
+        "disposition": "transfer",
+        "evidence": [
+          "ReviewCompass:tools/api_providers/external_api_approval.py"
+        ],
+        "identifier": "ESS-0018",
+        "kind": "contract",
+        "rationale": "外部送信の権限と対象を実行直前に完全一致で検査できる",
+        "related_tests": [],
+        "statement": "外部送信承認を利用者・期限・provider・model・purpose・対象へ束縛する"
+      },
+      {
+        "dependencies": [],
+        "destination": "artifact.safe_structured_io",
+        "disposition": "redesign",
+        "evidence": [
+          "ReviewCompass:tools/check_workflow_action/project_yaml.py"
+        ],
+        "identifier": "ESS-0019",
+        "kind": "capability",
+        "rationale": "大規模な旧分類規則は移さず安全なYAML境界だけを再設計する",
+        "related_tests": [],
+        "statement": "project YAMLの読書きと局所診断を共有境界へ集約する"
+      }
+    ],
+    "status": "complete"
+  },
+  "normative_status": "non-normative",
+  "priority_extraction": {
+    "batch_resolution_digest": "9af0518066d039da7122a70e26eeef6b092e83e210001f1df8d73f1e59f832a6",
+    "extracted": {
+      "ReviewCompass2:tools/paths.py": "ESS-0014",
+      "ReviewCompass:tools/api_providers/external_api_approval.py": "ESS-0018",
+      "ReviewCompass:tools/api_providers/model_capabilities.py": "ESS-0015",
+      "ReviewCompass:tools/api_providers/phase_trace.py": "ESS-0016",
+      "ReviewCompass:tools/api_providers/scope_assurance.py": "ESS-0017",
+      "ReviewCompass:tools/check_workflow_action/project_yaml.py": "ESS-0019"
+    },
+    "first_batch_candidate_count": 29,
+    "first_batch_identifier": "dependency_materials-0001",
+    "layer_batch_counts": {
+      "dependency_materials": 1,
+      "empirical_records": 26,
+      "implementation": 2,
+      "issues": 1,
+      "other": 16,
+      "sessions": 2,
+      "specifications": 14,
+      "structured_materials": 16,
+      "tests": 1
+    },
+    "layer_candidate_counts": {
+      "dependency_materials": 29,
+      "empirical_records": 6312,
+      "implementation": 275,
+      "issues": 62,
+      "other": 3942,
+      "sessions": 458,
+      "specifications": 3465,
+      "structured_materials": 3909,
+      "tests": 179
+    },
+    "not_selected": [
+      "ReviewCompass2:tools/session-capture.py",
+      "ReviewCompass:tests/tools/test_review_input_guard.py",
+      "ReviewCompass:tests/tools/test_run_risk_review.py",
+      "ReviewCompass:tests/tools/test_source_scope_guard.py",
+      "ReviewCompass:tools/api_providers/post_write_prompt_builder.py",
+      "ReviewCompass:tools/api_providers/post_write_review_flow.py",
+      "ReviewCompass:tools/api_providers/post_write_subagent_intake.py",
+      "ReviewCompass:tools/api_providers/prepare_post_write_review.py",
+      "ReviewCompass:tools/api_providers/tests/test_model_capabilities.py",
+      "ReviewCompass:tools/api_providers/tests/test_post_write_prompt_audit.py",
+      "ReviewCompass:tools/api_providers/tests/test_post_write_prompt_builder.py",
+      "ReviewCompass:tools/api_providers/tests/test_post_write_review_flow.py",
+      "ReviewCompass:tools/api_providers/tests/test_post_write_subagent_intake.py",
+      "ReviewCompass:tools/api_providers/tests/test_ppwm7_integration.py",
+      "ReviewCompass:tools/api_providers/tests/test_prepare_post_write_review.py",
+      "ReviewCompass:tools/api_providers/tests/test_run_review.py",
+      "ReviewCompass:tools/build-source-scope-delta-patch.py",
+      "ReviewCompass:tools/build-source-scope-freeze-patch.py",
+      "ReviewCompass:tools/check-review-inputs.py",
+      "ReviewCompass:tools/check-source-scope-response.py",
+      "ReviewCompass:tools/post-write-subagent-intake.py",
+      "ReviewCompass:tools/prepare-trusted-review-send.py",
+      "ReviewCompass:tools/trusted-review-send.py"
+    ],
+    "plan_digest": "9c9374c2bc3eb74e8dda0ec046a624d5800398df1069aa870c11f6101ac78602",
+    "scheduled_count": 18631,
+    "status": "complete",
+    "unscheduled_count": 0
+  },
+  "promotion_required": true,
+  "record_version": 1,
+  "rule_recount_correction": {
+    "corrected_source_count": 149,
+    "digest": "f912583ed2b1361eb98ee1ec43c195550f3015e6db15f64682a5989152aa7f8b",
+    "discrepancies": [],
+    "duplicate_source_paths": [
+      "tools/api_providers/phase_trace.py"
+    ],
+    "exact_duplicate_count": 5,
+    "exact_duplicate_rules": [
+      {
+        "impl": "external_api_approval.py",
+        "rule": "approval record is already consumed"
+      },
+      {
+        "impl": "check_workflow_action/scoped_authorization.py",
+        "rule": ")を含めることはできません(CAD-3)"
+      },
+      {
+        "impl": "check_workflow_action/preservation.py",
+        "rule": "staged pathがexact staged allowlistと一致しません"
+      },
+      {
+        "impl": "check-workflow-action.py",
+        "rule": "は YAML object が必要です"
+      },
+      {
+        "impl": "check-workflow-action.py",
+        "rule": "を YAML として読めません:"
+      }
+    ],
+    "fragment_count": 614,
+    "kept_count": 1408,
+    "raw_count": 2195,
+    "removed_source_aliases": [
+      "phase_trace.py"
+    ],
+    "status": "resolved",
+    "substring_count": 168,
+    "unexplained_count": 0
+  },
+  "status": "blocked"
+}
