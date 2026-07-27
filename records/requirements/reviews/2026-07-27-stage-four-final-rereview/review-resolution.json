@@ -1,0 +1,20 @@
+{
+  "material_digest": "4442988c1273a602843e12c3882ce8adfa3cbef86db841ac9bc388931f439567",
+  "resolved_finding_count": 7,
+  "remaining_count": 0,
+  "result": {
+    "feature_count": 9,
+    "requirement_count": 37,
+    "essence_count": 47,
+    "atomic_obligation_count": 464,
+    "boundary_relation_count": 23,
+    "uncovered_atomic_obligation_count": 0
+  },
+  "verification": {
+    "atomic_obligation_digest": "c0e2d5d5198b0778920d4c84b0bcc95e499c41ad2243f2fe20ce282f2467edf9",
+    "boundary_relation_digest": "129555411efb457f995cf5a6fd49e5aa6b5d7ddf324114470c0e355ed28c9494",
+    "requirement_contract_tests": "39 passed",
+    "status": "ready_for_minimal_final_verification"
+  },
+  "status": "resolved"
+}

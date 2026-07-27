@@ -1,0 +1,15 @@
+{
+  "material_digest": "4442988c1273a602843e12c3882ce8adfa3cbef86db841ac9bc388931f439567",
+  "finding_count": 7,
+  "adopted_count": 7,
+  "rejected_count": 0,
+  "groups": [
+    {"finding_ids":["ATFR-001","ATFR-002"],"resolution_id":"STAGE4-RERES-001","disposition":"adopted","reason":"464原子的義務を1件ずつsource relationへ結び固定入力上で機械検査する"},
+    {"finding_ids":["ATFR-003"],"resolution_id":"STAGE4-RERES-002","disposition":"adopted","reason":"provides_toとdepends_onの相互関係を23辺へ固定しvalidatorを追加する"},
+    {"finding_ids":["SFBFR-001"],"resolution_id":"STAGE4-RERES-003","disposition":"adopted","reason":"Traceはverdict生成、WorkflowとTriageは各確定拒否を所有する"},
+    {"finding_ids":["ATFR-004"],"resolution_id":"STAGE4-RERES-004","disposition":"adopted","reason":"provider受領とwrite-ahead captureを別状態にしirrecoverable終端を許す"},
+    {"finding_ids":["ATFR-005"],"resolution_id":"STAGE4-RERES-005","disposition":"adopted","reason":"版付きsupported-platform matrixを受け入れ対象の正本にする"},
+    {"finding_ids":["ATFR-006"],"resolution_id":"STAGE4-RERES-006","disposition":"adopted","reason":"対象Digest照合とHuman判断内容を別フィールドへ分離する"}
+  ],
+  "status": "complete"
+}
