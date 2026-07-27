@@ -710,6 +710,7 @@ def validate_strict_evidence_backed_bootstrap_conformance(
   expected_passed_count,
   repository_root,
   approved_input_digests,
+  approved_input_counts,
   conformant_evidence_obligation_map,
 ):
   if (
@@ -724,6 +725,48 @@ def validate_strict_evidence_backed_bootstrap_conformance(
   ):
     raise BootstrapConformanceError(
       "approved input digests are required"
+    )
+  actual_input_digests = {
+    "approved_dependencies": digest_integrity_input(
+      tuple(sorted(
+        (
+          value["provider_requirement_id"],
+          value["consumer_requirement_id"],
+        )
+        for value in approved_requirement_dependencies
+      ))
+    ),
+    "approved_obligations": digest_integrity_input(
+      approved_obligation_map
+    ),
+    "design_components": digest_integrity_input(
+      design_component_map
+    ),
+    "requirement_acceptance_tests": (
+      digest_integrity_input(
+        requirement_acceptance_test_map
+      )
+    ),
+  }
+  if actual_input_digests != approved_input_digests:
+    raise BootstrapConformanceError(
+      "approved input digests must match content"
+    )
+  actual_input_counts = {
+    "approved_dependency_count": len(
+      approved_requirement_dependencies
+    ),
+    "approved_obligation_count": len(
+      approved_obligation_map
+    ),
+    "design_count": len(design_component_map),
+    "requirement_acceptance_test_count": len(
+      requirement_acceptance_test_map
+    ),
+  }
+  if actual_input_counts != approved_input_counts:
+    raise BootstrapConformanceError(
+      "approved input counts must match content"
     )
   result = validate_evidence_backed_bootstrap_conformance(
     records=records,
@@ -783,6 +826,32 @@ def validate_strict_evidence_backed_bootstrap_conformance(
     "approved_input_digests": dict(sorted(
       approved_input_digests.items()
     )),
+    "approved_input_counts": dict(sorted(
+      approved_input_counts.items()
+    )),
+    "approved_inputs": {
+      "dependencies": sorted(
+        approved_requirement_dependencies,
+        key=lambda value: (
+          value["provider_requirement_id"],
+          value["consumer_requirement_id"],
+        ),
+      ),
+      "design_components": dict(sorted(
+        (
+          design_id,
+          tuple(components),
+        )
+        for design_id, components
+        in design_component_map.items()
+      )),
+      "obligations": dict(sorted(
+        approved_obligation_map.items()
+      )),
+      "requirement_acceptance_tests": dict(sorted(
+        requirement_acceptance_test_map.items()
+      )),
+    },
     "base_validation_digest": result.digest,
     "commit_verification": {
       "bootstrap_commit": bootstrap_commit,
@@ -816,3 +885,14 @@ def validate_strict_evidence_backed_bootstrap_conformance(
     evidence_count=result.evidence_count,
     digest=digest,
   )
+
+
+def digest_integrity_input(value):
+  return hashlib.sha256(
+    json.dumps(
+      value,
+      ensure_ascii=False,
+      separators=(",", ":"),
+      sort_keys=True,
+    ).encode("utf-8")
+  ).hexdigest()

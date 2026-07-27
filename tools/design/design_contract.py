@@ -140,6 +140,13 @@ _PROTOCOL_STEP_FIELDS = {
   "to_state",
   "on_failure",
 }
+_FAILURE_BRANCH_FIELDS = {
+  "machine_id",
+  "from_state",
+  "event",
+  "to_state",
+  "persistence",
+}
 _EVENT_ROUTE_FIELDS = {
   "route_id",
   "source_interface_id",
@@ -367,6 +374,7 @@ def validate_design_architecture(
   event_routes=(),
   required_interface_fields=None,
   required_boundary_fields=None,
+  required_protocol_machine_ids=None,
 ):
   parsed_designs = tuple(designs)
   if not parsed_designs:
@@ -771,6 +779,11 @@ def validate_design_architecture(
       or value["event"] not in machine_by_id[
         value["target_state_machine_id"]
       ]["events"]
+      or machine_by_id[
+        value["target_state_machine_id"]
+      ]["owner_design_id"] != interface_by_id[
+        value["source_interface_id"]
+      ]["consumer_design_id"]
     ):
       raise DesignContractError(
         "event routes must resolve"
@@ -841,7 +854,9 @@ def validate_design_architecture(
         or step["to_state"] not in machine_by_id[
           step["state_machine_id"]
         ]["states"]
-        or not _text(step["on_failure"])
+        or not isinstance(step["on_failure"], dict)
+        or set(step["on_failure"])
+        != _FAILURE_BRANCH_FIELDS
       ):
         raise DesignContractError(
           "protocol steps must resolve"
@@ -866,6 +881,31 @@ def validate_design_architecture(
         raise DesignContractError(
           "protocol step must match state transition"
         )
+      failure = step["on_failure"]
+      if (
+        failure["machine_id"] not in machine_ids
+        or failure["from_state"] not in machine_by_id[
+          failure["machine_id"]
+        ]["states"]
+        or failure["to_state"] not in machine_by_id[
+          failure["machine_id"]
+        ]["states"]
+        or failure["event"] not in machine_by_id[
+          failure["machine_id"]
+        ]["events"]
+        or not _text(failure["persistence"])
+        or not any(
+          transition["from"] == failure["from_state"]
+          and transition["event"] == failure["event"]
+          and transition["to"] == failure["to_state"]
+          for transition in machine_by_id[
+            failure["machine_id"]
+          ]["transitions"]
+        )
+      ):
+        raise DesignContractError(
+          "protocol failure branch must match transition"
+        )
       current_states[step["state_machine_id"]] = (
         step["to_state"]
       )
@@ -873,7 +913,7 @@ def validate_design_architecture(
       steps.append(dict(step))
     if current_states != expected_states:
       raise DesignContractError(
-        "protocol must reach expected states"
+      "protocol must reach expected states"
       )
     parsed_protocols.append({
       "expected_states": dict(sorted(
@@ -885,6 +925,23 @@ def validate_design_architecture(
       "protocol_id": value["protocol_id"],
       "steps": tuple(steps),
     })
+  if required_protocol_machine_ids is not None:
+    required_protocol_machines = set(_texts(
+      required_protocol_machine_ids,
+      "required protocol machine IDs",
+    ))
+    covered_protocol_machines = {
+      machine_id
+      for protocol in parsed_protocols
+      for machine_id in protocol["initial_states"]
+    }
+    if (
+      required_protocol_machines != machine_ids
+      or covered_protocol_machines != machine_ids
+    ):
+      raise DesignContractError(
+        "protocols must cover every state machine"
+      )
 
   document = {
     "boundary_interface_map": dict(sorted(
@@ -917,6 +974,11 @@ def validate_design_architecture(
     "protocols": sorted(
       parsed_protocols,
       key=lambda value: value["protocol_id"],
+    ),
+    "required_protocol_machine_ids": (
+      ()
+      if required_protocol_machine_ids is None
+      else tuple(sorted(required_protocol_machine_ids))
     ),
     "schema_version": 1,
     "state_machines": sorted(
