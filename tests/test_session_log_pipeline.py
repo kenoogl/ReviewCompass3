@@ -9,6 +9,8 @@ import hashlib
 import importlib
 import json
 
+import pytest
+
 
 def test_prepares_redacted_transcript_with_provenance(tmp_path):
   raw_root = tmp_path / "raw"
@@ -58,3 +60,35 @@ def test_prepares_redacted_transcript_with_provenance(tmp_path):
     artifact.text.encode("utf-8")
   ).hexdigest()
   assert len(artifact.events) == 1
+
+
+def test_pipeline_fails_closed_when_high_entropy_remains(tmp_path):
+  raw_root = tmp_path / "raw"
+  raw_log = raw_root / "session.jsonl"
+  raw_root.mkdir()
+  secret = "A9fK2mQ7xR4vT8pL3nC6sW1yH5jD0bZ"
+  raw_log.write_text(
+    json.dumps({
+      "uuid": "user-1",
+      "type": "user",
+      "sessionId": "session-1",
+      "message": {
+        "role": "user",
+        "content": "token=%s" % secret,
+      },
+    }) + "\n",
+    encoding="utf-8",
+  )
+
+  pipeline = importlib.import_module("tools.session_logs.pipeline")
+  redaction = importlib.import_module("tools.session_logs.redaction")
+
+  with pytest.raises(redaction.SensitiveDataRemaining) as error:
+    pipeline.prepare_artifact(
+      raw_log,
+      raw_root=raw_root,
+      rules=(),
+      tool_version="0.0.1",
+    )
+
+  assert secret not in repr(error.value)

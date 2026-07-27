@@ -7,6 +7,8 @@ promotion_required: true
 
 import importlib
 
+import pytest
+
 
 def test_redacts_known_patterns_and_reports_only_label_and_count():
   redaction = importlib.import_module("tools.session_logs.redaction")
@@ -32,3 +34,29 @@ def test_redacts_known_patterns_and_reports_only_label_and_count():
   )
   assert secret_1 not in repr(result)
   assert secret_2 not in repr(result)
+
+
+def test_detects_high_entropy_without_returning_secret_value():
+  redaction = importlib.import_module("tools.session_logs.redaction")
+  secret = "A9fK2mQ7xR4vT8pL3nC6sW1yH5jD0bZ"
+
+  findings = redaction.find_high_entropy("token=%s" % secret)
+
+  assert len(findings) == 1
+  assert findings[0].length == len(secret)
+  assert findings[0].entropy >= 3.5
+  assert secret not in repr(findings)
+
+
+def test_strict_redaction_fails_closed_without_leaking_secret():
+  redaction = importlib.import_module("tools.session_logs.redaction")
+  secret = "A9fK2mQ7xR4vT8pL3nC6sW1yH5jD0bZ"
+
+  with pytest.raises(redaction.SensitiveDataRemaining) as error:
+    redaction.redact_text_strict("token=%s" % secret, ())
+
+  assert secret not in repr(error.value)
+  assert error.value.count == 1
+
+  safe = "repeated=%s" % ("a" * 40)
+  assert redaction.redact_text_strict(safe, ()).text == safe
