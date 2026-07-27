@@ -695,8 +695,8 @@
       "oracle_type": "machine",
       "setup": "Attempt identity、request identityおよび送信条件／provider response stream／REQ-PORTABLE-002とREQ-PORTABLE-004を満たすwrite-ahead隔離保存境界",
       "stimulus": "システムはprovider responseの受領とrawの耐久的captureを別状態として管理し、解析前に共有隔離保存境界へwrite-ahead captureしなければならない",
-      "expected": "内部生成必須interfaceは初期入力へ偽装できず、Capture・Validation・成功／失敗Run結果を生成後に消費する／Capture分類は対応するRun終端へ固定し、全失敗stepが明示したRun・Workflow終端へ到達する",
-      "negative_case": "内部生成interfaceをinitialへ追加する／Capture診断失敗をirrecoverableへ結ぶ／失敗状態ベクトルからRunまたはWorkflowを省く"
+      "expected": "正常・失敗branch双方でinterface生成順を検査し、Capture分類は各失敗発生prefixで対応するfailedまたはirrecoverable Run結果へ固定する",
+      "negative_case": "失敗branchでRun結果を生成せずWorkflowへ進む／後続main stepだけでCapture分類相関を満たす／結果生成失敗をresult_publishedにする"
     },
     {
       "test_id": "AT-EXEC-004",
@@ -839,8 +839,8 @@
       "oracle_type": "machine",
       "setup": "現在の作業段階、要求action、関門結果／Harnessからの開始要求またはRun結果／REQ-TRACE-005のOperational Provenance verdict／REQ-PORTABLE-002を満たす状態保存境界",
       "stimulus": "システムは作業段階とRun開始・完了許可の正本として許可遷移および関門を一貫した状態機械で管理しなければならない",
-      "expected": "開始、retry、dispatch、Capture、Validation、Triageの全失敗がfailedまたはirrecoverable Run結果を生成後、Workflow blockedへ伝播し、成功Run結果もRun成功後に生成してから受け取る",
-      "negative_case": "開始またはretry失敗後もWorkflowをrunningに残す／成功Run結果を初期入力扱いする／全状態ベクトル未到達を受理する"
+      "expected": "全開始・retry・実行失敗branchがRun結果をoutput後にWorkflow inputへ渡し、失敗専用protocolの主経路もRun終端とWorkflow blockedへ到達する",
+      "negative_case": "Workflowを直接blockedにしてRun結果interfaceを省く／失敗専用protocolのexpectedをrunningへ戻す／成功結果生成失敗を成功公開済みにする"
     },
     {
       "test_id": "AT-WORKFLOW-003",
@@ -944,14 +944,14 @@
   ],
   "validation": {
     "contract": "tools/design/design_contract.py:validate_design_contract",
-    "digest": "6adfa4a0aa2eeb1136ed783cd9cc3b2221e8ef617113213d631a2c25fefef9f1",
+    "digest": "c594be9fa2656af02f3fff57fa3bf979e06bd253b7b0adbac0553ee68cb4bfc2",
     "feature_count": 9,
     "requirement_count": 37,
     "acceptance_test_count": 37,
     "boundary_count": 23,
     "architecture_contract": "tools/design/design_contract.py:validate_design_architecture",
     "architecture_record": "records/design/stage-five-architecture-integrity.json",
-    "architecture_digest": "5ab5c0bbffeb1020703c741bfb657a91b0cf730007fcdb6908a6993e7fd9f9a5",
+    "architecture_digest": "f3bbc271caf1d462afa14f292b8ab0c15709aa82dac1a72d27d56308a85db890",
     "interface_count": 29,
     "state_machine_count": 8,
     "status": "complete",

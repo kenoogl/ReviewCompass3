@@ -95,8 +95,10 @@ Validation結果はTriage結果と分離し、Runを`executing`から
 内部生成必須interfaceの初期入力化と未生成消費を拒否する。Capture失敗は診断保存可能、隔離、
 raw・診断保存不能を区別し、Validation・dispatch失敗とともにfailedまたは
 irrecoverable Run結果を介してWorkflow `blocked`まで伝播する。
-各失敗stepは全machineの期待状態ベクトルを宣言し、開始・retry失敗も
-Run結果を生成後にWorkflowへ返す。成功Run結果も成功終端後に生成する。
+各失敗stepは全machineの期待状態ベクトルとbranch内interface roleを宣言し、
+開始・retryを含む全失敗でRun結果を生成後にWorkflowへ返す。失敗専用
+protocolの主経路も同じ終端を要求する。成功Run結果は成功終端後に生成し、
+生成失敗はRun failedとして保存する。
 各遷移はguardと、
 結果を外部へ見せる前に何を耐久化するかを定義する。失敗、拒否、隔離、
 irrecoverable、retry枯渇、provenance不合格を耐久的終端へ伝播し、
