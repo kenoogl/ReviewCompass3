@@ -134,3 +134,63 @@ def test_rejects_duplicate_requirement_relations():
       ),
       defined_essence_ids=("ESS-0003", "ESS-0005"),
     )
+
+
+def test_rejects_requirement_without_source_relation():
+  source_trace = importlib.import_module(
+    "tools.requirements.source_trace"
+  )
+
+  with pytest.raises(source_trace.RequirementSourceTraceError):
+    source_trace.validate_requirement_sources(
+      records=(_record(),),
+      defined_requirement_ids=(
+        "REQ-RUNTIME-001",
+        "REQ-RUNTIME-002",
+      ),
+      defined_intent_ids=(
+        "INT-PRODUCT",
+        "INT-CONSTRAINTS",
+      ),
+      defined_essence_ids=("ESS-0003", "ESS-0005"),
+    )
+
+
+def test_rejects_out_of_feature_or_uncovered_essence():
+  source_trace = importlib.import_module(
+    "tools.requirements.source_trace"
+  )
+
+  with pytest.raises(source_trace.RequirementSourceTraceError):
+    source_trace.validate_requirement_sources(
+      records=(_record(essence_ids=("ESS-0003",)),),
+      defined_requirement_ids=("REQ-RUNTIME-001",),
+      defined_intent_ids=(
+        "INT-PRODUCT",
+        "INT-CONSTRAINTS",
+      ),
+      defined_essence_ids=(
+        "ESS-0003",
+        "ESS-0005",
+        "ESS-0006",
+      ),
+      allowed_essence_ids=("ESS-0003", "ESS-0005"),
+      required_essence_ids=("ESS-0003", "ESS-0005"),
+    )
+
+  with pytest.raises(source_trace.RequirementSourceTraceError):
+    source_trace.validate_requirement_sources(
+      records=(_record(essence_ids=("ESS-0006",)),),
+      defined_requirement_ids=("REQ-RUNTIME-001",),
+      defined_intent_ids=(
+        "INT-PRODUCT",
+        "INT-CONSTRAINTS",
+      ),
+      defined_essence_ids=(
+        "ESS-0003",
+        "ESS-0005",
+        "ESS-0006",
+      ),
+      allowed_essence_ids=("ESS-0003", "ESS-0005"),
+      required_essence_ids=("ESS-0003",),
+    )
