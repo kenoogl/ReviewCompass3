@@ -1,0 +1,75 @@
+{
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "scope": "material_payload"
+  },
+  "lifecycle": "provisional",
+  "material_digest": "ffdd8bae67dde65fc8681cf0a80f11356fb7cae365c39b80028f6211c44d9a48",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+        "role": "approved_intent",
+        "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+      },
+      {
+        "path": "records/extraction/stage-two-user-approval.json",
+        "role": "approved_essence_ledger",
+        "sha256": "ad04291ac9e76beef6d97078a791d0b4ea7dec73a621433135f33075dde76b1b"
+      },
+      {
+        "path": "records/requirements/fixed-input-verification.json",
+        "role": "fixed_input_verification",
+        "sha256": "d8b1739aa647beec3eddef7afd727d19c5027a1d3df3ba9c5ac7ee9aaba7ecaf"
+      },
+      {
+        "path": "records/requirements/feature-partition.json",
+        "role": "review_target_feature_partition",
+        "sha256": "03bbeaf61d42e18f680c98595a08f5231c375f36db2a5797204c73edcd3efe25"
+      },
+      {
+        "path": "docs/requirements/review-context-requirements.md",
+        "role": "review_target_requirements",
+        "sha256": "755db382c3f263f5736eadf20ef33dfba4bc80ea77116d5acd1baa4b987e9c90"
+      },
+      {
+        "path": "records/requirements/review-context-batch-0001.json",
+        "role": "review_target_trace_record",
+        "sha256": "99309e02a0b5a61ce84c37db897c38872090126223708a196c875562dcde8fbf"
+      },
+      {
+        "path": "tools/requirements/feature_partition.py",
+        "role": "mechanical_partition_contract",
+        "sha256": "0796d436b7f6c3e075b998f1d80451ea59d3cb3cc6b77e6ef3084f9ffbecec2a"
+      },
+      {
+        "path": "tools/requirements/requirement_batch.py",
+        "role": "mechanical_requirement_contract",
+        "sha256": "2e91889620ae18e2b49b856939d07102429b9d07d24b707fcd9d4b1ecb6f3986"
+      },
+      {
+        "path": "tools/requirements/source_trace.py",
+        "role": "mechanical_trace_contract",
+        "sha256": "d4530d3fee5065050fe88c573d5b68f5e69c995992b3f942b55fd925961b708e"
+      }
+    ],
+    "criteria": [
+      "9機能の責務境界に意味的な重複・欠落・過大統合がない",
+      "承認済み47エッセンスの割当がintentと矛盾しない",
+      "Review Context 6要件が外部可観測な振る舞いとして記述されている",
+      "各要件の停止・復旧・保存・受け入れ条件が反証可能である",
+      "要件からintentとエッセンスへの由来が十分である",
+      "実装方法がrequirementsへ不必要に固定されていない"
+    ],
+    "review_roles": [
+      "scope_and_feature_boundary",
+      "task_runtime_requirements",
+      "adversarial_traceability"
+    ]
+  },
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "status": "fixed"
+}
