@@ -92,3 +92,139 @@ def test_requires_gap_for_nonconformant_classification():
       ),
       bootstrap_commit="a" * 40,
     )
+
+
+def test_validates_commit_blobs_test_run_design_map_and_gaps():
+  conformance = importlib.import_module(
+    "tools.design.bootstrap_conformance"
+  )
+  record = _record(
+    classification="adapt",
+    gaps=("GAP-CONTEXT-001",),
+  )
+  result = (
+    conformance
+    .validate_evidence_backed_bootstrap_conformance(
+      records=(record,),
+      requirement_design_map={
+        "REQ-CONTEXT-001": "DES-CONTEXT",
+      },
+      evidence_manifest=(
+        {
+          "path": "tools/context.py",
+          "blob_sha256": "1" * 64,
+          "role": "implementation",
+          "requirement_ids": ("REQ-CONTEXT-001",),
+        },
+        {
+          "path": "tests/test_context.py",
+          "blob_sha256": "2" * 64,
+          "role": "test",
+          "requirement_ids": ("REQ-CONTEXT-001",),
+        },
+      ),
+      commit_blob_map={
+        "tools/context.py": "1" * 64,
+        "tests/test_context.py": "2" * 64,
+      },
+      test_run={
+        "bootstrap_commit": "a" * 40,
+        "command": "python3 -m pytest -q",
+        "status": "passed",
+        "passed_count": 1,
+        "output_digest": "3" * 64,
+      },
+      gaps=(
+        {
+          "gap_id": "GAP-CONTEXT-001",
+          "requirement_id": "REQ-CONTEXT-001",
+          "category": "missing_gate",
+          "component": "context_builder",
+          "atomic_obligation_ids": (
+            "REQ-CONTEXT-001#statement",
+          ),
+          "depends_on_gap_ids": (),
+          "acceptance_test_ids": ("AT-CONTEXT-001",),
+          "stop_condition": "gate remains absent",
+        },
+      ),
+      requirement_dependencies=(),
+      bootstrap_commit="a" * 40,
+    )
+  )
+
+  assert result.status == "complete"
+  assert result.gap_count == 1
+  assert result.evidence_count == 2
+
+
+def test_rejects_conformant_with_nonconformant_dependency():
+  conformance = importlib.import_module(
+    "tools.design.bootstrap_conformance"
+  )
+  provider = _record(
+    requirement_id="REQ-PORTABLE-001",
+    classification="adapt",
+    target_design_id="DES-PORTABLE",
+    implementation_evidence=(),
+    test_evidence=(),
+    gaps=("GAP-PORTABLE-001",),
+  )
+  consumer = _record()
+
+  with pytest.raises(
+    conformance.BootstrapConformanceError
+  ):
+    conformance.validate_evidence_backed_bootstrap_conformance(
+      records=(provider, consumer),
+      requirement_design_map={
+        "REQ-PORTABLE-001": "DES-PORTABLE",
+        "REQ-CONTEXT-001": "DES-CONTEXT",
+      },
+      evidence_manifest=(
+        {
+          "path": "tools/context.py",
+          "blob_sha256": "1" * 64,
+          "role": "implementation",
+          "requirement_ids": ("REQ-CONTEXT-001",),
+        },
+        {
+          "path": "tests/test_context.py",
+          "blob_sha256": "2" * 64,
+          "role": "test",
+          "requirement_ids": ("REQ-CONTEXT-001",),
+        },
+      ),
+      commit_blob_map={
+        "tools/context.py": "1" * 64,
+        "tests/test_context.py": "2" * 64,
+      },
+      test_run={
+        "bootstrap_commit": "a" * 40,
+        "command": "python3 -m pytest -q",
+        "status": "passed",
+        "passed_count": 1,
+        "output_digest": "3" * 64,
+      },
+      gaps=(
+        {
+          "gap_id": "GAP-PORTABLE-001",
+          "requirement_id": "REQ-PORTABLE-001",
+          "category": "missing_boundary",
+          "component": "portable_store",
+          "atomic_obligation_ids": (
+            "REQ-PORTABLE-001#statement",
+          ),
+          "depends_on_gap_ids": (),
+          "acceptance_test_ids": ("AT-PORTABLE-001",),
+          "stop_condition": "boundary remains absent",
+        },
+      ),
+      requirement_dependencies=(
+        {
+          "provider_requirement_id": "REQ-PORTABLE-001",
+          "consumer_requirement_id": "REQ-CONTEXT-001",
+        },
+      ),
+      bootstrap_commit="a" * 40,
+    )

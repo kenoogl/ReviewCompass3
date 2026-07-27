@@ -91,3 +91,102 @@ def test_rejects_incomplete_design_contract(
       defined_requirement_ids=("REQ-CONTEXT-001",),
       defined_boundary_ids=boundary_ids,
     )
+
+
+def test_validates_boundary_content_interfaces_and_state_machines():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+  result = contract.validate_design_architecture(
+    designs=(_design(),),
+    boundary_catalog=(
+      {
+        "boundary_id": "BOUNDARY-001",
+        "from": "REQ-CONTEXT-001",
+        "relation": "provides_to",
+        "to": "REQ-CONTEXT-001",
+        "contract": "self test boundary",
+      },
+    ),
+    approved_boundary_relations=(
+      {
+        "from": "REQ-CONTEXT-001",
+        "relation": "provides_to",
+        "to": "REQ-CONTEXT-001",
+        "contract": "self test boundary",
+      },
+    ),
+    requirement_feature_map={
+      "REQ-CONTEXT-001": "FEAT-CONTEXT",
+    },
+    interfaces=(
+      {
+        "interface_id": "IF-CONTEXT-EXEC",
+        "provider_design_id": "DES-CONTEXT",
+        "consumer_design_id": "DES-CONTEXT",
+        "identity_fields": ("context_digest",),
+        "payload_fields": ("task",),
+        "failure_verdict": "blocked",
+        "owner_design_id": "DES-CONTEXT",
+      },
+    ),
+    state_machines=(
+      {
+        "machine_id": "SM-WORKFLOW",
+        "owner_design_id": "DES-CONTEXT",
+        "states": ("ready", "blocked"),
+        "events": ("fail",),
+        "transitions": (
+          {
+            "from": "ready",
+            "event": "fail",
+            "to": "blocked",
+            "guard": "validation failed",
+            "persistence": "before visibility",
+          },
+        ),
+      },
+    ),
+    defined_interface_ids=("IF-CONTEXT-EXEC",),
+    defined_state_machine_ids=("SM-WORKFLOW",),
+  )
+
+  assert result.status == "complete"
+  assert result.boundary_count == 1
+  assert result.interface_count == 1
+  assert result.state_machine_count == 1
+
+
+def test_rejects_boundary_content_not_approved():
+  contract = importlib.import_module(
+    "tools.design.design_contract"
+  )
+
+  with pytest.raises(contract.DesignContractError):
+    contract.validate_design_architecture(
+      designs=(_design(),),
+      boundary_catalog=(
+        {
+          "boundary_id": "BOUNDARY-001",
+          "from": "REQ-CONTEXT-001",
+          "relation": "provides_to",
+          "to": "REQ-CONTEXT-001",
+          "contract": "changed",
+        },
+      ),
+      approved_boundary_relations=(
+        {
+          "from": "REQ-CONTEXT-001",
+          "relation": "provides_to",
+          "to": "REQ-CONTEXT-001",
+          "contract": "approved",
+        },
+      ),
+      requirement_feature_map={
+        "REQ-CONTEXT-001": "FEAT-CONTEXT",
+      },
+      interfaces=(),
+      state_machines=(),
+      defined_interface_ids=(),
+      defined_state_machine_ids=(),
+    )
