@@ -10,7 +10,7 @@
       "evidence_paths": [
         "records/stage-zero/native-deployment-validation.json"
       ],
-      "status": "pending"
+      "status": "passed"
     },
     "stage_zero_user_approval": {
       "status": "pending"
