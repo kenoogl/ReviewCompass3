@@ -1,0 +1,40 @@
+{
+  "reviewer_role": "task_runtime_requirements_final",
+  "material_digest": "888c141f13e0a6ddec637d62393d70d7dd6c4f3852ecd4bf6b3a132ace5ccbeb",
+  "verdict": "findings",
+  "summary": "material digestと全12 artifact SHAは一致した。Contextのstale・handoff、Harnessの再利用・外部送信条件、TriageのHuman判断は個別には反証可能だが、機能横断のOperational Provenance、HarnessとWorkflowの状態権限、承認者identity、Context要件の正本一致に残存問題がある。",
+  "findings": [
+    {
+      "id": "TRF-001",
+      "severity": "error",
+      "document": "cross",
+      "location": "REQ-CONTEXT-001〜006／REQ-EXEC-001〜006／REQ-TRIAGE-001〜003／REQ-TRACE-001",
+      "issue": "各機能は局所的なidentityと記録を要求するが、Review Task定義からExecution Context、effective execution identity、送信承認、Attempt、raw応答、Validation、Triage、Human判断、最終Findingまでを必須の型付き辺で結ぶ要件がない。REQ-TRACE-001はFindingから一次証拠への到達だけで合格できるため、実行過程の辺が欠けても全要件が受け入れ条件を満たし得る。",
+      "suggestion": "Operational Provenanceを所有する横断要件を追加し、列挙した全段階のID・内容Digest・関係種別を必須にする。任意の辺の欠落、不一致、未解決参照でRun完了またはFinding確定が拒否され、失敗Attempt、拒否・保留Findingも保持される受け入れ試験を定める。"
+    },
+    {
+      "id": "TRF-002",
+      "severity": "warning",
+      "document": "cross",
+      "location": "REQ-EXEC-001／REQ-EXEC-006／REQ-WORKFLOW-002",
+      "issue": "REQ-EXEC-001はReview Runの状態順序と状態遷移を検査してRunを開始し、REQ-WORKFLOW-002も許可遷移と関門を状態機械で管理する。Run内部状態と作業Workflow状態の区別、どちらがRun開始を最終許可するか、両者の関門が競合した場合の権威が定まっていない。",
+      "suggestion": "Workflowを作業段階とRun開始許可の正本、Harnessを開始許可後のRun・Attempt内部状態の正本として境界を定める。Harnessの開始要求、Workflowの許可・拒否、Run結果のWorkflowへの返却を外部可観測な入出力と停止条件にする。"
+    },
+    {
+      "id": "TRF-003",
+      "severity": "warning",
+      "document": "records/requirements/remaining-batches-0002-0009.json",
+      "location": "REQ-EXEC-002",
+      "issue": "外部送信承認はpayload、Provider、model、endpoint、account、region、purpose、期限へ束縛されるが、承認した利用者のidentityと権限が入力、実行identity、受け入れ条件にない。承認済みエッセンスESS-0018が要求する利用者への束縛を検査できず、承認記録の取り違えを反証できない。",
+      "suggestion": "承認者identityと承認権限を実行identityへ含め、実送信時にpayload・送信先・期限と併せて一致検査する。承認者不一致、権限不足、期限切れで送信されない受け入れ条件を追加する。"
+    },
+    {
+      "id": "TRF-004",
+      "severity": "warning",
+      "document": "cross",
+      "location": "REQ-CONTEXT-001",
+      "issue": "Markdown要件の入力は7項目だが、構造化記録review-context-batch-0001.jsonには追加の「利用者が確認した必須フィールド集合」が入力として含まれる。どちらも固定材料として参照されるため、利用者確認を入力契約とするか出力・関門とするかが一意に定まらない。",
+      "suggestion": "REQ-CONTEXT-001の正本表現を一致させ、利用者確認が必要なら両成果物の入力、停止条件、受け入れ条件へ同じ文言で定義する。両表現の意味フィールド一致を機械監査へ追加する。"
+    }
+  ]
+}

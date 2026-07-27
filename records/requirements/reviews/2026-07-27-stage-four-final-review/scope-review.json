@@ -1,0 +1,40 @@
+{
+  "reviewer_role": "scope_and_feature_boundary_final",
+  "material_digest": "888c141f13e0a6ddec637d62393d70d7dd6c4f3852ecd4bf6b3a132ace5ccbeb",
+  "verdict": "findings",
+  "summary": "material digestと全12 artifact SHAは一致し、9機能・33要件・47エッセンスは構造上重複なく揃っている。ただし、intentの変更影響範囲と自己適用の被覆不足、観測値責務と保存責務の境界不明瞭が残る。",
+  "findings": [
+    {
+      "id": "SFBF-001",
+      "severity": "error",
+      "document": "cross",
+      "location": "intent「何のために作るか／どのようなものを作るか」・REQ-CONTEXT-003・REQ-TRACE-001/002",
+      "issue": "intentは変更が触れた意味単位から影響範囲を取り出し、変更規模に応じてレビューを絞るとしている。しかしREQ-CONTEXT-003は既に固定された候補母集合を入力として分類するだけで、REQ-TRACE-001/002の意味関係と変更単位から候補母集合または影響閉包を導く契約がない。任意の母集合を完全分類するだけでも全33要件を満たせてしまう。",
+      "suggestion": "固定した変更単位、意味関係、閉包規則から影響候補を生成・検証し、その結果をScope contractへ渡す外部可観測な要件を追加する。Traceは関係の検査、Contextは母集合・除外理由・分類の固定を所有する境界を明記する。"
+    },
+    {
+      "id": "SFBF-002",
+      "severity": "warning",
+      "document": "cross",
+      "location": "feature-partition ESS-0029・REQ-EXEC-006・REQ-EVAL-002",
+      "issue": "ESS-0029は「観測値と解釈限界を分けて保持する」という複合義務だがHarnessへ単独割当されている。REQ-EXEC-006は観測値を記録する一方、解釈限界を対象外とし、REQ-EVAL-002が解釈限界を所有するもののESS-0029を由来に持たない。全体では振る舞いが存在しても、責務割当と由来が一致しない。",
+      "suggestion": "ESS-0029を「観測値と測定条件の不変記録」と「評価結果と解釈限界」に分解するか、HarnessとEvaluationへ跨る義務として明示する。Harnessは取得・保存、Evaluationは基準適用・解釈を所有する。"
+    },
+    {
+      "id": "SFBF-003",
+      "severity": "warning",
+      "document": "cross",
+      "location": "REQ-CONTEXT-007・REQ-PORTABLE-002",
+      "issue": "両要件が原子的保存、部分書込み時の旧版保全、再読込照合、失敗診断をそれぞれ要求しており、安全な構造化I/Oの所有責務がContextとPortableで重複している。機能ごとに別の保存保証を実装しても要件上は許され、共有境界という機能分割が保てない。",
+      "suggestion": "Contextは保存対象、機微情報、retention、再利用可否を定め、Portableは原子的書込み、再読込照合、部分失敗復旧を提供する、と所有境界を明記して要件間を参照で結ぶ。"
+    },
+    {
+      "id": "SFBF-004",
+      "severity": "warning",
+      "document": "cross",
+      "location": "intent「誰が使うか／成功の判定基準」・全33要件",
+      "issue": "intentはReviewCompass3自身の開発へ同じ手続きを継続適用できることを成功条件にしているが、33要件には自己の成果物をTargetとした場合も特例や迂回なしに同じContext、Harness、Triage、Trace、Workflow契約を満たす受け入れ条件がない。別プロジェクトだけで全要件を満たす実装を排除できない。",
+      "suggestion": "ReviewCompass3自身の成果物を対象に、通常と同じ契約・関門・来歴で一連のReview Taskを完了できることを、機能横断の受け入れ要件として追加する。"
+    }
+  ]
+}

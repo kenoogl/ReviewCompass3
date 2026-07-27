@@ -1,0 +1,72 @@
+{
+  "reviewer_role": "adversarial_traceability_final",
+  "material_digest": "888c141f13e0a6ddec637d62393d70d7dd6c4f3852ecd4bf6b3a132ace5ccbeb",
+  "verdict": "findings",
+  "summary": "固定12 artifactのSHA-256とmaterial digestはすべて一致した。33要件・47エッセンスの構造的被覆は成立するが、義務単位の由来、Scope母集合の完全性、機微情報を含む保存、受け入れ判定のoracle、機能間所有境界に未解決の穴がある。",
+  "findings": [
+    {
+      "id": "ATF-001",
+      "severity": "error",
+      "document": "obligation_trace_policy",
+      "location": "policy.meaning／required_scopes",
+      "issue": "各requirementの1件のsource_traceをstatement、inputs、停止、復旧、保存、受け入れ、対象外の全義務へ一括適用すると宣言しているだけで、個々の義務とsource fragmentの関係を記録していない。source_trace.pyもrequirementとessenceの件数・所属しか検査しないため、由来のない停止条件や保存義務を追加してもcoverage auditは完全になる。",
+      "suggestion": "義務scopeごとに安定IDを付け、各義務をintent fragmentまたはessence itemへ個別に結ぶ。機械auditは全義務IDの順逆被覆を検査する。"
+    },
+    {
+      "id": "ATF-002",
+      "severity": "error",
+      "document": "context_requirements",
+      "location": "REQ-CONTEXT-003／REQ-CONTEXT-004／REQ-CONTEXT-005",
+      "issue": "候補母集合の由来と閉包を確定する要件がない。任意に狭い母集合を固定し、Target以外をexcludeまたはdeferへ分類すれば、全件分類、独立一致、完全性状態を満たしながら必要材料を欠落させられる。固定集合内の被覆を、Taskに必要な材料の被覆と誤認する穴が残る。",
+      "suggestion": "source universeの生成根拠をContext Requirementsへ結び、閉包規則、除外・defer理由、決定主体を固定する。必要材料のdeferまたは根拠不足時はContext確定を停止する。"
+    },
+    {
+      "id": "ATF-003",
+      "severity": "error",
+      "document": "cross",
+      "location": "REQ-EXEC-003／REQ-SESSION-002／REQ-CONTEXT-007",
+      "issue": "安全な保存要件REQ-CONTEXT-007はContext構成と検査の記録だけを対象とする。一方、provider raw応答と生ログは機微情報を含み得るのに、REQ-EXEC-003とREQ-SESSION-002には保存形式、アクセス境界、retention、削除、再読込時保護がない。特に「生ログ保全版」と「機微情報残存時に保存されない」の対象境界が曖昧で、raw保全が漏えい経路になり得る。",
+      "suggestion": "全保存機能が依存する共通の機微情報保存契約を定め、raw原本、伏字化派生物、診断ごとにアクセス、retention、削除、改変検出を要求する。"
+    },
+    {
+      "id": "ATF-004",
+      "severity": "warning",
+      "document": "remaining_requirement_trace",
+      "location": "REQ-EXEC-003",
+      "issue": "raw保存失敗を停止条件にする一方、復旧条件は保存済みrawを変更せず解析試行を追加することしか規定しない。provider応答受信後に初回保存が失敗した場合、保持すべきrawが存在せず復旧不能であり、保存失敗の診断自体をどう残すかもない。",
+      "suggestion": "provider応答の確定前後における原子的capture、隔離保存、保存失敗時の値なし診断とRun状態、再取得不能時の最終失敗条件を定める。"
+    },
+    {
+      "id": "ATF-005",
+      "severity": "warning",
+      "document": "cross",
+      "location": "REQ-CONTEXT-007／REQ-PORTABLE-002／REQ-WORKFLOW-002／REQ-EXEC-003",
+      "issue": "原子的保存、旧版保持、不変記録、状態遷移保存が複数featureに重複しているが、requirement間の依存・提供関係が記録されていない。source traceは上流intent・essenceだけを扱うため、Portableが共有保存境界を提供するのか各featureが独自実装するのか判定できず、所有境界非重複を検証できない。",
+      "suggestion": "requirement間にprovides、depends_on、delegates等の限定関係を追加し、共有保存保証の所有者と各利用featureの追加責務を明示する。"
+    },
+    {
+      "id": "ATF-006",
+      "severity": "warning",
+      "document": "remaining_requirement_trace",
+      "location": "REQ-EXEC-005",
+      "issue": "「形式復旧前後の意味内容が同一」を受け入れoracleにするが、同一性の基準、判定主体、競合時の扱いがない。LLMの意味判断を機械的なValidation通過へ暗黙利用でき、同じ候補に対する合否も反証不能になる。",
+      "suggestion": "許可する形式変換を閉じた規則として定義するか、意味同一性をLLMの提案とHuman裁定へ分離し、判定対象、理由、競合、承認を記録する。"
+    },
+    {
+      "id": "ATF-007",
+      "severity": "warning",
+      "document": "remaining_requirement_trace",
+      "location": "REQ-TRACE-002",
+      "issue": "statementは受け先のない義務を拒否するとする一方、受け入れ条件は「理由付き非採用」だけで下流受け先なしを許す。非採用を決める主体と承認条件がなく、承認済み義務を任意の理由文で未実装にしても被覆済みにできる。",
+      "suggestion": "非採用可能な義務種別を限定し、Humanの明示判断と対象Digestへ束縛する。必須義務は理由の有無にかかわらず受け先なしを停止条件にする。"
+    },
+    {
+      "id": "ATF-008",
+      "severity": "warning",
+      "document": "context_requirements",
+      "location": "REQ-CONTEXT-007",
+      "issue": "「完了markerのある成果だけを再利用する」は、耐久的commitを示す一つの実装方式をrequirementsで必須化している。transactional storageなどmarkerを持たず同じ外部保証を満たす設計を不必要に排除する。",
+      "suggestion": "受け入れ条件を、クラッシュ後に確定済み版と未確定版を機械的に識別できることへ置き換え、markerの採否はdesignへ送る。"
+    }
+  ]
+}
