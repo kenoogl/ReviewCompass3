@@ -31,6 +31,22 @@ class RequirementSourceTrace:
   digest: str
 
 
+@dataclasses.dataclass(frozen=True)
+class ObligationSourceRecord:
+  obligation_id: str
+  requirement_id: str
+  intent_refs: tuple
+  essence_ids: tuple
+  rationale: str
+
+
+@dataclasses.dataclass(frozen=True)
+class ObligationSourceTrace:
+  status: str
+  records: tuple
+  digest: str
+
+
 _FIELDS = {
   "requirement_id",
   "intent_refs",
@@ -43,7 +59,20 @@ _REQUIREMENT_ID = re.compile(
 )
 _INTENT_ID = re.compile(r"INT-[A-Z0-9]+(?:-[A-Z0-9]+)*")
 _ESSENCE_ID = re.compile(r"ESS-[0-9]{4,}")
+_OBLIGATION_ID = re.compile(
+  r"(REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-[0-9]{3,})"
+  r"#(statement|inputs|outputs|stop_conditions|"
+  r"recovery_conditions|preserved_artifacts|"
+  r"acceptance_criteria|non_goals)"
+)
 _DISPOSITIONS = {"selected", "not_selected"}
+_OBLIGATION_FIELDS = {
+  "obligation_id",
+  "requirement_id",
+  "intent_refs",
+  "essence_ids",
+  "rationale",
+}
 
 
 def _text(value):
@@ -255,6 +284,122 @@ def validate_requirement_sources(
     ).encode("utf-8")
   ).hexdigest()
   return RequirementSourceTrace(
+    status="complete",
+    records=ordered,
+    digest=digest,
+  )
+
+
+def validate_obligation_sources(
+  *,
+  records,
+  required_obligation_ids,
+  defined_requirement_ids,
+  defined_intent_ids,
+  defined_essence_ids,
+):
+  requirement_ids = _defined(
+    defined_requirement_ids,
+    _REQUIREMENT_ID,
+    "requirement",
+  )
+  intent_ids = _defined(
+    defined_intent_ids,
+    _INTENT_ID,
+    "intent",
+  )
+  essence_ids = _defined(
+    defined_essence_ids,
+    _ESSENCE_ID,
+    "essence",
+  )
+  obligations = tuple(required_obligation_ids)
+  if (
+    len(set(obligations)) != len(obligations)
+    or any(
+      not _text(value)
+      or _OBLIGATION_ID.fullmatch(value) is None
+      or value.split("#", 1)[0] not in requirement_ids
+      for value in obligations
+    )
+  ):
+    raise RequirementSourceTraceError(
+      "obligation definitions must be unique and resolve"
+    )
+  required = frozenset(obligations)
+  parsed = []
+  for value in records:
+    if (
+      not isinstance(value, dict)
+      or set(value) != _OBLIGATION_FIELDS
+      or not _text(value["rationale"])
+    ):
+      raise RequirementSourceTraceError(
+        "obligation records require fixed non-empty fields"
+      )
+    obligation_id = value["obligation_id"]
+    requirement_id = value["requirement_id"]
+    match = (
+      _OBLIGATION_ID.fullmatch(obligation_id)
+      if _text(obligation_id)
+      else None
+    )
+    if (
+      match is None
+      or obligation_id not in required
+      or requirement_id not in requirement_ids
+      or match.group(1) != requirement_id
+    ):
+      raise RequirementSourceTraceError(
+        "obligation relation must resolve to its requirement"
+      )
+    parsed.append(ObligationSourceRecord(
+      obligation_id=obligation_id,
+      requirement_id=requirement_id,
+      intent_refs=_references(
+        value["intent_refs"],
+        defined=intent_ids,
+        pattern=_INTENT_ID,
+        label="intent",
+      ),
+      essence_ids=_references(
+        value["essence_ids"],
+        defined=essence_ids,
+        pattern=_ESSENCE_ID,
+        label="essence",
+      ),
+      rationale=value["rationale"],
+    ))
+  relation_ids = tuple(
+    record.obligation_id for record in parsed
+  )
+  if (
+    len(set(relation_ids)) != len(relation_ids)
+    or set(relation_ids) != required
+  ):
+    raise RequirementSourceTraceError(
+      "every obligation requires one source relation"
+    )
+  ordered = tuple(sorted(
+    parsed,
+    key=lambda record: record.obligation_id,
+  ))
+  document = {
+    "records": [
+      dataclasses.asdict(record)
+      for record in ordered
+    ],
+    "schema_version": 1,
+  }
+  digest = hashlib.sha256(
+    json.dumps(
+      document,
+      ensure_ascii=False,
+      separators=(",", ":"),
+      sort_keys=True,
+    ).encode("utf-8")
+  ).hexdigest()
+  return ObligationSourceTrace(
     status="complete",
     records=ordered,
     digest=digest,
