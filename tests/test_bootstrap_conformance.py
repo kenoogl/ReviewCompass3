@@ -379,3 +379,20 @@ def test_strict_integrity_validator_requires_inputs():
       conformance
       .validate_strict_evidence_backed_bootstrap_conformance()
     )
+
+
+def test_integrity_input_digest_changes_with_content():
+  conformance = importlib.import_module(
+    "tools.design.bootstrap_conformance"
+  )
+
+  first = conformance.digest_integrity_input(
+    {"REQ-CONTEXT-001#statement": "REQ-CONTEXT-001"}
+  )
+  second = conformance.digest_integrity_input({
+    "REQ-CONTEXT-001#statement": "REQ-CONTEXT-001",
+    "REQ-CONTEXT-001#inputs.001": "REQ-CONTEXT-001",
+  })
+
+  assert len(first) == 64
+  assert first != second

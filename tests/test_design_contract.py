@@ -269,7 +269,13 @@ def test_validates_protocol_boundary_map_and_event_routes():
             "from_state": "ready",
             "event": "fail",
             "to_state": "blocked",
-            "on_failure": "blocked",
+            "on_failure": {
+              "machine_id": "SM-WORKFLOW",
+              "from_state": "ready",
+              "event": "fail",
+              "to_state": "blocked",
+              "persistence": "before visibility",
+            },
           },
         ),
       },
@@ -291,6 +297,7 @@ def test_validates_protocol_boundary_map_and_event_routes():
         "freshness_verdict",
       ),
     },
+    required_protocol_machine_ids=("SM-WORKFLOW",),
   )
 
   assert result.protocol_count == 1
@@ -373,7 +380,13 @@ def test_rejects_protocol_state_sequence_mismatch():
               "from_state": "ready",
               "event": "fail",
               "to_state": "ready",
-              "on_failure": "blocked",
+              "on_failure": {
+                "machine_id": "SM-WORKFLOW",
+                "from_state": "ready",
+                "event": "fail",
+                "to_state": "blocked",
+                "persistence": "before visibility",
+              },
             },
           ),
         },
