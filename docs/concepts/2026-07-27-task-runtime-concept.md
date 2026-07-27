@@ -121,8 +121,9 @@ Execution Contextの内容を固定した識別を**Execution Context identity**
 Prompt、Harness contract、Validation、モデル条件まで含め、実行に有効な条件を
 固定した識別を**effective execution identity**とする。同じレビュー材料の比較は
 前者を、同じ実行条件の比較は後者を使う。
-外部送信を行うReview Runでは、承認されたserialized outbound payload Digestも
-effective execution identityへ含める。
+外部送信を行うReview Runでは、承認前に確定したcandidate serialized outbound
+payload Digestと、Provider、API endpoint、account、regionからなる論理的な
+送信先identityもeffective execution identityへ含める。
 
 Digestが直接保証するのは、規定した直列化規則に基づく内容の同一性と
 改変検知である。材料の完全性、出所の真実性、実際の送信、モデルによる
@@ -158,20 +159,24 @@ Harnessed Executionは、Task、Target、実行目的に応じて次を管理す
 - Humanの承認停止点と最終判定
 
 Harness contractでは、Runtimeとコードの版、Providerとモデルの識別、
-推論条件、Tool、Prompt、Policy、Schema、実行者、時刻の記録方法など、
-出力に影響する条件を固定する。単独LLM、複数LLMの独立レビュー、
-Toolによる検査、Humanによる裁定などを、Review Runの明示的な構成として扱う。
+API endpoint、account、region、推論条件、Tool、Prompt、Policy、Schema、
+実行者、時刻の記録方法など、出力と送信先に影響する条件を固定する。
+単独LLM、複数LLMの独立レビュー、Toolによる検査、Humanによる裁定などを、
+Review Runの明示的な構成として扱う。
 
-外部API送信前には、実際に送信する直列化payloadを先に確定し、Digestを付与する。
-機械的な機微情報検査とHuman承認を独立した関門として置き、両方を同じpayload
-Digestへ束縛する。Human承認はExecution Context、Prompt、Harness contractの
-各Digestにも束縛する。payload、検査結果、承認判断、送信Attempt、
-実送信結果をOperational Provenanceへ記録する。
+外部API送信前には、実際に送信するcandidate serialized payloadと論理的な
+送信先identityを先に確定し、それぞれへDigestを付与する。機械的な機微情報検査と
+Humanの承認・拒否を独立した状態付き来歴記録として、同じcandidate payload
+Digestと送信先identityへ束縛する。Human判断はExecution Context、Prompt、
+Harness contractの各Digestにも束縛する。検査失敗や承認拒否も消さずに記録し、
+検査通過かつ承認済みの場合だけAttemptを許可する。
 
 各Attemptは、実際に送信するserialized payloadのDigestがReview Runで承認された
-payload Digestと一致することを送信前に検査する。不一致の場合は送信しない。
-接続先、request ID、時刻などAttempt固有のtransport metadataはpayload identityと
-分離し、Attemptの来歴として記録する。
+payload Digestと一致し、実際のProvider、API endpoint、account、regionが
+承認済み送信先identityと一致することを送信前に検査する。不一致の場合は
+送信しない。request ID、実送信時刻、解決後の一時的network addressなどの
+観測metadataだけをAttempt固有のtransport metadataとして分離し、
+Attemptの来歴へ記録する。
 
 ## Review RunとOperational Provenance
 
@@ -192,8 +197,9 @@ Review Runを開始し、変更理由と前Runへの関係を記録する。
 - Prompt manifest
 - 実行主体と実行トポロジ
 - Harness contractとeffective execution identity
-- 直列化した送信payload、機微情報検査、Human承認
-- Attempt固有のtransport metadataとpayload Digest一致検査
+- candidate送信payloadと論理的な送信先identity
+- 機微情報検査とHumanの承認・拒否
+- Attempt固有のtransport metadata、payloadと送信先の一致検査
 - モデルまたはToolへの入力と出力
 - Validation結果
 - Retryと変更理由
@@ -214,9 +220,10 @@ session / change / artifact evidence
   → Review Task
   → Execution Context
   → Harness contract
-  → serialized outbound payload
-  → sensitive-information inspection for payload digest
-  → Human approval for the same payload digest
+  → candidate payload and logical destination identity
+  → sensitive-information inspection
+  → Human approval or rejection
+  → approved send gate
   → Attempt
   → delivery result / raw output
   → Validation

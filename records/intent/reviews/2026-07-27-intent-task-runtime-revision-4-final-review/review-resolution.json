@@ -1,0 +1,46 @@
+{
+  "artifacts_after_resolution": [
+    {
+      "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+      "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+    },
+    {
+      "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+      "sha256": "be501be50b04cd327e97cbd2ea3e3b26082065144c43a36f3e3899e12c4dba13"
+    },
+    {
+      "path": "records/intent/task-runtime-current-implementation-evidence.json",
+      "sha256": "0d7def6b0c58cd176bd2e2c75ea574d69095acc7aa00f71e9b6683dbba79fb82"
+    },
+    {
+      "path": "records/intent/task-runtime-current-implementation-verification-2.json",
+      "sha256": "9b7080d3ebb701bcb7a78618013eee592eb812ce5318b5a29cf5923196040897"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R4-001",
+      "resolution": "Provider、API endpoint、account、regionを論理的な送信先identityとしてHarness contract、effective execution identity、Human判断へ束縛し、各Attemptで実送信先との一致を検査する境界へ修正した",
+      "status": "applied_pending_minimal_verification"
+    },
+    {
+      "id": "R4-002",
+      "resolution": "承認前のcandidate payload Digestをidentityへ含め、検査結果とHumanの承認・拒否を状態付き来歴として保持し、検査通過かつ承認済みの場合だけAttemptを許可した",
+      "status": "applied_pending_minimal_verification"
+    }
+  ],
+  "lifecycle": "provisional",
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 1,
+  "review_run": {
+    "material_digest": "e718154a843dd3813602a43557c212a1c9487c1fccf4c1fa30b02388a307011d",
+    "path": "records/intent/reviews/2026-07-27-intent-task-runtime-revision-4-final-review/review-run.json",
+    "sha256": "4a891cc008d37843aff1f174241ba931aed801b8b5623f517cbffea5fe7a11f1"
+  },
+  "status": "awaiting_minimal_verification",
+  "user_instruction": {
+    "interpretation": "warning 2件を採用し、第3段完了と第4段移行まで実行する",
+    "text": "1から4まで実行"
+  }
+}

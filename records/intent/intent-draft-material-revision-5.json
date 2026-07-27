@@ -1,0 +1,52 @@
+{
+  "approval_candidate": {
+    "approved": false,
+    "material_digest": "4bed543815e294ba9bc001e0dbea8e8ea8ba8f86e2314e134918853f623ee189",
+    "target": "reviewcompass3_intent_revision_5"
+  },
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact",
+    "scope": "material_payload"
+  },
+  "lifecycle": "provisional",
+  "material_digest": "4bed543815e294ba9bc001e0dbea8e8ea8ba8f86e2314e134918853f623ee189",
+  "material_payload": {
+    "artifacts": [
+      {
+        "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+        "role": "non_normative_concept_detail",
+        "sha256": "be501be50b04cd327e97cbd2ea3e3b26082065144c43a36f3e3899e12c4dba13"
+      },
+      {
+        "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+        "role": "intent_revision",
+        "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+      },
+      {
+        "path": "records/intent/task-runtime-current-implementation-evidence.json",
+        "role": "current_implementation_evidence",
+        "sha256": "0d7def6b0c58cd176bd2e2c75ea574d69095acc7aa00f71e9b6683dbba79fb82"
+      },
+      {
+        "path": "records/intent/task-runtime-current-implementation-verification-2.json",
+        "role": "isolated_current_implementation_verification",
+        "sha256": "9b7080d3ebb701bcb7a78618013eee592eb812ce5318b5a29cf5923196040897"
+      }
+    ],
+    "previous_material": {
+      "material_digest": "e718154a843dd3813602a43557c212a1c9487c1fccf4c1fa30b02388a307011d",
+      "path": "records/intent/intent-draft-material-revision-4.json",
+      "sha256": "9dddcaea7b8777b19d832465850fe5c451eb6dc6fbed6979c6589a62755d98da"
+    },
+    "review_resolution": {
+      "applied_finding_count": 2,
+      "path": "records/intent/reviews/2026-07-27-intent-task-runtime-revision-4-final-review/review-resolution.json",
+      "sha256": "7b3f8028dd2452accd3d7eacd5fbb41061e0c00d52726f8cebce83d2f764f355"
+    }
+  },
+  "normative_status": "non-normative",
+  "promotion_required": true,
+  "record_version": 5,
+  "status": "awaiting_minimal_verification"
+}
