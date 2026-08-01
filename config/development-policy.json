@@ -1,0 +1,53 @@
+{
+  "change_kinds": {
+    "behavior": {
+      "base_verification": [
+        "relevant_automated_tests"
+      ],
+      "test_timing": "before_or_same_change"
+    },
+    "documentation": {
+      "base_verification": [
+        "document_consistency_check"
+      ],
+      "test_timing": "not_required"
+    },
+    "prototype": {
+      "base_verification": [
+        "record_findings_and_limitations"
+      ],
+      "test_timing": "not_required"
+    },
+    "research": {
+      "base_verification": [
+        "record_findings_and_sources"
+      ],
+      "test_timing": "not_required"
+    }
+  },
+  "commit_policy": "integrated_commits_green",
+  "human_approval_actions": [
+    "policy_change",
+    "external_send",
+    "irreversible_operation",
+    "semantic_adjudication",
+    "stage_completion"
+  ],
+  "policy_id": "reviewcompass3-development-policy-v1",
+  "record_version": 1,
+  "risk_verification": {
+    "high": [
+      "full_test_suite",
+      "mutation_or_equivalent_fault_injection",
+      "representative_data_validation",
+      "independent_review"
+    ],
+    "low": [],
+    "medium": [
+      "full_test_suite"
+    ]
+  },
+  "self_application_maturity": [
+    "stable"
+  ]
+}

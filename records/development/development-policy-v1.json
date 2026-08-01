@@ -1,0 +1,72 @@
+{
+  "artifacts": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "52e76018b429e85b2684d37d636623a8993b5159b358454b556f627acf477e4b"
+    },
+    {
+      "path": "README.md",
+      "sha256": "d6edb216424dc07aa737704efcf65c11ad5e392415f062440bc230cdad4f360a"
+    },
+    {
+      "path": "config/development-policy.json",
+      "sha256": "6e4216887af2a15be1e4522591fd4504ccd1de86a82ed1c490bf0811cc2392ee"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "1ca5acd37a8cfecc064f8e5ad3b11b24881fdcc00d6f4cd71f2ccdc8e11652e2"
+    },
+    {
+      "path": "docs/intent/2026-08-02-development-policy-amendment.md",
+      "sha256": "b9eb80469452c55ae510edf580021b432805256430c193b3c06ddecad9c17338"
+    },
+    {
+      "path": "docs/plan/2026-08-02-development-policy-amendment.md",
+      "sha256": "e5a29b93084038d00a645245d477200a94e681cdd57847fb0255affa48c2bdbb"
+    },
+    {
+      "path": "tools/development/policy.py",
+      "sha256": "88967e15df0860b627e275d4b556a6b07b1a5a7e143d899090c497ef5beec256"
+    },
+    {
+      "path": "tests/test_development_policy.py",
+      "sha256": "fcbe0417f6ee9c2d00a3771e9228424c437e039297bbae320e468085e0ad0fef"
+    }
+  ],
+  "decision": {
+    "approved": true,
+    "approved_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "evidence": {
+      "instruction": "上記提案の修正を文書と実装に対して改修。",
+      "meaning": "提示した開発方針改定を文書と実装へ反映する明示指示"
+    },
+    "target": "reviewcompass3-development-policy-v1"
+  },
+  "historical_inputs": [
+    {
+      "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+      "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+    },
+    {
+      "path": "docs/plan/2026-07-27-reviewcompass3-rebuild-plan.md",
+      "sha256": "87da13798b9af229ea304b5fb973c8a6ed41300a117f6356007e0dae4f17604e"
+    }
+  ],
+  "policy_id": "reviewcompass3-development-policy-v1",
+  "record_version": 1,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "implemented",
+  "verification": [
+    {
+      "command": "python3 -m pytest -q tests/test_development_policy.py",
+      "passed_count": 13,
+      "status": "passed"
+    },
+    {
+      "command": "python3 -m pytest -q",
+      "passed_count": 405,
+      "status": "passed"
+    }
+  ]
+}

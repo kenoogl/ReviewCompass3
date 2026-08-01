@@ -1,0 +1,144 @@
+"""開発方針のリスクベース関門に関するテスト。"""
+
+import importlib
+import json
+from pathlib import Path
+
+import pytest
+
+
+ROOT = Path(__file__).parents[1]
+POLICY_PATH = ROOT / "config" / "development-policy.json"
+
+
+def _policy_module():
+    return importlib.import_module("tools.development.policy")
+
+
+def test_low_risk_behavior_change_uses_lightweight_test_first_gate():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="low",
+    )
+
+    assert result.status == "ready"
+    assert result.test_timing == "before_or_same_change"
+    assert result.commit_policy == "integrated_commits_green"
+    assert result.verification_requirements == (
+        "relevant_automated_tests",
+    )
+
+
+def test_high_risk_behavior_change_adds_strong_assurance():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="high",
+    )
+
+    assert result.status == "ready"
+    assert result.verification_requirements == (
+        "relevant_automated_tests",
+        "full_test_suite",
+        "mutation_or_equivalent_fault_injection",
+        "representative_data_validation",
+        "independent_review",
+    )
+
+
+@pytest.mark.parametrize("change_kind", ("documentation", "prototype", "research"))
+def test_non_product_changes_do_not_require_formal_red_green_cycle(
+    change_kind,
+):
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind=change_kind,
+        risk="low",
+    )
+
+    assert result.test_timing == "not_required"
+    assert "relevant_automated_tests" not in result.verification_requirements
+
+
+@pytest.mark.parametrize(
+    "action",
+    (
+        "policy_change",
+        "external_send",
+        "irreversible_operation",
+        "semantic_adjudication",
+        "stage_completion",
+    ),
+)
+def test_material_actions_require_human_approval(action):
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="low",
+        actions=(action,),
+    )
+
+    assert result.status == "approval_required"
+    assert result.human_approval_actions == (action,)
+
+
+def test_routine_implementation_does_not_require_human_approval():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="medium",
+        actions=("routine_implementation",),
+    )
+
+    assert result.status == "ready"
+    assert result.human_approval_actions == ()
+
+
+def test_self_application_accepts_only_stable_capabilities():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    stable = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="medium",
+        self_application_capabilities=(
+            {"name": "source_universe", "maturity": "stable"},
+        ),
+    )
+    provisional = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="medium",
+        self_application_capabilities=(
+            {"name": "triage", "maturity": "provisional"},
+        ),
+    )
+
+    assert stable.status == "ready"
+    assert stable.unstable_self_application_capabilities == ()
+    assert provisional.status == "blocked"
+    assert provisional.unstable_self_application_capabilities == ("triage",)
+
+
+def test_rejects_policy_with_unknown_approval_action(tmp_path):
+    data = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+    data["human_approval_actions"].append("routine_implementation")
+    invalid_path = tmp_path / "invalid-policy.json"
+    invalid_path.write_text(
+        json.dumps(data, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(_policy_module().DevelopmentPolicyError):
+        _policy_module().load_policy(invalid_path)
