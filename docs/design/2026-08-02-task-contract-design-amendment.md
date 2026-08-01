@@ -33,7 +33,7 @@ promotion_required: true
 - Task Contract schemaとversion
 - Task Contract Portfolio
 - RequirementとContract obligationの被覆
-- Contract lifecycle
+- Contract definition lifecycle
 - Architecture Policyのidentity、適用範囲、優先順位解決
 - CompilerとPlan bundle
 - Contract、Compiler、Policy変更時のstale閉包
@@ -92,6 +92,28 @@ Policy解決は固定したPolicy集合、適用範囲、優先順位から決�
 Compilerへ渡さない。Policy変更時はruleとContract obligationの依存辺から影響閉包を
 求め、無関係なContract成果をstaleにしない。
 
+project固有の調整は基本Policy本文へ追記せず、版付きProject Policy Overlayとして保持する。
+
+```text
+ProjectPolicyOverlay
+├── overlay_id / version / digest
+├── project_id / binding_id
+├── base_policy_refs
+├── applicability_scope
+├── adjustments[]
+│   ├── adjustment_id
+│   ├── replaces_rule / replacement_rule
+│   ├── reason / evidence_refs
+│   ├── decided_at / decided_by
+│   └── supersedes
+└── effective_status
+```
+
+commit guardのdeadlockや一律reviewの過剰負荷のような運用結果は、失敗事象と置換規則を
+Policy Adjustment Eventとして残す。Agent entryは固定したbase PolicyとOverlayの解決結果
+から生成し、末尾への追記だけをPolicy正本にしない。Overlayも通常Policyと同じ競合解決、
+Digest固定、stale影響閉包の対象とする。
+
 ### 3.3 Compiler
 
 Compilerは純粋なprojection coreと、外部capability catalogを解決するvalidation境界に
@@ -147,9 +169,20 @@ Context Manifestへ追加する項目は次である。
 
 ### 4.2 Workflow
 
-WorkflowはContract lifecycleを直接変更しない。`approved`かつ`compiled`のContractに
-対して、active work、Context freshness、Plan bundle、必要承認を検査してRun permitを
-発行する。
+WorkflowはContract definition lifecycleを直接変更しない。`approved`なContractと
+`compiled`なPlan bundleに対して、active work、Context freshness、必要承認を検査して
+Run permitを発行する。
+
+Workflowは次を所有する。
+
+- `new_development | maintenance`のwork origin
+- `fresh | reopen`のcontinuation mode
+- Work Item lifecycleと単一active leaf
+- Upstream Inconsistency Findingのrouting
+- Dependency Discovery Recordとblocking状態
+- pause、cancel、scope disposition要求
+
+Contract定義、Plan bundle、Run / Attempt、Requirement scope自体の状態は所有しない。
 
 permitは次へ束縛する。
 
@@ -159,6 +192,10 @@ permitは次へ束縛する。
 - active work ID
 - required approval ID
 - validator version、発行時刻、期限
+
+Work Itemが`blocked_by_dependency`、`blocked_by_cycle`、`revision_pending`、`paused`、
+`cancellation_pending`のいずれか、またはPortfolioが実行可能leafと判定しない場合は
+permitを発行しない。
 
 ### 4.3 Harness
 
@@ -179,11 +216,16 @@ network、Provider、budget、side effectをPlanの許可範囲外へ拡張で�
 TriageはFindingへ`review_layer`を追加する。
 
 - `contract_conformance`
-- `contract_challenge`
+- `definition_challenge`
+- `final_contract_challenge`
+
+開発制御に関するFindingは`finding_kind`で、`upstream_inconsistency`、
+`dependency_discovery`、`cycle_detection`、`termination_candidate`を区別する。
 
 Challenge Findingはsource Requirement、Architecture Policy、risk catalogまたは隣接
 ContractへのEvidence referenceを必須とする。blocking Challenge Findingがある場合、
-成果を`accepted`へ進めず、ContractまたはRequirementの改定要求をWorkflowへ返す。
+Delivery Work Itemを`accepted`へ進めず、ContractまたはRequirementの改定要求を
+Workflowへ返す。
 
 ### 4.5 Semantic Trace
 
@@ -195,10 +237,12 @@ Intent / Requirement evidence
   → Task Contract
   → Compilation
   → Plan bundle
+  → Work routing / Work Item
   → Context Manifest
   → Workflow permit
   → Run / Attempt
   → Result / Evidence
+  → Dependency / Revision / Termination decision
   → Conformance / Challenge
   → Human decision
   → accepted artifact
@@ -225,16 +269,18 @@ root解決とsecret保存を実装しない。
 
 ### 4.8 Cross-Contract Integration
 
-Task Contract Controlはaccepted Contract集合、interface、共有状態owner、Integration
-Manifest、Project Bindingから版付きIntegration Planを生成する。WorkflowはPlanを受理し、
-E2Eとfailure propagationを実行する。Semantic TraceはContract単位EvidenceとIntegration
-Verdictを結び、Release Evaluationは`integration_passed`だけをrelease判断材料として
-受理する。
+Task Contract Controlはaccepted Delivery Work Itemに束縛されたContract集合、interface、
+共有状態owner、Integration Manifest、Project Bindingから版付きIntegration Planを
+生成する。WorkflowはPlanを受理し、E2Eとfailure propagationを実行する。Semantic Traceは
+Contract単位EvidenceとIntegration Verdictを結び、Release Evaluationは
+`integration_passed`だけをrelease判断材料として受理する。
 
 Task Contract Controlはconsumerの実行状態を直接変更しない。interface競合、owner重複、
 stale入力、局所成功・全体Intent不成立は`integration_failed`として耐久保存する。
 
-## 5. Contract lifecycle state machine
+## 5. ContractとWork lifecycle state machine
+
+### 5.1 Contract definition lifecycle
 
 ```text
 draft
@@ -246,11 +292,41 @@ challenged
   └─ approval_granted → approved
 
 approved
-  ├─ compile_failed → not_compilable
-  └─ compile_passed → compiled
-
-compiled
   ├─ upstream_changed → stale
+  └─ replaced_by_new_version → superseded
+```
+
+`revision_required`、`stale`、`rejected`、`superseded`は旧versionを変更しない耐久状態と
+する。`not_compilable`と`compiled`はContract本文の状態ではなく、固定したContract、
+Compiler、Policy、Catalogに対するPlan bundle verdictとする。
+
+### 5.2 Work routing
+
+```text
+WorkItem
+├── work_id / version / digest
+├── work_origin: new_development | maintenance
+├── continuation_mode: fresh | reopen
+├── contract_id / version / digest
+├── plan_bundle_id / digest
+├── prior_work / run / decision refs
+├── checkpoint_ref
+├── dependency_refs
+├── state / reason
+└── resume_or_disposition_conditions
+```
+
+maintenanceはbaseline、trigger、維持invariant、regression scope、compatibility、migration、
+rollbackを追加で持つ。reopenはprior identityと理由を必須とし、旧Work Itemを変更せず
+新しいWork Item versionを作る。
+
+### 5.3 Delivery Work Item lifecycle
+
+```text
+queued
+  └─ permit_ready → active
+
+active
   └─ red_confirmed → red
 
 red
@@ -258,16 +334,112 @@ red
 
 green
   ├─ refactor_completed_and_tests_passed → green
-  ├─ verification_failed → revision_required
+  ├─ verification_failed → revision_pending
   └─ verification_passed → verified
 
 verified
-  ├─ final_challenge_blocking → revision_required
+  ├─ final_challenge_blocking → revision_pending
   └─ acceptance_granted_or_not_required → accepted
+
+queued | active | red | green | verified
+  ├─ blocking_dependency_found → blocked_by_dependency
+  ├─ dependency_cycle_found → blocked_by_cycle
+  ├─ upstream_inconsistency_found → revision_pending
+  ├─ pause → paused
+  ├─ cancel_requested → cancellation_pending
+  └─ scope_exit_requested → scope_disposition_pending
+
+blocked_by_dependency | paused
+  └─ resume_conditions_satisfied → ready
+
+ready
+  ├─ freshness_failed → revision_pending
+  └─ permit_ready → active
+
+revision_pending
+  ├─ revision_rejected → ready
+  └─ revision_approved → replaced
+
+blocked_by_cycle
+  ├─ cycle_resolved → ready
+  └─ termination_selected → cancellation_pending
+
+cancellation_pending
+  ├─ cancellation_rejected → ready
+  └─ cleanup_and_decision_passed → cancelled
+
+scope_disposition_pending
+  ├─ scope_change_rejected → ready
+  └─ scope_change_approved_and_cleanup_passed → cancelled
 ```
 
-`revision_required`からは旧versionを変更せず、新しいContract versionを作る。
-`stale`、`rejected`、`not_compilable`も耐久的終端として保持する。
+`accepted`、`cancelled`、`replaced`はWork Itemの耐久終端である。`blocked_by_cycle`は循環を解くか
+controlled terminationが決まるまでpermit不能である。Contractの期待を変えずDesignまたは
+Implementationだけを修正する場合は同Contractに束縛した新Work Itemまたは新Runを作る。
+ContractまたはRequirementを変える場合は旧Work Itemを`revision_pending`から終了し、
+新Contract versionと新Work Itemのredへ移る。
+
+### 5.4 Upstream Revision Protocol
+
+TDD中の不整合はUpstream Inconsistency Findingとして、検出元、競合対象、Evidence、
+代替Design、risk、cost、checkpointを固定する。Findingには次を持たせる。
+
+- `change_semantics`: `editorial | evidence_only | implementation_only |
+  contract_semantic | requirement_semantic | scope_semantic`
+- `acceptance_truth_changed`: booleanと判定根拠
+- `state_effect`: `no_state_change | advances_workflow | changes_contract |
+  changes_requirement | changes_scope | external_or_irreversible`
+- prior / proposed Acceptance Criteria、義務、scopeの差分
+
+同じ入力とEvidenceでaccept/reject、義務またはscopeが変わり得る場合は
+`acceptance_truth_changed: true`とする。`false`の軽微修正は旧成果と訂正理由を結ぶが、
+ContractまたはRequirementの新versionとworkflow前進を要求しない。作業中に`true`と判明
+した場合は軽微修正を停止し、意味的reopenへ切り替える。
+
+次の順で、変更が必要な最下位層を選ぶ。
+
+1. Implementation
+2. Design Decision
+3. Task Contract
+4. Requirement
+5. Feature Partitioning
+6. Intent
+
+実装都合だけで上流を弱めない。上流変更にはprior / proposed identity、影響閉包、stale、
+Test migration、Human authorityを持つRevision Proposalを要求する。承認時は旧成果を
+上書きせず、Portfolio被覆、compile、redを新versionでやり直す。却下時は現Contractと
+Testを維持してImplementationへ戻る。
+
+### 5.5 Dependency Discoveryとcycle resolution
+
+境界外問題はDependency Discovery Recordとして次を持つ。
+
+- discovery IDと発見元Work Item、Contract、Run、phase
+- scopeとblocking分類
+- Evidenceと親checkpoint
+- child Contract候補またはbacklog disposition
+- `requires`、`blocks`、`discovered_during`、`related_to`関係
+- 親の再開条件
+
+blocking依存は親を`blocked_by_dependency`にし、schedulerは依存graphの未解決blocking辺を
+持たない単一active leafだけを選ぶ。新しい依存辺ごとにstrongly connected componentを
+計算し、自己循環または複数node循環を`blocked_by_cycle`にする。
+
+Cycle Resolution Recordは、誤辺除去、owner・方向訂正、共通前提Contract、版付きinterface
+またはstub、phase分割、不可分Contract統合、上流再設計、defer、cancelの候補と判断を
+保持する。循環解消後も親を直接再開せず、Contract、Plan、Context、checkpointのfreshnessと
+staleを検査する。
+
+### 5.6 Controlled Termination Protocol
+
+`pause`は再開予定、`cancel`は現在のWork Item終了、`close-scope`はRequirementまたはRelease
+scopeの上流改定候補とする。終了判断は理由、Evidence、代替案、最後の有効成果、未処理、
+部分side effect、cleanup、rollback、移管先、再開条件、決定者を持つ。
+
+cancelled Work Itemが必須Requirementを自動充足することはない。Requirementは`unfulfilled`
+としてreleaseをblockするか、Humanが承認した新scope versionで`deferred`、`withdrawn`、
+移管、不採用へ分類する。全残項目の処置、被覆、整合、移管先が確定しないclose-scopeを
+completedとして扱わない。
 
 ## 6. TDD成果物
 
@@ -285,12 +457,31 @@ verified
 - risk-based verification
 - conformance結果
 - Definition Challenge結果とFinal Contract Challenge結果
+- work origin、continuation mode、prior Work Item
+- Upstream Inconsistency FindingとRevision Proposal
+- Dependency Discovery、親checkpoint、cycle resolution
+- pause、cancelまたはscope disposition判断
 - Human acceptance
 - Operational Provenance verdict
 
 Test変更を禁止しない。RequirementまたはContractの期待が変わった場合、新Contract
 version、変更理由、新Test versionを結び、同一Contractの実装都合による期待値変更と
 区別する。
+
+### 6.1 Verification Profile
+
+Verification Planは`change_semantics`、`state_effect`、Contract risk、side effect、対象Policy
+から版付きVerification Profileを選ぶ。初期Profileは既存開発方針の`low | medium | high`を
+使い、必要なtest範囲、Challenge、独立性、reviewer数、Human判断、保存Evidenceを固定する。
+
+- `editorial`と`evidence_only`：意味不変の根拠と参照整合を検査する
+- `implementation_only`：現ContractとTestを維持し、riskに応じたtestを実行する
+- `contract_semantic`：Definition Challenge、被覆、compile、redを新versionでやり直す
+- `requirement_semantic`と`scope_semantic`：独立reviewを含むhigh profileを原則とする
+- `external_or_irreversible`：意味不変でもhigh profileとHuman gateを要求する
+
+一律の独立三者reviewやcommit gateをschemaへ固定しない。Profile選択根拠と実際に実行した
+検証を別eventで保持し、必要なprofileを満たさない場合は`verified`へ進めない。
 
 ## 7. Provenance Event設計
 
@@ -311,6 +502,8 @@ version、変更理由、新Test versionを結び、同一Contractの実装都�
 - `input_refs`と`input_digests`
 - `output_refs`と`output_digests`
 - `decision`と`reason`
+- `change_semantics`、`acceptance_truth_changed`、`state_effect`
+- `verification_profile_id`、`version`、`digest`
 - `execution_conditions`
 - `duration`、`resource_usage`、`cost`
 - `confidentiality_class`
@@ -329,6 +522,12 @@ version、変更理由、新Test versionを結び、同一Contractの実装都�
 - `invalidates`
 - `evaluates`
 - `decided_by`
+- `requires`
+- `blocks`
+- `discovered_during`
+- `related_to`
+- `resumes_from`
+- `terminated_by`
 
 内容そのものを重複保存せず、不変成果物への参照とDigestを基本にする。
 `previous_event_id`はappend順序だけを表し、意味的な依存関係は`relations`で表す。一つの
@@ -337,6 +536,7 @@ eventは複数の入力、成果、Evidence、判断へ関係を持てる。
 ### 7.2 event分類
 
 - Contract lifecycle event
+- Work routing、checkpoint、block、resume、termination event
 - compilation event
 - Context acquisition / selection / exclusion event
 - permission and capability resolution event
@@ -346,6 +546,9 @@ eventは複数の入力、成果、Evidence、判断へ関係を持てる。
 - Verification event
 - Conformance / Challenge Finding event
 - Human decision event
+- Dependency discovery、cycle detection、cycle resolution event
+- Upstream revision proposalとscope disposition event
+- Policy overlay、adjustment、verification profile selection event
 - deployment and migration event
 - evaluation observation event
 
@@ -415,6 +618,10 @@ Dependability、Auditability、Adaptability、Verifiabilityの7軸へ仮説とme
 - Human問い合わせ数、承認時間
 - Tool呼出、token、外部費用
 - stale検出と再構築時間
+- Work Item中断回数、blocking依存数、依存深さ、active leaf切替回数
+- dependency cycle件数、解消方法、解消時間、未解消率
+- pause、cancel、defer、close-scope件数と理由、投入済み時間・費用
+- 上流改定の対象層、影響閉包、再作業時間
 - 手動設定数、自動導出率、設定不整合数
 
 RecallとPrecisionは既知欠陥、注入欠陥、Human確定FindingなどOutcome Labelがある場合
@@ -596,6 +803,23 @@ Codex、Claude、IDEなどとの関係は次で表す。
   Challengeが検出する。
 - interface不整合、owner競合、局所成功・全体Intent不成立をIntegrationで拒否する。
 - 一Contractの失敗がIntegration Planどおり全体verdictへ伝播する。
+- new development / maintenanceとfresh / reopenの4組合せが共通Deliveryへrouteされる。
+- 実装不良は現ContractとTestを維持し、Requirement不良は新versionとstale閉包を生成する。
+- 誤字訂正とEvidence参照訂正は`acceptance_truth_changed: false`となり、Contract versionと
+  workflow stateを変更しない。
+- Acceptance Criteria、必須義務、scopeの変更は`acceptance_truth_changed: true`となり、
+  意味的reopenと新versionへrouteされる。
+- 軽微修正中に意味変更を検出すると処理を停止し、Upstream Revision Protocolへ切り替える。
+- 同一変更でもriskとstate effectが異なれば異なるVerification Profileが選択され、
+  profile未充足時は`verified`を拒否する。
+- base PolicyとProject Policy Overlayから同じAgent entryを再生成でき、Overlay変更では
+  依存するContractだけがstaleになる。
+- `A requires B requires C`ではCだけにpermitを発行し、完了後にB、Aを順に再検査する。
+- `A requires B requires A`では両Work Itemを`blocked_by_cycle`としてpermitを拒否する。
+- blockingでない境界外問題は親を止めずbacklogへ移す。
+- pause後のreopenでfreshnessを再検査し、必要なら新Contract versionへrouteする。
+- cancelした必須Requirementが`unfulfilled`としてreleaseをblockする。
+- close-scopeは全残項目の処置とHuman判断がなければ拒否される。
 - install途中失敗を注入し、所有対象だけを逆順補償する。
 - update失敗後に旧成果を再読込できる。
 - uninstall後もproject、Provenance、Evaluation、利用者dataが保持される。

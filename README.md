@@ -14,7 +14,9 @@ Task ContractをRequirementsとRuntimeのcontrol and provenance planeとする�
 契約間統合、評価可能なProvenance、配置非依存のdeploymentを追加します。
 
 - 後継候補の索引：`docs/README.md`
-- 変更記録：`records/task-contract/task-contract-centered-documentation-v1.json`
+- 初期変更記録：`records/task-contract/task-contract-centered-documentation-v1.json`
+- 開発レーン改定記録：`records/task-contract/task-contract-centered-documentation-v2.json`
+- LLMGP先行実験の反映記録：`records/task-contract/task-contract-centered-documentation-v3.json`
 
 ## 開発方針
 

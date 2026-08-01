@@ -1,0 +1,104 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "572a9b58268cc9257aeb314fe43d2644f3d0ac6f82bac9396e30db515a59bb15"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "b7c7509ada14b592a837c0ec22260a2dcf91b30ec3b0ce900fc647556a043774"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "1869f943c12ff405086424e054faef5336ab6f025eff6216d426effd570b9594"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "75e7c0ae466ec2778a92698a6b0c4afd95f05d08777adadd05051bbcd7f47723"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "051e6193d78909d10552f85139b31d706936ed760841a6a6e6613d67ee9f8614"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "a3b2a475f66b15780387a6680b6bb9a8d8aaa7ad57af22f9e9acc0f7b8657851"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "ce1030d81ea6c4f187828bbde8cf4ef1f737add1863b0c7c294e8fc98c804875"
+    },
+    {
+      "path": "records/sources/2026-08-02-llmgp-hybrid-experiment.md",
+      "sha256": "dc26f666371008534910e0619c1b0f00203ff83fa01a86a020548e7bee0f8ae5"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v2.json",
+      "sha256": "fdf1be0eebefcf75dc7dfbf390292f32758409daa4c73761ff7bd4e438850ab5"
+    },
+    {
+      "path": "records/sources/2026-08-02-task-contract-source.md",
+      "sha256": "c83f802df84668f5975462e0c5e50f5987071fe089e76fcf9e0d7f6ecbd136cb"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-LLMGP-DEC-001",
+        "meaning": "LLMGPを先行実験Evidenceとして位置付けるだけでなく、軽微修正と意味的reopenの境界、変更のstate effect、risk別review、project固有Policy調整を明示採用する",
+        "text": "OK.文書を修正"
+      }
+    ],
+    "scope": "llmgp-hybrid-experiment-explicit-adoption",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped human instruction excerpt and source digest record",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、文書修正の承認指示と採用内容を本recordへ保持する"
+    }
+  },
+  "external_source": {
+    "artifact_path": "records/sources/2026-08-02-llmgp-hybrid-experiment.md",
+    "captured_at": "2026-08-02",
+    "confidentiality_class": "project-internal",
+    "content_retained": false,
+    "name": "LLMGP SDD/TDD hybrid experiment",
+    "provided_by": "human_user",
+    "retention_policy": "retain-derived-source-record-with-successor-documentation-history",
+    "source_id": "SRC-LLMGP-HYBRID-001",
+    "source_kind": "external-project-empirical-reference",
+    "source_observations": [
+      {
+        "path": "/Users/Daily/Development/WindTurbineWake/LLMGP/.reviewcompass/AGENT_ENTRY.md",
+        "sha256": "a0166de3ca51aa7fa3fe3ef7401a5079863c927ad93dd2eabe03a0d1a796f2e0"
+      },
+      {
+        "path": "/Users/Daily/Development/WindTurbineWake/LLMGP/tasks/TASKS.md",
+        "sha256": "3d8e8bafe5db04ebc5d6f13941807383f54a81cb3f0a958dbf51a3d2a98d774b"
+      },
+      {
+        "path": "/Users/Daily/Development/WindTurbineWake/LLMGP/.reviewcompass/feature-dependency.yaml",
+        "sha256": "bae497e2322bb991d95ff022c3d2eb1094b995a40bd52ada76c41b9c965d259a"
+      }
+    ]
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v2.json",
+    "relation": "supersedes",
+    "sha256": "fdf1be0eebefcf75dc7dfbf390292f32758409daa4c73761ff7bd4e438850ab5"
+  },
+  "record_version": 3,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "documented",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "document_reference_check": "passed",
+    "requirement_shape_check": "passed: 11 requirements",
+    "test_command": "/usr/bin/python3 -m pytest -q",
+    "test_result": "405 passed in 1.76s"
+  }
+}

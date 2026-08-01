@@ -48,8 +48,21 @@ Reviewは、成果のContract適合性を確認するContract Conformance Review
 欠落と境界を確認するDefinition Challenge、成果検証後に上位Intentと隣接Contractへの
 影響を確認するFinal Contract Challengeに分ける。
 
-accepted Contractは局所成功だけでrelease可能とせず、interface、共有状態、E2E、
-failure propagation、配置およびlifecycle操作をCross-Contract Integrationで検証する。
+accepted Delivery Work Itemに束縛されたContractは、局所成功だけでrelease可能とせず、
+interface、共有状態、E2E、failure propagation、配置およびlifecycle操作を
+Cross-Contract Integrationで検証する。
+
+新規開発とmaintenanceは異なる入口プロファイルとして同じTask Contract Deliveryへ
+合流させる。reopenは独立レーンにせず、旧成果を保持して新Runまたは新versionへ移る
+継続プロトコルとする。
+
+実装中に上流不整合、境界外問題、blocking依存または循環を発見した場合、現在の
+Contractへ暗黙にscopeを追加しない。問題を固定してWork Itemを停止し、上流改定、依存
+Contract、backlog、継続、中止のいずれかへ分類する。
+
+既存文書や成果の訂正は、受入条件の真偽、義務またはscopeが変わるかを基準に、意味不変の
+軽微修正と意味的reopenへ分ける。reviewとHuman介入の強度は一律にせず、変更意味、状態への
+影響、risk、side effectから選択する。
 
 ## 4. 「何をしないか」への追加
 
@@ -61,6 +74,8 @@ failure propagation、配置およびlifecycle操作をCross-Contract Integratio
   再利用しない。
 - Provenance収集を理由に、機微情報、raw data、利用者データを無制限に保存しない。
 - 開発checkoutや特定の開発アプリとの物理的な相対位置へ製品を固定しない。
+- 入れ子になった問題を非永続な作業stackだけで管理せず、Contract依存グラフへ記録する。
+- cancel、deferまたはclose-scopeをRequirement充足とみなさない。
 
 ## 5. 「前提・制約」への追加
 
@@ -76,6 +91,16 @@ failure propagation、配置およびlifecycle操作をCross-Contract Integratio
 - 配置は論理rootとManifestから解決し、端末固有パスを成果物identityにしない。
 - projectの論理identityは安定IDとし、可変な内容digest、repository root、checkoutごとの
   Bindingから分離する。
+- Work Itemは単一active leafを原則とし、blocking依存または循環がある状態でRun permitを
+  発行しない。
+- 確定済みRequirement、Contract、Testを実装都合で上書きせず、新version、変更理由、
+  stale影響閉包、Human判断を結ぶ。
+- 同じ入力とEvidenceに対するaccept/reject、義務またはscopeが変わるかを記録し、意味不変の
+  訂正だけでworkflow stateを人工的に進めない。
+- project固有の方針調整は、base Policy、置換規則、理由、Evidence、決定者を持つ版付き
+  Overlayとして保持する。
+- pause、cancel、defer、withdraw、close-scopeでは、最後の有効成果、未充足義務、
+  cleanup、再開または移管条件を保存する。
 
 ## 6. 「成功の判定基準」への追加
 
@@ -87,7 +112,15 @@ failure propagation、配置およびlifecycle操作をCross-Contract Integratio
 - Contract変更時に依存Context、Plan、Runをstaleとして再構築できる。
 - Conformance Finding、Definition Challenge Finding、Final Contract Challenge Findingを
   混同せず保持できる。
-- accepted Contract間のIntegration VerdictとE2E Evidenceをrelease判断へ結べる。
+- accepted Delivery Work Itemに束縛されたContract間のIntegration VerdictとE2E Evidenceを
+  release判断へ結べる。
+- new developmentとmaintenanceを共通Deliveryで処理し、freshとreopenを独立に選べる。
+- TDD中に発見したblocking依存を別Contractへ切り出し、依存先完了後にfreshnessとstaleを
+  再検査して親Work Itemを再開できる。
+- Contract依存循環を実行前に検出し、解消またはHumanによる制御終了まで関係Runを
+  開始しない。
+- 中止した必須Requirementを未充足として保持し、明示的なscope改定なしにreleaseへ
+  進めない。
 - RequirementからContract、Context、Execution、Result、Evidence、Human判断までを
   一続きにたどれる。
 - 既存方式と固定条件で比較し、Evidence Coverage、Context量、Finding品質、

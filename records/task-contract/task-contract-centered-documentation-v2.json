@@ -1,0 +1,96 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "bce196d5838de7722ff661cdfb97f7191a6f97fa60c1fe2cbb05c498fb4e9aa5"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "2849e714ec65c46d30a8856ec32fb5cef39983445eecf26068a6d51c3c676899"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "9c538172265489238f72f5df3b54f6deb994f5c13b462d952986cd6a0b151fe4"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "e6fcd7b884b636652cfc2f6094d130646cfec2e3c9f64bb7ccbdec7378a4fda1"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "ccfc90307cff1805cb758edefbdcf3bc71fd44daf422bf304b36a8bf82d5d834"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "d16496e003cf13deda965798c752e8618b5e08d3ab2990632add6b381e48a640"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "8aa46411693529d7b38fa82c1c342c6771917b2aea627015c460488e8bbdb5ec"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v1.json",
+      "sha256": "d51c98a5c7fd0665139ff0fc350c1e65a6695655941c54b99c594f02ce757ba6"
+    },
+    {
+      "path": "records/sources/2026-08-02-task-contract-source.md",
+      "sha256": "c83f802df84668f5975462e0c5e50f5987071fe089e76fcf9e0d7f6ecbd136cb"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-LANE-DEC-001",
+        "meaning": "SDDとmaintenanceをwork origin、reopenをcontinuation modeとして共通Task Contract Deliveryへ統合する",
+        "text": "タスクコントラクト型のレビューシステムでは、この3つの開発レーンは継続して必要になるか。"
+      },
+      {
+        "decision_id": "TC-LANE-DEC-002",
+        "meaning": "TDD中の上流不整合を分類し、確定済み成果を上書きせず新versionへ戻す",
+        "text": "上流のリクワイアメントに遡って修正が発生する。こういった場合にはどうしたらよいか。"
+      },
+      {
+        "decision_id": "TC-LANE-DEC-003",
+        "meaning": "実装困難時のpause、cancel、close-scopeを制御された終了として扱う",
+        "text": "KDDのサイクルは、何かの困難でその実装を中止する判断が発生する場合もある。"
+      },
+      {
+        "decision_id": "TC-LANE-DEC-004",
+        "meaning": "入れ子問題を永続依存graphへ平坦化し、単一active leaf、循環停止、解消判断を導入する",
+        "text": "依存関係、循環が発生してしまい、TDD開発を続けられなくなる。こういうことも発生する。"
+      },
+      {
+        "decision_id": "TC-LANE-DEC-005",
+        "meaning": "開発レーンに関する一連の検討を後継候補文書へ反映する",
+        "text": "以上，議論した開発レーンの検討内容を整理し、文書に反映する。"
+      }
+    ],
+    "scope": "task-contract-development-routing-revision-dependency-and-termination",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped human instruction excerpts",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、採用判断に直接対応する指示だけを本recordへ保持する"
+    }
+  },
+  "prior_revision": {
+    "commit": "19149c0",
+    "record_path": "records/task-contract/task-contract-centered-documentation-v1.json",
+    "relation": "supersedes",
+    "sha256": "d51c98a5c7fd0665139ff0fc350c1e65a6695655941c54b99c594f02ce757ba6"
+  },
+  "record_version": 2,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "documented",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "document_reference_check": "passed",
+    "requirement_shape_check": "passed: 11 requirements",
+    "test_command": "/usr/bin/python3 -m pytest -q",
+    "test_result": "405 passed in 1.76s"
+  }
+}

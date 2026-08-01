@@ -14,7 +14,10 @@ Task Contract中心化に関する現行の後継候補は次の順に読む。
 議論の固定原文と変更判断は次へ保持する。
 
 - `../records/sources/2026-08-02-task-contract-source.md`
+- `../records/sources/2026-08-02-llmgp-hybrid-experiment.md`
 - `../records/task-contract/task-contract-centered-documentation-v1.json`
+- `../records/task-contract/task-contract-centered-documentation-v2.json`
+- `../records/task-contract/task-contract-centered-documentation-v3.json`
 
 ## 適用関係
 
@@ -26,7 +29,13 @@ Task Contract中心化に関する現行の後継候補は次の順に読む。
 - Task Contract文書群は第5段完了承認を代替しない。構造化requirements、design、
   acceptance test、差分監査を経て新しい承認候補を生成する必要がある。
 - Task Contract requirements差分は`REQ-CONTRACT-001`〜`007`を対象とし、最後の要件で
-  accepted Contract間のIntegration Verdictを定義する。
+  accepted Delivery Work Itemに束縛されたContract間のIntegration Verdictを定義する。
+- Workflow requirements差分は`REQ-WORKFLOW-005`〜`008`を追加し、new developmentと
+  maintenanceのrouting、reopen、上流改定、依存・循環、制御終了を定義する。
+- SDD workflow、maintenance、reopenは三つの独立engineにせず、二つのwork originと
+  fresh / reopenのcontinuation modeを共通Task Contract Deliveryへrouteする。
+- LLMGPのSDD/TDD折衷試行は先行実験Evidenceとして扱い、受入条件の真偽を基準とする
+  reopen分類、変更のstate effect、risk別review、Project Policy Overlayを明示的に採用する。
 
 ## 固定baseline
 

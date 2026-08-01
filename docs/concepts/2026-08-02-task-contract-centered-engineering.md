@@ -22,6 +22,11 @@ Task Contractは既存componentへ追加する独立文書ではない。構造�
 局所的な実行責務を切り出し、Context、実行、能力、検証、Human介入、Provenanceを
 同じ責務へ結び付ける、機械解釈可能な中間表現である。
 
+この構想は、LLMGPで試行された「Intent、Feature Partitioning、RequirementsまでのSDDと、
+それ以降のtask-driven TDD」の先行実験を形式化し、不足していた依存、循環、停止、再開、
+配置、Provenanceを補うものでもある。先行実験は規範そのものではなく、採用判断の経験的
+Evidenceとして`records/sources/2026-08-02-llmgp-hybrid-experiment.md`へ固定する。
+
 ## 2. 中心命題
 
 ReviewCompass3は次の導出関係を正本とする。
@@ -190,6 +195,23 @@ Provenanceは実行後に可能な範囲で集めるのではなく、Contract�
 Humanはすべての実行へ介入せず、意味的裁定、外部送信、不可逆操作、方針変更、
 段完了などContract上の判断点へ選択的に参加する。
 
+### 4.9 最小Task核と形式化
+
+先行実験のtask記述で使われたID、目的、入力成果物、出力成果物、完了条件を、Task
+Contractの最小核として次へ写像する。
+
+| 最小task項目 | Task Contract |
+|---|---|
+| ID | Identity |
+| 目的 | Responsibility |
+| 入力成果物 | Preconditions / Context Obligations |
+| 出力成果物 | Expected Outputs |
+| 完了条件 | Acceptance Criteria |
+
+実行可能なContractでは、この核にBoundary、Allowed Capabilities、Provenance Obligations、
+Escalation Policy、版付きdependencyを加える。最小記述を維持することと、実行制御に必要な
+情報を省略することを混同しない。
+
 ## 5. Task Contract Portfolio
 
 Requirementsの後に、Task Contract Portfolioを作る。Portfolioは詳細実装計画ではなく、
@@ -276,9 +298,10 @@ Planを部分的に成功扱いせず、診断付きの`not_compilable`を返す
 
 Task Contractをcontrol planeとしても、既存componentの状態所有責務は維持する。
 
-- Task Contract Control：Contract、Portfolio、compile、obligation被覆
+- Task Contract Control：Contract定義、Portfolio、compile、obligation被覆
 - Context Runtime：Context取得、構成、Manifest、freshness
-- Workflow：active work、段階、Run permit、成果物書込み許可
+- Workflow：work routing、Work Item lifecycle、単一active leaf、block、resume、termination、
+  Run permit、成果物書込み許可
 - Harness：Run、Attempt、送信、capture、Validation、Retry内部状態
 - Triage：Finding候補の保持、重複と競合
 - Semantic Trace：意味グラフ、影響閉包、Operational Provenance検証
@@ -316,20 +339,100 @@ supersedes関係を持つ。ContractとCompilerは適用Policyのidentityを固�
 競合するPolicyを暗黙補完しない。影響するPolicyが変わった場合、依存するContract、
 Plan、Context、Runだけをstaleにする。
 
-## 9. Task Contract TDD Delivery Cycle
+### 8.1 開発レーンの再編
 
-一つのContractは次の状態を進む。
+従来のSDD workflow、reopen、maintenanceを同格の独立レーンとして実装しない。
+SDDとmaintenanceは作業の発生源、reopenは継続方法であり、異なる軸である。
 
 ```text
-draft
-  → challenged
-  → approved
-  → compiled
+work_origin:
+  new_development | maintenance
+
+continuation_mode:
+  fresh | reopen
+```
+
+`new_development`は必要に応じてIntent、Feature Partitioning、Requirementsから開始する。
+`maintenance`は固定baseline、既存Requirement、維持すべきinvariant、regression scope、
+compatibility、migration、rollbackを入力にする。外部から観測可能な義務が変わる場合は
+maintenanceで閉じず、Requirementsへ戻る。
+
+`reopen`は既存成果を直接開き直すレーンではない。旧失敗、判断、成果を保持し、同じ
+Contractで期待を変えない新Run、再compile後の新Run、新Contract version、または
+上流Requirement versionのいずれから再開するかを理由別に決める。
+
+### 8.2 状態所有の分離
+
+Task Contract、開発中のWork Item、一回のRun、Portfolio依存状態を同じ状態機械へ
+押し込めない。
+
+- Task Contract：責務、境界、期待、versionを所有する
+- Workflow Work Item：active、blocked、paused、cancelled、completedを所有する
+- Run / Attempt：一回の実行、retry、失敗、成功を所有する
+- Task Contract Portfolio：Contract間依存、循環、被覆、実行可能性を所有する
+
+問題が見つかった時点ではまずWork Itemを停止する。責務または期待が変わる場合だけ
+ContractやRequirementを新versionにする。
+
+### 8.3 再帰的問題発見と単一active leaf
+
+TDD中にContract境界外の問題を発見した場合、現在のContractへ暗黙追加しない。
+Dependency Discovery Recordを作り、`requires`、`blocks`、`discovered_during`、
+`related_to`の型付き関係でPortfolioへ追加する。
+
+blockingな依存が見つかった親Work Itemは`blocked_by_dependency`とし、最後の有効な
+checkpointと再開条件を保存する。依存先がさらに別の依存を発見しても実装をcall stackの
+ように入れ子化せず、永続グラフへ平坦化する。schedulerは未解決のblocking依存を持たない
+単一のactive leafだけを選ぶ。
+
+依存辺追加時に自己循環またはstrongly connected componentを検出した場合、関係する
+Work Itemを`blocked_by_cycle`としRun permitを発行しない。誤った辺の除去、ownerと依存
+方向の訂正、共通前提Contractへの切出し、版付きinterfaceやstub、phase分割、不可分責務の
+統合、上流再設計の順に解消を試みる。解消不能ならdeferまたはcancelをHumanが判断する。
+
+### 8.4 変更意味と状態影響の分類
+
+既存成果の修正は、まず`change_semantics`を次へ分類する。
+
+- `editorial`：表記、誤字、意味を変えない説明改善
+- `evidence_only`：引用、参照、帰属、観測記録の訂正で、義務を変えない
+- `implementation_only`：確定した期待へ実装を合わせ、ContractとRequirementを変えない
+- `contract_semantic`：責務、境界、Acceptance Criteria、能力または副作用を変える
+- `requirement_semantic`：外部から観測可能な義務またはoracleの根拠を変える
+- `scope_semantic`：Feature、Intent、Release scopeまたは必須義務の採否を変える
+
+判定の中心は`acceptance_truth_changed`である。同じ入力とEvidenceに対するaccept/reject、
+必須義務、許可scopeのいずれかが変わり得る場合は`true`とし、軽微修正ではなく意味的
+reopenへ送る。作業中に意味変更が判明した場合は、その時点で軽微修正を中止して
+Upstream Revision Protocolへ切り替える。
+
+意味分類とは別に`state_effect`を`no_state_change | advances_workflow |
+changes_contract | changes_requirement | changes_scope | external_or_irreversible`へ分類する。
+証拠追記や説明訂正だけでworkflowを人工的に前進させない。stale閉包、Human承認、review、
+Run permit停止は、意味分類、state effect、riskを組み合わせて決める。
+
+## 9. Task Contract TDD Delivery Cycle
+
+Contract定義と、そのContractを実現するDelivery Work Itemを別状態として扱う。
+
+```text
+Contract definition:
+  draft → challenged → approved → stale | superseded
+```
+
+承認済みContractとcompiled Planから作る一つのDelivery Work Itemは次の状態を進む。
+
+```text
+queued
+  → active
   → red
   → green
   → verified
   → accepted
 ```
+
+Plan compile失敗の`not_compilable`はContract本文の状態ではなく、固定したContract、
+Compiler、Policy、Catalogに対するPlan bundle verdictとして保存する。
 
 ### 9.1 draft
 
@@ -370,11 +473,23 @@ Contract conformance、Provenance完全性を検証する。その後、Final Co
 
 ### 9.8 accepted
 
-Human判断が必要なContractだけ最終判断を記録し、cross-contract integrationへ
-渡せる状態にする。
+Human判断が必要なDelivery Work Itemだけ最終判断を記録し、Contract、Plan、Evidenceへ
+束縛したaccepted成果としてcross-contract integrationへ渡す。
 
-Contractまたは上流Requirementが変わった場合、`approved`以降をstaleとし、旧成果を
-残した新versionとしてchallengeとcompileをやり直す。
+Contractまたは上流Requirementが変わった場合、旧Contract定義、Plan、Work Item、Runを
+残して影響先をstaleとし、新versionとしてchallengeとcompileをやり直す。
+
+TDD中に不整合を発見した場合は、実装を期待へ合わせるか上流を変えるかをその場で決めず、
+Upstream Inconsistency Findingを固定する。実装不良、Design Decision不良、Contract不良、
+Requirement不良、Feature責務不良、Intent変更を分類し、変更が必要な最も下位の層へ戻る。
+承認済み上流成果を変更する場合は旧versionを上書きせず、影響する下流だけをstaleにして
+新しいredから開始する。
+
+TDD cycleは成功または改定だけで終わるとは限らない。再開予定なら`paused`、現在の試行を
+終了するなら`cancelled`、Release scopeから外すなら上流のscope dispositionとして扱う。
+必須Requirementを持つWork ItemのcancelだけでRequirementを充足済みにせず、Portfolioを
+`unfulfilled`としてreleaseを止める。defer、withdraw、close-scopeには移管先または不採用
+理由、影響、Human判断を要求する。
 
 ## 10. 二層レビュー
 
@@ -405,6 +520,12 @@ Challengeは無制限の一般レビューにしない。source Requirements、A
 Policyで決め、機械判定不能な場合だけHumanへ送る。blockingなContract欠陥は
 Requirementsまたは新しいContract versionへ戻し、実行結果だけを修正して閉じない。
 
+review強度は全変更へ一律に課さず、`change_semantics`、`state_effect`、risk、side effectから
+版付きVerification Profileとして導出する。`editorial`と`evidence_only`は整合性検査を中心と
+する。Contract、Requirement、scopeの意味変更は、誤ったoracleをTDDだけでは検出できない
+ため、独立Challengeを含む強いProfileを要求する。外部送信、不可逆操作、機微情報、権限、
+migrationは意味分類にかかわらずriskを引き上げる。
+
 ## 11. Provenanceと評価
 
 記録は3層へ分ける。
@@ -425,9 +546,10 @@ Evaluation Profileを参照し、CompilerがCapture Planへ観測を追加する
 解釈、限界、方針判断を分離する。
 
 一次eventは追記順を示す前eventだけでなく、`derived_from`、`compiled_from`、
-`satisfies`、`evidences`、`supersedes`、`invalidates`、`evaluates`、`decided_by`などの
-閉じた型付き関係を複数保持する。これにより、一つの結果へ複数のContract、Plan、
-Context、Evidence、Human判断が寄与する場合も後から再構成できる。
+`satisfies`、`evidences`、`supersedes`、`invalidates`、`evaluates`、`decided_by`、
+`requires`、`blocks`、`discovered_during`、`related_to`、`resumes_from`、
+`terminated_by`などの閉じた型付き関係を複数保持する。これにより、一つの結果へ複数の
+Contract、Plan、Context、Evidence、Human判断が寄与する場合も後から再構成できる。
 
 ## 12. デプロイと配置
 
@@ -479,6 +601,8 @@ adapter、source root、hook、実行command、権限、ownerを持つIntegratio
 - Harness手動設定と設定不整合が減るか
 - Human介入を必要な判断点へ限定できるか
 - Contractまたは状態変更後に正しいContextとPlanを再構築できるか
+- 入れ子問題をscope拡大せず依存graphへ切り出し、循環を実行前に停止できるか
+- pause、cancel、上流改定の理由と再作業を後から比較できるか
 - 追加手続きの時間、トークン、保存量が効果に見合うか
 
 これらを、Task applicability、Context adequacy、Controllability、Dependability、

@@ -22,6 +22,8 @@ Task Contractを構造化RequirementsとRuntimeの間に置き、ReviewCompass3�
 - 第0段から第2段の実装、テスト、Evidence
 - 2026-08-02開発方針改定
 - Task Contract centered engineeringの外部議論文書とDigest
+- LLMGPで試行されたSDD/TDD hybridのAgent entry、Task ledger、dependency定義のDigestと
+  そこから採用した運用規則
 
 第5段候補の状態は`awaiting_human_approval`である。本再計画は第5段完了を承認せず、
 Task Contract差分を反映するための再開理由になる。
@@ -60,25 +62,42 @@ Task Contractへ写像可能なatomic obligationと由来を保持する。
 
 全Requirementの受け先、Contract間依存、risk、cross-contract acceptanceを固定する。
 実行予定のないContractまで詳細化せず、未被覆と競合を検出できる最小定義にする。
+依存辺追加時に循環を検査し、未解決blocking依存を持たない実行可能leafを識別する。
 
 ### Stage E: Task Contract TDD Delivery
 
-各Contractを`draft → challenged → approved → compiled → red → green → verified →
+Contract定義を`draft → challenged → approved`、Plan bundleを`compiled |
+not_compilable`、Delivery Work Itemを`queued → active → red → green → verified →
 accepted`で進める。Design、旧Task記述、Implementationを全体段階にせず、Contractの
 実現成果として作る。green後は同一Contract versionとAcceptance Testを維持して
 refactorし、green再確認後にverifiedへ進む。
 
 ### Stage F: Cross-Contract Integration
 
-accepted Contract間のinterface、共有状態、E2E、failure propagation、配置、update、
-uninstallを検証する。局所Contractがすべて成功しても全体Intentを満たさない場合、
-Portfolio、RequirementsまたはIntentへ戻す。版付きIntegration Plan、E2E Evidence、
-failure propagation Evidence、Integration Verdictを成果とする。
+accepted Delivery Work Itemに束縛されたContract間のinterface、共有状態、E2E、failure
+propagation、配置、update、uninstallを検証する。局所Work Itemがすべて成功しても
+全体Intentを満たさない場合、Portfolio、RequirementsまたはIntentへ戻す。版付き
+Integration Plan、E2E Evidence、failure propagation Evidence、Integration Verdictを
+成果とする。
 
 ### Stage G: Release Evaluation
 
 supported-platform matrix、配布物、migration、データ保護、Provenance完全性、
 Evaluation Profile、既存方式との比較結果を確認し、release可否をHumanが判断する。
+
+### Development routing
+
+SDD workflow、maintenance、reopenを独立engineとして実装しない。
+
+```text
+work_origin: new_development | maintenance
+continuation_mode: fresh | reopen
+```
+
+4組合せを同じTask Contract Deliveryへrouteする。new developmentは必要に応じてIntent、
+Feature Partitioning、Requirementsから開始する。maintenanceは既存baseline、invariant、
+regression、compatibility、migration、rollbackを入力にし、義務変更時はRequirementsへ
+戻る。reopenは旧成果を保持した新Work Item、RunまたはContract versionとして開始する。
 
 ## 4. フィードバック
 
@@ -89,6 +108,13 @@ Evaluation Profile、既存方式との比較結果を確認し、release可否�
 - 成功条件または非目標の競合：Intentへ戻る
 - compile不能：Contract、Policy、Capability Catalogの該当箇所へ戻る
 - red testを定義不能：ContractまたはRequirementへ戻る
+- TDD中の不整合：Implementation、Design、Contract、Requirement、Feature、Intentのうち
+  変更が必要な最下位層へ戻る
+- 受入条件の真偽・義務・scopeが変わらない訂正：stateを進めず、訂正理由とEvidenceを
+  旧成果へ結ぶ
+- 受入条件の真偽・義務・scopeが変わる訂正：軽微修正を中止し、意味的reopenへ移る
+- blocking依存発見：親Work Itemを停止し、依存graphの単一active leafへ移る
+- dependency cycle：全関係permitを停止し、PortfolioまたはArchitecture Policyへ戻る
 - E2E不成立：Contract Portfolioまたはcross-contract interfaceへ戻る
 - 評価不能：Capture PlanまたはEvaluation Profileへ戻る
 - deploy不能：Portable RequirementまたはArchitecture Policyへ戻る
@@ -104,6 +130,7 @@ Evaluation Profile、既存方式との比較結果を確認し、release可否�
   confidentiality、retention、artifact pathを記録する。保存しない場合は理由と
   `non_reconstructable`を明記する。
 - 採用した議論をdecision ID、指示、意味、採否理由へ結ぶ。
+- LLMGP先行実験を規範ではなく経験的Evidenceとして固定し、採用品と非採用品を区別する。
 - Task Contractの適用範囲をReview Task Contractへ限定する。
 - 旧第5段候補をbaselineとして凍結する。
 - 本改定文書群のsource、関係、statusを記録する。
@@ -122,9 +149,13 @@ Evaluation Profile、既存方式との比較結果を確認し、release可否�
 
 - `FEAT-TASK-CONTRACT-CONTROL`を追加する。
 - `REQ-CONTRACT-001`〜`007`を確定する。
+- `REQ-WORKFLOW-005`〜`008`を確定する。
 - Architecture Policyのidentity、競合、優先順位、stale伝播を`001`〜`003`へ組み込む。
+- Project Policy Overlay、変更意味、state effect、risk別Verification Profileを組み込む。
 - Definition ChallengeとFinal Contract Challengeを`004`で分離する。
 - Cross-Contract IntegrationとIntegration Verdictを`007`で定義する。
+- entry routing、Upstream Revision、Dependency Discovery、Controlled Terminationを
+  `REQ-WORKFLOW-005`〜`008`で定義する。
 - 既存37 requirementsを`preserve / adapt / replace / defer`へ全件分類する。
 - 新旧Requirementとatomic obligationの順逆被覆を検査する。
 
@@ -134,11 +165,17 @@ Evaluation Profile、既存方式との比較結果を確認し、release可否�
 
 - Contract schema、Portfolio、Compiler、Plan bundleを設計する。
 - Architecture Policy schemaと決定的なPolicy解決を設計する。
+- Project Policy Overlay、Policy Adjustment Event、Agent entry生成を設計する。
 - 既存Context、Workflow、Harness、Triage、Trace、Portable、Evaluationへ接続する。
 - Contract lifecycleとfailure propagationを状態機械へ追加する。
 - Provenanceの型付き複数関係、Evaluation trial identity、Deployment Manifest、安定した
   Project Identity、Bindingを設計する。
 - Integration Plan、E2E Evidence、Integration Verdictを設計する。
+- Contract、Work Item、Run、Portfolioの状態所有を分離する。
+- work routing、upstream revision、dependency discovery、cycle resolution、controlled
+  terminationのprotocolと状態機械を設計する。
+- `acceptance_truth_changed`を中心とした軽微修正／意味的reopen分類と、変更意味・state
+  effect・riskからのVerification Profile選択を設計する。
 
 完了条件：全新Requirementに受け先、interface、状態、acceptance testがある。
 
@@ -161,6 +198,8 @@ Requirement
 
 初期実装では一Contract type、一Compiler version、一実行トポロジに限定する。
 汎用DSL、plugin system、任意Task orchestrationを先に作らない。
+最初のWork Itemは`new_development / fresh`とし、後続fixtureでmaintenanceとreopenを
+同じDeliveryへ通す。
 
 ### Work 6: TDD negative path
 
@@ -174,6 +213,19 @@ Requirement
 - 必須Provenance event欠落
 - optional Evaluation observation欠落
 - Contract適合だがRequirement欠落
+- maintenanceが観測可能な義務変更を内包する
+- reopen元のidentityまたは理由が欠落する
+- TDD中の実装不良をRequirement変更として処理しようとする
+- 意味不変の誤字・参照訂正でContract versionまたはworkflow stateを変更する
+- Acceptance Criteria、義務またはscopeの変更を軽微修正として閉じる
+- 軽微修正中に判明した意味変更をUpstream Revisionへ切り替えない
+- high Verification Profileの独立reviewまたはHuman gateを省略する
+- Project Policy Overlayの理由、Evidenceまたは置換元Policyが欠ける
+- blocking依存の親へRun permitを発行する
+- `A requires B requires C`のactive leafを誤る
+- `A requires B requires A`の循環中にRunを開始する
+- cancelした必須Requirementを充足済みにする
+- 未処理を分類せずclose-scopeする
 
 各負例をredとして確認し、同じContract versionのAcceptance Criteriaを変更せず実装を
 修正してgreenにする。green後はAcceptance Testを変更せずrefactorし、greenを再確認する。
@@ -207,6 +259,7 @@ label作成者、評価者、confidenceへ結ぶ。無作為化、盲検化、�
 - RequirementからEvidenceまでの追跡可能率
 - Contract作成からacceptedまでの時間と再作業
 - Human介入回数と判断時間
+- 上流改定、blocking依存、cycle、pause、cancelの件数、理由、解消時間
 - Tool、token、費用、保存量
 
 Pilot完了条件は優位性の確定ではなく、必要eventの取得、指標再計算、欠測、privacy、
@@ -269,8 +322,16 @@ supersedes関係、競合解決を持つ。未解決または同順位競合のP
 保存、削除、機微情報、権限、状態遷移、外部送信、migration、uninstall、Provenance
 完全性は原則highとする。
 
+Profileはartifact種別だけで固定せず、`change_semantics`、`state_effect`、risk、side effect
+から選ぶ。editorialとevidence-only訂正は意味不変を検査し、Contract、Requirement、scopeの
+意味変更は誤ったoracleをTDDだけで見逃さないよう独立reviewを含むhighを原則とする。
+
 赤テストだけのcommitは必須にしない。統合対象commitは原則greenにする。文書、調査、
 Contract候補探索には形式的なred-greenを強制しない。
+
+問題発見を再帰的な実装stackにしない。境界外問題はDependency Discovery Recordへ移し、
+WIPは未解決blocking依存を持たない単一active leafに制限する。親の部分変更はcheckpoint
+として隔離し、依存解消後にfreshness、stale、compile、関連Testを再確認する。
 
 ## 9. Provenanceと評価の運用
 
@@ -279,6 +340,10 @@ Contract候補探索には形式的なred-greenを強制しない。
 eventのappend順序は`previous_event_id`、意味的依存は閉じた語彙の複数`relations`で
 記録する。比較評価に必要なcase、condition、pair、trial、実行条件、評価者も一次event
 または参照先へ固定する。
+
+project固有の運用調整は、base Policy、Project Policy Overlay、置換規則、理由、Evidence、
+決定者、適用期間をPolicy Adjustment Eventへ固定する。Agent entryは解決済みPolicyから
+生成し、手作業の追記だけを正本にしない。
 
 - Operational Provenance欠落：Runをverifiedまたはacceptedにしない
 - optional評価観測欠落：成果を保ち評価状態だけを下げる
@@ -307,7 +372,11 @@ distribution testでは別install root、別project root、別runtime rootを使
 - Challenge Reviewの固定材料と完了条件がない
 - Definition ChallengeとFinal Contract Challengeを区別できない
 - Architecture Policyのidentity、適用範囲、優先順位または競合解決がない
-- accepted Contract間のIntegration Verdictを生成できない
+- accepted Delivery Work Item間のIntegration Verdictを生成できない
+- work originとcontinuation modeを同じ軸として扱い、独立レーンを重複実装する
+- blocking依存または循環を持つWork ItemへRun permitを発行する
+- 上流変更を実装都合で行う、または確定済み成果をin-placeで上書きする
+- pause、cancel、close-scopeで未充足義務、cleanup、移管先またはHuman判断がない
 - 必須Provenanceを保存できない
 - 評価値とOperational verdictを混同する
 - 開発checkoutまたは特定アプリ配置がruntime必須条件になる
@@ -322,6 +391,7 @@ distribution testでは別install root、別project root、別runtime rootを使
   ある。
 - Architecture Policy、型付きProvenance関係、Project Binding、Integration Verdictが
   設計済みである。
+- routing、upstream revision、dependency・cycle、controlled terminationが設計済みである。
 - 新旧設計の`preserve / adapt / replace / defer`監査が完了している。
 - 最小E2Eと負例のAcceptance Testが確定している。
 - 未解決review Findingがない。
