@@ -1,0 +1,125 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "d70bb2c127d286fb863a36a640fc51851d3fbf91278cccd5bfd68bb48e428e18"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "8520d6be47643770a7fda3d4a37708a13067af9f816f80de3dbf0745a0d6c828"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "a9d97ac300794091aa1cbe4ee4e969e656e2f0af5b76a0c04de047e4717a2150"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "d5aaf56fbfc447b9af68f606d72e979905a0f58650ff9742b5ec7839ca3ffc4c"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "6fd5aa54382ee6b48505eb9eee0498513ac88931270309d2dadedf0d277561fb"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "e6eb9d939b1de2334ec6c53aa6d14c4a8f75d10b34bca61a2c6d7d8d96c1a948"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "ed265776c434c4464b8612176fa8ac424fb3989b363e81544350e0b651060c52"
+    },
+    {
+      "path": "records/sources/2026-08-02-task-contract-source.md",
+      "sha256": "c83f802df84668f5975462e0c5e50f5987071fe089e76fcf9e0d7f6ecbd136cb"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+      "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+    },
+    {
+      "path": "docs/concepts/2026-07-27-task-runtime-concept.md",
+      "sha256": "be501be50b04cd327e97cbd2ea3e3b26082065144c43a36f3e3899e12c4dba13"
+    },
+    {
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "path": "docs/design/2026-07-28-reviewcompass3-design.md",
+      "sha256": "f250cf6bf91afd1e7c786952a1fb9c9530ccac2a51ef14b34172f5be65ccd8b5"
+    },
+    {
+      "path": "docs/plan/2026-08-02-development-policy-amendment.md",
+      "sha256": "e5a29b93084038d00a645245d477200a94e681cdd57847fb0255affa48c2bdbb"
+    },
+    {
+      "path": "records/design/stage-five-approval-candidate.json",
+      "sha256": "a1e211f4d63144f52cd5c8bf36c9b111a0715a205a8ce71ecb52f034172ab0b5"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-DOC-DEC-001",
+        "meaning": "Task ContractをRequirements以降の中心に置く基本整理を採用する",
+        "text": "基本はこれでよい．加えて，開発のステージ構成を考える。"
+      },
+      {
+        "decision_id": "TC-DOC-DEC-002",
+        "meaning": "Provenanceから後続評価に必要なデータを取得可能にする",
+        "text": "次はこの仕組みがうまく働くかどうかを検証する必要がある．"
+      },
+      {
+        "decision_id": "TC-DOC-DEC-003",
+        "meaning": "デプロイ配置は既存Portable Lifecycleを原則踏襲して最初から設計する",
+        "text": "デプロイ時のことを最初から考えておく必要がある．"
+      },
+      {
+        "decision_id": "TC-DOC-DEC-004",
+        "meaning": "議論全体を詳細文書化し既存文書へ後継改定として反映する",
+        "text": "以上の議論を文書として詳細にまとめる．既存文書のアップデートを実施．"
+      },
+      {
+        "decision_id": "TC-DOC-DEC-005",
+        "meaning": "セルフチェックで確認した不足を、合意した優先順位と責務分離に従って後継候補文書へ反映する",
+        "text": "変更を反映"
+      }
+    ],
+    "scope": "task-contract-centered-reviewcompass3-successor-documents",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped human instruction excerpts",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、採用判断に直接対応する指示だけを本recordへ保持する"
+    }
+  },
+  "external_source": {
+    "artifact_path": "records/sources/2026-08-02-task-contract-source.md",
+    "captured_at": "2026-08-02",
+    "confidentiality_class": "project-internal",
+    "content_retained": true,
+    "name": "Task-contract.md",
+    "provided_by": "human_user",
+    "retention_policy": "retain-with-successor-documentation-history",
+    "source_id": "SRC-TASK-CONTRACT-001",
+    "source_kind": "human-provided-attachment",
+    "sha256": "c83f802df84668f5975462e0c5e50f5987071fe089e76fcf9e0d7f6ecbd136cb"
+  },
+  "record_version": 1,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "documented",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "document_reference_check": "passed",
+    "test_command": "/usr/bin/python3 -m pytest -q",
+    "test_result": "405 passed in 1.75s"
+  }
+}

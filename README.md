@@ -9,6 +9,13 @@ ReviewCompass3は、仕様駆動開発の成果物、レビュー、判断と一
 段完了のHuman判断後は、新しい抽象基盤を増やす前に、決定的なstub reviewerを
 用いた最小E2E縦切りへ進みます。
 
+Task ContractをRequirementsとRuntimeのcontrol and provenance planeとする後継方針を
+現在レビューしています。この候補は旧第5段成果を上書きせず、Task Contract単位のTDD、
+契約間統合、評価可能なProvenance、配置非依存のdeploymentを追加します。
+
+- 後継候補の索引：`docs/README.md`
+- 変更記録：`records/task-contract/task-contract-centered-documentation-v1.json`
+
 ## 開発方針
 
 開発はSDDとリスクベースのテストファーストで進めます。振る舞いの変更には
@@ -19,6 +26,10 @@ ReviewCompass3は、仕様駆動開発の成果物、レビュー、判断と一
 - 実行設定：`config/development-policy.json`
 - 再構築計画の改定：`docs/plan/2026-08-02-development-policy-amendment.md`
 - intentの改定：`docs/intent/2026-08-02-development-policy-amendment.md`
+
+上記の固定方針とbaselineに対するTask Contract中心化の差分は、後継候補の索引から
+参照します。Human承認と差分監査が完了するまでは、後継候補を承認済み正本として
+扱いません。
 
 ## テスト
 
