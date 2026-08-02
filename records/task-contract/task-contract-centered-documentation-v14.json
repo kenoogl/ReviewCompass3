@@ -1,0 +1,128 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "bde5e52f9e067005b06fe114a3d096225da231e75e2b5973601fac8c4a9afd1b"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "be2fcf2ab51dd637e54b48f799d20d09ea91053e37dc51730d2e408ae353420e"
+    },
+    {
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "7886e8b77abdb4e6df36bae4cff17173f174859861af12b284ab246761cfbf6c"
+    },
+    {
+      "path": "docs/current/reviewcompass3-glossary-current.md",
+      "sha256": "a33f1715010db3abdb6976ce2ad7effcbc662fa19299b766dde5d4cc157f3cb6"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "a6f6d4f4318c839e4da0fd515f96034011f0eae6693f3fb3c3a8bc8c54b08214"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "f926db9a818575befedd0549f32b961ac6f4640f05f4fdb6acde4a6c54ef036b"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "653a8d2b876150415f06412508e0f02028bb2991c31ae44a3f6e43c35ac36720"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "965102914be4115921b7f6afd95a6318e422ad5a5ee99e70177e1f4d97721f58"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "899d2ee8fea37a6949ce13727abdb8a42d0e5e295de2bb9c06f62f22e4c7d9be"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "916cfec99531dda1688b9f73962c021c9843e903f0383854ec8017ee50986e0f"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "a4ac5391b699a1fbe35e515477e0880e73c100e2020e9a4006170423760054be"
+    },
+    {
+      "path": "records/sources/2026-08-02-reviewcompass2-change-scaled-review-input.md",
+      "sha256": "125b53a62de2d34198f8e2721f37612b8b1b8fbe3a4714d0133c4cfa80a358fb"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v13.json",
+      "sha256": "b5aa6c13c4d9537b7cf5c74564cdb6b391b4ee8006a1b222f34d6708811e89ef"
+    },
+    {
+      "path": "/Users/Daily/Development/ReviewCompass2/docs/plan/2026-07-23-plan-c-rebuild-minimal-base.md",
+      "sha256": "75915b28557b4e83b74e18670b1b80a5f1274cd391faa1ab0974419cb4b97e6b"
+    },
+    {
+      "path": "/Users/Daily/Development/ReviewCompass2/docs/design/2026-07-23-semantic-unit-schema-v0.md",
+      "sha256": "106dca8a054a6db8153930a92bfef2b58f87a95a6d82745ab410561e50dd7468"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-CHANGE-SCALED-REVIEW-INPUT-DEC-001",
+        "meaning": "ReviewCompass2の文書サイズ比例から変更規模比例への転換を、ReviewCompass3のIntent、Requirements強化、Context設計、受入試験、評価指標へ明示的に反映する",
+        "text": "補強する"
+      }
+    ],
+    "scope": "change-scaled-review-input-strengthening",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "fixed predecessor source digests, adaptation record, updated intent, terminology, requirement delta, concept, design, plan and policy digests",
+      "retention_limitation": "利用者の指示は簡潔であるため、直前の確認結果と固定したReviewCompass2 sourceを意味判断の根拠とする"
+    }
+  },
+  "adoption_summary": {
+    "adopted": [
+      "review input constructed from a deterministic impact closure rather than total document size",
+      "impact units and evidence excerpts selected with traceable reasons",
+      "unrelated source-universe growth does not increase the selected review payload",
+      "residual-risk full consistency review remains available as an explicit separate mode"
+    ],
+    "adapted": [
+      "change size means affected semantic closure plus mandatory contract materials, not changed lines or files",
+      "Semantic Trace owns candidate-universe generation and Review Context owns classification and composition",
+      "full or expanded scope requires explicit conditions, Decision Authority and Operational Provenance",
+      "budget overflow routes to evidence-preserving split, recomposition or escalation instead of silent truncation"
+    ],
+    "not_adopted": [
+      "strict linear proportionality to changed line count",
+      "implicit full-document fallback",
+      "input minimization as a substitute for Evidence Coverage or Finding Recall",
+      "direct mutation of fixed baseline requirement documents"
+    ],
+    "semantic_change": true
+  },
+  "acceptance_summary": {
+    "determinism": "fixed change units, graph, closure rules and contract materials regenerate the same candidates, classification and payload",
+    "unrelated_growth": "adding unreachable source materials triggers freshness checking but does not increase selected materials or payload bytes and tokens",
+    "affected_growth": "changing semantic relations or mandatory contract materials changes closure and payload and makes the prior context stale",
+    "safe_expansion": "expanded or full scope is rejected without an allowed condition, decision authority, reason and added-material record",
+    "measurement": "source universe, changed units, impact closure, review payload, scope expansion, evidence coverage and finding quality are observed separately"
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v13.json",
+    "relation": "supersedes",
+    "sha256": "b5aa6c13c4d9537b7cf5c74564cdb6b391b4ee8006a1b222f34d6708811e89ef"
+  },
+  "record_version": 14,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "change_scaled_review_input_strengthened",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "source_digest_check": "passed: both ReviewCompass2 source files match the recorded digests",
+    "plan_source_check": "passed: consolidated Intent, Glossary and Plan reference the updated source and generated artifact digests",
+    "scope_self_check": "passed: change size is defined as affected semantic closure; safe explicit full-review paths remain; silent truncation is prohibited",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.72s"
+  }
+}

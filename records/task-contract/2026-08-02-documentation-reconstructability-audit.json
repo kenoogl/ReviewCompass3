@@ -1,0 +1,137 @@
+{
+  "audit_version": 1,
+  "audited_at": "2026-08-02",
+  "scope": "records/task-contract/task-contract-centered-documentation-v1.json through v15.json",
+  "definitions": {
+    "git-reconstructable": "A single identified Git commit contains every artifact body with the digest recorded by the revision.",
+    "digest-only": "The manifest and artifact digests remain, but no single immutable repository snapshot containing every recorded body was identified.",
+    "current_mismatch_count": "Number of recorded artifact paths whose current working-tree digest differs from the revision manifest; this does not invalidate a separately identified historical Git snapshot."
+  },
+  "chain_verification": {
+    "status": "passed",
+    "checked_relations": 14,
+    "meaning": "Each v2-v15 prior_revision digest matches the preceding record file."
+  },
+  "revisions": [
+    {
+      "record_version": 1,
+      "artifact_count": 8,
+      "current_mismatch_count": 7,
+      "missing_path_count": 0,
+      "reconstructability": "git-reconstructable",
+      "snapshot_commit": "701473dd6d9de1538ec4f61fb480c78634c6e589"
+    },
+    {
+      "record_version": 2,
+      "artifact_count": 7,
+      "current_mismatch_count": 7,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 3,
+      "artifact_count": 8,
+      "current_mismatch_count": 7,
+      "missing_path_count": 0,
+      "reconstructability": "git-reconstructable",
+      "snapshot_commit": "b5ce03ef388a09f1ef2d7726089f3caa7f9b0461"
+    },
+    {
+      "record_version": 4,
+      "artifact_count": 8,
+      "current_mismatch_count": 7,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 5,
+      "artifact_count": 9,
+      "current_mismatch_count": 7,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 6,
+      "artifact_count": 10,
+      "current_mismatch_count": 7,
+      "missing_path_count": 0,
+      "reconstructability": "git-reconstructable",
+      "snapshot_commit": "05e29875bdc476d6cb60bb71f6ef4404ee7ebc2c"
+    },
+    {
+      "record_version": 7,
+      "artifact_count": 9,
+      "current_mismatch_count": 7,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 8,
+      "artifact_count": 4,
+      "current_mismatch_count": 4,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 9,
+      "artifact_count": 4,
+      "current_mismatch_count": 4,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 10,
+      "artifact_count": 4,
+      "current_mismatch_count": 4,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 11,
+      "artifact_count": 4,
+      "current_mismatch_count": 4,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 12,
+      "artifact_count": 6,
+      "current_mismatch_count": 5,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 13,
+      "artifact_count": 8,
+      "current_mismatch_count": 7,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 14,
+      "artifact_count": 12,
+      "current_mismatch_count": 11,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    },
+    {
+      "record_version": 15,
+      "artifact_count": 12,
+      "current_mismatch_count": 11,
+      "missing_path_count": 0,
+      "reconstructability": "digest-only"
+    }
+  ],
+  "finding": {
+    "severity": "high",
+    "status": "recorded_with_forward_fix",
+    "summary": "Mutable artifact paths were reused across revisions before an immutable snapshot was always established; the decision chain survives, but most historical bodies cannot be reproduced as a single exact revision snapshot."
+  },
+  "forward_rule": {
+    "effective_from_record_version": 16,
+    "requirement": "A documentation revision is not git-reconstructable until the record and every manifested artifact are committed together before any successor edit.",
+    "pre_commit_state": "content-present-pending-git-commit",
+    "post_commit_check": "Resolve the containing commit and verify every artifact digest against that commit before creating the next revision.",
+    "prohibition": "Do not label a revision git-reconstructable from current path existence or manifest digests alone."
+  }
+}

@@ -240,12 +240,24 @@ Planへすべて受け渡されなければならない。
 
 - 取得対象
 - source universe
-- Scopeと閉包規則
+- 変更単位、Scope、意味graph、閉包規則
+- 影響候補母集合と各候補の到達理由
+- 通常slice、明示的scope拡大、全文整合reviewの選択条件
 - 取得主体
 - freshness、trust、confidentiality
 - 変換と圧縮規則
 - budget
 - 充足検査
+
+review入力はsource universe全体から作らず、変更単位から導出した影響閉包、必要なEvidence
+抜粋、Contractが要求する固定材料から構成する。関係のない材料がsource universeへ増えても、
+freshness再検査後の選択材料とpayloadは増やさない。変更規模は変更行数ではなく、この影響閉包と
+必須材料の規模を意味する。
+
+意味graphまたはEvidenceの欠落、global invariant、横断Policy、未解決循環などにより安全な
+閉包を確定できない場合は、通常sliceへ暗黙に材料を足さない。理由、判断主体、追加材料、拡大
+前後のContext量、終了条件を固定し、広域scope、別の全文整合review、分割またはHuman
+escalationへrouteする。budget超過時も必須材料を黙って切り捨てない。
 
 ### 6.2 Review / Execution Plan
 
@@ -290,6 +302,21 @@ Planへすべて受け渡されなければならない。
 - 判断値
 - 理由
 - 未解決時の戻り先
+
+### 6.7 Evidence利用とAssuranceの横断規則
+
+Evidence抽出を第7のPlanにはしない。Context Acquisition PlanがEvidence Extraction Contractを
+持ち、探索開始集合、展開規則、分類、終了条件、除外、完全性oracleを固定する。Provenance
+Capture Planは候補と`adopt | adapt | reject | defer`、未解決を記録し、Verification Planは
+採用知見がRequirement、Contract obligation、検証またはDecisionへ接続したEvidence
+Consumption Closureを確認する。
+
+Compilerは重要規則を、宣言、runtime enforcement、failure verdict、permit効果、復旧、Evidenceへ
+展開したAssurance Obligation Matrixとして被覆検査する。Verification Planはvalidatorごとの既知
+正例、負例、境界例、mutation、独立oracleまたは代表実データをValidator Assurance Profileへ
+固定する。Review / Execution Planはverdict、severity、Evidence不足、責務外Finding、材料十分性と
+収束条件をReview Quality Contractへ固定する。これらは6 Plan内の横断成果であり、新stageを
+増やさない。
 
 Compilerが対応できないobligation、競合、未定義能力、未解決参照を検出した場合、
 Planを部分的に成功扱いせず、診断付きの`not_compilable`を返す。
@@ -378,7 +405,8 @@ Task Contract、開発中のWork Item、一回のRun、Portfolio依存状態を�
 押し込めない。
 
 - Task Contract：責務、境界、期待、versionを所有する
-- Workflow Work Item：active、blocked、paused、cancelled、completedを所有する
+- Workflow Work Item：`queued | active | red | implementation_ready | green | verified | accepted`、
+  個別のblocking／pending状態、`paused | cancelled | replaced`を所有する
 - Run / Attempt：一回の実行、retry、失敗、成功を所有する
 - Task Contract Portfolio：Contract間依存、循環、被覆、実行可能性を所有する
 
@@ -574,6 +602,36 @@ Implementation Discoveryでは、source treeとIndexのDigest、検索scope、�
 必須eventとして保存する。判断をTask Contract、Work Item、Design Decision、Test、
 Implementation、commitへ結び、台帳更新と実装変更の順序を再構成できるようにする。
 
+### 11.1 実装文書projection
+
+Requirementsより下流に大域的なDesign、Tasks、Implementation文書段階を復活させず、
+Task Contract TDDで得た事実から実装実態を説明する。規範的な正本はIntent、Feature、
+Requirements、Task Contractとし、Test、Design Decision、Implementation、Operational
+Provenance、Evidenceを実行事実とする。これらから機械可読な`As-Built Record`を生成し、
+人間向けの`As-Built Documentation`、Trace Matrix、変更履歴、drift reportを再生成可能な
+projectionとして導出する。派生文書はRequirementsまたはTask Contractを上書きしない。
+
+projectionはTask Contract、obligation、Work Item、Run、commit、source tree、実装symbol、
+公開interface、data、state、error、side effect、設定、deployment、Test、Design Decision、
+Evidence、既知制限と各Digestへ逆引きできなければならない。Provenanceを主な導出経路に
+するが、Source Symbol Index、Test、固定source treeとの独立照合も行い、Provenanceへ記録
+されなかった外部観測可能な実装を見逃さない。
+
+照合結果は少なくとも`unrealized_obligation`、`unattributed_implementation`、
+`implementation_detail`、`upstream_inconsistency`、`provenance_incomplete`、
+`stale_projection`へ分類する。実装詳細はAs-Builtだけへ反映できる。外部義務または
+accept/rejectの意味が変わる場合は本文を自動更新せず、Upstream Revision Proposalとして
+Human判断と通常のreopenへ渡す。
+
+この能力は初期Task Contract E2E、TDD negative path、deployment E2E、evaluation Pilotの
+実装範囲に含めない。初期開発では後からprojectionできるだけのProvenance identity、関係、
+Digestを失わず記録する。最初のaccepted Implementation Task Contractと実運用Provenanceが
+得られ、projectionの必要入力と欠測を実測した後に、独立した後続Task Contractとして着手
+判断する。Provenanceのない既存codebaseには、コード解析とHuman協働による
+`legacy_reconstruction`を将来の補助経路として残す。
+前身機能の固定commit、実装責務、採用・置換判断は
+`records/sources/2026-08-02-reviewcompass-conformance-evaluation.md`へ保持する。
+
 ## 12. デプロイと配置
 
 開発checkout、インストール済みcode、対象project、runtime data、機微情報保存を
@@ -622,6 +680,10 @@ adapter、source root、hook、実行command、権限、ownerを持つIntegratio
 
 - Task Contractで必要Evidenceの被覆が上がるか
 - 不要Contextと責務外Findingが減るか
+- 無関係な文書総量を増やしても同じ変更のreview payloadが増えず、影響閉包が変わった場合だけ
+  選択材料が規則に従って変わるか
+- scope拡大が必要なcaseを理由付きで検出し、局所入力への暗黙追加または必須Evidenceの切捨てを
+  防げるか
 - Requirementから成果までの追跡可能率が上がるか
 - Harness手動設定と設定不整合が減るか
 - Human介入を必要な判断点へ限定できるか
@@ -638,7 +700,10 @@ Auditability、Adaptability、VerifiabilityというLLMの実務可用性の評�
 この7軸は製品Requirementではなく、Evaluation Profileで仮説とmetricを整理するための
 非規範的な評価枠組みとする。
 
-同じ対象、source universe、model、Tool、budgetを固定した既存方式との比較を行う。
+同じ対象、変更、source universe、model、Tool、budgetを固定した既存方式との比較に加え、
+同じ変更へ無関係な材料だけを追加したpaired trialを行う。`source_universe_bytes`、
+`changed_unit_count`、`impact_closure_unit_count`、`review_input_bytes`、`review_input_tokens`を
+別々に観測し、入力削減とEvidence Coverage、Finding Recall、責務外Findingを同時に比較する。
 初期Pilotは仮説証明ではなく、観測可能性、欠測、privacy、記録負担、指標再計算を
 確認する。後続比較に必要なcase、condition、pair、trial、実行順序、model・Tool・budget
 設定、label作成者、評価者、confidenceは初回から記録する。無作為化、盲検化、反復数は

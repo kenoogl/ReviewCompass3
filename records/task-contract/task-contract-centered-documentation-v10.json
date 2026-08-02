@@ -1,0 +1,87 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "84cd8d950f3c795ca0ef27e3e8939664eabeae33ff56d91296d46879c55d5e0f"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "5fd2e6bb607fd2ad33c4f148a1ba8c6001f1e431bc2b39bf3dfa1e8ddc085174"
+    },
+    {
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "b92d05adc3b762c6402b50a3951e87f08051bcf730f375cf1f028264e0769ba5"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "361dd605c7173683a72e8e98afa19798e3b7c173534e788370bad5a05b02a61f"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v9.json",
+      "sha256": "00e4d02dd66b7595f5ab326bc5832dce7d3ad4c6871d5570f923f0774cacc651"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-AI-DELEGATION-DEC-001",
+        "meaning": "目的、最終判断、完了判断をAIへ無条件に委ねない原則を維持しつつ、対象業務で十分な能力が確認できた場合は、明示した範囲に限って一部を委譲できるIntentへ改める",
+        "text": "intentで，「AIへ目的、最終判断、完了判断を丸ごと委ねない」としているが，AIに十分な能力があると判断できたら，一部を委譲する方針で，書いて．"
+      }
+    ],
+    "scope": "consolidated-current-intent-conditional-ai-delegation-policy",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped Human instruction, prior Intent revision record and updated artifact digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、委譲方針の変更指示、委譲条件、保持するHuman authority、成果物Digestを本recordへ保持する"
+    }
+  },
+  "delegation_policy_summary": {
+    "delegable": [
+      "bounded elaboration of purpose within the Human-approved product purpose and policy",
+      "acceptance or rejection decisions within an explicitly authorized class and scope",
+      "completion decisions within an explicitly authorized class and scope"
+    ],
+    "preconditions": [
+      "capability evidence specific to the target work",
+      "explicit decision type and scope",
+      "explicit permissions and validity period",
+      "required evidence and stop or escalation conditions",
+      "traceable recording of the deciding actor, evidence and authority"
+    ],
+    "retained_by_human": [
+      "product reason for existence and policy",
+      "decision whether and how far to delegate",
+      "change, suspension and revocation of delegation",
+      "decisions outside delegation and irreversible high-impact decisions"
+    ],
+    "self_expansion_prohibited": true,
+    "semantic_change": true
+  },
+  "implementation_scope": {
+    "included": "Intent policy and current Plan intent-reference digest alignment",
+    "excluded": "Requirements, detailed delegation mechanism design and implementation",
+    "future_condition": "Before implementing delegation, capability evaluation, scope enforcement, stop conditions and provenance recording must be defined in Requirements and Plan"
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v9.json",
+    "relation": "supersedes",
+    "sha256": "00e4d02dd66b7595f5ab326bc5832dce7d3ad4c6871d5570f923f0774cacc651"
+  },
+  "record_version": 10,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "conditional_ai_judgment_delegation_policy_documented",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "intent_reference_check": "passed: consolidated Plan references the updated Intent digest",
+    "policy_self_check": "passed: delegation is evidence-based, bounded, time-limited, traceable, revocable and fail-closed outside scope",
+    "source_digest_check": "passed: all three Intent generation sources still match front-matter digests",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.73s"
+  }
+}

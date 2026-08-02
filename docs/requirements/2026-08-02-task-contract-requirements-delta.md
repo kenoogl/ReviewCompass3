@@ -10,12 +10,131 @@ promotion_required: true
 
 本文書は、承認済み37 requirementsを固定証拠として保持したまま、Task Contractを
 共通制御面として追加する差分候補である。既存Requirement IDの意味を履歴上で
-書き換えず、新Featureと新Requirementを追加し、既存Requirementとのinterface変更を
-定義する。
+書き換えず、新Featureと新Requirementを追加し、既存Requirementとのinterface変更および
+後継候補で強化する制約を定義する。
 
 対象Featureを`FEAT-TASK-CONTRACT-CONTROL`と`FEAT-WORKFLOW-CONTROL`とする。
 ReviewCompass2の承認済みintent P-5、共通ルーチン台帳、`R-F6-010`、`R-F6-011`を
 前身要件として継承し、Task Contract TDD DeliveryとProvenanceへ接続する。
+
+## 既存Review Context／Semantic Trace要件の強化
+
+ReviewCompass2の変更規模比例review入力を、既存`REQ-TRACE-004`、`REQ-CONTEXT-003`、
+`REQ-CONTEXT-005`の後継制約として採用する。ここでいう変更規模は変更行数ではなく、
+変更単位から版付き意味graphと閉包規則で導出した影響閉包、必要なEvidence抜粋、Task
+Contractの必須材料の規模である。
+
+- Semantic Traceは、固定変更単位、意味graph identity、閉包規則identityから候補母集合と
+  各候補への到達理由を決定的に生成する。
+- Context Runtimeは候補全件を`include | exclude | defer`へ分類し、採否理由、採用目的、
+  順序、変換をContext Manifestへ固定する。
+- source universeへ影響関係のない材料を追加した場合、source universeのidentity変更と
+  freshness再検査は行うが、選択材料とreview payloadを増やしてはならない。
+- graph、閉包規則、Evidenceの欠落、stale、競合、global invariant、横断Policy、未解決循環、
+  またはVerification Profileの要求により安全な局所scopeを確定できない場合は、通常sliceへ
+  暗黙追加せず、明示的なscope拡大、別の全文整合review、分割またはHuman escalationへrouteする。
+- scope拡大時は、起点、理由、判断主体、追加材料、拡大前後のContext identityと量、機密性、
+  終了条件をOperational Provenanceへ保存する。
+- tokenまたは容量上限を理由に必須材料を黙って除外してはならない。分割または再構成でも
+  Evidence closureを維持できない場合はRunを開始しない。
+
+強化後の受け入れ条件は次とする。
+
+- 同じ変更単位、意味graph、閉包規則、Contract材料から、同じ候補母集合、採否、review
+  payloadを再生成できる。
+- 同じ変更に対して無関係な材料だけをsource universeへ追加したfixtureでは、freshness
+  再検査後も選択材料集合、payload byte数、payload token数が増えない。
+- 関係辺または必須Contract材料を変更したfixtureでは、到達理由に従って影響閉包とpayloadが
+  変わり、prior Contextをstaleとして拒否する。
+- 関係欠落で閉包の完全性を判定できないfixtureでは、局所reviewを開始せず、不足診断または
+  許可済みscope拡大へrouteする。
+- 全文または広域scopeは、許可条件、Decision Authority、拡大理由、追加材料を欠く場合に
+  開始を拒否する。
+
+この強化は「入力を変更行数へ厳密に線形比例させる」ことを要求しない。小さな変更でも影響閉包が
+広ければ入力は増える。目的は無関係な文書総量をreview入力の支配要因にしないことであり、
+入力削減をEvidence CoverageまたはFinding Recallより優先しない。
+
+## 横断Assurance・Evidence利用・validator要件の強化
+
+次の制約は新しいRequirement IDを増やさず、既存Requirement配下の安定したsub-obligationとして
+適用する。各sub-obligationはprimary Requirementを一つ持ち、supporting Requirements、compile先、
+enforcement、failure verdict、復旧、Evidence、受け入れfixtureへ順逆にたどれるものとする。
+
+### OBL-CONTEXT-EVIDENCE-EXTRACTION
+
+- primary：`REQ-CONTEXT-002`
+- supporting：`REQ-CONTEXT-003`、`005`、`REQ-TRACE-004`、`REQ-CONTRACT-002`
+- compile先：Context Acquisition Plan
+- 義務：source universe、開始entry、展開規則、分類軸、終了条件、除外、完全性oracleを
+  Evidence Extraction Contractへ固定し、候補全件を`adopt | adapt | reject | defer`へ分類する。
+- enforcement／failure：未分類または完全性未判定なら`context_incomplete`としてRun permitを拒否する。
+- 復旧／Evidence：抽出条件を新versionで訂正し、候補台帳、分類、除外理由、未解決を保存する。
+
+### OBL-TRACE-EVIDENCE-CONSUMPTION
+
+- primary：`REQ-TRACE-002`
+- supporting：`REQ-TRACE-005`、`REQ-CONTRACT-003`、`005`
+- compile先：Verification Plan、Provenance Capture Plan
+- 義務：必須sourceと採用FindingをRequirement、Contract obligation、Plan項目、Verificationまたは
+  Decisionの少なくとも一つへ接続し、Evidence Consumption Closureを生成する。
+- enforcement／failure：参照、要約、指摘だけでconsumerがなければ`evidence_consumption_incomplete`とする。
+- 復旧／Evidence：consumerまたは非採用Decisionを追加し、source、Finding、consumer関係を保存する。
+
+### OBL-CONTRACT-ASSURANCE-MATRIX
+
+- primary：`REQ-CONTRACT-002`
+- supporting：`REQ-CONTRACT-001`、`003`、`005`、`REQ-WORKFLOW-002`
+- compile先：6 Planを横断するAssurance Obligation Matrix
+- 義務：重要規則ごとに宣言、runtime enforcement、failure verdict、permit効果、復旧、保存Evidenceを持つ。
+- enforcement／failure：必須欄欠落を`not_compilable`、未実行enforcementをRun permit拒否とする。
+- 復旧／Evidence：Contract、PolicyまたはCompilerを新versionにし、matrixと被覆診断を保存する。
+
+### OBL-VERIFICATION-VALIDATOR-ASSURANCE
+
+- primary：`REQ-CONTRACT-004`
+- supporting：`REQ-EVAL-001`、`003`、`REQ-CONTRACT-006`
+- compile先：Verification Plan
+- 義務：validatorと入力前提のversion、既知正例、負例、境界例、必要なmutation、独立oracleまたは
+  代表実データをValidator Assurance Profileへ固定する。
+- enforcement／failure：validatorまたは前提変更時は旧verdictをstaleにし、必須fixture未実行なら
+  `verification_incomplete`とする。
+- 復旧／Evidence：Profileに従ってfixtureを再実行し、入力、期待、実結果、mutation生存を保存する。
+
+### OBL-REVIEW-QUALITY-CONTRACT
+
+- primary：`REQ-CONTRACT-004`
+- supporting：`REQ-CONTEXT-005`、`REQ-EVAL-001`、`003`
+- compile先：Review / Execution Plan、Verification Plan
+- 義務：verdict、severity、Finding schema、`insufficient_evidence`、`out_of_level`、材料十分性、
+  終了条件、独立性をReview Quality Contractへ固定する。
+- enforcement／failure：Evidence不足を問題なしへ丸めず、責務外Findingを現reviewの合否へ混入しない。
+- 復旧／Evidence：材料追加、適切なownerへのrouteまたは新reviewを行い、分類と収束理由を保存する。
+
+### OBL-WORKFLOW-POST-WRITE-VERIFICATION
+
+- primary：`REQ-WORKFLOW-003`
+- supporting：`REQ-WORKFLOW-002`、`REQ-CONTRACT-005`
+- compile先：Verification Plan、Provenance Capture Plan
+- 義務：書込み後の出力を再読込し、関連validator、参照整合、stale閉包をriskに応じて確認する。
+- enforcement／failure：必須post-write verification未実行または不合格なら`verified`を拒否する。
+- 復旧／Evidence：成果物を訂正して再検証し、書込みidentity、再読込Digest、検証結果を保存する。
+
+### OBL-SESSION-SOURCE-AVAILABILITY
+
+- primary：`REQ-SESSION-003`
+- supporting：`REQ-SESSION-001`、`002`、`REQ-PORTABLE-004`、`REQ-TRACE-005`
+- compile先：Context Acquisition Plan、Provenance Capture Plan
+- 義務：capture deadline、実効retention、取得時点、復元方法、復元検証を記録し、
+  `source_missing | source_expired | non_reconstructable`を正常な空結果と区別する。
+- enforcement／failure：必須sourceが利用不能なら`context_incomplete`としてRun permitを拒否する。
+- 復旧／Evidence：許可済みsourceを再取得または復元し、期待Digest、構造、派生物再生成を検証する。
+
+受け入れfixtureは各sub-obligation IDへ束縛し、既知の違反を一件ずつ混入して対応するenforcementと
+permit拒否を確認する。
+validatorが違反を見逃すmutation、必須sourceが消費されない抽出、根拠不足review、書込み後だけ
+現れる不整合、期限切れsession sourceをそれぞれ成功として扱わない。既知の正常例は誤って
+blockingにせず、validator変更後はfixture群の再実行なしに旧verdictを再利用しない。
 
 ## REQ-CONTRACT-001 版付きTask Contract
 
@@ -274,6 +393,51 @@ Contract、Plan、Context、Execution、Result、Evidence、Human判断を必須
   - Task Contract ControlがWorkflowまたはconsumerの実行状態を直接変更すること
   - Contract単位の成功だけでrelease可能とみなすこと
 
+## REQ-CONTRACT-008 実装文書projection（後続開発）
+
+システムは、Task Contract TDDで固定したOperational Provenance、Test、Design Decision、
+Implementation、Source Symbol IndexとEvidenceから、実装実態を説明する機械可読な
+As-Built Recordと人間向け文書を再生成可能なprojectionとして導出できなければならない。
+projectionは規範的RequirementsまたはTask Contractを自動更新してはならない。本要件は
+初期開発範囲外とし、初期vertical sliceの完了条件またはrelease条件にしない。
+
+- 入力
+  - acceptedまたは検証対象のTask Contract、obligation、Work Item、Run
+  - Operational Provenance eventと完全性verdict
+  - 固定source tree、commit、Source Symbol Index、Reusable Routine Ledger
+  - Acceptance Test、Evidence Test、Design Decision、verification Evidence
+  - Deployment Manifest、Project Binding、confidentiality、retention policy
+- 出力
+  - version、schema、入力Digest、生成器identityを持つAs-Built Record
+  - Task Contract単位とFeature単位のAs-Built Documentation
+  - Requirement、Contract、Test、ImplementationのTrace Matrix
+  - 前accepted版からの変更履歴とDocumentation Conformance Verdict
+  - 正本変更が必要な場合のUpstream Revision Proposal
+- 停止条件
+  - 外部観測可能な実装をContract、Design Decisionまたは承認済み上流変更へ帰属できない
+  - 必須Provenance、source、Test、入力Digestが欠落またはstaleである
+  - 実装とRequirementまたはContractのaccept/reject、義務、scopeが競合する
+  - 派生文書を根拠に正本を直接更新しようとする
+- 復旧条件
+  - 不足Provenanceを新eventとして補い、固定入力からprojectionを再生成する
+  - 実装不良は現ContractとTestを維持してImplementationを訂正する
+  - 意味変更は`REQ-WORKFLOW-006`のRevision Proposalとreopenへ渡す
+- 失敗時に保存するもの
+  - 入力identityとDigest、生成器identity、部分Record、欠落項目、照合Finding
+  - `unrealized_obligation | unattributed_implementation | implementation_detail |
+    upstream_inconsistency | provenance_incomplete | stale_projection`の分類
+- 受け入れ条件
+  - 同じ固定入力と生成器versionから意味的に同じAs-Built Recordを再生成できる
+  - obligationからTest、Design Decision、実装symbol、Evidenceへ順方向に追跡できる
+  - 外部観測可能な実装symbolから所有Contractまたは未帰属Findingへ逆方向に追跡できる
+  - sourceまたは入力Digest変更時に旧projectionが`stale_projection`になる
+  - 正当な上流意味変更候補が本文更新ではなくRevision Proposalになる
+  - Provenanceのないcodebaseを標準経路へ混入せず、将来の`legacy_reconstruction`へ分類する
+- 対象外
+  - 大域的なDesign、Tasks、Implementation段階を復活させること
+  - LLM推定だけを実装事実の正本にすること
+  - 初期Work 1〜8、最初のTask Contractまたは初期製品releaseで本能力を実装すること
+
 ## REQ-WORKFLOW-005 開発入口とreopen routing
 
 システムは、作業の発生源を`new_development`または`maintenance`、継続方法を`fresh`
@@ -486,12 +650,19 @@ leafを選ばなければならない。
   追加する。
 - `REQ-EXEC-006`はContract、Plan bundle、Evaluation Profileのidentityを観測値へ
   結ぶ。
+- Harnessed ExecutionはExecution Planeとして固定Planとpermitを実行し、Contract、Work Item、
+  accepted verdictのauthorityを持つ唯一のstateをworker process内だけに保持しない。
+- Attempt受領、side effect、output capture、checkpointをdurable eventへ結ぶ前に成功応答を
+  確定せず、worker再起動後に重複side effectを避けて再開できるようにする。
 
 ### FEAT-SEMANTIC-TRACE
 
 - `REQ-TRACE-002`の上流義務へRequirement、Contract obligation、Plan項目を追加する。
 - `REQ-TRACE-005`のOperational Provenance起点をReview Task入力から、Requirement、
   Task Contract、Compilationへ拡張する。
+- `REQ-CONTRACT-008`のAs-Built Record、双方向trace、Documentation Conformance Verdictは
+  後続開発としてSemantic Traceへ割り当てる。初期実装はprojectionに必要なidentity、関係、
+  Digestを失わず保存するところまでとする。
 
 ### FEAT-WORKFLOW-CONTROL
 
@@ -499,7 +670,9 @@ leafを選ばなければならない。
   required approvalへ束縛する。
 - Contract definition lifecycleはTask Contract Controlが所有し、Work Item lifecycle、
   routing、block、resume、termination、Run permitはWorkflowが所有する。
-- `REQ-WORKFLOW-004`の自己適用はstableなContract能力だけを必須経路へ使用する。
+- `REQ-WORKFLOW-004`の自己適用はstableなContract能力とstable deploymentだけを必須経路へ
+  使用する。development candidateは別のcode、state、data rootへ置き、自身を唯一のreviewer
+  またはrelease oracleとして使用しない。
 - `REQ-WORKFLOW-005`〜`009`を追加し、entry routing、上流改定、依存・循環、制御終了、
   実装前共通ルーチン照合をWorkflowの観測可能な義務とする。
 - `REQ-WORKFLOW-009`は初期段階ではReviewCompass3自身のImplementation Task Contractへ
@@ -520,13 +693,29 @@ leafを選ばなければならない。
 ### FEAT-PORTABLE-LIFECYCLE
 
 - `REQ-PORTABLE-001`へDeployment Manifest、Project Binding、Integration Manifest、
-  contract、run、evaluation、sensitiveの論理rootを追加する。
+  contract、run、evaluation、sensitiveの論理rootとdeployment profileを追加する。
+- 初期profileを`local_integrated`とし、同一machine・単一利用者でもControl Plane、Execution
+  Plane、project、runtime data、sensitive dataの論理境界とstructured I/Oを維持する。単一process、
+  IPC、HTTPなどの物理transportはRequirementsで固定しない。
+- `shared_runtime`は共有Control PlaneとLocal Execution Agentの認証、permission、data locality、
+  通信切断、offline、再試行を独立Requirementsとthreat modelで確定するまで有効化しない。
+- `distributed_hybrid`は複数worker、scheduler、GPU、HPCまたはscaleの必要性が実測されるまで
+  実装しない。
 - `project_id`はProject Manifestに保存した安定IDとし、project内容digest、repository
   root、checkoutごとのBinding identityから分離する。
 - `REQ-PORTABLE-002`をContract、Plan、event、ledgerの共通原子的I/Oへ適用する。
-- `REQ-PORTABLE-003`へversion migration、adapter、project bindingの所有対象を追加する。
+- `REQ-PORTABLE-003`へversion migration、adapter、project binding、deployment profile、
+  distribution unitの所有対象を追加する。Runtime Core、integration client、Capability Adapter、
+  project側Contract／Policyのversionとrollbackを分離する。
 - `REQ-PORTABLE-004`へTask ContractのconfidentialityとCapture Planのretentionを
   接続する。
+- shared profileでは、serverがlocal file、Git、commandへ直接の包括権限を持たず、Project
+  Bindingとversion付きallowlistへ束縛されたLocal Execution Agentだけが操作する。
+- project側のTask Contract、Portfolio、Policy、PromptはRuntime Coreの再deployなしに更新できる。
+  実行codeとCapability Adapterはinstalled codeとして検証、version固定、permission reviewを経て
+  導入し、project artifactから任意codeを動的loadしない。
+- `REQ-CONTRACT-008`を有効化した後は、未検証projectionをproject外runtime data、accepted
+  As-Built Recordと共有文書をproject内verified artifactsへ分離配置する。
 
 ### FEAT-EVIDENCE-EVALUATION
 
@@ -562,6 +751,8 @@ leafを選ばなければならない。
 - Session Evidence Source → Portable Lifecycle / Semantic Trace
 - Evidence Evaluation → Self Improvement
 - Self Improvement → Task Contract / Compiler / Policy / Capture Plan owner
+- Semantic Trace → As-Built projection / Documentation Conformance Verdict
+- Documentation Conformance Verdict → Workflow / Upstream Revision Protocol
 
 各interfaceはContract ID、version、digest、Plan ID、obligation ID、Work Item ID、
 relation type、failure verdictを持つ。Task Contract Controlは各consumerの状態遷移を
@@ -569,7 +760,7 @@ relation type、failure verdictを持つ。Task Contract Controlは各consumer�
 
 ## 4. 要件差分の完了条件
 
-- 新しい`REQ-CONTRACT-001`〜`007`と`REQ-WORKFLOW-005`〜`009`の各入力、出力、停止、
+- 新しい`REQ-CONTRACT-001`〜`008`と`REQ-WORKFLOW-005`〜`009`の各入力、出力、停止、
   復旧、保存、受け入れ、対象外が確定する。
 - 既存37 requirementsへの影響を`preserve / adapt / replace / defer`で全件分類する。
 - 旧9 design、29 interface、8 state machine、14 protocolを全件分類し、replace対象にも
@@ -582,3 +773,5 @@ relation type、failure verdictを持つ。Task Contract Controlは各consumer�
   `preserve / adapt / replace`と後継test IDがある。
 - ReviewCompass2のP-5、`R-F6-010`、`R-F6-011`を`REQ-WORKFLOW-009`の各obligationへ
   逆引きでき、4分類、Human確認、追記履歴、retired routine検査を取りこぼしていない。
+- `REQ-CONTRACT-008`が後続開発であり、初期Work、最初のTask Contract、初期releaseを
+  blockしないことと、将来のowner、入力、配置、着手条件が明示されている。

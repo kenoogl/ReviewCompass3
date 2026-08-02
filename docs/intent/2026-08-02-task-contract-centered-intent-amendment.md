@@ -13,7 +13,10 @@ promotion_required: true
 本文書はそれらの後に適用する製品intentの改定候補である。
 
 本改定はTask ContractをReviewCompass3の中心概念へ昇格するが、原理A、原理B、
-Humanの最終判断、機微情報保護、fail-closed、ポータブルな配置を維持する。
+Humanが製品の存在理由と方針、および委譲の設定・変更・停止・取消しを保持すること、
+機微情報保護、fail-closed、ポータブルな配置を維持する。対象業務で十分な能力Evidenceがあり、
+Humanが判断class、scope、権限、有効期間、停止条件を明示した場合は、その範囲の目的具体化、
+採否または完了判断をAIへ限定的に委譲できる。委譲対象外または不可逆で重大な判断はHumanへ戻す。
 
 ## 2. 「何のために作るか」の追加
 
@@ -47,6 +50,16 @@ Evidence Evaluation、Self Improvementは、Task Contractから導出されたPl
 Session Evidence Sourceは、利用者が許可したsource universeだけを取り込み、raw原本、
 伏字化派生物、要約、mutation verdictを別identityと別保存Policyで管理する。Session取込みを
 要求しないContractの実行は妨げない。
+
+既存文書、過去のIssue、Plan、Evidenceを引き継ぐ作業は、単なる参照ではなく制御対象とする。
+探索開始集合、展開規則、採否、除外理由、未解決事項を記録し、採用した知見をRequirement、
+Contract obligation、検証またはDecisionへ接続する。重要な知見がどこにも消費されていない
+場合は、材料抽出を完了としない。
+
+PolicyまたはContractに規則を書くだけでは保証とみなさない。重要な規則は、実行時の確認、
+違反時の停止、permitへの効果、復旧、Evidenceまで一続きにする。自動validatorは既知の正例、
+負例、境界例、必要に応じた実データと独立oracleで検証し、validatorまたは入力前提が変われば
+従来の合格結果をstaleにする。
 
 Self ImprovementはEvaluation Ledgerから改善仮説を作るが、現行設定を直接変更しない。
 固定比較とHuman判断を経たContract、Compiler、PolicyまたはCapture Planの新version候補を
@@ -126,6 +139,12 @@ Contract、backlog、継続、中止のいずれかへ分類する。
 
 ## 6. 「成功の判定基準」への追加
 
+- review入力は文書全体の大きさではなく、変更から導出した影響閉包、必要な根拠抜粋、
+  Task Contractが要求する固定材料から構成される。
+- 影響関係のない文書または意味単位をsource universeへ追加しても、同じ変更に対する
+  review payloadが増えないことを再現可能に確認できる。
+- 局所的なreview入力では安全に判断できない場合、材料を暗黙追加または切捨てせず、
+  理由と判断主体を記録して広域review、分割またはHuman escalationへ切り替えられる。
 - 全必須RequirementがTask Contractまたは明示的なHuman非採用判断へ結ばれる。
 - 全Contract obligationが必要なPlanへ被覆され、各Plan項目を元obligationへ
   逆引きできる。
@@ -145,8 +164,9 @@ Contract、backlog、継続、中止のいずれかへ分類する。
   進めない。
 - RequirementからContract、Context、Execution、Result、Evidence、Human判断までを
   一続きにたどれる。
-- 既存方式と固定条件で比較し、Evidence Coverage、Context量、Finding品質、
-  Human負担、リードタイム、費用、Provenance完全性を実測できる。
+- 既存方式と固定条件で比較し、source universe量、変更単位数、影響閉包、review入力、
+  Evidence Coverage、Finding品質、Human負担、リードタイム、費用、Provenance完全性を
+  実測できる。
 - 開発checkout、インストール先、対象project、runtime dataを分離した環境で同じ
   論理動作を検証できる。
 - Session取込み範囲、raw／派生物分離、mutation、access、retention、削除を検証できる。

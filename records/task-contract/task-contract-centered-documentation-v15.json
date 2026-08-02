@@ -1,0 +1,74 @@
+{
+  "artifacts": [
+    {"path": "README.md", "sha256": "7007f3ebb01b5ec6119ad58305de983e1163f8f812555af5b5f8d00f27ee4e3b"},
+    {"path": "docs/README.md", "sha256": "0de30a21ad64dd89fca4dff4cd3a1d844b8378fa3272cc2bb162b33679332633"},
+    {"path": "docs/current/reviewcompass3-intent-current.md", "sha256": "8acaf39d476acc1240757221631b972c74e2b52d71781d2fbc95139818ead200"},
+    {"path": "docs/current/reviewcompass3-glossary-current.md", "sha256": "b489904c42f53476ed52b4c22bd9d2441236163127ad7f7656ed538b40de74d5"},
+    {"path": "docs/current/reviewcompass3-plan-current.md", "sha256": "90c13c3edaedd05f8c3a4b4477e9d37cc1eb2ceac46b72036ea5db0127963918"},
+    {"path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md", "sha256": "b4193dbeaea5fbaa6061ef47c7929f22c0915696b8f208e6d0f91e6c37f822a0"},
+    {"path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md", "sha256": "661be5c3e740599fbcdf7f8c0c38843366bbd077aa9943119e8fd816c966fc49"},
+    {"path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md", "sha256": "bb615033ee6dead3ad6d941b77c95aa135b58dec43b1a13d26595533791d17b1"},
+    {"path": "docs/design/2026-08-02-task-contract-design-amendment.md", "sha256": "d6675e652d014825775c73df462e939962bfe10754fc6fa51458f89816b28101"},
+    {"path": "docs/plan/2026-08-02-task-contract-centered-replan.md", "sha256": "3b0a4fa2347dd42953de688ceffbd4ba297f674301df3935c902411857228966"},
+    {"path": "docs/development/2026-08-02-development-policy.md", "sha256": "2e9c6242cda8338281ad768bcc2989823c10f1139ff83fa2d27549b97a003faa"},
+    {"path": "records/sources/2026-08-02-reviewcompass2-cross-cutting-lessons.md", "sha256": "b337bbe723dc416c25eb0d94849029c377077172543af1491a31bc1c18d0c7ac"}
+  ],
+  "baseline_inputs": [
+    {"path": "records/task-contract/task-contract-centered-documentation-v14.json", "sha256": "0cd0cbacce6523e5f2007a788738386aec72c2caeba7a7bdaa94c445673f35ca"},
+    {"path": "/Users/Daily/Development/ReviewCompass2", "git_commit": "d6bbb01500002872c713412bfbd63b702a291c99"}
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-RC2-CROSS-CUTTING-DEC-001",
+        "text": "変更規模に応じたレビュー入力に限らず．"
+      },
+      {
+        "decision_id": "TC-RC2-CROSS-CUTTING-DEC-002",
+        "text": "文書を修正"
+      }
+    ],
+    "scope": "reviewcompass2-cross-cutting-lessons-adoption"
+  },
+  "adoption_summary": {
+    "adopted": [
+      "Evidence Extraction Contract and Evidence Consumption Closure",
+      "Assurance Obligation Matrix connecting declarations to enforcement, permit effects, recovery and evidence",
+      "Validator Assurance Profile with known fixtures, mutation, independent oracle and representative data",
+      "Review Quality Contract, insufficient_evidence, out_of_level and convergence",
+      "risk-based post-write verification and session-source restore verification"
+    ],
+    "adapted": [
+      "cross-cutting outputs live inside the existing six compiled Plans and existing component owners",
+      "current bounded AI-delegation policy is preserved instead of the predecessor Human-only rule",
+      "reviewer counts, rounds, budgets and retention are selected by risk and evidence rather than fixed predecessor values"
+    ],
+    "not_adopted": [
+      "the frozen predecessor plan or unapproved intent as normative sources",
+      "the former three-lane workflow, single state ledger and legacy gate names",
+      "tests as the sole semantic plan authority",
+      "provider-specific paths, hooks, log formats or fixed numeric thresholds"
+    ],
+    "requirements_count_after_change": 50,
+    "compiled_plan_count_after_change": 6
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v14.json",
+    "relation": "supersedes",
+    "sha256": "0cd0cbacce6523e5f2007a788738386aec72c2caeba7a7bdaa94c445673f35ca"
+  },
+  "record_version": 15,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "reviewcompass2_cross_cutting_lessons_integrated",
+  "verification": {
+    "artifact_digest_check": "passed: all recorded artifact and predecessor-record digests match",
+    "external_source_check": "passed: all ten ReviewCompass2 files match the fixed commit and recorded digests",
+    "front_matter_check": "passed: consolidated Intent, Glossary and Plan reference the updated generated-source digests",
+    "scope_self_check": "passed: no new Requirement ID, seventh Plan, predecessor lane, fixed numeric threshold or provider-specific path was adopted",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.74s"
+  }
+}

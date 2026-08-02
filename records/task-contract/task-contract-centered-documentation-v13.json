@@ -1,0 +1,110 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "fca5acc6d93e75c95aff2177e747baf4327c31d16f31f878fcd084bba5d16822"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "9cbe396662504edbdd2d5acd03a9305e99a49d1161d901b6bcbdf045235f5c3d"
+    },
+    {
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "b6c023c6aa512d1152aed0a8495f24c1cbd7173e1ffc6224d067fb81220d903b"
+    },
+    {
+      "path": "docs/current/reviewcompass3-glossary-current.md",
+      "sha256": "74da7b22d36a8580250ad5716a5bd1ac941c513947b86a79d8bfb1b92b7a374c"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "2cd9d0a27d496ce225714ea586dcdf82c2a56d97d77debd080ee87dfc7e176a4"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "7e2db2d8c2eae9b18ac444efdcc35e8b50978d04cf78df5b69facbcd592823b0"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "373f86b476d3ca7996fed53f696d177645bde19cff863916186a660ea66b05e5"
+    },
+    {
+      "path": "records/sources/2026-08-02-deployment-topology-discussion.md",
+      "sha256": "95209eadae62ec80ef98cd23182266d657540576f6f542fdbc136f3c5d01c67b"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v12.json",
+      "sha256": "d79bfee61b12345ba4cb5e585468e0fe9058e64a40822d53ea5ccb5411a1750e"
+    },
+    {
+      "path": "/Users/keno/LLMsession/デプロイ方法の検討.md",
+      "sha256": "fa48a9a74cee52b19167c714c61b57bd69ae7af697b4de586c0533f1d2edcb91"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-DEPLOYMENT-TOPOLOGY-ADOPT-DEC-001",
+        "meaning": "過去の詳細なdeployment検討から現行Task Contract設計に必要な責務、段階profile、state境界、bootstrap、distribution unitを選択・修正採用し、Requirements、設計、計画、用語集へ反映する",
+        "text": "必要部分を採用し，文書を修正"
+      }
+    ],
+    "scope": "deployment-topology-selective-adoption",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "fixed source file digest, adoption disposition, updated requirement, design, plan, glossary and index digests",
+      "retention_limitation": "元資料は対話形式の検討文書で出典を持たないため、提案全体を承認済み設計とは扱わず、採用・修正採用・非採用をsource recordへ固定する"
+    }
+  },
+  "adoption_summary": {
+    "adopted": [
+      "logical component boundaries separated from physical process, container and host topology",
+      "local_integrated initial profile followed by evidence-gated shared_runtime and distributed_hybrid profiles",
+      "Control Plane ownership of contracts, plans, workflow state, policy, permits, decisions and provenance",
+      "Execution Plane and worker responsibility without authoritative process-local-only state",
+      "durable attempt, side-effect, capture and checkpoint recording for crash recovery",
+      "Local Execution Agent boundary for remote access to project-local files, Git and commands",
+      "stable deployment reviewing a root-isolated development candidate",
+      "separate distribution units for Runtime Core, Integration Client, Capability Adapter and Project Artifacts"
+    ],
+    "adapted": [
+      "middleware and review application separation into logical Control, Execution and integration responsibilities without fixing the initial process transport",
+      "Task Package and Registry into project-side Task Contract artifacts plus verified installed Capability Adapters",
+      "dynamic workflow into deterministic compilation from accepted Task Contracts and Portfolio",
+      "Docker Compose into an optional implementation decision rather than a product requirement"
+    ],
+    "not_adopted": [
+      "mandatory Docker, PostgreSQL, object storage, GraphRAG or Kubernetes",
+      "unchecked arbitrary executable Task Package or plugin loading",
+      "general Concierge Runtime or unrestricted task orchestration",
+      "shared server, worker pool, HPC and multi-tenant support in the initial release"
+    ],
+    "semantic_change": true
+  },
+  "scope_boundary": {
+    "initial": "local_integrated, single-machine and single-user with logical Control and Execution boundaries, structured I/O, durable recovery and stable/development separation",
+    "later": "shared_runtime after remote-security requirements and a minimal Local Execution Agent E2E",
+    "deferred": "distributed_hybrid only after measured worker, GPU, HPC, scheduler or scale need"
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v12.json",
+    "relation": "supersedes",
+    "sha256": "d79bfee61b12345ba4cb5e585468e0fe9058e64a40822d53ea5ccb5411a1750e"
+  },
+  "record_version": 13,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "deployment_topology_selectively_adopted",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "source_digest_check": "passed: attached 692-line deployment discussion matches the recorded digest",
+    "plan_source_check": "passed: consolidated Plan references current Requirements, Design, Glossary and deployment source-record digests",
+    "scope_self_check": "passed: initial local profile is technology-neutral; shared and hybrid profiles are evidence-gated; arbitrary runtime and plugin expansion remains excluded",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.74s"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "a108caa6355713492fe5565071c110e843ed01e28bad10e68461ecba254d45af"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "430e92ffe6430809e8c1bdf3cc0366800e9e8805ba30f07e65db5a4c3d24f1d3"
+    },
+    {
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "b6c023c6aa512d1152aed0a8495f24c1cbd7173e1ffc6224d067fb81220d903b"
+    },
+    {
+      "path": "docs/current/reviewcompass3-glossary-current.md",
+      "sha256": "ac708e646ba24ddf729366a31e87cf226f46a897f82ada7d0d44d05c42e387a4"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "5c6be43c99963e537ca656b9b682ad4e141de054e5ab35b8205f6ea699fb9918"
+    },
+    {
+      "path": "records/sources/2026-08-02-reviewcompass2-terminology-control.md",
+      "sha256": "0f84865e862f3b7cf0917476157afb5a2185177d158412bb7d6ea4d351a941f6"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v11.json",
+      "sha256": "587f06a7aef0e18af9c3bc07781f363a86cdf973060977f76d3e8ed20c91aa81"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-TERMINOLOGY-ADAPT-DEC-001",
+        "meaning": "ReviewCompass2の登録制用語集と改定履歴をEvidenceとして固定し、Task Contract中心のReviewCompass3へ選択的に適合した統合用語集、Intent原則、計画上の運用を作る",
+        "text": "ReviewCompass2の用語定義を参考に，本プロジェクト用に適合させる．"
+      }
+    ],
+    "scope": "reviewcompass3-terminology-control-adaptation",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped Human instruction, fixed predecessor source digests, adaptation disposition, current glossary and referencing artifact digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、適合指示、前身source、継承・置換判断、成果物Digestを本recordへ保持する"
+    }
+  },
+  "adaptation_summary": {
+    "preserved_or_adapted": [
+      "registered domain terminology before or within first normative use",
+      "one canonical term per concept with Japanese display and machine token",
+      "versioned semantic changes, aliases, retirement and retroactive registration",
+      "separation between human-readable glossary meaning and schema-enforced closed values",
+      "plain user-facing operation words",
+      "separation of execution independence from model independence",
+      "reuse, extend, merge and split_with_rationale classifications"
+    ],
+    "replaced": [
+      "six-stage SDD with the seven current development stages",
+      "three lanes with orthogonal work_origin and continuation_mode",
+      "Task description with versioned Task Contract",
+      "case with Delivery Work Item or Issue Record",
+      "single state ledger with component-owned state and Operational Provenance",
+      "approval stop point with Decision Authority, Decision Record and permit",
+      "proxy decision with evidence-based staged AI delegation",
+      "single shared-routine ledger lookup with Source Symbol Index, Reusable Routine Ledger and real-code inspection",
+      "deploy-manifest with deployment, project and integration manifests plus logical roots"
+    ],
+    "not_carried_forward": [
+      "fixed legacy gate vocabulary and review-wave",
+      "Principle A through C labels",
+      "legacy unit-file and master-role inversion vocabulary",
+      "legacy review-method vocabulary until required by current Requirements",
+      "predecessor-specific paths, IDs, model counts and size constants"
+    ],
+    "semantic_change": true
+  },
+  "implementation_scope": {
+    "included_now": "human-readable consolidated glossary, manual documentation discipline, Intent principle, Plan reference and staged terminology-control design",
+    "excluded_now": "runtime terminology registry, unrestricted prose vocabulary scanning and general ontology",
+    "future_condition": "runtime enforcement requires a separate Requirements delta after manual operation identifies a concrete E2E gap"
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v11.json",
+    "relation": "supersedes",
+    "sha256": "587f06a7aef0e18af9c3bc07781f363a86cdf973060977f76d3e8ed20c91aa81"
+  },
+  "record_version": 12,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "reviewcompass3_terminology_control_adapted",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "glossary_reference_check": "passed: consolidated Plan references the current glossary digest",
+    "intent_reference_check": "passed: glossary and consolidated Plan reference the current Intent digest",
+    "predecessor_source_digest_check": "passed: all four ReviewCompass2 source files match the source-record digests",
+    "terminology_self_check": "passed: workflow, authority, decision, provenance, reuse and deployment terms distinguish current concepts and map retired predecessor terms",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.77s"
+  }
+}

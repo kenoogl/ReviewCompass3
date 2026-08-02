@@ -1,0 +1,138 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "69c22c86edb32ba24e6d1b1de6259c629512415c590ed3df9c349f9ad57ee7d0"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "dbf149b8a12fcfec8ccad759ff0655467c00c188974bb2d5a7b179812ebf83bb"
+    },
+    {
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "6797f4d4e2ddfeaae2475a8af3e497ae784ddc587237bb98d25d5ede0670ccd1"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "e782ba1b60ebae383def3a8402c0a35c8752173bae6f821db90acd73eff8aad1"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v7.json",
+      "sha256": "f818139e453eb89716cc4d1d5150f983b645fdcb9bd698e1454536947acecbc7"
+    },
+    {
+      "path": "docs/intent/2026-07-27-reviewcompass3-intent-draft.md",
+      "sha256": "5d427d5b76a064ecfb56242fc2dcf096e3ec000278b81895dc6dedffd5201d91"
+    },
+    {
+      "path": "docs/intent/2026-08-02-development-policy-amendment.md",
+      "sha256": "b9eb80469452c55ae510edf580021b432805256430c193b3c06ddecad9c17338"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "02c5a14b1b3bbd0056e14f480f04e79df468c1390f25f6a2838a343f4d702161"
+    },
+    {
+      "path": "docs/plan/2026-07-27-reviewcompass3-rebuild-plan.md",
+      "sha256": "87da13798b9af229ea304b5fb973c8a6ed41300a117f6356007e0dae4f17604e"
+    },
+    {
+      "path": "docs/plan/2026-08-02-development-policy-amendment.md",
+      "sha256": "e5a29b93084038d00a645245d477200a94e681cdd57847fb0255affa48c2bdbb"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "838397cf7a0fa8d28bdf1df0d08918093bf94d33cccb1c4101eaa18795c99e87"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "1ca5acd37a8cfecc064f8e5ad3b11b24881fdcc00d6f4cd71f2ccdc8e11652e2"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "e17199f5dee29eda68b6a1d3e23fc7409c37b793c85ce4af47fbc870d3de33b2"
+    },
+    {
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "24714b525e5801cc6170e046df9cdd2a3b35101ab14006e484f1c5439fe750e7"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "2baa91af07fe41ddfd91de3c5b25ccfb674af333f0157f19a31998563b4efece"
+    },
+    {
+      "path": "docs/design/2026-08-02-stage-five-to-task-contract-inheritance.md",
+      "sha256": "b75450300fc6a254843d5353be17d66838553376393d68a0da8f529ab26cdd5e"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-CONSOLIDATED-CURRENT-DEC-001",
+        "meaning": "Intentを製品目的とauthorityの独立文書として統合する",
+        "text": "intentと計画の2文書の統合最新版を作成"
+      },
+      {
+        "decision_id": "TC-CONSOLIDATED-CURRENT-DEC-002",
+        "meaning": "Requirements以降の現行方針、設計、実装順、deferred範囲を一つの計画文書へ統合する",
+        "text": "intentと計画の2文書の統合最新版を作成"
+      }
+    ],
+    "scope": "consolidated-current-intent-and-plan",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped Human instruction, source artifact digests and consolidated output digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、二文書化の指示、生成元、解決規則、成果物Digestを本recordへ保持する"
+    }
+  },
+  "consolidation": {
+    "authority_model": [
+      "the consolidated Intent is the independent product-intent successor candidate",
+      "the consolidated Plan references the Intent by path and digest and does not redefine it",
+      "historical and amendment documents remain immutable evidence and detailed generation sources",
+      "both consolidated documents require Human promotion before becoming approved normative references"
+    ],
+    "intent_resolution": [
+      "preserve purpose, user, Principle A, Principle B, Human authority, fail-closed, provenance, privacy and portability",
+      "remove mandatory development-method details from product Intent",
+      "apply Task Contract-centered control, review, integration, routing, revision, dependency, termination, reuse and as-built boundaries"
+    ],
+    "plan_resolution": [
+      "combine the 37 baseline requirements and 13 Task Contract and Workflow additions into a 50-requirement current set",
+      "retain REQ-WORKFLOW-010 and 011 as post-Pilot candidates rather than current requirements",
+      "resolve the global stages to Intent, Feature, Requirements, Portfolio, TDD Delivery, Integration and Release Evaluation",
+      "retain Work 1 through 8 as the initial plan and As-Built projection as deferred Work",
+      "replace obsolete mandatory red-only commits, immutable tests during implementation, universal mutation testing and universal two-space indentation"
+    ]
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v7.json",
+    "relation": "supersedes",
+    "sha256": "f818139e453eb89716cc4d1d5150f983b645fdcb9bd698e1454536947acecbc7"
+  },
+  "record_version": 8,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "consolidated_current_views_created",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "generated_source_reference_check": "passed",
+    "intent_reference_check": "passed",
+    "requirement_id_check": "passed: 50 current requirement IDs plus two explicitly labeled post-Pilot candidates",
+    "initial_deferred_boundary_check": "passed: As-Built projection remains outside the initial implementation scope",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.71s"
+  }
+}

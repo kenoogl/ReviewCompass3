@@ -1,0 +1,88 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "d1782f52c9e27f8904042192751176aac2f615a53761376653d92d1641e2bec8"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "26f3ec9917cba4bf151bbdcab45177568914aa5653e81fe12013252fe2298ae0"
+    },
+    {
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "b92d05adc3b762c6402b50a3951e87f08051bcf730f375cf1f028264e0769ba5"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "d74636fe8be35cf593f4bb7f1d4e9d2dd6c5e9475a475c0aeca42e110be2f8cf"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v10.json",
+      "sha256": "aebf1a622bd8344f821cd3cebd4267ddb0540b6d5e41884a83e4f0272b562e59"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-AI-DELEGATION-PLAN-DEC-001",
+        "meaning": "Intentへ追加した能力確認後の限定的AI判断委譲方針を、初期Human mode、能力評価、段階導入、権限制御、停止・取消し、Provenanceを含む統合計画へ反映する",
+        "text": "計画書の方も修正"
+      }
+    ],
+    "scope": "consolidated-current-plan-conditional-ai-decision-delegation",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped Human instruction, prior conditional-delegation Intent record and updated artifact digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、計画書への反映指示、初期範囲、段階導入、権限境界、成果物Digestを本recordへ保持する"
+    }
+  },
+  "plan_change_summary": {
+    "initial_mode": "All acceptance, completion, stage and release decisions remain Human decisions through the initial release; no Delegation Authorization is issued.",
+    "planned_progression": [
+      "human_only",
+      "shadow_evaluation",
+      "supervised_delegation",
+      "bounded_delegation"
+    ],
+    "authorization_design": [
+      "Human-issued, versioned and time-bounded Delegation Authorization",
+      "decision-class, requirement, contract, risk, model, capability, tool, permission and side-effect scope",
+      "capability evidence, thresholds, known limitations and stop conditions",
+      "fail-closed scope and validity checks before a delegated decision can change workflow state",
+      "Human-only creation, expansion, renewal and reactivation of delegation",
+      "revocation and capability-degradation impact closure with stale downstream decisions"
+    ],
+    "provenance_and_evaluation": [
+      "Decision Record separates decision content from authority",
+      "delegated decisions bind actor, authorization digest, capability evidence, scope check and outcome",
+      "initial Human decisions and downstream outcomes supply later capability evidence",
+      "metrics include override, escalation, scope violation, false acceptance, false completion and degradation"
+    ],
+    "semantic_change": true
+  },
+  "scope_boundary": {
+    "included_now": "Plan policy, authority model, initial provenance readiness, negative paths and deferred rollout gates",
+    "excluded_from_initial_release": "active AI decision delegation and Delegation Authorization issuance",
+    "required_before_implementation": "separate Requirements delta, threat model, acceptance tests, rollback and Human approval"
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v10.json",
+    "relation": "supersedes",
+    "sha256": "aebf1a622bd8344f821cd3cebd4267ddb0540b6d5e41884a83e4f0272b562e59"
+  },
+  "record_version": 11,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "conditional_ai_judgment_delegation_plan_documented",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "intent_reference_check": "passed: consolidated Plan references the current conditional-delegation Intent digest",
+    "plan_consistency_self_check": "passed: initial Human gates remain authoritative, delegation is deferred, evidence-based, bounded, revocable and fail-closed",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.77s"
+  }
+}

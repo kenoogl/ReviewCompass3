@@ -27,6 +27,8 @@ Task Contractを構造化RequirementsとRuntimeの間に置き、ReviewCompass3�
   そこから採用した運用規則
 - ReviewCompass2のIssue／Plan実績、Issue→Plan粒度関門Issue、Plan独立レビューR1／R2の
   固定commit、artifact Digest、そこから採用する品質関門
+- ReviewCompassのconformance-evaluation要件・設計・実装の固定commitとDigest、そこから
+  継承する実装由来差分、draft-only更新候補、reopen handoff、置換するcode-only逆推定
 
 第5段候補の状態は`awaiting_human_approval`である。本再計画は第5段完了を承認せず、
 Task Contract差分を反映するための再開理由になる。
@@ -105,8 +107,9 @@ regression、compatibility、migration、rollbackを入力にし、義務変更�
 
 ### Cross-cutting Issue Resolution Path
 
-Issue処理を新しい第8の全体Stageまたは独立実装engineにしない。問題、Finding、障害、改善
-候補は、発見Stageにかかわらず次の横断経路へ入れる。
+Issue処理を新しい第8の全体Stageまたは独立実装engineにしない。以下はWork 8の手作業Pilotで
+検証する概念modelであり、初期製品の確定schemaまたは自動state machineではない。問題、Finding、
+障害、改善候補を発見Stageにかかわらず扱えるか、次の横断経路で確認する。
 
 ```text
 Problem / Finding / Incident
@@ -125,9 +128,10 @@ compiled Plan bundleはTask Contractから決定的に導出するRuntime設定�
 同じPlanまたは状態機械へ統合しない。Plan承認、Work Item完了、commit作成だけではIssueを
 resolvedにせず、Acceptance Evidenceを持つResolution Verdictで閉じる。
 
-現在の作業内で解消できず後日扱う問題、blocking依存、上流改定、複数作業にまたがる問題、
-反復またはsystemicな問題、高risk問題はIssue Recordを必須とする。現在のContract内で即時に
-訂正してEvidenceまで得られる一過性の実装誤りをすべてIssue化し、backlogを増殖させない。
+手作業Pilotでは、現在の作業内で解消できず後日扱う問題、blocking依存、上流改定、複数作業に
+またがる問題、反復またはsystemicな問題、高risk問題を暫定Issue記録の対象とする。現在の
+Contract内で即時に訂正してEvidenceまで得られる一過性の実装誤りをすべてIssue化し、backlogを
+増殖させない。正式な登録義務はPilot後のRequirements化で判断する。
 
 ## 4. フィードバック
 
@@ -168,13 +172,37 @@ resolvedにせず、Acceptance Evidenceを持つResolution Verdictで閉じる�
   `R-F6-010`、`R-F6-011`、DP-039、DP-040、実台帳の関係を記録する。
 - ReviewCompass2のIssue／Plan schema、実案件、Issue→Plan粒度関門Issue、Plan review
   R1／R2を固定し、有効だった経路と未解決だった品質関門を区別する。
+- ReviewCompass2のfreeze原因と横断知見を固定し、Evidence Extraction Contractで探索開始集合、
+  展開規則、分類、終了条件、除外、完全性oracleを定める。候補全件を採用、修正採用、不採用、
+  保留へ分類し、採用知見のEvidence Consumption Closureを確認する。
 - Task Contractの適用範囲をReview Task Contractへ限定する。
 - 旧第5段候補をbaselineとして凍結する。
 - 本改定文書群のsource、関係、statusを記録する。
 - `stage-five-design.json`と`stage-five-architecture-integrity.json`を要約Markdownではなく
   構造化baselineとしてDigest固定する。
 
-完了条件：入力Digest、適用範囲、非目標、旧候補状態が一意である。
+完了条件：入力Digest、適用範囲、非目標、旧候補状態が一意であり、必須sourceと採用Findingに
+未分類または消費先なしがない。
+
+### Work 1A: 配置baseline
+
+bootstrap成果を保存する前に、論理root、Git管理境界、相対参照基準、Project Manifest、Project
+Binding、stable／development分離、所有・retention・削除、path override優先順位をLayout Baseline
+Recordへ固定する。空の配置fixtureで別checkoutとproject移動後の参照、Manifest、Binding、文書linkを
+検査し、端末固有絶対pathがproject成果へ混入しないことを確認する。baseline後のmanaged path変更は
+通常編集ではなく、影響閉包、link検査、rollbackを持つmigrationとして扱う。
+
+### Work 1B: Session Log Bootstrap
+
+Work 1Aの保存境界を使い、Work 2以降の議論、判断、調査、変更からSession Evidenceを残せる最小
+capture profileを準備する。取込み対象と許可主体、session ID、source identity、開始・取得時刻、
+capture deadline、content Digest、完全性、confidentiality、access、retention、mutation、source
+availabilityを固定する。
+
+rawは既定で`SENSITIVE_ROOT`、伏字化派生物、要約、索引は別identityで`DATA_ROOT`へ置く。rawから
+派生物を再生成するrestore fixtureを確認し、取得不能、期限切れ、不完全取得を`source_missing |
+source_expired | non_reconstructable`として正常な空sessionと区別する。これはbootstrap Evidence用の
+最小基盤であり、Session Records製品機能の完成、外部送信、許可外取込み、無期限retentionを意味しない。
 
 ### Work 2: intent差分
 
@@ -191,6 +219,8 @@ resolvedにせず、Acceptance Evidenceを持つResolution Verdictで閉じる�
 
 - `FEAT-TASK-CONTRACT-CONTROL`を追加する。
 - `REQ-CONTRACT-001`〜`007`を確定する。
+- `REQ-CONTRACT-008`として実装文書projectionの将来契約を確定するが、初期実装対象には
+  含めない。
 - `REQ-WORKFLOW-005`〜`009`を確定する。
 - Architecture Policyのidentity、競合、優先順位、stale伝播を`001`〜`003`へ組み込む。
 - Project Policy Overlay、変更意味、state effect、risk別Verification Profileを組み込む。
@@ -200,11 +230,11 @@ resolvedにせず、Acceptance Evidenceを持つResolution Verdictで閉じる�
   `REQ-WORKFLOW-005`〜`008`で定義する。
 - Source Symbol Index、Reusable Routine Ledger、Implementation Discovery Record、
   green実装前gateを`REQ-WORKFLOW-009`で定義する。
-- `REQ-WORKFLOW-010`候補としてIssueの永続登録、triage、disposition、再検討を定義する。
-- `REQ-WORKFLOW-011`候補としてIssue Resolution Plan、Plan Challenge、stale、
-  Resolution Verdictを定義する。
-- `REQ-CONTRACT-003`のPortfolio入力へHuman承認済みResolution PlanとIssue被覆を追加する
-  差分を検討する。
+- `REQ-WORKFLOW-010`と`011`は、Issueの永続登録、triage、Resolution Plan、Plan Challenge、
+  stale、Resolution Verdictを扱うpost-Pilot仮説として名前だけを保持する。Work 8の手作業Pilot前に
+  正式Requirement、製品schemaまたは実行permitを確定しない。
+- `REQ-CONTRACT-003`のPortfolio入力へResolution PlanとIssue被覆を追加するかは、Work 8の
+  手作業Pilotで必要性と粒度を確認した後に判断する。
 - 既存37 requirementsを`preserve / adapt / replace / defer`へ全件分類する。
 - Session Evidence Sourceの任意取込み、raw／派生物分離、mutation、access、retention、削除を
   既存`REQ-SESSION-001`〜`003`の差分として固定する。
@@ -214,13 +244,15 @@ resolvedにせず、Acceptance Evidenceを持つResolution Verdictで閉じる�
 
 完了条件：未被覆、重複所有、未定義interface、未解決停止条件がない。
 
-### Work 4: design差分
+### Work 4: design差分と最初のslice選定
 
 - Contract schema、Portfolio、Compiler、Plan bundleを設計する。
 - Architecture Policy schemaと決定的なPolicy解決を設計する。
 - Project Policy Overlay、Policy Adjustment Event、Agent entry生成を設計する。
 - 既存Context、Workflow、Harness、Triage、Trace、Session Records、Portable、Evaluation、
   Self Improvementへ接続する。
+- Context入力を変更単位からの影響閉包、Evidence抜粋、Contract必須材料で決定的に構成し、
+  無関係な文書総量から分離する。広域scopeと全文整合reviewは理由付きの別modeとして設計する。
 - Contract lifecycleとfailure propagationを状態機械へ追加する。
 - Provenanceの型付き複数関係、Evaluation trial identity、Deployment Manifest、安定した
   Project Identity、Bindingを設計する。
@@ -232,22 +264,36 @@ resolvedにせず、Acceptance Evidenceを持つResolution Verdictで閉じる�
   effect・riskからのVerification Profile選択を設計する。
 - 事実層のSource Symbol Index、意味層のReusable Routine Ledger、4分類の再利用判断、
   Human確認、retired routine検査、配置、Provenanceを設計する。
-- Issue Record、Issue Disposition、Issue Resolution Plan、Plan Challenge Record、
-  Resolution Verdictのschemaと独立stateを設計する。
-- WorkflowがIssue lifecycle、Triageがduplicate／merge／conflict、Task Contract Controlが
-  承認済みPlanからPortfolio／Contractへのroute、Semantic Traceが関係検証を所有するよう
-  分担する。新componentは初期Pilotで不足が実証されるまで追加しない。
-- Plan ChallengeをDefinition Challenge、Contract Conformance、Compiler validationと分離し、
-  review目的、入力、Finding、verdict、実行permitへの効果を混同しない。
-- Planまたは固定材料のDigest変更で旧Challengeをstaleにし、未解決blocking Findingがある
-  Resolution PlanからWork Itemを開始できない状態遷移を設計する。
+- Issue Resolution Pathについては、Work 8の手作業Pilotに必要な暫定owner、routing、記録項目、
+  Plan Challenge観点だけを設計する。Issue Record等の製品schema、独立state、Workflow permit、
+  自動stale判定はPilot結果を受けるDeferred Work 10まで確定しない。
+- Assurance Obligation Matrix、Validator Assurance Profile、Review Quality Contract、
+  Evidence Consumption Closure、post-write verificationを6 Plan内の横断成果として設計する。
+- Session sourceの実効retention、capture deadline、source欠落／期限切れ／再構成不能、復元検証を
+  Session Evidence SourceとPortable Lifecycleへ割り当てる。
 - 旧9 design、29 interface、8 state machine、14 protocolを`preserve / adapt / replace`へ
   全件分類し、旧表現を置換してもfailure verdictと永続化順序を維持する。
-- 旧37 acceptance testを全件分類し、各旧test IDへ後継test IDとoracleを割り当てる。
+- 旧37 acceptance testを全件分類する。最初のslice対象には後継test IDとoracleを割り当て、
+  範囲外はsuccessor owner、依存、着手条件を持つ`deferred`として詳細化を後続Contractへ送る。
 
-完了条件：全新Requirementに受け先、interface、状態、acceptance testがある。
+完了条件：全新Requirementに受け先または明示的deferがあり、最初のsliceにはinterface、状態、
+acceptance testがある。範囲外の詳細設計は最小E2Eをblockしない。
 
-### Work 5: 最小Task Contract E2E
+### Work 4A: 関数台帳baseline
+
+配置baseline後にsource treeとsymbol identity規則を固定し、既存の全関数・methodをSource Symbol
+Indexへ機械収録する。Indexはsymbol ID、qualified name、kind、source path、signature、visibility、
+参照関係、Test参照、content Digestを持ち、同一source treeから再生成できなければ完了しない。
+
+再利用判断対象をReusable Routine Ledgerへ責務、入出力、side effect、制約、類似候補、利用箇所、
+active／retired、後継、統廃合履歴とともに登録する。Index、Ledger、実codeのcoverage、freshness、
+重複候補、retired routineをHumanが確認する。両baseline確定前に製品実装codeを追加せず、最初の
+Implementation Task Contractへ`implementation_ready`を発行しない。
+既存のIndex生成器がない場合、固定入力と出力schemaを持つ最小bootstrap生成器だけを隔離した
+development toolingとして作成できる。独立Testとreviewを行い、最終Indexには生成器自身も収録する。
+正式Runtime能力への流用は別Task Contractを必要とする。
+
+### Work 5A: 最小Review Task Contract happy path
 
 小さな仕様変更一件を対象に、次の一本を通す。
 
@@ -269,18 +315,7 @@ Requirement
 最初のWork Itemは`new_development / fresh`とし、後続fixtureでmaintenanceとreopenを
 同じDeliveryへ通す。
 
-Review Task Contractの最小E2Eがstableになった後、ReviewCompass3自身の小さなhelper追加を
-内部Implementation Task Contractとして一件だけ実行する。固定source treeからIndexを生成し、
-red確認、候補探索、Human確認、`implementation_ready`、green、commitまでを通す。このPilotは
-自己開発Evidenceであり、Implementation Task Contractを正式製品Runtime対象へ昇格しない。
-
-Issue Resolution Pathは最小Review Task E2Eの前提にしない。E2Eがstableになった後、実在する
-non-blocking Issue一件を選び、Issue Record、Triage、Resolution Plan、独立Plan Challenge、
-Task Contract route、Resolution Verdictまでを手作業で一周する。最初からschema、CLI、
-scheduler gateを実装せず、手作業Pilotで必須field、review観点、費用、停止条件を固定する。
-ただしPilot対象Work Itemは、対象Digestに束縛したPlan Challenge合格がなければ開始しない。
-
-### Work 6: TDD negative path
+### Work 6A: 初期sliceのTDD negative path
 
 - Contract obligation欠落
 - source Requirement未解決
@@ -290,6 +325,12 @@ scheduler gateを実装せず、手作業Pilotで必須field、review観点、�
 - Contract変更後のstale
 - crash後の再開
 - 必須Provenance event欠落
+- Evidence抽出候補の未分類、または採用Findingのconsumer欠落
+- 規則の宣言はあるがenforcement、permit効果、復旧、Evidenceのいずれかがない
+- validatorが既知違反を見逃す、正常fixtureを誤ってblockingにする
+- validator変更後にfixture再実行なしで旧verdictを再利用する
+- Evidence不足をFindingなしに丸める、責務外Findingを混在させる
+- 書込み後にだけ生じる不整合をpost-write verificationしない
 - optional Evaluation observation欠落
 - Contract適合だがRequirement欠落
 - maintenanceが観測可能な義務変更を内包する
@@ -305,17 +346,8 @@ scheduler gateを実装せず、手作業Pilotで必須field、review観点、�
 - `split_with_rationale`に責務境界または分離理由がない
 - retired routineを再登録判断なしに復活させる
 - `no_candidate`を4分類へ混ぜ、存在しない候補判断を作る
-- IssueとResolution Planの参照が切れている
-- Issueの禁止事項、対象外、Human判断またはEvidenceがResolution Planへ移送されない
 - 赤Testだけがあり、それをgreenにする実装作業がない
 - Work Itemごとのexpected outcome、oracle、検証方法または完了判定が単独で閉じない
-- Plan Challenge未実施またはblocking Finding未解決のPlanからWork Itemを開始する
-- Issue、Plan、Requirement、Policyまたはreview材料の変更後に旧Challenge合格を再利用する
-- Plan承認、commitまたはWork Item完了だけでIssueをresolvedにする
-- deferred Issueに再検討条件、ownerまたは次回確認時点がない
-- Session取込み範囲が未承認、rawと派生物が同一境界、mutationが未解決である
-- Session contextが不要なContractをSession未取込みだけで停止する
-- Self Improvementが版付きProposalとowner検証を経ず現行設定を変更する
 - 旧interfaceまたはprotocolを置換した際にfailure verdict、期待終端、永続化順序を失う
 - 旧acceptance testを後継testと義務対応なしに削除する
 - blocking依存の親へRun permitを発行する
@@ -329,7 +361,18 @@ scheduler gateを実装せず、手作業Pilotで必須field、review観点、�
 RequirementまたはContract期待が誤っていた場合は新versionへ移り、Test変更理由を
 記録する。
 
-### Work 7: deployment E2E
+AI委譲、用語Runtime統制、Issue Resolution automation、Session拡張、Self Improvementなど
+初期slice外の負例はDeferred Acceptance Catalogへ保存する。対象能力のTask ContractがPortfolioへ
+入った時点でredとして有効化し、初期Review Task Contractの完了をblockしない。
+
+### Work 5B: 内部Implementation Task Contract Pilot
+
+Work 6Aの中核負例がgreenになった後、ReviewCompass3自身の小さなhelper追加を一件だけ実行する。
+red、固定source tree、Index、Ledger、候補探索、Human確認、`implementation_ready`、green、台帳更新、
+post-write verification、commitを通す。このPilotは自己開発Evidenceであり、Implementation Task
+Contractを正式製品Runtime対象へ昇格しない。
+
+### Work 7A: `local_integrated`最小deployment E2E
 
 - source checkoutとinstalled codeを分離する。
 - target projectとruntime rootを別配置にする。
@@ -340,7 +383,7 @@ RequirementまたはContract期待が誤っていた場合は新versionへ移り
   分離配置する。
 - OS標準配置、環境設定、明示overrideの優先順位を検証する。
 - Project BindingとIntegration Manifestを検証する。
-- project移動、update、migration、uninstallを検証する。
+- project移動と複数checkoutを検証する。
 - sensitive storeの権限とretentionを検証する。
 - project内容変更で`project_id`が変わらないこと、同一projectの複数checkoutを異なる
   Bindingとして扱えることを検証する。
@@ -350,9 +393,20 @@ RequirementまたはContract期待が誤っていた場合は新versionへ移り
 既存Review Task方式とTask Contract方式を、同じ対象、source universe、model、Tool、
 budgetで比較する。
 
+変更規模比例の検証では、同じ変更、意味graph、Contract材料を固定したままsource universeへ
+無関係な材料だけを追加するpaired trialと、意味関係辺を変更して影響閉包を広げるtrialを行う。
+`source_universe_bytes`、`changed_unit_count`、`impact_closure_unit_count`、
+`review_input_bytes`、`review_input_tokens`、selection mode、scope拡大理由を一次観測へ残す。
+
 共通ルーチン照合は、同じRequirement、source tree、red Testを固定し、従来の実装探索と
 Implementation Discovery gateの条件を分けて比較する。比較のために重複実装を製品成果へ
 故意に統合せず、隔離fixtureまたは事前に期待判断を固定したcaseを使う。
+
+Issue Resolution Pathはここで初めて手作業Pilotする。実在するnon-blocking Issue一件を選び、
+暫定Issue記録、Triage、Resolution Plan、独立Plan Challenge、Task Contractへのroute、
+Resolution Verdictまでを一周する。製品schema、CLI、scheduler gateは実装せず、必須field、
+owner、review観点、費用、停止条件、stale条件を観測する。Pilot対象Work Itemは、対象Digestに
+束縛したPlan Challenge合格がなければ開始しない。
 
 各試行はevaluation case、condition、pair、trial、実行順序、model・Tool・budget設定、
 label作成者、評価者、confidenceへ結ぶ。無作為化、盲検化、反復数はProfileで指定し、
@@ -360,8 +414,11 @@ label作成者、評価者、confidenceへ結ぶ。無作為化、盲検化、�
 
 初期評価領域は次に限定する。
 
-- Context obligation充足とContext量
+- Context obligation充足、source universe量、変更単位数、影響閉包、review入力byte／token数
+- 無関係材料追加時のpayload不変性、scope拡大率、拡大理由、追加量
 - Finding Precision、Recall、責務外指摘率
+- material adequacy、必須source消費率、未消費Finding、`insufficient_evidence`、`out_of_level`
+- validator既知違反検出率、正常fixture誤停止率、mutation生存数、post-write再検出
 - RequirementからEvidenceまでの追跡可能率
 - Contract作成からacceptedまでの時間と再作業
 - Human介入回数と判断時間
@@ -377,6 +434,45 @@ label作成者、評価者、confidenceへ結ぶ。無作為化、盲検化、�
 Pilot完了条件は優位性の確定ではなく、必要eventの取得、指標再計算、欠測、privacy、
 比較可能性、記録負担を確認できることである。
 
+### Work 7B: lifecycle deployment E2E
+
+Work 8で最小方式の観測可能性を確認した後、update、migration、uninstall、stableからcandidateへの
+staging、migration dry-run、原子的切替、rollbackを検証する。Layout Baselineの変更が必要な場合は
+通常のfile移動で直さず、新baseline version、全link検査、data migration、rollbackを先に通す。
+
+### Deferred Work 9: 実装文書projection
+
+Task Contract TDDのaccepted成果から、Operational Provenance、Test、Design Decision、
+Implementation、Source Symbol Indexを固定入力としてAs-Built Recordを生成し、人間向け
+As-Built Documentation、Trace Matrix、変更履歴、drift reportを再生成する。Requirementsと
+Task Contractは規範正本のままとし、意味変更候補は本文へ自動反映せずUpstream Revision
+Proposalとreopenへ渡す。Provenanceのない既存codebase向けには、旧conformance-evaluationの
+コード解析とHuman協働を`legacy_reconstruction`として補助的に継承する。
+
+本Workは初期開発へ入れない。Work 1〜8、最初のTask Contract、初期vertical slice、初期製品
+releaseの完了条件またはblocking依存にしない。初期開発は、後からprojectionできるidentity、
+relation、DigestをProvenanceへ保存するところまでを担う。
+
+着手判断は、次を満たした後にHumanが行う。
+
+- acceptedされたImplementation Task Contractと実運用Provenanceが一件以上ある
+- source symbol、Test、Design Decision、commitまでの必須関係と欠測が実測されている
+- 生成文書の利用者、更新頻度、保存価値が確認されている
+- project内accepted成果とproject外暫定projectionの配置がdeployment E2Eで検証済みである
+- 初期開発のblocking問題より優先する根拠がある
+
+着手後は、単一Task Contractの機械可読Record、決定的再生成、双方向trace、stale検出を
+最小sliceとする。Feature集約文書、LLMによる説明改善、legacy reconstruction、独立コード
+監査は、その最小sliceの評価後に段階導入する。
+
+### Deferred Work 10: Issue Resolution automation
+
+Work 8の手作業Pilotで必須field、owner、停止条件、stale条件、費用が確認された後に、別の
+Task Contractとして着手を判断する。最初のsliceで`REQ-WORKFLOW-010`と`011`の正式化、Issue Record、
+Resolution Plan、Plan Challenge、Resolution Verdictのschema validator、Provenance記録をTDDで
+実装する。その検証後にだけWorkflow permitへ結線する。Issue管理UI、外部tracker同期、汎用
+project-management機能は対象外とする。
+
 ## 6. 最初のTask Contract
 
 最初のContractは、ReviewCompass3自身の小さな文書変更を対象とするReview Task
@@ -391,6 +487,10 @@ Contractとする。Implementation Task Contractを初回から正式Runtime対�
 - ConformanceとChallengeを分離する
 - Human判断を対象Digestへ束縛する
 - Requirementからaccepted artifactまでをProvenanceで結ぶ
+
+As-Built Record、実装文書renderer、Documentation Conformance gate、legacy reconstructionは
+最初のContractに含めない。ただし将来のprojectionに必要なidentity、relation、Digestを
+失わないProvenance記録は含める。
 
 ## 7. Designの扱い
 
@@ -511,6 +611,9 @@ Issue RecordとIssue Resolution Planは`.reviewcompass/issues/`と
 
 ## 11. 停止条件
 
+能力固有の条件は、その能力または対応Task Contractが現在のscopeに入った時だけ適用し、
+Deferred能力を初期sliceの暗黙依存にしない。
+
 - Task Contractの適用範囲が汎用Agent Runtimeへ暗黙拡大した
 - source RequirementまたはContract obligationの被覆が不明である
 - Compilerが未対応obligationを黙って落とす
@@ -525,48 +628,67 @@ Issue RecordとIssue Resolution Planは`.reviewcompass/issues/`と
 - 必須Provenanceを保存できない
 - 評価値とOperational verdictを混同する
 - 開発checkoutまたは特定アプリ配置がruntime必須条件になる
+- Layout Baselineが未確定、またはmanaged path変更をlink検査とmigrationなしで行う
+- Session Log Bootstrapの取込み範囲、raw保存境界、access、retention、source availability記録、
+  restore fixtureが未確定である
 - sensitive dataの分類、権限、retentionがない
 - 第5段旧候補を変更後設計の承認証拠として再利用する
 - source tree、Source Symbol Index、Reusable Routine Ledgerのいずれかを照合せず新規関数を
   実装する
 - 類似候補の判断、Human確認、分離理由またはretired routine検査が欠ける
-- Issue、Resolution Plan、compiled Plan bundle、Work Itemを同じidentityまたは状態機械へ
-  押し込める
-- IssueからPlanへ粒度、oracle、禁止事項、対象外または依存が移送されていない
-- Plan Challengeのblocking verdictがWork Item開始permitへ結線されていない
-- Planまたは固定材料の変更後も旧Challenge合格が有効なままである
-- Plan承認またはWork Item完了をIssue解決Evidenceとして代用する
+- Issue Resolution automationがscope内なのに、Issue、Resolution Plan、compiled Plan bundle、
+  Work Itemを同じidentityまたは状態機械へ押し込める
+- Issue Resolution automationがscope内なのに、IssueからPlanへ粒度、oracle、禁止事項、対象外、
+  依存が移送されない、またはPlan Challengeのblocking verdictが開始permitへ結線されない
+- Issue Resolution automationがscope内なのに、固定材料変更後の旧Challenge合格、Plan承認、
+  Work Item完了をIssue解決Evidenceとして代用する
+- 必須sourceまたは採用Findingにconsumerがなくても材料抽出を完了とする
+- PolicyまたはContractの宣言だけで、runtime enforcement、停止、復旧、Evidenceを保証済みとする
+- validator自体の正例、負例、境界例を検証せず、Findingゼロを品質保証に使う
 
 ## 12. 新しい第5段相当の完了条件
 
 - Task Contract中心intentがHuman判断済みである。
 - 新requirementsと既存37 requirementsの差分被覆が完了している。
-- Contract schema、Compiler、Plan、state、interface、deployment、evaluationが設計済みで
-  ある。
-- Architecture Policy、型付きProvenance関係、Project Binding、Integration Verdictが
-  設計済みである。
-- routing、upstream revision、dependency・cycle、controlled terminationが設計済みである。
-- Session Evidence SourceとSelf Improvement Proposalが設計済みである。
-- Source Symbol Index、Reusable Routine Ledger、Implementation Discovery、green実装前gate、
-  4分類、retired routine検査が設計済みである。
-- Issue Record、Issue Resolution Plan、Plan Challenge、Resolution Verdict、risk別review、
-  stale、実行permit、Provenance、配置が設計済みである。
-- Issue→Planの粒度、単独判定可能性、禁止事項保持、TDD closureを検査する受け入れ試験と、
-  手作業Pilotの評価項目が確定している。
+- 全50 Requirementに受け先または明示的deferがあり、最初のReview Task Contractに必要な
+  Contract schema、Compiler、Plan、state、interface、deployment、evaluationが詳細設計済みである。
+- 最初のsliceに必要なArchitecture Policy、Provenance、Project Binding、Integration、routing、
+  upstream revision、dependency・cycle、controlled terminationが設計済みである。
+- Layout Baselineが固定され、空の配置fixtureで相対参照、Manifest、Binding、project移動を
+  確認済みである。
+- Session Log Bootstrapでraw／派生物の分離、capture deadline、source availability、mutation、
+  restore fixtureが確認済みであり、Work 2以降のEvidenceを記録できる。
+- Source Symbol IndexとReusable Routine Ledgerの初期baseline、coverage、freshness、重複候補、
+  4分類、retired routine検査がHuman確認済みである。
+- Issue Resolution Pathの暫定owner、routing、手作業Pilotの記録項目と評価項目が確定し、製品
+  schema、正式Requirement、実行permitがDeferred Work 10へ明示的に分離されている。
+- Evidence Extraction Contract、Consumption Closure、Assurance Obligation Matrix、Validator
+  Assurance Profile、Review Quality Contract、post-write verificationのownerと負例が確定している。
+- 実装文書projectionがdeferred Workとしてowner、成果物、配置、着手条件まで定義され、
+  初期Workと初期releaseをblockしない。
 - 旧9 design、29 interface、8 state machine、14 protocol、37 acceptance testの全件に
-  disposition、successor owner、後継testまたはfailure verdictがある。
+  dispositionとsuccessor ownerがあり、最初のslice対象には後継testまたはfailure verdictがある。
 - 新旧設計の`preserve / adapt / replace / defer`監査が完了している。
-- 最小E2Eと負例のAcceptance Testが確定している。
+- 最小E2EとWork 6Aの負例が確定し、Deferred Acceptance Catalogが初期完了条件から分離されている。
 - 未解決review Findingがない。
 - 新しい承認候補が旧候補、変更理由、全Evidenceへ結ばれている。
 
 ## 13. 実装へ進む条件
 
-新しい第5段相当の設計全体を巨大な基盤として先に実装しない。Humanが方向と最小
-Contractを承認した後、Work 5の一本に必要な薄いvertical sliceから実装する。
+新しい第5段相当の設計全体を巨大な基盤として先に実装しない。Humanが方向、Layout Baseline、
+Session Log Bootstrap、関数台帳baseline、最小Contractを承認した後、Work 5Aの一本に必要な薄い
+vertical sliceから実装する。
+
+初期順序は`Work 1 → Work 1A → Work 1B → Work 2 → Work 3 → Work 4 → Work 4A → Work 5A →
+Work 6A → Work 5B → Work 7A → Work 8 → Work 7B`とする。その後は実測された不足だけを次
+Task Contractへ送り、関連ContractがacceptedになるたびにCross-Contract Integrationを反復する。
 
 E2Eで実測されていない汎用化、追加Schema、Contract type、adapter、評価指標はbacklogへ
 置き、具体的な不足が確認されるまで必須化しない。
+
+As-Built projector、文書renderer、Documentation Conformance gate、legacy reconstructionも
+このbacklogに置く。初期開発中に個別Markdown生成が便利でも正式Runtime能力へ昇格させず、
+Deferred Work 9の着手条件と新しいTask Contractを経て実装する。
 
 Issue Resolution Pathも同じ順序を守る。まず手作業Pilotと独立Plan Challengeを実施し、
 次にschema validatorとProvenance記録をTDDで実装し、最後にWorkflow permitへ結線する。

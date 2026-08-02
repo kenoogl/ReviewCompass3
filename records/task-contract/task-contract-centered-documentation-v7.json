@@ -1,0 +1,153 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "b46e9a15d7de2851eba597fce68b176138448f298d67800856eefc5b67ca6e82"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "94391885951f205505bfc02942027c52a14f64aa2b62e5b07f8a04d02eab7751"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "e17199f5dee29eda68b6a1d3e23fc7409c37b793c85ce4af47fbc870d3de33b2"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "02c5a14b1b3bbd0056e14f480f04e79df468c1390f25f6a2838a343f4d702161"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "24714b525e5801cc6170e046df9cdd2a3b35101ab14006e484f1c5439fe750e7"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "2baa91af07fe41ddfd91de3c5b25ccfb674af333f0157f19a31998563b4efece"
+    },
+    {
+      "path": "docs/design/2026-08-02-stage-five-to-task-contract-inheritance.md",
+      "sha256": "b75450300fc6a254843d5353be17d66838553376393d68a0da8f529ab26cdd5e"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "838397cf7a0fa8d28bdf1df0d08918093bf94d33cccb1c4101eaa18795c99e87"
+    },
+    {
+      "path": "records/sources/2026-08-02-reviewcompass-conformance-evaluation.md",
+      "sha256": "30e491f99d59b9227d25d4d8291025fd6c4061a3683d70422e89a6fdb54c2c93"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v6.json",
+      "sha256": "0bf9ded2d16f958a5d7d29bff9383be53cbc7fbe7c0ebc170fcc5f9904a80e2c"
+    },
+    {
+      "external_path": "/Users/Daily/Development/ReviewCompass",
+      "git_commit": "cab302d4b32af790628b811b3566f39d55781fa5",
+      "source_id": "SRC-RC-CONFORMANCE-001"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-ASBUILT-DEC-001",
+        "meaning": "Provenanceを中心に実装機能をAs-Built文書へ投影する将来計画を文書へ反映する",
+        "text": "この計画を文書に反映"
+      },
+      {
+        "decision_id": "TC-ASBUILT-DEC-002",
+        "meaning": "As-Built projectionを初期開発、最初のTask Contract、初期releaseの実装範囲から除外する",
+        "text": "ただし，初期開発には入れない"
+      }
+    ],
+    "scope": "task-contract-as-built-documentation-deferred-plan",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped human instructions, predecessor commit and artifact digests, successor documentation digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、計画反映と初期開発除外の指示、前身commit、観測Digest、採用・置換・defer内容を本recordへ保持する"
+    }
+  },
+  "external_source": {
+    "artifact_path": "records/sources/2026-08-02-reviewcompass-conformance-evaluation.md",
+    "captured_at": "2026-08-02",
+    "confidentiality_class": "project-internal",
+    "content_retained": false,
+    "fixed_commit": "cab302d4b32af790628b811b3566f39d55781fa5",
+    "name": "ReviewCompass conformance-evaluation requirements, design and implementation",
+    "provided_by": "human_user",
+    "retention_policy": "retain-derived-source-record-with-successor-documentation-history",
+    "source_id": "SRC-RC-CONFORMANCE-001",
+    "source_kind": "predecessor-project-reverse-conformance-design-and-implementation",
+    "source_observations": [
+      {
+        "git_blob": "4260fc097e2170f968ad9cd7219a12d4de4b7881",
+        "path": ".reviewcompass/specs/conformance-evaluation/requirements.md",
+        "sha256": "7e8f93103e2da376d0f1d1d5c3a8008852f691722eb9dfd25f6cf31ac5e8d0cd"
+      },
+      {
+        "git_blob": "8ac334c94848a635f5de9dfeafa1adfc6655656b",
+        "path": ".reviewcompass/specs/conformance-evaluation/design.md",
+        "sha256": "bb59dcceb92b4c8a67a0315ab352fc3a4be95bdd745c0af1713a259abb058d72"
+      },
+      {
+        "git_blob": "871e60f7290a695b64e25590f1406d8d7d60aa70",
+        "path": "tools/conformance_evaluation/generation_mode.py",
+        "sha256": "f0f3bd11ff6410d897e30bfa86908835899c580d2f4301ae52bcf5c0c3c2b041"
+      },
+      {
+        "git_blob": "f42c8fde0033b61ef091f112d1f2cea42681f916",
+        "path": "tools/conformance_evaluation/check_mode.py",
+        "sha256": "47ddd2a8aa7a6445177da79d628a5d43eb3910ac38dd78934bb82b2dbd5d76a8"
+      },
+      {
+        "git_blob": "ed03949bf711f18b207a12685e3a5f39b70b4da9",
+        "path": "tools/conformance_evaluation/contract_ownership.py",
+        "sha256": "7fe5704f28aefda387697b82bfa0b290739786645af61d8b9f593a0d369129d7"
+      }
+    ]
+  },
+  "plan_summary": {
+    "adopted": [
+      "separate implementation fact extraction, document generation and conformance verdict",
+      "retain code, test, decision and provenance evidence references",
+      "keep specification update artifacts draft-only",
+      "route normative semantic changes through Upstream Revision, reopen and Human decision",
+      "retain Human-collaborative reconstruction for codebases without managed provenance"
+    ],
+    "adapted": [
+      "replace normal code-to-requirements/design inference with deterministic As-Built projection from Task Contract provenance",
+      "use Source Symbol Index and tests as an independent reverse check for unattributed implementation",
+      "treat Markdown as a regenerable view of a machine-readable As-Built Record",
+      "separate unverified runtime projections from accepted project artifacts"
+    ],
+    "deferred": [
+      "As-Built Record projector",
+      "Markdown renderer and feature aggregate views",
+      "Documentation Conformance verification gate",
+      "legacy reconstruction and independent code-only audit"
+    ],
+    "initial_scope": "preserve identities, typed relations and digests needed for later projection",
+    "implementation_status": "not_started_deferred",
+    "activation_condition": "Human decision after at least one accepted Implementation Task Contract and measured operational provenance completeness"
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v6.json",
+    "relation": "supersedes",
+    "sha256": "0bf9ded2d16f958a5d7d29bff9383be53cbc7fbe7c0ebc170fcc5f9904a80e2c"
+  },
+  "record_version": 7,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "documented_deferred",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "document_reference_check": "passed",
+    "initial_scope_exclusion_check": "passed: excluded from Work 1-8, first Task Contract, initial vertical slice and initial release",
+    "requirement_shape_check": "passed: 13 requirements; REQ-CONTRACT-008 is deferred",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.58s"
+  }
+}

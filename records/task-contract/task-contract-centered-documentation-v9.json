@@ -1,0 +1,86 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "c78a42b25ee8c5ae62d1826c5afa35520174e8f50e971824506ba46ab90066fc"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "40c617d9ccd4109524248e4a611a37a5f274333f0148e199cb6dd7af70005288"
+    },
+    {
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "a4aab90f5ede45f60de770a343c6b661947e772cecaa41c10cfab832f4f04045"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0651cafe200d12fd3c305adf9ec7d5675199fd49e5c4abc6b76553fb328b058a"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v8.json",
+      "sha256": "68abc8e595a8052964b49ada695ffcd8a18bd89e7770c5b9701b7c00a97a8a7a"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-INTENT-PLAIN-LANGUAGE-DEC-001",
+        "meaning": "Intentを技術設計の語彙ではなく、目的、利用者、価値、原則を人が理解できる平易な文章へ改める",
+        "text": "Intentは人が理解しやすいように書く．現在はソフトウェア工学の言語で書かれている"
+      }
+    ],
+    "scope": "consolidated-current-intent-plain-language-rewrite",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped Human instruction, prior consolidation record and rewritten artifact digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、平易化指示、維持した意味、移動した技術詳細、成果物Digestを本recordへ保持する"
+    }
+  },
+  "rewrite_summary": {
+    "preserved": [
+      "product purpose and primary user",
+      "Human final authority",
+      "traceability from decisions to source evidence",
+      "fail-closed handling of missing, changed or conflicting inputs",
+      "Task Contract as the bridge from requirements to bounded work",
+      "local and system-wide verification",
+      "upstream revision, dependency, termination and Issue handling principles",
+      "implementation reuse, implementation documentation, measured improvement, privacy and portability"
+    ],
+    "rewritten": [
+      "explain Task Contract once as a small work agreement",
+      "describe user-visible questions and outcomes before internal mechanisms",
+      "replace component, schema, state and verification vocabulary with plain-language responsibilities",
+      "express success as conditions the user can directly understand and confirm"
+    ],
+    "moved_to_plan_only": [
+      "component names and state ownership details",
+      "contract fields and compiler plans",
+      "state-machine vocabulary",
+      "verification profiles and typed provenance relations",
+      "deployment manifests and storage-root details"
+    ],
+    "semantic_change": false
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v8.json",
+    "relation": "supersedes",
+    "sha256": "68abc8e595a8052964b49ada695ffcd8a18bd89e7770c5b9701b7c00a97a8a7a"
+  },
+  "record_version": 9,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "intent_plain_language_rewritten",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "intent_reference_check": "passed: consolidated Plan references the rewritten Intent digest",
+    "source_digest_check": "passed: all three Intent generation sources match front-matter digests",
+    "semantic_preservation_self_check": "passed: purpose, user, authority, traceability, fail-closed, Task Contract, integration, revision, dependency, termination, reuse, as-built, evaluation, privacy and portability remain represented",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.71s"
+  }
+}

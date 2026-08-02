@@ -19,6 +19,11 @@ promotion_required: true
 既存の第5段承認候補は`awaiting_human_approval`のまま上書きしない。本改定と対応する
 構造化設計、受け入れ試験、適合性監査が完成した後、新しい承認候補を生成する。
 
+6 Plan、Challenge、関数台帳、Provenanceの意味上の分離を維持しながら物理実装とHuman作業を
+軽量化する境界は、
+[Task Contract設計の過剰実装を避ける境界に関するメモ](2026-08-03-overdesign-boundaries-memo.md)
+を参照する。
+
 ## 2. 設計原則
 
 - Task ContractをRequirementsとRuntime間のcontrol and provenance planeにする。
@@ -29,6 +34,8 @@ promotion_required: true
 - Operational ProvenanceとEvaluation Observationsを分離する。
 - 実コードから生成するSource Symbol Indexと、人が確認するReusable Routine Ledgerを
   分離し、green実装前に両方を照合する。
+- 意味上の責務分離を、独立したauthority、lifecycle、security、failure recoveryまたは実測scaleの
+  根拠なしに、独立artifact、component、state machine、Human gateへ展開しない。
 - 開発checkout、installed code、project、runtime data、sensitive storeを分離する。
 - stableでない自己適用能力を必須経路へ置かない。
 
@@ -166,10 +173,23 @@ ReusableRoutineLedger
 └── previous_version
 ```
 
-Source Symbol Indexは固定source treeから機械生成する派生事実であり、手作業で実コードの
-存在を追加・削除しない。Reusable Routine Ledgerは人が確認した責務、alias、状態、統廃合
-履歴を保持し、過去entryを上書きしない。両方と実コードを照合し、片方だけを判断根拠に
-しない。
+Source Symbol Indexは固定source treeから全symbolを機械生成する派生事実であり、手作業で実コードの
+存在を追加・削除しない。Reusable Routine Ledgerはpublic、共有、cross-contract、high-risk、
+重複候補、retired、今回の影響閉包または新規・統廃合提案に該当するroutineについて、人が確認した
+責務、alias、状態、統廃合履歴を保持し、過去entryを上書きしない。単純accessor、generated code、
+外部vendorなどは明示した規則でLedger対象外にできるが、Index上の存在を削除しない。両方と実コードを
+照合し、片方だけを判断根拠にしない。
+
+初回の製品実装前に、確定したLayout Baselineを使ってsource pathとsymbol identity規則を固定し、
+既存の全関数・methodをSource Symbol Indexへ収録する。HumanはIndex生成・対象外規則、coverage／
+freshness統計、public／共有／high-risk抽出、重複候補、retired routine、representative sample、
+未解決候補の処置を確認する。全symbolの意味entry作成をbaseline完了条件にしない。今回の変更範囲に
+必要なLedger判断が未解決なら、最初のImplementation Task Contractへ`implementation_ready`を発行しない。
+配置変更後は旧Indexを利用せず、Layout Baseline、Project Binding、source treeの新identityから再生成する。
+
+Index生成器が存在しないbootstrap時は、固定source treeを読み、固定schemaのIndexだけを出力する
+隔離development toolを最小例外として作成できる。生成器のTestと独立reviewを先に行い、生成後の
+最終Indexへ生成器自身も収録する。Runtime capabilityとしての採用は別Task Contractで判断する。
 
 Review / Execution PlanはImplementation Task Contractの場合だけImplementation Discovery
 Planを内包する。これは6種類のPlanへ第7の全Contract必須Planを追加するものではない。
@@ -197,7 +217,7 @@ Compilerは純粋なprojection coreと、外部capability catalogを解決する
 Contract + fixed Policy + fixed Catalog
   → normalize
   → validate references
-  → project six Plans
+  → project six typed Plan views
   → verify obligation coverage
   → verify cross-plan consistency
   → Plan bundle identity
@@ -214,9 +234,12 @@ Plan bundleは次を持つ。
 - Contract ID、version、digest
 - Compiler ID、version、digest
 - PolicyとCatalogのidentity
-- 6 PlanのIDとdigest
+- 6 typed Plan viewの安定keyとcoverage
 - obligation coverage map
 - unresolvedとdiagnostic
+- Evidence Extraction ContractとEvidence Consumption Closure
+- Assurance Obligation Matrix
+- Validator Assurance ProfileとReview Quality Contract
 
 Implementation Task ContractではReview / Execution Plan内のImplementation Discovery Planと
 `REQ-WORKFLOW-009`の対応を被覆mapへ追加する。Review Task Contractなど実装を行わない型では
@@ -225,25 +248,59 @@ Implementation Task ContractではReview / Execution Plan内のImplementation Di
 一つでも必須Planが生成不能または被覆不足の場合、bundleは`not_compilable`であり、
 consumerへ開始可能なPlanとして渡さない。
 
+6 Planは一つのimmutable Plan bundle内のtyped viewであり、bundle全体に一つのidentity、version、
+digest、compile verdictを持つ。共通のContract、Policy、Catalog、risk、source、permissionはbundle共通部へ
+一度だけ保存し、consumerへ必要なviewを決定的にprojectionする。viewを利用者が直接編集せず、
+独立approval、独立lifecycle、独立state machineを持たせない。共通の中間modelから全viewを生成し、
+view間のpoint-to-point整合protocolを作らない。
+
+特定viewの独立保存またはprocess分離は、ownerと更新周期、security、retention、failure recovery、
+またはscaleの独立性が実測された場合だけ別Task Contractで判断する。分離してもbundle identity、
+Contractからの導出関係、obligation coverageを維持する。
+
 ## 4. 既存componentの改定
 
-### 4.1 Review Context
+### 4.1 Context Runtime（Review Context Feature owner）
 
-Review ContextはTask定義を所有しない。Context Acquisition Planを受け取り、候補取得、
+Context RuntimeはTask定義を所有しない。Context Acquisition Planを受け取り、候補取得、
 Scope分類、Composition、Manifest、freshnessを所有する。
 
 Context Manifestへ追加する項目は次である。
 
 - ContractとPlan identity
 - Context obligation ID
+- selection mode（`impact_slice | expanded_scope | full_consistency`）
+- fixed change unit、semantic graph、closure ruleのidentity
+- source universe量、変更単位数、影響閉包単位数
 - selected sourceとversion
+- 各候補への到達理由、採否、採用目的
 - transformation chain
 - excluded candidateと理由
 - unresolved obligation
 - contradiction
 - trustとfreshness verdict
-- token、時間、費用
+- review payloadのbyte、token、時間、費用
+- scope拡大時の起点、理由、判断主体、追加材料、拡大前後の量、終了条件
 - confidentiality class
+- material adequacy verdictとcompleteness oracle
+- `insufficient_evidence | out_of_level`の分類と処置
+- 必須source／Findingのconsumer参照
+
+`impact_slice`は既定modeであり、固定変更単位から版付き意味graphと閉包規則をたどった影響
+候補、必要なEvidence抜粋、Contract必須材料だけをCompositionする。source universeへ到達不能な
+材料を追加した場合、universe identityの変更によりfreshnessは再検査するが、選択材料集合と
+payloadは増やさない。
+
+`expanded_scope`と`full_consistency`は、graph、閉包規則またはEvidenceの欠落・stale・競合、
+global invariant、横断Policy、未解決循環、Verification ProfileまたはDecision Authorityの要求に
+限って選べる。通常sliceへの暗黙追加として扱わず、別Context identityとProvenanceを作る。
+budget超過時は必須材料を切り捨てず、Evidence closureを保つ分割・再構成、またはHuman
+escalationへrouteする。どの経路でも安全な入力を確定できない場合はRun permitを要求しない。
+
+既存資料を探索するPlanでは、開始entry、展開規則、分類軸、終了条件、除外条件、完全性oracleを
+Evidence Extraction Contractとして固定する。候補は`adopt | adapt | reject | defer`へ全件分類し、
+採用sourceまたはFindingをRequirement、Contract obligation、Verification、Decisionのいずれにも
+接続できない場合は`evidence_consumption_incomplete`としてContextを充足済みにしない。
 
 ### 4.2 Workflow
 
@@ -305,6 +362,12 @@ ContractへのEvidence referenceを必須とする。blocking Challenge Finding�
 Delivery Work Itemを`accepted`へ進めず、ContractまたはRequirementの改定要求を
 Workflowへ返す。
 
+`contract_conformance | definition_challenge | final_contract_challenge`はVerdictの意味、基準、
+failure routeとして分離するが、常に別Review Runを要求しない。low riskでは一つのRunが共有材料と
+deterministic validationから複数の型付きVerdictを生成できる。mediumは影響に応じてConformanceと
+Final Challengeを独立させ、highまたは外部・不可逆side effectでは必要な独立reviewerとHuman gateを
+要求する。同じFinding候補をVerdictごとに複製せず、共有Evidenceと各判断を別identityで結ぶ。
+
 ### 4.5 Semantic Trace
 
 Operational Provenance graphへ次のchainを追加する。
@@ -334,6 +397,13 @@ Semantic TraceはSource Symbol Index、Reusable Routine Ledger、Implementation 
 Recordのschemaと関係検証を所有する。Workflowはgreen実装permitを所有し、Portable
 LifecycleはLedgerとrecordの原子的書込みを所有する。Semantic Traceは実装またはWork Item
 状態を直接変更しない。
+
+後続開発ではSemantic TraceがAs-Built Recordのschema、固定入力からのprojection、
+Task Contract obligationと実装symbolの双方向照合、Documentation Conformance Verdictを
+所有する。Task Contract Controlは文書化に必要なProvenance obligationを提供し、Workflowは
+有効化後のverification gateとUpstream Revisionへのroutingを所有する。Portable Lifecycleは
+暫定projectionとaccepted成果の分離配置を所有する。初期実装ではprojectorを実装せず、
+将来の再構成に必要なidentity、relation、Digestを既存eventへ保持する。
 
 ### 4.6 Evidence Evaluation
 
@@ -385,6 +455,31 @@ raw、伏字化派生物、要約を同じidentityまたは保存境界にしな
 Session Evidence SourceはContext採否、Work Item、Run状態を変更しない。Context Runtimeが
 Context Acquisition Planに従って候補を採否し、Portable Lifecycleが保存とaccessを、Semantic
 TraceがrawからContext Manifestまでの来歴を検証する。
+
+source adapterはsourceの実効retention、capture deadline、取得時点、復元方法、復元検証を
+Availability Recordへ保存する。`source_missing | source_expired | non_reconstructable`は候補ゼロや
+正常な空sessionと区別し、必須sourceならRunを開始しない。復元成功は参照の存在だけでなく、
+期待digest、構造、派生物再生成の確認を要する。
+
+bootstrapでは完全なSession Records Runtimeに先立ち、次の最小Capture ProfileをLayout Baselineへ
+束縛して準備する。
+
+```text
+SessionLogBootstrapRecord
+├── session_id / source_identity / source_kind
+├── started_at / captured_at / capture_deadline
+├── raw_record_id / digest / sensitive_store_ref
+├── derived_record_id / redaction_policy_ref
+├── completeness / mutation_verdict / availability_verdict
+├── confidentiality / access / retention
+└── capture_actor / authorization_ref / restore_verification_ref
+```
+
+rawは既定で`SENSITIVE_ROOT`、伏字化派生物、要約、索引は別identityで`DATA_ROOT`へ置く。Work 2
+以降の議論、判断、調査、変更を取得対象にできる状態をbootstrap完了条件とし、rawから派生物を
+再生成するrestore fixtureを通す。source adapterが利用できない場合もAvailability Recordを残す。
+このprofileは開発Evidence保全用であり、外部送信、許可範囲拡大、無期限retentionまたは完成した
+製品Session Records能力として扱わない。
 
 ### 4.10 Self Improvement
 
@@ -624,33 +719,42 @@ Verification Planは`change_semantics`、`state_effect`、Contract risk、side e
 一律の独立三者reviewやcommit gateをschemaへ固定しない。Profile選択根拠と実際に実行した
 検証を別eventで保持し、必要なprofileを満たさない場合は`verified`へ進めない。
 
+Definition ChallengeはContract versionごと、Conformanceは成果候補または成果versionごと、Final
+Challengeはaccept前または上位・隣接影響の変更時を既定とする。stale後は影響を受けたVerdictだけを
+再実行する。Verdict identityの分離を、全state transitionでの三重Run、固定reviewer数、固定round数、
+一律Human gateへ読み替えない。
+
+各validatorはValidator Assurance Profileとして、validatorと入力前提のversion、既知正例、負例、
+境界例、mutationまたはfault injection、独立oracle、代表実データの要否を持つ。validatorまたは
+前提変更時は旧verdictをstaleにし、必要fixtureを再実行する。Findingがゼロであることだけを
+validatorの正しさのEvidenceにしない。
+
+Review Quality Contractは固定verdict、severity、Finding schema、`insufficient_evidence`、
+`out_of_level`、材料十分性、独立性、収束条件を持つ。書込みを伴うWorkはriskに応じて出力の再読込、
+関連validator、stale閉包をpost-write verificationで確認し、未実行なら`verified`へ進めない。
+
 ## 7. Provenance Event設計
 
 ### 7.1 event共通field
 
-各eventは最低限、次を持つ。
+全event共通のenvelopeは次へ限定する。
 
 - `event_id`
 - `event_type`
 - `schema_version`
 - `occurred_at`
 - `actor_type`と`actor_identity`
-- `requirement_ids`
-- `task_contract_id`、`version`、`digest`
-- `obligation_ids`
-- `run_id`と任意の`attempt_id`
-- `state_before`と`state_after`
+- 該当する`project_id`、`work_item_id`、`run_id`、`attempt_id`
 - `input_refs`と`input_digests`
 - `output_refs`と`output_digests`
-- `decision`と`reason`
-- `change_semantics`、`acceptance_truth_changed`、`state_effect`
-- `verification_profile_id`、`version`、`digest`
-- `execution_conditions`
-- `duration`、`resource_usage`、`cost`
-- `confidentiality_class`
-- `retention_policy`
+- `confidentiality_class`と`retention_class`
 - `previous_event_id`
 - `relations`
+
+Requirement、Task Contract、obligation、state before／after、decision、reason、change semantics、
+Verification Profile、execution conditions、duration、resource usage、costなどは、必要なevent typeの
+payloadへ置く。全eventへ空または無関係なfieldを要求しない。共通envelopeとtype-specific payloadは
+別schema versionを持てるが、event identityとtyped relationで一つのgraphとして検証する。
 
 `relations`の各項目は`relation_type`、`target_type`、`target_id`、`target_digest`を持つ。
 最初の閉じた関係語彙は次とする。
@@ -678,7 +782,8 @@ Verification Planは`change_semantics`、`state_effect`、Contract risk、side e
 
 内容そのものを重複保存せず、不変成果物への参照とDigestを基本にする。
 `previous_event_id`はappend順序だけを表し、意味的な依存関係は`relations`で表す。一つの
-eventは複数の入力、成果、Evidence、判断へ関係を持てる。
+eventは複数の入力、成果、Evidence、判断へ関係を持てる。relationはevent typeごとの許可集合を
+schemaで定め、すべてのeventが全relationを使用できる巨大共通schemaにしない。
 
 ### 7.2 event分類
 
@@ -686,11 +791,15 @@ eventは複数の入力、成果、Evidence、判断へ関係を持てる。
 - Work routing、checkpoint、block、resume、termination event
 - compilation event
 - Context acquisition / selection / exclusion event
+- Evidence extraction / classification / consumption closure event
+- Assurance matrix compilation / enforcement event
+- Context scope expansion / full consistency selection event
 - permission and capability resolution event
 - Workflow permit event
 - execution / Tool / LLM / Human event
 - artifact and side effect event
 - Verification event
+- validator assurance / post-write verification event
 - Conformance / Challenge Finding event
 - Human decision event
 - Dependency discovery、cycle detection、cycle resolution event
@@ -699,15 +808,78 @@ eventは複数の入力、成果、Evidence、判断へ関係を持てる。
 - Source Symbol Index generation、candidate search、reuse proposal、Human confirmation、
   routine consolidation／retirement／re-registration event
 - Session ingestion、raw isolation、derivation、mutation、Context adoption event
+- Session source availability、capture deadline、restore、restore verification event
 - Improvement hypothesis、proposal、Human decision、owner application、next trial event
 - deployment and migration event
 - evaluation observation event
 
+この分類は全低水準操作を耐久eventにする要求ではない。file read、symbol検索、個々のTest assertion、
+debug logなどは、Contract、risk、side effect、復旧に必要なCapture Profileが要求する場合だけ運用または
+診断eventとして取得する。
+
 ### 7.3 完全性
 
-Capture PlanはContract typeと実行経路ごとの必須event集合を持つ。Traceは必須event、
-関係、Digest、順序を検査する。欠落時はRun結果を削除せず、`provenance_incomplete`として
-Workflowへ返す。
+Capture PlanはContract type、risk、side effect、実行経路ごとの必須event集合と、次の保存層を持つ。
+
+- 必須・耐久event：Contract、Plan、Context、Source Snapshot、Run、Verification、Decision、authority、
+  permit、state、side effect、acceptance、stale、termination、integration、release
+- 運用event：retry、checkpoint、lease、cache、増分更新、scope expansion
+- 診断・raw data：debug log、詳細trace、raw response、session raw、performance sample
+- 派生物：query index、metric、dashboard、graph cache、As-Built候補
+
+Traceは必須・耐久event、関係、Digest、順序を検査する。欠落時はRun結果を削除せず、
+`provenance_incomplete`としてWorkflowへ返す。authority変更または外部・不可逆side effectの前に必要な
+eventはwrite-aheadで保存する。運用eventは安全性義務を損なわない範囲でbatch化でき、診断dataは
+sampling、quota、rotation、期限付きretentionを適用できる。Decision、authority、state transition、
+external send、acceptanceをsamplingしない。派生物は一次eventから再生成可能とし、同じretentionを
+要求しない。
+
+### 7.4 As-Built projection（後続開発）
+
+As-Built projectionは新しい開発stageまたは独立した業務状態を追加せず、有効化された
+Implementation Task ContractのVerification Planが要求する派生成果とverdictとして扱う。
+
+```text
+Task Contract / obligation
+  + Operational Provenance
+  + Test / Design Decision / Evidence
+  + fixed source tree / Source Symbol Index / commit
+  → As-Built Record
+  → As-Built Documentation / Trace Matrix / change history
+  → Documentation Conformance Verdict
+  → verified | Upstream Revision Proposal | provenance repair
+```
+
+As-Built Recordは少なくとも次を持つ。
+
+- `record_id`、`schema_version`、`projector_identity`、`projector_version`
+- source Requirement、Task Contract、obligation、Work Item、RunのidentityとDigest
+- source tree、commit、実装symbol、公開interface、data、state、error、side effect
+- Test、Design Decision、Evidence、configuration、deployment、migrationへの参照
+- 既知制限、未解決Issue、Provenance completeness
+- `complete | partial | stale | conflicting`の状態
+- 全入力Digestとprior accepted Recordへの`supersedes`関係
+
+MarkdownはRecordから導出する人間向けviewであり、編集されたMarkdownを実装事実または
+Requirementsの正本にしない。同じ固定入力とprojector versionから意味的に同じRecordを
+再生成できなければならない。
+
+Documentation Conformanceは順方向、逆方向、再現性の三検査を行う。順方向はobligationから
+Test、Design Decision、Implementation、Evidenceの被覆を検査する。逆方向は固定source treeと
+Source Symbol Indexから外部観測可能な実装を探索し、所有ContractまたはFindingへ帰属させる。
+再現性検査は入力Digest、生成器version、出力Digestを検証する。Provenanceだけを入力にせず、
+sourceとTestの独立照合を残す。
+
+Finding分類は`unrealized_obligation`、`unattributed_implementation`、
+`implementation_detail`、`upstream_inconsistency`、`provenance_incomplete`、
+`stale_projection`とする。`implementation_detail`はAs-Builtだけへ反映できる。外部義務、
+accept/reject、scopeを変える候補は仕様本文へ自動反映せず、Upstream Revision Protocolへ
+渡す。Provenanceを持たない既存codebaseは標準projectionと混同せず、コード解析とHuman協働の
+`legacy_reconstruction`へrouteする。
+
+本節は設計上の後続契約を固定するが、Work 1〜8、最初のTask Contract、初期vertical slice、
+初期releaseではprojector、Markdown renderer、独立legacy解析、verification gateを実装しない。
+初期実装が必須とするのは、後からRecordを作れるidentity、relation、Digestの保存だけである。
 
 ## 8. Evaluation設計
 
@@ -761,8 +933,14 @@ Dependability、Auditability、Adaptability、Verifiabilityの7軸へ仮説とme
 - Acceptance Criteria充足率
 - Context obligation充足率
 - Evidence Coverage
-- Context候補、採用、除外、token数
+- source universeのbyte／token、変更単位数、影響閉包単位数
+- Context候補、採用、除外、review payloadのbyte／token数
+- source universeに対するpayload比、変更単位に対する影響閉包比
+- `impact_slice | expanded_scope | full_consistency`の件数、拡大理由、追加量
 - Finding Precision、Recall、採用率、責務外指摘率
+- material adequacy、必須source消費率、未消費Finding数
+- `insufficient_evidence`、`out_of_level`、post-write再検出件数
+- validator既知欠陥検出率、正常fixture誤停止率、mutation生存数
 - Provenance Completeness
 - Contract作成、compile、red-to-green、acceptedまでの時間
 - Contract、Test、Design、Implementationの改定回数
@@ -788,6 +966,42 @@ Human解釈を保持する。一次eventと過去projectionを上書きせず、
 
 ## 9. 配置設計
 
+### 9.0 論理topologyとdeployment profile
+
+論理責務は物理process、container、hostから分離する。
+
+```text
+Integration Client
+  → Control Plane
+      ├─ Task Contract Control
+      ├─ Workflow / durable state
+      ├─ Context and Policy resolution
+      ├─ Decision / permit
+      └─ Operational Provenance
+  → Execution Plane
+      ├─ Harnessed Execution
+      ├─ LLM / Tool / Test adapters
+      └─ output capture / checkpoint
+```
+
+Control Planeは何を、どの固定Planと権限で実行するかを所有する。Execution Planeはpermitに従う
+実作業を行うが、Contract本文、Work Itemのauthority state、accepted verdictを変更しない。
+workerはauthorityを持つ唯一のstateをprocess memoryまたはlocal一時fileだけに保持せず、Attempt、
+side effect、capture、checkpointをdurable eventへ結ぶ。crash後は同じidentityを照合し、重複side
+effectを防いで再開する。
+
+deployment profileは次の3値とする。
+
+| profile | 初期状態 | topology | 追加関門 |
+|---|---|---|---|
+| `local_integrated` | 初期実装対象 | 単一machine・単一利用者。論理境界は維持し、物理process数とtransportは固定しない | root分離、structured I/O、crash再開、stable／development分離 |
+| `shared_runtime` | 後続 | 共有Control Planeとproject側Local Execution Agent | 認証、remote threat model、data locality、offline、通信障害、最小permission |
+| `distributed_hybrid` | deferred | 複数Execution Worker、GPU／HPC等 | scheduler、重複実行、scale、tenant、costの実測Evidence |
+
+profileは環境名だけでなく、component placement、endpointまたはlocal transport、state owner、failure
+model、permission、supported capabilityをDeployment Manifestへ固定する。Docker、PostgreSQL、Object
+Storage、Kubernetesなどはprofileの必須条件にせず、Design Decisionとdeployment E2Eで選ぶ。
+
 ### 9.1 論理root
 
 ```text
@@ -805,6 +1019,12 @@ EVALUATION_ROOT
 `PROJECT_ROOT`以外は既定で対象repository外とする。`SENSITIVE_ROOT`はアクセス境界を
 他のdataから分離できなければならない。
 
+bootstrap Evidenceを保存する前に、各logical root、Git管理境界、相対参照基準、Project Manifest、
+Project Binding、stable／development分離、所有・retention・削除、override優先順位をLayout Baseline Recordとして
+固定する。空の配置fixtureで別checkoutとproject移動後のlink解決を確認する。baseline後のmanaged
+path変更は通常のfile編集ではなく、新baseline version、影響閉包、全link検査、data migration、
+rollbackを持つmigrationとして扱う。
+
 ### 9.2 project内配置
 
 共有・version管理する候補は次とする。
@@ -820,6 +1040,7 @@ EVALUATION_ROOT
 ├── reuse/
 │   └── shared-routines.json
 └── verified-artifacts/
+    └── as-built/                  # 後続開発でaccepted Recordと文書を配置
 ```
 
 project内へ置かないものは次である。
@@ -847,6 +1068,7 @@ DATA_ROOT/projects/<project-id>/
   implementation-discovery/
     indices/
     records/
+  as-built/                        # 後続開発の未検証projection
 
 STATE_ROOT/projects/<project-id>/
   checkpoints/
@@ -879,9 +1101,12 @@ EVALUATION_ROOT/projects/<project-id>/
 Deployment Manifestは次を持つ。
 
 - deployment ID、owner、schema version
+- deployment profile、environment role（`stable | development`）
 - installed code identity
 - supported-platform matrix identity
 - logical root binding
+- Control Plane／Execution Plane placement、endpointまたはlocal transport
+- durable state owner、checkpoint store、failure model
 - project binding
 - integration binding
 - owned resource inventory
@@ -918,6 +1143,38 @@ Codex、Claude、IDEなどとの関係は次で表す。
 開発アプリとReviewCompass3の隣接配置を前提にしない。adapterが未対応、source rootが
 不明、権限が過剰、ownerが曖昧な場合は導入しない。
 
+shared profileでは、Integration ManifestにLocal Execution Agentのidentity、version、project
+binding、allowed operation、read／write root、command allowlist、credential scope、有効期間、
+revocation、offline policyを追加する。共有Control Planeはlocal repositoryを直接mountする包括権限を
+既定で持たない。Agentは固定requestとpermitの範囲だけを実行し、raw local dataを必要以上にserverへ
+返さない。
+
+### 9.7 distribution unit
+
+初期の配布・更新単位を次へ分ける。
+
+| unit | 内容 | 更新時の扱い |
+|---|---|---|
+| Runtime Core | Contract compile、Workflow、state、Provenanceのcodeとschema | install／migration／rollbackを必要とする |
+| Integration Client | CLI、IDE hook、adapter入口 | Core compatibilityをManifestで検査する |
+| Capability Adapter | LLM、Tool、command、test等の検証済み実行adapter | version、permission、side effect、ownerを固定する |
+| Project Artifacts | Task Contract、Portfolio、Policy、Requirement map、Prompt、Design Decision | Runtime再deployなしにversion更新できる |
+
+Project Artifactsは実行定義と入力であり、任意のexecutable codeを含めない。新しい実行方式が必要な
+場合はCapability Adapterをinstalled codeとしてpreflight、verification、permission reviewへ通す。
+汎用Task Registryまたはplugin loaderは初期範囲に含めない。
+
+### 9.8 stable／development bootstrap
+
+ReviewCompass3自身を開発するときは、確認済みstable deploymentとdevelopment candidateを別の
+Deployment Manifest、CODE_ROOT、STATE_ROOT、DATA_ROOT、LOG_ROOT、CACHE_ROOTへ置く。共用可能な
+project成果は明示Bindingとread／write authorityを持つ場合だけ共有する。
+
+stable deploymentがdevelopment sourceとcandidate artifactをreviewし、candidateは自分自身の
+release可否を決める唯一のoracleにならない。updateはcandidateをstaging rootへ配置し、旧stableで
+migration dry-run、E2E、Provenance、rollbackを確認してから原子的にstable bindingを切り替える。
+切替後のpost-write検証が失敗した場合は旧stable identityへ戻す。
+
 ## 10. install、update、uninstall
 
 ### install
@@ -932,9 +1189,10 @@ Codex、Claude、IDEなどとの関係は次で表す。
 
 1. code schema、config schema、event schema、Contract schemaのmigration planを作る。
 2. 既存dataを変更する前にbackup identityを固定する。
-3. 新旧runtimeで読める境界を明示する。
-4. migrationを追記型eventとして記録し、再読込照合する。
-5. 失敗時は旧確認済み版へ戻す。
+3. development candidateをstableと分離したstaging rootへ配置する。
+4. 新旧runtimeで読める境界を明示し、旧stableからcandidateのmigration dry-runを検証する。
+5. migrationとstable binding切替を追記型eventとして記録し、再読込照合する。
+6. post-write検証失敗時は旧確認済み版とbindingへ戻す。
 
 ### uninstall
 
@@ -948,17 +1206,53 @@ Codex、Claude、IDEなどとの関係は次で表す。
 
 - source checkout、installed code、target project、全runtime rootを別場所に置いて
   Task Contract E2Eが完了する。
+- `local_integrated`でControl／Executionのstructured I/Oを保ったまま単一processと分離processの
+  いずれかを選べ、process topologyがContract identityを変えない。
+- Execution WorkerをAttempt中に停止し、durable checkpointから重複side effectなしに再開できる。
+- stableとdevelopmentが別root、Manifest、stateを使い、candidateがstable stateへ無許可で
+  書き込めない。
+- stableからcandidateのupdateを検証し、切替後失敗で旧stableへrollbackできる。
+- `shared_runtime`を有効化するprofileでは、serverからlocal repositoryへの直接包括accessを拒否し、
+  Local Execution Agentの期限付きallowlist内操作だけを許す。
+- Project Artifactsだけの更新ではRuntime Coreの再installを要求せず、Capability Adapter追加では
+  code verificationとpermission reviewを要求する。
 - project移動後にBinding更新だけで同じContract identityを再利用できる。
 - project内容変更で`project_id`が変わらず、manifestと成果物digestだけが更新される。
 - 同一projectの複数checkoutが異なるBindingとして衝突なく解決される。
 - 成果物内の未許可絶対パスを検出する。
 - Contract obligationを一件落とすとcompileを拒否する。
 - Plan項目のobligation参照を切るとRun permitを拒否する。
+- 6 Plan viewが一つのbundle identityから決定的に生成され、viewを独立approvalまたは独立lifecycleへ
+  変更すると拒否する。
 - 必須Provenance eventを落とすと`verified`を拒否する。
+- 任意の診断eventまたは再生成可能な派生indexだけを落としても、必須eventが完全なら業務成果を
+  `provenance_incomplete`にしない。
+- Evidence抽出候補を未分類にする、または採用Findingのconsumerを外すとContext充足を拒否する。
+- Assurance Obligation Matrixのenforcement、permit効果、復旧、Evidenceを一つずつ外すとcompileを拒否する。
+- validatorが既知違反を見逃すmutationを生存させず、既知正常例をblockingにしない。
+- validatorまたは入力前提の変更後、fixture再実行なしに旧verdictを再利用できない。
+- Evidence不足をFindingなしへ丸めず`insufficient_evidence`とし、責務外指摘を`out_of_level`で分離する。
+- 書込み後にだけ現れる不整合をpost-write verificationで検出し、未実行時は`verified`を拒否する。
+- 同じ変更単位、意味graph、閉包規則、Contract必須材料から同じ影響候補、採否、review
+  payloadを再生成できる。
+- source universeへ影響関係のない材料だけを追加すると、freshness再検査は行うが選択材料、
+  payload byte数、payload token数は増えない。
+- 意味関係辺またはContract必須材料を変更すると、影響閉包とpayloadが規則どおり変わり、
+  prior Contextをstaleとして拒否する。
+- 関係欠落、global invariantまたは横断Policyにより局所閉包を確定できない場合、暗黙に全文を
+  追加せず、理由付きscope拡大、別の全文整合review、分割またはHuman escalationへrouteする。
+- 許可条件、Decision Authority、拡大理由、追加材料を欠く`expanded_scope`または
+  `full_consistency`を拒否し、budget超過による必須Evidenceの黙示的切捨ても拒否する。
+- 後続開発のAs-Built能力を有効化したprofileでは、同じ固定入力とprojector versionから
+  同じRecordを再生成し、source変更時に旧Recordを`stale_projection`と判定する。
+- 後続開発の双方向照合では、未実現obligationと未帰属の外部観測可能実装を区別し、意味変更
+  候補を本文更新ではなくUpstream Revision Proposalへ渡す。
 - 任意Evaluation observationだけを落とすと`partially_evaluable`になる。
 - Requirementを欠くContract fixtureをDefinition Challengeが実行前に検出する。
 - Contract適合だが上位Intentまたは隣接Contractを損なうfixtureをFinal Contract
   Challengeが検出する。
+- low riskの一Review RunがConformance、Definition、Finalの別Verdictを生成でき、high profileでは
+  必要な独立reviewerまたはHuman gateの省略を拒否する。
 - interface不整合、owner競合、局所成功・全体Intent不成立をIntegrationで拒否する。
 - 一Contractの失敗がIntegration Planどおり全体verdictへ伝播する。
 - new development / maintenanceとfresh / reopenの4組合せが共通Deliveryへrouteされる。
@@ -973,6 +1267,8 @@ Codex、Claude、IDEなどとの関係は次で表す。
 - base PolicyとProject Policy Overlayから同じAgent entryを再生成でき、Overlay変更では
   依存するContractだけがstaleになる。
 - 同じ固定source treeとgeneratorから同じSource Symbol Index identityを再生成できる。
+- 全symbolを機械Indexへ収録したまま、LedgerのHuman確認をpublic、共有、high-risk、重複、retired、
+  影響閉包へ限定し、対象外private helperの意味entry不足だけで`implementation_ready`を拒否しない。
 - red確認後、類似候補を持つ新規関数はHuman確認済みの`reuse | extend | merge |
   split_with_rationale`がなければ`implementation_ready`へ進めない。
 - `no_candidate`を4分類と混同せず記録し、候補なしの実装を不必要に停止しない。
@@ -1011,6 +1307,7 @@ Codex、Claude、IDEなどとの関係は次で表す。
 - `DES-EVIDENCE-EVALUATION`：adapt
 - `DES-SELF-IMPROVEMENT`：adapt
 - `DES-TASK-CONTRACT-CONTROL`：new
+- `DES-AS-BUILT-PROJECTION`：defer（後続Task ContractでSemantic Traceへ追加）
 
 component、interface、state machine、protocol、acceptance testの全件分類は
 `2026-08-02-stage-five-to-task-contract-inheritance.md`へ固定する。旧固定本数とpoint-to-point
