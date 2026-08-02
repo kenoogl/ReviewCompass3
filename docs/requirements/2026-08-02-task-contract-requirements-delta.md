@@ -14,6 +14,8 @@ promotion_required: true
 定義する。
 
 対象Featureを`FEAT-TASK-CONTRACT-CONTROL`と`FEAT-WORKFLOW-CONTROL`とする。
+ReviewCompass2の承認済みintent P-5、共通ルーチン台帳、`R-F6-010`、`R-F6-011`を
+前身要件として継承し、Task Contract TDD DeliveryとProvenanceへ接続する。
 
 ## REQ-CONTRACT-001 版付きTask Contract
 
@@ -177,6 +179,7 @@ Contract、Plan、Context、Execution、Result、Evidence、Human判断を必須
   - 追記型Operational Provenance event
   - 閉じた関係語彙に従う複数の型付きevent関係
   - Policy Overlay、Policy Adjustment、変更意味、state effect、Verification Profileのevent
+  - Implementation Discovery、再利用判断、Human確認、台帳更新、廃止routine検査のevent
   - 必須event完全性verdict
 - 停止条件
   - 必須eventまたは関係を記録できない
@@ -413,6 +416,57 @@ leafを選ばなければならない。
   - pauseまたはcancelをContract acceptanceとみなすこと
   - 未処理を黙って残したままstageまたはreleaseをcompletedにすること
 
+## REQ-WORKFLOW-009 実装前の共通ルーチン照合
+
+システムは、Implementation Task Contractのred確認後、green実装で新規関数または共通処理を
+書く前に、固定source treeから生成したSource Symbol Index、Reusable Routine Ledger、
+実コードを照合し、Implementation Discovery Recordと再利用判断を確定しなければならない。
+
+- 入力
+  - Implementation Task Contract、Delivery Work Item、red Testのidentity
+  - 固定source tree、repository、Project BindingのidentityとDigest
+  - 同じsource treeから生成したSource Symbol Indexのidentity、generator、schema、Digest
+  - Reusable Routine Ledgerのversion、Digest、active／retired routine、alias、統廃合履歴
+  - Index、Ledger、Discovery Recordのschemaと原子的I/O policy
+  - 予定する新規または変更symbolの責務、入出力、side effect、利用境界
+- 出力
+  - 検索scope、query、候補symbol、candidate Evidenceを持つImplementation Discovery Record
+  - `candidate_found | no_candidate`のdiscovery outcome
+  - `candidate_found`の場合は`reuse | extend | merge | split_with_rationale`の判断
+  - LLM proposalとHuman confirmationを分離した判断record
+  - Task Contract、Work Item、Design Decision、Test、Implementation、commitへの関係
+  - Ledger登録、統合、retireまたは再登録の追記候補
+  - Portable Lifecycleへ渡す原子的なLedger／Discovery更新操作
+- 停止条件
+  - source treeとIndexのDigestが一致しない、またはIndexを再生成できない
+  - 台帳だけを調べ、固定source treeと実コードを照合していない
+  - 候補があるのに4分類、理由またはHuman確認がない
+  - `split_with_rationale`に責務境界、非互換条件または分離理由がない
+  - retired routineまたはaliasと同じ責務を、再登録判断なしに追加しようとする
+  - Discovery RecordをTask Contract、red Testまたは予定Implementationへ結べない
+  - schema不適合、閉じた語彙外の判断、過去の判断または統廃合履歴の変更がある
+  - Ledgerを検証済みのPortable Lifecycle操作を経ず直接変更しようとする
+- 復旧条件
+  - current source treeからIndexを再生成し、候補探索をやり直す
+  - 既存routineの再利用、拡張または統合へDesign Decisionを訂正する
+  - 分離が必要なら理由とHuman確認を追加する
+  - retired routineの再登録を新しいDesign DecisionとHuman判断として記録する
+- 失敗時に保存するもの
+  - source／Index／Ledger identity、検索scope、候補、診断、未確認proposal、拒否理由
+- 受け入れ条件
+  - 同じ固定source treeとPolicyから同じSource Symbol Index identityを再生成できる
+  - 類似候補がないfixtureは`no_candidate`となり、4分類を偽造せずgreen実装へ進める
+  - 同一責務の候補があるfixtureは、Human確認済み4分類がなければgreen実装を拒否する
+  - stale Index、理由のない分離、retired routineの無断復活をそれぞれ拒否する
+  - 再利用判断から候補実装、Task Contract、Test、Design Decision、最終commitへ逆引きできる
+  - Ledgerの過去判断と統廃合履歴を上書きせず、新しい記録として追加する
+  - schema違反と閉じた語彙外の判断を拒否し、書込み失敗注入後も直前の有効Ledgerを読める
+  - Ledgerの直接変更を検出し、検証済み操作による追記へ戻す
+- 対象外
+  - 名前または埋込み類似度だけで意味的同一性を自動確定すること
+  - Human確認だけでsource tree、Indexまたは実コード照合を省略すること
+  - 初期Pilotの結果なしにImplementation Task Contractを正式製品Runtimeへ拡大すること
+
 ## 2. 既存requirementsへの差分
 
 ### FEAT-REVIEW-CONTEXT
@@ -446,8 +500,22 @@ leafを選ばなければならない。
 - Contract definition lifecycleはTask Contract Controlが所有し、Work Item lifecycle、
   routing、block、resume、termination、Run permitはWorkflowが所有する。
 - `REQ-WORKFLOW-004`の自己適用はstableなContract能力だけを必須経路へ使用する。
-- `REQ-WORKFLOW-005`〜`008`を追加し、entry routing、上流改定、依存・循環、制御終了を
-  Workflowの観測可能な義務とする。
+- `REQ-WORKFLOW-005`〜`009`を追加し、entry routing、上流改定、依存・循環、制御終了、
+  実装前共通ルーチン照合をWorkflowの観測可能な義務とする。
+- `REQ-WORKFLOW-009`は初期段階ではReviewCompass3自身のImplementation Task Contractへ
+  Project Architecture Policyとして適用し、Pilot後のHuman判断なしに正式Runtime範囲へ
+  拡大しない。
+
+### FEAT-SESSION-RECORDS
+
+- `REQ-SESSION-001`は取込みsource universeをContext obligation、利用者判断、Project
+  Bindingへ束縛し、Session取込みを要求しないContractの実行を妨げない。
+- `REQ-SESSION-002`はraw原本、伏字化派生物、要約、来歴を別identity、別access、別retention、
+  別削除Policyへ置き、派生物をContext candidateとしてだけ渡す。
+- `REQ-SESSION-003`は追記、非追記変更、消失のmutation verdictをContext freshnessと
+  Provenanceへ結び、未解決時に旧派生物の再利用を拒否する。
+- Session RecordsはWork Item、Run、Context採否を直接変更せず、Session Evidence Sourceとして
+  Context RuntimeとPortable Lifecycleへ接続する。
 
 ### FEAT-PORTABLE-LIFECYCLE
 
@@ -469,6 +537,12 @@ leafを選ばなければならない。
 
 - 改善候補はEvaluation Ledgerの固定比較を根拠とし、Contract、Compiler、Policy、
   Capture Planのどれを変更する仮説かを明示する。
+- `REQ-IMPROVE-001`はEvaluation case、condition、pair、trial、実行条件を固定し、異なる条件を
+  同一比較群にしない。
+- `REQ-IMPROVE-002`は直接的なWorkflow設定変更を置換し、Human判断付きの版付きImprovement
+  Proposal、対象owner、prior／proposed identity、stale閉包、rollback、次trialを要求する。
+- 承認済みProposalも各ownerの通常のchallenge、compile、migrationまたはPolicy解決を迂回せず、
+  未承認または検証不足の候補を現行方針から隔離する。
 
 ## 3. 新しい境界
 
@@ -484,7 +558,10 @@ leafを選ばなければならない。
 - Workflow → Task Contract Control / Portfolio
 - Workflow → Semantic Trace
 - Workflow → Requirements change authority
+- Session Evidence Source → Context Runtime
+- Session Evidence Source → Portable Lifecycle / Semantic Trace
 - Evidence Evaluation → Self Improvement
+- Self Improvement → Task Contract / Compiler / Policy / Capture Plan owner
 
 各interfaceはContract ID、version、digest、Plan ID、obligation ID、Work Item ID、
 relation type、failure verdictを持つ。Task Contract Controlは各consumerの状態遷移を
@@ -492,10 +569,16 @@ relation type、failure verdictを持つ。Task Contract Controlは各consumer�
 
 ## 4. 要件差分の完了条件
 
-- 新しい`REQ-CONTRACT-001`〜`007`と`REQ-WORKFLOW-005`〜`008`の各入力、出力、停止、
+- 新しい`REQ-CONTRACT-001`〜`007`と`REQ-WORKFLOW-005`〜`009`の各入力、出力、停止、
   復旧、保存、受け入れ、対象外が確定する。
 - 既存37 requirementsへの影響を`preserve / adapt / replace / defer`で全件分類する。
+- 旧9 design、29 interface、8 state machine、14 protocolを全件分類し、replace対象にも
+  successor owner、failure verdict、後継testを割り当てる。
 - 新旧Requirementの順逆被覆に未解決がない。
 - 新しいinterfaceと所有責務が競合しない。
 - 受け入れ試験ID、oracle種別、negative caseが各新Requirementへ一件以上ある。
 - 第5段の旧承認候補を上書きせず、新しい差分監査へ結べる。
+- Session Evidence SourceとSelf Improvement Proposalの旧testを含む全37 acceptance testに、
+  `preserve / adapt / replace`と後継test IDがある。
+- ReviewCompass2のP-5、`R-F6-010`、`R-F6-011`を`REQ-WORKFLOW-009`の各obligationへ
+  逆引きでき、4分類、Human確認、追記履歴、retired routine検査を取りこぼしていない。

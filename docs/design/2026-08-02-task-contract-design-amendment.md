@@ -12,6 +12,10 @@ promotion_required: true
 保持し、Task Contract中心化に必要なcomponent、interface、状態、Provenance、評価、
 配置の差分を定義する。
 
+旧9 design、29 interface、8 state machine、14 protocol、37 acceptance testの個別判定は
+`2026-08-02-stage-five-to-task-contract-inheritance.md`を正本とする。旧表現を`replace`する
+場合も、安全性義務、failure verdict、後継owner、後継testを失わない。
+
 既存の第5段承認候補は`awaiting_human_approval`のまま上書きしない。本改定と対応する
 構造化設計、受け入れ試験、適合性監査が完成した後、新しい承認候補を生成する。
 
@@ -23,6 +27,8 @@ promotion_required: true
 - Runtimeで観測する非決定値は、入力条件と結果を固定して後段へ渡す。
 - Contract conformanceとContract challengeを分離する。
 - Operational ProvenanceとEvaluation Observationsを分離する。
+- 実コードから生成するSource Symbol Indexと、人が確認するReusable Routine Ledgerを
+  分離し、green実装前に両方を照合する。
 - 開発checkout、installed code、project、runtime data、sensitive storeを分離する。
 - stableでない自己適用能力を必須経路へ置かない。
 
@@ -114,6 +120,74 @@ Policy Adjustment Eventとして残す。Agent entryは固定したbase Policy�
 から生成し、末尾への追記だけをPolicy正本にしない。Overlayも通常Policyと同じ競合解決、
 Digest固定、stale影響閉包の対象とする。
 
+#### Implementation Reuse Policy
+
+ReviewCompass3自身のImplementation Task Contractには、ReviewCompass2のP-5を継承した
+Architecture Policyを適用する。
+
+```text
+ImplementationReusePolicy
+├── policy_id / version / digest
+├── applicability_scope
+├── source_language_and_root_rules
+├── symbol_index_generator / schema
+├── candidate_search_rules
+├── candidate_decisions: reuse | extend | merge | split_with_rationale
+├── human_confirmation_policy
+├── retired_routine_policy
+└── provenance_and_gate_rules
+```
+
+候補探索の結果は`candidate_found | no_candidate`とする。`no_candidate`は4分類へ追加する
+第五の判断ではなく、比較対象が見つからなかった探索結果である。`candidate_found`の場合に
+限り4分類を必須とし、LLM proposalとHuman confirmationを別recordとして保持する。
+
+事実層と意味層を分離する。
+
+```text
+SourceSymbolIndex
+├── index_id / schema_version / digest
+├── project_id / binding_id
+├── source_tree_identity / digest
+├── generator_identity / digest
+└── symbols[]
+    ├── symbol_id / language / kind / qualified_name
+    ├── source_path / location / content_digest
+    ├── signature / imports / callers / callees
+    └── doc_and_test_refs
+
+ReusableRoutineLedger
+├── ledger_id / version / digest
+├── routines[]
+│   ├── routine_id / responsibility / canonical_symbols
+│   ├── aliases / status: active | retired
+│   └── origin / replacement / retirement refs
+├── consolidation_history[]
+└── previous_version
+```
+
+Source Symbol Indexは固定source treeから機械生成する派生事実であり、手作業で実コードの
+存在を追加・削除しない。Reusable Routine Ledgerは人が確認した責務、alias、状態、統廃合
+履歴を保持し、過去entryを上書きしない。両方と実コードを照合し、片方だけを判断根拠に
+しない。
+
+Review / Execution PlanはImplementation Task Contractの場合だけImplementation Discovery
+Planを内包する。これは6種類のPlanへ第7の全Contract必須Planを追加するものではない。
+
+```text
+ImplementationDiscoveryRecord
+├── discovery_id / schema_version / digest
+├── task_contract / work_item / red_test refs
+├── source_tree / symbol_index / ledger refs and digests
+├── planned_symbols / search_scope / queries
+├── candidates / evidence refs
+├── outcome: candidate_found | no_candidate
+├── proposed_decision / rationale / proposer
+├── human_confirmation_ref
+├── retired_routine_verdict
+└── design / implementation / commit refs
+```
+
 ### 3.3 Compiler
 
 Compilerは純粋なprojection coreと、外部capability catalogを解決するvalidation境界に
@@ -143,6 +217,10 @@ Plan bundleは次を持つ。
 - 6 PlanのIDとdigest
 - obligation coverage map
 - unresolvedとdiagnostic
+
+Implementation Task ContractではReview / Execution Plan内のImplementation Discovery Planと
+`REQ-WORKFLOW-009`の対応を被覆mapへ追加する。Review Task Contractなど実装を行わない型では
+このPlan項目を生成しない。
 
 一つでも必須Planが生成不能または被覆不足の場合、bundleは`not_compilable`であり、
 consumerへ開始可能なPlanとして渡さない。
@@ -240,6 +318,8 @@ Intent / Requirement evidence
   → Work routing / Work Item
   → Context Manifest
   → Workflow permit
+  → Source Symbol Index / Reusable Routine Ledger
+  → Implementation Discovery / Human confirmation
   → Run / Attempt
   → Result / Evidence
   → Dependency / Revision / Termination decision
@@ -249,6 +329,11 @@ Intent / Requirement evidence
 ```
 
 各Plan項目とRuntime eventはContract obligationへ逆引きできなければならない。
+
+Semantic TraceはSource Symbol Index、Reusable Routine Ledger、Implementation Discovery
+Recordのschemaと関係検証を所有する。Workflowはgreen実装permitを所有し、Portable
+LifecycleはLedgerとrecordの原子的書込みを所有する。Semantic Traceは実装またはWork Item
+状態を直接変更しない。
 
 ### 4.6 Evidence Evaluation
 
@@ -277,6 +362,51 @@ Contract単位EvidenceとIntegration Verdictを結び、Release Evaluationは
 
 Task Contract Controlはconsumerの実行状態を直接変更しない。interface競合、owner重複、
 stale入力、局所成功・全体Intent不成立は`integration_failed`として耐久保存する。
+
+### 4.9 Session Evidence Source
+
+Session Recordsは独立stageではなく、Context Runtimeへ候補を渡す版付きsource adapterとする。
+
+```text
+SessionEvidenceSource
+├── source_universe / human_decision_ref
+├── raw_record_id / digest / sensitive_store_ref
+├── redaction_policy_id / version / digest
+├── derived_record_id / digest
+├── mutation_verdict
+├── access / retention / deletion policy refs
+└── context_candidate / provenance relations
+```
+
+raw、伏字化派生物、要約を同じidentityまたは保存境界にしない。raw原本から派生物を再生成
+でき、追記、非追記変更、消失を区別する。未解決mutation、機微情報検査不合格、Policy不一致
+では派生物をContextへ渡さない。Session contextを要求しないContractは通常実行できる。
+
+Session Evidence SourceはContext採否、Work Item、Run状態を変更しない。Context Runtimeが
+Context Acquisition Planに従って候補を採否し、Portable Lifecycleが保存とaccessを、Semantic
+TraceがrawからContext Manifestまでの来歴を検証する。
+
+### 4.10 Self Improvement
+
+Self ImprovementはEvaluation Ledgerを読み、現行設定を直接変更せず版付きImprovement
+Proposalを生成する。
+
+```text
+ImprovementProposal
+├── proposal_id / version / digest
+├── evaluation_case / condition / pair / trial refs
+├── hypothesis / fixed_comparison / limitations
+├── target_owner / target_artifact_type
+├── prior_identity / proposed_change
+├── risk / stale_impact / rollback
+├── human_decision_ref
+└── next_trial_profile
+```
+
+targetはTask Contract、Compiler、Architecture／Project Policy、Capture Planのいずれかとする。
+承認済みProposalも各ownerのchallenge、compile、Policy解決、migrationを迂回しない。適用結果は
+旧baselineと異なるtrialとして記録し、未承認、比較不能、対象不明、stale閉包不明のProposalを
+現行方針から隔離する。
 
 ## 5. ContractとWork lifecycle state machine
 
@@ -330,6 +460,9 @@ active
   └─ red_confirmed → red
 
 red
+  └─ implementation_discovery_passed → implementation_ready
+
+implementation_ready
   └─ tests_passed → green
 
 green
@@ -341,7 +474,7 @@ verified
   ├─ final_challenge_blocking → revision_pending
   └─ acceptance_granted_or_not_required → accepted
 
-queued | active | red | green | verified
+queued | active | red | implementation_ready | green | verified
   ├─ blocking_dependency_found → blocked_by_dependency
   ├─ dependency_cycle_found → blocked_by_cycle
   ├─ upstream_inconsistency_found → revision_pending
@@ -378,6 +511,12 @@ controlled terminationが決まるまでpermit不能である。Contractの期�
 Implementationだけを修正する場合は同Contractに束縛した新Work Itemまたは新Runを作る。
 ContractまたはRequirementを変える場合は旧Work Itemを`revision_pending`から終了し、
 新Contract versionと新Work Itemのredへ移る。
+
+`implementation_ready`はredを確認した後、固定source tree、Source Symbol Index、Reusable
+Routine Ledger、実コードの照合と必要なHuman確認が完了した状態である。独立した全体stage
+ではなく、green実装permitの耐久gateである。source tree変更でIndexがstaleになった場合は
+`implementation_ready`を再利用せず、同Run内でIndexとDiscovery Recordを更新するか、影響が
+ContractまたはTestへ及ぶ場合は通常のRevision Protocolへ送る。
 
 ### 5.4 Upstream Revision Protocol
 
@@ -450,6 +589,8 @@ completedとして扱わない。
 - Plan bundle
 - Acceptance TestとEvidence Test
 - red確認証拠
+- Source Symbol Index、Reusable Routine Ledger、Implementation Discovery Record
+- LLM proposal、Human confirmation、retired routine verdict
 - Design Decision
 - Implementation change
 - green確認証拠
@@ -528,6 +669,12 @@ Verification Planは`change_semantics`、`state_effect`、Contract risk、side e
 - `related_to`
 - `resumes_from`
 - `terminated_by`
+- `matches`
+- `reuses`
+- `extends`
+- `merges`
+- `splits_from`
+- `retires`
 
 内容そのものを重複保存せず、不変成果物への参照とDigestを基本にする。
 `previous_event_id`はappend順序だけを表し、意味的な依存関係は`relations`で表す。一つの
@@ -549,6 +696,10 @@ eventは複数の入力、成果、Evidence、判断へ関係を持てる。
 - Dependency discovery、cycle detection、cycle resolution event
 - Upstream revision proposalとscope disposition event
 - Policy overlay、adjustment、verification profile selection event
+- Source Symbol Index generation、candidate search、reuse proposal、Human confirmation、
+  routine consolidation／retirement／re-registration event
+- Session ingestion、raw isolation、derivation、mutation、Context adoption event
+- Improvement hypothesis、proposal、Human decision、owner application、next trial event
 - deployment and migration event
 - evaluation observation event
 
@@ -622,6 +773,8 @@ Dependability、Auditability、Adaptability、Verifiabilityの7軸へ仮説とme
 - dependency cycle件数、解消方法、解消時間、未解消率
 - pause、cancel、defer、close-scope件数と理由、投入済み時間・費用
 - 上流改定の対象層、影響閉包、再作業時間
+- reuse、extend、merge、split_with_rationale、no_candidateの件数
+- 重複候補の事前検出率、候補誤判定、retired routine復活検出、再利用判断時間
 - 手動設定数、自動導出率、設定不整合数
 
 RecallとPrecisionは既知欠陥、注入欠陥、Human確定FindingなどOutcome Labelがある場合
@@ -664,6 +817,8 @@ EVALUATION_ROOT
 ├── policies/
 ├── requirement-maps/
 ├── design-decisions/
+├── reuse/
+│   └── shared-routines.json
 └── verified-artifacts/
 ```
 
@@ -689,6 +844,9 @@ DATA_ROOT/projects/<project-id>/
   runs/
   contexts/
   compiled-plans/
+  implementation-discovery/
+    indices/
+    records/
 
 STATE_ROOT/projects/<project-id>/
   checkpoints/
@@ -814,6 +972,21 @@ Codex、Claude、IDEなどとの関係は次で表す。
   profile未充足時は`verified`を拒否する。
 - base PolicyとProject Policy Overlayから同じAgent entryを再生成でき、Overlay変更では
   依存するContractだけがstaleになる。
+- 同じ固定source treeとgeneratorから同じSource Symbol Index identityを再生成できる。
+- red確認後、類似候補を持つ新規関数はHuman確認済みの`reuse | extend | merge |
+  split_with_rationale`がなければ`implementation_ready`へ進めない。
+- `no_candidate`を4分類と混同せず記録し、候補なしの実装を不必要に停止しない。
+- stale Index、理由のない`split_with_rationale`、retired routineの無断復活を拒否する。
+- 再利用判断からsource tree、候補symbol、Ledger、Task Contract、Test、Design Decision、
+  Implementation、commitへ逆引きできる。
+- Ledger、Index、Discovery Recordのschema違反と閉じた語彙外判断を拒否し、Ledger書込み
+  失敗注入後も直前の有効versionを読める。
+- Session取込みなしでもSession obligationを持たないContractが実行できる。
+- 許可範囲外Sessionを取込まず、raw／派生物へ別access、retention、削除Policyを適用する。
+- Session rawから派生物を再生成でき、非追記変更または消失時に旧Context再利用を拒否する。
+- Self Improvementが現行Workflow設定を直接変更しようとすると拒否する。
+- Improvement Proposalを元Evaluation trial、Human判断、対象owner、新version、stale閉包、
+  次trialへ逆引きできる。
 - `A requires B requires C`ではCだけにpermitを発行し、完了後にB、Aを順に再検査する。
 - `A requires B requires A`では両Work Itemを`blocked_by_cycle`としてpermitを拒否する。
 - blockingでない境界外問題は親を止めずbacklogへ移す。
@@ -832,12 +1005,15 @@ Codex、Claude、IDEなどとの関係は次で表す。
 - `DES-HARNESSED-EXECUTION`：adapt
 - `DES-REVIEW-TRIAGE`：adapt
 - `DES-SEMANTIC-TRACE`：adapt
-- `DES-SESSION-RECORDS`：preserveまたはadapt
+- `DES-SESSION-RECORDS`：adapt
 - `DES-WORKFLOW-CONTROL`：adapt
 - `DES-PORTABLE-LIFECYCLE`：adapt
 - `DES-EVIDENCE-EVALUATION`：adapt
 - `DES-SELF-IMPROVEMENT`：adapt
 - `DES-TASK-CONTRACT-CONTROL`：new
 
-最終分類は、固定commitの実装・テスト証拠と本改定requirementsを入力にした差分監査で
-確定する。
+component、interface、state machine、protocol、acceptance testの全件分類は
+`2026-08-02-stage-five-to-task-contract-inheritance.md`へ固定する。旧固定本数とpoint-to-point
+topologyは維持しないが、identity field、生成順、永続化順序、failure verdictを後継schema、
+failure matrix、testへ移す。promotion前の差分監査では、固定commitの実装・テスト証拠と本
+改定requirementsを入力に順逆被覆を確定する。

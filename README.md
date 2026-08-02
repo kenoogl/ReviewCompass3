@@ -17,12 +17,17 @@ Task ContractをRequirementsとRuntimeのcontrol and provenance planeとする�
 - 初期変更記録：`records/task-contract/task-contract-centered-documentation-v1.json`
 - 開発レーン改定記録：`records/task-contract/task-contract-centered-documentation-v2.json`
 - LLMGP先行実験の反映記録：`records/task-contract/task-contract-centered-documentation-v3.json`
+- 旧第5段設計の継承記録：`records/task-contract/task-contract-centered-documentation-v4.json`
+- 共通ルーチン台帳の継承記録：`records/task-contract/task-contract-centered-documentation-v5.json`
+- Issue→Plan経路の計画反映記録：`records/task-contract/task-contract-centered-documentation-v6.json`
 
 ## 開発方針
 
 開発はSDDとリスクベースのテストファーストで進めます。振る舞いの変更には
 関連テストを先行または同一変更内で用意し、統合対象のコミットは原則として
-緑に保ちます。高コストな検証とHuman承認は、リスクと判断責務に応じて適用します。
+緑に保ちます。green実装前には既存関数と共通ルーチン台帳を照合し、再利用、拡張、
+統合または理由付き分離を判断します。高コストな検証とHuman承認は、リスクと判断責務に
+応じて適用します。
 
 - 方針正本：`docs/development/2026-08-02-development-policy.md`
 - 実行設定：`config/development-policy.json`

@@ -1,0 +1,152 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "529a344aa61bb11c8bf48f452b2af5c9b8c31b7af88843d47a9fd1f729a4fc8f"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "639164d691fababd6238e7e5ba5c2d9824ab76e58478167a0f4280e20e4ea8c3"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "2bcf7c6a1efa649fc4e7d1d6aa200ca89e82dd1724897c64994278890748a502"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "02c5a14b1b3bbd0056e14f480f04e79df468c1390f25f6a2838a343f4d702161"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "c5a982ee9c00d4e23ddbe4cd3cf353e778ff657f397eb0088c1483a4d1537e49"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "d52d025256934e402912c1d0871088901372d22d01fe5feaa9e1a9bc54d22452"
+    },
+    {
+      "path": "docs/design/2026-08-02-stage-five-to-task-contract-inheritance.md",
+      "sha256": "b75450300fc6a254843d5353be17d66838553376393d68a0da8f529ab26cdd5e"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "a25aae21c5995213611653b83f7748e58ffaff3d9762749e6bb06ba3a3211247"
+    },
+    {
+      "path": "records/sources/2026-08-02-reviewcompass2-shared-routine-ledger.md",
+      "sha256": "043ff5c5c83db2bad2b968b32ac332e40ad64d9baeb4ad86dc273addfb904d9b"
+    },
+    {
+      "path": "records/sources/2026-08-02-reviewcompass2-issue-plan-path.md",
+      "sha256": "d28234ca17b2f2308bad9a63ed551f21caf4b3e4527416f4627bf05d1b5a84f7"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v5.json",
+      "sha256": "5a977be8c3ae0f75fb86cd0d0928661d90eafdd6d19a757432ef9203ba646956"
+    },
+    {
+      "external_path": "/Users/Daily/Development/ReviewCompass2",
+      "git_commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "source_id": "SRC-RC2-ISSUE-PLAN-001"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-ISSUE-PLAN-DEC-001",
+        "meaning": "ReviewCompass2のIssue登録から実施計画、実行へ至る経路を、Plan Challengeで補強してReviewCompass3の再計画へ反映する",
+        "text": "計画へ反映"
+      }
+    ],
+    "scope": "reviewcompass2-issue-to-plan-path-replanning",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped human instruction excerpt, predecessor commit and artifact digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、計画反映指示、前身commit、観測Digest、採用・修正内容を本recordへ保持する"
+    }
+  },
+  "external_source": {
+    "artifact_path": "records/sources/2026-08-02-reviewcompass2-issue-plan-path.md",
+    "captured_at": "2026-08-02",
+    "confidentiality_class": "project-internal",
+    "content_retained": false,
+    "fixed_commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+    "name": "ReviewCompass2 Issue-to-Plan path and plan-quality failure evidence",
+    "provided_by": "human_user",
+    "retention_policy": "retain-derived-source-record-with-successor-documentation-history",
+    "source_id": "SRC-RC2-ISSUE-PLAN-001",
+    "source_kind": "predecessor-project-operational-path-and-failure-evidence",
+    "source_observations": [
+      {
+        "git_blob": "5b2f04a7546976ff4a2d69f4683762006f289e21",
+        "path": ".reviewcompass/backlog/issues/issue-2026-07-25-issue-to-plan-granularity-gate.yaml",
+        "sha256": "366f660a8c9897c395719da69c03c4f9e6f090bd7c37fa75f0faa1c0ecb80a63"
+      },
+      {
+        "git_blob": "ebbd88f3170ce6b9e94bfc93ef492790a4552cd7",
+        "path": ".reviewcompass/backlog/plans/plan-2026-07-25-session-log-capture-tool.yaml",
+        "sha256": "eaf5dfad6199ad17828c2cb128fdfc6bef0cb37f192f2f2b096788a62a4497c9"
+      },
+      {
+        "git_blob": "08b42b23c899f1bcd99c9379841b24c2b4030f7d",
+        "path": ".reviewcompass/evidence/reviews/2026-07-25-plan-session-log-capture-r1.yaml",
+        "sha256": "365d41172325216d4820eec0c2a27e08332e3b46d0a0a0ea885105678682a50b"
+      },
+      {
+        "git_blob": "36e25d6104eaeca25b92ada2871dc30b508ed7b0",
+        "path": ".reviewcompass/evidence/reviews/2026-07-25-plan-session-log-capture-r2.yaml",
+        "sha256": "71528d826e36586163b1b2e408cd9af651db32c9307c25a9d1724481ea392d5a"
+      },
+      {
+        "git_blob": "10ffc019fcdbc1c69ef4d4ca8ddf228399eccd0e",
+        "path": ".reviewcompass/specs/requirements-f4.md",
+        "sha256": "14d75dcf5dbafce1feb035986de35059060f8ff7fd4b0506661ed466ce7f08cf"
+      }
+    ]
+  },
+  "plan_summary": {
+    "adopted": [
+      "durable Issue capture for problems not immediately resolved",
+      "separate Issue and semantic Issue Resolution Plan",
+      "embedded work-item list instead of an external checklist",
+      "independent Plan Challenge before implementation",
+      "fail-closed blocking findings bound to Work Item start permit",
+      "manual-first Pilot before schema and gate mechanization"
+    ],
+    "adapted": [
+      "separate Issue Resolution Plan from compiled Plan bundle",
+      "replace in-place status mutation with versioned identities and events",
+      "map legacy lanes to work origin, continuation mode and Issue disposition",
+      "use one independent reviewer by default and escalate by risk",
+      "retain semantic acceptance and prohibitions instead of acceptance-test-only plans",
+      "close Issues only through an Evidence-backed Resolution Verdict"
+    ],
+    "planned_requirement_candidates": [
+      "REQ-WORKFLOW-010 durable Issue intake, triage and disposition",
+      "REQ-WORKFLOW-011 Issue Resolution Plan, Plan Challenge, stale and Resolution Verdict"
+    ],
+    "implementation_status": "not_started",
+    "pilot_order": "after stable minimal Review Task E2E"
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v5.json",
+    "relation": "supersedes",
+    "sha256": "5a977be8c3ae0f75fb86cd0d0928661d90eafdd6d19a757432ef9203ba646956"
+  },
+  "record_version": 6,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "documented",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "document_reference_check": "passed",
+    "current_requirement_shape_check": "passed: 12 requirements; REQ-WORKFLOW-010 and 011 remain planned candidates",
+    "predecessor_evidence_check": "passed: issue schema, plan schema, granularity gate issue, R1 and R2 review evidence",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.75s"
+  }
+}

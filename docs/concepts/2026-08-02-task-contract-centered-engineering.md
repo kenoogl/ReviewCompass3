@@ -304,13 +304,19 @@ Task Contractをcontrol planeとしても、既存componentの状態所有責務
   Run permit、成果物書込み許可
 - Harness：Run、Attempt、送信、capture、Validation、Retry内部状態
 - Triage：Finding候補の保持、重複と競合
-- Semantic Trace：意味グラフ、影響閉包、Operational Provenance検証
+- Semantic Trace：意味グラフ、影響閉包、Source Symbol Index、共通ルーチン台帳、
+  Operational Provenance検証
+- Session Evidence Source：利用者指定範囲の取込み、raw隔離、伏字化派生、mutation検出
 - Portable Lifecycle：配置、構造化I/O、機微情報、導入・解除
 - Evidence Evaluation：評価基準、指標projection、解釈限界
-- Self Improvement：比較結果から改善候補を提案し、Human承認後に反映
+- Self Improvement：比較結果から版付き改善候補を作り、Human承認後に各ownerへ渡す
 
 Task ContractまたはCompilerは、これらcomponentの状態を直接変更しない。Planを提供し、
 各componentが自分の関門で受理または拒否する。
+
+Session Evidence SourceはContext sourceの一種であり、独立した開発stageではない。Self
+ImprovementもWorkflowまたはPolicyを直接変更せず、Contract、Compiler、Policy、Capture
+Planの通常version protocolを通す。
 
 ## 8. 開発ステージ
 
@@ -338,6 +344,11 @@ Architecture Policyは`policy_id`、version、digest、適用範囲、owner、�
 supersedes関係を持つ。ContractとCompilerは適用Policyのidentityを固定し、未解決または
 競合するPolicyを暗黙補完しない。影響するPolicyが変わった場合、依存するContract、
 Plan、Context、Runだけをstaleにする。
+
+ReviewCompass3自身の実装には共通のImplementation Reuse Policyを適用する。実コードから
+生成したSource Symbol Indexを事実層、人が確認した責務、alias、状態、統廃合履歴を持つ
+Reusable Routine Ledgerを意味層とする。台帳だけで実装の存在を判断せず、固定source treeと
+実コードを照合する。
 
 ### 8.1 開発レーンの再編
 
@@ -426,6 +437,7 @@ Contract definition:
 queued
   → active
   → red
+  → implementation_ready
   → green
   → verified
   → accepted
@@ -460,7 +472,13 @@ Compilerが6種類のPlanを生成し、obligation被覆と参照を検証する
 
 ### 9.6 green
 
-必要なDesign DecisionとImplementationによってテストを通す。Design Decisionは
+green実装へ着手する前に、新規関数または共通処理の予定をSource Symbol Index、Reusable
+Routine Ledger、実コードへ照合する。候補の有無を`candidate_found | no_candidate`で固定し、
+候補がある場合は`reuse / extend / merge / split_with_rationale`のいずれかをLLMが提案し、
+Humanが確認する。`split_with_rationale`は既存処理と分ける境界理由を必須とする。staleな
+Index、未確認判断、廃止済みroutineの無断復活がある間はgreen実装を開始しない。
+
+判断後、必要なDesign DecisionとImplementationによってテストを通す。Design Decisionは
 Contract、Requirement、Test、Implementationへ結ぶ。green後は同じContract versionと
 Acceptance Testを維持してrefactorし、関連テストが再びgreenであることを確認する。
 refactorは独立した永続状態にせず、green内の版付き活動とeventとして記録する。
@@ -551,6 +569,11 @@ Evaluation Profileを参照し、CompilerがCapture Planへ観測を追加する
 `terminated_by`などの閉じた型付き関係を複数保持する。これにより、一つの結果へ複数の
 Contract、Plan、Context、Evidence、Human判断が寄与する場合も後から再構成できる。
 
+Implementation Discoveryでは、source treeとIndexのDigest、検索scope、候補symbol、
+`candidate_found | no_candidate`、4分類の判断、理由、Human確認、廃止済みroutine検査を
+必須eventとして保存する。判断をTask Contract、Work Item、Design Decision、Test、
+Implementation、commitへ結び、台帳更新と実装変更の順序を再構成できるようにする。
+
 ## 12. デプロイと配置
 
 開発checkout、インストール済みcode、対象project、runtime data、機微情報保存を
@@ -584,8 +607,10 @@ projectの論理identityはProject Manifestに保存した安定IDとする。pr
 - evaluation store
 
 プロジェクト内には共有すべきTask Contract、Requirement対応、Design Decision、
-検証済み成果を置ける。raw response、生セッション、secret、lock、cache、端末固有の
-絶対パスは置かない。
+検証済み成果、Reusable Routine Ledgerを置ける。Source Symbol Indexはsourceから再生成
+可能な派生物としてruntime dataまたはcacheへ置き、判断時に使用したsnapshotだけをDigest
+付きProvenanceへ固定する。raw response、生セッション、secret、lock、cache、端末固有の
+絶対パスはproject内へ置かない。
 
 Codex、Claude、IDEなどの開発アプリとの関係は、隣接ディレクトリなどの推測ではなく、
 adapter、source root、hook、実行command、権限、ownerを持つIntegration Manifestで
@@ -603,6 +628,9 @@ adapter、source root、hook、実行command、権限、ownerを持つIntegratio
 - Contractまたは状態変更後に正しいContextとPlanを再構築できるか
 - 入れ子問題をscope拡大せず依存graphへ切り出し、循環を実行前に停止できるか
 - pause、cancel、上流改定の理由と再作業を後から比較できるか
+- 新規関数のうち既存routineを再利用・拡張・統合できた割合と、重複実装を事前検出できた
+  割合が上がるか
+- 共通ルーチン照合によるHuman確認、誤候補、台帳保守の負担が効果に見合うか
 - 追加手続きの時間、トークン、保存量が効果に見合うか
 
 これらを、Task applicability、Context adequacy、Controllability、Dependability、

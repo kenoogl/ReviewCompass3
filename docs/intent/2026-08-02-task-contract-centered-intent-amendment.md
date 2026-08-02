@@ -39,10 +39,24 @@ Capability、Verification、Provenance Capture、Human Interactionの各Planを
 版付きの決定的処理で導出する。各Plan項目を元Contract obligationへ逆引きでき、
 未対応、競合、未解決がある場合は実行を開始しない。
 
-Context、Harness、Workflow、Triage、Trace、Portable Lifecycle、Evidence
-Evaluationは、Task Contractから導出されたPlanを受け取るが、それぞれの状態と
-関門を所有し続ける。Task ContractまたはCompilerは、各componentの状態を直接
-変更しない。
+Context、Harness、Workflow、Triage、Trace、Session Evidence Source、Portable Lifecycle、
+Evidence Evaluation、Self Improvementは、Task Contractから導出されたPlanまたは版付き
+成果を受け取るが、それぞれの状態と関門を所有し続ける。Task ContractまたはCompilerは、
+各componentの状態を直接変更しない。
+
+Session Evidence Sourceは、利用者が許可したsource universeだけを取り込み、raw原本、
+伏字化派生物、要約、mutation verdictを別identityと別保存Policyで管理する。Session取込みを
+要求しないContractの実行は妨げない。
+
+Self ImprovementはEvaluation Ledgerから改善仮説を作るが、現行設定を直接変更しない。
+固定比較とHuman判断を経たContract、Compiler、PolicyまたはCapture Planの新version候補を
+各ownerへ渡し、stale影響検査後の次trialとして適用する。
+
+ReviewCompass3自身の実装では、新規関数または共通処理を書く前に、固定source treeから
+生成したSource Symbol Index、共通ルーチン台帳、実コードを照合する。類似候補がある場合は
+`reuse / extend / merge / split_with_rationale`のいずれかを選び、Task Contract、Design
+Decision、Test、Implementationへ結ぶ。これはコード量の最小化自体ではなく、同じ責務の
+重複実装と廃止済み処理の無断復活を防ぎ、保守対象を減らして品質を安定させるためである。
 
 Reviewは、成果のContract適合性を確認するContract Conformance Review、Contract確定前の
 欠落と境界を確認するDefinition Challenge、成果検証後に上位Intentと隣接Contractへの
@@ -76,6 +90,12 @@ Contract、backlog、継続、中止のいずれかへ分類する。
 - 開発checkoutや特定の開発アプリとの物理的な相対位置へ製品を固定しない。
 - 入れ子になった問題を非永続な作業stackだけで管理せず、Contract依存グラフへ記録する。
 - cancel、deferまたはclose-scopeをRequirement充足とみなさない。
+- Session raw、伏字化派生物、要約を同じidentity、access、retention、削除境界へ置かない。
+- Self ImprovementからWorkflow設定または現行Policyを直接変更しない。
+- 旧interface本数、状態機械数、protocol本数を維持すること自体を設計目的にしない。
+- 台帳だけを既存実装の事実源とせず、固定source treeの実コード照合を省略しない。
+- 類似候補がある新規関数を、判断記録または分離理由なしに追加しない。
+- 廃止済み共通ルーチンを、明示的な再登録判断なしに復活させない。
 
 ## 5. 「前提・制約」への追加
 
@@ -101,6 +121,8 @@ Contract、backlog、継続、中止のいずれかへ分類する。
   Overlayとして保持する。
 - pause、cancel、defer、withdraw、close-scopeでは、最後の有効成果、未充足義務、
   cleanup、再開または移管条件を保存する。
+- 旧第5段design、interface、state machine、protocol、acceptance testは、固定Digestと
+  `preserve / adapt / replace`判定を持ち、replace時も後継ownerと後継testへ結ぶ。
 
 ## 6. 「成功の判定基準」への追加
 
@@ -127,6 +149,15 @@ Contract、backlog、継続、中止のいずれかへ分類する。
   Human負担、リードタイム、費用、Provenance完全性を実測できる。
 - 開発checkout、インストール先、対象project、runtime dataを分離した環境で同じ
   論理動作を検証できる。
+- Session取込み範囲、raw／派生物分離、mutation、access、retention、削除を検証できる。
+- Improvement Proposalを元Evaluation trial、Human判断、変更対象version、stale閉包、
+  次trialへ逆引きでき、直接設定変更を拒否できる。
+- 旧9 design、29 interface、8 state machine、14 protocol、37 acceptance testの全件を
+  後継owner、schema、failure verdictまたはtestへ逆引きできる。
+- 新規関数または共通処理の変更を、固定source tree、候補、再利用判断、Human確認、
+  Task Contract、Design Decision、Test、Implementationへ逆引きできる。
+- staleなSource Symbol Index、未確認の類似判断、理由のない分離、廃止済みroutineの復活を
+  green実装開始前に拒否できる。
 
 ## 7. 意図や制約が衝突した場合
 

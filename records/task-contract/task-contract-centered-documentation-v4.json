@@ -1,0 +1,114 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "6b6f2540bb5115fd8d8504e25e1956c214c658160d9ad0f252ef71fb57fcd217"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "bf0f4556caab1d4d656891ecda932c8c219becb8dfec12b8efdb9eec88beb97a"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "f2c8ebd1f3f2275178f3df2e19c379be55015df8225f9bcf5acd2941d34e0b8f"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "22287b82e62c4ca9d8fa936038703e41297af861189632b74754d663805afda3"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "b9d3070342cd478249660cffff6676521d85e47f9396e98e7460a9fc23f62479"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "d95357d55de2ebd6fa3146fd12582d7c26c2115f2ba85bc4806032ef23603b8a"
+    },
+    {
+      "path": "docs/design/2026-08-02-stage-five-to-task-contract-inheritance.md",
+      "sha256": "b75450300fc6a254843d5353be17d66838553376393d68a0da8f529ab26cdd5e"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "cfe866b3db755d695afb0356c98ccc54ec0ad9c29d2e97733fccdd59302cbd3c"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v3.json",
+      "sha256": "c3916173390066ac7074d6e0f7a7025a5ad08aca4056120ca11aba6660b1c052"
+    },
+    {
+      "path": "docs/design/2026-07-28-reviewcompass3-design.md",
+      "sha256": "f250cf6bf91afd1e7c786952a1fb9c9530ccac2a51ef14b34172f5be65ccd8b5"
+    },
+    {
+      "path": "records/design/stage-five-design.json",
+      "sha256": "29ed55927061c9991ec7bbad3f03c929214527b653979d3453c9bbd7eb499c4f"
+    },
+    {
+      "path": "records/design/stage-five-architecture-integrity.json",
+      "sha256": "8b7e7666fd1918a4da0981e22fa274fa62e77f0b96ec7c47fd4aac09cac77f2a"
+    },
+    {
+      "path": "records/design/stage-five-approval-candidate.json",
+      "sha256": "a1e211f4d63144f52cd5c8bf36c9b111a0715a205a8ce71ecb52f034172ab0b5"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-INHERIT-DEC-001",
+        "meaning": "旧第5段設計を取り込み、修正取り込み、旧表現の置換へ全件分類し、Session RecordsとSelf Improvementを含む後継設計へ反映する",
+        "text": "了解．修正作業を実施"
+      }
+    ],
+    "scope": "stage-five-design-to-task-contract-inheritance",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped human instruction excerpt and fixed structured baseline digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、修正承認指示、分類結果、構造化baseline Digestを本recordへ保持する"
+    }
+  },
+  "inheritance_summary": {
+    "acceptance_tests": {
+      "adapt": 20,
+      "preserve": 15,
+      "replace": 2,
+      "total": 37
+    },
+    "design_components": {
+      "adapt": 9,
+      "new": 1,
+      "total_legacy": 9
+    },
+    "interfaces": {
+      "total_legacy": 29
+    },
+    "protocols": {
+      "total_legacy": 14
+    },
+    "state_machines": {
+      "total_legacy": 8
+    }
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v3.json",
+    "relation": "supersedes",
+    "sha256": "c3916173390066ac7074d6e0f7a7025a5ad08aca4056120ca11aba6660b1c052"
+  },
+  "record_version": 4,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "documented",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "document_reference_check": "passed",
+    "inheritance_coverage_check": "passed: 9 designs, 29 interfaces, 8 state machines, 14 protocols, 37 acceptance tests",
+    "requirement_shape_check": "passed: 11 requirements",
+    "test_command": "/usr/bin/python3 -m pytest -q",
+    "test_result": "405 passed in 1.62s"
+  }
+}

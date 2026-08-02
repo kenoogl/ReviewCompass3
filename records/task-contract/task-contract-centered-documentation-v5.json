@@ -1,0 +1,136 @@
+{
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "dd5d7b0ad31580e0e3b940db2fd6b8f9b9ff854e9ab4ef52bc2a281b13967f05"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "7eb1efd44ee4701a4928ba84156a60098e6102757a710b9315eead7476e523cc"
+    },
+    {
+      "path": "docs/concepts/2026-08-02-task-contract-centered-engineering.md",
+      "sha256": "2bcf7c6a1efa649fc4e7d1d6aa200ca89e82dd1724897c64994278890748a502"
+    },
+    {
+      "path": "docs/intent/2026-08-02-task-contract-centered-intent-amendment.md",
+      "sha256": "02c5a14b1b3bbd0056e14f480f04e79df468c1390f25f6a2838a343f4d702161"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "c5a982ee9c00d4e23ddbe4cd3cf353e778ff657f397eb0088c1483a4d1537e49"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "sha256": "d52d025256934e402912c1d0871088901372d22d01fe5feaa9e1a9bc54d22452"
+    },
+    {
+      "path": "docs/design/2026-08-02-stage-five-to-task-contract-inheritance.md",
+      "sha256": "b75450300fc6a254843d5353be17d66838553376393d68a0da8f529ab26cdd5e"
+    },
+    {
+      "path": "docs/plan/2026-08-02-task-contract-centered-replan.md",
+      "sha256": "a758af0ff92308df19a1877446df4200f31c000aba6ad748532589ba6e8939d8"
+    },
+    {
+      "path": "records/sources/2026-08-02-reviewcompass2-shared-routine-ledger.md",
+      "sha256": "043ff5c5c83db2bad2b968b32ac332e40ad64d9baeb4ad86dc273addfb904d9b"
+    }
+  ],
+  "baseline_inputs": [
+    {
+      "path": "records/task-contract/task-contract-centered-documentation-v4.json",
+      "sha256": "d3ac4ecee32006470ef258a4e80413542585f0816c22f5a0266ce888b84e70ae"
+    },
+    {
+      "external_path": "/Users/Daily/Development/ReviewCompass2",
+      "git_commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+      "source_id": "SRC-RC2-SHARED-ROUTINE-001"
+    }
+  ],
+  "decision": {
+    "approved_for_documentation": true,
+    "decided_at": "2026-08-02",
+    "decision_maker": "human_user",
+    "instructions": [
+      {
+        "decision_id": "TC-REUSE-DEC-001",
+        "meaning": "ReviewCompass2の共通ルーチン台帳方針をReviewCompass3のTask Contract中心設計へ継承する",
+        "text": "取り込む"
+      }
+    ],
+    "scope": "reviewcompass2-shared-routine-ledger-inheritance",
+    "session_evidence": {
+      "complete_transcript_retained": false,
+      "retained_evidence": "decision-scoped human instruction excerpt, predecessor commit and artifact digests",
+      "retention_limitation": "会話全体の永続参照identityは取得できないため、取込み指示、前身commit、観測Digest、採用内容を本recordへ保持する"
+    }
+  },
+  "external_source": {
+    "artifact_path": "records/sources/2026-08-02-reviewcompass2-shared-routine-ledger.md",
+    "captured_at": "2026-08-02",
+    "confidentiality_class": "project-internal",
+    "content_retained": false,
+    "fixed_commit": "d6bbb01500002872c713412bfbd63b702a291c99",
+    "name": "ReviewCompass2 shared routine ledger policy and implementation",
+    "provided_by": "human_user",
+    "retention_policy": "retain-derived-source-record-with-successor-documentation-history",
+    "source_id": "SRC-RC2-SHARED-ROUTINE-001",
+    "source_kind": "predecessor-project-approved-design-and-implementation",
+    "source_observations": [
+      {
+        "git_blob": "79b195c699705f97ec848820fde6fbcc7d86d300",
+        "path": ".reviewcompass/architecture/shared-routines.yaml",
+        "sha256": "56e06577a4c4ae5bc23f561eff28ffe7d4422d0c8ea5ef6962cf3ea3305cbc50"
+      },
+      {
+        "git_blob": "93fe8acfa02709c5c1aa0acda0b41aaa8aee8da7",
+        "path": ".reviewcompass/specs/intent.md",
+        "sha256": "a24c8888d4ee4dd474801f9d6d82b0cf747854950683803f6467abf79a00a1be"
+      },
+      {
+        "git_blob": "de88384ddda0b1912e1ba5c1009f151897f880a2",
+        "path": ".reviewcompass/specs/requirements-f6.md",
+        "sha256": "84de83e6d824e905546546f4bc2cb408831a14121411795236b437f5bd6aa59d"
+      },
+      {
+        "git_blob": "6f41c929e869b78e405e3e290ec9610df80fcf66",
+        "path": ".reviewcompass/architecture/decision-points.yaml",
+        "sha256": "493cff7cd052e6bc7f292b3a142a5caa3d74fd7ee3e468cafd38065c00b0cb5d"
+      }
+    ]
+  },
+  "inheritance_summary": {
+    "adopted": [
+      "compare ledger and actual code before new function or shared processing",
+      "reuse | extend | merge | split_with_rationale closed decision vocabulary",
+      "LLM proposal followed by Human confirmation",
+      "append-only decisions and consolidation history",
+      "retired routine resurrection detection"
+    ],
+    "adapted": [
+      "split machine-derived Source Symbol Index from Human-confirmed Reusable Routine Ledger",
+      "record no_candidate as discovery outcome outside the four candidate decisions",
+      "bind decision to Task Contract, Work Item, Test, Design Decision, Implementation and commit",
+      "place the gate after red confirmation and before green implementation"
+    ],
+    "initial_scope": "ReviewCompass3 self-development Implementation Task Contracts",
+    "runtime_scope_expansion": "requires Pilot evidence and a separate Human decision"
+  },
+  "prior_revision": {
+    "record_path": "records/task-contract/task-contract-centered-documentation-v4.json",
+    "relation": "supersedes",
+    "sha256": "d3ac4ecee32006470ef258a4e80413542585f0816c22f5a0266ce888b84e70ae"
+  },
+  "record_version": 5,
+  "stage_five_completion_status": "awaiting_human_approval",
+  "status": "documented",
+  "verification": {
+    "artifact_digest_check": "passed",
+    "document_reference_check": "passed",
+    "predecessor_obligation_check": "passed: P-5, R-F6-010, R-F6-011, DP-039, DP-040",
+    "requirement_shape_check": "passed: 12 requirements",
+    "test_command": "python3 -m pytest -q",
+    "test_result": "405 passed in 1.63s"
+  }
+}
