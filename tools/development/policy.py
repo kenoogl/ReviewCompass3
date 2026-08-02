@@ -17,6 +17,8 @@ class DevelopmentPolicy:
     human_approval_actions: tuple
     self_application_maturity: tuple
     commit_policy: str
+    validator_assurance_requirements: dict
+    post_write_verification_requirements: tuple
 
 
 @dataclasses.dataclass(frozen=True)
@@ -27,6 +29,7 @@ class ChangeEvaluation:
     verification_requirements: tuple
     human_approval_actions: tuple
     unstable_self_application_capabilities: tuple
+    prior_verdict_stale: bool
 
 
 _POLICY_FIELDS = {
@@ -34,9 +37,11 @@ _POLICY_FIELDS = {
     "commit_policy",
     "human_approval_actions",
     "policy_id",
+    "post_write_verification_requirements",
     "record_version",
     "risk_verification",
     "self_application_maturity",
+    "validator_assurance_requirements",
 }
 _CHANGE_KINDS = {
     "behavior",
@@ -89,13 +94,15 @@ def load_policy(path):
     if (
         not isinstance(data, dict)
         or set(data) != _POLICY_FIELDS
-        or data["record_version"] != 1
+        or data["record_version"] != 2
         or not _text(data["policy_id"])
         or data["commit_policy"] != "integrated_commits_green"
         or not isinstance(data["change_kinds"], dict)
         or set(data["change_kinds"]) != _CHANGE_KINDS
         or not isinstance(data["risk_verification"], dict)
         or set(data["risk_verification"]) != _RISK_LEVELS
+        or not isinstance(data["validator_assurance_requirements"], dict)
+        or set(data["validator_assurance_requirements"]) != _RISK_LEVELS
     ):
         raise DevelopmentPolicyError("invalid development policy")
 
@@ -123,6 +130,20 @@ def load_policy(path):
         )
         for identifier, value in data["risk_verification"].items()
     }
+    validator_assurance = {
+        identifier: _texts(
+            value,
+            "validator assurance requirement",
+            empty=True,
+        )
+        for identifier, value in data[
+            "validator_assurance_requirements"
+        ].items()
+    }
+    post_write_verification = _texts(
+        data["post_write_verification_requirements"],
+        "post-write verification requirement",
+    )
     human_actions = _texts(
         data["human_approval_actions"],
         "human approval actions",
@@ -146,6 +167,8 @@ def load_policy(path):
         human_approval_actions=human_actions,
         self_application_maturity=maturity,
         commit_policy=data["commit_policy"],
+        validator_assurance_requirements=validator_assurance,
+        post_write_verification_requirements=post_write_verification,
     )
 
 
@@ -176,6 +199,9 @@ def evaluate_change(
     risk,
     actions=(),
     self_application_capabilities=(),
+    changes_validator=False,
+    changes_input_assumption=False,
+    writes_artifact=False,
 ):
     if not isinstance(policy, DevelopmentPolicy):
         raise DevelopmentPolicyError("expected a loaded development policy")
@@ -191,11 +217,31 @@ def evaluate_change(
         raise DevelopmentPolicyError(
             "self application capabilities must be a sequence"
         )
+    if any(
+        not isinstance(value, bool)
+        for value in (
+            changes_validator,
+            changes_input_assumption,
+            writes_artifact,
+        )
+    ):
+        raise DevelopmentPolicyError("change flags must be boolean")
 
     change_policy = policy.change_kinds[change_kind]
     verification = list(change_policy["base_verification"])
     if change_kind == "behavior":
         verification.extend(policy.risk_verification[risk])
+    prior_verdict_stale = (
+        changes_validator or changes_input_assumption
+    )
+    if prior_verdict_stale:
+        verification.extend(
+            policy.validator_assurance_requirements[risk]
+        )
+    if writes_artifact:
+        verification.extend(
+            policy.post_write_verification_requirements
+        )
     approvals = tuple(
         action
         for action in actions
@@ -218,4 +264,5 @@ def evaluate_change(
         verification_requirements=tuple(verification),
         human_approval_actions=approvals,
         unstable_self_application_capabilities=unstable,
+        prior_verdict_stale=prior_verdict_stale,
     )

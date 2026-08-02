@@ -33,8 +33,14 @@
     "semantic_adjudication",
     "stage_completion"
   ],
-  "policy_id": "reviewcompass3-development-policy-v1",
-  "record_version": 1,
+  "policy_id": "reviewcompass3-development-policy-v2",
+  "post_write_verification_requirements": [
+    "reread_written_artifact",
+    "related_validator",
+    "reference_integrity",
+    "stale_closure_check"
+  ],
+  "record_version": 2,
   "risk_verification": {
     "high": [
       "full_test_suite",
@@ -49,5 +55,18 @@
   },
   "self_application_maturity": [
     "stable"
-  ]
+  ],
+  "validator_assurance_requirements": {
+    "high": [
+      "validator_mutation_or_fault_injection",
+      "independent_oracle",
+      "representative_validator_data"
+    ],
+    "low": [],
+    "medium": [
+      "known_positive_fixture",
+      "known_negative_fixture",
+      "boundary_fixture"
+    ]
+  }
 }

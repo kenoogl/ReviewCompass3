@@ -49,6 +49,95 @@ def test_high_risk_behavior_change_adds_strong_assurance():
         "representative_data_validation",
         "independent_review",
     )
+    assert result.prior_verdict_stale is False
+
+
+def test_validator_change_adds_assurance_and_stales_prior_verdict():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="medium",
+        changes_validator=True,
+    )
+
+    assert result.prior_verdict_stale is True
+    assert result.verification_requirements == (
+        "relevant_automated_tests",
+        "full_test_suite",
+        "known_positive_fixture",
+        "known_negative_fixture",
+        "boundary_fixture",
+    )
+
+
+def test_high_risk_validator_change_adds_independent_assurance():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="high",
+        changes_validator=True,
+    )
+
+    assert result.prior_verdict_stale is True
+    assert result.verification_requirements[-3:] == (
+        "validator_mutation_or_fault_injection",
+        "independent_oracle",
+        "representative_validator_data",
+    )
+
+
+def test_input_assumption_change_uses_validator_assurance():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind="behavior",
+        risk="medium",
+        changes_input_assumption=True,
+    )
+
+    assert result.prior_verdict_stale is True
+    assert "known_negative_fixture" in result.verification_requirements
+
+
+def test_artifact_write_requires_post_write_verification():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_change(
+        policy,
+        change_kind="documentation",
+        risk="low",
+        writes_artifact=True,
+    )
+
+    assert result.verification_requirements == (
+        "document_consistency_check",
+        "reread_written_artifact",
+        "related_validator",
+        "reference_integrity",
+        "stale_closure_check",
+    )
+
+
+@pytest.mark.parametrize(
+    "flag_name",
+    ("changes_validator", "changes_input_assumption", "writes_artifact"),
+)
+def test_change_flags_must_be_boolean(flag_name):
+    policy = _policy_module().load_policy(POLICY_PATH)
+    arguments = {flag_name: "yes"}
+
+    with pytest.raises(_policy_module().DevelopmentPolicyError):
+        _policy_module().evaluate_change(
+            policy,
+            change_kind="behavior",
+            risk="medium",
+            **arguments,
+        )
 
 
 @pytest.mark.parametrize("change_kind", ("documentation", "prototype", "research"))
