@@ -1,0 +1,63 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-EXEC-004@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-EXEC-004",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-HARNESSED-EXECUTION",
+  "statement": "システムは複数担当の実行トポロジとroundごとの結果を欠落なく記録しなければならない",
+  "inputs": [
+    "実行トポロジとround定義",
+    "担当別model結果"
+  ],
+  "outputs": [
+    "担当と対象を保持するround記録"
+  ],
+  "stop_conditions": [
+    "必須担当または対象が欠ける",
+    "同じ担当結果が競合する"
+  ],
+  "recovery_conditions": [
+    "成功済み担当を保ち欠落担当だけを新Attemptで実行する"
+  ],
+  "preserved_artifacts": [
+    "完了・失敗した全担当結果"
+  ],
+  "acceptance_criteria": [
+    "各roundの対象、役割、model結果が一意に結線される",
+    "欠落model結果を成功roundとして扱わない"
+  ],
+  "non_goals": [
+    "複数担当を一つの匿名結果へ統合すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "ef780c0134529f7e138e806b4328a000737cad639c4be94118c9cd94e41e2655"
+}

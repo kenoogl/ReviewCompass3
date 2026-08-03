@@ -1,0 +1,61 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-IMPROVE-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-IMPROVE-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SELF-IMPROVEMENT",
+  "statement": "システムは成功と失敗の実測を条件付き学習材料として蓄積しなければならない",
+  "inputs": [
+    "Review Runと運用の実測記録"
+  ],
+  "outputs": [
+    "根拠付きfeedback ledger"
+  ],
+  "stop_conditions": [
+    "元Runまたは条件identityへ結線できない"
+  ],
+  "recovery_conditions": [
+    "誤った比較群を訂正し新しいledger版を作る"
+  ],
+  "preserved_artifacts": [
+    "成功・失敗・未確定の全測定"
+  ],
+  "acceptance_criteria": [
+    "成功と失敗の実測を元Runへ逆引きできる",
+    "入力条件の異なる測定を同一比較群にしない"
+  ],
+  "non_goals": [
+    "成功結果だけを学習すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "16213548e2e20c0abaea8cedfc356277ebfcc980d61eb4870baaabce59304228"
+}

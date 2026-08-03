@@ -1,0 +1,66 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTEXT-002@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTEXT-002",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REVIEW-CONTEXT-BATCH-0001",
+      "version": 1,
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+    },
+    {
+      "logical_id": "REVIEW-CONTEXT-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-REVIEW-CONTEXT",
+  "statement": "システムはTargetとsource materialsを役割、内容、出所およびDigestを持つ一つの材料束として実体化しなければならない",
+  "inputs": [
+    "Targetとsource materialの参照",
+    "各材料の本文、役割、解決可能な出所identityおよび取得結果",
+    "固定済みprior material identity"
+  ],
+  "outputs": [
+    "Targetを含むExecution Context材料束"
+  ],
+  "stop_conditions": [
+    "参照先が存在しない",
+    "宣言したDigestと本文が一致しない",
+    "本文または出所が欠ける"
+  ],
+  "recovery_conditions": [
+    "正しい出所から材料を再取得し新しい材料束を作る"
+  ],
+  "preserved_artifacts": [
+    "拒否された材料束、宣言値、実測値および診断"
+  ],
+  "acceptance_criteria": [
+    "Targetを含みすべてのentryに本文と出所がある",
+    "本文と宣言Digestを同時に変更してもprior identityとの不一致を検出する"
+  ],
+  "non_goals": [
+    "Digestだけで材料内容の真実性を保証すること",
+    "Promptの文章表現を固定すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "2bff9e4382a5d2d24097cc32ddd38d7d21088ca6d1eb39e893a90be637499bfa"
+}

@@ -1,0 +1,65 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-EXEC-006@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-EXEC-006",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-HARNESSED-EXECUTION",
+  "statement": "システムは実行条件と観測値を不変記録し、再試行または再利用の根拠を監査可能にしなければならない",
+  "inputs": [
+    "Review RunのAttempt列",
+    "実行条件、観測値、費用、関門結果",
+    "handoff packageとeffective execution identity"
+  ],
+  "outputs": [
+    "不変実行監査記録と再実行判断"
+  ],
+  "stop_conditions": [
+    "実行条件identityが欠ける",
+    "再利用対象のContextまたは実行条件が一致しない"
+  ],
+  "recovery_conditions": [
+    "Contextとeffective execution identityが一致する成功成果だけを再利用する",
+    "条件変更時は新しいRunとして状態機械へ要求する"
+  ],
+  "preserved_artifacts": [
+    "成功・失敗Attemptと変更理由"
+  ],
+  "acceptance_criteria": [
+    "実行経路、条件、費用、関門、観測結果がRunへ固定される",
+    "同一Contextでもeffective execution identity変更時は旧成果を再利用しない"
+  ],
+  "non_goals": [
+    "観測値の意味的評価や改善方針をこの機能で決めること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "95707d56b2d092c6b7f1bb544e16568f8c7d4c0a7d8f40b5dbc685e834515dd3"
+}

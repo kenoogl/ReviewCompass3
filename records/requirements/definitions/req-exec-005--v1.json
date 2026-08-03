@@ -1,0 +1,67 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-EXEC-005@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-EXEC-005",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-HARNESSED-EXECUTION",
+  "statement": "システムは出力検証と形式復旧を版付き記録として管理し、閉じた機械変換またはHuman裁定なしに意味を変え得る復旧を確定してはならない",
+  "inputs": [
+    "raw・解析結果とValidation Policy",
+    "形式復旧候補",
+    "閉じた機械変換規則またはHuman裁定"
+  ],
+  "outputs": [
+    "Validation記録と許可された形式復旧結果"
+  ],
+  "stop_conditions": [
+    "Schema、Evidence、Scope要件に違反する",
+    "復旧が閉じた機械変換でなくHuman裁定もない"
+  ],
+  "recovery_conditions": [
+    "閉じた機械変換を別試行として適用する",
+    "意味判断が必要ならHuman裁定を得て別試行として再検証する"
+  ],
+  "preserved_artifacts": [
+    "失敗入力、復旧候補、判定主体、理由、競合、verdict"
+  ],
+  "acceptance_criteria": [
+    "Validation入力、結果、verdictが版付きで残る",
+    "閉じた機械変換規則だけが自動適用される",
+    "意味同一性の判断が必要な候補は対象Digest、理由、競合およびHuman裁定なしに確定されない"
+  ],
+  "non_goals": [
+    "意味を推測して欠落内容を補うこと",
+    "LLMの意味判断だけで復旧を確定すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "48e445bf3b238c898272f2bc511a87237387249556570ebdc788bad6bee1888e"
+}

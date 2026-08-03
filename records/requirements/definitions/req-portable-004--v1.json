@@ -1,0 +1,65 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-PORTABLE-004@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-PORTABLE-004",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-PORTABLE-LIFECYCLE",
+  "statement": "システムは全機能の構造化成果物とraw記録に共通する機微情報保存境界を提供しなければならない",
+  "inputs": [
+    "保存物の分類と機微情報検査結果",
+    "主体identityとアクセス権限",
+    "保存形式、retentionおよび削除方針"
+  ],
+  "outputs": [
+    "分類別に隔離した耐久的保存物とアクセス判断"
+  ],
+  "stop_conditions": [
+    "保存物分類、アクセス境界、retentionまたは削除方針が欠ける",
+    "改変検出または権限検査に失敗する"
+  ],
+  "recovery_conditions": [
+    "権限、分類または伏字化を訂正して新しい保存試行を行う"
+  ],
+  "preserved_artifacts": [
+    "値を含まない拒否、改変、期限切れおよび削除診断"
+  ],
+  "acceptance_criteria": [
+    "raw原本、伏字化派生物および値なし診断に別々のアクセス、retention、削除方針が適用される",
+    "未許可主体は機微情報を含む保存物を再読込できない",
+    "改変、期限切れおよび削除失敗を検出し診断する"
+  ],
+  "non_goals": [
+    "各利用featureが独自の機微情報保存機構を実装すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "824c994087cab243e6b2cb1e730ee1aa6a239df07f74113dde62b93f526becf1"
+}

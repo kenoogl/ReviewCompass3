@@ -1,0 +1,61 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-SESSION-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-SESSION-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SESSION-RECORDS",
+  "statement": "システムは利用者が明示した範囲からセッション取込を安全に起動しなければならない",
+  "inputs": [
+    "利用者指示と探索範囲"
+  ],
+  "outputs": [
+    "取込対象一覧と実行結果"
+  ],
+  "stop_conditions": [
+    "探索範囲が不正または未承認である"
+  ],
+  "recovery_conditions": [
+    "範囲を訂正して再実行する"
+  ],
+  "preserved_artifacts": [
+    "対象外理由と診断"
+  ],
+  "acceptance_criteria": [
+    "利用者が指定した範囲だけを取込む",
+    "取込なしでも通常作業を妨げない"
+  ],
+  "non_goals": [
+    "会話履歴全体の自動取込"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "8ad9803cb0873e411dfcd00be4650ea81048ceddc52b820d6b86a556dbb42458"
+}

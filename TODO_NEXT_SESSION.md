@@ -8,18 +8,18 @@
 
 ## 現在位置
 
-- 全体：初期開発Work 1BとWork 2完了、Work 3の追加13 Requirement promotionまで完了
-- 現在の工程：Work 3 `active / added_13_requirements_promoted`
+- 全体：初期開発Work 1BとWork 2完了、Work 3のdeferred scope監査と恒久対策実装まで完了
+- 現在の工程：Work 3 `paused / unified_requirements_promotion_pending`
 - activeなTask Contract／Work Item：正式Task Contractなし。activeなWork Itemなし
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`45ddb6f949913afb31b8d8c1cf9c0891caac7d669189f5decd05cb8467b0f48d`
+- 進行入口SHA-256：`986b9386b7d003d4fda612cf3a248f77a05f224018bfbeba0a5939a11331d085`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c`
-- 直近のDecision／Evidence：`records/development/2026-08-03-work-3-added-requirements-promotion-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`dc945ec1d2eae4fe4c8c3293b9f1390fe4c527094e5dc209082dafc6f3b80649`
+- 直近のDecision／Evidence：`records/development/2026-08-03-work-3-permanent-remediation-green-evidence-v1.md`
+- Decision／Evidence SHA-256：`096e91d786293b5d01f1a14717f49c2b0806c48a8ea8d3b76439108a7ec6af0c`
 
 ## 実施報告照合
 
@@ -296,6 +296,65 @@
   - 観測した事後状態：authority bundle digest
     `497bcc4374e3224acbfbb08e38c7d9f3d4e5373f59df505179b6a19bc035a02c`、authority chain `effective`、
     50 IDの欠落・重複0、独立schema 17 artifact、全Test `448 passed`だった。
+- Claim `EC-073`：50 Requirementの必須非機能義務を19 Verification Profileへ接続する候補を作成した。
+  - Evidence：`records/development/2026-08-03-work-3-nfr-verification-profile-candidate-v1.json`、file SHA-256
+    `08d5159a483d16507c5652857e5245993b42559ed3bcc24c9434e70b0d5c2381`、candidate digest
+    `c93f9336790fc8641f3f89687f94fcff3baa23254936545ed9cb85c15c25d3a6`
+  - 観測した事後状態：NFR接続29 Requirement、functional／control only 21 Requirement、重複・欠落0。
+    Profileは初期必須8、実測後閾値6、deployment defer 5となった。
+- Claim `EC-074`：Profile形状、7品質属性、authority境界、未被覆停止、既知違反を監査した。
+  - Evidence：`records/development/2026-08-03-work-3-nfr-verification-profile-evidence-v1.md`、SHA-256
+    `e0800a9832798df5ab50a83203c42b16a2728488ff0f8942eb86e919740d2a12`
+  - 観測した事後状態：必須field 18、未知Requirement参照0、Policy rule候補6、負例6件を監査し、
+    `not_compilable`、数値非発明、deferの`not_applicable`、stale規則に合格した。全Testは`448 passed`。
+    承認済みArchitecture Policy recordは存在しないため、Plan由来ruleをPolicy authorityにしていない。
+- Claim `EC-075`：HumanがNFR Verification Profile接続候補を承認した。
+  - Decision：`records/development/2026-08-03-work-3-nfr-verification-profile-decision.json`、SHA-256
+    `6cdb1f74c8b92bcc7257bf8087158f78e8c980428d1b0fa725a20e2dd8e96373`
+  - 観測した事後状態：exact candidate／Evidence Digestと19 Profileの3分類へ承認を束縛し、Architecture
+    Policy昇格0、数値閾値承認0、Requirement変更0を維持した。
+- Claim `EC-076`：NFR Verification Profile接続項目を完了Evidenceへ接続した。
+  - Evidence：`records/development/2026-08-03-work-3-nfr-verification-profile-completion-evidence-v1.md`、SHA-256
+    `c8c99ca93d9eb29c112febbc18fa53fbf5476d703399a07888b7733cb9fb379f`
+  - 観測した事後状態：Decision binding、Profile分類、authority境界に合格し、全Testは`448 passed`。
+    本項目は`verified / completed`、次の未完了項目はdeferred候補の暗黙依存確認となった。
+- Claim `EC-077`：deferred能力13件のowner、成果、論理配置、有効化条件、初期非依存境界を候補へ固定した。
+  - Evidence：`records/development/2026-08-03-work-3-deferred-scope-candidate-v1.json`、file SHA-256
+    `01da1ea0c6c4f6adad8fdcd09085f97b387ea4639d01b0811b80dc5957916210`、candidate digest
+    `8993a6e4671679ab8cfe665322efdaf862cf085a8f1fab7d500d15f5fd7deb84`
+  - 観測した事後状態：明示延期9、条件付きPilot 2、新Evidenceなしには不採用2、ID重複0、必須field欠落0、
+    未知Requirement／Profile参照0、全13件のrelease effectは`nonblocking`だった。
+- Claim `EC-078`：50 RequirementからStage G／releaseまで9 consumerのscope leakを監査した。
+  - Evidence：`records/development/2026-08-03-work-3-deferred-scope-evidence-v1.md`、SHA-256
+    `1c24269e36d2baa2a4e22d39162e7bb85b7c5e513c55a5035fa55efa54029b71`
+  - 観測した事後状態：scope leak 0、release blocker 0、既知違反6件の負例監査は全件検出した。
+    `REQ-CONTRACT-008`はeffectiveだが自身の初期範囲外規則により初期Contract／releaseをblockしない。
+    初回監査のbundle ID取得誤りは実形状へ合わせて監査側だけを修正し、候補内容は変更していない。
+- Claim `EC-079`：恒久対策の共通reader、機械移行、policy Test runnerをtest-firstで固定した。
+  - Evidence：`records/development/2026-08-03-work-3-permanent-remediation-red-evidence-v1.md`、SHA-256
+    `700a26c69af875ad44e1df446ae79212fc4f3e6de0f552fa529624a70957ea2d`
+  - 観測した事後状態：未実装を理由に`2 failed, 12 passed, 8 errors`のREDとなり、既存12件はgreenだった。
+- Claim `EC-080`：旧37要件を単一definition形式へ決定的に機械移行した。
+  - Evidence：`records/requirements/candidates/rc3-requirements-unified-50-2026-08-03-v1.json`、file SHA-256
+    `c82144375fecc22c088d06d510d9e041fe9c607a0d6e4eb353b034467654ca16`、candidate digest
+    `cc4ba8f872973f8035b798042f4a5335005394cca339ec6f0121cf16c8c533b4`
+  - 観測した事後状態：旧37＋既存13＝50 unique ID、意味field不一致0、schema不一致0、初回38 write、
+    2回目と`--check`は`written 0 / unchanged 38`だった。旧authorityとlegacy bindingは未変更である。
+- Claim `EC-081`：公式Testを版付きpolicy、preflight、fallback禁止、receipt必須のmachine runnerへ統一した。
+  - Evidence：`records/development/2026-08-03-work-3-permanent-remediation-full-test-receipt-v2.json`、SHA-256
+    `8405cdb8c9b7d74b4c5cb12d9c71c3f2baee8e900627c5fd023ae6f17f35cef4`
+  - 観測した事後状態：Python `3.9.6`、pytest `8.4.2`、fallback `false`、全`462 passed in 2.27s`。
+- Claim `EC-082`：統一candidateをformal Evidenceへ機械接続した。
+  - Evidence：`records/requirements/evidence/rc3-requirements-unified-50-evidence-2026-08-03-v2.json`、file SHA-256
+    `dce1994d194ef8f4c03d32a7fe66fe1764a2456b013270a79d93c261a074ba7f`、evidence digest
+    `5b42979ab79699b2da950bae4788f582b023211c5c919571209a7f43bb5492fe`
+  - 観測した事後状態：50 definition＋candidateの51 subject、result `passed`。Human Decisionとauthority
+    bundle v2は未作成である。
+- Claim `EC-083`：receipt自己参照境界をpost-writeで検出し、回帰Test後に修正した。
+  - Evidence：`records/development/2026-08-03-work-3-permanent-remediation-green-evidence-v1.md`、SHA-256
+    `096e91d786293b5d01f1a14717f49c2b0806c48a8ea8d3b76439108a7ec6af0c`
+  - 観測した事後状態：指定receipt outputだけをsource state計算から除外し、関連26件と全462件がgreen。
+    旧receipt v1とformal Evidence v1はstaleな経過記録として判断対象外にした。
 
 ### reported_unverified／contradicted
 
@@ -305,7 +364,8 @@
 
 ### 未実施
 
-- Work 3の必須非機能義務とVerification Profileの接続
+- 統一50 Requirement candidateのHuman promotion判断
+- promotion後のNFR／deferred Evidence再検証とdeferred scope候補のHuman判断
 - platform別OS標準rootの具体解決とProject Bindingのdurable保存
 - 実施報告照合の自動Claim抽出、Provenance対応、完了state結線
 
@@ -325,50 +385,60 @@
 - B1に従いdirectory、schema、validator、legacy inventory、追加13 definition、candidate、Evidence、Human
   Decision、50 Requirement authority bundleを作成した。既存37要件はlegacy bindingのまま移動・書換えず、
   追加13件と合わせたauthority chainは`effective`である。
+- NFR Profile接続はHuman Decisionで承認済みである。effective Requirementを初期Profileのauthorityとし、Planの
+  Architecture Policy rule 6件は`proposed_policy_rule_not_authoritative`としてWork 4へ分離した。数値閾値、
+  Architecture Policy、shared／distributed scopeは承認・実装していない。
+- deferred scope候補は13件すべてを初期releaseの`nonblocking`へ固定し、9 consumerのscope leakは0だった。
+  候補は`proposed_only`であり、Human判断前はWork 3最後のcheckboxを完了にしない。
+- 旧37 Requirementは機械移行済みで、統一50 candidateは意味field不一致0、再生成差分0である。現行effective
+  authorityは旧新混在v1のままであり、Human promotion前は生成definitionやcandidateを正本にしない。
+- 公式Testはpolicy runner経由へ変更した。raw `python3 -m pytest -q`はrunner内部commandであり、今後の完了
+  Evidenceにはrunner receiptを要求する。
 
 ## 次に行う一作業
 
-50 RequirementとArchitecture Policyから必須非機能義務を抽出し、Verification Profile接続候補を作成する。
+統一50 Requirement candidateをHumanがpromotion判断する。
 
 開始条件：
 
-- 50 Requirement authority bundle digestが
-  `497bcc4374e3224acbfbb08e38c7d9f3d4e5373f59df505179b6a19bc035a02c`である。
-- 現行Planと`docs/design/2026-08-03-non-functional-requirements-verification-profile-memo.md`のDigestが一致する。
-- 初期slice、実測後閾値確定、deployment profileまでdeferの境界を変更せず抽出を開始する。
+- unified candidate file SHA-256が
+  `c82144375fecc22c088d06d510d9e041fe9c607a0d6e4eb353b034467654ca16`である。
+- candidate digestが`cc4ba8f872973f8035b798042f4a5335005394cca339ec6f0121cf16c8c533b4`である。
+- formal Evidence v2 digestが`5b42979ab79699b2da950bae4788f582b023211c5c919571209a7f43bb5492fe`である。
 
 完了条件：
 
-- 必須非機能義務ごとにauthority、適用条件、workload／fixture、環境、metric、thresholdまたはinvariant、
-  failure verdict、必要Evidenceを対応付ける。
-- `initial_required | threshold_after_measurement | deferred_to_deployment_profile`へ分類し、ownerと確定条件を持たせる。
-- Profile未被覆の必須義務を`not_compilable`として検出できるHuman判断候補と監査Evidenceを作成する。
+- Humanが統一candidateを`approve | revise | reject`で判断する。
+- 承認時はDecisionをexact candidate／Evidence Digestへ束縛し、50 `definition_refs`だけを持つauthority
+  bundle v2で現行v1をsupersedeする。
+- promotion後にNFR／deferred候補を新authority identityへ再検証する。
 
-後続作業：Human判断後、deferred候補が初期Requirementの暗黙依存になっていないことを確認する。
+後続作業：identity再検証後、deferred scope候補のHuman判断とWork 3完了関門を評価する。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：なし
-- 再開条件：50 Requirement authority bundle、現行Plan、非機能要件memoのDigest一致を確認する
+- Human判断待ち：統一50 Requirement candidateを`approve | revise | reject`で判断する
+- 後続Human判断待ち：identity再検証後にdeferred scope候補を判断する
+- 再開条件：unified candidate、formal Evidence v2、current authority v1のDigest一致を確認する
 
 ## stale・deferred
 
-- stale：current artifactはなし。Work 1固定入力Evidence v2はpromotion前state、旧candidate Digestと
-  session `001`はsupersededとして保持する。現行はEvidence v3、Approval Decision、session `003`とする。
+- stale：permanent remediation receipt v1とunified formal Evidence v1はrunner修正前stateのため判断対象外。
+  currentはreceipt v2とformal Evidence v2である。その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
   Issue Resolution・実施報告照合のautomation、汎用Task Registry／plugin system
 
 ## Git・Test
 
 - branch：`main`
-- HEAD：本TODOを含むhandoff commit（`git log -1 -- TODO_NEXT_SESSION.md`で解決）
-- 直前の成果commit：`10a00cc`（Work 3 authority判断記録）、`2460908`（Work 1B／Work 2完了）
-- remote：push未実施。本TODOを含むruntime commit後は`origin/main`よりahead 5
-- worktree：本TODOを含むruntime commitへ全変更を固定し、commit後のstatusでcleanを再確認する
-- 直近の関連Test：Requirements artifact targeted `12 passed`、Requirements関連`71 passed`
-- 直近の全Test：`448 passed in 1.79s`
-- 差分検査：`git diff --check`、通過
+- HEAD：`6938fb8`（追加13 Requirement authority promotion）
+- 直前の成果commit：`d416a32`（追加13 Requirement構造化）、`6938fb8`（Human promotion）
+- remote：push未実施。`origin/main`よりahead 7
+- worktree：NFR／deferred一式、恒久対策code・Test・37 definition・unified candidate／Evidenceを未コミットで保持
+- 直近の関連監査：legacy 37、unified 50、意味不一致0、再生成差分0、関連26件、すべて合格
+- 直近の全Test：policy runner final post-write receipt v3、`462 passed`、fallback `false`
+- 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則
 

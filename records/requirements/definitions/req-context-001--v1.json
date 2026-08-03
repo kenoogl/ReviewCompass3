@@ -1,0 +1,70 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTEXT-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTEXT-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REVIEW-CONTEXT-BATCH-0001",
+      "version": 1,
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+    },
+    {
+      "logical_id": "REVIEW-CONTEXT-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-REVIEW-CONTEXT",
+  "statement": "Review Taskを開始する前に利用者はGoal、Target、Constraints、Expected Output、Context Requirements、Validation PolicyおよびProvenanceを確認できなければならない",
+  "inputs": [
+    "Constraints",
+    "Context Requirements",
+    "Expected Output",
+    "Goal",
+    "Provenance",
+    "Validation Policy",
+    "一意に識別されたTarget"
+  ],
+  "outputs": [
+    "版付きのReview Task入力定義"
+  ],
+  "stop_conditions": [
+    "Targetが一意に定まらない",
+    "必須項目が欠けるか未解決である"
+  ],
+  "recovery_conditions": [
+    "Targetを訂正し参照先を再検証する",
+    "不足項目を補い新しい版として再検証する"
+  ],
+  "preserved_artifacts": [
+    "拒否された入力候補と項目別の診断"
+  ],
+  "acceptance_criteria": [
+    "7つの必須入力をそれぞれ欠落、空、未解決、無効にした入力はContext生成前に拒否される",
+    "同一入力から同一のTask入力Digestが得られる"
+  ],
+  "non_goals": [
+    "LLMへ必須項目の採否を暗黙に委ねること",
+    "Task内部の実行経路をこの定義へ固定すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "f4c91df05ad7736a21334c26d0ccc7697ac4912f27455c69ea8c1eea4d2eb510"
+}

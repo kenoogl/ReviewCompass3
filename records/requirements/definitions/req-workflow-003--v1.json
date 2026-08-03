@@ -1,0 +1,61 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-003@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-003",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムは成果物書込みを進行中作業単位と承認actionへ束縛しなければならない",
+  "inputs": [
+    "active work identity、書込み対象、承認action"
+  ],
+  "outputs": [
+    "書込み許可または拒否判断"
+  ],
+  "stop_conditions": [
+    "active workまたは対象が一致しない"
+  ],
+  "recovery_conditions": [
+    "正しい作業単位と対象へ再束縛する"
+  ],
+  "preserved_artifacts": [
+    "書込み要求と拒否理由"
+  ],
+  "acceptance_criteria": [
+    "書込み対象がactive workの許可範囲と完全一致する",
+    "拒否書込みが成果物を変更しない"
+  ],
+  "non_goals": [
+    "所有外成果物への包括的書込み許可"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "813e8b76bb10238dbf04939231c4d23135fa5e27046712e01c169764bf0d6290"
+}

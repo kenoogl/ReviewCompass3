@@ -1,0 +1,62 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-004@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-004",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムはReviewCompass3自身の成果物にも通常と同じReview Task契約、関門および来歴を適用できなければならない",
+  "inputs": [
+    "ReviewCompass3自身の固定成果物Target",
+    "通常のReview Task定義と関門"
+  ],
+  "outputs": [
+    "通常契約で完了した自己適用Review Run"
+  ],
+  "stop_conditions": [
+    "自己対象を理由に必須契約または関門を迂回する"
+  ],
+  "recovery_conditions": [
+    "通常契約の不足を訂正し新しい自己適用Runを開始する"
+  ],
+  "preserved_artifacts": [
+    "自己適用のTask入力からHuman判断までのOperational Provenance"
+  ],
+  "acceptance_criteria": [
+    "ReviewCompass3自身の要求、設計、Taskまたは実装をTargetとして通常と同じContext、Harness、Triage、TraceおよびWorkflow契約でReview Taskを完了できる",
+    "自己対象を理由に関門、Validationまたは来歴を迂回できない"
+  ],
+  "non_goals": [
+    "自己適用時だけの特例経路"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "d9527f798e4cdfb5d340058a783fc88c4544cfa63868a58d5942569e5be37492"
+}

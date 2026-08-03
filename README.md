@@ -63,5 +63,10 @@ freshnessを確認してから最小E2Eへ進みます。
 ## テスト
 
 ```shell
-python3 -m pytest -q
+python3 -m tools.development.policy_test_runner \
+  --suite full \
+  --receipt /path/to/verification-receipt.json
 ```
+
+公式Testは`config/development-test-runner.json`の版付きpolicyだけから起動し、環境preflightと
+Verification Run receiptを機械生成します。設定されたPythonが利用できない場合は別環境へ切り替えず停止します。

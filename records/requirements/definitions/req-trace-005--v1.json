@@ -1,0 +1,65 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-TRACE-005@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-TRACE-005",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SEMANTIC-TRACE",
+  "statement": "システムはReview Task入力から最終FindingまでのOperational Provenanceを必須の型付き辺と内容Digestで一続きに固定し検証verdictを生成しなければならない",
+  "inputs": [
+    "Review Taskから最終Findingまでの各段階identityと内容Digest",
+    "閉じたOperational Provenance辺種別"
+  ],
+  "outputs": [
+    "Operational Provenanceグラフとfail-closed検証verdict"
+  ],
+  "stop_conditions": [
+    "必須nodeまたは辺が欠ける",
+    "参照または内容Digestが不一致である"
+  ],
+  "recovery_conditions": [
+    "欠落辺または不一致identityを訂正してグラフ全体を再検査する"
+  ],
+  "preserved_artifacts": [
+    "成功・失敗・拒否・保留を含む全node、edgeおよび診断"
+  ],
+  "acceptance_criteria": [
+    "Task、Context、effective execution、承認、Attempt、raw、Validation、Triage、Human判断、最終Findingの全段階がID、内容Digestおよび閉じた辺種別で結ばれる",
+    "任意の必須辺の欠落、不一致または未解決参照からfail-closed verdictが得られる",
+    "失敗Attemptと拒否・保留Findingもグラフに保持する"
+  ],
+  "non_goals": [
+    "Run状態遷移またはFinding確定を所有すること",
+    "各機能の業務判断または実行処理を所有すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "50fa990be0f51c4dba9225b1cbbecca2e3f9395811c951a75e0609881f53f660"
+}

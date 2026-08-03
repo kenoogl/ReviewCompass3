@@ -1,0 +1,65 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-PORTABLE-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-PORTABLE-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-PORTABLE-LIFECYCLE",
+  "statement": "システムは版付きsupported-platform matrixの全対象でリポジトリ、設定、データ、成果物の配置を移植可能に解決しなければならない",
+  "inputs": [
+    "版、対象OS、最低version、filesystem特性、権限環境を持つsupported-platform matrix",
+    "利用者設定と成果物"
+  ],
+  "outputs": [
+    "matrix identityに束縛した論理配置とportability診断"
+  ],
+  "stop_conditions": [
+    "matrixが未固定または対象環境を一意に定めない",
+    "配置が所有境界外または未許可絶対パスを含む"
+  ],
+  "recovery_conditions": [
+    "supported-platform matrix、標準配置または明示設定を訂正する"
+  ],
+  "preserved_artifacts": [
+    "matrix identity、解決根拠と違反箇所"
+  ],
+  "acceptance_criteria": [
+    "matrixの全環境で標準配置または明示設定から同じ論理区画を解決する",
+    "matrixに固定したfilesystem特性と権限条件で配置検査を再現できる",
+    "成果物内の未許可絶対パスを検出する"
+  ],
+  "non_goals": [
+    "macOS固有パスへの固定",
+    "要件本文へOS数またはversionを固定すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "3909b1d5cb4db41065bc296efd9212fd8c86559c56d7a5f788765e7851359920"
+}

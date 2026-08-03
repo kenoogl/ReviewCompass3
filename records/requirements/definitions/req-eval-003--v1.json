@@ -1,0 +1,61 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-EVAL-003@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-EVAL-003",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-EVIDENCE-EVALUATION",
+  "statement": "システムは評価と分析を再現可能なpackageとして固定し、結果の限界を失ってはならない",
+  "inputs": [
+    "固定材料、評価基準、既知失敗例"
+  ],
+  "outputs": [
+    "再現可能な評価・分析package"
+  ],
+  "stop_conditions": [
+    "入力または基準identityが不一致である"
+  ],
+  "recovery_conditions": [
+    "条件変更を新しい評価identityとして比較する"
+  ],
+  "preserved_artifacts": [
+    "成功・失敗結果と限界"
+  ],
+  "acceptance_criteria": [
+    "同じ固定入力と基準から同じ機械評価が得られる",
+    "失敗例と限界を除外せず保存する"
+  ],
+  "non_goals": [
+    "評価結果だけから一般化した真実を主張すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "1e01f09c66a097a6b12172815e10336e7d0d61ba71665ef0bf73fa48e9341047"
+}

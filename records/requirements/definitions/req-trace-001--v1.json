@@ -1,0 +1,62 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-TRACE-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-TRACE-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SEMANTIC-TRACE",
+  "statement": "システムは意味単位と関係を閉じた語彙とID参照で決定的にたどれる形へ固定しなければならない",
+  "inputs": [
+    "意味単位、型付き関係、一次証拠参照"
+  ],
+  "outputs": [
+    "版付き意味グラフ"
+  ],
+  "stop_conditions": [
+    "未定義IDまたは辺種別がある",
+    "自己参照または禁止循環がある"
+  ],
+  "recovery_conditions": [
+    "未定義参照を解決して新しい版を作る"
+  ],
+  "preserved_artifacts": [
+    "拒否された辺と診断"
+  ],
+  "acceptance_criteria": [
+    "閉じた辺種別と存在するIDだけを保存できる",
+    "任意Findingから一次証拠へ決定的に到達できる"
+  ],
+  "non_goals": [
+    "追跡不能な専用DBを正本にすること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "60a958fb9766090ad99c2636d934974c2c47427695e5e56924183faf00f33920"
+}

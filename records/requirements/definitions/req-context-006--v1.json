@@ -1,0 +1,67 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTEXT-006@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTEXT-006",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REVIEW-CONTEXT-BATCH-0001",
+      "version": 1,
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+    },
+    {
+      "logical_id": "REVIEW-CONTEXT-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-REVIEW-CONTEXT",
+  "statement": "システムは確認済み成果、未解決事項、変更方針および再開地点をDigest付きhandoff packageへ固定し受け取り側が完全性とfreshnessを検査できる形で引き渡さなければならない",
+  "inputs": [
+    "再開対象のReview TaskとContext identity",
+    "未解決事項と変更方針",
+    "元Review Runとeffective execution identity",
+    "確認主体、Validation結果および承認判断",
+    "確認済み成果とそのDigest"
+  ],
+  "outputs": [
+    "package全体のDigestを持つ照合可能なhandoff package"
+  ],
+  "stop_conditions": [
+    "再開対象または変更方針が一意に定まらない",
+    "確認済み成果のDigestが欠けるか一致しない"
+  ],
+  "recovery_conditions": [
+    "保存済みの確認済み成果からpackageを再構成する"
+  ],
+  "preserved_artifacts": [
+    "既存の確認済み成果、失敗履歴および不一致診断"
+  ],
+  "acceptance_criteria": [
+    "packageの再構成が確認済み成果の内容とDigestを変更しない",
+    "受け取り時にpackage全体のDigest、Context identityおよびfreshnessを再検査できる"
+  ],
+  "non_goals": [
+    "成果再利用、新Review Run開始、再開状態遷移を決定すること",
+    "再開のために失敗履歴を削除すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "bb16e0bf9b3fa551b0aac05a45c74a5edf49a58e4fdfa7b999cd88abc4d3010a"
+}

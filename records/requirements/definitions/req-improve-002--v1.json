@@ -1,0 +1,61 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-IMPROVE-002@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-IMPROVE-002",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SELF-IMPROVEMENT",
+  "statement": "システムは改善候補を検証し、Human承認を経た変更だけを次周期へ反映しなければならない",
+  "inputs": [
+    "feedback ledger、改善候補、検証結果"
+  ],
+  "outputs": [
+    "採否根拠付き改善判断"
+  ],
+  "stop_conditions": [
+    "検証不足、判断競合、Human承認なし"
+  ],
+  "recovery_conditions": [
+    "反証または不足材料を追加して再提案する"
+  ],
+  "preserved_artifacts": [
+    "候補、反証、検証、Human判断"
+  ],
+  "acceptance_criteria": [
+    "改善前後を固定条件で比較できる",
+    "Human承認前に現行方針を変更しない"
+  ],
+  "non_goals": [
+    "LLMによる自律的な方針変更"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "f8348587904bf623b40e9ead795f801f112f9f8c2814cd01490f768e26813391"
+}

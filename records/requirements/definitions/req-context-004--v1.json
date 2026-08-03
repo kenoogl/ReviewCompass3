@@ -1,0 +1,70 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTEXT-004@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTEXT-004",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REVIEW-CONTEXT-BATCH-0001",
+      "version": 1,
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+    },
+    {
+      "logical_id": "REVIEW-CONTEXT-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-REVIEW-CONTEXT",
+  "statement": "システムはExecution Contextの内容をDigestで固定し入力変更後に旧結果を再利用せずstaleとして停止しなければならない",
+  "inputs": [
+    "Composition記録",
+    "Scope contract",
+    "source universe identity",
+    "任意のhandoff package identity",
+    "各入力の完全性、取得状態およびDigest",
+    "固定済みExecution Context材料束",
+    "版付きReview Task入力定義のDigest"
+  ],
+  "outputs": [
+    "Execution Context identityとfreshness検査結果"
+  ],
+  "stop_conditions": [
+    "Context確定後に参照元が変わる",
+    "入力Digestが固定値と一致しない"
+  ],
+  "recovery_conditions": [
+    "変更後の材料から新しいContext identityを作る",
+    "旧結果を残したまま新しいReview Runを開始する"
+  ],
+  "preserved_artifacts": [
+    "旧identity、実測Digest、不一致箇所および検出時刻"
+  ],
+  "acceptance_criteria": [
+    "Task定義、材料束、Scope、Composition、source universe、完全性状態、handoffの各構成要素を1つずつ変更すると旧identityと旧結果の再利用が拒否される",
+    "同じ正規化入力から同じidentityが得られる"
+  ],
+  "non_goals": [
+    "Digestで意味的正しさを保証すること",
+    "staleな履歴を新しい結果で上書きすること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "29afb219d41afe8d6537d6809337877afa8ee967a7af9dea3bd1a4d0e694bd9e"
+}

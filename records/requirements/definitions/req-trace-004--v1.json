@@ -1,0 +1,64 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-TRACE-004@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-TRACE-004",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SEMANTIC-TRACE",
+  "statement": "システムは固定した変更単位、版付き意味関係および閉包規則からレビューの影響候補母集合を決定的に生成しなければならない",
+  "inputs": [
+    "固定した変更単位",
+    "版付き意味グラフ",
+    "関係種別ごとの閉じた影響閉包規則"
+  ],
+  "outputs": [
+    "生成根拠とDigestを持つ影響候補母集合"
+  ],
+  "stop_conditions": [
+    "変更単位または関係参照が未解決である",
+    "閉包規則にない関係を暗黙採用する"
+  ],
+  "recovery_conditions": [
+    "変更単位、意味関係または閉包規則を訂正して再生成する"
+  ],
+  "preserved_artifacts": [
+    "辿った辺、除外規則、未解決参照および診断"
+  ],
+  "acceptance_criteria": [
+    "同じ変更単位、意味グラフおよび閉包規則から同じ影響候補母集合が得られる",
+    "未解決関係または閉包不能時にScopeへ母集合を渡さない"
+  ],
+  "non_goals": [
+    "候補のinclude、exclude、defer分類を所有すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "7f5278e4593c1254bdc0ae401ad356ba377f57b6846f2d4d6bc868352e6c784a"
+}

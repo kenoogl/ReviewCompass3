@@ -510,6 +510,98 @@ def _requirement_ids_from_record(path):
     )
 
 
+def _load_declared_definition(reference, project_root, schema):
+    relative_path = reference["path"]
+    _validate_relative_path(relative_path)
+    path = project_root / relative_path
+    if not path.is_file():
+        raise RequirementArtifactError(
+            f"Requirement definition does not exist: {relative_path}"
+        )
+    try:
+        record = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError) as error:
+        raise RequirementArtifactError(
+            f"cannot load Requirement definition: {relative_path}"
+        ) from error
+    validate_artifact(record, schema=schema, path=relative_path)
+    declared = (
+        reference["logical_id"],
+        reference["version"],
+        reference["path"],
+        reference["sha256"],
+    )
+    if declared != _artifact_reference(record):
+        raise RequirementArtifactError(
+            f"Requirement definition reference is stale: {relative_path}"
+        )
+    return record
+
+
+def resolve_effective_requirement_ids(
+    authority_bundle,
+    *,
+    schema,
+    project_root,
+):
+    """旧新どちらのauthority bundleも一つの機械経路で解決する。"""
+
+    project_root = Path(project_root)
+    validate_artifact(authority_bundle, schema=schema)
+
+    definition_records = tuple(
+        _load_declared_definition(reference, project_root, schema)
+        for reference in authority_bundle["definition_refs"]
+    )
+    declared_ids = [
+        record["requirement_id"]
+        for record in definition_records
+    ]
+    for binding in authority_bundle["legacy_authority_bindings"]:
+        declared_ids.extend(binding["requirement_ids"])
+    if len(declared_ids) != len(set(declared_ids)):
+        raise RequirementArtifactError(
+            "Requirement ID is duplicated across authority representations"
+        )
+
+    for binding in authority_bundle["legacy_authority_bindings"]:
+        definition_path = _validate_file_reference(
+            binding["definition_source"],
+            project_root,
+        )
+        human_path = _validate_file_reference(
+            binding["human_source"],
+            project_root,
+        )
+        _validate_file_reference(
+            binding["approval_decision"],
+            project_root,
+        )
+        _validate_file_reference(
+            binding["completion_evidence"],
+            project_root,
+        )
+        source_ids = _requirement_ids_from_record(definition_path)
+        if set(binding["requirement_ids"]) != source_ids:
+            raise RequirementArtifactError(
+                "legacy binding IDs do not match definition source"
+            )
+        human_text = human_path.read_text()
+        if any(
+            requirement_id not in human_text
+            for requirement_id in binding["requirement_ids"]
+        ):
+            raise RequirementArtifactError(
+                "legacy human source omits a bound Requirement ID"
+            )
+
+    return AuthorityResolution(
+        status="effective",
+        requirement_ids=tuple(sorted(declared_ids)),
+        bundle_digest=authority_bundle["bundle_digest"],
+    )
+
+
 def validate_legacy_binding_inventory(
     inventory,
     *,

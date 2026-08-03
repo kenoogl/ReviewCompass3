@@ -1,0 +1,61 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムは現在の作業対象、作業単位、backlogおよび進行段階を一意IDで結線しなければならない",
+  "inputs": [
+    "open作業単位、選択規則、現在状態"
+  ],
+  "outputs": [
+    "版付きactive work selection"
+  ],
+  "stop_conditions": [
+    "現在対象が0件または複数件になる"
+  ],
+  "recovery_conditions": [
+    "競合をHumanへ提示して新しい選択版を作る"
+  ],
+  "preserved_artifacts": [
+    "候補、選択根拠、旧状態"
+  ],
+  "acceptance_criteria": [
+    "複数open案件でも現在対象が一意になる",
+    "状態と作業単位をIDで逆引きできる"
+  ],
+  "non_goals": [
+    "LLM推論だけで現在作業を選ぶこと"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "701b6d3ea98928483da7f7d4d99fb7b3fe2a07d16b9083f55078eddda8c33c8b"
+}

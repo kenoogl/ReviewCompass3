@@ -14,6 +14,11 @@ dependencies = [
   "platformdirs>=4,<5",
 ]
 
+[project.optional-dependencies]
+development = [
+  "pytest>=8.4,<9",
+]
+
 [project.scripts]
 reviewcompass3-session-logs = "tools.session_logs.entry:main"
 reviewcompass3-bootstrap-review = "tools.bootstrap.review_cli:main"

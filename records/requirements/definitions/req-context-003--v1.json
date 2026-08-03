@@ -1,0 +1,74 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTEXT-003@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTEXT-003",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REVIEW-CONTEXT-BATCH-0001",
+      "version": 1,
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+    },
+    {
+      "logical_id": "REVIEW-CONTEXT-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-REVIEW-CONTEXT",
+  "statement": "システムはレビュー母集合、対象範囲、除外条件および分類結果をScope contractとして固定し対象漏れと判断競合を検出しなければならない",
+  "inputs": [
+    "Review TaskのTargetと固定変更単位",
+    "版付き意味グラフと閉包規則",
+    "include、exclude、deferの判定基準",
+    "固定した候補母集合"
+  ],
+  "outputs": [
+    "全候補の分類を含む版付きScope contract"
+  ],
+  "stop_conditions": [
+    "Targetが母集合に存在しないかReview Taskで許可されない分類に入る",
+    "同じ候補に競合する分類がある",
+    "分類中に母集合が変わる",
+    "母集合を変更単位、意味関係および閉包規則へ逆引きできない",
+    "必要材料がdeferまたは根拠不足のまま残る",
+    "unknownまたは未分類が残る"
+  ],
+  "recovery_conditions": [
+    "変更単位、意味関係または閉包規則を訂正して母集合を再生成する",
+    "未分類または競合を解消し新しいScope版を作る"
+  ],
+  "preserved_artifacts": [
+    "全分類判断、競合、未分類および母集合の変更記録"
+  ],
+  "acceptance_criteria": [
+    "Targetが母集合内の許可分類へ入る",
+    "全候補が重複なく許可された分類のいずれかに入る",
+    "固定変更単位、版付き意味グラフ、閉包規則から同じ候補母集合が再生成される",
+    "母集合、Scope基準、期待分類を同じidentityへ固定し独立検査結果が全件一致する",
+    "独立検査の相違時はScope確定を停止しHuman裁定へ戻す"
+  ],
+  "non_goals": [
+    "LLMの非公開推論だけで対象範囲を確定すること",
+    "常にプロジェクト全体をレビュー対象にすること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "0500610a65437544c4cb55da4eb7e8012c1b19d655f054146b767d7ccccb93ef"
+}

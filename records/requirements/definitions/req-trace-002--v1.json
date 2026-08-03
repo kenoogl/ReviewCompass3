@@ -1,0 +1,66 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-TRACE-002@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-TRACE-002",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SEMANTIC-TRACE",
+  "statement": "システムは上流義務と下流成果物を順逆追跡し、必須義務またはHumanが非採用を明示していない義務に受け先がなければ拒否しなければならない",
+  "inputs": [
+    "上流義務と下流成果物",
+    "被覆対象母集合",
+    "非採用可能義務の閉じた種別とHuman判断"
+  ],
+  "outputs": [
+    "双方向被覆記録"
+  ],
+  "stop_conditions": [
+    "必須義務の未被覆がある",
+    "重複受け先がある",
+    "非採用種別、Human判断または対象Digestが欠ける"
+  ],
+  "recovery_conditions": [
+    "受け先または有効なHuman非採用判断を追加して全件再検査する"
+  ],
+  "preserved_artifacts": [
+    "未被覆、競合、Human判断付き非採用理由"
+  ],
+  "acceptance_criteria": [
+    "必須義務は下流受け先なしを理由の有無にかかわらず拒否する",
+    "限定された非採用可能義務だけがHuman判断と対象Digest付きで非採用になる",
+    "順方向と逆方向の被覆結果が一致する"
+  ],
+  "non_goals": [
+    "件数一致だけを意味的被覆とみなすこと"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "f4b7527bdc16d2324e3dc8a2928debc00f9cab8b65f09512e484e355f70cb6e5"
+}

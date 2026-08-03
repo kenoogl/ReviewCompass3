@@ -22,6 +22,10 @@ LEGACY_INVENTORY_PATH = (
     PROJECT_ROOT
     / "records/requirements/authority/rc3-legacy-requirements-37--v1.json"
 )
+CURRENT_AUTHORITY_PATH = (
+    PROJECT_ROOT
+    / "records/requirements/authority/rc3-requirements-authority-2026-08-03--v1.json"
+)
 EXPECTED_DIRECTORIES = (
     "records/requirements/definitions",
     "records/requirements/candidates",
@@ -363,4 +367,39 @@ def test_rejects_legacy_binding_after_source_digest_change(layout):
             project_root=PROJECT_ROOT,
             expected_requirement_ids=EXPECTED_REQUIREMENT_IDS,
             path="records/requirements/authority/rc3-legacy-requirements-37--v1.json",
+        )
+
+
+def test_resolves_mixed_authority_bundle_through_one_machine_reader(layout):
+    schema = layout.load_schema(SCHEMA_PATH)
+    authority = json.loads(CURRENT_AUTHORITY_PATH.read_text())
+
+    result = layout.resolve_effective_requirement_ids(
+        authority,
+        schema=schema,
+        project_root=PROJECT_ROOT,
+    )
+
+    assert result.status == "effective"
+    assert len(result.requirement_ids) == 50
+    assert len(set(result.requirement_ids)) == 50
+    assert result.bundle_digest == authority["bundle_digest"]
+
+
+def test_machine_reader_rejects_duplicate_across_definition_and_legacy(layout):
+    schema = layout.load_schema(SCHEMA_PATH)
+    authority = json.loads(CURRENT_AUTHORITY_PATH.read_text())
+    authority["legacy_authority_bindings"][0]["requirement_ids"][0] = (
+        "REQ-CONTRACT-001"
+    )
+    authority = _seal(authority)
+
+    with pytest.raises(
+        layout.RequirementArtifactError,
+        match="duplicated",
+    ):
+        layout.resolve_effective_requirement_ids(
+            authority,
+            schema=schema,
+            project_root=PROJECT_ROOT,
         )

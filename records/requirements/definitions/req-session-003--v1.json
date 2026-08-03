@@ -1,0 +1,62 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-SESSION-003@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-SESSION-003",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SESSION-RECORDS",
+  "statement": "システムはセッション記録の追記と改変を区別し、転写変異を検出しなければならない",
+  "inputs": [
+    "前回raw identityと現在ログ",
+    "転写・来歴"
+  ],
+  "outputs": [
+    "変更種別と保全判断"
+  ],
+  "stop_conditions": [
+    "非追記変更または検証不能な消失がある"
+  ],
+  "recovery_conditions": [
+    "変更前保全版から復元または新版として隔離する"
+  ],
+  "preserved_artifacts": [
+    "変更前後identityと変異診断"
+  ],
+  "acceptance_criteria": [
+    "追記、非追記変更、消失を区別して検出する",
+    "既知変異で検査が失敗する"
+  ],
+  "non_goals": [
+    "変異を新規追記として黙認すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "86404fe13919ef305238faa3f353063094cd52be27d7bbc04a588ca0f1581256"
+}

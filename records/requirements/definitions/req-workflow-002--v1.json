@@ -1,0 +1,70 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-002@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-002",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムは作業段階とRun開始・完了許可の正本として許可遷移および関門を一貫した状態機械で管理しなければならない",
+  "inputs": [
+    "現在の作業段階、要求action、関門結果",
+    "Harnessからの開始要求またはRun結果",
+    "REQ-TRACE-005のOperational Provenance verdict",
+    "REQ-PORTABLE-002を満たす状態保存境界"
+  ],
+  "outputs": [
+    "原子的な作業状態遷移記録",
+    "HarnessへのRun開始許可または拒否"
+  ],
+  "stop_conditions": [
+    "未定義遷移または関門未通過である",
+    "Harnessの開始要求またはRun結果がactive workと一致しない",
+    "Operational Provenance verdictが不合格である"
+  ],
+  "recovery_conditions": [
+    "有効な関門結果から新しいactionを要求する"
+  ],
+  "preserved_artifacts": [
+    "成功・拒否action、開始要求、Run結果、来歴verdictおよび関門結果"
+  ],
+  "acceptance_criteria": [
+    "許可遷移だけが状態を変更する",
+    "WorkflowのRun開始許可なしにHarnessが開始されない",
+    "Harnessから返るRun結果とOperational Provenance verdictを検証するまで完了段へ進まない"
+  ],
+  "non_goals": [
+    "Prompt内だけで状態を保持すること",
+    "許可後のRun・Attempt内部状態を所有すること",
+    "Operational Provenance自体の検証"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "920c7370a3c0ca1e64f670bdcae8080d28df7631423c1fd59fb97f99c889e710"
+}

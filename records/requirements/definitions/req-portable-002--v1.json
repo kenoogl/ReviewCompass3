@@ -1,0 +1,61 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-PORTABLE-002@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-PORTABLE-002",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-PORTABLE-LIFECYCLE",
+  "statement": "システムは構造化成果物を共有境界で安全に読書きし、部分失敗から復旧できなければならない",
+  "inputs": [
+    "構造化成果物とSchema"
+  ],
+  "outputs": [
+    "原子的に保存した構造化成果物"
+  ],
+  "stop_conditions": [
+    "parse、Schema、原子的保存に失敗する"
+  ],
+  "recovery_conditions": [
+    "正しい入力から新しい版を保存する"
+  ],
+  "preserved_artifacts": [
+    "旧版と値なし診断"
+  ],
+  "acceptance_criteria": [
+    "部分書込み後も旧版が読める",
+    "不正構造を局所診断して上書きしない"
+  ],
+  "non_goals": [
+    "不正データの推測修復"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "1eda16d2906dfa54369dc9e5d578b2bb58cbb75074d9cf67deb66e9c8cf5d084"
+}

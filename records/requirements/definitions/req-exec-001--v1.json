@@ -1,0 +1,68 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-EXEC-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-EXEC-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-HARNESSED-EXECUTION",
+  "statement": "システムはWorkflowが開始を許可した固定実行仕様について許可された状態順序に従うReview Runだけを開始しなければならない",
+  "inputs": [
+    "Review TaskとExecution Context identity",
+    "Workflowが発行したRun開始許可identity",
+    "役割、対象、順序、停止関門を持つ版付き実行仕様"
+  ],
+  "outputs": [
+    "状態順序付きReview Run計画",
+    "Workflowへ返却するRun結果"
+  ],
+  "stop_conditions": [
+    "Workflowの開始許可がないか要求と一致しない",
+    "必須実行条件が欠ける",
+    "未定義または順序違反のRun内部状態遷移がある"
+  ],
+  "recovery_conditions": [
+    "仕様を訂正してWorkflowへ新しい開始要求を出す"
+  ],
+  "preserved_artifacts": [
+    "開始要求、Workflowの許可・拒否、拒否仕様と関門診断"
+  ],
+  "acceptance_criteria": [
+    "Workflowの許可後だけHarnessのRun内部状態が開始される",
+    "未定義状態遷移と不完全な実行仕様が送信前に拒否される",
+    "同じ固定仕様から同じ実行計画identityが得られる"
+  ],
+  "non_goals": [
+    "Humanの最終判断を実行主体へ委ねること",
+    "作業Workflowの状態またはRun開始許可をHarnessが決めること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "f42e94a4568a9cdc8d64598e616e971e9655e6b0ef6026cf9d2407cabfe9c186"
+}

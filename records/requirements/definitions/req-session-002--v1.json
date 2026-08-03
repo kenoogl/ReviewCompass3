@@ -1,0 +1,64 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-SESSION-002@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-SESSION-002",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-SESSION-RECORDS",
+  "statement": "システムは生ログ原本を共有隔離保存境界で保全し、伏字化した転写・要約・来歴へ一続きに変換しなければならない",
+  "inputs": [
+    "生ログと取込範囲",
+    "伏字化規則",
+    "REQ-PORTABLE-004を満たす分類別保存境界"
+  ],
+  "outputs": [
+    "伏字化転写、要約、来歴"
+  ],
+  "stop_conditions": [
+    "機微情報検査、アクセス境界、retention、削除方針または来歴照合に失敗する"
+  ],
+  "recovery_conditions": [
+    "規則を訂正して新しい転写版を生成する"
+  ],
+  "preserved_artifacts": [
+    "隔離した生ログ保全版と値なし診断"
+  ],
+  "acceptance_criteria": [
+    "raw範囲から転写を再生成し一致確認できる",
+    "raw原本と伏字化派生物へ別々のアクセス、retention、削除方針が適用される",
+    "機微情報残存時に派生物が通常境界へ保存されない"
+  ],
+  "non_goals": [
+    "rawを転写で置換すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "62d4a8e8e9c7f8e11759a839db86fcca0d1019bf23db87bcd650525bc09a08bc"
+}

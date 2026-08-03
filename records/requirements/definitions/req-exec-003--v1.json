@@ -1,0 +1,69 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-EXEC-003@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-EXEC-003",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-HARNESSED-EXECUTION",
+  "statement": "システムはprovider responseの受領とrawの耐久的captureを別状態として管理し、解析前に共有隔離保存境界へwrite-ahead captureしなければならない",
+  "inputs": [
+    "Attempt identity、request identityおよび送信条件",
+    "provider response stream",
+    "REQ-PORTABLE-002とREQ-PORTABLE-004を満たすwrite-ahead隔離保存境界"
+  ],
+  "outputs": [
+    "不変raw応答記録と構造化解析結果",
+    "success、failedまたはirrecoverableのRun終端状態"
+  ],
+  "stop_conditions": [
+    "request、Attemptまたは送信条件へ結線できない",
+    "raw captureと値なし診断の双方を耐久保存できない"
+  ],
+  "recovery_conditions": [
+    "保存済みrawを変更せず新しい解析試行を追加する",
+    "rawを確定できず再取得不能ならRunをirrecoverableとして閉じ外部提示する"
+  ],
+  "preserved_artifacts": [
+    "request identity、受領時点、raw応答、解析試行、値を含まない保存診断"
+  ],
+  "acceptance_criteria": [
+    "request identityを耐久保存してから送信しresponse受領時点を明示記録する",
+    "受領したresponseは解析前にwrite-ahead captureされ送信条件とAttemptへ結線される",
+    "capture前後のクラッシュ注入でsuccess、failedまたはirrecoverableのいずれか一意な終端状態になる",
+    "通常保存と診断保存の双方が不能なら値を含まないirrecoverable状態を外部へ提示する"
+  ],
+  "non_goals": [
+    "外部providerの受信とローカル保存を一つの原子操作とみなすこと",
+    "raw応答を解析結果で置換すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "8addbe8dd1c54a68357aa6484944e0295d68a5a43a403a24687451f1cb3b48ce"
+}

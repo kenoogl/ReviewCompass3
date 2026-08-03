@@ -1,0 +1,70 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTEXT-007@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTEXT-007",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REVIEW-CONTEXT-BATCH-0001",
+      "version": 1,
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+    },
+    {
+      "logical_id": "REVIEW-CONTEXT-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-REVIEW-CONTEXT",
+  "statement": "システムはContext構成と検査で生じた確認済み成果、失敗履歴および診断を共有保存境界を介して部分書込みや機微情報の漏えいを防ぎ再起動後に照合できる形で保存しなければならない",
+  "inputs": [
+    "保存対象とそのidentity",
+    "機微情報検査結果",
+    "REQ-PORTABLE-002およびREQ-PORTABLE-004を満たす共有保存境界",
+    "許可された保存形式、アクセス境界およびretention policy"
+  ],
+  "outputs": [
+    "保存結果と再読込照合結果",
+    "耐久的に確定した成果物"
+  ],
+  "stop_conditions": [
+    "保存先のアクセス境界を確認できない",
+    "原子的な確定または再読込照合に失敗する",
+    "機微情報検査が失敗する"
+  ],
+  "recovery_conditions": [
+    "不完全な一時成果を確定扱いせず直前の確認済み版から再試行する",
+    "機微情報を除去し新しい保存試行として記録する"
+  ],
+  "preserved_artifacts": [
+    "直前の確認済み版と値を含まない失敗診断"
+  ],
+  "acceptance_criteria": [
+    "クラッシュ後も確定済み版と未確定版を機械的に識別でき再読込Digestが一致する",
+    "削除時も対象identity、理由および削除結果のDigest付き診断が残る",
+    "書込み途中の強制終了後も直前の確認済み版が変わらない"
+  ],
+  "non_goals": [
+    "保存失敗を無視して後続処理を続けること",
+    "未検査の失敗材料を恒久保存すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "0ee8eb7f304ca59351c030a79ccfb81d8d1afbbf4cf7231f8ca903c6be0c45a1"
+}

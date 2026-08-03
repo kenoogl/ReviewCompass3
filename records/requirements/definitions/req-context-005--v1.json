@@ -1,0 +1,67 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTEXT-005@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTEXT-005",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REVIEW-CONTEXT-BATCH-0001",
+      "version": 1,
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+    },
+    {
+      "logical_id": "REVIEW-CONTEXT-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-REVIEW-CONTEXT",
+  "statement": "システムは呼び出し側が指定した材料と採用目的を明示的に構成し暗黙の資料をExecution Contextへ追加してはならない",
+  "inputs": [
+    "任意の候補材料と候補生成条件",
+    "呼び出し側が指定した採用材料",
+    "材料の採用目的"
+  ],
+  "outputs": [
+    "材料の採否と根拠を含むComposition記録",
+    "検証済みExecution Context"
+  ],
+  "stop_conditions": [
+    "候補の採否が未解決である",
+    "採用材料の出所または採用主体を追跡できない"
+  ],
+  "recovery_conditions": [
+    "呼び出し側または利用者が採用材料を訂正する",
+    "訂正後の材料から新しいComposition記録を作る"
+  ],
+  "preserved_artifacts": [
+    "候補一覧、採否、判断主体、目的および未解決事項"
+  ],
+  "acceptance_criteria": [
+    "全採用材料を明示指定または決定的な採用規則へたどれる",
+    "指定されていない材料をLLMが暗黙に追加できない"
+  ],
+  "non_goals": [
+    "Context候補探索から採用までを完全自律化すること",
+    "会話履歴全体を既定のContextとして扱うこと"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "ab3efbebd71ed58acf21254208184d046c986eb470df5ecd342243d1f6deb67c"
+}

@@ -1,0 +1,61 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-EVAL-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-EVAL-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-EVIDENCE-EVALUATION",
+  "statement": "システムは固定対象へ明示基準を適用し、成果物と実装の適合性を証拠付きで評価しなければならない",
+  "inputs": [
+    "固定評価対象、基準、証拠"
+  ],
+  "outputs": [
+    "証拠付き評価結果"
+  ],
+  "stop_conditions": [
+    "対象、基準、証拠が欠ける"
+  ],
+  "recovery_conditions": [
+    "材料または基準を再固定して新評価を行う"
+  ],
+  "preserved_artifacts": [
+    "評価入力と不適合診断"
+  ],
+  "acceptance_criteria": [
+    "対象、基準、入力identity、結果を相互に逆引きできる",
+    "固定材料変更時に旧評価をstaleとする"
+  ],
+  "non_goals": [
+    "実行観測の収集を所有すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "04a2f4cbaf01cb2be28df4ea6b1a314b12f4852f7487cc003ff70ff3be61a7c0"
+}

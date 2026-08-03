@@ -1,0 +1,62 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-TRIAGE-002@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-TRIAGE-002",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "REMAINING-BATCHES-0002-0009",
+      "version": 1,
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "logical_id": "REMAINING-FEATURE-REQUIREMENTS",
+      "version": 1,
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "logical_id": "STAGE-FOUR-USER-APPROVAL",
+      "version": 1,
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "logical_id": "STAGE-FOUR-COMPLETION",
+      "version": 1,
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "feature_id": "FEAT-REVIEW-TRIAGE",
+  "statement": "システムは複数modelの所見を重複と競合を保ったまま統合しなければならない",
+  "inputs": [
+    "担当別FindingとEvidence"
+  ],
+  "outputs": [
+    "重複群、競合群、独立所見を持つtriage記録"
+  ],
+  "stop_conditions": [
+    "統合元を追跡できない",
+    "競合が未表示のまま確定される"
+  ],
+  "recovery_conditions": [
+    "根拠追加後に新しいtriage版を作る"
+  ],
+  "preserved_artifacts": [
+    "統合前後の全Finding"
+  ],
+  "acceptance_criteria": [
+    "重複元と競合する全主張を逆引きできる",
+    "未解決競合がHumanへ提示される"
+  ],
+  "non_goals": [
+    "多数決で競合を自動解消すること"
+  ],
+  "acceptance_truth_changed": false,
+  "canonical_payload_digest": "b08ff3d2059599af5fdb39169b4e37bdaaec04e5c042bc4c8cf0baf3c0eabb9f"
+}

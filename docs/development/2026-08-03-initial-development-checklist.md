@@ -279,7 +279,7 @@ Plan参照を再照合した。内容Digestに変化はなく、Work 1の`verifi
 - [x] Requirement本体、候補、Decision、Evidence、schemaの配置、命名、authority結線を固定した。
 - [x] 承認済み配置へ最小schema、validator、fixture、既存37要件のlegacy binding inventoryを実装した。
 - [x] 追加13 Requirementをdefinition／candidate形式へ構造化し、schema検証、Evidence、Human promotionへ接続した。
-- [ ] 必須非機能義務をVerification Profileへ接続した。
+- [x] 必須非機能義務をVerification Profileへ接続した。
 - [ ] deferred候補を初期Requirementの暗黙依存にしていない。
 
 `Evidence`：固定sourceと被覆baselineは
@@ -370,6 +370,49 @@ definitionを結線し、authority chainは`effective`、50 IDの欠落・重複
 `records/development/2026-08-03-work-3-added-requirements-promotion-completion-evidence-v1.md`、SHA-256
 `dc945ec1d2eae4fe4c8c3293b9f1390fe4c527094e5dc209082dafc6f3b80649`。本項目は
 `verified / completed`であり、次の未完了項目は必須非機能義務のVerification Profile接続である。
+必須非機能義務の接続候補は
+`records/development/2026-08-03-work-3-nfr-verification-profile-candidate-v1.json`、file SHA-256
+`08d5159a483d16507c5652857e5245993b42559ed3bcc24c9434e70b0d5c2381`、candidate digest
+`c93f9336790fc8641f3f89687f94fcff3baa23254936545ed9cb85c15c25d3a6`。50 RequirementをNFR接続29件と
+functional／control only 21件へ重複・欠落0でscreeningし、Profile 19件を`initial_required: 8`、
+`threshold_after_measurement: 6`、`deferred_to_deployment_profile: 5`へ分類した。性能、規模、信頼性、費用、
+互換性、security・privacy、maintainabilityの7属性と、各Profileのauthority、適用条件、fixture、environment、
+measurement、oracle、failure verdict、Evidenceを被覆した。監査Evidenceは
+`records/development/2026-08-03-work-3-nfr-verification-profile-evidence-v1.md`、SHA-256
+`e0800a9832798df5ab50a83203c42b16a2728488ff0f8942eb86e919740d2a12`。既知違反6件の負例監査、全Test
+`448 passed`に合格した。承認済みArchitecture Policy recordはまだ存在しないため、Planの横断rule 6件は
+`proposed_policy_rule_not_authoritative`としてWork 4へrouteし、Policy authorityにはしていない。候補は
+`verified / human_decision_pending`であり、Human承認前は本checkboxを未完了のまま維持する。
+HumanはNFR Verification Profile接続候補を承認した。Decisionは
+`records/development/2026-08-03-work-3-nfr-verification-profile-decision.json`、SHA-256
+`6cdb1f74c8b92bcc7257bf8087158f78e8c980428d1b0fa725a20e2dd8e96373`。candidate／Evidence Digestと
+Profile 19件の3分類へ承認を束縛し、Architecture Policy昇格0、数値閾値承認0を確認した。完了Evidenceは
+`records/development/2026-08-03-work-3-nfr-verification-profile-completion-evidence-v1.md`、SHA-256
+`c8c99ca93d9eb29c112febbc18fa53fbf5476d703399a07888b7733cb9fb379f`。Decision bindingと全Test
+`448 passed`に合格し、本項目は`verified / completed`となった。次の未完了項目は、deferred候補を初期
+Requirementの暗黙依存にしていないことの確認である。
+deferred scope候補は
+`records/development/2026-08-03-work-3-deferred-scope-candidate-v1.json`、file SHA-256
+`01da1ea0c6c4f6adad8fdcd09085f97b387ea4639d01b0811b80dc5957916210`、candidate digest
+`8993a6e4671679ab8cfe665322efdaf862cf085a8f1fab7d500d15f5fd7deb84`。13候補を
+`explicit_deferred: 9`、`conditional_pilot: 2`、`not_adopted_without_new_evidence: 2`へ分類し、
+各候補のowner、成果、論理配置、有効化条件、初期非依存規則を固定した。監査Evidenceは
+`records/development/2026-08-03-work-3-deferred-scope-evidence-v1.md`、SHA-256
+`1c24269e36d2baa2a4e22d39162e7bb85b7c5e513c55a5035fa55efa54029b71`。50 Requirement、NFR Profile、
+Work 5A、Work 6A、Work 7A、Work 8、Work 8A、Work 7B、Stage G／releaseの9 consumerでscope leak 0、
+未知Requirement／Profile参照0、release blocker 0、既知違反6件の負例監査に合格した。
+`REQ-CONTRACT-008`はeffectiveだが、definition自身の初期範囲外規則へ従い最初のContractとreleaseを
+blockしない。候補は`verified / human_decision_pending`であり、Human承認前は本checkboxを未完了に保つ。
+scope監査中に発生したauthority bundle二形式読取りとTest実行環境選択の問題に対する恒久対策は
+`records/development/2026-08-03-work-3-permanent-remediation-green-evidence-v1.md`、SHA-256
+`096e91d786293b5d01f1a14717f49c2b0806c48a8ea8d3b76439108a7ec6af0c`。共通machine reader、旧37要件の
+決定的移行器、版付きpolicy Test runnerをtest-firstで実装した。旧37 definitionと既存13 definitionを結ぶ
+統一50 candidateは`records/requirements/candidates/rc3-requirements-unified-50-2026-08-03-v1.json`、file
+SHA-256 `c82144375fecc22c088d06d510d9e041fe9c607a0d6e4eb353b034467654ca16`、candidate digest
+`cc4ba8f872973f8035b798042f4a5335005394cca339ec6f0121cf16c8c533b4`。移行は意味field不一致0、再生成差分0、
+schema不一致0で、policy runnerによる全Testは`462 passed`、fallbackは`false`だった。現行effective authorityは
+v1のままであり、統一candidateは`verified / human_decision_pending`である。Human promotion後にだけ旧v1を
+supersedeするauthority bundle v2を作成し、影響するNFR／deferred Evidenceを新identityへ再検証する。
 
 ### Work 4：Designと代表シナリオ
 
