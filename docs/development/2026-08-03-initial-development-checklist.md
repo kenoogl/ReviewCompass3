@@ -100,25 +100,30 @@ Session EvidenceとGitへ委ねる。
 
 ### 開始条件
 
-- [ ] 利用者から開発着手の指示がある。
-- [ ] 本チェックリストを当面の進行入口として確認している。
+- [x] 利用者から開発着手の指示がある。
+- [x] 本チェックリストを当面の進行入口として確認している。
 
 ### 確認項目
 
-- [ ] Intent、統合用語集、現行計画の対象versionとDigestを固定した。
-- [ ] 既存baseline、前身Evidence、未コミット変更を列挙した。
-- [ ] 今回のsource universe、対象、非対象、confidentialityを定めた。
-- [ ] 初期scopeとDeferred Workを確認した。
-- [ ] 未承認事項、既知Finding、必要なHuman判断を列挙した。
-- [ ] Evidence Extraction ContractとConsumption Closureの最小運用を定めた。
-- [ ] 固定入力が変わった場合のstale化と再開入口を定めた。
+- [x] Intent、統合用語集、現行計画の対象versionとDigestを固定した。
+- [x] 既存baseline、前身Evidence、未コミット変更を列挙した。
+- [x] 今回のsource universe、対象、非対象、confidentialityを定めた。
+- [x] 初期scopeとDeferred Workを確認した。
+- [x] 未承認事項、既知Finding、必要なHuman判断を列挙した。
+- [x] Evidence Extraction ContractとConsumption Closureの最小運用を定めた。
+- [x] 固定入力が変わった場合のstale化と再開入口を定めた。
 
 ### 完了関門
 
-- [ ] 固定入力、scope、非目標、未解決事項を一つのEvidenceから確認できる。
-- [ ] blockingなIntent／Requirement／Plan競合がない、または停止理由が明示されている。
+- [x] 固定入力、scope、非目標、未解決事項を一つのEvidenceから確認できる。
+- [x] blockingなIntent／Requirement／Plan競合がない、または停止理由が明示されている。
 
-`Evidence`：未記録
+`Evidence`：`RC3-WORK1-FIXED-INPUT-2026-08-03-V1`、
+`records/development/2026-08-03-work-1-fixed-input-evidence.md`、SHA-256
+`d07c5abdce7bc4b3322e7c6f973feb0e00d7218151dafe7013aff5d08148b879`。
+結果は`blocked / pause_and_triage`。停止Evidenceは
+`records/development/2026-08-03-work-1-reconstructability-candidate.md`、SHA-256
+`4206805e3066335c5a84a56baa839e4b074da4b5af1f8cd17b20bcbe22860404`。
 
 ## 4. Work 1A：Layout Baseline
 

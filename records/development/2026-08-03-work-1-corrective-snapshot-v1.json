@@ -1,0 +1,125 @@
+{
+  "record_id": "WORK1-CORRECTIVE-SNAPSHOT-2026-08-03-V1",
+  "record_version": 1,
+  "recorded_at": "2026-08-03",
+  "purpose": "Close the unfulfilled v16 immutable-snapshot attempt and establish a reconstructable fixed-input snapshot for Work 1.",
+  "human_decision": {
+    "path": "records/development/2026-08-03-work-1-reconstructability-repair-decision.json",
+    "sha256": "d8da18034eabaa38dcd80f2648a7484ed516ce0dfadce91f819ba436956e7576",
+    "decision_id": "WORK1-RECONSTRUCTABILITY-REPAIR-DEC-001"
+  },
+  "prior_revision": {
+    "path": "records/task-contract/task-contract-centered-documentation-v16.json",
+    "sha256": "7c60fe046bb65ca4137b1c3384b139ad53321380f7a12f7c3668962fbacdd35d",
+    "relation": "resolves_unfulfilled_forward_fix",
+    "observed_containing_commit": "e603804d4853f29c1ebeb97ef82774447211ff05",
+    "corrected_reconstructability": "digest-only",
+    "reason": "The containing commit does not match five of the eighteen artifact digests recorded by v16, so v16 never became git-reconstructable."
+  },
+  "observed_v16_mismatches": [
+    {
+      "path": "README.md",
+      "recorded_sha256": "8bdcd33d1cc4091353e2bc7edf29544d495e2c8fef5c63f004c8e886136eaf8b",
+      "commit_sha256": "529a344aa61bb11c8bf48f452b2af5c9b8c31b7af88843d47a9fd1f729a4fc8f"
+    },
+    {
+      "path": "docs/README.md",
+      "recorded_sha256": "0c115beb2822fb635195be60c3a90c2d5c4ae20dd88bc8719c31dd7a435ab28d",
+      "commit_sha256": "639164d691fababd6238e7e5ba5c2d9824ab76e58478167a0f4280e20e4ea8c3"
+    },
+    {
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "recorded_sha256": "307bdbcc39d028064ea3ed715ccac38fb68760ac1e8a13b46d4caf3803c11c59",
+      "commit_sha256": "1950f5a37fb5d0d0554f56343b39bbca7fc635523409f10ee761d8cef68f9ec6"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "recorded_sha256": "b5d11aa184d56cbb075f9fb7aea53cabfac14185dcd35442f954bba9e74705de",
+      "commit_sha256": "9c7d54aaa19c9146f751921e5cca962a1b6c151adc130afc5d009f9766f2603b"
+    },
+    {
+      "path": "docs/design/2026-08-02-task-contract-design-amendment.md",
+      "recorded_sha256": "42e46a6b390c842257496cc0fc329c7a90c060ee0b82f4f21612a37b52c0ab04",
+      "commit_sha256": "55115696a3a33612fa52d7fab59dddccb2045ef6baba982a4b5fe17437b25eda"
+    }
+  ],
+  "snapshot_artifacts": [
+    {
+      "role": "intent_candidate",
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "1950f5a37fb5d0d0554f56343b39bbca7fc635523409f10ee761d8cef68f9ec6"
+    },
+    {
+      "role": "glossary_candidate",
+      "path": "docs/current/reviewcompass3-glossary-current.md",
+      "sha256": "f1e7e9a9c57292fe911217d9b4f5d5b8ed99a881d6f113f9b60db1f0d01b19fa"
+    },
+    {
+      "role": "current_plan_candidate",
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f"
+    },
+    {
+      "role": "operational_policy",
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c"
+    },
+    {
+      "role": "operational_policy_decision",
+      "path": "records/development/development-policy-v4.json",
+      "sha256": "87bd0460bce3ae471a598ae5ab2964d05e6ceb97701870f25b5cc9110133f24a"
+    },
+    {
+      "role": "source_catalog",
+      "path": "records/sources/2026-08-02-source-catalog.json",
+      "sha256": "1a40adcec2af6c9f2829af9f4a90cc33bfe6d9cb3fd0e1e305014d71356bd6bb"
+    },
+    {
+      "role": "predecessor_baseline",
+      "path": "records/reference-baselines/2026-07-27/baseline.toml",
+      "sha256": "ba09b5da741482103373e524980ca0870da21f6b5d7cc2fc7c1d7d8094295f76"
+    },
+    {
+      "role": "historical_reconstructability_audit",
+      "path": "records/task-contract/2026-08-02-documentation-reconstructability-audit.json",
+      "sha256": "771dcf1ff88ea3d8e6438b5b75579e0143229cd03362990c56767bcb189a008a"
+    },
+    {
+      "role": "unfulfilled_revision_record",
+      "path": "records/task-contract/task-contract-centered-documentation-v16.json",
+      "sha256": "7c60fe046bb65ca4137b1c3384b139ad53321380f7a12f7c3668962fbacdd35d"
+    },
+    {
+      "role": "work_1_operational_entry_at_repair_start",
+      "path": "docs/development/2026-08-03-initial-development-checklist.md",
+      "sha256": "ea833b027d61b5fc200ef289dffa5cde41be5e8d7fbe36b97bfeae3ab94e2db3"
+    },
+    {
+      "role": "work_1_blocked_evidence",
+      "path": "records/development/2026-08-03-work-1-fixed-input-evidence.md",
+      "sha256": "d07c5abdce7bc4b3322e7c6f973feb0e00d7218151dafe7013aff5d08148b879"
+    },
+    {
+      "role": "work_1_blocking_candidate",
+      "path": "records/development/2026-08-03-work-1-reconstructability-candidate.md",
+      "sha256": "4206805e3066335c5a84a56baa839e4b074da4b5af1f8cd17b20bcbe22860404"
+    },
+    {
+      "role": "human_repair_decision",
+      "path": "records/development/2026-08-03-work-1-reconstructability-repair-decision.json",
+      "sha256": "d8da18034eabaa38dcd80f2648a7484ed516ce0dfadce91f819ba436956e7576"
+    }
+  ],
+  "commit_binding": {
+    "rule": "The immutable snapshot is the Git commit containing this record. Every snapshot_artifacts entry must be read from that commit and match its recorded SHA-256.",
+    "containing_commit": null,
+    "pre_commit_state": "pending_post_commit_verification",
+    "post_commit_evidence_required": true,
+    "record_mutation_after_commit": "prohibited; verification must be a separate record"
+  },
+  "scope_boundary": {
+    "included": "Work 1 fixed-input identity and the evidence needed to repair the v16 provenance gap",
+    "excluded": "semantic changes to Intent, Glossary, Plan, v16, product implementation and Work 1A"
+  },
+  "status": "pending_post_commit_verification"
+}

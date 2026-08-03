@@ -1,0 +1,30 @@
+{
+  "decision_id": "WORK1-RECONSTRUCTABILITY-REPAIR-DEC-001",
+  "decided_at": "2026-08-03",
+  "decision_maker": "human_user",
+  "decision": "approved",
+  "instruction": "進めて",
+  "instruction_context": {
+    "meaning": "v16を上書きせず、訂正記録、同一commit固定、post-commit照合、Work 1再確認を行う説明済みの修復案を進める",
+    "referenced_candidate_id": "IC-WORK1-DOC-RECONSTRUCTABILITY-001",
+    "referenced_candidate_path": "records/development/2026-08-03-work-1-reconstructability-candidate.md"
+  },
+  "approved_scope": [
+    "record that documentation revision v16 did not become git-reconstructable",
+    "create a corrective successor snapshot record without rewriting v16",
+    "commit the corrective snapshot and fixed inputs as one change set",
+    "verify every manifested artifact from the containing commit",
+    "create post-commit verification evidence",
+    "create Work 1 fixed-input Evidence v2 after successful verification",
+    "update the operational checklist and session handoff"
+  ],
+  "excluded_scope": [
+    "semantic changes to the current Intent, Glossary or Plan",
+    "rewriting or deleting documentation revision v16",
+    "accepting digest-only provenance as sufficient",
+    "starting Work 1A before the repair and Work 1 re-verification pass",
+    "product implementation"
+  ],
+  "authority_effect": "authorizes the bounded provenance repair only",
+  "status": "approved_for_execution"
+}

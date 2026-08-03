@@ -8,14 +8,30 @@
 
 ## 現在位置
 
-- 全体：Task Contract中心設計から初期開発へ移る準備段階
-- 現在の工程：Work 1「固定入力と開発入口」のEvidence確認前
+- 全体：初期開発Work 1のProvenance修復をHuman承認に基づいて実施中
+- 現在の工程：Work 1 corrective snapshotのcommit前検証
 - activeな製品Task Contract／Work Item：なし
 - 製品実装code：未着手
 - 当面の進行入口：
   `docs/development/2026-08-03-initial-development-checklist.md`
 - checklist SHA-256：
-  `42dc7a0d2d1080a2297abeeaa0da79edd902c38f6d3572245b1d0e42026b44c9`
+  `ea833b027d61b5fc200ef289dffa5cde41be5e8d7fbe36b97bfeae3ab94e2db3`
+- Work 1固定入力Evidence：
+  `records/development/2026-08-03-work-1-fixed-input-evidence.md`
+- Work 1固定入力Evidence SHA-256：
+  `d07c5abdce7bc4b3322e7c6f973feb0e00d7218151dafe7013aff5d08148b879`
+- blocking改善候補：
+  `records/development/2026-08-03-work-1-reconstructability-candidate.md`
+- blocking改善候補 SHA-256：
+  `4206805e3066335c5a84a56baa839e4b074da4b5af1f8cd17b20bcbe22860404`
+- 修復Decision：
+  `records/development/2026-08-03-work-1-reconstructability-repair-decision.json`
+- 修復Decision SHA-256：
+  `d8da18034eabaa38dcd80f2648a7484ed516ce0dfadce91f819ba436956e7576`
+- corrective snapshot：
+  `records/development/2026-08-03-work-1-corrective-snapshot-v1.json`
+- corrective snapshot SHA-256：
+  `08365d976f020b428c46d1f83b14d7b0861beb335103493cf81823a144cc25c4`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画 SHA-256：
   `0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f`
@@ -52,6 +68,35 @@
 - Claim `EC-005`：文書索引を更新し、旧TODOを不変snapshotへ分離してcommitした。
   - Evidence：commit `64a6665`（`Index guidance and archive prior handoff`）
   - 観測した事後状態：`git show --stat 64a6665`で索引とsnapshotの2 fileを確認した。
+- Claim `EC-006`：Work 1の固定入力、scope、非目標、未解決事項、Extraction Contract、
+  Consumption Closure、stale／再開規則を一つのEvidenceへ固定した。
+  - Evidence：`records/development/2026-08-03-work-1-fixed-input-evidence.md`、SHA-256
+    `d07c5abdce7bc4b3322e7c6f973feb0e00d7218151dafe7013aff5d08148b879`
+  - 観測した事後状態：authority 3文書、source catalog 10 entry、前身inventory 2件、Git開始状態を
+    再照合した。Work 1結果は`blocked`であり、Work 1Aの開始根拠には使用しない。
+- Claim `EC-007`：documentation revision v16の同一commit再構築でmanifest 18件中5件のDigest不一致を
+  検出し、blocking改善候補へ記録した。
+  - Evidence：`records/development/2026-08-03-work-1-reconstructability-candidate.md`、SHA-256
+    `4206805e3066335c5a84a56baa839e4b074da4b5af1f8cd17b20bcbe22860404`
+  - 観測した事後状態：commit `e603804d4853f29c1ebeb97ef82774447211ff05`からv16 manifestを
+    再読込し、`README.md`、`docs/README.md`、現行Intent、現行Plan、design amendmentの不一致を確認した。
+- Claim `EC-008`：checklist Work 1へ固定Evidenceと停止結果を接続した。
+  - Evidence：`docs/development/2026-08-03-initial-development-checklist.md`、SHA-256
+    `ea833b027d61b5fc200ef289dffa5cde41be5e8d7fbe36b97bfeae3ab94e2db3`
+  - 観測した事後状態：Work 1の開始条件、確認項目、完了関門、Evidence path／Digest、
+    `blocked / pause_and_triage`表示を再読込した。
+- Claim `EC-009`：Humanがv16を上書きしないcorrective snapshot修復の開始を承認した。
+  - Evidence：`records/development/2026-08-03-work-1-reconstructability-repair-decision.json`、
+    Decision `WORK1-RECONSTRUCTABILITY-REPAIR-DEC-001`、SHA-256
+    `d8da18034eabaa38dcd80f2648a7484ed516ce0dfadce91f819ba436956e7576`
+  - 観測した事後状態：修復scope、Intent／Plan意味変更・v16上書き・risk受容を含まない境界、
+    `approved_for_execution`をJSON再読込で確認した。
+- Claim `EC-010`：v16の未達forward fixを訂正し、Work 1固定入力13件を同一commitへ固定する
+  corrective snapshot manifestを作成した。
+  - Evidence：`records/development/2026-08-03-work-1-corrective-snapshot-v1.json`、SHA-256
+    `08365d976f020b428c46d1f83b14d7b0861beb335103493cf81823a144cc25c4`
+  - 観測した事後状態：JSON構文とworktree上のmanifest 13件全Digest一致を確認した。
+    状態は`pending_post_commit_verification`であり、まだreconstructableとは扱わない。
 
 ### reported_unverified／contradicted
 
@@ -59,47 +104,53 @@
 
 ### 未実施
 
-- checklist Work 1の固定Evidence作成
+- corrective recordを含むcommitとpost-commit manifest全件照合
+- Human判断後のWork 1再開Evidence v2
+- Work 1A Layout Baseline
 - 実施報告照合の自動Claim抽出、Provenance対応、完了state結線
 
 ### 残余risk
 
 - 統合最新版はHuman承認前の候補であり、製品実装codeは未着手である。
+- documentation revision v16はforward immutable-snapshot ruleを満たしたcommitを再構築できず、
+  現行候補への過去revision Provenanceを完全と扱えない。
 
 ## 次に行う一作業
 
-checklistのWork 1で、固定入力、scope、非目標、未解決事項を既存artifactと固定Evidenceへ接続する。
+corrective snapshot、固定入力13件、Work 1 blocked Evidence、修復Decisionを第一commitへ固定する。
 
 開始条件：
 
-- 現行Intent、用語集、計画、checklistのpathとDigestが一致している。
+- corrective snapshotのworktree manifest 13件が全件一致している。
 
 完了条件：
 
-- 固定入力、scope、非目標、未解決事項、blocking conflictを一つのEvidenceから確認できる。
+- corrective snapshotを含むcommit SHAを取得できる。
 
-後続作業：Work 1AでLayout Baselineを固定する。
+後続作業：固定commitからmanifest全件を照合し、post-commit EvidenceとWork 1 Evidence v2を作る。
 
 ## blocker・Human判断待ち
 
-- blocker：なし
-- Human判断待ち：なし
-- 再開条件：満たしている
+- blocker：v16不一致はcorrective snapshotへ記録したが、まだ固定commitとpost-commit Evidenceがない。
+- Human判断待ち：なし。修復開始Decisionを固定済み。
+- 再開条件：corrective snapshotを含むcommitからmanifest 13件が全件一致し、Work 1 Evidence v2が
+  fixed-input completenessをpassする。
 
 ## stale・deferred
 
-- stale：確認済みの参照Digestには不一致なし
+- stale：Work 1 Evidence v1は`blocked`結果として固定し、Work 1Aのpermitには使わない。
+  authority 3文書の現在内容とchecklist記載Digestには不一致なし。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、
   改善候補、Issue Resolution、実施報告照合のautomation、汎用Task Registry／plugin system
 
 ## Git・Test
 
 - branch：`main`
-- handoff base HEAD：`64a6665`。本TODOを含むcommitは
-  `git log -1 --format=%H -- TODO_NEXT_SESSION.md`で取得する。
-- worktree：本TODO以外はclean。本TODOをhandoff commit対象とし、session終了時に再確認する。
-- 直近の全Test：`python3 -m pytest -q`、`412 passed`
+- session base HEAD：`13347232f2f0c1b891d761840c4ae9d9382b354f`（`Refresh session handoff`）
+- worktree：checklist、TODO、Work 1 Evidence、blocking改善候補、修復Decision、corrective snapshotが未commit。
+- 本sessionの全Test：`python3 -m pytest -q`、`412 passed`
 - `git diff --check`：通過
+- commit：未実施。利用者から本sessionのcommit指示は受けていない。
 
 ## 更新規則
 
