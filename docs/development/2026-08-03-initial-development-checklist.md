@@ -9,13 +9,13 @@ authority_order:
   - path: docs/current/reviewcompass3-glossary-current.md
     sha256: f1e7e9a9c57292fe911217d9b4f5d5b8ed99a881d6f113f9b60db1f0d01b19fa
   - path: docs/current/reviewcompass3-plan-current.md
-    sha256: 0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f
+    sha256: 0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694
 operational_policy:
   path: docs/development/2026-08-02-development-policy.md
-  sha256: a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c
+  sha256: 9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0
 policy_decision:
-  path: records/development/development-policy-v4.json
-  sha256: 87bd0460bce3ae471a598ae5ab2964d05e6ceb97701870f25b5cc9110133f24a
+  path: records/development/development-policy-v5.json
+  sha256: 88af550d5bc77406cd796e4c78efc20225134473d3d87251942854e6dc57fe98
 related_design:
   - path: docs/design/2026-08-03-current-work-projection-memo.md
     sha256: 940bff56f749bebdff08698882ca92dbe8505cb4692ba864c8ee7b76b4f01595
@@ -468,6 +468,73 @@ blocker 0、完了を阻害するstale 0へ判断を束縛した。段完了Evid
 `e602092b3236f62697b2f24d2b706095dda6b8c83e22e5b6211fb539542c7221`。公式全Testは`470 passed in 2.35s`、
 fallback `false`である。Work 3は`verified / completed`となり、次の未完了工程はWork 4である。Work 4の
 成果物変更、Plan全体の承認、deferred能力の有効化、commit、push、releaseは開始または承認していない。
+
+### Inter-work：Work 3完了後の追加correctiveと早期Pilot
+
+このthreadで当初順序外に追加した作業は、
+`records/development/2026-08-04-thread-added-work-plan-checklist-reconciliation-v1.md`をscope正本として扱う。
+
+#### Session transcript eventual preservation
+
+- [x] Codex CLI／Desktopの異なるsource形式を扱い、Claudeをsource adapter境界へ含めた。
+- [x] manual collector、durable cursor、再開、reconcile、raw／派生物／Provenance分離を実装した。
+- [x] Humanが許可した現在のCodex Desktop taskだけを限定captureし、再実行一致と権限を検証した。
+- [ ] background automation、長期retention、削除、application-layer暗号化、backupを判断・実装した。
+
+`Evidence`：`records/development/2026-08-04-session-transcript-eventual-preservation-completion-evidence-v1.md`、
+SHA-256 `194c302277299cb3ab8853951f8db8d5d64424d4f16c1798e0a82f40eb41740a`。本完了はdevelopment限定であり、
+Session Records製品機能全体または常駐automationの完了を意味しない。
+
+#### Deployment／Project Artifact boundary
+
+- [x] Project Artifactを移動せずdeployment packageを交換するLayout Baseline v2を承認した。
+- [x] ReviewCompass3 Project Manifest v2と移動させない`.reviewcompass/workflow/` rootを作成・検証した。
+- [x] Issue、Plan、Decision、EvidenceをpathだけでなくID、version、Digest、relationで結ぶ境界を固定した。
+- [ ] Deployment Manifest、package builder、原子的切替、rollback、durable Project Bindingを実装した。
+
+`Evidence`：Layout v2 Approval Decision
+`records/development/2026-08-04-layout-baseline-v2-approval-decision.json`、SHA-256
+`856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`。Project Manifest v2 Completion
+Evidenceは`records/development/2026-08-04-project-manifest-v2-completion-evidence-v1.md`、SHA-256
+`154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020`。未完了項目はWork 7A／7Bに残す。
+
+#### ReviewCompass Issue Resolution早期Pilot
+
+- [x] ReviewCompass2のIssue→Plan経路をReviewCompass3へ継承する早期PilotをHumanが承認した。
+- [x] TODOはactive ID projectionに限定し、詳細候補をdurable Candidate／Issue経路へ分離する案を固定した。
+- [x] Pilot recordの移動させない上位rootを`.reviewcompass/workflow/`へ固定した。
+- [ ] Pilot Task Contractと固定sourceを作成した。
+- [ ] Improvement CandidateとHuman Triage Decisionのidentity、field、命名、version、Digest、参照規則を
+      正常・負例・境界Testへ固定した。
+- [ ] 最初のCandidate／Triage Decisionを作り、Human判断なしのIssue昇格を拒否した。
+- [ ] ReviewCompass Issue Record、Resolution Plan、Plan Challenge、Verdictの最初の手作業経路を検証した。
+
+`Evidence`：Early Pilot Decision
+`records/development/2026-08-04-reviewcompass2-issue-path-early-pilot-decision.json`、SHA-256
+`5e19bca05aead7836595168f8e44edc3a5f146507ab33ffde3646de964814f9f`。TODO routing revision memoは
+`docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、SHA-256
+`e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。製品schema、正式state machine、
+Workflow permit、自動Plan編集、automation、Work 8評価は前倒ししない。
+
+#### Commit／handoff安定化
+
+- [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
+- [x] commit後はread-only照合だけを行い、guarded commit、amend、hookを使わない規則を固定した。
+- [x] 完了済み作業単位が未コミットなら、次作業を停止してHumanへリマインドするPilotを実装した。
+- [x] 自動commit、push、rebase、reset、履歴書換えをPilot対象外に維持した。
+
+`Evidence`：commit handoff Completion
+`records/development/2026-08-04-commit-handoff-stability-completion-evidence-v1.md`、SHA-256
+`a0e03f686c9879416798ed58a56e610f59e0fb775a9c4c73fb61a16a623ea077`。work unit reminder Completionは
+`records/development/2026-08-04-work-unit-commit-reminder-completion-evidence-v1.md`、SHA-256
+`b7f8e91520b2664ede24347144004b724c5654d23c5cb318864c1a8530ab35d0`。
+
+#### Inter-work完了関門
+
+- [x] 完了済みcorrectiveを固定Evidenceへ接続した。
+- [x] Layout bootstrapをWork 7、session保全をSession Records製品機能、早期PilotをWork 8完了と誤表示していない。
+- [ ] Issue Resolution早期Pilotの限定bootstrapを完了した。
+- [ ] 限定bootstrap完了後、当初順序のWork 4へ戻った。
 
 ### Work 4：Designと代表シナリオ
 

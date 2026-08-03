@@ -9,11 +9,11 @@
 ## 現在位置
 
 - 全体：初期開発Work 1B、Work 2、Work 3完了。次の未完了工程はWork 4
-- 現在の工程：Work 3 `verified / completed`、Work 4 `not_started`。inter-work correctiveは
-  `verified / completed`
+- 現在の工程：Work 3 `verified / completed`、Work 4 `not_started`。完了済みinter-work correctiveと、
+  `bootstrap_in_progress`のIssue Resolution早期PilotをPlan／checklistへ反映済み。
 - Issue Resolution早期Pilot：Layout Baseline v2、ReviewCompass3 Project Manifest v2、workflow rootを
   検証済み。次はPilot Task ContractとImprovement Candidate／Triage Decisionの形状を固定する。
-- work unit commit reminder Pilot：実装・検証済み。本handoffを含むcommit完了までは
+- work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
   `records/development/2026-08-04-layout-baseline-v2-approval-decision.json`、SHA-256
@@ -21,18 +21,18 @@
 - TODO手戻り候補対策の修正案：`docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
-- activeなTask Contract／Work Item：work unit commit reminder Pilotは本handoffを含むcommit境界で完了する。
+- activeなTask Contract／Work Item：Plan／checklist reconciliationは本handoffを含むcommit境界で完了する。
   その後はIssue Resolution早期Pilot Task Contractの作成。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`b088822c477d3103efd936a382a067a7e13a976fa11e5002b76cd43530b65383`
+- 進行入口SHA-256：`db4850b60e0972fbe1e7a79e00b9b777b9b055a404d6d1831cd6a12978b374f7`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
-- 現行計画SHA-256：`911d0c49d1646f308a733e45d0af6071cd7206dd80b31e123369e921b0b490db`
+- 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-work-unit-commit-reminder-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`b7f8e91520b2664ede24347144004b724c5654d23c5cb318864c1a8530ab35d0`
+  `records/development/2026-08-04-plan-reconciliation-stale-closure-evidence-v1.md`
+- Decision／Evidence SHA-256：`652390b74d0c78bd1b12d8cc5be6be4c6258c5ef68f6ee86f8dd86c5938b127b`
 
 ## 実施報告照合
 
@@ -532,6 +532,16 @@
     `b7f8e91520b2664ede24347144004b724c5654d23c5cb318864c1a8530ab35d0`
   - 観測した事後状態：`completed`とdirtyの同時成立だけを`completed_work_unit_uncommitted`として停止し、
     `in_progress` dirtyは誤停止しない。
+- Claim `EC-116`：このthreadで当初順序外に追加した作業をPlanとchecklistへ正式に反映した。
+  - Evidence：`records/development/2026-08-04-thread-added-work-plan-checklist-reconciliation-v1.md`、SHA-256
+    `e86539f3b3034ec6f3a6f6650ae78aed7295f1e3a99e2bbcfbf9a2d891a7d0fa`
+  - 観測した事後状態：session transcript保全、Layout／Project Artifact、ReviewCompass Issue Resolution早期Pilot、
+    commit／handoff安定化をWork 3後・Work 4前のinter-work列へ配置し、完了／未完了境界をcheckboxへ写像した。
+- Claim `EC-117`：Plan Digest変更のstale閉包を確認した。
+  - Evidence：`records/development/2026-08-04-plan-reconciliation-stale-closure-evidence-v1.md`、SHA-256
+    `652390b74d0c78bd1b12d8cc5be6be4c6258c5ef68f6ee86f8dd86c5938b127b`
+  - 観測した事後状態：変更は現在地、inter-work節、初期実装順に限定され、Requirement、NFR接続、
+    deferred disposition、Acceptance truthは変更していない。Work 4／7／8を完了扱いにしていない。
 
 ### reported_unverified／contradicted
 
@@ -595,6 +605,12 @@
   commit前に安定handoffを検査する`machine`、実executorはLLMによるpost-commit転記だった。恒久対策として
   commit安定TODO validator、policy、template、checklist、AGENTSを実装し、targeted／全Testに合格した。routeは
   `manual_rework_candidate / resolved_by_commit_stable_todo_validator`とする。
+- 今回のPlan／checklist最終照合で、LLMがzshの特殊変数`path`をloop変数へ使用し、command検索PATHを上書きして
+  `shasum`が1回だけ`command not found`になった。成果物変更前のread-only照合であり、成果物への影響はない。
+  期待executorはshell予約・特殊変数を検査した構造化command、実executorはLLMによるshell文字列組立てだった。
+  `artifact_path`へ変更して同一照合を再実行する。機械処理候補はshell composition lintと予約変数検査、routeは
+  `manual_operation_candidate / checkpoint`とし、Issue Resolution Pilotのdurable Candidate経路が利用可能に
+  なった後の昇格候補とする。
 
 ### 未実施
 
@@ -645,6 +661,8 @@ identity、field、命名、version、Digest規則をtest-firstで固定する�
 開始条件：
 
 - work unit transition preflightが`passed`である。
+- Plan SHA-256が`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`、
+  checklist SHA-256が`db4850b60e0972fbe1e7a79e00b9b777b9b055a404d6d1831cd6a12978b374f7`である。
 - Project Manifest v2 Completion Evidence SHA-256が
   `154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020`である。
 - `.reviewcompass/workflow/`の初期snapshotが`.gitkeep`一件だけである。
@@ -660,9 +678,9 @@ identity、field、命名、version、Digest規則をtest-firstで固定する�
 
 ## blocker・Human判断待ち
 
-- blocker：本handoffを含むcommit前は、完了済み作業単位に変更が残るため次作業へ移行しない。
+- blocker：本Plan／checklist reconciliationを含むcommit前は、完了済み作業単位に変更が残るため次作業へ移行しない。
   当該commit完了と同時に解除する。
-- Human判断待ち：本作業単位のlocal commit指示
+- Human判断待ち：本Plan／checklist reconciliationのlocal commit指示
 - 実行保留：実際のIssue Resolution Pilot record作成。shapeとvalidatorのRED／GREEN後に開始する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：checklist、Completion Evidence、Test receiptのDigest一致を確認する
@@ -684,7 +702,8 @@ identity、field、命名、version、Digest規則をtest-firstで固定する�
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：work unit transition／TODO handoff `11 passed in 0.03s`、template finding 0
+- 直近の関連検証：Plan／checklist reconciliation関連`37 passed in 0.10s`、Requirement authority
+  `effective / 50 / legacy binding 0`、TODO handoff finding 0
 - 直近の全Test：work unit commit reminder official receiptを機械参照する
 - 差分検査：最終post-write verificationで再実行する
 

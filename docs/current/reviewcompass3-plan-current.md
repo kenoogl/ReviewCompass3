@@ -4,6 +4,10 @@ normative_status: consolidated-current-plan-candidate
 document_role: product-and-development-plan
 promotion_required: true
 generated_at: 2026-08-03
+last_reconciled_at: 2026-08-04
+reconciliation_ref:
+  path: records/development/2026-08-04-thread-added-work-plan-checklist-reconciliation-v1.md
+  sha256: e86539f3b3034ec6f3a6f6650ae78aed7295f1e3a99e2bbcfbf9a2d891a7d0fa
 intent_ref:
   path: docs/current/reviewcompass3-intent-current.md
   sha256: 1950f5a37fb5d0d0554f56343b39bbca7fc635523409f10ee761d8cef68f9ec6
@@ -89,6 +93,11 @@ Intentの正本候補は`docs/current/reviewcompass3-intent-current.md`であり
 
 ### 2.1 現在地
 
+- Work 1B、Work 2、Work 3は`verified / completed`であり、当初順序上の次工程はWork 4である。
+- Work 3完了後、Work 4開始前に、session transcript保全、配置境界、Issue Resolution早期Pilot、
+  commit／handoff安定化をinter-work correctiveとして挿入した。
+- 完了済みcorrectiveはSession Records、Work 7またはWork 8全体の完了を意味しない。未完了の
+  Issue Resolution早期Pilot bootstrapを限定して終えた後、Work 4へ戻る。
 - 第0段から第2段のbootstrap実装、test、Evidenceを保持している。
 - 2026-07-27のIntent、Feature Partitioning、37 requirementsを固定baselineとして保持する。
 - 2026-07-28の第5段design候補、9 design、29 interface、8 state machine、14 protocol、
@@ -1007,6 +1016,28 @@ CI providerの操作機能は初期要件へ入れない。
 判断委譲用Requirements差分は、能力Evidenceを得た後の独立Workとし、このWorkの要件数へ
 含めない。用語統制のRuntime強制も、手作業運用で具体的な不足を確認した後の独立差分とする。
 
+### Inter-work：Work 3完了後の追加correctiveと早期Pilot
+
+このthreadで当初順序外に追加した作業を、Work 4開始前の一時的なinter-work列として扱う。変更理由、
+対象一覧、完了境界の正本は
+`records/development/2026-08-04-thread-added-work-plan-checklist-reconciliation-v1.md`とする。
+
+| work | state | 実施範囲 | 未完了境界 |
+|---|---|---|---|
+| Session transcript eventual preservation | `verified / completed` | Codex exec／rollout／Claudeの3 source kind adapter、manual collector、durable cursor、reconcile、現在のCodex Desktop taskだけの限定実ログcapture | background automation、過去Codex／Claude log capture、長期retention、削除、暗号化、backup |
+| Commit／handoff stability | `verified / completed` | commit安定TODO、post-commit read-only照合、完了済み・未コミット時の次作業停止Pilot | 自動commit、push、hook、履歴書換え |
+| Deployment／Project Artifact boundary | `approved_effective / bootstrap_completed` | Layout Baseline v2、Project Manifest v2、移動させない`.reviewcompass/workflow/` root | Deployment Manifest、package builder、原子的切替、rollback、durable Project Binding |
+| ReviewCompass Issue Resolution early Pilot | `approved / bootstrap_in_progress` | ReviewCompass2 Issue→Plan経路の継承、TODO routing修正案、Project Artifact上位root | Candidate／Triage Decision shape、最初の手作業record、Issue／Plan実record |
+
+Issue Resolution早期Pilotは、Improvement CandidateとHuman Triage Decisionのidentity、field、命名、version、
+Digest、参照規則を固定し、最初の手作業recordで経路を確認するところまでを前倒し範囲とする。製品schema、
+正式state machine、Workflow permit、自動Plan編集、Issue Resolution automation、Work 8の評価は前倒ししない。
+
+TODOの詳細な手戻り候補を恒久保存する経路はIssue Resolution Pilotへ接続するが、TODO自体はactive IDの
+projectionに限定する。Pilot shape確定前に手作業でIssue fileを置かない。限定Pilotを終えたら、当初順序の
+Work 4へ戻る。Layoutのbootstrap完了をWork 7A／7B完了、session保全corrective完了をSession Records製品機能
+完了として扱わない。
+
 ### Work 4：Design差分と最初のslice選定
 
 Contract、Portfolio、Compiler、Policy、Plan、state、interface、Provenance、Evaluation、Deployment、
@@ -1428,19 +1459,21 @@ HumanがIntent統合最新版、統合用語集、新しい第5段相当、Layou
 1. Work 1でsource、baseline、適用範囲、非目標を固定する
 2. Work 1Aで配置baselineと空配置smoke testを固定する
 3. Work 1BでSession Log Bootstrapとraw復元fixtureを準備する
-4. Work 2〜4でIntent、Requirements、最初のsliceのDesignを確定する
-5. Work 4AでSource Symbol IndexとReusable Routine Ledgerの初期baselineを固定する
-6. 最小Contract schema、validator、一種類のContractから一つのbundleと6 typed viewを作るCompilerを実装する
-7. Context、Workflow permit、Harness stub、Traceの最小interfaceとhappy pathを通す
-8. Conformance、Final Challenge、Human decision、Decision Record、Provenance verdictを通す
-9. Work 6Aの中核negative pathをgreenにする
-10. Work 5Bの内部Implementation Task Contract Pilotで台帳gateを実証する
-11. Work 7Aの`local_integrated`最小deployment E2Eを通す
-12. Work 8のevaluation、Issue手作業Pilot、並行作業のshadow評価を行う
-13. 開始条件を満たす場合だけWork 8Aの`bounded_parallel`実並行Pilotを行い、満たさない場合は
+4. Work 2とWork 3でIntent、Requirementsを確定する
+5. Work 3完了後のinter-work correctiveを閉じ、限定したIssue Resolution早期Pilot bootstrapを行う
+6. Work 4へ戻り、最初のsliceのDesignを確定する
+7. Work 4AでSource Symbol IndexとReusable Routine Ledgerの初期baselineを固定する
+8. 最小Contract schema、validator、一種類のContractから一つのbundleと6 typed viewを作るCompilerを実装する
+9. Context、Workflow permit、Harness stub、Traceの最小interfaceとhappy pathを通す
+10. Conformance、Final Challenge、Human decision、Decision Record、Provenance verdictを通す
+11. Work 6Aの中核negative pathをgreenにする
+12. Work 5Bの内部Implementation Task Contract Pilotで台帳gateを実証する
+13. Work 7Aの`local_integrated`最小deployment E2Eを通す
+14. Work 8のevaluation、Issue手作業Pilot、並行作業のshadow評価を行う
+15. 開始条件を満たす場合だけWork 8Aの`bounded_parallel`実並行Pilotを行い、満たさない場合は
     Evidenceと理由を14.5へ送る
-14. Work 7Bのupdate、migration、uninstall、rollbackを通す。Work 8A実施時だけ並行状態を対象に追加する
-15. 実測された不足だけを次Task Contractへ送り、関連ContractごとにStage Fを反復する
+16. Work 7Bのupdate、migration、uninstall、rollbackを通す。Work 8A実施時だけ並行状態を対象に追加する
+17. 実測された不足だけを次Task Contractへ送り、関連ContractごとにStage Fを反復する
 
 開発中の文書変更や個別Markdown生成を理由に、deferred能力を正式Runtimeへ前倒ししない。
 
