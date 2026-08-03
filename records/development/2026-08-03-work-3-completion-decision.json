@@ -1,0 +1,29 @@
+{
+  "decision_id": "DEC-WORK3-COMPLETION-2026-08-03-V1",
+  "decided_at": "2026-08-03T22:41:37+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "work_completion",
+  "decision": "approved",
+  "instruction": "Work 3段完了を承認する",
+  "instruction_context": {
+    "meaning": "Work 3 Completion Candidateと7件の固定Completion Evidenceに基づくWork 3の段完了を明示承認",
+    "candidate_id": "RC3-WORK3-COMPLETION-2026-08-03-V1",
+    "candidate_path": "records/development/2026-08-03-work-3-completion-candidate-v1.md",
+    "candidate_sha256": "aff0f3977a50f0e4aee9a2937b16518665d0267f44094780b75eba65991d7788"
+  },
+  "approved_scope": [
+    "mark Work 3 verified and completed",
+    "close the Work 3 completion gate",
+    "make Work 4 the next eligible checklist work"
+  ],
+  "excluded_scope": [
+    "start or modify Work 4 artifacts",
+    "approve the current Plan as final",
+    "implement or activate deferred capabilities",
+    "commit repository changes",
+    "push repository changes",
+    "release the product"
+  ],
+  "authority_effect": "completes Work 3 and permits a later explicit instruction to start Work 4",
+  "status": "approved_and_effective"
+}

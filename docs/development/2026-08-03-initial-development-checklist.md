@@ -280,7 +280,7 @@ Plan参照を再照合した。内容Digestに変化はなく、Work 1の`verifi
 - [x] 承認済み配置へ最小schema、validator、fixture、既存37要件のlegacy binding inventoryを実装した。
 - [x] 追加13 Requirementをdefinition／candidate形式へ構造化し、schema検証、Evidence、Human promotionへ接続した。
 - [x] 必須非機能義務をVerification Profileへ接続した。
-- [ ] deferred候補を初期Requirementの暗黙依存にしていない。
+- [x] deferred候補を初期Requirementの暗黙依存にしていない。
 
 `Evidence`：固定sourceと被覆baselineは
 `records/development/2026-08-03-work-3-requirements-baseline-evidence-v1.md`、SHA-256
@@ -403,6 +403,15 @@ Work 5A、Work 6A、Work 7A、Work 8、Work 8A、Work 7B、Stage G／releaseの9
 未知Requirement／Profile参照0、release blocker 0、既知違反6件の負例監査に合格した。
 `REQ-CONTRACT-008`はeffectiveだが、definition自身の初期範囲外規則へ従い最初のContractとreleaseを
 blockしない。候補は`verified / human_decision_pending`であり、Human承認前は本checkboxを未完了に保つ。
+Humanは再検証済みdeferred scope候補を承認した。Decisionは
+`records/development/2026-08-03-work-3-deferred-scope-decision.json`、SHA-256
+`fc1aba9c31b612939c5e62fec3327ab1b65449257f044a2a7206f2c564cd7873`。candidate、旧監査Evidence、
+authority v2に対する再検証Evidenceへ判断を束縛し、13件すべてのrelease effect `nonblocking`、scope leak 0、
+release blocker 0を維持した。Completion Evidenceは
+`records/development/2026-08-03-work-3-deferred-scope-completion-evidence-v1.md`、SHA-256
+`2f79c3f8005967670b97c0597d86e3aeb17b5151ba7ebd260e201a3c66a893fe`。deferred能力の実装・有効化、個別Pilot開始、
+Requirement／Plan変更、Work 3段完了は承認していない。本項目は`verified / completed`となり、Work 3の個別項目は
+すべて完了Evidenceへ接続された。
 scope監査中に発生したauthority bundle二形式読取りとTest実行環境選択の問題に対する恒久対策は
 `records/development/2026-08-03-work-3-permanent-remediation-green-evidence-v1.md`、SHA-256
 `096e91d786293b5d01f1a14717f49c2b0806c48a8ea8d3b76439108a7ec6af0c`。共通machine reader、旧37要件の
@@ -421,6 +430,24 @@ Humanの方針変更指示により、LLMを文章操作・意味分析へ限定
 `manual_rework_candidate`と`manual_operation_candidate`、8つの必須報告fieldを機械判定し、全Test
 `467 passed`だった。現行Planのpolicy参照はv5へ更新し、旧Plan Digestを固定したNFR／deferred候補は
 identity再検証までstaleとする。
+Humanは統一50 Requirement candidateを承認した。Decisionは
+`records/requirements/decisions/dec-requirements-unified-50-2026-08-03-v1.json`、record digest
+`b8cce324d5693a2bf4c8e5b9acb8adbf023f726069407e137faebcaa765442d8`。authority bundle v2は
+`records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json`、bundle digest
+`79a69d921bb00eb2b321e3d1adb073b88a527eb938398d1813567009255bd688`で、50 definition、legacy binding 0、
+authority `effective`となった。生成器はtest-firstで追加し、全Test `470 passed`、独立JSON Schema 54 artifact、
+再生成`written 0 / unchanged 2`に合格した。Completion Evidenceは
+`records/development/2026-08-03-work-3-unified-requirements-promotion-completion-evidence-v1.md`、SHA-256
+`c151019466bdcca66236646f6e635cc729b96585ffa43e68eacac975f3470e80`。NFR／deferred候補は新authorityと
+current Planへ再検証し、NFRは既承認範囲の変更0によりfresh、deferredは`verified / human_decision_pending`とした。
+HumanはWork 3 Completion Candidateを明示承認した。Decisionは
+`records/development/2026-08-03-work-3-completion-decision.json`、SHA-256
+`5cf7bb52e5cff547e06581ed6c8b57e8b77eaedc352615e5a063f422467dcf45`。7個別項目、現行effective authority v2、
+blocker 0、完了を阻害するstale 0へ判断を束縛した。段完了Evidenceは
+`records/development/2026-08-03-work-3-completion-evidence-v1.md`、SHA-256
+`e602092b3236f62697b2f24d2b706095dda6b8c83e22e5b6211fb539542c7221`。公式全Testは`470 passed in 2.35s`、
+fallback `false`である。Work 3は`verified / completed`となり、次の未完了工程はWork 4である。Work 4の
+成果物変更、Plan全体の承認、deferred能力の有効化、commit、push、releaseは開始または承認していない。
 
 ### Work 4：Designと代表シナリオ
 

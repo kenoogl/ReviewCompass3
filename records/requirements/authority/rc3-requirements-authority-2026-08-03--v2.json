@@ -1,0 +1,333 @@
+{
+  "artifact_kind": "requirements_authority_bundle",
+  "authority_bundle_id": "RC3-REQUIREMENTS-AUTHORITY-2026-08-03",
+  "bundle_version": 2,
+  "definition_refs": [
+    {
+      "logical_id": "REQ-CONTEXT-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-context-001--v1.json",
+      "sha256": "f4c91df05ad7736a21334c26d0ccc7697ac4912f27455c69ea8c1eea4d2eb510"
+    },
+    {
+      "logical_id": "REQ-CONTEXT-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-context-002--v1.json",
+      "sha256": "2bff9e4382a5d2d24097cc32ddd38d7d21088ca6d1eb39e893a90be637499bfa"
+    },
+    {
+      "logical_id": "REQ-CONTEXT-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-context-003--v1.json",
+      "sha256": "0500610a65437544c4cb55da4eb7e8012c1b19d655f054146b767d7ccccb93ef"
+    },
+    {
+      "logical_id": "REQ-CONTEXT-004@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-context-004--v1.json",
+      "sha256": "29afb219d41afe8d6537d6809337877afa8ee967a7af9dea3bd1a4d0e694bd9e"
+    },
+    {
+      "logical_id": "REQ-CONTEXT-005@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-context-005--v1.json",
+      "sha256": "ab3efbebd71ed58acf21254208184d046c986eb470df5ecd342243d1f6deb67c"
+    },
+    {
+      "logical_id": "REQ-CONTEXT-006@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-context-006--v1.json",
+      "sha256": "bb16e0bf9b3fa551b0aac05a45c74a5edf49a58e4fdfa7b999cd88abc4d3010a"
+    },
+    {
+      "logical_id": "REQ-CONTEXT-007@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-context-007--v1.json",
+      "sha256": "0ee8eb7f304ca59351c030a79ccfb81d8d1afbbf4cf7231f8ca903c6be0c45a1"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-001--v1.json",
+      "sha256": "2236702a3c88ee30a80673c8cabbf387981730d125edc59484c6452f50d61f8c"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-002--v1.json",
+      "sha256": "47c995267bf8bd66a435460e4e61824509216d3b528231edd86cfa4a9368626a"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-003--v1.json",
+      "sha256": "2091f422d430e2364fffdf0a919eb2faa6ead3a8e327330ff732225e04d450d5"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-004@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-004--v1.json",
+      "sha256": "b7f3bdb6a707a7e7203c3531897fa2d638299c3556a543b6c53567a3b191e81c"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-005@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-005--v1.json",
+      "sha256": "fd6ed397a46874cbc49137521ad939b0297f3c22c8c82940ea170a11b8e40f44"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-006@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-006--v1.json",
+      "sha256": "0384b0215bd3a88cc12779688b2f1b6a5b4598db35f516fa73855b3701d8a73b"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-007@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-007--v1.json",
+      "sha256": "74ce5eb330e070a305c93011f1ded7e471da3d32ae8f353793f67de5ef5f784e"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-008@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-008--v1.json",
+      "sha256": "efa3bd0f5b637b286af6dfb6e751bcf00e3a31a937613393557308c5b574f0c0"
+    },
+    {
+      "logical_id": "REQ-EVAL-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-eval-001--v1.json",
+      "sha256": "04a2f4cbaf01cb2be28df4ea6b1a314b12f4852f7487cc003ff70ff3be61a7c0"
+    },
+    {
+      "logical_id": "REQ-EVAL-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-eval-002--v1.json",
+      "sha256": "dc7c1b6ec67d631bfeb78b52160db1ec7484952253942a3b73cd81c561554411"
+    },
+    {
+      "logical_id": "REQ-EVAL-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-eval-003--v1.json",
+      "sha256": "1e01f09c66a097a6b12172815e10336e7d0d61ba71665ef0bf73fa48e9341047"
+    },
+    {
+      "logical_id": "REQ-EXEC-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-exec-001--v1.json",
+      "sha256": "f42e94a4568a9cdc8d64598e616e971e9655e6b0ef6026cf9d2407cabfe9c186"
+    },
+    {
+      "logical_id": "REQ-EXEC-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-exec-002--v1.json",
+      "sha256": "524e0b1f6ee8eb3e4a05dc1c0b9ab4a438683c3dd03214e3fee4c186a4e17c35"
+    },
+    {
+      "logical_id": "REQ-EXEC-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-exec-003--v1.json",
+      "sha256": "8addbe8dd1c54a68357aa6484944e0295d68a5a43a403a24687451f1cb3b48ce"
+    },
+    {
+      "logical_id": "REQ-EXEC-004@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-exec-004--v1.json",
+      "sha256": "ef780c0134529f7e138e806b4328a000737cad639c4be94118c9cd94e41e2655"
+    },
+    {
+      "logical_id": "REQ-EXEC-005@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-exec-005--v1.json",
+      "sha256": "48e445bf3b238c898272f2bc511a87237387249556570ebdc788bad6bee1888e"
+    },
+    {
+      "logical_id": "REQ-EXEC-006@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-exec-006--v1.json",
+      "sha256": "95707d56b2d092c6b7f1bb544e16568f8c7d4c0a7d8f40b5dbc685e834515dd3"
+    },
+    {
+      "logical_id": "REQ-IMPROVE-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-improve-001--v1.json",
+      "sha256": "16213548e2e20c0abaea8cedfc356277ebfcc980d61eb4870baaabce59304228"
+    },
+    {
+      "logical_id": "REQ-IMPROVE-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-improve-002--v1.json",
+      "sha256": "f8348587904bf623b40e9ead795f801f112f9f8c2814cd01490f768e26813391"
+    },
+    {
+      "logical_id": "REQ-PORTABLE-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-portable-001--v1.json",
+      "sha256": "3909b1d5cb4db41065bc296efd9212fd8c86559c56d7a5f788765e7851359920"
+    },
+    {
+      "logical_id": "REQ-PORTABLE-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-portable-002--v1.json",
+      "sha256": "1eda16d2906dfa54369dc9e5d578b2bb58cbb75074d9cf67deb66e9c8cf5d084"
+    },
+    {
+      "logical_id": "REQ-PORTABLE-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-portable-003--v1.json",
+      "sha256": "f1ebd567aa40ed0561042ff5e260d51f935551f26c92c6e09284e4eb23e5f734"
+    },
+    {
+      "logical_id": "REQ-PORTABLE-004@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-portable-004--v1.json",
+      "sha256": "824c994087cab243e6b2cb1e730ee1aa6a239df07f74113dde62b93f526becf1"
+    },
+    {
+      "logical_id": "REQ-SESSION-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-session-001--v1.json",
+      "sha256": "8ad9803cb0873e411dfcd00be4650ea81048ceddc52b820d6b86a556dbb42458"
+    },
+    {
+      "logical_id": "REQ-SESSION-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-session-002--v1.json",
+      "sha256": "62d4a8e8e9c7f8e11759a839db86fcca0d1019bf23db87bcd650525bc09a08bc"
+    },
+    {
+      "logical_id": "REQ-SESSION-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-session-003--v1.json",
+      "sha256": "86404fe13919ef305238faa3f353063094cd52be27d7bbc04a588ca0f1581256"
+    },
+    {
+      "logical_id": "REQ-TRACE-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-trace-001--v1.json",
+      "sha256": "60a958fb9766090ad99c2636d934974c2c47427695e5e56924183faf00f33920"
+    },
+    {
+      "logical_id": "REQ-TRACE-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-trace-002--v1.json",
+      "sha256": "f4b7527bdc16d2324e3dc8a2928debc00f9cab8b65f09512e484e355f70cb6e5"
+    },
+    {
+      "logical_id": "REQ-TRACE-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-trace-003--v1.json",
+      "sha256": "31523e6ac17db320736901279c532e9bd16bf474a52e8db6ea9e865682672feb"
+    },
+    {
+      "logical_id": "REQ-TRACE-004@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-trace-004--v1.json",
+      "sha256": "7f5278e4593c1254bdc0ae401ad356ba377f57b6846f2d4d6bc868352e6c784a"
+    },
+    {
+      "logical_id": "REQ-TRACE-005@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-trace-005--v1.json",
+      "sha256": "50fa990be0f51c4dba9225b1cbbecca2e3f9395811c951a75e0609881f53f660"
+    },
+    {
+      "logical_id": "REQ-TRIAGE-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-triage-001--v1.json",
+      "sha256": "d5d958927832b8257e94059e9c40b2d64ef44ceb488d2fdebf39a987cc734f31"
+    },
+    {
+      "logical_id": "REQ-TRIAGE-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-triage-002--v1.json",
+      "sha256": "b08ff3d2059599af5fdb39169b4e37bdaaec04e5c042bc4c8cf0baf3c0eabb9f"
+    },
+    {
+      "logical_id": "REQ-TRIAGE-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-triage-003--v1.json",
+      "sha256": "ba01af739ce72b9e60b7b55e2a22fdc8f13b0474222437ab15057a8eba64f128"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-001--v1.json",
+      "sha256": "701b6d3ea98928483da7f7d4d99fb7b3fe2a07d16b9083f55078eddda8c33c8b"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-002--v1.json",
+      "sha256": "920c7370a3c0ca1e64f670bdcae8080d28df7631423c1fd59fb97f99c889e710"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-003--v1.json",
+      "sha256": "813e8b76bb10238dbf04939231c4d23135fa5e27046712e01c169764bf0d6290"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-004@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-004--v1.json",
+      "sha256": "d9527f798e4cdfb5d340058a783fc88c4544cfa63868a58d5942569e5be37492"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-005@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-005--v1.json",
+      "sha256": "55211d2c326147c1aada1d2bebf4854792435b1b5cad290af47e41a0b80f7b4c"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-006@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-006--v1.json",
+      "sha256": "b60744e47a98ffe841e0af7aadaf9a8a76910e88613ebca7b90ebba5649ec6ce"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-007@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-007--v1.json",
+      "sha256": "123751211eb860529c6885ac9523165633fa0e93d32b00350b7fc0b68ed93b10"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-008@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-008--v1.json",
+      "sha256": "87f86e53494dbf350371adc9b207c942c07a9c3bce98ceee79eaa657382d5cbe"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-009@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-009--v1.json",
+      "sha256": "b424cfb5a71a210dbc5fd8ff2a686ba7b7d0bfba870f9b41dfcdcfa56f224116"
+    }
+  ],
+  "decision_refs": [
+    {
+      "logical_id": "DEC-REQUIREMENTS-UNIFIED-50-2026-08-03-V1",
+      "version": 1,
+      "path": "records/requirements/decisions/dec-requirements-unified-50-2026-08-03-v1.json",
+      "sha256": "b8cce324d5693a2bf4c8e5b9acb8adbf023f726069407e137faebcaa765442d8"
+    }
+  ],
+  "evidence_refs": [
+    {
+      "logical_id": "RC3-REQUIREMENTS-UNIFIED-50-EVIDENCE-2026-08-03-V2",
+      "version": 2,
+      "path": "records/requirements/evidence/rc3-requirements-unified-50-evidence-2026-08-03-v2.json",
+      "sha256": "5b42979ab79699b2da950bae4788f582b023211c5c919571209a7f43bb5492fe"
+    }
+  ],
+  "legacy_authority_bindings": [],
+  "supersedes": [
+    {
+      "logical_id": "RC3-REQUIREMENTS-AUTHORITY-2026-08-03",
+      "version": 1,
+      "path": "records/requirements/authority/rc3-requirements-authority-2026-08-03--v1.json",
+      "sha256": "497bcc4374e3224acbfbb08e38c7d9f3d4e5373f59df505179b6a19bc035a02c"
+    }
+  ],
+  "bundle_digest": "79a69d921bb00eb2b321e3d1adb073b88a527eb938398d1813567009255bd688"
+}

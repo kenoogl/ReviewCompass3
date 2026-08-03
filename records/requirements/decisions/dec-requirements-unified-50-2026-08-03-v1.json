@@ -1,0 +1,26 @@
+{
+  "artifact_kind": "requirements_decision_record",
+  "decision_id": "DEC-REQUIREMENTS-UNIFIED-50-2026-08-03-V1",
+  "decision_version": 1,
+  "decision_class": "requirements_promotion",
+  "actor": "human_user",
+  "authority": "human",
+  "target_candidate_id": "RC3-REQUIREMENTS-UNIFIED-50-2026-08-03-V1",
+  "target_candidate_digest": "cc4ba8f872973f8035b798042f4a5335005394cca339ec6f0121cf16c8c533b4",
+  "evidence_refs": [
+    {
+      "logical_id": "RC3-REQUIREMENTS-UNIFIED-50-EVIDENCE-2026-08-03-V2",
+      "version": 2,
+      "path": "records/requirements/evidence/rc3-requirements-unified-50-evidence-2026-08-03-v2.json",
+      "sha256": "5b42979ab79699b2da950bae4788f582b023211c5c919571209a7f43bb5492fe"
+    }
+  ],
+  "outcome": "approved",
+  "decided_at": "2026-08-03T22:13:07+09:00",
+  "scope": [
+    "統一candidate内の50 Requirement definitionを現行effective Requirementの単一格納形式として昇格する",
+    "要件本文、Acceptance truth、現行Plan、製品実装、NFR／deferred判断は承認範囲外とする"
+  ],
+  "supersedes_or_revokes": [],
+  "record_digest": "b8cce324d5693a2bf4c8e5b9acb8adbf023f726069407e137faebcaa765442d8"
+}

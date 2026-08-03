@@ -1,0 +1,58 @@
+{
+  "decision_id": "DEC-WORK3-DEFERRED-SCOPE-2026-08-03-V1",
+  "decided_at": "2026-08-03T22:35:06+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "deferred_scope_promotion",
+  "decision": "approved",
+  "instruction": "承認する",
+  "instruction_context": {
+    "meaning": "再検証済みdeferred scope候補を明示承認",
+    "candidate_id": "RC3-WORK3-DEFERRED-SCOPE-2026-08-03-V1",
+    "candidate_path": "records/development/2026-08-03-work-3-deferred-scope-candidate-v1.json",
+    "candidate_sha256": "01da1ea0c6c4f6adad8fdcd09085f97b387ea4639d01b0811b80dc5957916210",
+    "candidate_digest": "8993a6e4671679ab8cfe665322efdaf862cf085a8f1fab7d500d15f5fd7deb84",
+    "original_evidence_path": "records/development/2026-08-03-work-3-deferred-scope-evidence-v1.md",
+    "original_evidence_sha256": "1c24269e36d2baa2a4e22d39162e7bb85b7c5e513c55a5035fa55efa54029b71",
+    "revalidation_evidence_path": "records/development/2026-08-03-work-3-unified-requirements-revalidation-evidence-v1.md",
+    "revalidation_evidence_sha256": "933af699185c27df4a7e4ea80fd15153c5ae9927df4fbdb98e10ae66a8523108",
+    "authority_bundle_path": "records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json",
+    "authority_bundle_sha256": "760e33ea2ecf6937f56d7bf8d2bd703b18b47dbd2bd6b2bd5919e0dd556d9dae",
+    "authority_bundle_digest": "79a69d921bb00eb2b321e3d1adb073b88a527eb938398d1813567009255bd688"
+  },
+  "approved_summary": {
+    "deferred_capability_count": 13,
+    "explicit_deferred_count": 9,
+    "conditional_pilot_count": 2,
+    "not_adopted_without_new_evidence_count": 2,
+    "initial_consumer_count": 9,
+    "scope_leak_count": 0,
+    "unknown_requirement_reference_count": 0,
+    "unknown_profile_reference_count": 0,
+    "release_blocker_count": 0
+  },
+  "approved_scope": [
+    "13 deferred候補のowner、成果、論理配置、有効化条件、初期非依存境界",
+    "explicit_deferred 9件、conditional_pilot 2件、not_adopted_without_new_evidence 2件の分類",
+    "全13件を初期releaseに対してnonblockingとする境界",
+    "9 consumerにおけるscope leak 0の監査結果",
+    "各候補の開始前に上流authority、activation condition、別Task Contract、Human判断を要求するrouting規則",
+    "Work 3のdeferred候補を初期Requirementの暗黙依存にしていないchecklist項目"
+  ],
+  "excluded_scope": [
+    "deferred能力のRequirement、Design、schema、runtimeまたはUIを実装・有効化すること",
+    "REQ-CONTRACT-008、50 Requirement、NFR Profileまたは現行Plan本文を変更すること",
+    "bounded_parallel、外部project、shared／distributed、AI判断委譲またはCI provider操作を開始すること",
+    "数値閾値またはArchitecture Policy authorityを承認すること",
+    "個別deferred候補の将来の開始判断を事前承認すること",
+    "Work 3の段完了、commitまたはpushを承認すること"
+  ],
+  "promotion": {
+    "mode": "external_decision_bound",
+    "candidate_interpretation": "approved_deferred_scope_and_initial_non_dependency_snapshot",
+    "implementation_state": "not_started_not_approved",
+    "initial_release_effect": "nonblocking",
+    "future_activation": "separate_task_contract_and_human_decision_required"
+  },
+  "authority_effect": "closes only the Work 3 deferred-candidate independence checklist gate",
+  "status": "approved_and_effective"
+}

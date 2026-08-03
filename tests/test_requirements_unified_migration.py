@@ -117,3 +117,87 @@ def test_migration_writer_is_idempotent_and_rejects_conflicting_output(
         match="conflicting_output",
     ):
         migration.write_migration_plan(plan, tmp_path)
+
+
+def test_builds_approved_decision_and_definition_only_authority_v2(
+    migration,
+    tmp_path,
+):
+    plan = migration.build_migration_plan(PROJECT_ROOT)
+    evidence = json.loads(
+        (
+            PROJECT_ROOT
+            / "records/requirements/evidence/"
+            "rc3-requirements-unified-50-evidence-2026-08-03-v2.json"
+        ).read_text()
+    )
+
+    promotion = migration.build_approved_promotion(
+        PROJECT_ROOT,
+        plan=plan,
+        evidence=evidence,
+        decided_at="2026-08-03T22:30:00+09:00",
+        scope=(
+            "統一candidate内の50 Requirement definitionを単一格納形式へ昇格する",
+            "要件本文、Acceptance truth、Plan、製品実装は変更しない",
+        ),
+    )
+
+    assert promotion.decision["target_candidate_digest"] == (
+        plan.candidate["candidate_digest"]
+    )
+    assert promotion.decision["outcome"] == "approved"
+    assert promotion.authority_bundle["bundle_version"] == 2
+    assert promotion.authority_bundle["definition_refs"] == (
+        plan.candidate["definition_refs"]
+    )
+    assert promotion.authority_bundle["legacy_authority_bindings"] == []
+    assert len(promotion.authority_bundle["supersedes"]) == 1
+    assert promotion.resolution.status == "effective"
+    assert len(promotion.resolution.requirement_ids) == 50
+
+    first = migration.write_approved_promotion(promotion, tmp_path)
+    second = migration.write_approved_promotion(promotion, tmp_path)
+
+    assert first.written_count == 2
+    assert second.written_count == 0
+    assert second.unchanged_count == 2
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ("failed_result", "candidate_digest_mismatch"),
+)
+def test_rejects_nonpassing_or_candidate_mismatched_promotion_evidence(
+    migration,
+    mutation,
+):
+    plan = migration.build_migration_plan(PROJECT_ROOT)
+    evidence = json.loads(
+        (
+            PROJECT_ROOT
+            / "records/requirements/evidence/"
+            "rc3-requirements-unified-50-evidence-2026-08-03-v2.json"
+        ).read_text()
+    )
+    if mutation == "failed_result":
+        evidence["result"] = "failed"
+    else:
+        evidence["subject_refs"][-1]["sha256"] = "0" * 64
+    evidence["evidence_digest"] = migration._canonical_digest({
+        key: value
+        for key, value in evidence.items()
+        if key != "evidence_digest"
+    })
+
+    with pytest.raises(
+        migration.RequirementMigrationError,
+        match="promotion_evidence_rejected",
+    ):
+        migration.build_approved_promotion(
+            PROJECT_ROOT,
+            plan=plan,
+            evidence=evidence,
+            decided_at="2026-08-03T22:30:00+09:00",
+            scope=("承認対象",),
+        )

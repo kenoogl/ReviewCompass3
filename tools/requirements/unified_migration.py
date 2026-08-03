@@ -25,6 +25,13 @@ class MigrationWriteResult:
     unchanged_count: int
 
 
+@dataclasses.dataclass(frozen=True)
+class ApprovedPromotion:
+    decision: dict
+    authority_bundle: dict
+    resolution: artifact_layout.AuthorityResolution
+
+
 LEGACY_AUTHORITY_PATH = (
     "records/requirements/authority/rc3-legacy-requirements-37--v1.json"
 )
@@ -37,6 +44,10 @@ SCHEMA_PATH = (
 )
 CANDIDATE_ID = "RC3-REQUIREMENTS-UNIFIED-50-2026-08-03-V1"
 EVIDENCE_ID = "RC3-REQUIREMENTS-UNIFIED-50-EVIDENCE-2026-08-03-V2"
+PROMOTION_DECISION_ID = (
+    "DEC-REQUIREMENTS-UNIFIED-50-2026-08-03-V1"
+)
+PROMOTED_AUTHORITY_VERSION = 2
 SEMANTIC_FIELDS = (
     "feature_id",
     "statement",
@@ -412,6 +423,182 @@ def validate_evidence_record(project_root, evidence):
         evidence,
         schema=schema,
         path=_evidence_path(evidence),
+    )
+
+
+def _decision_path(decision):
+    return (
+        "records/requirements/decisions/"
+        f"{decision['decision_id'].lower()}.json"
+    )
+
+
+def _authority_path(authority_bundle):
+    return (
+        "records/requirements/authority/"
+        f"{authority_bundle['authority_bundle_id'].lower()}"
+        f"--v{authority_bundle['bundle_version']}.json"
+    )
+
+
+def build_approved_promotion(
+    project_root,
+    *,
+    plan,
+    evidence,
+    decided_at,
+    scope,
+):
+    project_root = Path(project_root)
+    schema = artifact_layout.load_schema(project_root / SCHEMA_PATH)
+    validate_evidence_record(project_root, evidence)
+    candidate_ref = _artifact_ref(
+        plan.candidate["candidate_id"],
+        plan.candidate["candidate_version"],
+        _candidate_path(plan.candidate),
+        plan.candidate["candidate_digest"],
+    )
+    expected_candidate_reference = (
+        candidate_ref["logical_id"],
+        candidate_ref["version"],
+        candidate_ref["path"],
+        candidate_ref["sha256"],
+    )
+    if (
+        evidence["result"] != "passed"
+        or expected_candidate_reference
+        not in artifact_layout._declared_reference_set(
+            evidence["subject_refs"]
+        )
+    ):
+        raise RequirementMigrationError(
+            "promotion_evidence_rejected: exact passed candidate Evidence required"
+        )
+    if not scope or any(not item for item in scope):
+        raise RequirementMigrationError(
+            "promotion_incomplete: decision scope is required"
+        )
+
+    evidence_ref = _artifact_ref(
+        evidence["evidence_id"],
+        evidence["evidence_version"],
+        _evidence_path(evidence),
+        evidence["evidence_digest"],
+    )
+    decision = {
+        "artifact_kind": "requirements_decision_record",
+        "decision_id": PROMOTION_DECISION_ID,
+        "decision_version": 1,
+        "decision_class": "requirements_promotion",
+        "actor": "human_user",
+        "authority": "human",
+        "target_candidate_id": plan.candidate["candidate_id"],
+        "target_candidate_digest": plan.candidate["candidate_digest"],
+        "evidence_refs": [evidence_ref],
+        "outcome": "approved",
+        "decided_at": decided_at,
+        "scope": list(scope),
+        "supersedes_or_revokes": [],
+    }
+    decision["record_digest"] = _canonical_digest(decision)
+    artifact_layout.validate_artifact(
+        decision,
+        schema=schema,
+        path=_decision_path(decision),
+    )
+
+    current = _read_json(project_root / CURRENT_AUTHORITY_PATH)
+    current_resolution = artifact_layout.resolve_effective_requirement_ids(
+        current,
+        schema=schema,
+        project_root=project_root,
+    )
+    decision_ref = _artifact_ref(
+        decision["decision_id"],
+        decision["decision_version"],
+        _decision_path(decision),
+        decision["record_digest"],
+    )
+    authority_bundle = {
+        "artifact_kind": "requirements_authority_bundle",
+        "authority_bundle_id": current["authority_bundle_id"],
+        "bundle_version": PROMOTED_AUTHORITY_VERSION,
+        "definition_refs": plan.candidate["definition_refs"],
+        "decision_refs": [decision_ref],
+        "evidence_refs": [evidence_ref],
+        "legacy_authority_bindings": [],
+        "supersedes": [
+            _artifact_ref(
+                current["authority_bundle_id"],
+                current["bundle_version"],
+                CURRENT_AUTHORITY_PATH,
+                current["bundle_digest"],
+            )
+        ],
+    }
+    authority_bundle["bundle_digest"] = _canonical_digest(
+        authority_bundle
+    )
+    artifact_layout.validate_artifact(
+        authority_bundle,
+        schema=schema,
+        path=_authority_path(authority_bundle),
+    )
+
+    definitions = tuple(
+        _read_json(project_root / reference["path"])
+        for reference in plan.candidate["definition_refs"]
+    )
+    resolution = artifact_layout.resolve_authority_chain(
+        definitions=definitions,
+        candidate=plan.candidate,
+        decisions=(decision,),
+        evidence=(evidence,),
+        authority_bundle=authority_bundle,
+        schema=schema,
+    )
+    if set(resolution.requirement_ids) != set(
+        current_resolution.requirement_ids
+    ):
+        raise RequirementMigrationError(
+            "promotion_changes_effective_requirement_ids"
+        )
+    return ApprovedPromotion(
+        decision=decision,
+        authority_bundle=authority_bundle,
+        resolution=resolution,
+    )
+
+
+def write_approved_promotion(promotion, output_root):
+    output_root = Path(output_root)
+    outputs = (
+        (_decision_path(promotion.decision), promotion.decision),
+        (
+            _authority_path(promotion.authority_bundle),
+            promotion.authority_bundle,
+        ),
+    )
+    written = 0
+    unchanged = 0
+    for relative_path, record in outputs:
+        target = output_root / relative_path
+        content = _serialized(record)
+        if target.exists():
+            if target.read_text() != content:
+                raise RequirementMigrationError(
+                    f"conflicting_output: {relative_path}"
+                )
+            unchanged += 1
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        temporary = target.with_suffix(target.suffix + ".tmp")
+        temporary.write_text(content)
+        temporary.replace(target)
+        written += 1
+    return MigrationWriteResult(
+        written_count=written,
+        unchanged_count=unchanged,
     )
 
 
