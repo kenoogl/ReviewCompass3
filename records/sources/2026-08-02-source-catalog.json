@@ -1,6 +1,6 @@
 {
-  "catalog_version": 1,
-  "captured_at": "2026-08-02",
+  "catalog_version": 2,
+  "captured_at": "2026-08-03",
   "purpose": "Task Contract中心設計に用いた外部・前身資料のidentity、機密性、保持状態、再構築可能性を一か所で監査する。",
   "entries": [
     {
@@ -95,6 +95,17 @@
       "raw_content_retained": false,
       "source_reconstructability": "git-object-pinned",
       "retention": "retain derived record, commit, blob identities, and digests"
+    },
+    {
+      "source_id": "SRC-PROJECT-PROGRESSION-DISCUSSION-001",
+      "record_path": "records/sources/2026-08-03-project-progression-discussion.md",
+      "record_sha256": "fa941abe8c7aec9bb03dadb20bb3ed4b4228783d32c02cf1e16d15f14f32e131",
+      "source_kind": "user-provided-project-progression-discussion",
+      "confidentiality_class": "project-internal",
+      "raw_content_retained": false,
+      "source_reconstructability": "digest-only",
+      "non_reconstructable_reason": "Only the observed absolute path, digest, line count, and derived record are retained.",
+      "retention": "retain derived record and observed digest"
     }
   ]
 }
