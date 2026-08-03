@@ -14,6 +14,9 @@
 - pathだけでなく、内容同一性が必要なauthorityとEvidenceにはDigestを記録する。
 - 次作業は、開始条件と完了条件を説明できる一作業に限定する。
 - 最終stage前に`python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`を実行する。
+- 完了した作業単位から次作業へ移る前に
+  `python3 tools/development/work_unit_transition.py --work-status completed`を実行する。
+- `completed_work_unit_uncommitted`ならコミットをリマインドし、コミットまで次作業を開始しない。
 - Git欄へ自己SHA、固定ahead／behind、push済否、未コミットsnapshotを記録しない。
 
 ## 現在位置

@@ -143,6 +143,17 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 
 ## Commitとhandoffの原子性
 
+### 作業単位終端のcommit reminder Pilot
+
+完了した作業単位を未コミットのまま次の作業単位へ進めない。作業単位の完了時と次作業への移行要求時に、
+完了状態とGit worktree状態を機械的に照合する。`completed`かつdirtyなら
+`completed_work_unit_uncommitted`として次作業への遷移を停止し、Humanへコミットをリマインドする。
+作業中のdirty差分だけではこの状態に分類しない。
+
+Pilotではコミットを自動実行せず、従来どおりHumanの明示指示を必要とする。push、guarded commit、hook、
+amend、rebase、reset、履歴書換えは対象外とする。遷移前の機械検査には
+`python3 tools/development/work_unit_transition.py --work-status completed`を使用する。
+
 最終コミットに`TODO_NEXT_SESSION.md`の引き継ぎ更新を含める場合、TODOのGit欄は、そのコミット完了と
 同時に真になるcommit安定形式へコミット前に更新する。コミット後はGitの事後状態をread-onlyで照合し、
 自己SHAまたはremote状態をTODOへ転記するためだけの追加コミットを作らない。

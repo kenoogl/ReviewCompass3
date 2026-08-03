@@ -13,22 +13,26 @@
   `verified / completed`
 - Issue Resolution早期Pilot：Layout Baseline v2、ReviewCompass3 Project Manifest v2、workflow rootを
   検証済み。次はPilot Task ContractとImprovement Candidate／Triage Decisionの形状を固定する。
+- work unit commit reminder Pilot：実装・検証済み。本handoffを含むcommit完了までは
+  `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
   `records/development/2026-08-04-layout-baseline-v2-approval-decision.json`、SHA-256
   `856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`。
 - TODO手戻り候補対策の修正案：`docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
-- activeなTask Contract／Work Item：なし。次はIssue Resolution早期Pilot Task Contractの作成。
+- activeなTask Contract／Work Item：work unit commit reminder Pilotは本handoffを含むcommit境界で完了する。
+  その後はIssue Resolution早期Pilot Task Contractの作成。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`b1fd0a1954a55511c41dc0fc03a99e26f5fcee61b6170f3a57aec7fa72d0c09d`
+- 進行入口SHA-256：`b088822c477d3103efd936a382a067a7e13a976fa11e5002b76cd43530b65383`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`911d0c49d1646f308a733e45d0af6071cd7206dd80b31e123369e921b0b490db`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
-- 現行開発方針SHA-256：`444898d51e1190458de000fbc3d6499a5bacee5dce2353a07e723e1b4546dc5e`
-- 直近のDecision／Evidence：`records/development/2026-08-04-project-manifest-v2-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020`
+- 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
+- 直近のDecision／Evidence：
+  `records/development/2026-08-04-work-unit-commit-reminder-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`b7f8e91520b2664ede24347144004b724c5654d23c5cb318864c1a8530ab35d0`
 
 ## 実施報告照合
 
@@ -514,6 +518,20 @@
   - Evidence：同Completion Evidence V1
   - 観測した事後状態：targeted `6 passed`、公式全Test `496 passed in 2.57s`、fallback `false`で、候補を
     `manual_rework_candidate / resolved_by_commit_stable_todo_validator`として閉じた。
+- Claim `EC-113`：Humanがwork unit commit reminderのdevelopment限定Pilotを承認した。
+  - Decision：`records/development/2026-08-04-work-unit-commit-reminder-pilot-decision.json`、SHA-256
+    `327cdf74c4cedfa2230a906fbe4e75f24b2cff1da6a00c06a6c3ea03c1cdb64b`
+  - 観測した事後状態：完了済み・未コミット時の次作業停止を承認し、自動commit、push、hook、
+    guarded commit、履歴書換えを対象外に維持した。
+- Claim `EC-114`：正常、負例、境界、Git状態取得、CLIをtest-firstで固定した。
+  - Evidence：`records/development/2026-08-04-work-unit-commit-reminder-red-evidence-v1.md`、SHA-256
+    `2fabf5401ef44c1fbcf92758215855b941d8ef5de30178dea0b2763870e31f0b`
+  - 観測した事後状態：初回は遷移preflight未実装だけで`5 failed`、実装後は`5 passed`となった。
+- Claim `EC-115`：遷移preflight、policy、AGENTS、checklist、templateをPilot運用へ接続した。
+  - Evidence：`records/development/2026-08-04-work-unit-commit-reminder-completion-evidence-v1.md`、SHA-256
+    `b7f8e91520b2664ede24347144004b724c5654d23c5cb318864c1a8530ab35d0`
+  - 観測した事後状態：`completed`とdirtyの同時成立だけを`completed_work_unit_uncommitted`として停止し、
+    `in_progress` dirtyは誤停止しない。
 
 ### reported_unverified／contradicted
 
@@ -626,6 +644,7 @@ identity、field、命名、version、Digest規則をtest-firstで固定する�
 
 開始条件：
 
+- work unit transition preflightが`passed`である。
 - Project Manifest v2 Completion Evidence SHA-256が
   `154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020`である。
 - `.reviewcompass/workflow/`の初期snapshotが`.gitkeep`一件だけである。
@@ -641,8 +660,9 @@ identity、field、命名、version、Digest規則をtest-firstで固定する�
 
 ## blocker・Human判断待ち
 
-- blocker：なし
-- Human判断待ち：なし
+- blocker：本handoffを含むcommit前は、完了済み作業単位に変更が残るため次作業へ移行しない。
+  当該commit完了と同時に解除する。
+- Human判断待ち：本作業単位のlocal commit指示
 - 実行保留：実際のIssue Resolution Pilot record作成。shapeとvalidatorのRED／GREEN後に開始する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：checklist、Completion Evidence、Test receiptのDigest一致を確認する
@@ -664,8 +684,8 @@ identity、field、命名、version、Digest規則をtest-firstで固定する�
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Layout Baseline／Project Manifest `12 passed in 0.04s`、絶対path finding 0
-- 直近の全Test：Project Manifest v2 official receipt、`501 passed in 2.24s`、fallback `false`
+- 直近の関連検証：work unit transition／TODO handoff `11 passed in 0.03s`、template finding 0
+- 直近の全Test：work unit commit reminder official receiptを機械参照する
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則
