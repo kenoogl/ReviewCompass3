@@ -1,0 +1,3 @@
+{"event_id":"evt-001","occurred_at":"2026-08-03T09:00:00+09:00","session_id":"session-work1b-fixture","type":"session_started"}
+{"content":"Work 1Bの固定fixtureを作る。","event_id":"evt-002","occurred_at":"2026-08-03T09:00:01+09:00","role":"user","session_id":"session-work1b-fixture","type":"message"}
+{"content":"固定fixtureとred testだけを作成する。","event_id":"evt-003","occurred_at":"2026-08-03T09:00:02+09:00","role":"assistant","session_id":"session-work1b-fixture","type":"message"}

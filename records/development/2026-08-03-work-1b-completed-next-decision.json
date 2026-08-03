@@ -1,0 +1,17 @@
+{
+  "decision_id": "DEC-WORK1B-COMPLETED-NEXT-2026-08-03-V1",
+  "decided_at": "2026-08-03T14:00:01+09:00",
+  "decision_authority": "human",
+  "candidate_id": "IC-WORK1B-COMPLETED-NEXT-001",
+  "candidate_input_sha256": "a23fad6701ce68a4d22582ffe35e75d80060ca00c7c4bdade078eb603716c6bf",
+  "selected_option": 1,
+  "rule": {
+    "work_completed_payload_next": "required",
+    "when_present": "replace_prior_next",
+    "when_missing": "projection_incomplete",
+    "missing_field": "work_completed.payload.next"
+  },
+  "authorized_route": "current_work_repair",
+  "work1b_completion_approved": false,
+  "status": "approved_for_repair"
+}

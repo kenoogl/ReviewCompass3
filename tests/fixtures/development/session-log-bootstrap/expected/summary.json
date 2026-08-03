@@ -1,0 +1,9 @@
+{
+  "message_count": 2,
+  "roles": [
+    "user",
+    "assistant"
+  ],
+  "session_id": "session-work1b-fixture",
+  "source_identity": "codex-thread:fixture-001"
+}

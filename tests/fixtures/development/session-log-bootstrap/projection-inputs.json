@@ -1,0 +1,15 @@
+{
+  "fixed_inputs": [
+    {
+      "digest": "0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f",
+      "identity": "docs/current/reviewcompass3-plan-current.md"
+    },
+    {
+      "digest": "8009712a3c673e935aa60434839acc104bae6ab606638538f172df1d43c4b024",
+      "identity": "session-log-bootstrap/workflow-events.jsonl"
+    }
+  ],
+  "freshness": "current",
+  "generated_at": "2026-08-03T09:30:00+09:00",
+  "project_id": "reviewcompass3"
+}

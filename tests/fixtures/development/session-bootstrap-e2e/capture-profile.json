@@ -1,0 +1,37 @@
+{
+  "access": [
+    "authorized_human",
+    "session_capture_runtime"
+  ],
+  "capture": {
+    "capture_deadline": "2026-08-03T10:05:00+09:00",
+    "captured_at": "2026-08-03T10:00:03+09:00",
+    "range": {
+      "end_event_id": "e2e-003",
+      "event_count": 3,
+      "start_event_id": "e2e-001"
+    },
+    "started_at": "2026-08-03T10:00:00+09:00"
+  },
+  "completeness": "complete",
+  "confidentiality": "restricted",
+  "digests": {
+    "index_sha256": "6b9073dc71914cef6e6ed6e5d66672987950df644a63cfd95b3e2b0f6df64053",
+    "raw_sha256": "d106284d8ae71ba4a12a70a65a1425f7cf26454962a4458774a745ded9b7b5b8",
+    "summary_sha256": "340ccb84ee7e7901b0f652a0896991d27ceca1129f85621f1e7816a781e20e4b",
+    "transcript_sha256": "6440def105ebc71a4d1d7d313f79ea97f0b038a24568a14b04f85ce79e2c4a57"
+  },
+  "mutation": "append_only",
+  "retention": {
+    "derived": "project_policy",
+    "raw": "30_days"
+  },
+  "schema_version": 1,
+  "session_id": "session-work1b-e2e",
+  "source": {
+    "identity": "bootstrap-session:e2e-001",
+    "kind": "synthetic_workflow_event_stream",
+    "revision": "event-stream-v1"
+  },
+  "source_availability": "available"
+}

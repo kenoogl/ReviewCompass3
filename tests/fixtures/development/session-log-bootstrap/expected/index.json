@@ -1,0 +1,20 @@
+{
+  "events": [
+    {
+      "event_id": "evt-001",
+      "line": 1,
+      "type": "session_started"
+    },
+    {
+      "event_id": "evt-002",
+      "line": 2,
+      "type": "message"
+    },
+    {
+      "event_id": "evt-003",
+      "line": 3,
+      "type": "message"
+    }
+  ],
+  "session_id": "session-work1b-fixture"
+}

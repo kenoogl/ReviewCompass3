@@ -1,0 +1,54 @@
+[
+  {
+    "expected": {
+      "normal_empty": true,
+      "status": "available"
+    },
+    "observation": {
+      "accessible": true,
+      "complete": true,
+      "event_count": 0,
+      "expired": false,
+      "reconstructable": true
+    }
+  },
+  {
+    "expected": {
+      "normal_empty": false,
+      "status": "source_missing"
+    },
+    "observation": {
+      "accessible": false,
+      "complete": false,
+      "event_count": null,
+      "expired": false,
+      "reconstructable": false
+    }
+  },
+  {
+    "expected": {
+      "normal_empty": false,
+      "status": "source_expired"
+    },
+    "observation": {
+      "accessible": false,
+      "complete": false,
+      "event_count": null,
+      "expired": true,
+      "reconstructable": false
+    }
+  },
+  {
+    "expected": {
+      "normal_empty": false,
+      "status": "non_reconstructable"
+    },
+    "observation": {
+      "accessible": true,
+      "complete": false,
+      "event_count": 2,
+      "expired": false,
+      "reconstructable": false
+    }
+  }
+]

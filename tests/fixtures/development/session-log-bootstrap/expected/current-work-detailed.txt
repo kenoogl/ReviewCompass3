@@ -1,0 +1,28 @@
+ReviewCompass3 Current Work
+generated_at: 2026-08-03T09:30:00+09:00
+freshness: current
+inputs:
+  - docs/current/reviewcompass3-plan-current.md 0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f
+  - session-log-bootstrap/workflow-events.jsonl 8009712a3c673e935aa60434839acc104bae6ab606638538f172df1d43c4b024
+
+PLAN
+  stage: bootstrap
+  work: Work 1B Session Log Bootstrapと現在位置text表示
+  state: active
+
+CURRENT ACTIVITY
+  contract: none
+  work_item: RC3-WORK1B-RED-TESTS
+  tdd_state: red
+
+NEXT
+  Implement Session Log Bootstrap mapping
+
+BLOCKERS
+  none
+
+HUMAN DECISIONS
+  none
+
+STALE / REVERIFY
+  none

@@ -1,0 +1,62 @@
+{
+  "access": [
+    "authorized_human",
+    "session_capture_runtime"
+  ],
+  "capture": {
+    "capture_deadline": "2026-08-03T09:05:00+09:00",
+    "captured_at": "2026-08-03T09:00:03+09:00",
+    "range": {
+      "end_event_id": "evt-003",
+      "event_count": 3,
+      "start_event_id": "evt-001"
+    },
+    "started_at": "2026-08-03T09:00:00+09:00"
+  },
+  "completeness": "complete",
+  "confidentiality": "restricted",
+  "digests": {
+    "index_sha256": "34d560cb1585a8d011ba918e297bcc5f769915d2c160ef36e0ea0029c6a9b157",
+    "raw_sha256": "461d29923f1b3c5ac5926458c469620ce1f945a863daab86b120de3a36d8db23",
+    "summary_sha256": "9f9fc99862f3b03495a616c09fe2ee5a6a6c3e5cdc30df703b7c516badfecc99",
+    "transcript_sha256": "3df2e7f70243f761e12f7495f1f4cdc1d6fcc311cd06de6713a97fc8266c6240"
+  },
+  "mutation": "append_only",
+  "retention": {
+    "derived": "project_policy",
+    "raw": "30_days"
+  },
+  "schema_version": 1,
+  "session_id": "session-work1b-fixture",
+  "source": {
+    "identity": "codex-thread:fixture-001",
+    "kind": "synthetic_session_export",
+    "revision": "export-v1"
+  },
+  "source_availability": "available",
+  "status": "captured",
+  "storage": {
+    "derived": {
+      "index": {
+        "path": "sessions/session-work1b-fixture/index.json",
+        "root": "data_root"
+      },
+      "summary": {
+        "path": "sessions/session-work1b-fixture/summary.json",
+        "root": "data_root"
+      },
+      "transcript": {
+        "path": "sessions/session-work1b-fixture/transcript.md",
+        "root": "data_root"
+      }
+    },
+    "evidence": {
+      "path": "sessions/session-work1b-fixture/session-evidence.json",
+      "root": "data_root"
+    },
+    "raw": {
+      "path": "sessions/session-work1b-fixture/raw/session.jsonl",
+      "root": "sensitive_root"
+    }
+  }
+}

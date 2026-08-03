@@ -1,0 +1,14 @@
+{"event_id":"state-001","event_type":"session_started","occurred_at":"2026-08-03T09:00:00+09:00","payload":{"session_id":"session-work1b-fixture"}}
+{"event_id":"state-002","event_type":"work_started","occurred_at":"2026-08-03T09:01:00+09:00","payload":{"contract_id":null,"next":"Implement Session Log Bootstrap mapping","stage":"bootstrap","state":"active","tdd_state":"red","work_id":"Work 1B","work_item_id":"RC3-WORK1B-RED-TESTS","work_name":"Session Log Bootstrapと現在位置text表示"}}
+{"event_id":"state-003","event_type":"work_paused","occurred_at":"2026-08-03T09:02:00+09:00","payload":{"reason":"fixture pause","work_id":"Work 1B"}}
+{"event_id":"state-004","event_type":"work_resumed","occurred_at":"2026-08-03T09:03:00+09:00","payload":{"work_id":"Work 1B"}}
+{"event_id":"state-005","event_type":"blocker_raised","occurred_at":"2026-08-03T09:04:00+09:00","payload":{"blocker_id":"BLOCKER-FIXTURE","summary":"fixture blocker"}}
+{"event_id":"state-006","event_type":"blocker_cleared","occurred_at":"2026-08-03T09:05:00+09:00","payload":{"blocker_id":"BLOCKER-FIXTURE"}}
+{"event_id":"state-007","event_type":"human_decision_requested","occurred_at":"2026-08-03T09:06:00+09:00","payload":{"decision_id":"DECISION-FIXTURE","summary":"fixture decision"}}
+{"event_id":"state-008","event_type":"human_decision_recorded","occurred_at":"2026-08-03T09:07:00+09:00","payload":{"decision_id":"DECISION-FIXTURE","outcome":"approved"}}
+{"event_id":"state-009","event_type":"upstream_revised","occurred_at":"2026-08-03T09:08:00+09:00","payload":{"artifact_id":"PLAN-FIXTURE","revision":"v2"}}
+{"event_id":"state-010","event_type":"artifact_stale","occurred_at":"2026-08-03T09:09:00+09:00","payload":{"artifact_id":"WORK1B-FIXTURE","reason":"upstream revision"}}
+{"event_id":"state-011","event_type":"artifact_reverified","occurred_at":"2026-08-03T09:10:00+09:00","payload":{"artifact_id":"WORK1B-FIXTURE"}}
+{"event_id":"state-012","event_type":"work_deferred","occurred_at":"2026-08-03T09:11:00+09:00","payload":{"summary":"future UI","work_id":"DEFERRED-UI"}}
+{"event_id":"state-013","event_type":"work_canceled","occurred_at":"2026-08-03T09:12:00+09:00","payload":{"summary":"obsolete experiment","work_id":"CANCELED-EXPERIMENT"}}
+{"event_id":"state-014","event_type":"session_ended","occurred_at":"2026-08-03T09:13:00+09:00","payload":{"session_id":"session-work1b-fixture"}}
