@@ -38,13 +38,15 @@ generated_from:
   - path: records/task-contract/task-contract-centered-documentation-v11.json
     sha256: 587f06a7aef0e18af9c3bc07781f363a86cdf973060977f76d3e8ed20c91aa81
   - path: records/sources/2026-08-02-source-catalog.json
-    sha256: 8564e95606a8b812bcfacfc6d13f51a67a323b3135a24d8bf9c6c7d43409634c
+    sha256: 1a40adcec2af6c9f2829af9f4a90cc33bfe6d9cb3fd0e1e305014d71356bd6bb
   - path: records/sources/2026-08-02-deployment-topology-discussion.md
     sha256: 95209eadae62ec80ef98cd23182266d657540576f6f542fdbc136f3c5d01c67b
   - path: records/sources/2026-08-02-reviewcompass2-change-scaled-review-input.md
     sha256: 125b53a62de2d34198f8e2721f37612b8b1b8fbe3a4714d0133c4cfa80a358fb
   - path: records/sources/2026-08-02-reviewcompass2-cross-cutting-lessons.md
     sha256: b337bbe723dc416c25eb0d94849029c377077172543af1491a31bc1c18d0c7ac
+  - path: records/sources/2026-08-03-project-progression-discussion.md
+    sha256: fa941abe8c7aec9bb03dadb20bb3ed4b4228783d32c02cf1e16d15f14f32e131
   - path: docs/design/2026-08-03-parallel-work-introduction-timing-memo.md
     sha256: 3b2604e3510cdb09d49681bd85ea6bf93fb71478fd89bb46042cfb4f4be86d4c
   - path: docs/design/2026-08-03-source-change-verification-identity-timing-memo.md
@@ -383,6 +385,10 @@ approvalは別recordとし、初期approvalをContract、source Requirement、ch
 後続で委譲を有効にした場合も、Decision RecordとDelegation AuthorizationはContract本文から
 分離して保存する。
 
+外部side effectを持つContractまたは適用Policyは、timeout／deadline、cancellation可能範囲、
+idempotency identity、部分成功時のcompensationまたはreconciliation、自動回復不能時のHuman
+escalationを定める。外部side effectを持たないContractへ汎用job controlを一律に要求しない。
+
 ### 6.2 Architecture PolicyとProject Overlay
 
 複数Contract共通制約はTask Contractへ複製せず版付きArchitecture Policyへ置く。
@@ -523,6 +529,9 @@ draft → challenged → approved
 
 Definition Challengeはsource Requirements、Architecture Policy、risk catalog、隣接Contractを
 固定材料とし、責務欠落、狭すぎる境界、禁止side effect、依存、cross-contract責務を検査する。
+Contract分割は、一つの責任、独立して観測可能な受入、必要なretry／termination境界、side effectの
+所有、再利用または追跡価値を基準とする。独立して受理、復旧または追跡できない内部手順を、
+Contract数を増やすためだけに分割しない。
 
 Definition Challenge、Conformance、Final ChallengeはVerdictの意味、基準、failure routeとして分離するが、
 常に別Runを要求しない。low riskでは一つのRunから別identityのVerdictを生成でき、mediumは影響に応じて
@@ -947,6 +956,11 @@ Contract、Portfolio、Compiler、Policy、Plan、state、interface、Provenance
 Integration、upstream revision、dependency、termination、reuseを設計する。Issue Resolutionは
 Work 8の手作業Pilot用の暫定owner、routing、記録項目に限定し、製品schema、正式state、permitは
 Pilot後のDeferred Workへ送る。
+`new_development / fresh`、`maintenance / reopen`、上流改定と依存／中止、配置lifecycle、条件付き
+並行を代表シナリオとし、Requirementからaccepted artifactまでの接続を設計とE2E fixtureで確認する。
+独立Feature、lane、schemaまたはgateは追加しない。確認観点と採否境界は
+[プロジェクト進行検討から採用する知見](../../records/sources/2026-08-03-project-progression-discussion.md)
+を参照する。
 変更単位から影響閉包を作る`impact_slice`、理由付きscope拡大、独立した全文整合review、
 budget超過時の分割・停止もContext設計へ含める。
 Workflow設計では`single_active_leaf | bounded_parallel`を版付きscheduler policyとし、実行可能leaf、
@@ -1017,6 +1031,7 @@ Source SnapshotとChange Setを作る。GitへのwriteまたはCI連携は行わ
 - 既知違反を見逃すvalidator、正常fixtureの誤停止、validator変更後の旧verdict再利用
 - 書込み後だけ現れる不整合のpost-write verification欠落
 - permission過剰、stale、crash再開、optional観測欠測
+- 外部side effectの部分成功後にcompensation／reconciliationまたはHuman escalationがない
 - Contract適合だが上位RequirementまたはIntentを損なう成果
 - maintenance義務変更、reopen identity欠落
 - 実装不良を上流変更で通す、意味変更を軽微修正で閉じる
@@ -1209,6 +1224,9 @@ deploymentの導入条件は14.3を優先する。
 
 ### 14.6 その他
 
+- 自己適用のvertical sliceと`local_integrated` E2E後に行う、外部software project一件での
+  portability pilot。Repository Binding、impact slice、maintenance／reopen、配置独立性、
+  Provenance移植性に限定し、初期sliceをblockせず、別domain applicationまたは汎用middlewareを作らない
 - E2E不足に結び付かない汎用schema、adapter、Contract type、metric
 - Issue管理UI、外部tracker同期、汎用project management
 - 汎用Agent Runtime、任意Task orchestration、plugin system

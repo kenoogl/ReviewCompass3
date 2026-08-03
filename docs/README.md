@@ -51,6 +51,7 @@ Task Contract中心化に関する詳細な生成元は次の順に読む。
 - `../records/sources/2026-08-02-deployment-topology-discussion.md`
 - `../records/sources/2026-08-02-reviewcompass2-change-scaled-review-input.md`
 - `../records/sources/2026-08-02-reviewcompass2-cross-cutting-lessons.md`
+- `../records/sources/2026-08-03-project-progression-discussion.md`
 - `../records/task-contract/task-contract-centered-documentation-v1.json`
 - `../records/task-contract/task-contract-centered-documentation-v2.json`
 - `../records/task-contract/task-contract-centered-documentation-v3.json`
@@ -120,6 +121,9 @@ Task Contract中心化に関する詳細な生成元は次の順に読む。
   post-write verification、session source復元検証を修正継承する。旧Intent、旧lane、固定reviewer数・
   round数・容量値、provider固有pathは継承しない。新要件IDや第7 Planは追加せず既存50要件と6 Planを
   横断強化する。
+- 過去のプロジェクト進行検討から、代表シナリオによる縦断被覆、Task Contractの粒度基準、
+  部分side effectの補償／調停、自己適用後の外部software project検証を修正継承する。汎用Concierge、
+  Task Registry、plugin platform、別domain applicationは継承しない。
 
 ## 固定baseline
 
