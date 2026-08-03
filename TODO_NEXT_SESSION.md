@@ -238,11 +238,12 @@ Work 3 Requirementsの固定sourceと被覆baselineを確認する。
 ## Git・Test
 
 - branch：`main`
-- HEAD：`eba6960aba234889f82fd68bb7d4678fc8b795bd`
-- remote：`origin/main`と同期済み
-- worktree：Work 1B成果一式、Work 2完了Decision／Evidence、checklist、TODOが未コミット
+- HEAD：本TODOを含むhandoff commit（`git log -1 -- TODO_NEXT_SESSION.md`で解決）
+- 直前の成果commit：`2460908`（Work 1B／Work 2完了）、`f301597`（session log bootstrap実装）
+- remote：push未実施。このsessionの3 commitが`origin/main`よりahead
+- worktree：handoff commit直後clean
 - 直近の関連Test：bootstrap／durable／E2E／NEXT回帰、合計`17 passed in 0.07s`
-- 直近の全Test：`436 passed in 1.95s`
+- 直近の全Test：`436 passed in 1.87s`
 - 差分検査：`git diff --check`、通過
 
 ## 更新規則
