@@ -215,6 +215,56 @@ def test_regenerates_public_codex_json_stream(tmp_path):
   assert result.text == artifact.text
 
 
+def test_regenerates_codex_rollout_stream(tmp_path):
+  raw_root = tmp_path / "raw"
+  raw_log = raw_root / "rollout.jsonl"
+  raw_root.mkdir()
+  records = (
+    {
+      "timestamp": "2026-08-03T10:00:00Z",
+      "type": "session_meta",
+      "payload": {"id": "thread-1", "cwd": "/workspace"},
+    },
+    {
+      "timestamp": "2026-08-03T10:00:01Z",
+      "type": "response_item",
+      "payload": {
+        "id": "message-1",
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {"type": "output_text", "text": "Rollout done."},
+        ],
+      },
+    },
+  )
+  raw_log.write_text(
+    "".join(json.dumps(record) + "\n" for record in records),
+    encoding="utf-8",
+  )
+  pipeline = importlib.import_module("tools.session_logs.pipeline")
+  artifact = pipeline.prepare_artifact(
+    raw_log,
+    raw_root=raw_root,
+    rules=(),
+    tool_version="0.0.1",
+  )
+  regeneration = importlib.import_module(
+    "tools.session_logs.regeneration"
+  )
+
+  result = regeneration.regenerate_transcript(
+    artifact.provenance,
+    raw_root=raw_root,
+    stored_text=artifact.text,
+    rules=(),
+    tool_version="0.0.1",
+  )
+
+  assert result.status == "matches"
+  assert result.text == artifact.text
+
+
 def test_regenerates_summary_and_detects_summary_only_change(tmp_path):
   raw_root = tmp_path / "raw"
   raw_log = raw_root / "session.jsonl"

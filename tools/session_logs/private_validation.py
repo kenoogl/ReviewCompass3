@@ -140,7 +140,8 @@ def validate_private_logs(
     ) from error
   counts = {
     "claude": 0,
-    "codex": 0,
+    "codex_exec_json": 0,
+    "codex_rollout": 0,
     "failed": 0,
     "ignored": 0,
     "unsupported": 0,

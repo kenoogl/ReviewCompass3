@@ -98,7 +98,8 @@ def test_private_validation_records_counts_without_values_or_git_changes(
   assert result.git_unchanged is True
   assert result.counts == {
     "claude": 1,
-    "codex": 1,
+    "codex_exec_json": 1,
+    "codex_rollout": 0,
     "failed": 0,
     "ignored": 2,
     "unsupported": 0,
@@ -198,7 +199,8 @@ def test_private_validation_fixed_cli_outputs_counts_only(
   assert json.loads(output) == {
     "counts": {
       "claude": 1,
-      "codex": 0,
+      "codex_exec_json": 0,
+      "codex_rollout": 0,
       "failed": 0,
       "ignored": 0,
       "unsupported": 0,

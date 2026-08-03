@@ -7,19 +7,17 @@ promotion_required: true
 
 import dataclasses
 
-from tools.session_logs import parse_claude, parse_codex
 from tools.session_logs.provenance import build_provenance
 from tools.session_logs.redaction import (
   redact_text_strict,
   redaction_rules_digest,
 )
-from tools.session_logs.source_kind import identify_source_kind
+from tools.session_logs.source_adapter import (
+  UnsupportedSourceKind,
+  parse_source_log,
+)
 from tools.session_logs.summary import render_summary
 from tools.session_logs.transcript import render_transcript
-
-
-class UnsupportedSourceKind(Exception):
-  """実装していない、または識別できない入力形式。"""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -44,13 +42,9 @@ def prepare_artifact(
   changed_files=(),
   allow_patterns=(),
 ) -> PreparedArtifact:
-  source_kind = identify_source_kind(raw_log)
-  if source_kind == "claude":
-    parsed = parse_claude.parse_claude_log(raw_log)
-  elif source_kind == "codex":
-    parsed = parse_codex.parse_codex_log(raw_log)
-  else:
-    raise UnsupportedSourceKind(str(source_kind))
+  source = parse_source_log(raw_log)
+  source_kind = source.source_kind
+  parsed = source.parsed
 
   transcript_text = render_transcript(parsed)
   redacted = redact_text_strict(

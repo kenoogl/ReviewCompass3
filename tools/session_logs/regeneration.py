@@ -7,17 +7,15 @@ promotion_required: true
 
 import dataclasses
 import hashlib
-import json
 from pathlib import Path
 
-from tools.session_logs.parse_claude import parse_claude_bytes
-from tools.session_logs.parse_codex import parse_codex_bytes
 from tools.session_logs.provenance import read_recorded_range
 from tools.session_logs.redaction import (
   redact_text_strict,
   redaction_rules_digest,
 )
 from tools.session_logs.summary import render_summary
+from tools.session_logs.source_adapter import parse_source_bytes
 from tools.session_logs.transcript import render_transcript
 
 
@@ -43,22 +41,6 @@ class RegenerationResult:
   summary_stored_matches: bool = True
 
 
-def _parse_source_bytes(data):
-  first_line = next((
-    line
-    for line in data.split(b"\n")
-    if line.strip()
-  ), b"")
-  first_record = json.loads(first_line) if first_line else {}
-  if (
-    isinstance(first_record, dict)
-    and first_record.get("type") == "thread.started"
-    and isinstance(first_record.get("thread_id"), str)
-  ):
-    return parse_codex_bytes(data)
-  return parse_claude_bytes(data)
-
-
 def regenerate_transcript(
   record,
   *,
@@ -71,7 +53,7 @@ def regenerate_transcript(
   raw_log = Path(raw_root) / record.source_path
   try:
     source_bytes = read_recorded_range(raw_log, record)
-    parsed = _parse_source_bytes(source_bytes)
+    parsed = parse_source_bytes(source_bytes).parsed
     transcript = render_transcript(parsed)
     redacted = redact_text_strict(
       transcript,
@@ -143,7 +125,7 @@ def regenerate_artifact(
   raw_log = Path(raw_root) / record.source_path
   try:
     source_bytes = read_recorded_range(raw_log, record)
-    parsed = _parse_source_bytes(source_bytes)
+    parsed = parse_source_bytes(source_bytes).parsed
     summary = render_summary(
       parsed.events,
       commits=getattr(record, "summary_commits", ()),

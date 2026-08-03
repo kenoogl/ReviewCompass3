@@ -9,14 +9,7 @@ import json
 from pathlib import Path
 
 
-def identify_source_kind(path):
-  with Path(path).open(encoding="utf-8") as raw_log:
-    first_line = raw_log.readline()
-
-  if not first_line:
-    return None
-
-  first_event = json.loads(first_line)
+def _identify_first_event(first_event):
   if not isinstance(first_event, dict):
     return None
 
@@ -31,9 +24,45 @@ def identify_source_kind(path):
     and isinstance(thread_id, str)
     and thread_id
   ):
-    return "codex"
+    return "codex_exec_json"
+
+  payload = first_event.get("payload")
+  if (
+    first_event.get("type") == "session_meta"
+    and isinstance(first_event.get("timestamp"), str)
+    and isinstance(payload, dict)
+    and isinstance(payload.get("id"), str)
+    and payload.get("id")
+  ):
+    return "codex_rollout"
 
   return None
+
+
+def _first_record(lines):
+  for line in lines:
+    if not line.strip():
+      continue
+    try:
+      return json.loads(line)
+    except json.JSONDecodeError:
+      return None
+  return None
+
+
+def identify_source_kind_bytes(data):
+  text = data.decode("utf-8")
+  return _identify_first_event(_first_record(text.split("\n")))
+
+
+def identify_source_kind(path):
+  try:
+    with Path(path).open(encoding="utf-8") as raw_log:
+      first_event = _first_record(raw_log)
+  except OSError:
+    return None
+
+  return _identify_first_event(first_event)
 
 
 def identify_auxiliary_kind(path):

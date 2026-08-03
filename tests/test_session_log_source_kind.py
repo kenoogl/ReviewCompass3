@@ -50,4 +50,24 @@ def test_identifies_public_codex_exec_json_stream(tmp_path):
 
   source_kind = importlib.import_module("tools.session_logs.source_kind")
 
-  assert source_kind.identify_source_kind(raw_log) == "codex"
+  assert source_kind.identify_source_kind(raw_log) == "codex_exec_json"
+
+
+def test_identifies_codex_rollout_stream(tmp_path):
+  raw_log = tmp_path / "rollout.jsonl"
+  raw_log.write_text(
+    json.dumps({
+      "timestamp": "2026-08-03T10:00:00Z",
+      "type": "session_meta",
+      "payload": {
+        "id": "019fc541-2734-79b1-b3d9-3e12665d79f5",
+        "cwd": "/workspace/project",
+        "originator": "Codex Desktop",
+      },
+    }) + "\n",
+    encoding="utf-8",
+  )
+
+  source_kind = importlib.import_module("tools.session_logs.source_kind")
+
+  assert source_kind.identify_source_kind(raw_log) == "codex_rollout"

@@ -1,0 +1,27 @@
+{
+  "decision_id": "DEC-SESSION-TRANSCRIPT-SOURCE-FORMATS-2026-08-03-V1",
+  "decided_at": "2026-08-03T23:18:14+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "implementation_scope",
+  "decision": "approved",
+  "instructions": [
+    "ReviewCompassの開発過程で，会話の逐語録が原因解明に役立った．記録の抜粋では落ちてしまう情報がある．そのため逐語録を記録しておく必要がある．元の会話情報は消える可能性があるためである．gitには入れなくてもローカルディレクトリ内に保持する必要がある．実装はReviewCompass2で実装済",
+    "2種類を対象に実装．また，入口はcodexだけでなく，claudeも考慮しておく．"
+  ],
+  "approved_scope": [
+    "distinguish codex exec JSONL and Codex rollout JSONL as separate source kinds",
+    "parse both Codex formats without truncating message or tool payload text",
+    "dispatch Claude and both Codex formats through one source adapter",
+    "reuse the existing local non-Git transcript and raw preservation boundaries",
+    "report unknown source and event shapes without guessing"
+  ],
+  "excluded_scope": [
+    "capture or copy the current private conversation log",
+    "install or activate session hooks",
+    "change retention or deletion policy",
+    "commit repository changes",
+    "push repository changes"
+  ],
+  "authority_effect": "authorizes a TDD implementation of the three-source parsing boundary without starting Work 4",
+  "status": "approved_and_effective"
+}
