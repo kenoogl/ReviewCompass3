@@ -163,6 +163,12 @@ SHA-256 `4a086be730b3310cc6933826ab6dac751e36af0596c5a8b6a7e381357d956282`、公
 `500 passed in 2.56s`、fallback `false`。v1 recordとEvidenceは`historical_verified`として保持する。
 本承認はWork 7A／7Bのdeployment lifecycle実装完了を意味しない。
 
+ReviewCompass3自己適用projectのManifest v2 bootstrapは
+`records/development/2026-08-04-project-manifest-v2-completion-evidence-v1.md`、SHA-256
+`154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020`へ固定した。Project ID
+`reviewcompass3`、workflow root、相対document link 5件、端末固有絶対path finding 0を確認し、公式全Testは
+`501 passed in 2.24s`、fallback `false`。Project Bindingのdurable保存とdeployment lifecycleは未実施のまま。
+
 ## 5. Work 1B：Session Log Bootstrapと現在位置text表示
 
 ### Session Evidence

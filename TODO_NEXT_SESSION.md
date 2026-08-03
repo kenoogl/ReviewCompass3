@@ -11,24 +11,24 @@
 - 全体：初期開発Work 1B、Work 2、Work 3完了。次の未完了工程はWork 4
 - 現在の工程：Work 3 `verified / completed`、Work 4 `not_started`。inter-work correctiveは
   `verified / completed`
-- Issue Resolution早期Pilot：`.reviewcompass/workflow/`境界のLayout Baseline v2をHuman承認済み。
-  実Pilot recordの前に、ReviewCompass3 project用Manifest v2とworkflow rootを作成・検証する。
+- Issue Resolution早期Pilot：Layout Baseline v2、ReviewCompass3 Project Manifest v2、workflow rootを
+  検証済み。次はPilot Task ContractとImprovement Candidate／Triage Decisionの形状を固定する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
   `records/development/2026-08-04-layout-baseline-v2-approval-decision.json`、SHA-256
   `856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`。
 - TODO手戻り候補対策の修正案：`docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
-- activeなTask Contract／Work Item：なし。次はProject Manifest v2とworkflow rootのbootstrap。
+- activeなTask Contract／Work Item：なし。次はIssue Resolution早期Pilot Task Contractの作成。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`e6c1f78e9fa1131d7ec617d0f348d94a46078e5f8a6c9c62826df0f9559dab6e`
+- 進行入口SHA-256：`b1fd0a1954a55511c41dc0fc03a99e26f5fcee61b6170f3a57aec7fa72d0c09d`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`911d0c49d1646f308a733e45d0af6071cd7206dd80b31e123369e921b0b490db`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`444898d51e1190458de000fbc3d6499a5bacee5dce2353a07e723e1b4546dc5e`
-- 直近のDecision：`records/development/2026-08-04-layout-baseline-v2-approval-decision.json`
-- Decision SHA-256：`856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`
+- 直近のDecision／Evidence：`records/development/2026-08-04-project-manifest-v2-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020`
 
 ## 実施報告照合
 
@@ -580,7 +580,6 @@
 
 ### 未実施
 
-- ReviewCompass3 project用Project Manifest v2と`.reviewcompass/workflow/`rootの作成・検証
 - `.reviewcompass/workflow/`を使うIssue Resolution早期Pilot recordの作成
 - Deployment Manifest、package builder、原子的切替、rollbackのWork 7実装
 - Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定
@@ -622,27 +621,29 @@
 
 ## 次に行う一作業
 
-ReviewCompass3 project用Project Manifest v2と`.reviewcompass/workflow/`rootをtest-firstで作成・検証する。
+Issue Resolution早期PilotのTask Contractと固定sourceを作り、Improvement CandidateとHuman Triage Decisionの
+identity、field、命名、version、Digest規則をtest-firstで固定する。
 
 開始条件：
 
-- v2 Approval Decision SHA-256が`856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`である。
-- v2 candidate SHA-256が`4a086be730b3310cc6933826ab6dac751e36af0596c5a8b6a7e381357d956282`である。
-- repository rootに既存`.reviewcompass/project-manifest.json`がないことを確認済みである。
+- Project Manifest v2 Completion Evidence SHA-256が
+  `154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020`である。
+- `.reviewcompass/workflow/`の初期snapshotが`.gitkeep`一件だけである。
+- 先行PilotメモとTODO routing修正メモの固定Digestが一致する。
 
 完了条件：
 
-- Project Manifest v2が承認済みartifact rootsとProject IDを持つ。
-- `.reviewcompass/workflow/`がproject root内にあり、端末固有絶対pathを含まない。
-- current validatorがManifest、workflow root、checkout移動後のBindingを検証できる。
+- Task Contractが対象一件、scope、non-scope、停止条件、Acceptanceを固定する。
+- CandidateとTriage Decisionのidentity、必須field、Digest、参照規則を正常・負例・境界Testへ固定する。
+- Human判断なしのIssue昇格と、TODOへの詳細複製を禁止する。
 
-後続作業：最初のPilot Improvement CandidateとHuman Triage Decisionを作る。
+後続作業：固定schema候補を使って最初のPilot Improvement CandidateとHuman Triage Decisionを作る。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
 - Human判断待ち：なし
-- 実行保留：実際のIssue Resolution Pilot record作成。Project Manifest v2検証後に開始する
+- 実行保留：実際のIssue Resolution Pilot record作成。shapeとvalidatorのRED／GREEN後に開始する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：checklist、Completion Evidence、Test receiptのDigest一致を確認する
 
@@ -654,7 +655,7 @@ ReviewCompass3 project用Project Manifest v2と`.reviewcompass/workflow/`rootを
   その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
   Issue Resolution・実施報告照合の正式automation、汎用Task Registry／plugin system。Issue Resolutionの
-  development限定早期PilotはProject Manifest bootstrap待ちであり、正式schemaまたはWork 8正式Pilotを前倒ししない。
+  development限定早期Pilotはartifact shape bootstrap待ちであり、正式schemaまたはWork 8正式Pilotを前倒ししない。
 
 ## Git・Test
 
@@ -663,8 +664,8 @@ ReviewCompass3 project用Project Manifest v2と`.reviewcompass/workflow/`rootを
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Layout Baseline `11 passed in 0.05s`、v2 fixture絶対path finding 0
-- 直近の全Test：Layout Baseline v2 official receipt、`500 passed in 2.56s`、fallback `false`
+- 直近の関連検証：Layout Baseline／Project Manifest `12 passed in 0.04s`、絶対path finding 0
+- 直近の全Test：Project Manifest v2 official receipt、`501 passed in 2.24s`、fallback `false`
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則

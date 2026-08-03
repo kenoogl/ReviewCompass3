@@ -1,0 +1,20 @@
+{
+  "artifact_roots": {
+    "contracts": ".reviewcompass/contracts",
+    "design_decisions": ".reviewcompass/design-decisions",
+    "policies": ".reviewcompass/policies",
+    "requirement_maps": ".reviewcompass/requirement-maps",
+    "reuse": ".reviewcompass/reuse",
+    "verified_artifacts": ".reviewcompass/verified-artifacts",
+    "workflow": ".reviewcompass/workflow"
+  },
+  "document_links": [
+    "docs/current/reviewcompass3-intent-current.md",
+    "docs/current/reviewcompass3-glossary-current.md",
+    "docs/current/reviewcompass3-plan-current.md",
+    "docs/development/2026-08-02-development-policy.md",
+    "docs/development/2026-08-03-initial-development-checklist.md"
+  ],
+  "project_id": "reviewcompass3",
+  "schema_version": 2
+}

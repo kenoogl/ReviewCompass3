@@ -1,6 +1,7 @@
 """Work 1A Layout Baselineの受入テスト。"""
 
 import importlib
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -34,6 +35,12 @@ EMPTY_PROJECT_V2 = (
     / "fixtures"
     / "layout"
     / "empty-project-v2"
+)
+LAYOUT_V2_APPROVAL = (
+    PROJECT_ROOT
+    / "records"
+    / "development"
+    / "2026-08-04-layout-baseline-v2-approval-decision.json"
 )
 LOGICAL_ROOTS = {
     "code_root",
@@ -381,6 +388,53 @@ def test_deployment_package_rejects_project_workflow_records(tmp_path):
     leaked_issue.write_text('{"issue_id":"issue-001","version":1}\n')
     with pytest.raises(layout.LayoutError, match="Project Artifact"):
         layout.validate_deployment_package_layout(package, baseline)
+
+
+def test_reviewcompass3_project_manifest_uses_approved_v2_boundary():
+    layout = _layout()
+    approval = json.loads(LAYOUT_V2_APPROVAL.read_text(encoding="utf-8"))
+    approved_path = PROJECT_ROOT / approval["approved_target"]["path"]
+    approved_digest = hashlib.sha256(approved_path.read_bytes()).hexdigest()
+
+    assert approved_digest == approval["approved_target"]["sha256"]
+    assert approval["approved_target"]["authority_status"] == "current"
+    baseline = layout.load_layout_baseline(approved_path)
+    binding = layout.validate_project_layout(
+        PROJECT_ROOT,
+        binding_id="reviewcompass3-local-binding",
+        checkout_id="reviewcompass3-local-checkout",
+        captured_at="2026-08-04T00:00:00+09:00",
+    )
+
+    manifest_path = PROJECT_ROOT / ".reviewcompass" / "project-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert baseline["layout_version"] == 2
+    assert binding.project_id == manifest["project_id"] == "reviewcompass3"
+    assert manifest["schema_version"] == 2
+    assert manifest["artifact_roots"]["workflow"] == (
+        ".reviewcompass/workflow"
+    )
+    assert set(manifest["artifact_roots"]) == {
+        "contracts",
+        "design_decisions",
+        "policies",
+        "requirement_maps",
+        "reuse",
+        "verified_artifacts",
+        "workflow",
+    }
+    workflow_snapshot = layout.snapshot_project_artifacts(
+        PROJECT_ROOT,
+        "workflow",
+    )
+    assert workflow_snapshot == {
+        ".reviewcompass/workflow/.gitkeep": hashlib.sha256(
+            b"project-artifact-root\n"
+        ).hexdigest(),
+    }
+    assert layout.find_terminal_absolute_paths(
+        PROJECT_ROOT / ".reviewcompass"
+    ) == ()
 
     baseline = layout.load_layout_baseline(BASELINE_RECORD)
     with pytest.raises(layout.LayoutError, match="rollback"):
