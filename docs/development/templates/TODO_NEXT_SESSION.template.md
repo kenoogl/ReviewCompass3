@@ -41,6 +41,10 @@
 
 - `{{EC-ID、報告、欠けているEvidence、不一致、影響またはなし}}`
 
+### 手戻り・機械化候補
+
+- `{{対象操作、期待executor、実executor、手作業理由、手戻り事象、Evidence、機械処理候補、routeまたはなし}}`
+
 ### 未実施
 
 - `{{提案、予定、deferred、未実施作業またはなし}}`
@@ -88,6 +92,7 @@
 - session終了時に、現在位置、実施報告照合、未実施、次の一作業、blocker、stale、Git／Test、
   参照Digestを更新する。
 - 報告だけでClaimを`verified`にせず、Evidenceと観測した事後状態を記録する。
+- 手戻り時は手作業との因果を確認し、原因または原因候補なら機械処理候補とrouteを記録する。
 - TODOは現行handoffだけを保持し、過去sessionの時系列logにしない。
 - Stage変更、長期中断、大きな計画改定など、独立保持する価値がある場合だけ
   `records/session-handoffs/`へ日付付きの不変snapshotを作る。

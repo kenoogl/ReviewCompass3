@@ -13,13 +13,13 @@
 - activeなTask Contract／Work Item：正式Task Contractなし。activeなWork Itemなし
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`986b9386b7d003d4fda612cf3a248f77a05f224018bfbeba0a5939a11331d085`
+- 進行入口SHA-256：`2315e7ca70f4d1685e2bfe24c56af60200d8d7c06293af32b3b01c1ce6b692ac`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
-- 現行計画SHA-256：`0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f`
+- 現行計画SHA-256：`911d0c49d1646f308a733e45d0af6071cd7206dd80b31e123369e921b0b490db`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
-- 現行開発方針SHA-256：`a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c`
-- 直近のDecision／Evidence：`records/development/2026-08-03-work-3-permanent-remediation-green-evidence-v1.md`
-- Decision／Evidence SHA-256：`096e91d786293b5d01f1a14717f49c2b0806c48a8ea8d3b76439108a7ec6af0c`
+- 現行開発方針SHA-256：`d37a60ab273520f8ab2e7391bdb402b4a1e92839be69fbe226f5c46c3903ed46`
+- 直近のDecision／Evidence：`records/development/development-policy-v5.json`
+- Decision／Evidence SHA-256：`88af550d5bc77406cd796e4c78efc20225134473d3d87251942854e6dc57fe98`
 
 ## 実施報告照合
 
@@ -355,12 +355,39 @@
     `096e91d786293b5d01f1a14717f49c2b0806c48a8ea8d3b76439108a7ec6af0c`
   - 観測した事後状態：指定receipt outputだけをsource state計算から除外し、関連26件と全462件がgreen。
     旧receipt v1とformal Evidence v1はstaleな経過記録として判断対象外にした。
+- Claim `EC-084`：LLMと機械処理の責務境界、手戻りの機械化候補報告を開発Policy v5へ固定した。
+  - Decision：`records/development/development-policy-v5.json`、SHA-256
+    `88af550d5bc77406cd796e4c78efc20225134473d3d87251942854e6dc57fe98`
+  - 観測した事後状態：LLM許可は文章操作・意味分析、決定的処理はmachine必須、手作業による手戻りは
+    `manual_rework_candidate`、手戻り前でも境界違反は`manual_operation_candidate`となった。
+- Claim `EC-085`：Policy evaluatorへexecutor境界と手戻り報告fieldの機械判定を実装した。
+  - Evidence：`records/development/2026-08-03-development-policy-v5-green-test-receipt-v2.json`、SHA-256
+    `e974b1afbfcc95b20b6fe734d731375d19164b5b4a5fdec01b0a3b0611bd66ca`
+  - 観測した事後状態：実装前は新規5件だけが失敗し、実装後はpolicy runnerで全`467 passed`だった。
+- Claim `EC-086`：現行Planのdevelopment policy参照をPolicy v5へ再束縛した。
+  - Evidence：`docs/current/reviewcompass3-plan-current.md`、SHA-256
+    `911d0c49d1646f308a733e45d0af6071cd7206dd80b31e123369e921b0b490db`
+  - 観測した事後状態：policy本文、config、v5 recordの現行Digestへ更新した。旧Plan Digestを固定sourceに持つ
+    NFR／deferred候補はidentity再検証までstaleとして扱う。
 
 ### reported_unverified／contradicted
 
 - `report_execution_mismatch`：Work 2を`verified / human_decision_pending`とした報告は、candidateの
   `generated_at`が事後状態と一致しないため無効だった。`EC-045`と`EC-046`で修復し、旧candidate Digestと
   session `001`をsuperseded、新candidateとsession `002`をcurrentとして閉じた。
+
+### 手戻り・機械化候補
+
+- 既知候補：authority bundleのRequirement ID列挙は期待executor `machine`に対し一度LLMの個別走査となり、
+  0件誤判定の手戻りが発生した。Evidenceはdeferred scope監査Evidence、機械処理候補はmixed authority
+  reader、routeは恒久対策commit `f9adef4`で実装済み。
+- 既知候補：Test実行環境選択は期待executor `machine`に対しLLMが`.venv` pathを選び、存在しないpathで
+  手戻りが発生した。Evidenceは恒久対策GREEN Evidence、機械処理候補はpolicy Test runner、routeは
+  commit `f9adef4`で実装済み。
+- 今回の候補：checklistへPolicy v5説明を挿入する際、期待executorは構造見出しを解決する`machine`、
+  実executorはLLMによるexact anchor選択となり、実fileと一致せず`apply_patch verification failed`が1回発生した。
+  再読込後のpatchは成功した。機械処理候補は見出しidentityからのlocator自動解決、routeは
+  `manual_rework_candidate / checkpoint`とし、同種再発時に共通patch helperのTask Contract候補へ昇格する。
 
 ### 未実施
 
@@ -394,6 +421,8 @@
   authorityは旧新混在v1のままであり、Human promotion前は生成definitionやcandidateを正本にしない。
 - 公式Testはpolicy runner経由へ変更した。raw `python3 -m pytest -q`はrunner内部commandであり、今後の完了
   Evidenceにはrunner receiptを要求する。
+- Policy v5により、今後の作業後報告は手戻りと手作業の因果、期待／実executor、Evidence、機械処理候補、
+  routeを含む。決定的処理をLLMが行った場合は、手戻りがなくても改善候補として報告する。
 
 ## 次に行う一作業
 
@@ -425,19 +454,20 @@
 ## stale・deferred
 
 - stale：permanent remediation receipt v1とunified formal Evidence v1はrunner修正前stateのため判断対象外。
-  currentはreceipt v2とformal Evidence v2である。その他の旧candidate／sessionは従来どおりsuperseded保持する。
+  currentはreceipt v2とformal Evidence v2。Policy v5で現行Plan Digestが変わったため、旧Plan Digestを固定した
+  NFR／deferred候補はidentity再検証までstale。その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
   Issue Resolution・実施報告照合のautomation、汎用Task Registry／plugin system
 
 ## Git・Test
 
 - branch：`main`
-- HEAD：`6938fb8`（追加13 Requirement authority promotion）
-- 直前の成果commit：`d416a32`（追加13 Requirement構造化）、`6938fb8`（Human promotion）
-- remote：push未実施。`origin/main`よりahead 7
-- worktree：NFR／deferred一式、恒久対策code・Test・37 definition・unified candidate／Evidenceを未コミットで保持
-- 直近の関連監査：legacy 37、unified 50、意味不一致0、再生成差分0、関連26件、すべて合格
-- 直近の全Test：policy runner final post-write receipt v3、`462 passed`、fallback `false`
+- HEAD：`f9adef4`（Work 3恒久対策）
+- 直前の成果commit：`7588766`（NFR）、`cee241b`（deferred監査）、`f9adef4`（恒久対策）
+- remote：push未実施。`origin/main`よりahead 10
+- worktree：Policy v5本文、config、evaluator、Test、Plan参照、TODO／templateを未コミットで保持
+- 直近の関連Test：Policy責務境界5件を含みgreen
+- 直近の全Test：policy runner receipt、`467 passed in 2.29s`、fallback `false`
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則
@@ -445,6 +475,7 @@
 - session終了時に、現在位置、実施報告照合、未実施、次の一作業、blocker、stale、Git／Test、
   参照Digestを更新する。
 - 報告だけでClaimを`verified`にせず、Evidenceと観測した事後状態を記録する。
+- 手戻り時は手作業との因果を確認し、原因または原因候補なら機械処理候補とrouteを記録する。
 - TODOは現行handoffだけを保持し、過去sessionの時系列logにしない。
 - Stage変更、長期中断、大きな計画改定など、独立保持する価値がある場合だけ
   `records/session-handoffs/`へ日付付きの不変snapshotを作る。

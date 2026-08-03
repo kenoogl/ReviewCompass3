@@ -45,6 +45,27 @@ test、validator、lint、schema検査も誤り得る実装として扱う。`me
 緑の状態にする。要求の誤解や設計変更が判明した場合は、理由と変更後の期待動作を
 記録してテストを修正できる。
 
+## LLMと機械処理の責務分離
+
+LLMが直接担う処理は、文章の作成・編集・要約と、意味分析、意味分類、判断候補の説明に限定する。
+入力と規則から同じ結果を再生成できる決定的処理は、LLMが文章上で手計算・手転記・手探索せず、
+版付きの機械処理へ渡す。
+
+機械処理の対象には少なくとも次を含む。
+
+- 構造化dataの抽出、変換、正規化、生成
+- ID、version、Digest、参照、schema、coverage、staleの照合
+- 件数、集合差、重複、sort、再生成一致の計算
+- fileの読込み、書込み、再読込、配置検査
+- Test、validator、lint、build、Git状態確認、command実行、receipt生成
+
+機械処理の出力も誤り得るため、固定入力、版、Digest、正例・負例・境界例、post-write verificationを
+riskに応じて要求する。機械処理は意味的裁定またはHuman承認を代替しない。
+
+必要な機械処理が存在しない場合は、反復的な手作業を既定経路にせず、最小の決定的toolを作るか、
+`manual_operation_candidate`として改善候補へrouteする。手作業に起因または起因が疑われる手戻りは
+`manual_rework_candidate`とし、同じ作業内の軽微なやり直しとして隠さない。
+
 ## Human判断
 
 Human承認を必須とするのは次の操作である。
@@ -87,9 +108,10 @@ routeする。候補はIssueへ自動昇格させず、consumerと後続Outcome�
 重複の検査と分類・route候補の提示まで行えるが、Plan、Requirement、Task Contract、Test、permitを
 自動変更しない。意味分類、停止、上流改定、Issue昇格、risk受容、再開はHuman判断とする。
 
-初期は実行チェックリストによる手作業運用とし、Work 8で停止漏れ、誤停止、route時間、未消費候補、
-重複、再発、記録負担を評価する。製品schema、正式state machine、permit連携、自動Plan編集は
-手作業Pilot後の別Task Contractまで導入しない。詳細な分類と決定表は
+意味分類、停止判定、route候補の説明とHuman裁定は実行チェックリストで運用し、Work 8で停止漏れ、
+誤停止、route時間、未消費候補、重複、再発、記録負担を評価する。一方、必須field、identity、Digest、
+freshness、重複の検査と記録生成は機械処理を使う。製品schema、正式state machine、permit連携、
+自動Plan編集は手作業Pilot後の別Task Contractまで導入しない。詳細な分類と決定表は
 `docs/design/2026-08-03-self-application-improvement-routing-memo.md`を参照する。
 
 ## 実施報告と実状態の照合
@@ -106,6 +128,19 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 結果、commitはcommit SHAと対象treeを照合する。外部または不可逆操作はreceiptと独立した事後状態を
 確認する。詳細は`docs/design/2026-08-03-execution-claim-verification-memo.md`を参照する。
 
+手戻りが発生した場合は、手作業との因果を必ず確認する。手作業が原因または原因候補である場合、
+作業後報告へ次を含める。
+
+- 対象操作
+- 期待executorと実際のexecutor
+- 手作業になった理由
+- 手戻り事象とEvidence
+- 機械処理へ移す候補
+- current Work、改善候補、別Task Contract、defer等のroute
+
+手戻りがなくても、本来機械処理すべき決定的操作をLLMが直接行った場合は
+`manual_operation_candidate`として報告する。
+
 ## コード形式
 
 Pythonは4スペースを使用する。その他の言語は標準フォーマッターに従う。
@@ -118,6 +153,7 @@ Pythonは4スペースを使用する。その他の言語は標準フォーマ�
 
 - 最小E2E縦切りまでのリードタイム
 - 一変更のサイクルタイムと再作業量
+- 手作業による手戻り件数、`manual_rework_candidate`、`manual_operation_candidate`、機械処理移行率
 - 本番または受け入れ段階へ流出した欠陥
 - source universeの大きさ、変更単位数、影響閉包、レビュー入力のbyte／token数
 - 無関係な材料追加時の入力増加、広域scopeまたは全文整合reviewへの拡大率と理由
@@ -139,9 +175,11 @@ Pythonは4スペースを使用する。その他の言語は標準フォーマ�
 `prior_verdict_stale`が真となり、risk別のvalidator assuranceが必要になる。実行設定と本文が
 競合する場合は本文を優先し、設定を修正する。
 
-改善候補の規律は現時点では本文と実行チェックリストによる手作業運用であり、
-`config/development-policy.json`と`tools.development.policy`はまだ強制しない。機械化はWork 8の
-手作業Pilotで必要性と境界を確認した後に判断する。
+改善候補の意味分類、停止判定、route裁定は本文、実行チェックリスト、Human判断で運用する。
+`config/development-policy.json`と`tools.development.policy`は、LLM許可操作、機械処理必須操作、
+手作業による手戻りの報告項目を決定的に評価する。製品state machine、permit連携、自動Plan編集は
+Work 8のPilotで必要性と境界を確認した後に判断する。
 
-実施報告照合も現時点では手作業運用とする。報告Claimの自動抽出、Provenanceとの自動対応、
-完了状態への結線は、Session Log BootstrapとWork 8の評価後に別Task Contractで判断する。
+実施報告の文章化と意味分析はLLMが行えるが、path、Digest、Test、Git、receipt、Decisionとの対応確認は
+機械処理する。報告Claimの製品内自動抽出と完了状態への自動結線は、Session Log BootstrapとWork 8の
+評価後に別Task Contractで判断する。

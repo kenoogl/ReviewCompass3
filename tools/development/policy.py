@@ -19,6 +19,7 @@ class DevelopmentPolicy:
     commit_policy: str
     validator_assurance_requirements: dict
     post_write_verification_requirements: tuple
+    operation_responsibility: dict
 
 
 @dataclasses.dataclass(frozen=True)
@@ -32,10 +33,21 @@ class ChangeEvaluation:
     prior_verdict_stale: bool
 
 
+@dataclasses.dataclass(frozen=True)
+class OperationEvaluation:
+    status: str
+    operation_kind: str
+    expected_executor: str
+    actual_executor: str
+    improvement_candidate: str
+    report_fields: tuple
+
+
 _POLICY_FIELDS = {
     "change_kinds",
     "commit_policy",
     "human_approval_actions",
+    "operation_responsibility",
     "policy_id",
     "post_write_verification_requirements",
     "record_version",
@@ -60,6 +72,24 @@ _HUMAN_APPROVAL_ACTIONS = {
     "stage_completion",
 }
 _KNOWN_ACTIONS = _HUMAN_APPROVAL_ACTIONS | {"routine_implementation"}
+_OPERATION_RESPONSIBILITY_FIELDS = {
+    "llm_allowed",
+    "machine_required",
+    "manual_rework_report_fields",
+}
+_LLM_OPERATIONS = {"text_editing", "semantic_analysis"}
+_MACHINE_OPERATIONS = {"deterministic_operation"}
+_EXECUTORS = {"llm", "machine"}
+_MANUAL_REWORK_REPORT_FIELDS = (
+    "operation",
+    "expected_executor",
+    "actual_executor",
+    "manual_reason",
+    "rework_event",
+    "rework_evidence",
+    "machine_processing_candidate",
+    "route",
+)
 
 
 def _text(value):
@@ -94,7 +124,7 @@ def load_policy(path):
     if (
         not isinstance(data, dict)
         or set(data) != _POLICY_FIELDS
-        or data["record_version"] != 2
+        or data["record_version"] != 5
         or not _text(data["policy_id"])
         or data["commit_policy"] != "integrated_commits_green"
         or not isinstance(data["change_kinds"], dict)
@@ -103,6 +133,9 @@ def load_policy(path):
         or set(data["risk_verification"]) != _RISK_LEVELS
         or not isinstance(data["validator_assurance_requirements"], dict)
         or set(data["validator_assurance_requirements"]) != _RISK_LEVELS
+        or not isinstance(data["operation_responsibility"], dict)
+        or set(data["operation_responsibility"])
+        != _OPERATION_RESPONSIBILITY_FIELDS
     ):
         raise DevelopmentPolicyError("invalid development policy")
 
@@ -160,6 +193,27 @@ def load_policy(path):
         raise DevelopmentPolicyError(
             "self application must be restricted to stable capabilities"
         )
+    operation_responsibility = data["operation_responsibility"]
+    llm_allowed = _texts(
+        operation_responsibility["llm_allowed"],
+        "LLM operation",
+    )
+    machine_required = _texts(
+        operation_responsibility["machine_required"],
+        "machine operation",
+    )
+    report_fields = _texts(
+        operation_responsibility["manual_rework_report_fields"],
+        "manual rework report field",
+    )
+    if (
+        set(llm_allowed) != _LLM_OPERATIONS
+        or set(machine_required) != _MACHINE_OPERATIONS
+        or report_fields != _MANUAL_REWORK_REPORT_FIELDS
+    ):
+        raise DevelopmentPolicyError(
+            "operation responsibility boundary is invalid"
+        )
     return DevelopmentPolicy(
         policy_id=data["policy_id"],
         change_kinds=change_kinds,
@@ -169,6 +223,11 @@ def load_policy(path):
         commit_policy=data["commit_policy"],
         validator_assurance_requirements=validator_assurance,
         post_write_verification_requirements=post_write_verification,
+        operation_responsibility={
+            "llm_allowed": llm_allowed,
+            "machine_required": machine_required,
+            "manual_rework_report_fields": report_fields,
+        },
     )
 
 
@@ -265,4 +324,51 @@ def evaluate_change(
         human_approval_actions=approvals,
         unstable_self_application_capabilities=unstable,
         prior_verdict_stale=prior_verdict_stale,
+    )
+
+
+def evaluate_operation(
+    policy,
+    *,
+    operation_kind,
+    actual_executor,
+    rework_observed,
+):
+    if not isinstance(policy, DevelopmentPolicy):
+        raise DevelopmentPolicyError("expected a loaded development policy")
+    if operation_kind in policy.operation_responsibility["llm_allowed"]:
+        expected_executor = "llm"
+    elif operation_kind in policy.operation_responsibility["machine_required"]:
+        expected_executor = "machine"
+    else:
+        raise DevelopmentPolicyError("unknown operation kind")
+    if actual_executor not in _EXECUTORS:
+        raise DevelopmentPolicyError("unknown operation executor")
+    if not isinstance(rework_observed, bool):
+        raise DevelopmentPolicyError("rework flag must be boolean")
+
+    if actual_executor == expected_executor:
+        return OperationEvaluation(
+            status="ready",
+            operation_kind=operation_kind,
+            expected_executor=expected_executor,
+            actual_executor=actual_executor,
+            improvement_candidate=None,
+            report_fields=(),
+        )
+    if expected_executor == "machine" and rework_observed:
+        candidate = "manual_rework_candidate"
+    elif expected_executor == "machine":
+        candidate = "manual_operation_candidate"
+    else:
+        candidate = "executor_boundary_violation"
+    return OperationEvaluation(
+        status="improvement_candidate_required",
+        operation_kind=operation_kind,
+        expected_executor=expected_executor,
+        actual_executor=actual_executor,
+        improvement_candidate=candidate,
+        report_fields=policy.operation_responsibility[
+            "manual_rework_report_fields"
+        ],
     )

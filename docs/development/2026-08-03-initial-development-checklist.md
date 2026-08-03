@@ -413,6 +413,14 @@ SHA-256 `c82144375fecc22c088d06d510d9e041fe9c607a0d6e4eb353b034467654ca16`、can
 schema不一致0で、policy runnerによる全Testは`462 passed`、fallbackは`false`だった。現行effective authorityは
 v1のままであり、統一candidateは`verified / human_decision_pending`である。Human promotion後にだけ旧v1を
 supersedeするauthority bundle v2を作成し、影響するNFR／deferred Evidenceを新identityへ再検証する。
+Humanの方針変更指示により、LLMを文章操作・意味分析へ限定し、それ以外の決定的処理をmachineへ割り当て、
+手作業由来の手戻りを機械化候補として報告するPolicy v5を実装した。Decision recordは
+`records/development/development-policy-v5.json`、RED Evidenceは
+`records/development/2026-08-03-development-policy-v5-red-evidence-v1.md`、GREEN receiptは
+`records/development/2026-08-03-development-policy-v5-green-test-receipt-v2.json`。Policy evaluatorは
+`manual_rework_candidate`と`manual_operation_candidate`、8つの必須報告fieldを機械判定し、全Test
+`467 passed`だった。現行Planのpolicy参照はv5へ更新し、旧Plan Digestを固定したNFR／deferred候補は
+identity再検証までstaleとする。
 
 ### Work 4：Designと代表シナリオ
 

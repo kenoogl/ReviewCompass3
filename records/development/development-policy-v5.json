@@ -1,0 +1,76 @@
+{
+  "artifacts": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "b1a034ac927071274ddb398de29d81a5f3b9bde787ff3a3eff110a3b2efd471f"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "d37a60ab273520f8ab2e7391bdb402b4a1e92839be69fbe226f5c46c3903ed46"
+    },
+    {
+      "path": "docs/development/templates/TODO_NEXT_SESSION.template.md",
+      "sha256": "3f2866af179f02c281d598674e26f6cd92397ac304cb69270c14b56ae352446d"
+    },
+    {
+      "path": "config/development-policy.json",
+      "sha256": "d190a75e8826b5b240364eee6db5ab490dcca2b5c4023b828e42bdf5ce8f0e8b"
+    },
+    {
+      "path": "tools/development/policy.py",
+      "sha256": "10cc522608629e80cb5038d83d50db235878120f1df6dba2ef191ddd3883c3d3"
+    },
+    {
+      "path": "tests/test_development_policy.py",
+      "sha256": "2920252103af27ef905269de38ccab554cce7e51bf111d28f51371deb10b453a"
+    },
+    {
+      "path": "records/development/2026-08-03-development-policy-v5-red-evidence-v1.md",
+      "sha256": "25632fb38eb3c8efff60053d8017a75a465440399dcf51b64474f60e7de749a9"
+    },
+    {
+      "path": "records/development/2026-08-03-development-policy-v5-green-test-receipt-v2.json",
+      "sha256": "e974b1afbfcc95b20b6fe734d731375d19164b5b4a5fdec01b0a3b0611bd66ca"
+    }
+  ],
+  "decision": {
+    "approved_for_use": true,
+    "decided_at": "2026-08-03",
+    "decision_maker": "human_user",
+    "evidence": {
+      "instruction": "開発ポリシーとして，LLMは文章操作，意味分析のみとする方針で，それ以外は機械処理にしていく。処理の中で手戻りが発生するのは，手作業による可能性が高く，機械処理すべき内容候補となるため，報告に含める",
+      "meaning": "LLMを文章操作と意味分析へ限定し、決定的処理を機械へ割り当て、手作業由来の手戻りを機械化候補として作業後報告へ含める方針変更"
+    },
+    "scope": "llm-machine-operation-boundary-and-manual-rework-reporting"
+  },
+  "enforcement": {
+    "current_mode": "machine_boundary_enforced_semantic_routing_human",
+    "machine_enforcement": true,
+    "enforced_by": [
+      "config/development-policy.json",
+      "tools/development/policy.py",
+      "tests/test_development_policy.py"
+    ],
+    "semantic_boundary": "文章操作、意味分析、意味分類、判断候補の説明はLLM、意味的裁定と方針決定はHuman",
+    "deterministic_boundary": "抽出、変換、集計、照合、file、Test、Git、command、receiptは機械処理"
+  },
+  "policy_id": "reviewcompass3-development-policy-v5",
+  "prior_revision": {
+    "record_path": "records/development/development-policy-v4.json",
+    "relation": "supersedes",
+    "sha256": "87bd0460bce3ae471a598ae5ab2964d05e6ceb97701870f25b5cc9110133f24a"
+  },
+  "record_version": 5,
+  "status": "current_policy",
+  "verification": [
+    {
+      "command": "python3 -m tools.development.policy_test_runner --project-root . --suite full --receipt records/development/2026-08-03-development-policy-v5-green-test-receipt-v2.json",
+      "passed_count": 467,
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}

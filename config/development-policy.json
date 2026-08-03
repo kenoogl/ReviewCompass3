@@ -33,14 +33,33 @@
     "semantic_adjudication",
     "stage_completion"
   ],
-  "policy_id": "reviewcompass3-development-policy-v2",
+  "operation_responsibility": {
+    "llm_allowed": [
+      "text_editing",
+      "semantic_analysis"
+    ],
+    "machine_required": [
+      "deterministic_operation"
+    ],
+    "manual_rework_report_fields": [
+      "operation",
+      "expected_executor",
+      "actual_executor",
+      "manual_reason",
+      "rework_event",
+      "rework_evidence",
+      "machine_processing_candidate",
+      "route"
+    ]
+  },
+  "policy_id": "reviewcompass3-development-policy-v5",
   "post_write_verification_requirements": [
     "reread_written_artifact",
     "related_validator",
     "reference_integrity",
     "stale_closure_check"
   ],
-  "record_version": 2,
+  "record_version": 5,
   "risk_verification": {
     "high": [
       "full_test_suite",

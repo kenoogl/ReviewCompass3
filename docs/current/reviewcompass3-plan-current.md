@@ -18,15 +18,17 @@ generated_from:
   - path: docs/plan/2026-08-02-task-contract-centered-replan.md
     sha256: c329b6989aca16cbf84d05a4eb028dfe31d7e38c625f2302bb2d4001ef39e5fe
   - path: docs/development/2026-08-02-development-policy.md
-    sha256: a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c
+    sha256: d37a60ab273520f8ab2e7391bdb402b4a1e92839be69fbe226f5c46c3903ed46
   - path: config/development-policy.json
-    sha256: 164fc60cda3315f41d9b6f4f1e86b04590bf6217b90ba7eccbaa87900be2ecc1
+    sha256: d190a75e8826b5b240364eee6db5ab490dcca2b5c4023b828e42bdf5ce8f0e8b
   - path: records/development/development-policy-v2.json
     sha256: 691ae3ba0c5cf8c7cdccfefc63ce9187aee13ba5b994447c2ebd48d289486fb7
   - path: records/development/development-policy-v3.json
     sha256: d3cc24ed9f158f2cc95c3de35925c874ff265e2a2d1249180f1ad6f59b6a33a9
   - path: records/development/development-policy-v4.json
     sha256: 87bd0460bce3ae471a598ae5ab2964d05e6ceb97701870f25b5cc9110133f24a
+  - path: records/development/development-policy-v5.json
+    sha256: 88af550d5bc77406cd796e4c78efc20225134473d3d87251942854e6dc57fe98
   - path: docs/concepts/2026-08-02-task-contract-centered-engineering.md
     sha256: 80f388b9308450f1758f623346e25fa6623c8d5d59cb32979436ee3831af1d91
   - path: docs/requirements/review-context-requirements.md

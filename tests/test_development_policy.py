@@ -231,3 +231,76 @@ def test_rejects_policy_with_unknown_approval_action(tmp_path):
 
     with pytest.raises(_policy_module().DevelopmentPolicyError):
         _policy_module().load_policy(invalid_path)
+
+
+@pytest.mark.parametrize(
+    "operation_kind",
+    ("text_editing", "semantic_analysis"),
+)
+def test_llm_is_limited_to_text_and_semantic_operations(operation_kind):
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_operation(
+        policy,
+        operation_kind=operation_kind,
+        actual_executor="llm",
+        rework_observed=False,
+    )
+
+    assert result.status == "ready"
+    assert result.expected_executor == "llm"
+    assert result.improvement_candidate is None
+
+
+def test_deterministic_operation_requires_machine_execution():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_operation(
+        policy,
+        operation_kind="deterministic_operation",
+        actual_executor="machine",
+        rework_observed=False,
+    )
+
+    assert result.status == "ready"
+    assert result.expected_executor == "machine"
+    assert result.improvement_candidate is None
+
+
+def test_llm_manual_rework_becomes_reportable_machine_candidate():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_operation(
+        policy,
+        operation_kind="deterministic_operation",
+        actual_executor="llm",
+        rework_observed=True,
+    )
+
+    assert result.status == "improvement_candidate_required"
+    assert result.expected_executor == "machine"
+    assert result.improvement_candidate == "manual_rework_candidate"
+    assert result.report_fields == (
+        "operation",
+        "expected_executor",
+        "actual_executor",
+        "manual_reason",
+        "rework_event",
+        "rework_evidence",
+        "machine_processing_candidate",
+        "route",
+    )
+
+
+def test_llm_manual_operation_without_rework_is_still_a_candidate():
+    policy = _policy_module().load_policy(POLICY_PATH)
+
+    result = _policy_module().evaluate_operation(
+        policy,
+        operation_kind="deterministic_operation",
+        actual_executor="llm",
+        rework_observed=False,
+    )
+
+    assert result.status == "improvement_candidate_required"
+    assert result.improvement_candidate == "manual_operation_candidate"
