@@ -42,6 +42,11 @@
     `bb998fe67d78ce578aae23e3cd305ad749ba0e9aa3279182156fbd8f61f0f73c`
   - 観測した事後状態：Work 1Aのcheckbox、Evidence path／Digest、commit、Test件数、
     `verified / completed`を再読込した。
+- Claim `EC-018`：Layout実装とWork 1A完了Evidenceをgreenな意味単位で分割commitした。
+  - Evidence：commit `d3add9f2e6bc812bf512a36a24877e29879e9842`
+    （`Implement portable layout baseline`）、commit `bc9b6f149672fe5de3dcf55807f4163a2fef4d1e`
+    （`Verify Work 1A layout baseline`）
+  - 観測した事後状態：`git show --stat`で実装commit 11 file、検証commit 3 fileを確認した。
 
 ### reported_unverified／contradicted
 
@@ -89,8 +94,10 @@ Work 1Bで、Layout Baselineを使うSession Log Bootstrapの固定fixtureとred
 ## Git・Test
 
 - branch：`main`
-- HEAD：`d3add9f2e6bc812bf512a36a24877e29879e9842`
-- worktree：Work 1A Evidence、checklist、TODOが未commit
+- Layout implementation commit：`d3add9f2e6bc812bf512a36a24877e29879e9842`
+- Work 1A verification commit：`bc9b6f149672fe5de3dcf55807f4163a2fef4d1e`
+- HEAD：`bc9b6f149672fe5de3dcf55807f4163a2fef4d1e`
+- worktree：本TODOだけをhandoff commit対象とし、commit後にcleanを再確認する
 - 直近の関連Test：`python3 -m pytest -q tests/test_layout_baseline.py`、`7 passed`
 - 直近の全Test：`python3 -m pytest -q`、`419 passed`
 - 差分検査：`git diff --check`、通過
