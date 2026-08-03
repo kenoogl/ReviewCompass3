@@ -1,0 +1,809 @@
+{
+  "candidate_id": "RC3-WORK3-NFR-VERIFICATION-PROFILE-CONNECTION-2026-08-03-V1",
+  "candidate_version": 1,
+  "generated_at": "2026-08-03T20:50:54+09:00",
+  "stage": "initial-development",
+  "work": "Work 3",
+  "status": "human_decision_candidate",
+  "authority": "proposed_only",
+  "fixed_sources": [
+    {
+      "path": "records/requirements/authority/rc3-requirements-authority-2026-08-03--v1.json",
+      "sha256": "fc6d945a6bef1ebea0c4ef22705d70fac6177a8c561be0f992ca94474a8a7509",
+      "logical_digest": "497bcc4374e3224acbfbb08e38c7d9f3d4e5373f59df505179b6a19bc035a02c",
+      "authority_status": "effective"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f",
+      "authority_status": "provisional_plan"
+    },
+    {
+      "path": "docs/design/2026-08-03-non-functional-requirements-verification-profile-memo.md",
+      "sha256": "5fb46a8b54e0cec2b3de7a5b4ad8debae0a4e05828e33454b8d654c3f811122c",
+      "authority_status": "non_normative_design_input"
+    }
+  ],
+  "authority_boundary": {
+    "effective_requirement_authority": "50 Requirement authority bundleだけをRequirement真偽のauthorityとする",
+    "architecture_policy_status": "承認済みの版付きArchitecture Policy recordはまだ存在しない",
+    "policy_handling": "Planの横断ruleはpolicy_rule_candidateとしてWork 4へ渡し、この候補だけでPolicy authorityにしない",
+    "human_decision_scope": "Profile接続、3分類、未被覆時の停止規則を判断し、RequirementまたはPolicy本文を変更しない"
+  },
+  "classification_vocabulary": [
+    "initial_required",
+    "threshold_after_measurement",
+    "deferred_to_deployment_profile"
+  ],
+  "profile_required_fields": [
+    "profile_id",
+    "profile_version",
+    "classification",
+    "quality_attribute",
+    "owner",
+    "source_requirement_ids",
+    "authority_status",
+    "applicability",
+    "workload_or_fixture",
+    "environment",
+    "measurement",
+    "threshold_or_invariant",
+    "sampling_and_tolerance",
+    "failure_verdict",
+    "required_evidence",
+    "stale_when",
+    "recovery",
+    "activation_or_completion_condition"
+  ],
+  "profiles": [
+    {
+      "profile_id": "VP-NFR-INITIAL-SOURCE-INTEGRITY-V1",
+      "profile_version": 1,
+      "classification": "initial_required",
+      "quality_attribute": "reliability",
+      "owner": "FEAT-SEMANTIC-TRACE",
+      "source_requirement_ids": [
+        "REQ-CONTEXT-002",
+        "REQ-CONTEXT-004",
+        "REQ-CONTEXT-006",
+        "REQ-CONTRACT-003",
+        "REQ-EVAL-001",
+        "REQ-TRACE-003",
+        "REQ-TRACE-004",
+        "REQ-TRACE-005"
+      ],
+      "authority_status": "effective_requirement_authority",
+      "applicability": "local_integratedのContext生成、Verification、Evidence再利用、release判断",
+      "workload_or_fixture": "一致する固定source、source変更、stale Evidence、Digest不一致の各fixture",
+      "environment": "固定Repository BindingとSource Snapshotを持つlocal reference environment",
+      "measurement": "source、Context、Run、Evidence、VerdictのID／version／Digest関係とstale閉包",
+      "threshold_or_invariant": "対象identityが全関係で一致し、変更後の旧Evidenceは必ずstaleとして再利用拒否される",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "source_evidence_identity_failed",
+      "required_evidence": [
+        "source snapshot identity",
+        "change set identity",
+        "relationship audit",
+        "stale closure",
+        "rejection verdict"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "最初のReview Task Contractをcompileする前に必須"
+    },
+    {
+      "profile_id": "VP-NFR-INITIAL-DURABLE-RECOVERY-V1",
+      "profile_version": 1,
+      "classification": "initial_required",
+      "quality_attribute": "reliability",
+      "owner": "FEAT-PORTABLE-LIFECYCLE",
+      "source_requirement_ids": [
+        "REQ-CONTEXT-007",
+        "REQ-EXEC-003",
+        "REQ-PORTABLE-002",
+        "REQ-WORKFLOW-008"
+      ],
+      "authority_status": "effective_requirement_authority",
+      "applicability": "authority state、raw capture、構造化成果物、制御終了の永続化",
+      "workload_or_fixture": "write前、write中、rename前後、response受領前後、cleanup中のfailure injection fixture",
+      "environment": "local_integratedの共有保存境界と再起動可能な一時project fixture",
+      "measurement": "直前有効状態の再読込、部分file数、終端状態数、重複side effect数",
+      "threshold_or_invariant": "部分書込み0、直前有効状態を再読込可能、終端状態は一意、重複side effect 0",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "durability_or_recovery_failed",
+      "required_evidence": [
+        "failure injection point",
+        "pre-write digest",
+        "post-restart digest",
+        "terminal state",
+        "cleanup or reconciliation record"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "永続成果または外部responseを扱うContractのRun permit前に必須"
+    },
+    {
+      "profile_id": "VP-NFR-INITIAL-EXTERNAL-SEND-V1",
+      "profile_version": 1,
+      "classification": "initial_required",
+      "quality_attribute": "security_privacy",
+      "owner": "FEAT-HARNESSED-EXECUTION",
+      "source_requirement_ids": [
+        "REQ-EXEC-002"
+      ],
+      "authority_status": "effective_requirement_authority",
+      "applicability": "model、Toolまたは外部serviceへpayloadを送信する全経路",
+      "workload_or_fixture": "payload、送信先、account、region、権限、期限、Human承認を一つずつ変更した負例fixture",
+      "environment": "送信をstub化し送信試行を観測できるlocal_integrated harness",
+      "measurement": "承認対象と実送信条件の完全一致、機微情報検査結果、実送信回数",
+      "threshold_or_invariant": "exact bindingと有効なHuman承認が揃う場合だけ1回送信し、それ以外は送信0回",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "external_send_not_authorized",
+      "required_evidence": [
+        "payload digest",
+        "destination identity",
+        "permission decision",
+        "sensitive-data inspection",
+        "Human approval",
+        "send attempt log without secret values"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "外部送信能力をPlanへ含める前に必須"
+    },
+    {
+      "profile_id": "VP-NFR-INITIAL-SENSITIVE-STORAGE-V1",
+      "profile_version": 1,
+      "classification": "initial_required",
+      "quality_attribute": "security_privacy",
+      "owner": "FEAT-PORTABLE-LIFECYCLE",
+      "source_requirement_ids": [
+        "REQ-CONTEXT-007",
+        "REQ-CONTRACT-005",
+        "REQ-CONTRACT-006",
+        "REQ-EXEC-003",
+        "REQ-PORTABLE-004",
+        "REQ-SESSION-001",
+        "REQ-SESSION-002",
+        "REQ-SESSION-003"
+      ],
+      "authority_status": "effective_requirement_authority",
+      "applicability": "raw session、provider response、diagnostic、Provenance、Evaluation Observationの保存",
+      "workload_or_fixture": "許可root、禁止root、伏字化、retention、改変、値なし診断の各fixture",
+      "environment": "local_integratedの隔離raw root、通常data root、復元可能なretention fixture",
+      "measurement": "保存path分類、rawと転写のDigest関係、retention decision、改変検出、秘密値finding",
+      "threshold_or_invariant": "rawは許可rootだけに保存し、通常領域への機微情報漏えい0、改変検出100%、retention未解決なら停止",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "sensitive_storage_boundary_failed",
+      "required_evidence": [
+        "storage-root identity",
+        "classification result",
+        "redaction relation",
+        "retention decision",
+        "tamper finding",
+        "secret-free diagnostic"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "機微情報を含み得るContextまたはRunを開始する前に必須"
+    },
+    {
+      "profile_id": "VP-NFR-INITIAL-PLATFORM-LIFECYCLE-V1",
+      "profile_version": 1,
+      "classification": "initial_required",
+      "quality_attribute": "compatibility",
+      "owner": "FEAT-PORTABLE-LIFECYCLE",
+      "source_requirement_ids": [
+        "REQ-CONTRACT-007",
+        "REQ-PORTABLE-001",
+        "REQ-PORTABLE-002",
+        "REQ-PORTABLE-003",
+        "REQ-WORKFLOW-008"
+      ],
+      "authority_status": "effective_requirement_authority",
+      "applicability": "supported-platform matrixに含まれるlocal_integrated deployment",
+      "workload_or_fixture": "空配置、既存data、update、migration、失敗rollback、uninstall後利用者dataの各fixture",
+      "environment": "版付きsupported-platform matrixの代表環境。未確定platformは対象外理由を必須とする",
+      "measurement": "配置解決、install、update、migration、rollback、uninstallのverdictと利用者data Digest",
+      "threshold_or_invariant": "matrix内の全対象で配置が解決し、失敗時はrollback可能で、利用者dataを無断削除しない",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "platform_or_lifecycle_compatibility_failed",
+      "required_evidence": [
+        "platform identity",
+        "deployment manifest",
+        "migration input and output digest",
+        "rollback result",
+        "user-data preservation audit"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "support対象platformを宣言またはreleaseする前に必須"
+    },
+    {
+      "profile_id": "VP-NFR-INITIAL-STATE-OWNERSHIP-V1",
+      "profile_version": 1,
+      "classification": "initial_required",
+      "quality_attribute": "maintainability",
+      "owner": "FEAT-WORKFLOW-CONTROL",
+      "source_requirement_ids": [
+        "REQ-CONTRACT-007",
+        "REQ-WORKFLOW-001",
+        "REQ-WORKFLOW-002",
+        "REQ-WORKFLOW-003"
+      ],
+      "authority_status": "effective_requirement_authority",
+      "applicability": "Workflow、Harness、consumer、Provenance間のstate mutationとcross-contract interface",
+      "workload_or_fixture": "正規owner更新、非owner直接更新、競合更新、部分成功の各state fixture",
+      "environment": "single-process local_integrated state storeと固定interface schema",
+      "measurement": "stateごとのowner数、非owner直接mutation数、許可遷移、競合verdict",
+      "threshold_or_invariant": "各state ownerは一つ、非owner直接mutation 0、未定義遷移とowner競合は実行前拒否",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "component_state_ownership_failed",
+      "required_evidence": [
+        "state inventory",
+        "owner relation",
+        "transition trace",
+        "rejected mutation",
+        "integration verdict"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "最初のcross-component Contractをcompileする前に必須"
+    },
+    {
+      "profile_id": "VP-NFR-INITIAL-REUSE-BOUNDARY-V1",
+      "profile_version": 1,
+      "classification": "initial_required",
+      "quality_attribute": "maintainability",
+      "owner": "FEAT-WORKFLOW-CONTROL",
+      "source_requirement_ids": [
+        "REQ-WORKFLOW-009"
+      ],
+      "authority_status": "effective_requirement_authority",
+      "applicability": "ReviewCompass3自身のImplementation Task Contract Pilot",
+      "workload_or_fixture": "候補なし、同一責務候補、stale Index、retired routine、理由なし分離の各fixture",
+      "environment": "固定source tree、Source Symbol Index、Reusable Routine Ledgerを持つlocal repository",
+      "measurement": "source／Index Digest一致、候補探索結果、4分類、Human確認、Ledger更新経路",
+      "threshold_or_invariant": "stale Indexと未確認候補はgreen実装を拒否し、過去Ledger履歴を上書きしない",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "implementation_reuse_boundary_failed",
+      "required_evidence": [
+        "source-tree digest",
+        "Index identity",
+        "search scope and candidates",
+        "reuse decision",
+        "Human confirmation",
+        "append-only Ledger operation"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "Work 5Bのgreen実装開始前に必須。正式製品Runtimeへの拡大は別Human判断"
+    },
+    {
+      "profile_id": "VP-NFR-INITIAL-EVALUATION-REPRODUCIBILITY-V1",
+      "profile_version": 1,
+      "classification": "initial_required",
+      "quality_attribute": "reliability",
+      "owner": "FEAT-EVIDENCE-EVALUATION",
+      "source_requirement_ids": [
+        "REQ-CONTRACT-006",
+        "REQ-EVAL-001",
+        "REQ-EVAL-002",
+        "REQ-EVAL-003",
+        "REQ-EXEC-006"
+      ],
+      "authority_status": "effective_requirement_authority",
+      "applicability": "VerificationおよびWork 8 Pilotの観測、再計算、比較",
+      "workload_or_fixture": "同一event再計算、metric version変更、欠測、異条件比較、評価者差の各fixture",
+      "environment": "固定event、metric、case、condition、trial identityを持つlocal evaluation environment",
+      "measurement": "metric projection一致、欠測分類、比較条件一致、結果と解釈限界の分離",
+      "threshold_or_invariant": "同じ固定入力とmetricから同じ値を再計算し、欠測と異条件比較を合格として扱わない",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "evaluation_reproducibility_failed",
+      "required_evidence": [
+        "Evaluation Profile identity",
+        "primary events",
+        "metric version",
+        "recalculation result",
+        "missingness verdict",
+        "interpretation limits"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "評価値を受入または改善判断へ使用する前に必須"
+    },
+    {
+      "profile_id": "VP-NFR-MEASURE-PERFORMANCE-V1",
+      "profile_version": 1,
+      "classification": "threshold_after_measurement",
+      "quality_attribute": "performance",
+      "owner": "FEAT-EVIDENCE-EVALUATION",
+      "source_requirement_ids": [
+        "REQ-CONTRACT-006",
+        "REQ-EXEC-006"
+      ],
+      "authority_status": "effective_requirement_authority_for_measurement_only",
+      "applicability": "local_integratedのContext取得、review、保存、E2E実行",
+      "workload_or_fixture": "小・中・代表project fixtureとphase別timing",
+      "environment": "identityを固定したreference local environment",
+      "measurement": "phase別およびE2E elapsed timeとthroughput",
+      "threshold_or_invariant": "Work 8前は観測完全性だけを判定し、数値閾値を品質合否に使わない",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "performance_measurement_incomplete",
+      "required_evidence": [
+        "workload digest",
+        "environment identity",
+        "raw timing",
+        "summary",
+        "missingness"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "Work 8 baseline後にHumanがRequirementまたはPolicyの閾値を承認して新Profileにする"
+    },
+    {
+      "profile_id": "VP-NFR-MEASURE-SCALE-V1",
+      "profile_version": 1,
+      "classification": "threshold_after_measurement",
+      "quality_attribute": "scale",
+      "owner": "FEAT-SEMANTIC-TRACE",
+      "source_requirement_ids": [
+        "REQ-EXEC-006",
+        "REQ-TRACE-004",
+        "REQ-WORKFLOW-009"
+      ],
+      "authority_status": "effective_requirement_authority_for_measurement_only",
+      "applicability": "固定source treeからの影響閉包、Index生成、review payload構成",
+      "workload_or_fixture": "project、symbol、relation、Contract、Evidence件数を段階的に増やすfixture",
+      "environment": "reference local environmentと固定generator version",
+      "measurement": "入力件数、出力件数、処理時間、peak memory、失敗点",
+      "threshold_or_invariant": "Work 8前は規模別観測と欠測検出だけを必須とし最大値を発明しない",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "scale_measurement_incomplete",
+      "required_evidence": [
+        "fixture counts",
+        "generator identity",
+        "raw measurements",
+        "failure point",
+        "summary"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "Work 8 baseline後にHumanが最大project規模とsymbol数を承認して新Profileにする"
+    },
+    {
+      "profile_id": "VP-NFR-MEASURE-COST-V1",
+      "profile_version": 1,
+      "classification": "threshold_after_measurement",
+      "quality_attribute": "cost",
+      "owner": "FEAT-EVIDENCE-EVALUATION",
+      "source_requirement_ids": [
+        "REQ-CONTRACT-006",
+        "REQ-EVAL-002",
+        "REQ-EXEC-006"
+      ],
+      "authority_status": "effective_requirement_authority_for_measurement_only",
+      "applicability": "model、Tool、storage、外部serviceを使用するRun",
+      "workload_or_fixture": "case、condition、trial別のtoken、Tool call、単価snapshot fixture",
+      "environment": "model、Tool、pricing identityを固定したevaluation environment",
+      "measurement": "input/output token、Tool回数、単価、推定費用、欠測",
+      "threshold_or_invariant": "Work 8前は観測完全性だけを判定し費用上限を品質合否に使わない",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "cost_measurement_incomplete",
+      "required_evidence": [
+        "model and tool identity",
+        "pricing snapshot",
+        "raw usage",
+        "cost projection",
+        "missingness"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "Work 8 baseline後にHumanがtokenと費用上限を承認して新Profileにする"
+    },
+    {
+      "profile_id": "VP-NFR-MEASURE-STORAGE-V1",
+      "profile_version": 1,
+      "classification": "threshold_after_measurement",
+      "quality_attribute": "scale",
+      "owner": "FEAT-PORTABLE-LIFECYCLE",
+      "source_requirement_ids": [
+        "REQ-CONTRACT-005",
+        "REQ-CONTRACT-006",
+        "REQ-EXEC-006",
+        "REQ-PORTABLE-004"
+      ],
+      "authority_status": "effective_requirement_authority_for_measurement_only",
+      "applicability": "raw、Provenance、Evidence、projectionの保存量とretention",
+      "workload_or_fixture": "Run数、event数、raw size、retention経過を段階的に増やすfixture",
+      "environment": "隔離raw rootと通常data rootを持つreference local environment",
+      "measurement": "artifact種別ごとのbytes、増加率、retained／deleted件数、cleanup時間",
+      "threshold_or_invariant": "Work 8前は保存量とretention結果の観測を必須とし容量上限を発明しない",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "storage_measurement_incomplete",
+      "required_evidence": [
+        "storage-root identity",
+        "artifact counts",
+        "byte measurements",
+        "retention result",
+        "cleanup result"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "Work 8 baseline後にHumanがProvenance保存量と容量上限を承認して新Profileにする"
+    },
+    {
+      "profile_id": "VP-NFR-MEASURE-CONCURRENCY-V1",
+      "profile_version": 1,
+      "classification": "threshold_after_measurement",
+      "quality_attribute": "scale",
+      "owner": "FEAT-WORKFLOW-CONTROL",
+      "source_requirement_ids": [
+        "REQ-EXEC-006",
+        "REQ-WORKFLOW-001",
+        "REQ-WORKFLOW-002"
+      ],
+      "authority_status": "effective_requirement_authority_for_measurement_only",
+      "applicability": "複数Work Itemを観測するPilot。初期既定は直列実行を維持する",
+      "workload_or_fixture": "1件および条件付き2件の独立Work Item fixture",
+      "environment": "single-project local environment。並行permitはWork 8Aの条件を満たす場合だけ",
+      "measurement": "active Work Item数、競合、待機時間、直列fallback、stale再検査",
+      "threshold_or_invariant": "Work 8前は直列を合格基準とし、待機時間、競合、fallbackの観測完全性だけを判定して同時数上限を初期Requirementへ追加しない",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "concurrency_measurement_incomplete",
+      "required_evidence": [
+        "work-item identities",
+        "conflict domains",
+        "permit decisions",
+        "wait timing",
+        "fallback result"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "Work 8／8A Evidence後にHumanが同時Work Item数を判断して新Profileにする"
+    },
+    {
+      "profile_id": "VP-NFR-MEASURE-CI-WAIT-V1",
+      "profile_version": 1,
+      "classification": "threshold_after_measurement",
+      "quality_attribute": "performance",
+      "owner": "FEAT-EVIDENCE-EVALUATION",
+      "source_requirement_ids": [
+        "REQ-EXEC-006"
+      ],
+      "authority_status": "generic_observation_requirement_only_ci_policy_required",
+      "applicability": "将来CI Verification Runを使用する場合。初期read-only local Git経路では対象外",
+      "workload_or_fixture": "queue、start、finish identityを持つCI timing fixture",
+      "environment": "provider固有操作を行わないrecorded observation environment",
+      "measurement": "queue wait、execution time、total time、missing timestamps",
+      "threshold_or_invariant": "CI導入前はnot_applicable。導入後もHuman閾値前は観測完全性だけを判定する",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "ci_wait_measurement_incomplete",
+      "required_evidence": [
+        "CI run identity",
+        "provider identity",
+        "queue timestamps",
+        "raw timing",
+        "missingness"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "CI providerをscopeへ入れる別判断とWork 8 baseline後に新Profileにする"
+    },
+    {
+      "profile_id": "VP-NFR-DEFERRED-SHARED-AVAILABILITY-V1",
+      "profile_version": 1,
+      "classification": "deferred_to_deployment_profile",
+      "quality_attribute": "reliability",
+      "owner": "FEAT-PORTABLE-LIFECYCLE",
+      "source_requirement_ids": [],
+      "authority_status": "upstream_requirement_or_policy_required_on_activation",
+      "applicability": "shared_runtimeを選択した場合だけ。local_integratedではnot_applicable",
+      "workload_or_fixture": "service outage、restart、dependency lossのavailability fixture",
+      "environment": "将来のshared_runtime deployment profile",
+      "measurement": "availability、recovery time、data loss window",
+      "threshold_or_invariant": "現時点は数値基準なし。scope activation時に上流RequirementまたはPolicyが必須",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "deployment_profile_required",
+      "required_evidence": [
+        "deployment identity",
+        "fault timeline",
+        "availability measurements",
+        "recovery evidence"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "shared_runtime採用Decision後、Run permit前に上流authorityと新Profileを作る"
+    },
+    {
+      "profile_id": "VP-NFR-DEFERRED-TENANT-ISOLATION-V1",
+      "profile_version": 1,
+      "classification": "deferred_to_deployment_profile",
+      "quality_attribute": "security_privacy",
+      "owner": "FEAT-PORTABLE-LIFECYCLE",
+      "source_requirement_ids": [],
+      "authority_status": "upstream_requirement_or_policy_required_on_activation",
+      "applicability": "multi-tenant shared runtimeの場合だけ。local_integratedではnot_applicable",
+      "workload_or_fixture": "tenant間data、permission、load interference fixture",
+      "environment": "将来のmulti-tenant deployment profile",
+      "measurement": "cross-tenant access、data leakage、performance interference",
+      "threshold_or_invariant": "現時点は基準なし。scope activation時にtenant isolation authorityが必須",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "deployment_profile_required",
+      "required_evidence": [
+        "tenant identities",
+        "permission matrix",
+        "isolation findings",
+        "load measurements"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "multi-tenant採用Decision後、Run permit前に上流authorityと新Profileを作る"
+    },
+    {
+      "profile_id": "VP-NFR-DEFERRED-DISTRIBUTED-WORKER-V1",
+      "profile_version": 1,
+      "classification": "deferred_to_deployment_profile",
+      "quality_attribute": "reliability",
+      "owner": "FEAT-HARNESSED-EXECUTION",
+      "source_requirement_ids": [],
+      "authority_status": "upstream_requirement_or_policy_required_on_activation",
+      "applicability": "distributed_hybrid workerを選択した場合だけ。local_integratedではnot_applicable",
+      "workload_or_fixture": "worker crash、retry、partition、duplicate delivery、reordering fixture",
+      "environment": "将来のdistributed_hybrid deployment profile",
+      "measurement": "重複side effect、lost work、recovery、ordering violation",
+      "threshold_or_invariant": "現時点は基準なし。scope activation時にworker authorityが必須",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "deployment_profile_required",
+      "required_evidence": [
+        "worker identities",
+        "delivery trace",
+        "fault injection",
+        "idempotency result",
+        "recovery result"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "distributed worker採用Decision後、Run permit前に上流authorityと新Profileを作る"
+    },
+    {
+      "profile_id": "VP-NFR-DEFERRED-AUTOSCALE-V1",
+      "profile_version": 1,
+      "classification": "deferred_to_deployment_profile",
+      "quality_attribute": "scale",
+      "owner": "FEAT-PORTABLE-LIFECYCLE",
+      "source_requirement_ids": [],
+      "authority_status": "upstream_requirement_or_policy_required_on_activation",
+      "applicability": "自動scale能力をscopeへ入れる場合だけ。local_integratedではnot_applicable",
+      "workload_or_fixture": "load step、scale out／in、quota、capacity failure fixture",
+      "environment": "将来のscalable deployment profile",
+      "measurement": "capacity、scale latency、error rate、quota exhaustion",
+      "threshold_or_invariant": "現時点は基準なし。scope activation時にscale authorityが必須",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "deployment_profile_required",
+      "required_evidence": [
+        "load identity",
+        "capacity timeline",
+        "scale events",
+        "error measurements",
+        "quota result"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "autoscale採用Decision後、Run permit前に上流authorityと新Profileを作る"
+    },
+    {
+      "profile_id": "VP-NFR-DEFERRED-MULTI-REGION-V1",
+      "profile_version": 1,
+      "classification": "deferred_to_deployment_profile",
+      "quality_attribute": "reliability",
+      "owner": "FEAT-PORTABLE-LIFECYCLE",
+      "source_requirement_ids": [],
+      "authority_status": "upstream_requirement_or_policy_required_on_activation",
+      "applicability": "複数地域deploymentをscopeへ入れる場合だけ。local_integratedではnot_applicable",
+      "workload_or_fixture": "region loss、failover、replication delay、data residency fixture",
+      "environment": "将来のmulti-region deployment profile",
+      "measurement": "failover time、data loss window、replication lag、residency violation",
+      "threshold_or_invariant": "現時点は基準なし。scope activation時にregion authorityが必須",
+      "sampling_and_tolerance": "必須invariantは正例、負例、境界例を各1件以上検査し違反許容0。観測型はraw sampleを保持し、Humanが閾値を承認するまで品質合否を生成しない。",
+      "failure_verdict": "deployment_profile_required",
+      "required_evidence": [
+        "region identities",
+        "failure timeline",
+        "replication measurements",
+        "residency audit"
+      ],
+      "stale_when": [
+        "source Requirement、適用PolicyまたはProfileのID、version、Digestが変わる",
+        "workload、fixture、environment、toolまたは測定方法のidentityが変わる"
+      ],
+      "recovery": "変更されたauthorityと条件から新しいProfile versionを作成し、影響するVerificationを再実行する",
+      "activation_or_completion_condition": "multi-region採用Decision後、Run permit前に上流authorityと新Profileを作る"
+    }
+  ],
+  "architecture_policy_rule_candidates": [
+    {
+      "rule_candidate_id": "APC-STATE-OWNERSHIP",
+      "plan_topic": "原理Aとcomponent state ownership",
+      "profile_ids": [
+        "VP-NFR-INITIAL-STATE-OWNERSHIP-V1"
+      ],
+      "authority_status": "proposed_policy_rule_not_authoritative"
+    },
+    {
+      "rule_candidate_id": "APC-ID-DIGEST-SCHEMA",
+      "plan_topic": "ID、Digest、Schema",
+      "profile_ids": [
+        "VP-NFR-INITIAL-SOURCE-INTEGRITY-V1"
+      ],
+      "authority_status": "proposed_policy_rule_not_authoritative"
+    },
+    {
+      "rule_candidate_id": "APC-SECURITY-PERMISSION-EXTERNAL-SEND",
+      "plan_topic": "security、permission、external send",
+      "profile_ids": [
+        "VP-NFR-INITIAL-EXTERNAL-SEND-V1",
+        "VP-NFR-INITIAL-SENSITIVE-STORAGE-V1"
+      ],
+      "authority_status": "proposed_policy_rule_not_authoritative"
+    },
+    {
+      "rule_candidate_id": "APC-DECISION-AUTHORITY",
+      "plan_topic": "Decision Authority、Human decision、Delegation Authorization",
+      "profile_ids": [
+        "VP-NFR-INITIAL-EXTERNAL-SEND-V1"
+      ],
+      "authority_status": "proposed_policy_rule_not_authoritative"
+    },
+    {
+      "rule_candidate_id": "APC-STORAGE-DEPLOYMENT-INTERFACE",
+      "plan_topic": "storage、deployment、cross-contract interface",
+      "profile_ids": [
+        "VP-NFR-INITIAL-DURABLE-RECOVERY-V1",
+        "VP-NFR-INITIAL-SENSITIVE-STORAGE-V1",
+        "VP-NFR-INITIAL-PLATFORM-LIFECYCLE-V1"
+      ],
+      "authority_status": "proposed_policy_rule_not_authoritative"
+    },
+    {
+      "rule_candidate_id": "APC-IMPLEMENTATION-REUSE",
+      "plan_topic": "Implementation Reuse Policy",
+      "profile_ids": [
+        "VP-NFR-INITIAL-REUSE-BOUNDARY-V1"
+      ],
+      "authority_status": "proposed_policy_rule_not_authoritative"
+    }
+  ],
+  "requirement_screening": {
+    "authority_requirement_count": 50,
+    "mapped_nfr_requirement_ids": [
+      "REQ-CONTEXT-002",
+      "REQ-CONTEXT-004",
+      "REQ-CONTEXT-006",
+      "REQ-CONTEXT-007",
+      "REQ-CONTRACT-003",
+      "REQ-CONTRACT-005",
+      "REQ-CONTRACT-006",
+      "REQ-CONTRACT-007",
+      "REQ-EVAL-001",
+      "REQ-EVAL-002",
+      "REQ-EVAL-003",
+      "REQ-EXEC-002",
+      "REQ-EXEC-003",
+      "REQ-EXEC-006",
+      "REQ-PORTABLE-001",
+      "REQ-PORTABLE-002",
+      "REQ-PORTABLE-003",
+      "REQ-PORTABLE-004",
+      "REQ-SESSION-001",
+      "REQ-SESSION-002",
+      "REQ-SESSION-003",
+      "REQ-TRACE-003",
+      "REQ-TRACE-004",
+      "REQ-TRACE-005",
+      "REQ-WORKFLOW-001",
+      "REQ-WORKFLOW-002",
+      "REQ-WORKFLOW-003",
+      "REQ-WORKFLOW-008",
+      "REQ-WORKFLOW-009"
+    ],
+    "functional_or_control_only_requirement_ids": [
+      "REQ-CONTEXT-001",
+      "REQ-CONTEXT-003",
+      "REQ-CONTEXT-005",
+      "REQ-CONTRACT-001",
+      "REQ-CONTRACT-002",
+      "REQ-CONTRACT-004",
+      "REQ-CONTRACT-008",
+      "REQ-EXEC-001",
+      "REQ-EXEC-004",
+      "REQ-EXEC-005",
+      "REQ-IMPROVE-001",
+      "REQ-IMPROVE-002",
+      "REQ-TRACE-001",
+      "REQ-TRACE-002",
+      "REQ-TRIAGE-001",
+      "REQ-TRIAGE-002",
+      "REQ-TRIAGE-003",
+      "REQ-WORKFLOW-004",
+      "REQ-WORKFLOW-005",
+      "REQ-WORKFLOW-006",
+      "REQ-WORKFLOW-007"
+    ],
+    "screening_rule": "一Requirementに非機能invariantまたは観測義務が一つでもあればmappedへ置き、残りだけをfunctional_or_control_onlyへ置く"
+  },
+  "compilation_rules": [
+    "initial_requiredのsource authorityまたは必須fieldが一つでも欠ければnot_compilable",
+    "initial_required profileをContract、Plan、TestまたはEvidenceへ結べなければnot_compilable",
+    "threshold_after_measurementは観測完全性を検査し、Human承認前の数値を品質合否へ使用しない",
+    "Humanが閾値をRequirementまたはPolicyへ固定した後は新Profile versionなしに旧観測だけで合格にしない",
+    "deferred profileはlocal_integratedでは明示的not_applicableとしrelease blockerにしない",
+    "sharedまたはdistributed scopeを有効化した時点で上流RequirementまたはPolicyとProfileがなければnot_compilable",
+    "policy_rule_candidateをArchitecture Policy authorityとしてcompileしてはならない",
+    "Requirement、Policy、Profile、workload、environment、tool変更時は依存EvidenceとVerdictをstaleにする"
+  ],
+  "out_of_scope": [
+    "根拠のない性能、規模、費用または容量の数値閾値を作ること",
+    "Architecture Policy recordまたはschemaをWork 3で先行作成・承認すること",
+    "shared_runtimeまたはdistributed_hybridを初期Requirementへ追加すること",
+    "Verification runtime、benchmark、CI provider操作を実装すること",
+    "50 Requirement、現行Planまたは非機能要件memoの本文を変更すること",
+    "Human判断なしにこの候補をeffectiveにすること"
+  ],
+  "approved_effect": "Profile接続、3分類、authority境界、not_compilable規則をWork 3の設計入力として固定する。Architecture Policy本文、数値閾値、runtime実装は固定しない。",
+  "candidate_digest": "c93f9336790fc8641f3f89687f94fcff3baa23254936545ed9cb85c15c25d3a6"
+}

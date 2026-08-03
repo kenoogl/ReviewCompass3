@@ -1,0 +1,59 @@
+{
+  "decision_id": "DEC-WORK3-NFR-VERIFICATION-PROFILE-2026-08-03-V1",
+  "decided_at": "2026-08-03T21:02:06+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "nfr_verification_profile_connection_promotion",
+  "decision": "approved",
+  "instruction": "承認する",
+  "instruction_context": {
+    "meaning": "監査済みNFR Verification Profile接続候補を明示承認",
+    "candidate_id": "RC3-WORK3-NFR-VERIFICATION-PROFILE-CONNECTION-2026-08-03-V1",
+    "candidate_path": "records/development/2026-08-03-work-3-nfr-verification-profile-candidate-v1.json",
+    "candidate_sha256": "08d5159a483d16507c5652857e5245993b42559ed3bcc24c9434e70b0d5c2381",
+    "candidate_digest": "c93f9336790fc8641f3f89687f94fcff3baa23254936545ed9cb85c15c25d3a6",
+    "evidence_path": "records/development/2026-08-03-work-3-nfr-verification-profile-evidence-v1.md",
+    "evidence_sha256": "e0800a9832798df5ab50a83203c42b16a2728488ff0f8942eb86e919740d2a12"
+  },
+  "approved_summary": {
+    "effective_requirement_count": 50,
+    "nfr_mapped_requirement_count": 29,
+    "functional_or_control_only_requirement_count": 21,
+    "profile_count": 19,
+    "initial_required_count": 8,
+    "threshold_after_measurement_count": 6,
+    "deferred_to_deployment_profile_count": 5,
+    "quality_attribute_count": 7,
+    "policy_rule_candidate_count": 6,
+    "negative_audit_count": 6,
+    "unknown_reference_count": 0,
+    "coverage_gap_count": 0
+  },
+  "approved_scope": [
+    "19 Verification Profile connections and their owners",
+    "initial_required, threshold_after_measurement and deferred_to_deployment_profile classification",
+    "authority, applicability, workload or fixture, environment, measurement, invariant, failure verdict and required Evidence mappings",
+    "not_compilable, not_applicable and stale propagation rules",
+    "use of effective Requirements as authority for the eight initial profiles",
+    "routing of six provisional Architecture Policy rules to Work 4 without granting them policy authority",
+    "completion of the Work 3 mandatory non-functional obligation connection checklist item"
+  ],
+  "excluded_scope": [
+    "approve or create an Architecture Policy record or schema",
+    "set numeric performance, scale, cost, storage, concurrency or CI thresholds",
+    "add shared_runtime or distributed_hybrid Requirements to the initial scope",
+    "implement Verification runtime, benchmark, CI provider operations or deployment profiles",
+    "modify the 50 Requirements, current Plan or NFR memo",
+    "complete the deferred-candidate independence checklist item or Work 3 as a whole",
+    "commit or push repository changes"
+  ],
+  "promotion": {
+    "mode": "external_decision_bound",
+    "candidate_interpretation": "approved_nfr_profile_connection_snapshot",
+    "requirement_state": "unchanged_effective_50",
+    "architecture_policy_state": "not_yet_defined_not_promoted",
+    "numeric_threshold_state": "unapproved_pending_work_8_measurement",
+    "deployment_deferred_state": "not_applicable_to_local_integrated"
+  },
+  "authority_effect": "closes only the Work 3 mandatory non-functional obligation to Verification Profile connection gate",
+  "status": "approved_and_effective"
+}
