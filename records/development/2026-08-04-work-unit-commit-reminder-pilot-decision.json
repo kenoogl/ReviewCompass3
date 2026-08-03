@@ -1,0 +1,28 @@
+{
+  "decision_id": "RC3-WORK-UNIT-COMMIT-REMINDER-PILOT-DECISION-2026-08-04-V1",
+  "decided_at": "2026-08-04T07:10:31+09:00",
+  "status": "approved_pilot",
+  "decision_maker": "human",
+  "instruction": "その運用にしてみよう",
+  "approved_policy_change": [
+    "when a work unit is completed, inspect Git state mechanically before starting the next work unit",
+    "if completed work remains uncommitted, remind the Human and block the next-work transition",
+    "do not classify ordinary in-progress dirty changes as completed uncommitted work",
+    "retain explicit Human commit authority during the pilot"
+  ],
+  "implementation_scope": [
+    "development policy",
+    "AGENTS commit instructions",
+    "initial development checklist",
+    "deterministic transition preflight and tests",
+    "current handoff"
+  ],
+  "not_authorized_or_required": [
+    "automatic commit",
+    "automatic push",
+    "guarded commit",
+    "Git hook",
+    "amend, rebase, reset, or history rewrite",
+    "product state machine expansion"
+  ]
+}
