@@ -1,0 +1,31 @@
+{
+  "decision_id": "DEC-WORK2-CANDIDATE-TIMESTAMP-2026-08-03-V1",
+  "decided_at": "2026-08-03T15:44:34+09:00",
+  "decision_maker": "human_user",
+  "decision": "approved",
+  "instruction": "1",
+  "instruction_context": {
+    "meaning": "Work 2候補の生成時刻訂正、新Digest化、session 002再capture、再監査を承認",
+    "improvement_candidate_id": "IC-WORK2-CANDIDATE-TIMESTAMP-001",
+    "improvement_candidate_path": "records/development/2026-08-03-work-2-candidate-timestamp-improvement.md",
+    "improvement_candidate_input_sha256": "60d5fb01d909d4c11889de87694da311c1cf117e81ac2ff8d876ceb48f9c77f2",
+    "stale_candidate_path": "records/development/2026-08-03-work-2-intent-glossary-candidate-v1.md",
+    "stale_candidate_sha256": "2666511bcf95a2fdc5237257b5c5e38fbc7dc1c80fd829064b02e34b759e6ab9"
+  },
+  "selected_option": 1,
+  "approved_scope": [
+    "correct generated_at using the verified Work 2 session boundary",
+    "record the prior candidate digest as superseded",
+    "rerun the fixed Intent and Glossary audit",
+    "capture a new Human decision request bound to the corrected candidate digest",
+    "update Work 2 evidence, checklist and session handoff"
+  ],
+  "excluded_scope": [
+    "change Intent, Glossary or Plan body content",
+    "approve or promote the Intent and Glossary candidate",
+    "start Work 3",
+    "commit or push repository changes"
+  ],
+  "authority_effect": "authorizes bounded provenance metadata repair only",
+  "status": "approved_for_execution"
+}

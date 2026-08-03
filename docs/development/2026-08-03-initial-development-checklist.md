@@ -155,39 +155,122 @@ Layout一式はcommit `d3add9f2e6bc812bf512a36a24877e29879e9842`へ固定し、t
 
 ### Session Evidence
 
-- [ ] session ID、source identity、取得範囲、時刻、Digest、完全性を記録できる。
-- [ ] rawを`SENSITIVE_ROOT`、伏字化派生物・要約・索引を`DATA_ROOT`へ分離した。
-- [ ] confidentiality、access、retention、capture deadline、source availabilityを定めた。
-- [ ] `source_missing | source_expired | non_reconstructable`を正常な空記録と区別した。
-- [ ] rawから派生物を再生成し、Digestを照合するrestore fixtureを確認した。
+- [x] session ID、source identity、取得範囲、時刻、Digest、完全性を記録できる。
+- [x] rawを`SENSITIVE_ROOT`、伏字化派生物・要約・索引を`DATA_ROOT`へ分離した。
+- [x] confidentiality、access、retention、capture deadline、source availabilityを定めた。
+- [x] `source_missing | source_expired | non_reconstructable`を正常な空記録と区別した。
+- [x] rawから派生物を再生成し、Digestを照合するrestore fixtureを確認した。
 
 ### bootstrap現在位置プロジェクション
 
-- [ ] Work開始／完了、pause／resume、blocker発生／解消を記録できる。
-- [ ] Human判断要求／決定、upstream revision、stale／再検証を記録できる。
-- [ ] cancel／defer、session開始／終了を記録できる。
-- [ ] 固定入力から同じstructured projectionを決定的に生成できる。
-- [ ] 全体Stage／Work、active作業、TDD状態、次作業、blocker、Human判断待ち、staleをtext表示できる。
-- [ ] session開始用の短縮表示と、調査用の詳細表示を生成できる。
-- [ ] 入力identity、Digest、生成時刻、freshnessを表示できる。
-- [ ] 欠測または競合を推測で埋めず、不完全または不整合として詳細表示できる。
-- [ ] 手編集する`STATUS.md`、第二の状態台帳、WebUI、常駐serviceを作っていない。
-- [ ] 表示器だけのfailureとWorkflow authority欠落を区別できる。
+- [x] Work開始／完了、pause／resume、blocker発生／解消を記録できる。
+- [x] Human判断要求／決定、upstream revision、stale／再検証を記録できる。
+- [x] cancel／defer、session開始／終了を記録できる。
+- [x] 固定入力から同じstructured projectionを決定的に生成できる。
+- [x] 全体Stage／Work、active作業、TDD状態、次作業、blocker、Human判断待ち、staleをtext表示できる。
+- [x] session開始用の短縮表示と、調査用の詳細表示を生成できる。
+- [x] 入力identity、Digest、生成時刻、freshnessを表示できる。
+- [x] 欠測または競合を推測で埋めず、不完全または不整合として詳細表示できる。
+- [x] 手編集する`STATUS.md`、第二の状態台帳、WebUI、常駐serviceを作っていない。
+- [x] 表示器だけのfailureとWorkflow authority欠落を区別できる。
 
 ### 完了関門
 
-- [ ] Work 2以降のsessionと主要状態変化を失わず記録できる。
-- [ ] 現在位置のtext表示をsession開始・終了で実際に使用できる。
-- [ ] bootstrap toolingを作成した場合、固定fixture、red確認、関連Test、全Testがgreenである。
+- [x] Work 2以降のsessionと主要状態変化を失わず記録できる。
+- [x] 現在位置のtext表示をsession開始・終了で実際に使用できる。
+- [x] bootstrap toolingを作成した場合、固定fixture、red確認、関連Test、全Testがgreenである。
 
-`Evidence`：未記録
+`Evidence`：`RC3-WORK1B-RED-2026-08-03-V1`、
+`records/development/2026-08-03-work-1b-red-evidence-v1.md`、SHA-256
+`079277ae1f3f1c5277672d2ad24e4e1650983c0e0fc3eec5da4ee6f56d79604a`。
+固定fixture 13 fileとAcceptance Test 7件を追加し、targeted `7 failed`、全Test
+`419 passed, 7 failed`。失敗は全件bootstrap mapping module未実装による期待どおりのredである。
+red時点ではWork 1Bを`active / red`とし、checkboxと完了関門を未完了のまま保持した。
+Green Evidenceは`RC3-WORK1B-GREEN-2026-08-03-V1`、
+`records/development/2026-08-03-work-1b-green-evidence-v1.md`、SHA-256
+`fdaeeb439226c6e86b17b8aa33e0e11fbdc64512ccd3b2c3f9a14f0970e169b9`。
+固定Testを変更せずtargeted `7 passed`、全`426 passed`。Work 1Bは`active / green`であり、durable
+captureとsession開始／終了での実使用に関する項目・完了関門は未完了のまま保持する。
+Durable capture red Evidenceは`RC3-WORK1B-DURABLE-RED-2026-08-03-V1`、
+`records/development/2026-08-03-work-1b-durable-capture-red-evidence-v1.md`、SHA-256
+`a25c7cfde5817ff35375b07087e740820a7080b67bec8b6921fac167eb5e862d`。
+writer未実装を理由にtargeted `4 failed`、全Testは既存`426 passed`、新規red `4 failed`。現在の
+durable capture Work Itemは`active / red`であり、既存green項目は維持し、保存関連項目は未完了とする。
+Durable capture green Evidenceは`RC3-WORK1B-DURABLE-GREEN-2026-08-03-V1`、
+`records/development/2026-08-03-work-1b-durable-capture-green-evidence-v1.md`、SHA-256
+`7ab01e1a106c6d8cb2711f1b8bc4df150d34761d94c7d0f13f033332783f2f22`。
+固定Testを変更せずdurable `4 passed`、bootstrap `7 passed`、全`430 passed`。Session Evidence関連項目を
+完了Evidenceへ接続した。Work 1Bは`active / green`であり、実session利用の完了関門は未完了とする。
+Session lifecycle E2E red Evidenceは`RC3-WORK1B-SESSION-E2E-RED-2026-08-03-V1`、
+`records/development/2026-08-03-work-1b-session-e2e-red-evidence-v1.md`、SHA-256
+`84cf75898883b73d4db996dbcdf465ada0a6a8b2375551c866d6a22a3e3429ab`。
+orchestration API未実装を理由にtargeted `4 failed`、全Testは既存`430 passed`、新規red `4 failed`。
+現在のE2E Work Itemは`active / red`であり、session lifecycleと表示failure分離の項目は未完了とする。
+Session lifecycle E2E green Evidenceは`RC3-WORK1B-SESSION-E2E-GREEN-2026-08-03-V1`、
+`records/development/2026-08-03-work-1b-session-e2e-green-evidence-v1.md`、SHA-256
+`b3ec1686d6caeaba6f745a3ec355a24152e42572c77a451c06343d6ffa013e84`。
+固定E2E Testを変更せずE2E `4 passed`、関連`15 passed`、全`434 passed`。session lifecycleと
+display／authority failure分離を完了Evidenceへ接続した。Work 1Bは`active / green`であり、実sessionでの
+表示利用に関する完了関門は未完了とする。
+実使用で検出した完了後NEXT残留は改善候補`IC-WORK1B-COMPLETED-NEXT-001`へ固定し、Human Decision
+`DEC-WORK1B-COMPLETED-NEXT-2026-08-03-V1`で選択肢1を採用した。回帰Testは修正前`2 failed`、修正後は
+関連`17 passed`、全`436 passed`。修復GREEN Evidenceは
+`records/development/2026-08-03-work-1b-completed-next-green-evidence-v1.md`、SHA-256
+`03541809e7f57cdc80308ad7eb1ab6f2e4b20a7d487263eaa32219257d031afb`。
+別の外部development rootでsession開始short表示、完了eventを含むdurable capture、保存後rawからの終了
+detailed表示を実際に使用し、終了NEXTがHuman完了承認依頼へ更新された。raw、派生3 artifact、Session
+Evidence、start／end receiptを独立再読込し、Digest一致を確認した。
+Work 1B Completion Candidateは
+`records/development/2026-08-03-work-1b-completion-candidate-v1.md`、SHA-256
+`cb48778b36bf1d26673f753a91f97faf25c13a8d738d9193e4e23d9e4497d03d`。
+技術的完了関門は`verified_completion_candidate`となり、Humanが2026-08-03T14:35:03+09:00にWork 1Bの
+段完了を承認した。Decision正本は`records/development/2026-08-03-work-1b-completion-decision.json`、
+SHA-256 `69b4f792e3ccf529af338bce08e46ec2dace77ba86b5e4df624ff4b399e63ac8`。
+Work 1Bの結果は`verified / completed`であり、次の未完了工程はWork 2とする。
 
 ## 6. Work 2〜4：上流文書、Requirements、最初のslice設計
 
 ### Work 2：Intentと用語
 
-- [ ] Intent、利用者、非目標、Human／AI／機械のauthority境界をHuman判断候補として固定した。
-- [ ] 新しいdomain用語を統合用語集へ登録した。
+- [x] Intent、利用者、非目標、Human／AI／機械のauthority境界をHuman判断候補として固定した。
+- [x] 新しいdomain用語を統合用語集へ登録した。
+
+`Evidence`：Work 2 Human判断候補は
+`records/development/2026-08-03-work-2-intent-glossary-candidate-v1.md`、SHA-256
+`bfec3b29cf8ebb5ffeedc349e39b2215922ebef8e4105a258e73279a7226a252`。
+現行PlanのIntent／用語集参照とWork 1 corrective snapshotを再照合し、Intent必須8節、authority境界3件、
+canonical token 109件、Work 2必須13語、旧語読み替え8件を確認した。必須語の欠落と重複は0で、
+追加本文差分は不要だった。Intent、用語集、Plan本文は変更していない。
+Work 2 Session Evidenceは`rc3-work2-operational-20260803-001`、SHA-256
+`456c9071781d5bbcddadd6cb2fa181274ba1930e34c5903c18eb96066719e5c6`。判断対象Digestをeventへ固定し、
+Work Item `paused`、Human判断1件、blocker／staleなしとして保存後Digestを再照合した。
+post-write確認でcandidateの`generated_at`がWork 1完了承認時刻を誤って再利用していることを検出した。
+改善候補は`records/development/2026-08-03-work-2-candidate-timestamp-improvement.md`、SHA-256
+`6d0f4722a2aa926b638384ee58789be0fce6f4b617932c2c2a2c3d744c5357c5`。candidate修正により判断対象Digestと
+保存済みeventが変わるため、Work 2を`pause_and_triage`し、上記2項目を未完了へ戻した。Intent、用語集、
+Plan本文と監査結果は変更していない。metadata修復、再capture、promotion、Work 3進行はHuman判断待ちとする。
+Humanは選択肢1を承認した。Decisionは
+`records/development/2026-08-03-work-2-candidate-timestamp-decision.json`、SHA-256
+`9dcc7570d80bde8711049c688e5f03ec4a607457a96179fd146c512c288f271a`。候補の生成時刻を検証可能なWork 2
+session境界へ訂正し、旧Digest`2666511b...`をmetadataに保持した。再監査は同じ被覆で合格した。
+修復Evidenceは`records/development/2026-08-03-work-2-candidate-timestamp-repair-evidence-v1.md`、SHA-256
+`d1fb1e1f6f2ad0c794fdf36d74fa188ef068753a10f3e71c8428bf39a6c25ad0`。session `001`をsupersededとし、
+session `002`で旧Digestのstale化、新Digestの再検証、新DigestへのHuman判断要求を保存した。session `002`
+Evidence SHA-256は`9af96cd068b61a093b4f7068bfd7e553b3bdc475d3ba87f93771434700ae340a`で、保存後照合は
+`verification: passed`だった。
+Humanは選択肢1として訂正済みIntent／統合用語集候補を承認した。Approval Decision正本は
+`records/development/2026-08-03-work-2-intent-glossary-approval.json`、SHA-256
+`068ff06132dfcd24685d4a626d9107cf65b37456eebcd567dc72b9f6b27c7b78`。候補、Intent、用語集のDigestへ
+承認を束縛し、現行Planは引き続きprovisionalとして扱う。promotion状態の変更によりWork 1固定入力Evidence
+v2をstaleとし、`records/development/2026-08-03-work-1-fixed-input-evidence-v3.md`、SHA-256
+`334f7aeee44f65ee953d13f1737d08e24c38a4b2356aff26e3f7d4accec60d8a`でsnapshot 13 artifact、承認対象2文書、
+Plan参照を再照合した。内容Digestに変化はなく、Work 1の`verified / completed`は維持する。
+完了状態はsession `rc3-work2-operational-20260803-003`へdurable captureし、Session Evidence SHA-256
+`341911fda7e7ac25c210c389c1e8fd33d9bed0117d7eecfb13e91a12b1726cb3`、保存後照合
+`verification: passed`を確認した。Work 2 Completion Evidenceは
+`records/development/2026-08-03-work-2-completion-evidence-v1.md`、SHA-256
+`8a5f42dbde5d3b79ae2b200746e46f441cf07219a8ff5836fbf749d6563442d2`。Work 2は
+`verified / completed`であり、次の未完了工程はWork 3とする。
 
 ### Work 3：Requirements
 

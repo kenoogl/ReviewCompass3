@@ -1,0 +1,49 @@
+{
+  "decision_id": "DEC-WORK2-INTENT-GLOSSARY-2026-08-03-V1",
+  "decided_at": "2026-08-03T15:54:36+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "document_promotion",
+  "decision": "approved",
+  "instruction": "1",
+  "instruction_context": {
+    "meaning": "訂正済みWork 2 Intent・統合用語集候補の選択肢1を明示承認",
+    "candidate_id": "RC3-WORK2-INTENT-GLOSSARY-2026-08-03-V1",
+    "candidate_path": "records/development/2026-08-03-work-2-intent-glossary-candidate-v1.md",
+    "candidate_sha256": "bfec3b29cf8ebb5ffeedc349e39b2215922ebef8e4105a258e73279a7226a252"
+  },
+  "approved_materials": [
+    {
+      "role": "intent",
+      "path": "docs/current/reviewcompass3-intent-current.md",
+      "sha256": "1950f5a37fb5d0d0554f56343b39bbca7fc635523409f10ee761d8cef68f9ec6"
+    },
+    {
+      "role": "terminology",
+      "path": "docs/current/reviewcompass3-glossary-current.md",
+      "sha256": "f1e7e9a9c57292fe911217d9b4f5d5b8ed99a881d6f113f9b60db1f0d01b19fa"
+    }
+  ],
+  "promotion": {
+    "mode": "external_decision_bound",
+    "reason": "preserve the approved content digests and reconstructable Work 1 snapshot without mutating the approved candidates",
+    "intent_status": "approved_normative_source",
+    "terminology_status": "approved_normative_source",
+    "candidate_frontmatter_interpretation": "pre_promotion_snapshot"
+  },
+  "approved_scope": [
+    "product purpose, primary user and non-goals in the fixed Intent digest",
+    "Human, AI and machine authority boundaries in the fixed Intent digest",
+    "canonical terms and legacy mappings in the fixed Glossary digest",
+    "initial development remains human mode with no Delegation Authorization"
+  ],
+  "excluded_scope": [
+    "approve or promote the current Plan",
+    "approve Requirements or Design",
+    "issue a Delegation Authorization",
+    "change Intent, Glossary or Plan body content",
+    "start or modify Work 3 artifacts",
+    "commit or push repository changes"
+  ],
+  "authority_effect": "promotes only the two approved material digests and completes the Work 2 Human content gate",
+  "status": "approved_and_effective"
+}

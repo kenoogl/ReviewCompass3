@@ -1,0 +1,25 @@
+{
+  "decision_id": "DEC-WORK1B-COMPLETION-2026-08-03-V1",
+  "decided_at": "2026-08-03T14:35:03+09:00",
+  "decision_maker": "human_user",
+  "decision": "approved",
+  "instruction": "承認",
+  "instruction_context": {
+    "meaning": "Work 1B Completion Candidateに基づくWork 1Bの段完了を明示承認",
+    "candidate_id": "RC3-WORK1B-COMPLETION-CANDIDATE-2026-08-03-V1",
+    "candidate_path": "records/development/2026-08-03-work-1b-completion-candidate-v1.md",
+    "candidate_input_sha256": "748cec5e0f6ca2fa37fe5c8bd8569b305c14bf3535facfc88e6b812e1be7d5d3"
+  },
+  "approved_scope": [
+    "mark Work 1B completed",
+    "close the Work 1B completion gate",
+    "make Work 2 the next eligible checklist work"
+  ],
+  "excluded_scope": [
+    "start or modify Work 2 artifacts",
+    "commit repository changes",
+    "push repository changes"
+  ],
+  "authority_effect": "completes Work 1B and permits a later explicit instruction to start Work 2",
+  "status": "approved_and_effective"
+}
