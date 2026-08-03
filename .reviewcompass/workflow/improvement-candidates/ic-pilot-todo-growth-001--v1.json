@@ -1,0 +1,64 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-PILOT-TODO-GROWTH-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-04T08:41:56+09:00",
+  "source_work": "inter-work/issue-resolution-early-pilot",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-TODO-GROWTH-2026-08-04-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-04-todo-growth-pilot-observation-v1.json",
+    "sha256": "7d3e472f84d20e19d28a1c0e5c1c3d894b10e851fe3e7164cc2b7302fc00f67b"
+  },
+  "problem": "TODO_NEXT_SESSION.mdが現在位置の入口であるにもかかわらず、過去sessionの完了Claimと手戻り詳細を累積している。新しい問題も同じTODOへ追記すると、引き継ぎを改善する作業そのものがTODOをさらに肥大化させる。",
+  "impact": [
+    "現在位置と次の一作業を短時間で把握しにくい",
+    "解決済み履歴とactiveな判断待ちが同じ文書に混在する",
+    "新しい改善候補を記録するたびにhandoffの読解と更新コストが増える"
+  ],
+  "scope": [
+    "TODO肥大化という一つのdevelopment限定Pilot subject",
+    "ObservationからCandidate、Human Triage Decision、必要な場合のIssue経路への耐久的な結線",
+    "Plan Challenge合格後のmilestone snapshotとactive IDだけのTODO projection"
+  ],
+  "non_scope": [
+    "正式な製品Issue Resolution schema、state machine、Workflow permit",
+    "過去の全Claimと手戻り候補の一括移行",
+    "Human判断を介さないIssue昇格または意味的裁定",
+    "Work 4製品DesignまたはWork 8正式評価の完了"
+  ],
+  "classification_candidates": [
+    "process_improvement",
+    "task_contract"
+  ],
+  "route_candidates": [
+    "issue_resolution",
+    "checkpoint"
+  ],
+  "consumer_candidates": [
+    "reviewcompass3-development",
+    "TODO_NEXT_SESSION handoff"
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/development/2026-08-04-todo-growth-pilot-observation-v1.json",
+      "sha256": "7d3e472f84d20e19d28a1c0e5c1c3d894b10e851fe3e7164cc2b7302fc00f67b"
+    },
+    {
+      "path": "records/task-contract/issue-resolution-early-pilot-v1.json",
+      "sha256": "69e2c73167f930cab48abdcf3bd4d1eafa938aa9b3abaa714d6c3ad5e41c4ed7"
+    },
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-bootstrap-completion-evidence-v1.md",
+      "sha256": "1f2b981301e9a249226de4253f504586cea6f6dc23c5c1d780c53e4ec84b1f37"
+    },
+    {
+      "path": "docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md",
+      "sha256": "e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3"
+    }
+  ],
+  "proposed_action": "Humanがdisposition、blocking、consumer、Issue昇格可否を裁定する。issue_resolutionを承認した場合だけ、一件のIssue RecordとResolution Planを作り、Plan Challenge合格前にはTODOを圧縮しない。",
+  "content_digest": "d4ef84bc8cc7d2b7d3e812f87a7ebac19521e1edf502f220a89ad75d656cc83c"
+}

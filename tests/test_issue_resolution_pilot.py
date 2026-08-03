@@ -15,6 +15,11 @@ TASK_CONTRACT_PATH = (
     PROJECT_ROOT
     / "records/task-contract/issue-resolution-early-pilot-v1.json"
 )
+CANDIDATE_PATH = (
+    PROJECT_ROOT
+    / ".reviewcompass/workflow/improvement-candidates"
+    / "ic-pilot-todo-growth-001--v1.json"
+)
 
 
 def _module():
@@ -159,10 +164,35 @@ def test_repository_config_and_task_contract_fix_the_limited_pilot():
         TASK_CONTRACT_PATH,
         project_root=PROJECT_ROOT,
     ) == 9
-    pilot.validate_bootstrap_layout(
+    for relative_path in config["directories"].values():
+        assert (PROJECT_ROOT / relative_path).is_dir()
+
+
+def test_repository_contains_only_the_single_valid_pilot_subject():
+    pilot = _module()
+    config = pilot.load_config(CONFIG_PATH)
+    candidate_files = sorted(CANDIDATE_PATH.parent.glob("*.json"))
+    decision_files = sorted(
+        (
+            PROJECT_ROOT
+            / config["directories"]["human_triage_decision"]
+        ).glob("*.json")
+    )
+
+    assert candidate_files == [CANDIDATE_PATH]
+    assert len(decision_files) <= 1
+    result = pilot.validate_record_file(
+        CANDIDATE_PATH,
         project_root=PROJECT_ROOT,
         config=config,
     )
+    assert result.record_id == "IC-PILOT-TODO-GROWTH-001"
+    for decision_file in decision_files:
+        pilot.validate_record_file(
+            decision_file,
+            project_root=PROJECT_ROOT,
+            config=config,
+        )
 
 
 def test_validates_candidate_identity_digest_path_and_fixed_sources(

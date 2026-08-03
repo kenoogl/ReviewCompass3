@@ -427,7 +427,7 @@ def test_reviewcompass3_project_manifest_uses_approved_v2_boundary():
         PROJECT_ROOT,
         "workflow",
     )
-    assert workflow_snapshot == {
+    expected_bootstrap_snapshot = {
         ".reviewcompass/workflow/.gitkeep": hashlib.sha256(
             b"project-artifact-root\n"
         ).hexdigest(),
@@ -438,6 +438,8 @@ def test_reviewcompass3_project_manifest_uses_approved_v2_boundary():
             hashlib.sha256(b"").hexdigest()
         ),
     }
+    for path, digest in expected_bootstrap_snapshot.items():
+        assert workflow_snapshot[path] == digest
     assert layout.find_terminal_absolute_paths(
         PROJECT_ROOT / ".reviewcompass"
     ) == ()

@@ -1,0 +1,25 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 1,
+  "decision_id": "DEC-PILOT-TODO-GROWTH-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-04T08:44:52+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "candidate_id": "IC-PILOT-TODO-GROWTH-001",
+    "candidate_version": 1,
+    "path": ".reviewcompass/workflow/improvement-candidates/ic-pilot-todo-growth-001--v1.json",
+    "sha256": "9b9896758b616a9e6571ad7aa518821f2d812c179a1a9b7b327a8f55b2309854",
+    "content_digest": "d4ef84bc8cc7d2b7d3e812f87a7ebac19521e1edf502f220a89ad75d656cc83c"
+  },
+  "disposition": "issue_resolution",
+  "blocking": false,
+  "rationale": "Humanは選択肢1を承認した。TODO肥大化を一つのdevelopment限定Issueとして耐久的に追跡する必要があるが、安全性、authority、Acceptance truthを直ちに停止する問題ではないためnonblockingとする。合意済みの作業順序として本Pilotを優先して閉じる。",
+  "selected_consumer": "reviewcompass3-development",
+  "next_action": "承認された一件のIssue RecordとResolution Planを作り、Plan Challengeを実施する。",
+  "issue_promotion": {
+    "approved": true,
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001"
+  },
+  "content_digest": "3d00aa2f458eec1ad6d248b0867358bb72383f0b267dfc181df80a0ed5d9e046"
+}
