@@ -14,6 +14,20 @@ Intent統合最新版は製品目的、利用者、原則、非目標、成功�
 日本語表示名、canonical token、意味、旧語の読み替えを保持する。3文書はHuman承認前の
 successor候補であり、front matterの生成元pathとDigestから詳細と変更Evidenceへ戻れる。
 
+## 当面の開発入口
+
+開発作業は、次のoperational checklistを開始入口とする。
+
+- `development/2026-08-03-initial-development-checklist.md`
+- `../TODO_NEXT_SESSION.md`（session更新・引き継ぎメモ）
+- `development/templates/TODO_NEXT_SESSION.template.md`（TODO新規作成・構造復元用）
+- `../records/session-handoffs/2026-07-28-todo-next-session-snapshot.md`（過去snapshot）
+
+checklistはIntent、Requirements、計画を置き換えず、現在の作業順、確認項目、完了Evidenceを一つの
+操作viewへまとめる。checkboxだけを完了根拠にせず、参照するauthorityと固定Evidenceを確認する。
+ルートTODOも状態正本ではなく、最新状況と次作業からauthority／Evidenceへ移るための人向け入口とする。
+過去内容はTODOへ累積せず、独立保持する価値があるmilestoneだけ`records/session-handoffs/`へ保存する。
+
 ## 生成元の更新候補
 
 Task Contract中心化に関する詳細な生成元は次の順に読む。
@@ -35,9 +49,18 @@ Task Contract中心化に関する詳細な生成元は次の順に読む。
 - `design/2026-08-03-source-change-verification-identity-timing-memo.md`
 - `design/2026-08-03-non-functional-requirements-verification-profile-memo.md`
 - `design/2026-08-03-overdesign-boundaries-memo.md`
+- `design/2026-08-03-current-work-projection-memo.md`
+- `design/2026-08-03-self-application-improvement-routing-memo.md`
+- `design/2026-08-03-execution-claim-verification-memo.md`
 
 特に`overdesign-boundaries`は、6 Plan、Challenge、関数台帳、Provenanceについて、意味上の分離を
 維持しながら独立artifact、service、Human gate、無期限captureへ過剰展開しない設計判断を保持する。
+`current-work-projection`は、現在位置を第二の状態正本にせず、Provenance等からtextへ導出し、
+実測後の画面UIへ同じstructured projectionを渡す設計判断を保持する。
+`self-application-improvement-routing`は、自己適用中の問題・アイデアを実行中の合否基準と混ぜず、
+既存のcurrent Work、Upstream Revision、Issue Resolution、checkpointへ機械的なroute候補を出す境界を保持する。
+`execution-claim-verification`は、会話上の実施報告を完了Evidenceとみなさず、実施・結果・判断Claimを
+固定Evidenceと観測した事後状態へ照合し、不一致時に進行を停止する規律を保持する。
 
 議論の固定原文と変更判断は次へ保持する。
 
@@ -70,14 +93,18 @@ Task Contract中心化に関する詳細な生成元は次の順に読む。
 - `../records/task-contract/2026-08-02-documentation-reconstructability-audit.json`
 - `../records/task-contract/task-contract-centered-documentation-v16.json`
 - `../records/development/development-policy-v2.json`
+- `../records/development/development-policy-v3.json`
+- `../records/development/development-policy-v4.json`
 
 ## 適用関係
 
 - 2026-07-27から2026-07-28のintent、concept、requirements、design、planは固定済みの
   baselineであり、過去の承認と監査証拠の参照先として保持する。
 - 2026-08-02のTask Contract文書群は、それらを上書きしない差分・後継候補である。
-- 2026-08-02の開発方針は、リスクベースのテストファースト、段階的自己適用、
-  Human判断範囲を定める。
+- 2026-08-02の開発方針と2026-08-03の改定は、リスクベースのテストファースト、段階的自己適用、
+  自己適用で得た改善候補の記録・分類・停止判定・route、Human判断範囲を定める。改善候補は
+  Work 8まで手作業規律として運用し、機械強制済みとは扱わない。また、会話上の実施報告を
+  固定Evidenceと事後状態へ照合し、報告だけを完了根拠にしない。
 - Task Contract文書群は第5段完了承認を代替しない。構造化requirements、design、
   acceptance test、差分監査を経て新しい承認候補を生成する必要がある。
 - Task Contract requirements差分は`REQ-CONTRACT-001`〜`008`を対象とする。`007`でaccepted
