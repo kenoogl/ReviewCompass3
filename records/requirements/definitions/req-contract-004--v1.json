@@ -1,0 +1,60 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTRACT-004@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTRACT-004",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+  "statement": "システムは、成果のTask Contract適合性を検証するContract Conformance Reviewと、 Contract確定前のDefinition Challenge、成果検証後のFinal Contract Challengeを、目的、 材料、Finding、完了条件を混同せず実行できなければならない。",
+  "inputs": [
+    "Task Contractとsource Requirements",
+    "compiled Verification Plan",
+    "Architecture Policy、Challenge Policy、risk catalog、隣接Contract",
+    "change semantics、state effect、side effect、riskから選択したVerification Profile",
+    "成果物、Test、Evidence"
+  ],
+  "outputs": [
+    "Conformance Finding集合",
+    "Definition Challenge Finding集合とverdict",
+    "Final Contract Challenge Finding集合とverdict",
+    "Contract改定またはRequirement再検討要求",
+    "Verification Profile選択理由と充足verdict"
+  ],
+  "stop_conditions": [
+    "三つのreview目的、実行時点または材料範囲を区別できない",
+    "blocking Challenge Findingがあるまま成果をacceptedにしようとする",
+    "blocking分類を固定したChallenge PolicyまたはHuman裁定へ逆引きできない",
+    "選択したVerification Profileの必須test、独立review、Human判断またはEvidenceが欠ける",
+    "Contract外問題を根拠なしに無制限探索する"
+  ],
+  "recovery_conditions": [
+    "ContractまたはRequirementを新versionとして訂正し再reviewする",
+    "review scopeとchallenge基準を訂正する"
+  ],
+  "preserved_artifacts": [
+    "全Finding、review phase、分類、Evidence、Policy判定、未解決、Human裁定"
+  ],
+  "acceptance_criteria": [
+    "Requirementを欠くContract fixtureをDefinition Challengeが実行前に検出する",
+    "Contractを満たすが上位Intentまたは隣接Contractを損なう成果fixtureをFinal Contract Challengeが検出する",
+    "Contract違反fixtureをConformanceへ分類する",
+    "blocking Challenge FindingがDelivery Work Itemの`accepted`遷移を拒否する",
+    "非意味的な訂正は軽量な整合性検査、Requirementまたはscopeの意味変更は独立reviewを 含むhigh profileへ決定的に分類される"
+  ],
+  "non_goals": [
+    "Contract適合だけをシステム妥当性とみなすこと",
+    "Challengeを一般的な無制限レビューにすること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "b7f3bdb6a707a7e7203c3531897fa2d638299c3556a543b6c53567a3b191e81c"
+}

@@ -1,0 +1,56 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTRACT-007@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTRACT-007",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+  "statement": "システムは、accepted Delivery Work Itemに束縛されたTask Contract間のinterface、共有 状態、E2E、failure propagation、配置およびlifecycle操作をIntegration Planとして固定し、 全体Intentに対するIntegration Verdictを生成しなければならない。",
+  "inputs": [
+    "accepted Delivery Work Item、Task Contract、Plan bundleのidentity",
+    "cross-contract interfaceと共有状態owner",
+    "Integration Manifest、Project Binding、Deployment Manifest",
+    "Contract単位のVerification、Conformance、Final Challenge Evidence"
+  ],
+  "outputs": [
+    "版付きIntegration Plan",
+    "cross-contract E2Eとfailure propagation Evidence",
+    "`integration_passed`または`integration_failed`のIntegration Verdict",
+    "Release Evaluationへ渡すEvidence bundle identity"
+  ],
+  "stop_conditions": [
+    "schema、権限、順序、共有状態ownerまたはfailure propagationが競合する",
+    "staleなContract、Plan、Bindingまたは未acceptedのWork Itemを入力に含む",
+    "局所Contractが成功しても全体Intentまたはcross-contract acceptanceを満たさない",
+    "install、update、migrationまたはuninstallの必要条件を解決できない"
+  ],
+  "recovery_conditions": [
+    "Portfolio、Contract、interface、PolicyまたはBindingを新versionとして訂正する",
+    "影響するContractだけを再検証し、新しいIntegration Planを実行する"
+  ],
+  "preserved_artifacts": [
+    "入力identity、競合interface、共有状態owner、実行済みEvidence、失敗伝播、verdict理由"
+  ],
+  "acceptance_criteria": [
+    "interface schema不整合を実行開始前に拒否する",
+    "一Contractの失敗がPlanどおり隣接Contractと全体verdictへ伝播する",
+    "局所テストがすべて成功してもIntentを満たさないfixtureを`integration_failed`にする",
+    "Release EvaluationからIntegration Verdictと全Evidenceへ逆引きできる"
+  ],
+  "non_goals": [
+    "Task Contract ControlがWorkflowまたはconsumerの実行状態を直接変更すること",
+    "Contract単位の成功だけでrelease可能とみなすこと"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "74ce5eb330e070a305c93011f1ded7e471da3d32ae8f353793f67de5ef5f784e"
+}

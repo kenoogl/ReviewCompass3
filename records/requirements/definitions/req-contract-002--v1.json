@@ -1,0 +1,57 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTRACT-002@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTRACT-002",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+  "statement": "システムは、固定したTask Contract、Compiler、Policyから、Context Acquisition、 Review / Execution、Harness and Capability、Verification、Provenance Capture、 Human InteractionのPlan bundleを決定的に生成しなければならない。",
+  "inputs": [
+    "Task Contract ID、version、digest",
+    "Compiler ID、version、digest",
+    "Architecture PolicyのID、version、digest、適用範囲、優先順位",
+    "任意のProject Policy Overlay、base Policy参照、調整理由、Evidence、supersedes",
+    "Schema、supported capability catalog"
+  ],
+  "outputs": [
+    "6種類の版付きPlan",
+    "Plan bundle identity",
+    "Contract obligationとPlan項目の順逆被覆"
+  ],
+  "stop_conditions": [
+    "Compilerが扱えないobligationがある",
+    "Plan間で権限、順序、停止条件、保存条件が競合する",
+    "未定義Tool、権限、oracle、event、保存区画を要求する",
+    "適用Policyの不足、競合または優先順位を決定できない"
+  ],
+  "recovery_conditions": [
+    "Contract、Compiler、Policyまたはcapability catalogを新versionとして訂正する"
+  ],
+  "preserved_artifacts": [
+    "入力identity、生成可能だった診断、未対応obligation、競合"
+  ],
+  "acceptance_criteria": [
+    "同じ固定入力から同じPlan bundle identityが得られる",
+    "各Plan項目が一つ以上のContract obligation IDを持つ",
+    "必要Planへ受け渡されないobligationが一件でもあれば`not_compilable`になる",
+    "Policy順序を変えず同じ固定入力をcompileすると同じPolicy解決結果になる",
+    "同じbase PolicyとProject Policy Overlayから同じ実効PolicyとAgent entryを再生成できる",
+    "Overlay変更時は依存するContractだけがstale候補になる"
+  ],
+  "non_goals": [
+    "Runtime stateをCompilerが変更すること",
+    "LLMの推論だけで実行Planを確定すること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "47c995267bf8bd66a435460e4e61824509216d3b528231edd86cfa4a9368626a"
+}

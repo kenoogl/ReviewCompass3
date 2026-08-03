@@ -1,0 +1,56 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTRACT-001@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTRACT-001",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+  "statement": "システムは、構造化Requirementsから切り出した局所責務を、Identity、Responsibility、 Boundary、Preconditions、Context Obligations、Allowed Capabilities、Expected Outputs、 Acceptance Criteria、Provenance Obligations、Escalation Policyを持つ版付きTask Contractとして固定しなければならない。",
+  "inputs": [
+    "source Requirement IDと内容identity",
+    "適用するArchitecture PolicyのID、version、digest、適用範囲",
+    "Task Contract type、goal、obligation",
+    "in-scope、out-of-scope、prohibited effect",
+    "required state、assumption、dependency",
+    "Context、能力、成果、検証、来歴、escalationの各定義"
+  ],
+  "outputs": [
+    "一意ID、version、内容Digestを持つTask Contract",
+    "RequirementとContract obligationの順逆対応",
+    "ID、目的、入力、出力、完了条件の最小task核と、追加したBoundary、Capabilities、 Provenance、Escalation、Dependencyの対応"
+  ],
+  "stop_conditions": [
+    "必須領域が欠落、空、未解決、競合している",
+    "source Requirementを解決できない",
+    "必須RequirementにContract obligationの受け先がない",
+    "prohibited effectとallowed side effectが競合する",
+    "適用すべきArchitecture Policyが未解決または競合している"
+  ],
+  "recovery_conditions": [
+    "RequirementまたはContractを訂正し、新しいversionとして再検証する"
+  ],
+  "preserved_artifacts": [
+    "拒否候補、source identity、項目別診断、競合"
+  ],
+  "acceptance_criteria": [
+    "各必須領域を一つずつ欠落させたContractが確定前に拒否される",
+    "同じ正規化入力から同じContract digestが得られる",
+    "全Contract obligationをsource Requirementへ逆引きできる"
+  ],
+  "non_goals": [
+    "ContractだけでRequirementの真実性を保証すること",
+    "LLMが欠落項目を暗黙補完して確定すること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "2236702a3c88ee30a80673c8cabbf387981730d125edc59484c6452f50d61f8c"
+}

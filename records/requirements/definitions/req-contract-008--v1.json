@@ -1,0 +1,63 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTRACT-008@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTRACT-008",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+  "statement": "システムは、Task Contract TDDで固定したOperational Provenance、Test、Design Decision、 Implementation、Source Symbol IndexとEvidenceから、実装実態を説明する機械可読な As-Built Recordと人間向け文書を再生成可能なprojectionとして導出できなければならない。 projectionは規範的RequirementsまたはTask Contractを自動更新してはならない。本要件は 初期開発範囲外とし、初期vertical sliceの完了条件またはrelease条件にしない。",
+  "inputs": [
+    "acceptedまたは検証対象のTask Contract、obligation、Work Item、Run",
+    "Operational Provenance eventと完全性verdict",
+    "固定source tree、commit、Source Symbol Index、Reusable Routine Ledger",
+    "Acceptance Test、Evidence Test、Design Decision、verification Evidence",
+    "Deployment Manifest、Project Binding、confidentiality、retention policy"
+  ],
+  "outputs": [
+    "version、schema、入力Digest、生成器identityを持つAs-Built Record",
+    "Task Contract単位とFeature単位のAs-Built Documentation",
+    "Requirement、Contract、Test、ImplementationのTrace Matrix",
+    "前accepted版からの変更履歴とDocumentation Conformance Verdict",
+    "正本変更が必要な場合のUpstream Revision Proposal"
+  ],
+  "stop_conditions": [
+    "外部観測可能な実装をContract、Design Decisionまたは承認済み上流変更へ帰属できない",
+    "必須Provenance、source、Test、入力Digestが欠落またはstaleである",
+    "実装とRequirementまたはContractのaccept/reject、義務、scopeが競合する",
+    "派生文書を根拠に正本を直接更新しようとする"
+  ],
+  "recovery_conditions": [
+    "不足Provenanceを新eventとして補い、固定入力からprojectionを再生成する",
+    "実装不良は現ContractとTestを維持してImplementationを訂正する",
+    "意味変更は`REQ-WORKFLOW-006`のRevision Proposalとreopenへ渡す"
+  ],
+  "preserved_artifacts": [
+    "入力identityとDigest、生成器identity、部分Record、欠落項目、照合Finding",
+    "`unrealized_obligation | unattributed_implementation | implementation_detail | upstream_inconsistency | provenance_incomplete | stale_projection`の分類"
+  ],
+  "acceptance_criteria": [
+    "同じ固定入力と生成器versionから意味的に同じAs-Built Recordを再生成できる",
+    "obligationからTest、Design Decision、実装symbol、Evidenceへ順方向に追跡できる",
+    "外部観測可能な実装symbolから所有Contractまたは未帰属Findingへ逆方向に追跡できる",
+    "sourceまたは入力Digest変更時に旧projectionが`stale_projection`になる",
+    "正当な上流意味変更候補が本文更新ではなくRevision Proposalになる",
+    "Provenanceのないcodebaseを標準経路へ混入せず、将来の`legacy_reconstruction`へ分類する"
+  ],
+  "non_goals": [
+    "大域的なDesign、Tasks、Implementation段階を復活させること",
+    "LLM推定だけを実装事実の正本にすること",
+    "初期Work 1〜8、最初のTask Contractまたは初期製品releaseで本能力を実装すること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "efa3bd0f5b637b286af6dfb6e751bcf00e3a31a937613393557308c5b574f0c0"
+}

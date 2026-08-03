@@ -1,0 +1,121 @@
+{
+  "artifact_kind": "requirements_evidence_record",
+  "evidence_id": "RC3-REQUIREMENTS-ADDED-13-EVIDENCE-2026-08-03-V1",
+  "evidence_version": 1,
+  "subject_refs": [
+    {
+      "logical_id": "REQ-CONTRACT-001@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-001--v1.json",
+      "sha256": "2236702a3c88ee30a80673c8cabbf387981730d125edc59484c6452f50d61f8c"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-002@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-002--v1.json",
+      "sha256": "47c995267bf8bd66a435460e4e61824509216d3b528231edd86cfa4a9368626a"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-003@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-003--v1.json",
+      "sha256": "2091f422d430e2364fffdf0a919eb2faa6ead3a8e327330ff732225e04d450d5"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-004@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-004--v1.json",
+      "sha256": "b7f3bdb6a707a7e7203c3531897fa2d638299c3556a543b6c53567a3b191e81c"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-005@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-005--v1.json",
+      "sha256": "fd6ed397a46874cbc49137521ad939b0297f3c22c8c82940ea170a11b8e40f44"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-006@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-006--v1.json",
+      "sha256": "0384b0215bd3a88cc12779688b2f1b6a5b4598db35f516fa73855b3701d8a73b"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-007@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-007--v1.json",
+      "sha256": "74ce5eb330e070a305c93011f1ded7e471da3d32ae8f353793f67de5ef5f784e"
+    },
+    {
+      "logical_id": "REQ-CONTRACT-008@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-contract-008--v1.json",
+      "sha256": "efa3bd0f5b637b286af6dfb6e751bcf00e3a31a937613393557308c5b574f0c0"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-005@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-005--v1.json",
+      "sha256": "55211d2c326147c1aada1d2bebf4854792435b1b5cad290af47e41a0b80f7b4c"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-006@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-006--v1.json",
+      "sha256": "b60744e47a98ffe841e0af7aadaf9a8a76910e88613ebca7b90ebba5649ec6ce"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-007@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-007--v1.json",
+      "sha256": "123751211eb860529c6885ac9523165633fa0e93d32b00350b7fc0b68ed93b10"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-008@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-008--v1.json",
+      "sha256": "87f86e53494dbf350371adc9b207c942c07a9c3bce98ceee79eaa657382d5cbe"
+    },
+    {
+      "logical_id": "REQ-WORKFLOW-009@v1",
+      "version": 1,
+      "path": "records/requirements/definitions/req-workflow-009--v1.json",
+      "sha256": "b424cfb5a71a210dbc5fd8ff2a686ba7b7d0bfba870f9b41dfcdcfa56f224116"
+    },
+    {
+      "logical_id": "RC3-REQUIREMENTS-ADDED-13-2026-08-03-V1",
+      "version": 1,
+      "path": "records/requirements/candidates/rc3-requirements-added-13-2026-08-03-v1.json",
+      "sha256": "89ee1908ec3c0cafd6b4c5d5fe244b7098745265dcc3f247b554a5abe1494773"
+    }
+  ],
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    },
+    {
+      "logical_id": "RC3-REQUIREMENT-ARTIFACTS",
+      "version": 1,
+      "path": "schemas/requirements/rc3-requirement-artifacts--v1.schema.json",
+      "sha256": "cd8d5f69565b17c9ec2753dadab841ca2dd58cb7f401b3223bea61ef73b035ff"
+    },
+    {
+      "logical_id": "RC3-LEGACY-REQUIREMENTS-37",
+      "version": 1,
+      "path": "records/requirements/authority/rc3-legacy-requirements-37--v1.json",
+      "sha256": "7f7ac6a6733b74fd88bdafc6b42e19bd40be14c232021adf6f46cdd1c188ca2d"
+    }
+  ],
+  "observations": [
+    "13個のRequirement definitionと1個のcandidate manifestが記録schema、自己Digest、配置規則の検証に合格した",
+    "追加13要件のstatement、入力、出力、停止条件、復旧条件、保存対象、受け入れ条件、対象外が固定Markdown sourceの対応節と一致した",
+    "candidateの13 definition参照、7 fixed source参照、1 schema参照はID、version、path、Digestが対象と一致した",
+    "legacy 37件とcandidate 13件の和集合は50件、重複0件で、未採用候補REQ-WORKFLOW-010とREQ-WORKFLOW-011を含まない",
+    "Requirements関連のtargeted Testは75 passed in 0.09s、post-write検証は15 artifact、全Testは448 passed in 1.78sだった"
+  ],
+  "result": "passed",
+  "recorded_at": "2026-08-03T20:31:24+09:00",
+  "evidence_digest": "4f5d76d4606627e47b98f8408cdac437d9cb8235e9d2be72f2114fc582d227ca"
+}

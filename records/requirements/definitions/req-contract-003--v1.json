@@ -1,0 +1,53 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTRACT-003@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTRACT-003",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+  "statement": "システムは、RequirementsとTask Contract Portfolioの順逆被覆を検査し、Contract、 Requirement、CompilerまたはPolicy変更時に依存Plan、Context、Runをstaleとして 再利用拒否しなければならない。",
+  "inputs": [
+    "Requirement母集合",
+    "Task Contract Portfolio",
+    "Requirement、Contract、Plan、Context、Runの依存辺",
+    "prior identityとcurrent identity"
+  ],
+  "outputs": [
+    "Portfolio被覆verdict",
+    "stale対象の閉包と再compile要求"
+  ],
+  "stop_conditions": [
+    "必須Requirementの受け先がない",
+    "Contract間責務が競合または禁止循環を持つ",
+    "staleなPlan、Context、Runを再利用しようとする"
+  ],
+  "recovery_conditions": [
+    "Portfolioまたは依存辺を訂正する",
+    "新しいContract versionをcompileし、新しいRunを開始する"
+  ],
+  "preserved_artifacts": [
+    "未被覆、競合、変更元、影響閉包、拒否再利用対象"
+  ],
+  "acceptance_criteria": [
+    "Requirement、Contract、Compiler、Policyを一つずつ変更すると依存先だけが staleになる",
+    "無関係なContract成果はstaleにならない",
+    "旧成果を残したまま新versionへ関係をたどれる",
+    "Policy変更時は適用範囲に含まれる依存先だけがstaleになる"
+  ],
+  "non_goals": [
+    "stale履歴を削除または上書きすること",
+    "物理ファイルの更新時刻だけで意味的依存を判断すること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "2091f422d430e2364fffdf0a919eb2faa6ead3a8e327330ff732225e04d450d5"
+}

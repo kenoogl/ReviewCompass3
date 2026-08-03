@@ -1,0 +1,59 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTRACT-006@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTRACT-006",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+  "statement": "システムは、評価仮説、必要観測、baseline、比較条件、指標、欠測、privacy、retentionを 版付きEvaluation Profileとして固定し、一次eventから評価指標を再計算できなければ ならない。",
+  "inputs": [
+    "Evaluation Profile",
+    "Operational Provenance event",
+    "Evaluation Observation",
+    "Outcome Label",
+    "metric定義とversion",
+    "evaluation case、condition、pair、trial、実行順序",
+    "model、Tool、budget、設定のidentity",
+    "label作成者、評価者、confidence、裁定履歴"
+  ],
+  "outputs": [
+    "再現可能なmetric projection",
+    "`evaluable`、`partially_evaluable`、`not_evaluable`の評価状態",
+    "解釈と限界を分離したEvaluation Ledger entry"
+  ],
+  "stop_conditions": [
+    "profile、metric、比較条件のidentityが欠ける",
+    "指標計算が一次eventへ逆引きできない",
+    "異なる条件を同一baselineとして比較する"
+  ],
+  "recovery_conditions": [
+    "profileまたはmetricの新versionで再計算する",
+    "欠測を明示して比較対象から分離する"
+  ],
+  "preserved_artifacts": [
+    "入力identity、欠測、計算診断、部分結果"
+  ],
+  "acceptance_criteria": [
+    "同じ固定eventとmetricから同じ評価値が得られる",
+    "metric version変更時に旧評価を保持した新projectionになる",
+    "任意評価観測の欠測だけでは業務成果を無効にしない",
+    "比較値をcase、condition、trial、実行条件、評価者へ逆引きできる",
+    "無作為化、盲検化、反復数をProfileで未指定の初期Pilotも、未指定を明示して保存する"
+  ],
+  "non_goals": [
+    "指標だけで意味的な改善方針を自動決定すること",
+    "baselineなしにTask Contract方式の優位性を確定すること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "0384b0215bd3a88cc12779688b2f1b6a5b4598db35f516fa73855b3701d8a73b"
+}

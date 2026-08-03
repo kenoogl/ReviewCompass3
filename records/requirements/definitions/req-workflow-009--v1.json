@@ -1,0 +1,72 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-009@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-009",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムは、Implementation Task Contractのred確認後、green実装で新規関数または共通処理を 書く前に、固定source treeから生成したSource Symbol Index、Reusable Routine Ledger、 実コードを照合し、Implementation Discovery Recordと再利用判断を確定しなければならない。",
+  "inputs": [
+    "Implementation Task Contract、Delivery Work Item、red Testのidentity",
+    "固定source tree、repository、Project BindingのidentityとDigest",
+    "同じsource treeから生成したSource Symbol Indexのidentity、generator、schema、Digest",
+    "Reusable Routine Ledgerのversion、Digest、active／retired routine、alias、統廃合履歴",
+    "Index、Ledger、Discovery Recordのschemaと原子的I/O policy",
+    "予定する新規または変更symbolの責務、入出力、side effect、利用境界"
+  ],
+  "outputs": [
+    "検索scope、query、候補symbol、candidate Evidenceを持つImplementation Discovery Record",
+    "`candidate_found | no_candidate`のdiscovery outcome",
+    "`candidate_found`の場合は`reuse | extend | merge | split_with_rationale`の判断",
+    "LLM proposalとHuman confirmationを分離した判断record",
+    "Task Contract、Work Item、Design Decision、Test、Implementation、commitへの関係",
+    "Ledger登録、統合、retireまたは再登録の追記候補",
+    "Portable Lifecycleへ渡す原子的なLedger／Discovery更新操作"
+  ],
+  "stop_conditions": [
+    "source treeとIndexのDigestが一致しない、またはIndexを再生成できない",
+    "台帳だけを調べ、固定source treeと実コードを照合していない",
+    "候補があるのに4分類、理由またはHuman確認がない",
+    "`split_with_rationale`に責務境界、非互換条件または分離理由がない",
+    "retired routineまたはaliasと同じ責務を、再登録判断なしに追加しようとする",
+    "Discovery RecordをTask Contract、red Testまたは予定Implementationへ結べない",
+    "schema不適合、閉じた語彙外の判断、過去の判断または統廃合履歴の変更がある",
+    "Ledgerを検証済みのPortable Lifecycle操作を経ず直接変更しようとする"
+  ],
+  "recovery_conditions": [
+    "current source treeからIndexを再生成し、候補探索をやり直す",
+    "既存routineの再利用、拡張または統合へDesign Decisionを訂正する",
+    "分離が必要なら理由とHuman確認を追加する",
+    "retired routineの再登録を新しいDesign DecisionとHuman判断として記録する"
+  ],
+  "preserved_artifacts": [
+    "source／Index／Ledger identity、検索scope、候補、診断、未確認proposal、拒否理由"
+  ],
+  "acceptance_criteria": [
+    "同じ固定source treeとPolicyから同じSource Symbol Index identityを再生成できる",
+    "類似候補がないfixtureは`no_candidate`となり、4分類を偽造せずgreen実装へ進める",
+    "同一責務の候補があるfixtureは、Human確認済み4分類がなければgreen実装を拒否する",
+    "stale Index、理由のない分離、retired routineの無断復活をそれぞれ拒否する",
+    "再利用判断から候補実装、Task Contract、Test、Design Decision、最終commitへ逆引きできる",
+    "Ledgerの過去判断と統廃合履歴を上書きせず、新しい記録として追加する",
+    "schema違反と閉じた語彙外の判断を拒否し、書込み失敗注入後も直前の有効Ledgerを読める",
+    "Ledgerの直接変更を検出し、検証済み操作による追記へ戻す"
+  ],
+  "non_goals": [
+    "名前または埋込み類似度だけで意味的同一性を自動確定すること",
+    "Human確認だけでsource tree、Indexまたは実コード照合を省略すること",
+    "初期Pilotの結果なしにImplementation Task Contractを正式製品Runtimeへ拡大すること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "b424cfb5a71a210dbc5fd8ff2a686ba7b7d0bfba870f9b41dfcdcfa56f224116"
+}

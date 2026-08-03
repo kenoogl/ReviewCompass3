@@ -1,0 +1,54 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-005@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-005",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムは、作業の発生源を`new_development`または`maintenance`、継続方法を`fresh` または`reopen`として独立に固定し、同じTask Contract Deliveryへ決定的にrouteしなければ ならない。",
+  "inputs": [
+    "work originとcontinuation mode",
+    "source Intent、Requirement、Contract、baselineのidentity",
+    "reopen時のprior Work Item、Run、失敗、判断、成果",
+    "maintenance時のtrigger、維持invariant、regression scope、compatibility、rollback"
+  ],
+  "outputs": [
+    "一意IDを持つWork Itemとrouting verdict",
+    "作成または再利用するRequirement、Contract、Planのidentity",
+    "reopen basisとfreshness検査要求"
+  ],
+  "stop_conditions": [
+    "originまたはcontinuation modeが曖昧である",
+    "prior identityと理由を持たずreopenしようとする",
+    "観測可能な義務変更をmaintenance内部だけで確定しようとする",
+    "旧成果を上書きしてreopenしようとする"
+  ],
+  "recovery_conditions": [
+    "routing入力を訂正する",
+    "RequirementまたはContractの新versionを作り、再routeする"
+  ],
+  "preserved_artifacts": [
+    "routing候補、入力identity、不一致、必要な上流戻り先"
+  ],
+  "acceptance_criteria": [
+    "二つのoriginと二つのcontinuation modeの全組合せが共通Deliveryへ到達する",
+    "reopen後もprior失敗、判断、成果を逆引きできる",
+    "義務変更を含むmaintenance fixtureがRequirementsへrouteされる"
+  ],
+  "non_goals": [
+    "originごとにContract、TDD、Provenanceの別engineを実装すること",
+    "reopenを旧Work Itemのin-place変更とすること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "55211d2c326147c1aada1d2bebf4854792435b1b5cad290af47e41a0b80f7b4c"
+}

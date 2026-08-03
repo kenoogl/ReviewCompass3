@@ -1,0 +1,58 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-CONTRACT-005@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-CONTRACT-005",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+  "statement": "システムは、Task ContractのProvenance Obligationsから実行前にCapture Planを生成し、 Contract、Plan、Context、Execution、Result、Evidence、Human判断を必須eventと型付き 関係で記録しなければならない。",
+  "inputs": [
+    "ContractとProvenance Obligations",
+    "Plan bundle",
+    "event schema、retention、confidentiality policy"
+  ],
+  "outputs": [
+    "版付きCapture Plan",
+    "追記型Operational Provenance event",
+    "閉じた関係語彙に従う複数の型付きevent関係",
+    "Policy Overlay、Policy Adjustment、変更意味、state effect、Verification Profileのevent",
+    "Implementation Discovery、再利用判断、Human確認、台帳更新、廃止routine検査のevent",
+    "必須event完全性verdict"
+  ],
+  "stop_conditions": [
+    "必須eventまたは関係を記録できない",
+    "保存区画、機密性、retentionを解決できない",
+    "eventがContractまたはRun identityへ結線できない"
+  ],
+  "recovery_conditions": [
+    "設定を訂正し、未開始なら新しいPlanをcompileする",
+    "確認済みeventから値なし診断付きの新Runを開始する"
+  ],
+  "preserved_artifacts": [
+    "保存可能な直前event、欠落種別、値なし診断"
+  ],
+  "acceptance_criteria": [
+    "必須eventを一種類ずつ欠落させると`verified`遷移が拒否される",
+    "eventからRequirementとContract obligationへ逆引きできる",
+    "機微情報分類違反時に通常保存されない",
+    "複数入力から生成した成果を各入力へ関係型とDigest付きで逆引きできる",
+    "event追記順序と意味的な依存関係を独立して再構成できる",
+    "project固有の規則変更を、置換前後のPolicy、理由、Evidence、決定者へ逆引きできる"
+  ],
+  "non_goals": [
+    "評価目的を理由に全raw dataを無期限保存すること",
+    "Provenance Storeが業務状態を所有すること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "fd6ed397a46874cbc49137521ad939b0297f3c22c8c82940ea170a11b8e40f44"
+}

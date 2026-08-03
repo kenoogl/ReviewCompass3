@@ -1,0 +1,53 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-008@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-008",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムは、進行中Work Itemを`pause`、`cancel`または`close-scope`候補として制御終了し、 未充足義務、最後の有効成果、cleanup、再開または移管条件を失わず保存しなければ ならない。",
+  "inputs": [
+    "Work Item、Contract、Run、TDD phase、最後のcheckpoint",
+    "終了種別、理由分類、Evidence、代替案、risk、cost",
+    "未処理義務、部分side effect、cleanupとrollback計画",
+    "decision authorityとrelease scope"
+  ],
+  "outputs": [
+    "`paused`または`cancelled`の耐久Work Item状態",
+    "`deferred`、`withdrawn`、移管または不採用のscope disposition候補",
+    "cleanup verdict、未充足Requirement、release blocking verdict"
+  ],
+  "stop_conditions": [
+    "必須Requirementをcancelだけで充足済みにする",
+    "部分side effect、cleanup、未処理、移管先または再開条件が未解決である",
+    "Human判断なしにrelease scope、Intentまたは必須義務を縮小する"
+  ],
+  "recovery_conditions": [
+    "paused Work Itemをfreshness検査後に同Contractの新Runまたは新versionで再開する",
+    "scopeの新versionとHuman判断を固定し、Portfolio被覆を再検査する"
+  ],
+  "preserved_artifacts": [
+    "終了候補、実行者、決定者、理由、Evidence、checkpoint、未処理、cleanup、移管先"
+  ],
+  "acceptance_criteria": [
+    "pause後に上流変更がなければ新Run、変更があれば新versionへrouteされる",
+    "cancelした必須Requirementが`unfulfilled`としてreleaseをblockする",
+    "close-scopeは全残項目の完了、対象外、移管、不採用分類とHuman判断がなければ拒否される"
+  ],
+  "non_goals": [
+    "pauseまたはcancelをContract acceptanceとみなすこと",
+    "未処理を黙って残したままstageまたはreleaseをcompletedにすること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "87f86e53494dbf350371adc9b207c942c07a9c3bce98ceee79eaa657382d5cbe"
+}

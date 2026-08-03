@@ -1,0 +1,60 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-006@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-006",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムは、TDD中に発見した不整合をUpstream Inconsistency Findingとして固定し、 Implementation、Design Decision、Task Contract、Requirement、Feature Partitioning、Intentの うち変更が必要な最下位層へ分類してから、改定または実装継続を判断しなければならない。 同じ入力とEvidenceに対するaccept/reject、義務またはscopeが変わり得るかを `acceptance_truth_changed`として判定し、軽微修正と意味的reopenを区別しなければならない。",
+  "inputs": [
+    "検出元Work Item、Contract、Run、TDD phase",
+    "競合するRequirement、Design、Test、ImplementationとEvidence",
+    "代替Design、実現可能性、risk、costの検討結果",
+    "prior / proposed Acceptance Criteria、義務、scope"
+  ],
+  "outputs": [
+    "改定対象層とclassification verdict",
+    "`change_semantics`、`acceptance_truth_changed`、`state_effect`と判定根拠",
+    "prior identity、proposed identity、理由を持つRevision Proposal",
+    "影響閉包、stale候補、Test migration候補",
+    "Human decisionまたは実装継続指示"
+  ],
+  "stop_conditions": [
+    "実装を通す都合だけで期待またはRequirementを変更しようとする",
+    "Evidence、prior digest、影響閉包または判断authorityがない",
+    "確定済み成果をin-placeで上書きしようとする",
+    "意味変更の可能性を解消せず軽微修正として完了しようとする"
+  ],
+  "recovery_conditions": [
+    "現ContractとTestを維持してImplementationを訂正する",
+    "意味不変のeditorialまたはevidence-only訂正として、stateを進めず理由と差分を保存する",
+    "承認済みRevision Proposalから新versionを作り、被覆検査とcompileをやり直す"
+  ],
+  "preserved_artifacts": [
+    "Finding、検出時checkpoint、分類候補、Evidence、不採用案、Human判断"
+  ],
+  "acceptance_criteria": [
+    "実装不良fixtureは上流を変更せずImplementationへ戻る",
+    "誤字、参照、帰属の訂正でAcceptance Criteriaの真偽と義務が変わらないfixtureは `acceptance_truth_changed: false`となり、Contract versionを増やさない",
+    "Acceptance Criteria、必須義務またはscopeが変わるfixtureは `acceptance_truth_changed: true`となり、意味的reopenへrouteされる",
+    "軽微修正中に意味変更が判明したfixtureは処理を停止し、Revision Proposalを生成する",
+    "Requirement不良fixtureは旧Requirementを保持した新versionと依存staleを生成する",
+    "上流改定後は旧TDD cycleを再利用せず、新Test versionのredから開始する"
+  ],
+  "non_goals": [
+    "実装困難をRequirement誤りと自動判定すること",
+    "Human判断なしにIntent、scopeまたは必須義務を弱めること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "b60744e47a98ffe841e0af7aadaf9a8a76910e88613ebca7b90ebba5649ec6ce"
+}

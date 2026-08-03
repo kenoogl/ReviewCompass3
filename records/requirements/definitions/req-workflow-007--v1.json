@@ -1,0 +1,55 @@
+{
+  "artifact_kind": "requirement_definition",
+  "record_id": "REQ-WORKFLOW-007@v1",
+  "record_version": 1,
+  "requirement_id": "REQ-WORKFLOW-007",
+  "requirement_version": 1,
+  "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+  "schema_version": 1,
+  "source_refs": [
+    {
+      "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+      "version": 1,
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    }
+  ],
+  "feature_id": "FEAT-WORKFLOW-CONTROL",
+  "statement": "システムは、TDD中に発見した境界外問題をDependency Discovery Recordとして固定し、 blocking依存を持つ親Work Itemを停止し、Contract依存グラフから実行可能な単一active leafを選ばなければならない。",
+  "inputs": [
+    "発見元Work Item、Contract、Run、TDD phase、checkpoint",
+    "問題のscope分類、Evidence、blocking判定",
+    "version付きContract依存graphと許可されたrelation vocabulary"
+  ],
+  "outputs": [
+    "child Contract候補またはnon-blocking backlog disposition",
+    "`blocked_by_dependency`、`blocked_by_cycle`またはactive leaf verdict",
+    "strongly connected componentとCycle Resolution Record",
+    "親Work Itemの再開条件"
+  ],
+  "stop_conditions": [
+    "Contract境界外問題を現在のContractへ暗黙追加する",
+    "未解決blocking依存または循環を持つWork ItemへRun permitを発行する",
+    "relation type、方向、owner、versionのいずれかが未定義である"
+  ],
+  "recovery_conditions": [
+    "誤った辺、ownerまたは依存方向を訂正する",
+    "共通前提Contract、版付きinterface、phase分割、Contract統合または上流改定で循環を解く",
+    "解消不能なWork Itemをdeferまたはcancelする"
+  ],
+  "preserved_artifacts": [
+    "discovery、親checkpoint、依存graph、SCC、解消案、選択理由、Human判断"
+  ],
+  "acceptance_criteria": [
+    "`A requires B requires C`ではCだけがactive leafになる",
+    "C完了後にB、Aの順でfreshness、stale、compileを再検査して再開する",
+    "`A requires B requires A`では両方のRun permitを拒否する",
+    "non-blocking問題は親を止めずbacklogへ移る"
+  ],
+  "non_goals": [
+    "問題対処を非永続な再帰call stackだけで管理すること",
+    "循環中の実装順を根拠なく選んで実行すること"
+  ],
+  "acceptance_truth_changed": true,
+  "canonical_payload_digest": "123751211eb860529c6885ac9523165633fa0e93d32b00350b7fc0b68ed93b10"
+}
