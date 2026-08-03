@@ -92,6 +92,10 @@ Session EvidenceとGitへ委ねる。
 - [ ] 現在位置表示または手作業statusとauthorityの不一致がないことを確認した。
 - [ ] `TODO_NEXT_SESSION.md`の先頭へ、現在地、実施内容、次作業、blocker、Human判断待ち、
       stale、Git／Test結果、Evidence linkを更新した。
+- [ ] 最終stage前にTODOのGit欄をcommit安定形式へ更新し、
+      `python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`が合格した。
+- [ ] コミット後のGit確認はread-onlyで行い、自己SHA、固定ahead／behind、push済否の転記だけを目的とする
+      追加コミットを作成していない。
 - [ ] TODOへ過去sessionを累積せず、現行handoffを短時間で読める量に保った。
 
 `Evidence`：未記録

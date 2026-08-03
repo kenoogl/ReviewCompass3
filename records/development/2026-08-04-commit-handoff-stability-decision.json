@@ -1,0 +1,37 @@
+{
+  "decision_id": "RC3-COMMIT-HANDOFF-STABILITY-DECISION-2026-08-04-V1",
+  "decided_at": "2026-08-04T05:18:39+09:00",
+  "status": "approved_effective",
+  "decision_maker": "human",
+  "instruction": "対処する",
+  "problem": "A post-commit TODO rewrite was used to copy the new commit SHA and clean state, causing an avoidable extra commit and a mutable remote-state cycle.",
+  "approved_policy_change": [
+    "prepare the TODO Git section in commit-stable form before final staging",
+    "do not store the TODO-containing commit SHA in that same TODO Git section",
+    "do not store numbered ahead or behind, pushed or unpushed state, or a transient uncommitted TODO snapshot",
+    "derive HEAD, upstream, ahead or behind, and push state mechanically from Git",
+    "perform only read-only Git verification after commit",
+    "reject unstable TODO Git sections with a deterministic validator"
+  ],
+  "implementation_scope": [
+    "development policy",
+    "AGENTS commit instructions",
+    "session checklist",
+    "TODO template",
+    "current TODO",
+    "deterministic validator and tests"
+  ],
+  "not_authorized_or_required": [
+    "guarded commit",
+    "post-commit amend",
+    "Git hook",
+    "history rewrite",
+    "commit or push in this task without a separate Human instruction"
+  ],
+  "acceptance": [
+    "the current TODO and template pass the validator",
+    "self SHA, mutable remote snapshots, and transient uncommitted snapshots are detected",
+    "commit SHA evidence outside the Git section remains allowed",
+    "related and full tests pass"
+  ]
+}

@@ -4,7 +4,7 @@
 
 制定日：2026-08-02
 
-改定日：2026-08-03
+改定日：2026-08-04
 
 ## 目的
 
@@ -140,6 +140,25 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 
 手戻りがなくても、本来機械処理すべき決定的操作をLLMが直接行った場合は
 `manual_operation_candidate`として報告する。
+
+## Commitとhandoffの原子性
+
+最終コミットに`TODO_NEXT_SESSION.md`の引き継ぎ更新を含める場合、TODOのGit欄は、そのコミット完了と
+同時に真になるcommit安定形式へコミット前に更新する。コミット後はGitの事後状態をread-onlyで照合し、
+自己SHAまたはremote状態をTODOへ転記するためだけの追加コミットを作らない。
+
+TODOのGit欄へ次のmutable snapshotを固定しない。
+
+- TODO自身を含むコミットのSHAまたはHEAD値
+- 数値付きahead／behind
+- push済みまたはpush未実施というremote同期状態
+- TODOだけが未コミットという一時的worktree状態
+
+HEAD、upstream、ahead／behind、push状態の正本はGitとし、必要時に機械取得する。TODOには
+`本handoffを含むcommit完了時点`というcommit境界と、Gitから機械取得する旨を記録する。最終stage前に
+`python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`を実行して検査する。commit SHAが必要な
+Evidenceは、当該コミットと循環しない後続EvidenceまたはGit自体へ接続する。この運用にguarded commit、
+post-commit amend、hookは要求しない。
 
 ## コード形式
 

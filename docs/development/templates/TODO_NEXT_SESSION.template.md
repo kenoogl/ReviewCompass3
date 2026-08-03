@@ -13,6 +13,8 @@
 - `{{...}}`を実値または`なし`へ置き換え、不要な説明とplaceholderを残さない。
 - pathだけでなく、内容同一性が必要なauthorityとEvidenceにはDigestを記録する。
 - 次作業は、開始条件と完了条件を説明できる一作業に限定する。
+- 最終stage前に`python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`を実行する。
+- Git欄へ自己SHA、固定ahead／behind、push済否、未コミットsnapshotを記録しない。
 
 ## 現在位置
 
@@ -81,8 +83,9 @@
 ## Git・Test
 
 - branch：`{{branch}}`
-- HEAD：`{{commit SHA}}`
-- worktree：`{{clean／変更概要}}`
+- commit境界：本handoffを含むcommit完了時点
+- Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
+- worktree：本handoffを含むcommit完了時点でclean
 - 直近の関連Test：`{{command、結果または未実施理由}}`
 - 直近の全Test：`{{command、結果または未実施理由}}`
 - 差分検査：`{{command、結果}}`
@@ -93,6 +96,7 @@
   参照Digestを更新する。
 - 報告だけでClaimを`verified`にせず、Evidenceと観測した事後状態を記録する。
 - 手戻り時は手作業との因果を確認し、原因または原因候補なら機械処理候補とrouteを記録する。
+- Git欄はcommit安定形式を維持し、mutableなGit状態はGitから機械取得する。
 - TODOは現行handoffだけを保持し、過去sessionの時系列logにしない。
 - Stage変更、長期中断、大きな計画改定など、独立保持する価値がある場合だけ
   `records/session-handoffs/`へ日付付きの不変snapshotを作る。

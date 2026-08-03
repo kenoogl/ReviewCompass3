@@ -15,14 +15,14 @@
   `records/development/2026-08-04-session-transcript-eventual-preservation-completion-evidence-v1.md`で閉じた。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`f301e0d9638a57e32aaa9d2a4c2688596774207db5b60d13eaa75cdd24c3d4d9`
+- 進行入口SHA-256：`c593b10dc8668511b1adb86db31b68db1f860ba0369cfc282456fd7c48f7d6aa`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`911d0c49d1646f308a733e45d0af6071cd7206dd80b31e123369e921b0b490db`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
-- 現行開発方針SHA-256：`d37a60ab273520f8ab2e7391bdb402b4a1e92839be69fbe226f5c46c3903ed46`
+- 現行開発方針SHA-256：`444898d51e1190458de000fbc3d6499a5bacee5dce2353a07e723e1b4546dc5e`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-session-transcript-eventual-preservation-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`194c302277299cb3ab8853951f8db8d5d64424d4f16c1798e0a82f40eb41740a`
+  `records/development/2026-08-04-commit-handoff-stability-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`a0e03f686c9879416798ed58a56e610f59e0fb775a9c4c73fb61a16a623ea077`
 
 ## 実施報告照合
 
@@ -489,6 +489,25 @@
     `194c302277299cb3ab8853951f8db8d5d64424d4f16c1798e0a82f40eb41740a`
   - 観測した事後状態：公式全Testは`490 passed in 2.54s`、fallback `false`、correctiveは
     `verified / completed`となり、次の未完了工程はWork 4である。
+- Claim `EC-109`：Humanがcommit後のTODO転記による追加commitを廃止する方針変更を承認した。
+  - Decision：`records/development/2026-08-04-commit-handoff-stability-decision.json`、SHA-256
+    `3569bbdcfdc2cfa0181951aeb0699f2409aa4ed675be5f33ce8afb36dbaf8428`
+  - 観測した事後状態：commit前のcommit安定形式、Git状態の機械取得、commit後read-only照合をscopeへ固定し、
+    guarded commit、amend、hook、履歴書換えを対象外にした。
+- Claim `EC-110`：commit安定TODO validatorの正常、負例、境界例をtest-firstで固定した。
+  - Evidence：`records/development/2026-08-04-commit-handoff-stability-red-evidence-v1.md`、SHA-256
+    `b3fdf564af7cfa51321da721b6534321cf79ef1b8cec64b909ca21a3b32305ed`
+  - 観測した事後状態：初回はmodule未実装だけで`6 failed`、実装後は旧template／TODOだけで
+    `5 passed, 1 failed`となった。
+- Claim `EC-111`：policy、AGENTS、checklist、template、現行TODOと機械validatorをcommit安定形式へ統一した。
+  - Evidence：`records/development/2026-08-04-commit-handoff-stability-completion-evidence-v1.md`、SHA-256
+    `a0e03f686c9879416798ed58a56e610f59e0fb775a9c4c73fb61a16a623ea077`
+  - 観測した事後状態：自己SHA、数値付きahead／behind、push済否、未コミットsnapshotを拒否し、現行TODOと
+    templateのCLI検査はfinding 0だった。
+- Claim `EC-112`：commit handoff恒久対策をGREEN Evidenceへ接続した。
+  - Evidence：同Completion Evidence V1
+  - 観測した事後状態：targeted `6 passed`、公式全Test `496 passed in 2.57s`、fallback `false`で、候補を
+    `manual_rework_candidate / resolved_by_commit_stable_todo_validator`として閉じた。
 
 ### reported_unverified／contradicted
 
@@ -542,6 +561,16 @@
   成果物、capture、Testへの影響はない。期待executorは構造化argvを渡す`machine`、実executorはLLMによる
   shell文字列の直接組立てだった。引用を修正して再検索した。機械処理候補はshell非経由のargv実行または
   composition lint、routeは`manual_operation_candidate / checkpoint`とする。
+- 今回のcommit作業で、権限定義から`.git`がread-onlyだと事前に分かっていたにもかかわらず、最初の
+  `git add`を通常権限で実行し、`.git/index.lock`を作成できず1回停止した。file内容またはGit状態の問題ではなく、
+  Git書込み権限で同じstageを再実行して解消した。期待executorはcommand種別とpermission profileから実行経路を
+  決定する`machine`、実executorはLLMが通常権限を選択した。恒久対策はread-only Git操作を通常権限、Git metadata
+  書込み操作を初回からGit書込み権限へ機械routingし、試行失敗後の権限切替を廃止する。guarded commitは使用しない。
+  routeは`manual_operation_candidate / checkpoint`とする。
+- 今回のcommit後照合では、TODOへ自己SHA、clean、remote状態を転記するための追加commitが発生した。期待executorは
+  commit前に安定handoffを検査する`machine`、実executorはLLMによるpost-commit転記だった。恒久対策として
+  commit安定TODO validator、policy、template、checklist、AGENTSを実装し、targeted／全Testに合格した。routeは
+  `manual_rework_candidate / resolved_by_commit_stable_todo_validator`とする。
 
 ### 未実施
 
@@ -620,12 +649,12 @@ Work 4のDesign差分、代表シナリオ、最初のvertical sliceを選定す
 ## Git・Test
 
 - branch：`main`
-- 直近の成果commit：`895840a`（eventual preservation設計）、`75b6fd6`（collector実装）、
-  `680ce1f`（限定capture完了記録）
-- remote：push未実施。`680ce1f`時点で`origin/main`よりahead 18
-- worktree：`680ce1f`時点でclean。private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git未追加
-- 直近の関連検証：collector `12 passed`、session-log `171 passed`、collector／path `15 passed`
-- 直近の全Test：completion receipt、`490 passed in 2.54s`、fallback `false`
+- commit境界：本handoffを含むcommit完了時点
+- Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
+- worktree：本handoffを含むcommit完了時点でclean
+- private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
+- 直近の関連検証：commit handoff validator `6 passed`、現行TODO／template CLI finding 0
+- 直近の全Test：commit handoff stability receipt、`496 passed in 2.57s`、fallback `false`
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則

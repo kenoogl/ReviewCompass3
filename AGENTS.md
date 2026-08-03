@@ -56,3 +56,9 @@
 - 各コミットは、目的と確認結果を独立して説明できる意味的・論理的な単位に分ける。
 - ファイル数だけを基準に分割せず、途中状態が不整合またはテスト失敗になる分割はしない。
 - 利用者が一括コミットまたは分割方法を指定した場合は、その指定を優先する。
+- 最終コミット前にTODOのGit欄をcommit安定形式へ更新し、
+  `python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`を合格させる。
+- TODOのGit欄には、そのTODOを含むコミット自身のSHA、固定ahead／behind件数、push済否、
+  未コミットsnapshotを記録しない。これらはGitから機械取得する。
+- コミット後はread-only照合だけを行い、自己SHAまたはremote状態の転記だけを目的とする
+  追加コミットを作らない。guarded commitは使用しない。
