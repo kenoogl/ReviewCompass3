@@ -1,0 +1,59 @@
+{
+  "receipt_id": "RC3-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-LIMITED-CAPTURE-2026-08-04-V1",
+  "recorded_at": "2026-08-04T00:53:13+09:00",
+  "status": "verified",
+  "confidentiality_class": "project-internal-value-safe",
+  "decision_binding": {
+    "path": "records/development/2026-08-04-session-transcript-eventual-preservation-storage-decision.json",
+    "sha256": "79c9e7aa781d09cb4afe477919889e12583ae1d8e57b15317046cff5c1e74953"
+  },
+  "capture_scope": {
+    "provider": "codex",
+    "selector": "current Codex Desktop task rollout only",
+    "source_id": "619ff2b0e985199b0006a7166f12ed4b2af26c291ecb1662a9d41d093ac023df",
+    "source_kind": "codex_rollout",
+    "historical_codex_capture": false,
+    "claude_capture": false
+  },
+  "execution": {
+    "first_run_id": "limited-pilot-first-20260804",
+    "first_action": "created",
+    "immediate_rerun_id": "limited-pilot-rerun-20260804",
+    "immediate_rerun_action": "unchanged",
+    "idempotent": true,
+    "state": "reconciled",
+    "event_count": 2595,
+    "issue_count": 0,
+    "captured_raw_bytes": 19305386,
+    "parsed_bytes": 19305386
+  },
+  "artifact_verification": {
+    "artifact_file_count": 5,
+    "raw_sha256": "4746e67013e96520f76c94b739d4614bb615b6520dfad3b5c4bd2b90e84239ba",
+    "verbatim_sha256": "d87155c5fe8ad42f6546d38523042be84d57c8372a048f45935152317beeb079",
+    "cursor_sha256": "0672195688696040aaf560c4a07e094994fc8335e533d5d814d7252e884c8699",
+    "provenance_sha256": "f46cda95d8c889d654228a57c7bd3fe05ed828a05b19e456d8c19b1ce59fbf2c",
+    "ledger_sha256": "156485d0a1f7c2de43125e8f7369bbbb0122701d07387bd1a07301c051457524",
+    "source_prefix_matches": true,
+    "raw_digest_matches_cursor": true,
+    "verbatim_digest_matches_cursor": true,
+    "cursor_provenance_match": true,
+    "redacted_transcript_absent": true
+  },
+  "boundary_verification": {
+    "private_root_outside_repository": true,
+    "directory_count": 28,
+    "all_directory_modes": "0700",
+    "all_file_modes": "0600",
+    "temporary_or_lock_file_count": 0,
+    "private_paths_or_transcript_content_recorded_here": false
+  },
+  "not_performed": [
+    "historical Codex capture",
+    "Claude capture",
+    "redacted transcript generation",
+    "hook, watcher, scheduler, or background service activation",
+    "external transmission",
+    "Git storage of private artifacts"
+  ]
+}

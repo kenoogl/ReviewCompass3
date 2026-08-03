@@ -1,6 +1,6 @@
 # TODO_NEXT_SESSION
 
-更新日：2026-08-03
+更新日：2026-08-04
 用途：session更新・次sessionへの引き継ぎ
 
 > 本書は人向けの入口であり、Workflow state、完了判断、Evidenceの正本ではない。
@@ -9,8 +9,10 @@
 ## 現在位置
 
 - 全体：初期開発Work 1B、Work 2、Work 3完了。次の未完了工程はWork 4
-- 現在の工程：Work 3 `verified / completed`、Work 4 `not_started`
-- activeなTask Contract／Work Item：正式Task Contractなし。activeなWork Itemなし
+- 現在の工程：Work 3 `verified / completed`、Work 4 `not_started`。inter-work correctiveは
+  `verified / completed`
+- activeなTask Contract／Work Item：なし。直近Task Contractは
+  `records/development/2026-08-04-session-transcript-eventual-preservation-completion-evidence-v1.md`で閉じた。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
 - 進行入口SHA-256：`f301e0d9638a57e32aaa9d2a4c2688596774207db5b60d13eaa75cdd24c3d4d9`
@@ -19,8 +21,8 @@
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`d37a60ab273520f8ab2e7391bdb402b4a1e92839be69fbe226f5c46c3903ed46`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-03-session-transcript-source-formats-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`bf8aba264810f19bb8ac495ce579412d6df589e286a72484f83efc88ed3f8fd4`
+  `records/development/2026-08-04-session-transcript-eventual-preservation-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`194c302277299cb3ab8853951f8db8d5d64424d4f16c1798e0a82f40eb41740a`
 
 ## 実施報告照合
 
@@ -433,6 +435,60 @@
     `bf8aba264810f19bb8ac495ce579412d6df589e286a72484f83efc88ed3f8fd4`
   - 観測した事後状態：実rolloutは`codex_rollout`、unknown issue 0、公式全Testは
     `477 passed in 2.38s`、fallback `false`だった。private本文は表示またはGit保存していない。
+- Claim `EC-099`：Humanが終了hook非依存のeventual preservationを設計方向として承認した。
+  - Decision：`records/development/2026-08-03-session-transcript-eventual-preservation-decision.json`、SHA-256
+    `620fde82dc424141f4f5a9e8ce383fd9669506149e764eceebff0ada6addfcba`
+  - 観測した事後状態：継続回収、定期／起動時再照合、機械的cursor／重複排除／Digest、hookの補助trigger化を
+    approved directionへ固定し、実装、activation、保存場所、retentionを承認範囲外に維持した。
+- Claim `EC-100`：eventual preservationの保証、artifact、状態、復旧、責務、Acceptanceを設計文書へ固定した。
+  - Evidence：
+    `records/development/2026-08-03-session-transcript-eventual-preservation-documentation-evidence-v1.md`、SHA-256
+    `cf2aad73102777057cf8e29b2829b18e1d7cb1eb7fcfa7d85a07217d3279182e`
+  - 観測した事後状態：byte-exact raw、private verbatim、redacted派生物を分離し、現行再利用候補8責務と
+    未実装のdurable cursor、startup reconcile、artifact分離を区別した。公式全Testは
+    `477 passed in 2.42s`、fallback `false`だった。
+- Claim `EC-101`：Humanがeventual preservationのfixture実装と限定実ログ保存までを承認した。
+  - Decision：
+    `records/development/2026-08-03-session-transcript-eventual-preservation-implementation-decision.json`、SHA-256
+    `1fe3c2a6cf8a3430ffb9a290a437dbc34777d2514beac910a26f52a419732262`
+  - 観測した事後状態：collector、cursor、reconcile、artifact分離、復旧Test、保存候補、Human判断後の
+    現session 1件保存をscopeへ固定し、hook／watcher／scheduler、外部送信、Work 4を対象外に維持した。
+- Claim `EC-102`：Task Contractと初回REDを固定した。
+  - Evidence：`records/development/2026-08-04-session-transcript-eventual-preservation-red-evidence-v1.md`、SHA-256
+    `f7e8649c2ebff2d9941716d67c531990664b53364c20d2c70f70166a3f6938a1`
+  - 観測した事後状態：module未実装10件、CLI入口未実装1件だけを理由として`11 failed in 0.16s`となった。
+- Claim `EC-103`：manual collector、durable cursor、startup-compatible reconcile、private artifact分離を実装した。
+  - Evidence：
+    `records/development/2026-08-04-session-transcript-eventual-preservation-implementation-checkpoint-evidence-v1.md`、
+    SHA-256 `134a00b9ba94dca600b4f26f4b0ce132099fc2eabd72648cda8e30e4f3c8479a`
+  - 観測した事後状態：同一再実行、追記、部分行、中断、divergence、3形式、missing／unknown、単一source CLIが
+    greenとなり、session-log全Testは`171 passed`だった。
+- Claim `EC-104`：private permissionとOS標準pathの実環境不足をnegative testで修復した。
+  - Evidence：同Implementation Checkpoint Evidence V1の4節
+  - 観測した事後状態：directory `0700`、file `0600`へ固定し、optional `platformdirs`がないmacOSでも
+    標準library fallbackでpath解決した。公式全Testは`490 passed in 2.19s`、fallback `false`だった。
+- Claim `EC-105`：現session 1件だけを保存するstorage／operation候補をHuman判断へ固定した。
+  - Candidate：`records/development/2026-08-04-session-transcript-eventual-preservation-storage-candidate-v1.json`、
+    SHA-256 `0c712308275cd321870fe2c203b0b53207bc817108a9fba3910da6ee730a5fdc`
+  - 観測した事後状態：推奨は`option_1_os_standard_limited_pilot`。実private logは未copy、automationは未有効で、
+    Task Contractは`human_storage_decision_pending`を維持した。
+- Claim `EC-106`：Humanが選択肢1としてOS標準rootへの限定pilotを承認した。
+  - Decision：`records/development/2026-08-04-session-transcript-eventual-preservation-storage-decision.json`、
+    SHA-256 `79c9e7aa781d09cb4afe477919889e12583ae1d8e57b15317046cff5c1e74953`
+  - 観測した事後状態：現在のCodex Desktop task 1件と5 private artifactだけを承認し、過去履歴、Claude、
+    redacted transcript、automation、外部送信、Git保存を対象外に維持した。
+- Claim `EC-107`：現在のCodex rolloutを限定保存し、同一即時再実行と完全性を検証した。
+  - Receipt：
+    `records/development/2026-08-04-session-transcript-eventual-preservation-limited-capture-receipt-v1.json`、
+    SHA-256 `ef351d6a7e9754d5206a5a5183d8e2230bd90c156d9763473985331e3cb5f77e`
+  - 観測した事後状態：初回`created`、再実行`unchanged`、event 2595、issue 0、source prefix一致、
+    5 artifactのDigest結線合格、directory `0700`、file `0600`、一時／lock残留0、Git混入0だった。
+- Claim `EC-108`：Task Contractを限定captureの完了Evidenceへ接続した。
+  - Evidence：
+    `records/development/2026-08-04-session-transcript-eventual-preservation-completion-evidence-v1.md`、SHA-256
+    `194c302277299cb3ab8853951f8db8d5d64424d4f16c1798e0a82f40eb41740a`
+  - 観測した事後状態：公式全Testは`490 passed in 2.54s`、fallback `false`、correctiveは
+    `verified / completed`となり、次の未完了工程はWork 4である。
 
 ### reported_unverified／contradicted
 
@@ -474,14 +530,26 @@
   `UnicodeDecodeError`にする契約がunknown sourceへ変わる回帰を1件検出した。実executorと期待executorはともに
   `machine`で、手作業因果はない。decode errorを変換せず伝播させ、関連`30 passed`、全`477 passed`へ復旧した。
   既存機械Testが回帰を閉じており、routeは`machine_regression / closed_by_existing_contract`とする。
+- 今回の文書化では失敗、手戻り、手入力転記訂正は発生しなかった。path存在、見出し、JSON、Digest、Testを
+  機械処理で照合し、新しい`manual_rework_candidate`／`manual_operation_candidate`はない。
+- 今回の実装調査で、並列`functions.exec`のJavaScript出力区切りをLLMが誤記し、構文エラーが1回発生した。
+  期待executorはtool-call schemaを検査する`machine`、実executorはLLM直接組立てだった。成果物影響はない。
+  機械処理候補はcomposition lint、routeは`manual_operation_candidate / checkpoint`とする。
+- 今回のcompile確認はworkspace外cacheへの書込みをsandboxが拒否した。実／期待executorはともに`machine`で
+  手作業因果はない。task専用`PYTHONPYCACHEPREFIX`で合格した。機械処理候補はcompile runnerのcache固定、
+  routeは`machine_environment_mismatch / checkpoint`とする。
+- 今回の限定capture後の補助検索で、検索語中のbacktickをshellが解釈し、一部検索だけが1回失敗した。
+  成果物、capture、Testへの影響はない。期待executorは構造化argvを渡す`machine`、実executorはLLMによる
+  shell文字列の直接組立てだった。引用を修正して再検索した。機械処理候補はshell非経由のargv実行または
+  composition lint、routeは`manual_operation_candidate / checkpoint`とする。
 
 ### 未実施
 
 - Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定
-- platform別OS標準rootの具体解決とProject Bindingのdurable保存
+- Project Bindingのdurable保存
 - 実施報告照合の自動Claim抽出、Provenance対応、完了state結線
-- 実private rolloutのlocal transcript保存先へのcapture、session hook／Desktop監視／Claude hookの有効化
-- private transcriptの保存期間、削除、暗号化、アクセス制御の運用判断
+- private transcriptの長期retention、削除、application-layer暗号化、backupの運用判断
+- session hook／Desktop監視／Claude hook／scheduler／background serviceの有効化
 
 ### 残余risk
 
@@ -510,37 +578,35 @@
   Evidenceにはrunner receiptを要求する。
 - Policy v5により、今後の作業後報告は手戻りと手作業の因果、期待／実executor、Evidence、機械処理候補、
   routeを含む。決定的処理をLLMが行った場合は、手戻りがなくても改善候補として報告する。
-- transcript parserは3 source kindへ対応したが、実ログの自動保存は有効化していない。rawと可読逐語録を
-  local non-Git境界へ実際に保存するには、保存先と運用方法の明示判断が必要である。
+- eventual preservationのmanual collector、durable cursor、reconcile、artifact分離と限定captureは完了した。
+  capture後に追記された会話は次のmanual reconcile対象である。自動実行は未実装・未有効化であり、
+  hook／watcherをcorrectness pathにはしない。
 
 ## 次に行う一作業
 
-Work 4の固定sourceと設計対象を確認し、Design差分と最初の`new_development / fresh` vertical sliceを
-Human判断可能な候補へ固定する。
+Work 4のDesign差分、代表シナリオ、最初のvertical sliceを選定する。
 
 開始条件：
 
-- Work 3 Completion Evidence SHA-256が
-  `e602092b3236f62697b2f24d2b706095dda6b8c83e22e5b6211fb539542c7221`である。
-- checklist Work 3が`7/7 completed`、Work 4が`0/8 completed`、SHA-256
-  `f301e0d9638a57e32aaa9d2a4c2688596774207db5b60d13eaa75cdd24c3d4d9`である。
-- Requirement authority v2が`effective / requirements=50`である。
-- blocker 0、Work 4開始を阻害するstale 0である。
+- checklistでWork 3が`verified / completed`、Work 4が`not_started`である。
+- eventual preservation Completion Evidence SHA-256が
+  `194c302277299cb3ab8853951f8db8d5d64424d4f16c1798e0a82f40eb41740a`である。
+- 公式全Testが`490 passed`、fallback `false`である。
 
 完了条件：
 
-- Work 4の固定source、7設計対象、代表シナリオ境界をDigest付きで列挙する。
-- 最初のvertical slice候補について、対象、対象外、owner、停止、復旧、Acceptanceを明示する。
-- Design本文または実装を変更する前に、候補と未確定事項をHuman判断へ渡す。
+- Work 4の固定sourceとauthority境界を再照合する。
+- Design差分、代表シナリオ、最初の小さなE2E縦切りを候補へ固定する。
+- 方針変更または意味的裁定があればHuman判断を得る。
 
-後続作業：Human判断後にWork 4の小さなE2E縦切りをSDDで進める。
+後続作業：承認されたvertical sliceをtest-firstで進める。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
 - Human判断待ち：なし
-- 後続Human判断待ち：なし
-- 再開条件：Work 3 Completion Evidence、checklist、authority v2のDigest一致を確認する
+- 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
+- 再開条件：checklist、Completion Evidence、Test receiptのDigest一致を確認する
 
 ## stale・deferred
 
@@ -556,9 +622,10 @@ Human判断可能な候補へ固定する。
 - branch：`main`
 - 直近の成果commit：`9d1ff61`（session transcript source）、`a3fa630`（Work 3段完了）
 - remote：push未実施。引き継ぎ更新commit後は`origin/main`よりahead 15
-- worktree：成果変更は2分割でコミット済み。本引き継ぎ更新commit後にcleanを確認する
-- 直近の関連Test：session transcript source関連`30 passed in 0.20s`
-- 直近の全Test：session transcript source receipt、`477 passed in 2.38s`、fallback `false`
+- worktree：eventual preservation設計、実装、Test、Decision、限定capture receipt、Evidence、TODOを未コミットで保持。
+  private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git未追加
+- 直近の関連検証：collector `12 passed`、session-log `171 passed`、collector／path `15 passed`
+- 直近の全Test：completion receipt、`490 passed in 2.54s`、fallback `false`
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則

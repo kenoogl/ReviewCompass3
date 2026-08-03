@@ -1,0 +1,51 @@
+{
+  "decision_id": "RC3-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-STORAGE-DECISION-2026-08-04-V1",
+  "decided_at": "2026-08-04T00:51:19+09:00",
+  "status": "approved_effective",
+  "decision_maker": "human",
+  "instruction": "1",
+  "selected_option": "option_1_os_standard_limited_pilot",
+  "candidate_binding": {
+    "path": "records/development/2026-08-04-session-transcript-eventual-preservation-storage-candidate-v1.json",
+    "sha256": "0c712308275cd321870fe2c203b0b53207bc817108a9fba3910da6ee730a5fdc"
+  },
+  "authorized_storage": {
+    "logical_path": "reviewcompass3_user_data/eventual-preservation",
+    "resolver": "tools.session_logs.deployment_paths.resolve_deployment_paths().data_root / eventual-preservation",
+    "repository_external_required": true,
+    "directories": "0700",
+    "files": "0600",
+    "application_layer_encryption": false,
+    "volume_encryption": "not_assumed_or_verified"
+  },
+  "authorized_capture": {
+    "provider": "codex",
+    "selector": "current Codex Desktop task rollout only",
+    "source_kind_required": "codex_rollout",
+    "artifacts": [
+      "byte_exact_raw",
+      "private_verbatim_transcript",
+      "durable_cursor",
+      "private_provenance",
+      "integrity_ledger"
+    ],
+    "redacted_transcript": false,
+    "execution": "one_manual_capture_then_idempotent_rerun"
+  },
+  "retention": {
+    "automatic_deletion": false,
+    "review_due": "2026-09-03",
+    "deletion_before_review": "human_decision_required"
+  },
+  "not_authorized": [
+    "historical Codex capture",
+    "Claude capture",
+    "hook activation",
+    "watcher activation",
+    "scheduler activation",
+    "background service activation",
+    "external transmission",
+    "Git storage of private artifacts"
+  ],
+  "effect": "Authorizes creation of the resolved OS-standard private root and one capture of the current Codex Desktop rollout followed by an immediate identical rerun and integrity verification."
+}
