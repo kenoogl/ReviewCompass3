@@ -1,0 +1,49 @@
+{
+  "decision_id": "RC3-DEPLOYMENT-PROJECT-ARTIFACT-BOUNDARY-DECISION-2026-08-04-V1",
+  "decided_at": "2026-08-04T06:20:13+09:00",
+  "status": "approved_corrective_in_progress",
+  "decision_maker": "human",
+  "instruction": "OK.メモ作成。対応を始める。",
+  "approved": {
+    "design_memo": {
+      "path": "docs/design/2026-08-04-deployment-project-artifact-boundary-adoption-memo.md",
+      "sha256": "a12434bb1fd927be25b060b07804877937406f93e14735f8564f19e3988752f1"
+    },
+    "predecessor_observation": {
+      "path": "records/sources/2026-08-04-predecessor-deployment-package-observation.md",
+      "sha256": "8ebd0bc13be4c6175cafc651d2950e7445267c8093756a6d398ea1963db800c2"
+    },
+    "deployment_topology": "build a versioned stable package from a Deployment Manifest allowlist and connect the target project through Integration Manifest and Project Binding",
+    "project_artifact_boundary": ".reviewcompass/workflow/ is the stable project-side root; deployment package updates do not move or rewrite canonical workflow records",
+    "record_identity_rule": "Issue, Plan, Decision, Challenge, Verdict and Evidence remain separate records connected by ID, version, digest and relation kind",
+    "self_application_rule": "generate stable deployment from an approved snapshot and keep it separate from development source, state and data",
+    "migration_rule": "semantic Project Artifact migration is exceptional and Human-approved, not an ordinary remedy for directory design changes"
+  },
+  "corrective_scope": [
+    "record predecessor deployment observations",
+    "record the adopted deployment and Project Artifact boundary",
+    "prepare a successor Layout Baseline candidate",
+    "add test-first normal, negative and boundary fixtures",
+    "make the minimum validator changes required by the successor baseline",
+    "reverify the successor baseline before creating Issue Pilot records"
+  ],
+  "supersedes": [
+    {
+      "artifact": "docs/design/2026-08-04-reviewcompass2-issue-path-adoption-pilot-memo.md",
+      "scope": "section 6 provisional records/development/issue-resolution-pilot placement only"
+    },
+    {
+      "artifact": "docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md",
+      "scope": "section 4.2 provisional records/development/issue-resolution-pilot placement only"
+    }
+  ],
+  "preserved_constraints": [
+    "do not edit fixed predecessor Evidence in place",
+    "do not edit Layout Baseline v1 or Work 1A Evidence v1 in place",
+    "do not create actual Issue Pilot records before the successor layout is verified and approved",
+    "do not formalize the product Issue Resolution schema or Workflow permit in this corrective",
+    "do not implement the complete Work 7A or Work 7B deployment lifecycle in this corrective",
+    "do not commit or push without a separate Human instruction"
+  ],
+  "next_action": "create Layout Baseline v2 candidate and RED tests for the workflow root and no-move package boundary"
+}

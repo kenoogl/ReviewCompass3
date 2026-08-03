@@ -1,0 +1,59 @@
+{
+  "decision_id": "RC3-LAYOUT-BASELINE-V2-APPROVAL-DECISION-2026-08-04-V1",
+  "decided_at": "2026-08-04T06:32:42+09:00",
+  "status": "approved_effective",
+  "decision_maker": "human",
+  "instruction": "承認する",
+  "approved_target": {
+    "path": "records/development/2026-08-04-layout-baseline-v2-candidate.json",
+    "sha256": "4a086be730b3310cc6933826ab6dac751e36af0596c5a8b6a7e381357d956282",
+    "record_id": "RC3-LAYOUT-BASELINE-2026-08-04-V2-CANDIDATE",
+    "effective_layout_version": 2,
+    "authority_status": "current"
+  },
+  "verification": {
+    "candidate": {
+      "path": "records/development/2026-08-04-layout-baseline-v2-verification-candidate-v1.md",
+      "sha256": "b3088a530b2150ebde4ed8c8b5c2b50ae763d4c9635758548e2934dbab5c1fbc"
+    },
+    "official_test_receipt": {
+      "path": "records/development/2026-08-04-layout-baseline-v2-green-test-receipt-v1.json",
+      "sha256": "0c95f01246bba78272cbd55a6f3ae1e2367d2b1ca9c446ead048440b836c8aae",
+      "result": "500 passed in 2.56s",
+      "fallback_used": false
+    }
+  },
+  "effective_rules": [
+    ".reviewcompass/workflow is the stable project-side workflow artifact root",
+    "canonical workflow records are append-only and are not moved or rewritten as an ordinary change",
+    "Issue, Plan, Decision, Challenge, Verdict and Evidence remain separate identities connected by ID, version, digest and relation kind",
+    "deployment packages are selected by manifest allowlist and exclude Project Manifest and workflow Project Artifacts",
+    "deployment package replacement does not require Project Artifact movement or Runtime Core reinstallation",
+    "semantic Project Artifact migration is exceptional and requires separate Human approval"
+  ],
+  "previous_authority": {
+    "path": "records/development/2026-08-03-layout-baseline-v1.json",
+    "sha256": "c18ee7a14a5720e578ea24b71e0cc120524fcfc2bca9df87a81de795cfc36cc2",
+    "record_id": "RC3-LAYOUT-BASELINE-2026-08-03-V1",
+    "new_status": "historical_verified",
+    "superseded_scope": "current Layout selection and Project Manifest shape",
+    "preserved_evidence": {
+      "path": "records/development/2026-08-03-work-1a-layout-evidence-v1.md",
+      "sha256": "5d54c7de759388ae81c1fefebcc50c817c0b38ae2bcdc65444f47aa48cc8e899"
+    }
+  },
+  "immutability": {
+    "approved_candidate_is_not_rewritten": true,
+    "candidate_filename_and_embedded_status_are_historical_content": true,
+    "current_authority_is_established_by_this_external_decision": true,
+    "v1_record_and_evidence_are_not_deleted_or_edited": true
+  },
+  "pilot_control": {
+    "placement_boundary_approved": true,
+    "actual_pilot_record_creation_permitted_after_project_manifest_v2_validation": true,
+    "product_issue_schema_formalized": false,
+    "workflow_permit_implemented": false,
+    "work_7_lifecycle_implemented": false
+  },
+  "next_action": "create and validate the ReviewCompass3 Project Manifest v2 and .reviewcompass/workflow root before the first Pilot Improvement Candidate"
+}

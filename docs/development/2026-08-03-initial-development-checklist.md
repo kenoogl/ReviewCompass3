@@ -155,6 +155,14 @@ source catalog 10件、前身inventory 2件を再読込し、全件一致した�
 Layout一式はcommit `d3add9f2e6bc812bf512a36a24877e29879e9842`へ固定し、targeted
 `7 passed`、全`419 passed`。結果は`verified / completed`。
 
+2026-08-04 successor：Project Artifactを移動せずdeployment packageを交換する境界を追加したLayout Baseline
+v2をHumanが承認した。現行authorityは
+`records/development/2026-08-04-layout-baseline-v2-approval-decision.json`、SHA-256
+`856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`。承認対象v2 candidateは
+SHA-256 `4a086be730b3310cc6933826ab6dac751e36af0596c5a8b6a7e381357d956282`、公式全Testは
+`500 passed in 2.56s`、fallback `false`。v1 recordとEvidenceは`historical_verified`として保持する。
+本承認はWork 7A／7Bのdeployment lifecycle実装完了を意味しない。
+
 ## 5. Work 1B：Session Log Bootstrapと現在位置text表示
 
 ### Session Evidence

@@ -1,0 +1,16 @@
+{
+  "artifact_roots": {
+    "contracts": ".reviewcompass/contracts",
+    "design_decisions": ".reviewcompass/design-decisions",
+    "policies": ".reviewcompass/policies",
+    "requirement_maps": ".reviewcompass/requirement-maps",
+    "reuse": ".reviewcompass/reuse",
+    "verified_artifacts": ".reviewcompass/verified-artifacts",
+    "workflow": ".reviewcompass/workflow"
+  },
+  "document_links": [
+    "docs/layout-entry.md"
+  ],
+  "project_id": "rc3-fixture-empty-project-v2",
+  "schema_version": 2
+}

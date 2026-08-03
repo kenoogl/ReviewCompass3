@@ -31,13 +31,17 @@ WRITABLE_RUNTIME_ROOTS = {
     "sensitive_root",
     "evaluation_root",
 }
-ARTIFACT_ROOTS = {
+ARTIFACT_ROOTS_V1 = {
     "contracts",
     "design_decisions",
     "policies",
     "requirement_maps",
     "reuse",
     "verified_artifacts",
+}
+ARTIFACT_ROOTS_BY_VERSION = {
+    1: ARTIFACT_ROOTS_V1,
+    2: ARTIFACT_ROOTS_V1 | {"workflow"},
 }
 BINDING_FIELDS = {
     "binding_id",
@@ -144,10 +148,20 @@ def load_layout_baseline(record_path):
         "migration_policy",
         "verification",
     }
-    if not isinstance(record, dict) or set(record) != required:
+    if not isinstance(record, dict):
         raise LayoutError("Layout Baseline Record has unknown or missing keys")
-    if record["schema_version"] != 1 or record["layout_version"] != 1:
+    version = (record.get("schema_version"), record.get("layout_version"))
+    if version == (1, 1):
+        expected = required
+    elif version == (2, 2):
+        expected = required | {
+            "deployment_package_policy",
+            "project_artifact_policy",
+        }
+    else:
         raise LayoutError("Unsupported Layout Baseline version")
+    if set(record) != expected:
+        raise LayoutError("Layout Baseline Record has unknown or missing keys")
     if set(record["logical_roots"]) != LOGICAL_ROOTS:
         raise LayoutError("Layout Baseline logical roots are incomplete")
     if record["environment_variables"] != ENVIRONMENT_VARIABLES:
@@ -157,6 +171,31 @@ def load_layout_baseline(record_path):
         "external_roots": sorted(EXTERNAL_ROOTS),
     }:
         raise LayoutError("Layout Baseline Git boundary is invalid")
+    if version == (2, 2):
+        if record["project_artifact_policy"] != {
+            "canonical_root_name": "workflow",
+            "canonical_project_artifact_move": "prohibited",
+            "record_relation_identity": [
+                "id",
+                "version",
+                "digest",
+                "relation_kind",
+            ],
+            "classification_change": "rebuild_projection",
+            "semantic_data_migration": "exceptional_human_approved",
+        }:
+            raise LayoutError("Layout Baseline Project Artifact policy is invalid")
+        if record["deployment_package_policy"] != {
+            "source_selection": "manifest_allowlist",
+            "deployment_package_replaceable": True,
+            "runtime_projection_rebuildable": True,
+            "project_artifact_update_requires_runtime_reinstall": False,
+            "prohibited_project_paths": [
+                ".reviewcompass/project-manifest.json",
+                ".reviewcompass/workflow",
+            ],
+        }:
+            raise LayoutError("Layout Baseline deployment package policy is invalid")
     return record
 
 
@@ -262,19 +301,76 @@ def _load_project_manifest(project_root):
     }
     if not isinstance(manifest, dict) or set(manifest) != expected:
         raise LayoutError("Project Manifest has unknown or missing keys")
-    if manifest["schema_version"] != 1:
+    artifact_roots = ARTIFACT_ROOTS_BY_VERSION.get(manifest["schema_version"])
+    if artifact_roots is None:
         raise LayoutError("Unsupported Project Manifest version")
     if _IDENTIFIER.fullmatch(manifest.get("project_id", "")) is None:
         raise LayoutError("Project Manifest project identity is invalid")
     if (
         not isinstance(manifest["artifact_roots"], dict)
-        or set(manifest["artifact_roots"]) != ARTIFACT_ROOTS
+        or set(manifest["artifact_roots"]) != artifact_roots
     ):
         raise LayoutError("Project Manifest artifact roots are incomplete")
     if not isinstance(manifest["document_links"], list):
         raise LayoutError("Project Manifest document links are invalid")
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     return manifest, digest
+
+
+def snapshot_project_artifacts(project_root, artifact_root_name):
+    root = _absolute_path(project_root, name="project_root")
+    if not root.is_dir():
+        raise LayoutError("project_root must be an existing directory")
+    manifest, _digest = _load_project_manifest(root)
+    if artifact_root_name not in manifest["artifact_roots"]:
+        raise LayoutError("Project Manifest artifact root is unknown")
+    artifact_root = _resolve_project_path(
+        root,
+        manifest["artifact_roots"][artifact_root_name],
+        field=f"artifact_roots.{artifact_root_name}",
+        must_be_file=False,
+    )
+    snapshot = {}
+    for path in sorted(item for item in artifact_root.rglob("*") if item.is_file()):
+        resolved = path.resolve()
+        if path.is_symlink() or not _inside(resolved, artifact_root):
+            raise LayoutError("Project Artifact must remain inside its root")
+        relative = path.relative_to(root).as_posix()
+        snapshot[relative] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return snapshot
+
+
+def validate_project_artifact_append_only(before, after):
+    if not isinstance(before, dict) or not isinstance(after, dict):
+        raise LayoutError("Project Artifact snapshots must be mappings")
+    changed = [
+        path
+        for path, digest in before.items()
+        if after.get(path) != digest
+    ]
+    if changed:
+        raise LayoutError(
+            "Canonical Project Artifact was removed or rewritten: "
+            + ", ".join(sorted(changed))
+        )
+    return True
+
+
+def validate_deployment_package_layout(package_root, baseline):
+    root = _absolute_path(package_root, name="deployment package root")
+    if not root.is_dir():
+        raise LayoutError("deployment package root must be an existing directory")
+    policy = baseline.get("deployment_package_policy")
+    if not isinstance(policy, dict):
+        raise LayoutError("Deployment package policy is required")
+    for value in policy.get("prohibited_project_paths", []):
+        relative = _safe_relative(value, field="prohibited_project_paths")
+        target = root.joinpath(*relative.parts)
+        if target.exists() or target.is_symlink():
+            raise LayoutError(
+                "Deployment package contains a prohibited Project Artifact path"
+            )
+    return True
 
 
 def _resolve_project_path(project_root, value, *, field, must_be_file):

@@ -11,23 +11,24 @@
 - 全体：初期開発Work 1B、Work 2、Work 3完了。次の未完了工程はWork 4
 - 現在の工程：Work 3 `verified / completed`、Work 4 `not_started`。inter-work correctiveは
   `verified / completed`
-- Issue Resolution早期Pilot：Human承認済み、実装保留。対象はTODO履歴累積・巨大化の一件だけで、
-  Humanの明示的な再開指示まではartifact作成、TODO縮小、validator拡張を開始しない。
+- Issue Resolution早期Pilot：`.reviewcompass/workflow/`境界のLayout Baseline v2をHuman承認済み。
+  実Pilot recordの前に、ReviewCompass3 project用Manifest v2とworkflow rootを作成・検証する。
+- デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
+  `records/development/2026-08-04-layout-baseline-v2-approval-decision.json`、SHA-256
+  `856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`。
 - TODO手戻り候補対策の修正案：`docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
-- activeなTask Contract／Work Item：なし。直近Task Contractは
-  `records/development/2026-08-04-session-transcript-eventual-preservation-completion-evidence-v1.md`で閉じた。
+- activeなTask Contract／Work Item：なし。次はProject Manifest v2とworkflow rootのbootstrap。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`c593b10dc8668511b1adb86db31b68db1f860ba0369cfc282456fd7c48f7d6aa`
+- 進行入口SHA-256：`e6c1f78e9fa1131d7ec617d0f348d94a46078e5f8a6c9c62826df0f9559dab6e`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`911d0c49d1646f308a733e45d0af6071cd7206dd80b31e123369e921b0b490db`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`444898d51e1190458de000fbc3d6499a5bacee5dce2353a07e723e1b4546dc5e`
-- 直近のDecision／Evidence：
-  `records/development/2026-08-04-reviewcompass2-issue-path-early-pilot-decision.json`
-- Decision／Evidence SHA-256：`5e19bca05aead7836595168f8e44edc3a5f146507ab33ffde3646de964814f9f`
+- 直近のDecision：`records/development/2026-08-04-layout-baseline-v2-approval-decision.json`
+- Decision SHA-256：`856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`
 
 ## 実施報告照合
 
@@ -579,6 +580,9 @@
 
 ### 未実施
 
+- ReviewCompass3 project用Project Manifest v2と`.reviewcompass/workflow/`rootの作成・検証
+- `.reviewcompass/workflow/`を使うIssue Resolution早期Pilot recordの作成
+- Deployment Manifest、package builder、原子的切替、rollbackのWork 7実装
 - Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定
 - Project Bindingのdurable保存
 - 実施報告照合の自動Claim抽出、Provenance対応、完了state結線
@@ -618,30 +622,27 @@
 
 ## 次に行う一作業
 
-Work 4のDesign差分、代表シナリオ、最初のvertical sliceを選定する。
-
-Issue Resolution早期Pilotは承認済みだが実装保留であり、Humanの明示的な再開指示までは開始しない。
+ReviewCompass3 project用Project Manifest v2と`.reviewcompass/workflow/`rootをtest-firstで作成・検証する。
 
 開始条件：
 
-- checklistでWork 3が`verified / completed`、Work 4が`not_started`である。
-- eventual preservation Completion Evidence SHA-256が
-  `194c302277299cb3ab8853951f8db8d5d64424d4f16c1798e0a82f40eb41740a`である。
-- 公式全Testが`490 passed`、fallback `false`である。
+- v2 Approval Decision SHA-256が`856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e`である。
+- v2 candidate SHA-256が`4a086be730b3310cc6933826ab6dac751e36af0596c5a8b6a7e381357d956282`である。
+- repository rootに既存`.reviewcompass/project-manifest.json`がないことを確認済みである。
 
 完了条件：
 
-- Work 4の固定sourceとauthority境界を再照合する。
-- Design差分、代表シナリオ、最初の小さなE2E縦切りを候補へ固定する。
-- 方針変更または意味的裁定があればHuman判断を得る。
+- Project Manifest v2が承認済みartifact rootsとProject IDを持つ。
+- `.reviewcompass/workflow/`がproject root内にあり、端末固有絶対pathを含まない。
+- current validatorがManifest、workflow root、checkout移動後のBindingを検証できる。
 
-後続作業：承認されたvertical sliceをtest-firstで進める。
+後続作業：最初のPilot Improvement CandidateとHuman Triage Decisionを作る。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
 - Human判断待ち：なし
-- 実行保留：Issue Resolution早期Pilot。再開authorityはHumanの明示指示
+- 実行保留：実際のIssue Resolution Pilot record作成。Project Manifest v2検証後に開始する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：checklist、Completion Evidence、Test receiptのDigest一致を確認する
 
@@ -653,7 +654,7 @@ Issue Resolution早期Pilotは承認済みだが実装保留であり、Humanの
   その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
   Issue Resolution・実施報告照合の正式automation、汎用Task Registry／plugin system。Issue Resolutionの
-  development限定早期Pilotは承認済み・実装保留であり、正式schemaまたはWork 8正式Pilotを前倒ししない。
+  development限定早期PilotはProject Manifest bootstrap待ちであり、正式schemaまたはWork 8正式Pilotを前倒ししない。
 
 ## Git・Test
 
@@ -662,8 +663,8 @@ Issue Resolution早期Pilotは承認済みだが実装保留であり、Humanの
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：commit handoff validator `6 passed`、現行TODO／template CLI finding 0
-- 直近の全Test：commit handoff stability receipt、`496 passed in 2.57s`、fallback `false`
+- 直近の関連検証：Layout Baseline `11 passed in 0.05s`、v2 fixture絶対path finding 0
+- 直近の全Test：Layout Baseline v2 official receipt、`500 passed in 2.56s`、fallback `false`
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則

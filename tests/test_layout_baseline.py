@@ -15,12 +15,25 @@ BASELINE_RECORD = (
     / "development"
     / "2026-08-03-layout-baseline-v1.json"
 )
+BASELINE_V2_CANDIDATE = (
+    PROJECT_ROOT
+    / "records"
+    / "development"
+    / "2026-08-04-layout-baseline-v2-candidate.json"
+)
 EMPTY_PROJECT = (
     PROJECT_ROOT
     / "tests"
     / "fixtures"
     / "layout"
     / "empty-project"
+)
+EMPTY_PROJECT_V2 = (
+    PROJECT_ROOT
+    / "tests"
+    / "fixtures"
+    / "layout"
+    / "empty-project-v2"
 )
 LOGICAL_ROOTS = {
     "code_root",
@@ -261,6 +274,113 @@ def test_project_relative_escape_and_incomplete_migration_are_rejected(
             checkout_id="checkout-a",
             captured_at="2026-08-03T00:00:00+09:00",
         )
+
+
+def test_v2_baseline_fixes_workflow_and_deployment_package_boundary():
+    layout = _layout()
+
+    baseline = layout.load_layout_baseline(BASELINE_V2_CANDIDATE)
+
+    assert baseline["schema_version"] == 2
+    assert baseline["layout_version"] == 2
+    assert baseline["project_artifact_policy"] == {
+        "canonical_root_name": "workflow",
+        "canonical_project_artifact_move": "prohibited",
+        "record_relation_identity": [
+            "id",
+            "version",
+            "digest",
+            "relation_kind",
+        ],
+        "classification_change": "rebuild_projection",
+        "semantic_data_migration": "exceptional_human_approved",
+    }
+    assert baseline["deployment_package_policy"] == {
+        "source_selection": "manifest_allowlist",
+        "deployment_package_replaceable": True,
+        "runtime_projection_rebuildable": True,
+        "project_artifact_update_requires_runtime_reinstall": False,
+        "prohibited_project_paths": [
+            ".reviewcompass/project-manifest.json",
+            ".reviewcompass/workflow",
+        ],
+    }
+
+
+def test_v2_project_manifest_requires_workflow_root(tmp_path):
+    layout = _layout()
+    checkout = tmp_path / "checkout"
+    shutil.copytree(EMPTY_PROJECT_V2, checkout)
+
+    binding = layout.validate_project_layout(
+        checkout,
+        binding_id="binding-v2",
+        checkout_id="checkout-v2",
+        captured_at="2026-08-04T00:00:00+09:00",
+    )
+
+    assert binding.project_id == "rc3-fixture-empty-project-v2"
+    manifest_path = checkout / ".reviewcompass" / "project-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    del manifest["artifact_roots"]["workflow"]
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(layout.LayoutError, match="artifact roots"):
+        layout.validate_project_layout(
+            checkout,
+            binding_id="binding-v2",
+            checkout_id="checkout-v2",
+            captured_at="2026-08-04T00:00:00+09:00",
+        )
+
+
+def test_workflow_records_are_append_only_instead_of_moved(tmp_path):
+    layout = _layout()
+    checkout = tmp_path / "checkout"
+    shutil.copytree(EMPTY_PROJECT_V2, checkout)
+    workflow = checkout / ".reviewcompass" / "workflow"
+    issue = workflow / "issues" / "issue-001--v1.json"
+    issue.parent.mkdir()
+    issue.write_text('{"issue_id":"issue-001","version":1}\n')
+    before = layout.snapshot_project_artifacts(checkout, "workflow")
+
+    plan = workflow / "resolution-plans" / "plan-001--v1.json"
+    plan.parent.mkdir()
+    plan.write_text(
+        '{"plan_id":"plan-001","issue_id":"issue-001","version":1}\n'
+    )
+    after_add = layout.snapshot_project_artifacts(checkout, "workflow")
+
+    assert layout.validate_project_artifact_append_only(before, after_add)
+    moved = workflow / "resolution-plans" / issue.name
+    issue.rename(moved)
+    after_move = layout.snapshot_project_artifacts(checkout, "workflow")
+    with pytest.raises(layout.LayoutError, match="removed or rewritten"):
+        layout.validate_project_artifact_append_only(before, after_move)
+
+
+def test_deployment_package_rejects_project_workflow_records(tmp_path):
+    layout = _layout()
+    baseline = layout.load_layout_baseline(BASELINE_V2_CANDIDATE)
+    package = tmp_path / "package"
+    (package / "tools").mkdir(parents=True)
+    (package / "tools" / "runner.py").write_text("pass\n")
+
+    assert layout.validate_deployment_package_layout(package, baseline)
+
+    leaked_issue = (
+        package
+        / ".reviewcompass"
+        / "workflow"
+        / "issues"
+        / "issue-001--v1.json"
+    )
+    leaked_issue.parent.mkdir(parents=True)
+    leaked_issue.write_text('{"issue_id":"issue-001","version":1}\n')
+    with pytest.raises(layout.LayoutError, match="Project Artifact"):
+        layout.validate_deployment_package_layout(package, baseline)
 
     baseline = layout.load_layout_baseline(BASELINE_RECORD)
     with pytest.raises(layout.LayoutError, match="rollback"):
