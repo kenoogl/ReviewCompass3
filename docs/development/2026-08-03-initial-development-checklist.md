@@ -506,7 +506,7 @@ Evidenceは`records/development/2026-08-04-project-manifest-v2-completion-eviden
 - [x] Pilot Task Contractと固定sourceを作成した。
 - [x] Improvement CandidateとHuman Triage Decisionのidentity、field、命名、version、Digest、参照規則を
       正常・負例・境界Testへ固定した。
-- [ ] 最初のCandidate／Triage Decisionを作り、Human判断なしのIssue昇格を拒否した。
+- [x] 最初のCandidate／Triage Decisionを作り、Human判断なしのIssue昇格を拒否した。
 - [ ] ReviewCompass Issue Record、Resolution Plan、Plan Challenge、Verdictの最初の手作業経路を検証した。
 
 `Evidence`：Early Pilot Decision
@@ -522,6 +522,13 @@ Task Contract／暫定shape bootstrap Completion Evidenceは
 Pilot Testを変更せず`15 failed`から`15 passed`へした。既存Layout snapshot Testは意図した空directory追加へ
 更新し、関連`27 passed`となった。Candidate、Decision、Issueは未作成である。Pilot全体の完了ではなく、次は
 単一CandidateとHuman Triage Decisionを作成する。
+
+Candidate／Triage Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-candidate-triage-completion-evidence-v1.md`、SHA-256
+`9ebfe80bb351f6c09a0d27508c70988ce1fe24593324209423e94e9d94bea523`。Humanは選択肢1として
+`issue_resolution / blocking=false`とIssue ID `ISSUE-PILOT-TODO-GROWTH-001`への昇格を承認した。Decisionは
+CandidateのID、version、file Digest、content Digestへ束縛され、関連Testは`16 passed`となった。Issue Record、
+Resolution Plan、Plan Challenge、TODO compactionは未実施であり、最後のPilot checkboxは未完了のままとする。
 
 #### Commit／handoff安定化
 
