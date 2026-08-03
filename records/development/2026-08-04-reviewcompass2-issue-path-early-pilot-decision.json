@@ -1,0 +1,53 @@
+{
+  "decision_id": "RC3-RC2-ISSUE-PATH-EARLY-PILOT-DECISION-2026-08-04-V1",
+  "decided_at": "2026-08-04T05:40:03+09:00",
+  "status": "approved_execution_on_hold",
+  "decision_maker": "human",
+  "instruction": "この提案を記録し，新しい採用Pilotメモを作成．早期Pilotを承認する．実装は少し待て．",
+  "approved": {
+    "early_pilot": true,
+    "keep_predecessor_evidence_immutable": true,
+    "memo_binding": {
+      "path": "docs/design/2026-08-04-reviewcompass2-issue-path-adoption-pilot-memo.md",
+      "sha256": "e0a1a140ad76a06c00e08244314a00d866e92efb0a377773358c00d5c0f4f4ef"
+    },
+    "pilot_subject": "TODO history accumulation and oversized handoff",
+    "single_issue_only": true,
+    "development_only_provisional_artifacts": true,
+    "separate_identities": [
+      "Improvement Candidate",
+      "Triage Decision",
+      "Issue Record",
+      "Issue Resolution Plan",
+      "Plan Challenge",
+      "Task Contract or Work Item",
+      "Verification Evidence",
+      "Resolution Verdict"
+    ]
+  },
+  "execution_control": {
+    "implementation_started": false,
+    "hold": true,
+    "resume_authority": "explicit Human instruction",
+    "actions_not_started": [
+      "create pilot artifact directories",
+      "define schemas",
+      "create the first Issue Record",
+      "create the Issue Resolution Plan",
+      "perform the Plan Challenge",
+      "compact TODO_NEXT_SESSION.md",
+      "extend validators",
+      "add repository prompt references"
+    ]
+  },
+  "not_authorized": [
+    "formalize a product Issue Resolution schema or state machine",
+    "promote REQ-WORKFLOW-010 or REQ-WORKFLOW-011",
+    "integrate Workflow permits",
+    "implement UI or external tracker synchronization",
+    "migrate past findings or rework candidates in bulk",
+    "modify the fixed predecessor Evidence",
+    "commit or push"
+  ],
+  "effect": "This Decision approves the early Pilot timing and design direction but does not permit implementation to start."
+}

@@ -11,6 +11,11 @@
 - 全体：初期開発Work 1B、Work 2、Work 3完了。次の未完了工程はWork 4
 - 現在の工程：Work 3 `verified / completed`、Work 4 `not_started`。inter-work correctiveは
   `verified / completed`
+- Issue Resolution早期Pilot：Human承認済み、実装保留。対象はTODO履歴累積・巨大化の一件だけで、
+  Humanの明示的な再開指示まではartifact作成、TODO縮小、validator拡張を開始しない。
+- TODO手戻り候補対策の修正案：`docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、
+  SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
+  Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
 - activeなTask Contract／Work Item：なし。直近Task Contractは
   `records/development/2026-08-04-session-transcript-eventual-preservation-completion-evidence-v1.md`で閉じた。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
@@ -21,8 +26,8 @@
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`444898d51e1190458de000fbc3d6499a5bacee5dce2353a07e723e1b4546dc5e`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-commit-handoff-stability-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`a0e03f686c9879416798ed58a56e610f59e0fb775a9c4c73fb61a16a623ea077`
+  `records/development/2026-08-04-reviewcompass2-issue-path-early-pilot-decision.json`
+- Decision／Evidence SHA-256：`5e19bca05aead7836595168f8e44edc3a5f146507ab33ffde3646de964814f9f`
 
 ## 実施報告照合
 
@@ -615,6 +620,8 @@
 
 Work 4のDesign差分、代表シナリオ、最初のvertical sliceを選定する。
 
+Issue Resolution早期Pilotは承認済みだが実装保留であり、Humanの明示的な再開指示までは開始しない。
+
 開始条件：
 
 - checklistでWork 3が`verified / completed`、Work 4が`not_started`である。
@@ -634,6 +641,7 @@ Work 4のDesign差分、代表シナリオ、最初のvertical sliceを選定す
 
 - blocker：なし
 - Human判断待ち：なし
+- 実行保留：Issue Resolution早期Pilot。再開authorityはHumanの明示指示
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：checklist、Completion Evidence、Test receiptのDigest一致を確認する
 
@@ -644,7 +652,8 @@ Work 4のDesign差分、代表シナリオ、最初のvertical sliceを選定す
   authority v1はv2にsupersededされた。NFR／deferred候補のidentity再検証は合格し、双方freshでHuman承認済み。
   その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
-  Issue Resolution・実施報告照合のautomation、汎用Task Registry／plugin system
+  Issue Resolution・実施報告照合の正式automation、汎用Task Registry／plugin system。Issue Resolutionの
+  development限定早期Pilotは承認済み・実装保留であり、正式schemaまたはWork 8正式Pilotを前倒ししない。
 
 ## Git・Test
 
