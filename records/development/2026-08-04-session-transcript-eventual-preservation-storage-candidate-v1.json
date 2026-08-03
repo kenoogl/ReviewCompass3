@@ -1,0 +1,87 @@
+{
+  "candidate_id": "RC3-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-STORAGE-2026-08-04-V1",
+  "created_at": "2026-08-04T00:10:33+09:00",
+  "status": "human_decision_pending",
+  "decision_requested": "Select the private storage and limited-capture operation profile before reading and copying the current private session log.",
+  "recommended_option": "option_1_os_standard_limited_pilot",
+  "options": [
+    {
+      "option_id": "option_1_os_standard_limited_pilot",
+      "label": "OS標準rootで現sessionだけ保存",
+      "storage_binding": {
+        "logical_path": "reviewcompass3_user_data/eventual-preservation",
+        "resolver": "tools.session_logs.deployment_paths.resolve_deployment_paths().data_root / eventual-preservation",
+        "repository_external_required": true
+      },
+      "capture_scope": {
+        "provider": "codex",
+        "selector": "current Codex Desktop task rollout only",
+        "source_kind_required": "codex_rollout",
+        "claude_capture": false,
+        "historical_codex_capture": false
+      },
+      "artifacts": [
+        "byte_exact_raw",
+        "private_verbatim_transcript",
+        "durable_cursor",
+        "private_provenance",
+        "integrity_ledger"
+      ],
+      "redacted_transcript": "disabled_for_private_pilot",
+      "access": {
+        "directories": "0700",
+        "files": "0600",
+        "application_layer_encryption": false,
+        "volume_encryption": "not_assumed_or_verified"
+      },
+      "retention": {
+        "automatic_deletion": false,
+        "review_due": "2026-09-03",
+        "deletion_before_review": "human_decision_required"
+      },
+      "execution": {
+        "mode": "one_manual_capture_then_idempotent_rerun",
+        "hook": false,
+        "watcher": false,
+        "scheduler": false,
+        "background_service": false
+      },
+      "tradeoff": "Uses the OS-standard local application-data boundary and the smallest private-data scope; it does not add application-layer encryption."
+    },
+    {
+      "option_id": "option_2_explicit_external_root",
+      "label": "利用者指定の外部rootで現sessionだけ保存",
+      "storage_binding": {
+        "logical_path": "human_supplied_repository_external_private_root",
+        "repository_external_required": true
+      },
+      "capture_scope": "same as option_1",
+      "access": "same owner-only permissions as option_1",
+      "retention": "same 2026-09-03 review boundary as option_1",
+      "tradeoff": "Allows an existing encrypted volume or backup policy, but requires the Human to provide and authorize the exact external path."
+    },
+    {
+      "option_id": "option_3_defer_private_capture",
+      "label": "実ログ保存を延期",
+      "capture_scope": "none",
+      "tradeoff": "Keeps the implementation fixture-verified but leaves the current conversation dependent on the provider source log."
+    }
+  ],
+  "machine_observations": {
+    "os_standard_path_resolution": "passed_with_builtin_macos_fallback",
+    "codex_rollout_file_count": 907,
+    "claude_jsonl_file_count": 664,
+    "contents_read_for_inventory": false,
+    "current_private_log_copied": false
+  },
+  "implementation_binding": {
+    "collector_path": "tools/session_logs/eventual_preservation.py",
+    "collector_sha256": "a9503935489593d5c9007be7a1e1f52534a972d78539e5a4a460a15c9e66029b",
+    "acceptance_test_path": "tests/test_session_log_eventual_preservation.py",
+    "acceptance_test_sha256": "a4f704c4ac267e983c0831b2f1a6a97a64c6db335b8eae9d3efa032e897b3999",
+    "official_test_receipt": "records/development/2026-08-04-session-transcript-eventual-preservation-implementation-checkpoint-test-receipt-v1.json",
+    "official_test_receipt_sha256": "7e496d33d955dfa10e1423176d72332a9c751a7efd0e01a5b671c52befe51c33",
+    "official_test_result": "490 passed in 2.19s"
+  },
+  "approval_effect": "option_1 authorizes creation of the resolved OS-standard private root and one current Codex rollout capture plus an idempotent rerun; it does not authorize broader history capture or automation activation"
+}

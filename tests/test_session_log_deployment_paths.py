@@ -59,3 +59,33 @@ def test_rejects_non_absolute_platform_directory_results():
     deployment_paths.resolve_deployment_paths(
       platform_dirs_factory=lambda **_arguments: UnsafePlatformDirs(),
     )
+
+
+def test_resolves_macos_standard_paths_without_optional_dependency(
+  monkeypatch,
+):
+  deployment_paths = importlib.import_module(
+    "tools.session_logs.deployment_paths"
+  )
+  monkeypatch.setattr(
+    deployment_paths,
+    "_load_platform_dirs_factory",
+    lambda: None,
+    raising=False,
+  )
+
+  result = deployment_paths.resolve_deployment_paths(
+    platform_name="darwin",
+    home_directory=Path("/Users/example"),
+  )
+
+  application_support = Path(
+    "/Users/example/Library/Application Support/ReviewCompass3"
+  )
+  assert result.config_file == application_support / "session-logs.json"
+  assert result.data_root == application_support
+  assert result.state_root == application_support / "state"
+  assert result.log_root == Path("/Users/example/Library/Logs/ReviewCompass3")
+  assert result.cache_root == Path(
+    "/Users/example/Library/Caches/ReviewCompass3"
+  )

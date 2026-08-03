@@ -1,0 +1,38 @@
+{
+  "decision_id": "DEC-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-IMPLEMENTATION-2026-08-03-V1",
+  "decided_at": "2026-08-03T23:56:21+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "implementation_authorization",
+  "decision": "approved",
+  "instructions": [
+    "では，6までを今から実装ということだと理解したが，よいか",
+    "では自律的に実装"
+  ],
+  "approved_scope": [
+    "create a bounded Task Contract and test-first fixtures",
+    "implement a manual collector, durable cursor, and startup-compatible reconcile entry",
+    "separate byte-exact raw, private verbatim transcript, and optional redacted transcript identities",
+    "verify interruption, partial JSONL line, idempotency, append, source divergence, and three supported source kinds",
+    "prepare concrete storage and operation choices for Human judgment",
+    "perform one limited manual capture only after the private storage choice is fixed"
+  ],
+  "conditions": [
+    "use synthetic fixtures until the private storage choice is fixed",
+    "keep every private artifact outside the repository and Git",
+    "make deterministic file, offset, digest, deduplication, and verification operations machine-executed",
+    "do not infer session completion"
+  ],
+  "excluded_scope": [
+    "install or activate hooks, file watchers, schedulers, or background services",
+    "delete, move, shorten, or edit provider source logs",
+    "external transmission or cloud synchronization",
+    "indefinite retention or automated deletion",
+    "start Work 4 artifacts",
+    "commit or push repository changes"
+  ],
+  "supersedes_boundary": {
+    "decision_id": "DEC-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-03-V1",
+    "effect": "authorizes the bounded implementation that the design-direction Decision left unimplemented; activation exclusions remain"
+  },
+  "status": "approved_and_effective"
+}
