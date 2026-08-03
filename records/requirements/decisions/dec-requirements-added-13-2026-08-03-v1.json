@@ -1,0 +1,26 @@
+{
+  "artifact_kind": "requirements_decision_record",
+  "decision_id": "DEC-REQUIREMENTS-ADDED-13-2026-08-03-V1",
+  "decision_version": 1,
+  "decision_class": "requirements_promotion",
+  "actor": "human_user",
+  "authority": "human",
+  "target_candidate_id": "RC3-REQUIREMENTS-ADDED-13-2026-08-03-V1",
+  "target_candidate_digest": "89ee1908ec3c0cafd6b4c5d5fe244b7098745265dcc3f247b554a5abe1494773",
+  "evidence_refs": [
+    {
+      "logical_id": "RC3-REQUIREMENTS-ADDED-13-EVIDENCE-2026-08-03-V1",
+      "version": 1,
+      "path": "records/requirements/evidence/rc3-requirements-added-13-evidence-2026-08-03-v1.json",
+      "sha256": "4f5d76d4606627e47b98f8408cdac437d9cb8235e9d2be72f2114fc582d227ca"
+    }
+  ],
+  "outcome": "approved",
+  "decided_at": "2026-08-03T20:42:33+09:00",
+  "scope": [
+    "candidate内の追加13 Requirement definitionを既存37 legacy Requirementと合わせた50 Requirement集合へ昇格する",
+    "REQ-WORKFLOW-010とREQ-WORKFLOW-011、要件本文変更、現行Plan変更、実装完了は承認範囲外とする"
+  ],
+  "supersedes_or_revokes": [],
+  "record_digest": "707c306a19d82cfe94b1140bde884974973e9bf5daeb13d0d8b0f6376f632e31"
+}

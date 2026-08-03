@@ -278,7 +278,7 @@ Plan参照を再照合した。内容Digestに変化はなく、Work 1の`verifi
 - [x] source、Change Set、Test／CI／Build Artifactのidentityとstale規則を確認した。
 - [x] Requirement本体、候補、Decision、Evidence、schemaの配置、命名、authority結線を固定した。
 - [x] 承認済み配置へ最小schema、validator、fixture、既存37要件のlegacy binding inventoryを実装した。
-- [ ] 追加13 Requirementをdefinition／candidate形式へ構造化し、schema検証、Evidence、Human promotionへ接続した。
+- [x] 追加13 Requirementをdefinition／candidate形式へ構造化し、schema検証、Evidence、Human promotionへ接続した。
 - [ ] 必須非機能義務をVerification Profileへ接続した。
 - [ ] deferred候補を初期Requirementの暗黙依存にしていない。
 
@@ -346,6 +346,30 @@ legacy inventoryを実装した。GREEN Evidenceは
 `71 passed`、全`448 passed`、独立JSON Schema検査`artifacts=6`に合格した。既存37要件は未変更、追加13
 definitionは未作成であり、本項目は`verified / completed`となった。次の未完了項目は追加13 Requirementの
 definition／candidate構造化、schema検証、Evidence、Human promotionへの接続である。
+追加13 Requirementは`records/requirements/definitions/`の13個の不変definitionへ構造化し、candidate manifestを
+`records/requirements/candidates/rc3-requirements-added-13-2026-08-03-v1.json`、file SHA-256
+`c3d6497516fcbabd18fdffe88279b1095eec8a140f32e8ca8c7f1d6e3c8d2525`、candidate digest
+`89ee1908ec3c0cafd6b4c5d5fe244b7098745265dcc3f247b554a5abe1494773`として固定した。schema、固定source、
+definition 13件のID／version／Digestへ結線し、Markdown sourceの8領域と全件一致した。検証Evidenceは
+`records/requirements/evidence/rc3-requirements-added-13-evidence-2026-08-03-v1.json`、file SHA-256
+`f57a5cdaeb4cf37a0285218e73c6e5342b417d822878d919c29bd0c13d810f55`、evidence digest
+`4f5d76d4606627e47b98f8408cdac437d9cb8235e9d2be72f2114fc582d227ca`。独立schema、source alignment、
+reference Digest、legacy 37件＋追加13件の50件coverageに合格し、post-write検証は15 artifact、
+Requirements関連Testは`75 passed`、全Testは`448 passed`だった。
+候補は`verified / human_decision_pending`である。Human promotion Decisionと50 Requirement authority bundleは
+未作成であり、directory、definition、Evidenceだけではauthorityにならないため、本checkboxは未完了を維持する。
+Humanは追加13 Requirement candidateを承認した。Decisionは
+`records/requirements/decisions/dec-requirements-added-13-2026-08-03-v1.json`、file SHA-256
+`5489b4b45baa8a9078f97540cc154363157c14e8c5cc56f151ca4d8259b46aff`、record digest
+`707c306a19d82cfe94b1140bde884974973e9bf5daeb13d0d8b0f6376f632e31`。50 Requirement authority bundleは
+`records/requirements/authority/rc3-requirements-authority-2026-08-03--v1.json`、file SHA-256
+`fc6d945a6bef1ebea0c4ef22705d70fac6177a8c561be0f992ca94474a8a7509`、bundle digest
+`497bcc4374e3224acbfbb08e38c7d9f3d4e5373f59df505179b6a19bc035a02c`。既存37 legacy bindingと追加13
+definitionを結線し、authority chainは`effective`、50 IDの欠落・重複0、独立schema 17 artifact、全Test
+`448 passed`だった。完了Evidenceは
+`records/development/2026-08-03-work-3-added-requirements-promotion-completion-evidence-v1.md`、SHA-256
+`dc945ec1d2eae4fe4c8c3293b9f1390fe4c527094e5dc209082dafc6f3b80649`。本項目は
+`verified / completed`であり、次の未完了項目は必須非機能義務のVerification Profile接続である。
 
 ### Work 4：Designと代表シナリオ
 

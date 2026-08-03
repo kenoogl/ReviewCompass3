@@ -8,18 +8,18 @@
 
 ## 現在位置
 
-- 全体：初期開発Work 1BとWork 2完了、Work 3のcoverage・identity・配置規則・最小runtime完了
-- 現在の工程：Work 3 `active / requirements_artifact_runtime_completed`
+- 全体：初期開発Work 1BとWork 2完了、Work 3の追加13 Requirement promotionまで完了
+- 現在の工程：Work 3 `active / added_13_requirements_promoted`
 - activeなTask Contract／Work Item：正式Task Contractなし。activeなWork Itemなし
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`0b7734271fe027a10ec2568b02fc99ef485b49c5d80fb7c5400c191341f03493`
+- 進行入口SHA-256：`45ddb6f949913afb31b8d8c1cf9c0891caac7d669189f5decd05cb8467b0f48d`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c`
-- 直近のDecision／Evidence：`records/development/2026-08-03-work-3-requirements-artifact-runtime-green-evidence-v1.md`
-- Decision／Evidence SHA-256：`b213de7ae162879dfe7a73bae0aa69d6ccc9a2633dfb08091ebe20ca6dd515f2`
+- 直近のDecision／Evidence：`records/development/2026-08-03-work-3-added-requirements-promotion-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`dc945ec1d2eae4fe4c8c3293b9f1390fe4c527094e5dc209082dafc6f3b80649`
 
 ## 実施報告照合
 
@@ -270,6 +270,32 @@
     `b213de7ae162879dfe7a73bae0aa69d6ccc9a2633dfb08091ebe20ca6dd515f2`
   - 観測した事後状態：targeted `12 passed`、Requirements関連`71 passed`、全`448 passed`、独立JSON Schema
     `artifacts=6`。初回2不一致はTestを変えずREADME固定句と`@v1` schema patternを修正して閉じた。
+- Claim `EC-069`：追加13 Requirementを不変definitionへ構造化し、一つのcandidate manifestへ束縛した。
+  - Evidence：`records/requirements/candidates/rc3-requirements-added-13-2026-08-03-v1.json`、file SHA-256
+    `c3d6497516fcbabd18fdffe88279b1095eec8a140f32e8ca8c7f1d6e3c8d2525`、candidate digest
+    `89ee1908ec3c0cafd6b4c5d5fe244b7098745265dcc3f247b554a5abe1494773`
+  - 観測した事後状態：definition 13件、definition ref 13件で、source、feature owner、停止、復旧、受入、
+    対象外を保持した。既存37 Requirementは移動・書換え0件だった。
+- Claim `EC-070`：追加13 definitionとcandidateをschema、source、reference Digest、50件coverageへ照合した。
+  - Evidence：`records/requirements/evidence/rc3-requirements-added-13-evidence-2026-08-03-v1.json`、file SHA-256
+    `f57a5cdaeb4cf37a0285218e73c6e5342b417d822878d919c29bd0c13d810f55`、evidence digest
+    `4f5d76d4606627e47b98f8408cdac437d9cb8235e9d2be72f2114fc582d227ca`
+  - 観測した事後状態：独立schema `artifacts=15`、source alignment `definitions=13 fields=8`、参照Digest
+    `definition_refs=13 fixed_refs=7 schema_refs=1`、coverage `37+13=50、重複0、除外2`に合格し、
+    Requirements関連Testは`75 passed`、全Testは`448 passed`だった。Human Decisionとauthority bundleは
+    未作成である。
+- Claim `EC-071`：Humanが追加13 Requirement candidateのpromotionを承認した。
+  - Decision：`records/requirements/decisions/dec-requirements-added-13-2026-08-03-v1.json`、file SHA-256
+    `5489b4b45baa8a9078f97540cc154363157c14e8c5cc56f151ca4d8259b46aff`、record digest
+    `707c306a19d82cfe94b1140bde884974973e9bf5daeb13d0d8b0f6376f632e31`
+  - 観測した事後状態：Decisionはexact candidate／Evidence Digestへ束縛され、outcome `approved`、authority
+    `human`となった。未採用候補、要件本文変更、現行Plan変更、実装完了は承認範囲外に維持した。
+- Claim `EC-072`：既存37 legacy bindingと追加13 definitionを50 Requirement authority bundleへ接続した。
+  - Evidence：`records/development/2026-08-03-work-3-added-requirements-promotion-completion-evidence-v1.md`、SHA-256
+    `dc945ec1d2eae4fe4c8c3293b9f1390fe4c527094e5dc209082dafc6f3b80649`
+  - 観測した事後状態：authority bundle digest
+    `497bcc4374e3224acbfbb08e38c7d9f3d4e5373f59df505179b6a19bc035a02c`、authority chain `effective`、
+    50 IDの欠落・重複0、独立schema 17 artifact、全Test `448 passed`だった。
 
 ### reported_unverified／contradicted
 
@@ -279,7 +305,6 @@
 
 ### 未実施
 
-- 追加13 Requirementのdefinition／candidate構造化、schema検証Evidence、Human promotion
 - Work 3の必須非機能義務とVerification Profileの接続
 - platform別OS標準rootの具体解決とProject Bindingのdurable保存
 - 実施報告照合の自動Claim抽出、Provenance対応、完了state結線
@@ -297,32 +322,35 @@
 - coverage matrixの現行authorityは外部Approval Decisionであり、候補fileを第二正本にしない。
 - identity／stale規則とRequirements配置規則の現行authorityは外部Decisionと承認対象Digestであり、候補fileを
   第二正本にしない。CI adapter、Build Artifact実装、provider操作は引き続き対象外である。
-- B1に従いdirectory、schema、validator、legacy inventoryを実装した。既存37要件はlegacy authorityのまま
-  移動・書換えせず、追加13 definition、candidate、Decision、50 Requirement authority bundleは未作成である。
+- B1に従いdirectory、schema、validator、legacy inventory、追加13 definition、candidate、Evidence、Human
+  Decision、50 Requirement authority bundleを作成した。既存37要件はlegacy bindingのまま移動・書換えず、
+  追加13件と合わせたauthority chainは`effective`である。
 
 ## 次に行う一作業
 
-追加13 Requirementを承認済みdefinition／candidate形式へ構造化し、schema検証Evidenceを作成する。
+50 RequirementとArchitecture Policyから必須非機能義務を抽出し、Verification Profile接続候補を作成する。
 
 開始条件：
 
-- artifact runtime GREEN Evidence、schema、validator、legacy inventoryのidentityとDigestが一致する。
-- checklist SHA-256が`0b7734271fe027a10ec2568b02fc99ef485b49c5d80fb7c5400c191341f03493`である。
-- 追加13 definition、candidate、Decision、50 Requirement authority bundleが未作成である。
+- 50 Requirement authority bundle digestが
+  `497bcc4374e3224acbfbb08e38c7d9f3d4e5373f59df505179b6a19bc035a02c`である。
+- 現行Planと`docs/design/2026-08-03-non-functional-requirements-verification-profile-memo.md`のDigestが一致する。
+- 初期slice、実測後閾値確定、deployment profileまでdeferの境界を変更せず抽出を開始する。
 
 完了条件：
 
-- 追加13 Requirementを13個の不変definitionへ変換し、source、owner、停止、復旧、受入、対象外を保持する。
-- candidate manifestをdefinition、schema、固定source Digestへ接続する。
-- validator、既存coverage matrix、独立JSON Schemaで検証し、Human promotion判断候補をEvidenceへ固定する。
+- 必須非機能義務ごとにauthority、適用条件、workload／fixture、環境、metric、thresholdまたはinvariant、
+  failure verdict、必要Evidenceを対応付ける。
+- `initial_required | threshold_after_measurement | deferred_to_deployment_profile`へ分類し、ownerと確定条件を持たせる。
+- Profile未被覆の必須義務を`not_compilable`として検出できるHuman判断候補と監査Evidenceを作成する。
 
-後続作業：必須非機能義務をVerification Profileへ接続する。
+後続作業：Human判断後、deferred候補が初期Requirementの暗黙依存になっていないことを確認する。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
 - Human判断待ち：なし
-- 再開条件：artifact runtime GREEN Evidence、schema、validator、legacy inventory、checklistのDigest一致を確認する
+- 再開条件：50 Requirement authority bundle、現行Plan、非機能要件memoのDigest一致を確認する
 
 ## stale・deferred
 
