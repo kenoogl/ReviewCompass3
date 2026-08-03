@@ -1,0 +1,98 @@
+{
+  "definition": {
+    "artifact_kind": "requirement_definition",
+    "record_id": "REQ-CONTRACT-001@v1",
+    "record_version": 1,
+    "requirement_id": "REQ-CONTRACT-001",
+    "requirement_version": 1,
+    "schema_id": "RC3-REQUIREMENT-ARTIFACTS",
+    "schema_version": 1,
+    "source_refs": [
+      {
+        "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+        "version": 1,
+        "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "feature_id": "FEAT-TASK-CONTRACT-CONTROL",
+    "statement": "Task Contractは判断対象とauthorityを版付きで固定する。",
+    "inputs": ["固定Requirement", "Human authority"],
+    "outputs": ["版付きTask Contract"],
+    "stop_conditions": ["必須authorityが欠ける"],
+    "recovery_conditions": ["不足authorityを補って新しい版を作る"],
+    "preserved_artifacts": ["拒否候補と診断"],
+    "acceptance_criteria": ["同じ入力から同じDigestを得る"],
+    "non_goals": ["Human判断の暗黙委譲"],
+    "acceptance_truth_changed": true,
+    "canonical_payload_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "candidate": {
+    "artifact_kind": "requirements_candidate_manifest",
+    "candidate_id": "RC3-REQUIREMENTS-ADDED-13-2026-08-03-V1",
+    "candidate_version": 1,
+    "definition_refs": [],
+    "schema_refs": [
+      {
+        "logical_id": "RC3-REQUIREMENT-ARTIFACTS",
+        "version": 1,
+        "path": "schemas/requirements/rc3-requirement-artifacts--v1.schema.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "fixed_source_refs": [
+      {
+        "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+        "version": 1,
+        "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "candidate_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "evidence": {
+    "artifact_kind": "requirements_evidence_record",
+    "evidence_id": "RC3-REQUIREMENTS-ADDED-13-EVIDENCE-2026-08-03-V1",
+    "evidence_version": 1,
+    "subject_refs": [],
+    "source_refs": [
+      {
+        "logical_id": "TASK-CONTRACT-REQUIREMENTS-DELTA",
+        "version": 1,
+        "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "observations": ["schema validation passed"],
+    "result": "passed",
+    "recorded_at": "2026-08-03T18:20:00+09:00",
+    "evidence_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "decision": {
+    "artifact_kind": "requirements_decision_record",
+    "decision_id": "DEC-REQUIREMENTS-ADDED-13-2026-08-03-V1",
+    "decision_version": 1,
+    "decision_class": "requirements_promotion",
+    "actor": "human_user",
+    "authority": "human",
+    "target_candidate_id": "RC3-REQUIREMENTS-ADDED-13-2026-08-03-V1",
+    "target_candidate_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "evidence_refs": [],
+    "outcome": "approved",
+    "decided_at": "2026-08-03T18:21:00+09:00",
+    "scope": ["the exact candidate definitions"],
+    "supersedes_or_revokes": [],
+    "record_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "authority_bundle": {
+    "artifact_kind": "requirements_authority_bundle",
+    "authority_bundle_id": "RC3-REQUIREMENTS-AUTHORITY-2026-08-03",
+    "bundle_version": 1,
+    "definition_refs": [],
+    "decision_refs": [],
+    "evidence_refs": [],
+    "legacy_authority_bindings": [],
+    "supersedes": [],
+    "bundle_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

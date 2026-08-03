@@ -8,18 +8,18 @@
 
 ## 現在位置
 
-- 全体：初期開発Work 1BとWork 2完了
-- 現在の工程：Work 3 Requirements開始待ち
+- 全体：初期開発Work 1BとWork 2完了、Work 3のcoverage・identity・配置規則・最小runtime完了
+- 現在の工程：Work 3 `active / requirements_artifact_runtime_completed`
 - activeなTask Contract／Work Item：正式Task Contractなし。activeなWork Itemなし
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`253bcf43c5e492d47c34e4cc505670ae69b56d21496014af85fb301c918d9d45`
+- 進行入口SHA-256：`0b7734271fe027a10ec2568b02fc99ef485b49c5d80fb7c5400c191341f03493`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c`
-- 直近のDecision／Evidence：`records/development/2026-08-03-work-2-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`8a5f42dbde5d3b79ae2b200746e46f441cf07219a8ff5836fbf749d6563442d2`
+- 直近のDecision／Evidence：`records/development/2026-08-03-work-3-requirements-artifact-runtime-green-evidence-v1.md`
+- Decision／Evidence SHA-256：`b213de7ae162879dfe7a73bae0aa69d6ccc9a2633dfb08091ebe20ca6dd515f2`
 
 ## 実施報告照合
 
@@ -183,6 +183,93 @@
   - Evidence：`records/development/2026-08-03-work-2-completion-evidence-v1.md`、SHA-256
     `8a5f42dbde5d3b79ae2b200746e46f441cf07219a8ff5836fbf749d6563442d2`
   - 観測した事後状態：Work 2は`verified / completed`、次の未完了工程はWork 3となった。
+- Claim `EC-051`：既存37要件と追加13要件の固定sourceと50 ID母集合を再照合した。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-baseline-evidence-v1.md`、SHA-256
+    `7fdc24c8063292871761af3c888824f3e3c715689df3a3924c28c7856f9c5a20`
+  - 観測した事後状態：37＋13 IDと現行Planは欠落・余剰0、旧新ID重複0、候補`010/011`は母集合外だった。
+- Claim `EC-052`：50要件のowner、停止、復旧、受入、対象外の形状を監査した。
+  - Evidence：既存37要件の構造化record 2件、追加13要件差分、既存coverage audit
+  - 観測した事後状態：owner欠落0、既存shape欠測0、追加shape欠測0、source trace未被覆0、専用Test
+    `59 passed in 0.07s`だった。
+- Claim `EC-053`：Requirement単位の新旧semantic coverage gapを識別した。
+  - Evidence：同Baseline Evidence V1の6節
+  - 観測した事後状態：37 Acceptance Testの継承表は存在するが、既存37 Requirementを
+    `preserve | adapt | replace | defer`へ結ぶ37行matrixはなく、Work 3先頭checkboxを未完了で維持した。
+- Claim `EC-054`：既存37 Requirementのdisposition／successor coverage matrix候補を作成した。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-coverage-candidate-v1.json`、SHA-256
+    `c529e1495a8ea5a84ac15ae651299a410f6aba627ee115b395a5940aa209cb7e`
+  - 観測した事後状態：37 unique ID、`preserve: 15`、`adapt: 20`、`replace: 2`、`defer: 0`となった。
+- Claim `EC-055`：候補を既存owner、Acceptance Test継承表、追加13 IDから独立照合した。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-coverage-evidence-v1.md`、SHA-256
+    `fa4dc0818ff4666a940b8347ee44af39b7262f09386cf903e9775165c5e31508`
+  - 観測した事後状態：owner不一致0、旧／後継test不一致0、追加13 ID逆引き欠落0。初回に検出した
+    `REQ-TRACE-004`旧test IDの転記ミス1件を訂正し、再監査は`matrix_audit: passed`だった。
+- Claim `EC-056`：Humanが選択肢1としてWork 3 Coverage Matrix候補を承認した。
+  - Decision：`records/development/2026-08-03-work-3-requirements-coverage-decision.json`、SHA-256
+    `cb1c879e28b27fdec765fb9c37636ab59b6017e822b9e4315c33965a8823e54f`
+  - 観測した事後状態：候補Digestと監査Evidenceへ承認を束縛し、Requirements／Plan本文は変更しなかった。
+- Claim `EC-057`：Work 3先頭項目を完了Evidenceへ接続した。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-coverage-completion-evidence-v1.md`、SHA-256
+    `bcddaa3e5b4388adba958cc3198c2ac543b2977e8efdcb48c1d440f332023e61`
+  - 観測した事後状態：先頭checkboxは`verified / completed`、Work 3残り3項目は未完了となった。
+- Claim `EC-058`：sourceからBuild Artifactまでのidentity／stale規則をHuman判断候補へ固定した。
+  - Evidence：`records/development/2026-08-03-work-3-source-identity-stale-candidate-v1.json`、SHA-256
+    `e697ba20409bfe32094103a5a2fa4a68ee0b43f60f12dd440f8bd1e155b871fc`
+  - 観測した事後状態：Repository Binding、Source Snapshot、Change Set、Verification Run、Build Artifactの
+    5 entityにowner、identity、stale、復旧、受入、対象外が揃った。
+- Claim `EC-059`：5つの対象一致関門と固定sourceを独立監査した。
+  - Evidence：`records/development/2026-08-03-work-3-source-identity-stale-evidence-v1.md`、SHA-256
+    `3d04943d0174c323d9b5f1feb605eb70ff3e4dc3a779e681bf179d810db16812`
+  - 観測した事後状態：entity 5件、gate 5件、source Digest 6件、relation 7段階、欠落・未知参照・
+    Digest不一致0で`AUDIT_OK`。候補は`proposed_only`、checkboxはHuman判断前のため未完了を維持した。
+- Claim `EC-060`：追加13 Requirement構造化前の配置・命名・authority境界をHuman判断候補へ固定した。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-artifact-layout-candidate-v1.json`、SHA-256
+    `154a4f40487bc52537e87575d063f0c3e0e72b19fa13d2cdcee0e4fc0339e6ed`
+  - 観測した事後状態：人向けsource、definition、candidate、Decision、Evidence、schema、authority bundleの
+    7 classと、ID／version／Digest／Decisionによる正本解決規則を固定した。
+- Claim `EC-061`：配置・authority候補を既存Requirements配置、legacy Approval、Layout規則へ照合した。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-artifact-layout-evidence-v1.md`、SHA-256
+    `25c7a61e99f04b78ab2732ef70bf507ec161f859085238579f6d0fcb09285871`
+  - 観測した事後状態：artifact class 7、fixed source 10、stale rule 5、欠落・重複・Digest不一致0で
+    `LAYOUT_AUTHORITY_AUDIT_OK`。既存37要件は未変更、提案directoryは未作成、追加13要件は未構造化である。
+- Claim `EC-062`：HumanがA1としてidentity／stale候補を承認した。
+  - Decision：`records/development/2026-08-03-work-3-source-identity-stale-decision.json`、SHA-256
+    `1eba4807e9b1e5d5ff4fa38e8617e768c27cfe02c553572d91c86cd67366bae9`
+  - 観測した事後状態：candidateとEvidence Digestへ承認を束縛し、CI／Build Artifact実装、provider操作、
+    Requirements／Plan本文変更は承認範囲外に維持した。
+- Claim `EC-063`：identity／stale checklist項目を完了Evidenceへ接続した。
+  - Evidence：`records/development/2026-08-03-work-3-source-identity-stale-completion-evidence-v1.md`、SHA-256
+    `e0c450b3ec7758f46a9056620513bfa023e8ca8dc8ad78e2e4eb1c65871edb06`
+  - 観測した事後状態：5 entity、5 gate、7 relationは`verified / completed`となった。
+- Claim `EC-064`：HumanがB1としてRequirements配置・authority候補を承認した。
+  - Decision：`records/development/2026-08-03-work-3-requirements-artifact-layout-decision.json`、SHA-256
+    `516caf5214bd9bfe840d96a7f1249593c2844da26b511432a8cee12ff91e336e`
+  - 観測した事後状態：7 artifact class、命名、version、Digest、authority、stale、legacy移行規則を承認し、
+    directory／schema作成、追加13構造化、既存37移動は承認範囲外に維持した。
+- Claim `EC-065`：Requirements配置・authority checklist項目を完了Evidenceへ接続した。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-artifact-layout-completion-evidence-v1.md`、SHA-256
+    `1aac602366fbe3e5c6a04ec9e509119bcd7472ef54cc627b7af44411f3822725`
+  - 観測した事後状態：配置規則は`verified / completed`、次はdirectory、schema、validator、fixture、
+    legacy binding inventoryのtest-first実装となった。
+- Claim `EC-066`：Requirements artifact runtimeの正常、負例、境界例を固定Test 12件へ先行固定した。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-artifact-runtime-red-evidence-v1.md`、SHA-256
+    `9c6ec0d66f3bda56deee59e1a410694dd5c60a0ad2dd30fc68125c6efb97d373`
+  - 観測した事後状態：Test SHA-256
+    `49df58714f901cf83c11594a9ac0f5f77567ac445e3977f81a1c756d9325a6a9`、fixture SHA-256
+    `8d063195352ac6b376b16cea32fc4bcb7584ac98a52ada83f50979dbb5b4c59c`を固定し、module未実装により
+    `12 errors in 0.07s`の期待どおりのREDとなった。
+- Claim `EC-067`：承認済みdirectory、最小schema、validator、legacy binding inventoryを実装した。
+  - Evidence：`tools/requirements/artifact_layout.py`、SHA-256
+    `8e96086c9a6cb9aee7d8db87377afffb8a8cd41092aa49967a65b5b9fd350ac2`、schema SHA-256
+    `cd8d5f69565b17c9ec2753dadab841ca2dd58cb7f401b3223bea61ef73b035ff`、legacy inventory SHA-256
+    `8daec571041b8a70dab3055922b05fab58be49f270ad63438397dfda47a0e792`
+  - 観測した事後状態：5 artifact kind、Digest、locator、authority chain、legacy 37 ID／6 sourceを検査でき、
+    追加13 definitionと既存37要件の移動・書換えは0だった。
+- Claim `EC-068`：固定Testを変更せずRequirements artifact runtimeをgreenにした。
+  - Evidence：`records/development/2026-08-03-work-3-requirements-artifact-runtime-green-evidence-v1.md`、SHA-256
+    `b213de7ae162879dfe7a73bae0aa69d6ccc9a2633dfb08091ebe20ca6dd515f2`
+  - 観測した事後状態：targeted `12 passed`、Requirements関連`71 passed`、全`448 passed`、独立JSON Schema
+    `artifacts=6`。初回2不一致はTestを変えずREADME固定句と`@v1` schema patternを修正して閉じた。
 
 ### reported_unverified／contradicted
 
@@ -192,7 +279,8 @@
 
 ### 未実施
 
-- Work 3着手
+- 追加13 Requirementのdefinition／candidate構造化、schema検証Evidence、Human promotion
+- Work 3の必須非機能義務とVerification Profileの接続
 - platform別OS標準rootの具体解決とProject Bindingのdurable保存
 - 実施報告照合の自動Claim抽出、Provenance対応、完了state結線
 
@@ -205,28 +293,36 @@
 - Intent／用語集候補のfrontmatterはpromotion前snapshotである。現行authorityは外部Approval Decisionと
   承認対象Digestであり、候補fileを第二正本にはしない。
 - session `001`と旧candidate Digestは問題発生Evidenceとして保持し、current判断関門には使用しない。
+- 現行Planと追加13要件はprovisional／review-candidateであり、baseline確認だけで承認済みにしない。
+- coverage matrixの現行authorityは外部Approval Decisionであり、候補fileを第二正本にしない。
+- identity／stale規則とRequirements配置規則の現行authorityは外部Decisionと承認対象Digestであり、候補fileを
+  第二正本にしない。CI adapter、Build Artifact実装、provider操作は引き続き対象外である。
+- B1に従いdirectory、schema、validator、legacy inventoryを実装した。既存37要件はlegacy authorityのまま
+  移動・書換えせず、追加13 definition、candidate、Decision、50 Requirement authority bundleは未作成である。
 
 ## 次に行う一作業
 
-Work 3 Requirementsの固定sourceと被覆baselineを確認する。
+追加13 Requirementを承認済みdefinition／candidate形式へ構造化し、schema検証Evidenceを作成する。
 
 開始条件：
 
-- Work 2 Approval Decision、Work 1固定入力Evidence v3、Work 2 Completion EvidenceのidentityとDigestが一致する。
-- Work 2は`verified / completed`で、現行Planはprovisionalとして明示されている。
+- artifact runtime GREEN Evidence、schema、validator、legacy inventoryのidentityとDigestが一致する。
+- checklist SHA-256が`0b7734271fe027a10ec2568b02fc99ef485b49c5d80fb7c5400c191341f03493`である。
+- 追加13 definition、candidate、Decision、50 Requirement authority bundleが未作成である。
 
 完了条件：
 
-- 既存37要件と追加13要件の固定sourceを特定し、順逆被覆のbaselineをEvidenceへ固定する。
-- owner、停止、復旧、受入、対象外の欠測を識別し、次の一作業を決める。
+- 追加13 Requirementを13個の不変definitionへ変換し、source、owner、停止、復旧、受入、対象外を保持する。
+- candidate manifestをdefinition、schema、固定source Digestへ接続する。
+- validator、既存coverage matrix、独立JSON Schemaで検証し、Human promotion判断候補をEvidenceへ固定する。
 
-後続作業：source、Change Set、Test／CI／Build Artifactのidentityとstale規則を確認する。
+後続作業：必須非機能義務をVerification Profileへ接続する。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
 - Human判断待ち：なし
-- 再開条件：Work 2完了EvidenceとchecklistのDigest一致を確認する
+- 再開条件：artifact runtime GREEN Evidence、schema、validator、legacy inventory、checklistのDigest一致を確認する
 
 ## stale・deferred
 
@@ -239,11 +335,11 @@ Work 3 Requirementsの固定sourceと被覆baselineを確認する。
 
 - branch：`main`
 - HEAD：本TODOを含むhandoff commit（`git log -1 -- TODO_NEXT_SESSION.md`で解決）
-- 直前の成果commit：`2460908`（Work 1B／Work 2完了）、`f301597`（session log bootstrap実装）
-- remote：push未実施。このsessionの3 commitが`origin/main`よりahead
-- worktree：handoff commit直後clean
-- 直近の関連Test：bootstrap／durable／E2E／NEXT回帰、合計`17 passed in 0.07s`
-- 直近の全Test：`436 passed in 1.87s`
+- 直前の成果commit：`10a00cc`（Work 3 authority判断記録）、`2460908`（Work 1B／Work 2完了）
+- remote：push未実施。本TODOを含むruntime commit後は`origin/main`よりahead 5
+- worktree：本TODOを含むruntime commitへ全変更を固定し、commit後のstatusでcleanを再確認する
+- 直近の関連Test：Requirements artifact targeted `12 passed`、Requirements関連`71 passed`
+- 直近の全Test：`448 passed in 1.79s`
 - 差分検査：`git diff --check`、通過
 
 ## 更新規則

@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:reviewcompass3:requirements:artifacts:v1",
+  "title": "ReviewCompass3 Requirements artifacts V1",
+  "oneOf": [
+    {"$ref": "#/$defs/requirement_definition"},
+    {"$ref": "#/$defs/requirements_candidate_manifest"},
+    {"$ref": "#/$defs/requirements_decision_record"},
+    {"$ref": "#/$defs/requirements_evidence_record"},
+    {"$ref": "#/$defs/requirements_authority_bundle"}
+  ],
+  "$defs": {
+    "artifact_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["logical_id", "version", "path", "sha256"],
+      "properties": {
+        "logical_id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9][A-Z0-9._:@-]*(?:v[0-9]+)?$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._@-]+(?:/[A-Za-z0-9._@-]+)*$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "artifact_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/artifact_ref"}
+    },
+    "non_empty_artifact_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/artifact_ref"}
+    },
+    "non_empty_texts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "legacy_authority_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_ids",
+        "definition_source",
+        "human_source",
+        "approval_decision",
+        "completion_evidence"
+      ],
+      "properties": {
+        "requirement_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-[0-9]{3,}$"
+          }
+        },
+        "definition_source": {"$ref": "#/$defs/artifact_ref"},
+        "human_source": {"$ref": "#/$defs/artifact_ref"},
+        "approval_decision": {"$ref": "#/$defs/artifact_ref"},
+        "completion_evidence": {"$ref": "#/$defs/artifact_ref"}
+      }
+    },
+    "requirement_definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_kind",
+        "record_id",
+        "record_version",
+        "requirement_id",
+        "requirement_version",
+        "schema_id",
+        "schema_version",
+        "source_refs",
+        "feature_id",
+        "statement",
+        "inputs",
+        "outputs",
+        "stop_conditions",
+        "recovery_conditions",
+        "preserved_artifacts",
+        "acceptance_criteria",
+        "non_goals",
+        "acceptance_truth_changed",
+        "canonical_payload_digest"
+      ],
+      "properties": {
+        "artifact_kind": {"const": "requirement_definition"},
+        "record_id": {
+          "type": "string",
+          "pattern": "^REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-[0-9]{3,}@v[1-9][0-9]*$"
+        },
+        "record_version": {"type": "integer", "minimum": 1},
+        "requirement_id": {
+          "type": "string",
+          "pattern": "^REQ-[A-Z0-9]+(?:-[A-Z0-9]+)*-[0-9]{3,}$"
+        },
+        "requirement_version": {"type": "integer", "minimum": 1},
+        "schema_id": {"const": "RC3-REQUIREMENT-ARTIFACTS"},
+        "schema_version": {"const": 1},
+        "source_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "feature_id": {
+          "type": "string",
+          "pattern": "^FEAT-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+        },
+        "statement": {"type": "string", "minLength": 1},
+        "inputs": {"$ref": "#/$defs/non_empty_texts"},
+        "outputs": {"$ref": "#/$defs/non_empty_texts"},
+        "stop_conditions": {"$ref": "#/$defs/non_empty_texts"},
+        "recovery_conditions": {"$ref": "#/$defs/non_empty_texts"},
+        "preserved_artifacts": {"$ref": "#/$defs/non_empty_texts"},
+        "acceptance_criteria": {"$ref": "#/$defs/non_empty_texts"},
+        "non_goals": {"$ref": "#/$defs/non_empty_texts"},
+        "acceptance_truth_changed": {"type": "boolean"},
+        "canonical_payload_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "requirements_candidate_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_kind",
+        "candidate_id",
+        "candidate_version",
+        "definition_refs",
+        "schema_refs",
+        "fixed_source_refs",
+        "candidate_digest"
+      ],
+      "properties": {
+        "artifact_kind": {"const": "requirements_candidate_manifest"},
+        "candidate_id": {
+          "type": "string",
+          "pattern": "^RC3-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+        },
+        "candidate_version": {"type": "integer", "minimum": 1},
+        "definition_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "schema_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "fixed_source_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "candidate_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "requirements_decision_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_kind",
+        "decision_id",
+        "decision_version",
+        "decision_class",
+        "actor",
+        "authority",
+        "target_candidate_id",
+        "target_candidate_digest",
+        "evidence_refs",
+        "outcome",
+        "decided_at",
+        "scope",
+        "supersedes_or_revokes",
+        "record_digest"
+      ],
+      "properties": {
+        "artifact_kind": {"const": "requirements_decision_record"},
+        "decision_id": {
+          "type": "string",
+          "pattern": "^DEC-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+        },
+        "decision_version": {"type": "integer", "minimum": 1},
+        "decision_class": {
+          "type": "string",
+          "enum": ["requirements_promotion", "requirements_rejection", "requirements_revision", "requirements_revocation"]
+        },
+        "actor": {"type": "string", "minLength": 1},
+        "authority": {"const": "human"},
+        "target_candidate_id": {
+          "type": "string",
+          "pattern": "^RC3-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+        },
+        "target_candidate_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evidence_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "outcome": {
+          "type": "string",
+          "enum": ["approved", "rejected", "revision_requested", "revoked"]
+        },
+        "decided_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{2}:[0-9]{2}$"
+        },
+        "scope": {"$ref": "#/$defs/non_empty_texts"},
+        "supersedes_or_revokes": {"$ref": "#/$defs/artifact_refs"},
+        "record_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "requirements_evidence_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_kind",
+        "evidence_id",
+        "evidence_version",
+        "subject_refs",
+        "source_refs",
+        "observations",
+        "result",
+        "recorded_at",
+        "evidence_digest"
+      ],
+      "properties": {
+        "artifact_kind": {"const": "requirements_evidence_record"},
+        "evidence_id": {
+          "type": "string",
+          "pattern": "^RC3-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+        },
+        "evidence_version": {"type": "integer", "minimum": 1},
+        "subject_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "source_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "observations": {"$ref": "#/$defs/non_empty_texts"},
+        "result": {
+          "type": "string",
+          "enum": ["passed", "failed", "incomplete"]
+        },
+        "recorded_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{2}:[0-9]{2}$"
+        },
+        "evidence_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "requirements_authority_bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_kind",
+        "authority_bundle_id",
+        "bundle_version",
+        "definition_refs",
+        "decision_refs",
+        "evidence_refs",
+        "legacy_authority_bindings",
+        "supersedes",
+        "bundle_digest"
+      ],
+      "properties": {
+        "artifact_kind": {"const": "requirements_authority_bundle"},
+        "authority_bundle_id": {
+          "type": "string",
+          "pattern": "^RC3-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+        },
+        "bundle_version": {"type": "integer", "minimum": 1},
+        "definition_refs": {"$ref": "#/$defs/artifact_refs"},
+        "decision_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "evidence_refs": {"$ref": "#/$defs/non_empty_artifact_refs"},
+        "legacy_authority_bindings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/legacy_authority_binding"}
+        },
+        "supersedes": {"$ref": "#/$defs/artifact_refs"},
+        "bundle_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}
