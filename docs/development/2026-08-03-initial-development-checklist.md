@@ -118,12 +118,14 @@ Session EvidenceとGitへ委ねる。
 - [x] 固定入力、scope、非目標、未解決事項を一つのEvidenceから確認できる。
 - [x] blockingなIntent／Requirement／Plan競合がない、または停止理由が明示されている。
 
-`Evidence`：`RC3-WORK1-FIXED-INPUT-2026-08-03-V1`、
+`Evidence`：`RC3-WORK1-FIXED-INPUT-2026-08-03-V2`、
+`records/development/2026-08-03-work-1-fixed-input-evidence-v2.md`、SHA-256
+`7997b203935a9e53c56ed2556b4598773cd9d7b13c43079fcf8524b5e06bc9be`。
+corrective snapshot commit `ee60e3b4baf74c60da949a9d04d793fb83a61e69`からmanifest 13件、
+source catalog 10件、前身inventory 2件を再読込し、全件一致した。結果は`verified / completed`。
+先行するblocked Evidence v1は
 `records/development/2026-08-03-work-1-fixed-input-evidence.md`、SHA-256
-`d07c5abdce7bc4b3322e7c6f973feb0e00d7218151dafe7013aff5d08148b879`。
-結果は`blocked / pause_and_triage`。停止Evidenceは
-`records/development/2026-08-03-work-1-reconstructability-candidate.md`、SHA-256
-`4206805e3066335c5a84a56baa839e4b074da4b5af1f8cd17b20bcbe22860404`。
+`d07c5abdce7bc4b3322e7c6f973feb0e00d7218151dafe7013aff5d08148b879`として保持する。
 
 ## 4. Work 1A：Layout Baseline
 

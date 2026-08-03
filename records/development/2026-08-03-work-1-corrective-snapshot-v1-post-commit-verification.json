@@ -1,0 +1,56 @@
+{
+  "verification_id": "WORK1-CORRECTIVE-SNAPSHOT-2026-08-03-V1-POST-COMMIT",
+  "verified_at": "2026-08-03",
+  "verification_method": "read every fixed artifact from the target Git commit and compare its SHA-256 with the recorded manifest",
+  "target_snapshot": {
+    "record_id": "WORK1-CORRECTIVE-SNAPSHOT-2026-08-03-V1",
+    "record_path": "records/development/2026-08-03-work-1-corrective-snapshot-v1.json",
+    "record_sha256": "08365d976f020b428c46d1f83b14d7b0861beb335103493cf81823a144cc25c4",
+    "commit": "ee60e3b4baf74c60da949a9d04d793fb83a61e69",
+    "tree": "a887507515ff15293660d7c5df2080325f534049",
+    "commit_committed_at": "2026-08-03T10:55:30+09:00",
+    "commit_subject": "Record Work 1 provenance repair snapshot"
+  },
+  "checks": [
+    {
+      "check_id": "snapshot_manifest",
+      "checked_count": 13,
+      "mismatch_count": 0,
+      "result": "passed"
+    },
+    {
+      "check_id": "source_catalog_records",
+      "checked_count": 10,
+      "mismatch_count": 0,
+      "result": "passed"
+    },
+    {
+      "check_id": "reviewcompass_inventory",
+      "path": "records/reference-baselines/2026-07-27/reviewcompass-35ef8d4.git-tree.txt",
+      "expected_sha256": "34fe974552a1572d5f383e9cd8d461e2a1df8836f92b5f1135a22463fecd52b8",
+      "actual_sha256": "34fe974552a1572d5f383e9cd8d461e2a1df8836f92b5f1135a22463fecd52b8",
+      "result": "passed"
+    },
+    {
+      "check_id": "reviewcompass2_inventory",
+      "path": "records/reference-baselines/2026-07-27/reviewcompass2-d6bbb015.git-tree.txt",
+      "expected_sha256": "6bfa12351cb274e384c607f4dd01b3e1f0997589db523d91237146150cb23d2b",
+      "actual_sha256": "6bfa12351cb274e384c607f4dd01b3e1f0997589db523d91237146150cb23d2b",
+      "result": "passed"
+    }
+  ],
+  "historical_correction": {
+    "v16_reconstructability": "digest-only",
+    "v16_mismatch_count": 5,
+    "v16_is_rewritten": false,
+    "corrective_snapshot_reconstructability": "git-reconstructable",
+    "corrective_snapshot_commit": "ee60e3b4baf74c60da949a9d04d793fb83a61e69"
+  },
+  "scope_effect": {
+    "work_1_fixed_input_provenance": "repaired",
+    "intent_glossary_plan_promotion": "not_granted",
+    "work_1a_start": "requires Work 1 Evidence v2",
+    "product_implementation": "not_authorized"
+  },
+  "verdict": "passed"
+}
