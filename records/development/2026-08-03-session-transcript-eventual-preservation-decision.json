@@ -1,0 +1,36 @@
+{
+  "decision_id": "DEC-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-03-V1",
+  "decided_at": "2026-08-03T23:44:09+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "design_direction",
+  "decision": "approved",
+  "instructions": [
+    "自動保存はReviewCompassでもReviewCompass2でもトライしてきたが，いい方法がない．",
+    "その方針で考えて",
+    "文書化してください"
+  ],
+  "approved_direction": [
+    "do not depend on a session-end hook for correctness",
+    "continuously collect available native Codex and Claude logs",
+    "recover missed ranges through periodic and startup reconciliation",
+    "make raw preservation, cursor movement, deduplication, digest verification, and regeneration deterministic machine operations",
+    "treat hooks and file watchers as optional latency optimizations",
+    "keep byte-exact raw, private verbatim transcript, and redacted derivatives as separate artifact identities"
+  ],
+  "approved_document": {
+    "document_id": "RC3-DESIGN-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-03-V1",
+    "path": "docs/design/2026-08-03-session-transcript-eventual-preservation-design.md",
+    "sha256": "b387b9cf913b11a0d39e13cbd5aa6222527fdb4f801e478f1110683c3dd8d1fe"
+  },
+  "excluded_scope": [
+    "implement collector, cursor store, or reconciler",
+    "select private storage locations",
+    "set retention, deletion, encryption, access, or scan interval policies",
+    "install or activate scheduler, hook, watcher, or background service",
+    "capture or copy current private conversation data",
+    "start Work 4 artifacts",
+    "commit or push repository changes"
+  ],
+  "authority_effect": "fixes the eventual-preservation design direction and its implementation boundaries; activation and implementation require separate authorization",
+  "status": "approved_and_effective"
+}
