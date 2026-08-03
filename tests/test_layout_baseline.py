@@ -431,6 +431,12 @@ def test_reviewcompass3_project_manifest_uses_approved_v2_boundary():
         ".reviewcompass/workflow/.gitkeep": hashlib.sha256(
             b"project-artifact-root\n"
         ).hexdigest(),
+        ".reviewcompass/workflow/improvement-candidates/.gitkeep": (
+            hashlib.sha256(b"").hexdigest()
+        ),
+        ".reviewcompass/workflow/triage-decisions/.gitkeep": (
+            hashlib.sha256(b"").hexdigest()
+        ),
     }
     assert layout.find_terminal_absolute_paths(
         PROJECT_ROOT / ".reviewcompass"

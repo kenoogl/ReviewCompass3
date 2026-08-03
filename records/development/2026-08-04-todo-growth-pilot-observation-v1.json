@@ -1,0 +1,30 @@
+{
+  "observation_id": "OBS-RC3-TODO-GROWTH-2026-08-04-V1",
+  "observed_at": "2026-08-04T08:18:05+09:00",
+  "status": "fixed_pilot_source",
+  "subject": "TODO history accumulation and oversized handoff",
+  "source": {
+    "path": "TODO_NEXT_SESSION.md",
+    "sha256": "a93bb2dc8b052f1c4bb4e41dd04aebc19627890df3d9627cb690b3cf845fd51f"
+  },
+  "machine_observations": {
+    "bytes": 66477,
+    "lines": 719,
+    "execution_claims": 99,
+    "rework_or_observation_entries": 6,
+    "workflow_files": [
+      ".reviewcompass/workflow/.gitkeep"
+    ]
+  },
+  "problem": "The human handoff entry contains accumulated historical claims and rework details, so each newly observed problem risks increasing the TODO instead of entering a durable Issue path.",
+  "impact": [
+    "current state is harder to recover quickly",
+    "resolved and active information are mixed",
+    "new process findings can recursively enlarge the handoff"
+  ],
+  "boundary": [
+    "preserve this observation as immutable source",
+    "do not treat this observation as an Improvement Candidate or Issue Record",
+    "do not compact TODO until the later Plan Challenge permits it"
+  ]
+}

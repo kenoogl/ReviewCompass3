@@ -1,0 +1,37 @@
+{
+  "decision_id": "RC3-ISSUE-RESOLUTION-PILOT-BOOTSTRAP-RESUME-2026-08-04-V1",
+  "decided_at": "2026-08-04T08:18:05+09:00",
+  "status": "approved_limited_execution_resumed",
+  "decision_maker": "human",
+  "instruction": "進めて",
+  "prior_decision": {
+    "path": "records/development/2026-08-04-reviewcompass2-issue-path-early-pilot-decision.json",
+    "sha256": "5e19bca05aead7836595168f8e44edc3a5f146507ab33ffde3646de964814f9f"
+  },
+  "approved_scope": [
+    "keep the single Pilot subject as TODO history accumulation and oversized handoff",
+    "create the Pilot Task Contract and immutable observation source",
+    "fix development-only provisional Improvement Candidate and Human Triage Decision shapes",
+    "create normal, negative, and boundary tests before implementation",
+    "create deterministic validation and empty workflow artifact directories",
+    "continue the approved manual Pilot in separate committed work units"
+  ],
+  "human_gates_retained": [
+    "candidate disposition and Issue promotion",
+    "Issue Resolution Plan approval",
+    "Plan Challenge blocking adjudication",
+    "TODO compaction execution",
+    "Resolution Verdict",
+    "each local commit and push"
+  ],
+  "not_authorized": [
+    "more than one Pilot Issue subject",
+    "automatic Issue promotion",
+    "formal product schema or state machine",
+    "Workflow permit integration",
+    "Issue Resolution automation, UI, or external tracker synchronization",
+    "bulk migration of past findings",
+    "TODO deletion before Plan Challenge and fixed Evidence",
+    "commit or push without a separate Human instruction"
+  ]
+}

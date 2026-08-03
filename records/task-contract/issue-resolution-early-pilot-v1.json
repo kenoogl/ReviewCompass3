@@ -1,0 +1,96 @@
+{
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1",
+  "created_at": "2026-08-04T08:18:05+09:00",
+  "status": "active",
+  "owner": "reviewcompass3-development",
+  "goal": "Close one development-only ReviewCompass Issue Resolution Pilot for TODO history accumulation without expanding TODO, formalizing product schema, or auto-promoting additional findings.",
+  "fixed_sources": [
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-bootstrap-resume-decision.json",
+      "sha256": "d633c3b319cd46bf98a2b90cb5251370cd495511421a485ba41184e1b3e962b6"
+    },
+    {
+      "path": "records/development/2026-08-04-todo-growth-pilot-observation-v1.json",
+      "sha256": "7d3e472f84d20e19d28a1c0e5c1c3d894b10e851fe3e7164cc2b7302fc00f67b"
+    },
+    {
+      "path": "records/sources/2026-08-02-reviewcompass2-issue-plan-path.md",
+      "sha256": "d28234ca17b2f2308bad9a63ed551f21caf4b3e4527416f4627bf05d1b5a84f7"
+    },
+    {
+      "path": "docs/design/2026-08-04-reviewcompass2-issue-path-adoption-pilot-memo.md",
+      "sha256": "e0a1a140ad76a06c00e08244314a00d866e92efb0a377773358c00d5c0f4f4ef"
+    },
+    {
+      "path": "docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md",
+      "sha256": "e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0"
+    },
+    {
+      "path": "records/development/2026-08-04-layout-baseline-v2-approval-decision.json",
+      "sha256": "856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e"
+    },
+    {
+      "path": "records/development/2026-08-04-project-manifest-v2-completion-evidence-v1.md",
+      "sha256": "154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020"
+    }
+  ],
+  "in_scope": [
+    "one Pilot subject: TODO history accumulation and oversized handoff",
+    "separate immutable Observation, Improvement Candidate, Human Triage Decision, Issue Record, Resolution Plan, Plan Challenge, Verification Evidence, and Resolution Verdict identities",
+    "development-only provisional artifact shapes under .reviewcompass/workflow",
+    "deterministic ID, version, path, digest, reference, Human authority, and TODO projection validation",
+    "one Human-triaged Candidate and at most one promoted Issue",
+    "one challenged Resolution Plan before TODO compaction",
+    "one milestone snapshot and compact active-ID TODO projection",
+    "Pilot measurements and closure Evidence"
+  ],
+  "out_of_scope": [
+    "additional Pilot Issue subjects or bulk migration of past findings",
+    "formal product Issue Resolution schema, Requirement, state machine, or Workflow permit",
+    "automatic Issue promotion or semantic disposition",
+    "Issue Resolution UI, external tracker synchronization, or general project management",
+    "Work 4 product Design, Work 7 deployment lifecycle, or Work 8 formal evaluation completion",
+    "commit or push without a separate Human instruction"
+  ],
+  "acceptance": [
+    "fixed sources remain byte-identical and resolvable",
+    "Candidate and Triage Decision identities, paths, versions, content digests, and references pass deterministic normal, negative, and boundary tests",
+    "non-Human Issue promotion and stale Candidate binding are rejected",
+    "the Pilot creates no more than one Issue subject",
+    "TODO contains only active Candidate or Issue IDs, derived state, current impact, and one next action after compaction",
+    "Plan Challenge precedes TODO compaction and detects missing scope, prohibition, Acceptance, oracle, or rollback",
+    "Resolution Verdict references fixed Acceptance Evidence and records residual risk",
+    "official full tests pass without fallback"
+  ],
+  "stop_conditions": [
+    "a second Issue subject is required",
+    "a Pilot artifact is treated as formal product authority",
+    "Issue promotion or blocking adjudication would occur without Human decision",
+    "TODO compaction would remove the only Evidence or unresolved obligation",
+    "Plan Challenge has not passed before TODO compaction",
+    "fixed predecessor, Plan, Requirement, Test, or Decision source would be rewritten in place"
+  ],
+  "recovery": [
+    "leave fixed Observation and prior records unchanged",
+    "reject stale references without rewriting the referenced artifact",
+    "restore TODO from the milestone snapshot if compaction verification fails",
+    "retain unresolved or partial Resolution Verdict instead of declaring closure"
+  ],
+  "work_units": [
+    "bootstrap Candidate and Triage Decision shape with RED and GREEN validation",
+    "create the single Candidate and obtain Human Triage Decision",
+    "create the promoted Issue and Resolution Plan if Human approved",
+    "perform Plan Challenge and obtain Human approval",
+    "snapshot and compact TODO with validator and shared prompt",
+    "verify outcome and create Resolution Verdict and Pilot evaluation"
+  ],
+  "current_work_unit": "bootstrap Candidate and Triage Decision shape with RED and GREEN validation"
+}
