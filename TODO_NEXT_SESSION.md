@@ -620,10 +620,10 @@ Work 4のDesign差分、代表シナリオ、最初のvertical sliceを選定す
 ## Git・Test
 
 - branch：`main`
-- 直近の成果commit：`9d1ff61`（session transcript source）、`a3fa630`（Work 3段完了）
-- remote：push未実施。引き継ぎ更新commit後は`origin/main`よりahead 15
-- worktree：eventual preservation設計、実装、Test、Decision、限定capture receipt、Evidence、TODOを未コミットで保持。
-  private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git未追加
+- 直近の成果commit：`895840a`（eventual preservation設計）、`75b6fd6`（collector実装）、
+  `680ce1f`（限定capture完了記録）
+- remote：push未実施。`680ce1f`時点で`origin/main`よりahead 18
+- worktree：`680ce1f`時点でclean。private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git未追加
 - 直近の関連検証：collector `12 passed`、session-log `171 passed`、collector／path `15 passed`
 - 直近の全Test：completion receipt、`490 passed in 2.54s`、fallback `false`
 - 差分検査：最終post-write verificationで再実行する
