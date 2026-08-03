@@ -1,0 +1,177 @@
+{
+  "record_id": "RC3-LAYOUT-BASELINE-2026-08-03-V1",
+  "schema_version": 1,
+  "layout_version": 1,
+  "status": "verified",
+  "logical_roots": {
+    "cache_root": {
+      "meaning": "再生成可能なcontext、search、compiled cacheを保存するproject外root",
+      "git_managed": false,
+      "owner": "runtime",
+      "retention": "evictable",
+      "deletion": "runtime may delete owned cache"
+    },
+    "code_root": {
+      "meaning": "検証済みinstalled codeとCapability Adapterを保存するproject外root",
+      "git_managed": false,
+      "owner": "deployment",
+      "retention": "until verified update or uninstall",
+      "deletion": "delete owned code only after replacement or uninstall"
+    },
+    "config_root": {
+      "meaning": "versioned user settingとintegration configurationを保存するproject外root",
+      "git_managed": false,
+      "owner": "human_and_deployment",
+      "retention": "retain across update",
+      "deletion": "explicit operation only"
+    },
+    "data_root": {
+      "meaning": "Provenance、Run、Context、compiled Plan、Index、Discovery Recordを保存するproject外root",
+      "git_managed": false,
+      "owner": "control_plane",
+      "retention": "policy controlled",
+      "deletion": "explicit retention action"
+    },
+    "evaluation_root": {
+      "meaning": "Observation、Label、projection、evaluation Ledgerを保存するproject外root",
+      "git_managed": false,
+      "owner": "evaluation",
+      "retention": "evaluation policy controlled",
+      "deletion": "explicit retention action"
+    },
+    "log_root": {
+      "meaning": "runtimeとintegrationのoperational logを保存するproject外root",
+      "git_managed": false,
+      "owner": "runtime",
+      "retention": "rotated by policy",
+      "deletion": "rotation or explicit operation"
+    },
+    "project_root": {
+      "meaning": "共有・version管理するProject Manifest、Contract、Policy、Requirement map、Design Decision、reuse判断、verified artifactを保存するtarget checkout root",
+      "git_managed": true,
+      "owner": "project",
+      "retention": "Git history and project policy",
+      "deletion": "never by runtime uninstall"
+    },
+    "sensitive_root": {
+      "meaning": "raw response、生session、quarantine、未検査機微情報を分離保存するproject外root",
+      "git_managed": false,
+      "owner": "restricted_runtime",
+      "retention": "explicit sensitive-data policy",
+      "deletion": "separate authorized operation"
+    },
+    "state_root": {
+      "meaning": "checkpoint、lock、scheduler stateを保存するproject外root",
+      "git_managed": false,
+      "owner": "runtime_state",
+      "retention": "lifecycle controlled",
+      "deletion": "only after ownership and recovery check"
+    }
+  },
+  "resolution_precedence": [
+    "explicit_cli",
+    "versioned_user_setting",
+    "allowlisted_environment",
+    "os_standard"
+  ],
+  "environment_variables": {
+    "cache_root": "REVIEWCOMPASS3_CACHE_ROOT",
+    "code_root": "REVIEWCOMPASS3_CODE_ROOT",
+    "config_root": "REVIEWCOMPASS3_CONFIG_ROOT",
+    "data_root": "REVIEWCOMPASS3_DATA_ROOT",
+    "evaluation_root": "REVIEWCOMPASS3_EVALUATION_ROOT",
+    "log_root": "REVIEWCOMPASS3_LOG_ROOT",
+    "sensitive_root": "REVIEWCOMPASS3_SENSITIVE_ROOT",
+    "state_root": "REVIEWCOMPASS3_STATE_ROOT"
+  },
+  "git_boundary": {
+    "managed_root": "project_root",
+    "external_roots": [
+      "cache_root",
+      "code_root",
+      "config_root",
+      "data_root",
+      "evaluation_root",
+      "log_root",
+      "sensitive_root",
+      "state_root"
+    ]
+  },
+  "relative_path_policy": {
+    "allowed_for": "project_artifacts_only",
+    "base_root": "project_root",
+    "escape": "reject"
+  },
+  "project_manifest": {
+    "managed_path": ".reviewcompass/project-manifest.json",
+    "required_fields": [
+      "schema_version",
+      "project_id",
+      "artifact_roots",
+      "document_links"
+    ],
+    "project_id_rule": "stable explicit ID; never derive from absolute path, checkout ID or content digest",
+    "absolute_path_storage": "prohibited"
+  },
+  "project_binding": {
+    "managed_in_project": false,
+    "storage": "state_root/projects/<project_id>/bindings/<binding_id>.json",
+    "required_fields": [
+      "schema_version",
+      "binding_id",
+      "project_id",
+      "checkout_id",
+      "repository_root",
+      "captured_at",
+      "project_manifest_digest",
+      "validation"
+    ],
+    "move_rule": "preserve project_id and create or update only the checkout-specific binding"
+  },
+  "environment_isolation": {
+    "roles": [
+      "stable",
+      "development"
+    ],
+    "isolated_roots": [
+      "cache_root",
+      "code_root",
+      "config_root",
+      "data_root",
+      "evaluation_root",
+      "log_root",
+      "sensitive_root",
+      "state_root"
+    ],
+    "shared_root": "project_root_read_only_for_stable",
+    "cross_write": "reject"
+  },
+  "migration_policy": {
+    "ordinary_edit": "prohibited_for_managed_path_change",
+    "required_fields": [
+      "from_version",
+      "to_version",
+      "affected_roots",
+      "impact_closure",
+      "link_check",
+      "data_migration",
+      "dry_run",
+      "rollback"
+    ],
+    "activation": "new baseline version and passed dry run before write"
+  },
+  "verification": {
+    "fixture": "tests/fixtures/layout/empty-project",
+    "test": "tests/test_layout_baseline.py",
+    "required_checks": [
+      "root_resolution_precedence",
+      "runtime_absolute_paths",
+      "stable_development_isolation",
+      "project_move",
+      "document_link_resolution",
+      "manifest_binding_identity",
+      "managed_absolute_path_absence",
+      "migration_completeness"
+    ]
+  }
+}
