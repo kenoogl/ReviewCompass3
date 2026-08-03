@@ -4,7 +4,20 @@
 
 - 利用者から指示を受けたら、作業開始前に指示を自分の理解で復唱する。
 - 作業開始前に、具体的な作業項目を適切な粒度で示す。
+- 当面の開発作業は`docs/development/2026-08-03-initial-development-checklist.md`を開始入口とし、
+  authority文書との一致を確認して、未完了の先頭工程から進める。
+- checklistのcheckboxだけを完了根拠にせず、各節の固定Evidenceを確認する。
+- session開始時にルートの`TODO_NEXT_SESSION.md`を読み、終了時に現行更新欄へ実施内容、次作業、
+  blocker、Human判断待ち、Git／Test結果、Evidence linkを反映する。
+- TODOの新規作成または構造を復元する場合は、
+  `docs/development/templates/TODO_NEXT_SESSION.template.md`を使用する。
+- `TODO_NEXT_SESSION.md`は人向けの引き継ぎ入口とし、Workflow stateまたは完了Evidenceの正本にしない。
+- TODOへ過去sessionを累積せず、独立保持が必要なmilestoneだけ`records/session-handoffs/`へ移す。
 - 作業後に、実施内容と確認結果を報告する。
+- 「実施した」という報告だけを完了根拠にしない。実施、結果、判断、提案、未実施を分け、
+  実施・結果・判断にはpath、diff、Digest、command結果、commit SHA、receiptまたはDecisionを対応付ける。
+- Evidenceがない報告は`reported_unverified`として未完了にし、報告と事後状態が違う場合は
+  `report_execution_mismatch`として完了判断を停止し、影響を受ける表示と判断をstaleにする。
 - 問題がある場合は、起きている事象とその原因を平易に説明する。
 
 ## 開発方針
@@ -23,6 +36,13 @@
   既存ファイルは機能変更と無関係な一括整形をせず、変更時に段階的に合わせる。
 - Human承認は、方針変更、外部送信、不可逆操作、意味的裁定、段完了に要求する。
 - 自己適用にはstableと判定された機能だけを使用する。
+- 自己適用中に問題、改善案、新機能案を見つけた場合、現行Plan、Task Contract、Testまたは
+  受入基準を先に書き換えず、発生元Work、固定source、Evidenceを持つ改善候補
+  （`improvement_candidate`）として記録し、分類、停止判定、routeを行う。
+- safety、authority、Acceptanceの真偽、必須Provenance、source／Test／Verdict identity、不可逆または
+  外部side effectへ影響する候補では現行Workを停止する。それ以外はcheckpointで扱う。
+- AIまたは機械の分類とrouteは提案として扱い、上流改定、Issue昇格、risk受容、再開はHumanが判断する。
+  採用候補はconsumerとOutcomeへ接続されるまでclosedにしない。
 - 詳細は`docs/development/2026-08-02-development-policy.md`を正本とする。
 
 ## コミット方針

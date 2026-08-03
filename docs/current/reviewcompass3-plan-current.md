@@ -9,7 +9,7 @@ intent_ref:
   sha256: 1950f5a37fb5d0d0554f56343b39bbca7fc635523409f10ee761d8cef68f9ec6
 glossary_ref:
   path: docs/current/reviewcompass3-glossary-current.md
-  sha256: f2bc6a122829b4406bb9dc0508c648b329ef80e4c9734227be6eb784943e6092
+  sha256: f1e7e9a9c57292fe911217d9b4f5d5b8ed99a881d6f113f9b60db1f0d01b19fa
 generated_from:
   - path: docs/plan/2026-07-27-reviewcompass3-rebuild-plan.md
     sha256: 87da13798b9af229ea304b5fb973c8a6ed41300a117f6356007e0dae4f17604e
@@ -18,11 +18,15 @@ generated_from:
   - path: docs/plan/2026-08-02-task-contract-centered-replan.md
     sha256: c329b6989aca16cbf84d05a4eb028dfe31d7e38c625f2302bb2d4001ef39e5fe
   - path: docs/development/2026-08-02-development-policy.md
-    sha256: 7062495c22afe1c944d62e1d4e3713680c77c862b6b6737a2a301d105fcc97f2
+    sha256: a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c
   - path: config/development-policy.json
     sha256: 164fc60cda3315f41d9b6f4f1e86b04590bf6217b90ba7eccbaa87900be2ecc1
   - path: records/development/development-policy-v2.json
     sha256: 691ae3ba0c5cf8c7cdccfefc63ce9187aee13ba5b994447c2ebd48d289486fb7
+  - path: records/development/development-policy-v3.json
+    sha256: d3cc24ed9f158f2cc95c3de35925c874ff265e2a2d1249180f1ad6f59b6a33a9
+  - path: records/development/development-policy-v4.json
+    sha256: 87bd0460bce3ae471a598ae5ab2964d05e6ceb97701870f25b5cc9110133f24a
   - path: docs/concepts/2026-08-02-task-contract-centered-engineering.md
     sha256: 80f388b9308450f1758f623346e25fa6623c8d5d59cb32979436ee3831af1d91
   - path: docs/requirements/review-context-requirements.md
@@ -57,6 +61,12 @@ generated_from:
     sha256: c3845bfa42277f6c0f003d313398bb31f840e5d76e5a21251338723cf94e16b0
   - path: docs/design/2026-08-03-overdesign-boundaries-memo.md
     sha256: c6134265bde8bccfdac6ddef12da349ae4049fdc24907475f3e1ab52a36c3f5c
+  - path: docs/design/2026-08-03-current-work-projection-memo.md
+    sha256: 940bff56f749bebdff08698882ca92dbe8505cb4692ba864c8ee7b76b4f01595
+  - path: docs/design/2026-08-03-self-application-improvement-routing-memo.md
+    sha256: 0ee336ac2da20e78df00cc096eceb9dc4907a096835f7e579050072478b5d14f
+  - path: docs/design/2026-08-03-execution-claim-verification-memo.md
+    sha256: 32caf8ea2052b81001a77caa78ffcc3900574ab3bde59a63ee8e3ab8447ad542
 ---
 
 # ReviewCompass3 計画 統合最新版
@@ -707,7 +717,27 @@ low risk、相互に素なconflict domain、Human判断へ限定したPilotを�
 理由、Evidence、代替、部分side effect、cleanup、rollback、未処理、移管先、決定者がない終了は
 完了にしない。
 
-## 9. Issue Resolution Path
+## 9. 改善候補とIssue Resolution Path
+
+### 9.1 改善候補の受付とroute
+
+自己適用中に得た問題、改善案、新機能案は、改善候補（`improvement_candidate`）として、
+発生元Work、固定source、Evidenceを記録してから扱う。現行のPlan、Task Contract、Testまたは
+受入基準を先に変更しない。Implementation、Test／oracle、Task Contract、Requirement、Intent、
+外部blocker、process改善、product ideaへ分類し、current Work、Upstream Revision、Dependency、
+Issue Resolution、checkpoint queue、defer、rejectまたはduplicateへrouteする。
+
+safety、authority、Acceptanceの真偽、必須Provenance、source／Test／Verdict identity、不可逆または
+外部side effectへ影響する候補では現行Workを`pause_and_triage`する。それ以外はcheckpointまで
+継続できる。機械またはAIは必須fieldの検査、分類とrouteの提案までとし、Plan、Requirement、
+Task Contract、Test、permitを自動変更しない。上流改定、Issue昇格、risk受容、再開はHumanが判断し、
+採用候補はconsumerとOutcomeへ接続されるまでclosedにしない。
+
+初期は実行チェックリストによる手作業規律として運用し、Work 8で評価する。製品schema、正式state、
+permit連携、自動Plan編集は14.4の後続判断まで導入しない。詳細な分類と決定表は
+`docs/design/2026-08-03-self-application-improvement-routing-memo.md`を参照する。
+
+### 9.2 Issue Resolution Path
 
 Issue処理を第8 stageまたは独立engineにしない。以下は手作業Pilotで検証する概念modelであり、
 初期製品の確定schemaまたは自動state machineではない。
@@ -765,6 +795,19 @@ quota、rotation、access、期限付きretentionを適用する。query index�
 文書revisionはmanifestのDigestだけで再構築可能とみなさない。recordと全manifest artifactを
 同一のimmutable snapshotへ固定し、そのsnapshotから全Digestを再検証してから後継revisionを作る。
 commit前の最新版は`content-present-pending-git-commit`として扱う。
+
+#### 10.1.1 現在位置プロジェクション（`current_work_projection`）
+
+全体計画上の位置、active Work、TDD状態、次の実行可能作業、blocker／cycle、Human判断待ち、stale／
+再検証を、固定Plan、Portfolio、Work Item、Dependency、Decision、Provenance、Source Snapshot、Test
+Evidenceから決定的に導出する。現在位置を別のauthorityとして手編集・保存せず、一つのstructured
+projectionから初期textと後続UIを生成する。入力identity、Digest、生成時刻、freshnessを表示する。
+
+必要入力の欠落は推測で埋めず不完全であることを、競合は不整合であることを表示して詳細を示す。
+表示器だけのfailureは有効な成果を無効にしないが、authority状態の欠落によりWorkflow permitを
+導出できない場合は既存規則どおりfail-closedにする。初期項目と段階導入は
+[現在位置を把握するCurrent Work Projectionの検討メモ](../design/2026-08-03-current-work-projection-memo.md)
+を参照する。
 
 ### 10.2 Evaluation
 
@@ -927,6 +970,18 @@ non_reconstructable`を記録し、正常な空sessionとして扱わない。
 完成を意味しない。外部送信、許可範囲外取込み、無期限retentionを導入せず、後続の正式実装は別の
 Task Contractとnegative testを必要とする。
 
+bootstrap前から、session終了時の実施報告照合（`execution_claim_verification`）を手作業で行う。
+後続状態を変える報告を実施、結果、判断、提案、未実施へ分け、実施・結果・判断Claimをpath、diff、
+Digest、command結果、commit SHA、receiptまたはDecisionと、再確認した事後状態へ接続する。
+EvidenceがないClaimは`reported_unverified`、報告と事後状態が競合する場合は
+`report_execution_mismatch`とし、完了、checkbox、projectionへ使用しない。Session Log Bootstrapは
+この記録を後から復元可能にするが、会話上の成功報告だけを操作完了のEvidenceへ昇格しない。
+
+同時に、Work開始／完了、pause／resume、blocker発生／解消、Human判断要求／決定、upstream revision、
+stale／再検証、cancel／defer、session開始／終了の最小recordから、現在位置を一つのtextへ導出する
+bootstrap Current Work Projectionを準備する。手編集する`STATUS.md`、製品schema、WebUI、常駐serviceを
+作らず、Work 5A後に正式なTask Contract／Workflow／Provenance recordへ入力を写像する。
+
 ### Work 2：Intent統合
 
 製品Intentから開発方法を分離し、Task Contract、二層review、最小権限、stale、配置非依存、
@@ -1030,11 +1085,18 @@ Source SnapshotとChange Setを作る。GitへのwriteまたはCI連携は行わ
 - 宣言だけでenforcement、permit効果、復旧、Evidenceがない規則
 - 既知違反を見逃すvalidator、正常fixtureの誤停止、validator変更後の旧verdict再利用
 - 書込み後だけ現れる不整合のpost-write verification欠落
+- 実施報告だけでfile変更、Test、commit、外部操作または文書反映を完了にする
+- EvidenceのないClaimを`reported_unverified`にせず完了へ使う、または報告と事後状態の競合を
+  `report_execution_mismatch`として停止しない
 - permission過剰、stale、crash再開、optional観測欠測
+- Current Work Projectionが第二の状態正本になる、欠測を推測で埋める、またはstale／競合入力を正常表示する
 - 外部side effectの部分成功後にcompensation／reconciliationまたはHuman escalationがない
 - Contract適合だが上位RequirementまたはIntentを損なう成果
 - maintenance義務変更、reopen identity欠落
 - 実装不良を上流変更で通す、意味変更を軽微修正で閉じる
+- 改善候補を記録・分類せず現行Plan、Contract、Testまたは受入基準を変更する
+- blocking候補を継続する、非blocking候補を無条件に割り込ませる、またはconsumerとOutcomeなしで閉じる
+- AIまたは機械のroute提案がPlan、Requirement、Contract、Testまたはpermitを自動変更する
 - high profileの独立reviewまたはHuman gate欠落
 - Policy Overlayの根拠欠落
 - stale Index、類似判断なし、理由なし分離、retired routine無断復活
@@ -1086,6 +1148,15 @@ Work 1Aの配置baselineを使い、別install root、project root、runtime roo
 Human decision、AI proposal、後続Outcomeを結び、将来の能力評価に使えるかも確認するが、
 このPilot自体はAIへ判断権限を与えない。
 
+改善候補の手作業運用では、停止漏れ、誤停止、発見からroute判断までの時間、未消費候補、重複、
+同種問題の再発、記録負担を測る。候補数の多さだけを改善活動の成果にせず、current Work、上流改定、
+Dependency、Issue Resolution、defer等のconsumerとOutcomeまで追跡できるかを確認する。
+
+実施報告照合では、完了報告Claim数、Evidence接続率、`reported_unverified`、
+`report_execution_mismatch`、誤ったStage進行またはcheckbox、post-writeで初めて見つかった不備、
+照合時間と記録量を測る。Claimや記録の多さではなく、誤った完了判断の削減と通常作業への負担を
+比較する。
+
 変更規模比例は、同じ変更と意味graphへ無関係な材料だけを追加したpaired trial、および関係辺を
 変えて影響閉包を広げたtrialで確認する。source universe量、変更単位数、影響閉包、payload量を
 別々に測り、入力削減だけでなくEvidence Coverage、Finding Recall、責務外Findingも比較する。
@@ -1105,6 +1176,10 @@ Index／意味graphの増分更新と全再生成も比較し、安全性を保�
 Work 7A後に実対象projectがCIを受入へ利用する場合だけ、既存CI Runのworkflow、Run／Attempt、source、
 Test結果、artifact Digestをread-onlyで取り込む条件付きPilotを別Task Contractで行う。CI起動、provider
 管理、PR操作は含めず、CIを使わないprojectでは初期releaseをblockしない。
+
+Current Work Projectionは、同じ状態質問についてprojectionあり／なしで、現在Stage／Work、active作業、
+blocker、Human判断待ち、stale、次の実行可能作業の正確性、状況復元時間、参照artifact数、誤表示、
+記録・生成負担を比較する。速さだけでなく固定入力からの再生成一致と誤った作業開始の削減を確認する。
 
 ### Work 8A：`bounded_parallel`実並行Pilot（条件付き）
 
@@ -1204,7 +1279,12 @@ project、一つのControl Plane、一つのLocal Execution Agentに限定し、
 場合だけ検討する。汎用Task Registry、任意Domain Package、Concierge orchestrationを同時に導入
 しない。
 
-### 14.4 Issue Resolution automation
+### 14.4 改善候補とIssue Resolution automation
+
+改善候補は、Work 8の手作業Pilotで停止条件、分類、route、consumer、Outcome、誤停止、停止漏れ、
+記録費用を確認した後、別Task Contractで機械化の着手を判断する。最初の候補は必須field、identity、
+Digest、freshness、重複のvalidatorとroute提案に限定する。Plan、Requirement、Task Contract、Test、
+permitの自動変更は別のRequirement、Human authority、negative Testなしに導入しない。
 
 Work 8の手作業Pilotで必須field、owner、停止条件、stale条件、費用を確認した後、別Task Contractで
 着手を判断する。最初のsliceは`REQ-WORKFLOW-010`と`011`の正式化、Issue Record、Resolution Plan、
@@ -1227,6 +1307,10 @@ deploymentの導入条件は14.3を優先する。
 - 自己適用のvertical sliceと`local_integrated` E2E後に行う、外部software project一件での
   portability pilot。Repository Binding、impact slice、maintenance／reopen、配置独立性、
   Provenance移植性に限定し、初期sliceをblockせず、別domain applicationまたは汎用middlewareを作らない
+- Current Work Projectionのtext／machine-readable出力を実測した後の画面UI。UI側に状態authority、
+  Workflow permit、独自の現在位置計算を持たせない
+- Session Log BootstrapとWork 8の手作業評価後に判断する、報告Claimの自動抽出、Git／Test／Provenance／
+  receiptとの自動対応、完了stateへの結線。最初のsliceは対応候補と不一致警告までとし、自動完了にしない
 - E2E不足に結び付かない汎用schema、adapter、Contract type、metric
 - Issue管理UI、外部tracker同期、汎用project management
 - 汎用Agent Runtime、任意Task orchestration、plugin system
@@ -1250,6 +1334,12 @@ deploymentの導入条件は14.3を優先する。
 - 並行Work Itemの局所greenだけで統合をacceptedにする、またはbase変更後の並行性判断とEvidenceを
   staleにしない
 - 上流を実装都合で弱める、または確定成果をin-place上書きする
+- 自己適用中の改善候補を記録、分類、停止判定せず、現行Plan、Task Contract、Testまたは
+  受入基準へ直接反映する
+- 実施報告Claimに固定Evidenceと観測した事後状態がないまま、Work、checkbox、Stage、Verdictを
+  完了またはacceptedにする
+- `report_execution_mismatch`を検出した後も、影響するTODO、checkbox、Verdict、projectionを
+  staleにせず進行する
 - terminationで未充足義務、cleanup、移管、権限を確認できるDecision Recordがない
 - 必須Provenanceを保存できない
 - optional評価値とOperational verdictを混同する
@@ -1365,6 +1455,12 @@ HumanがIntent統合最新版、統合用語集、新しい第5段相当、Layou
 - 文書、調査、試作へ形式的red-greenを強制しない。
 - 赤testだけのcommitを必須にせず、統合対象commitは原則greenとする。
 - stableな機能だけを自己適用の必須経路にする。
+- 自己適用で得た問題、改善案、新機能案は改善候補として記録し、分類、停止判定、route、
+  consumerとOutcomeの確認を行う。現行の受入基準を先に変更しない。
+- 機械またはAIによる改善候補の分類とrouteは提案までとし、上流改定、Issue昇格、risk受容、
+  再開はHuman判断へ残す。
+- 会話、TODO、checklist、最終報告の実施Claimを固定Evidenceと事後状態へ照合し、報告だけを
+  完了根拠にしない。Evidence欠落は未完了、実態との競合は停止として扱う。
 - stable deploymentとdevelopment candidateのcode、Manifest、state、dataを分離し、stableから
   candidateを検証する。
 - Pythonは4 spaces、他言語は標準formatterを使い、一括整形を機能変更へ混在させない。

@@ -1,0 +1,54 @@
+{
+  "artifacts": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "fe2abb49bca733139096c80dacb57f7919076e39466eba063b9a05c14957862a"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "8fe0e095be6b9fbd6d487092d1d3db182b26fdb3fff81fe91b64a10aadd293d8"
+    },
+    {
+      "path": "docs/current/reviewcompass3-glossary-current.md",
+      "sha256": "d9fcd00c576d9c4835347c79fbe27faab5159368bfd3cdec84648cc0d6466c92"
+    },
+    {
+      "path": "docs/design/2026-08-03-self-application-improvement-routing-memo.md",
+      "sha256": "0ee336ac2da20e78df00cc096eceb9dc4907a096835f7e579050072478b5d14f"
+    },
+    {
+      "path": "config/development-policy.json",
+      "sha256": "164fc60cda3315f41d9b6f4f1e86b04590bf6217b90ba7eccbaa87900be2ecc1"
+    }
+  ],
+  "decision": {
+    "approved_for_manual_use": true,
+    "decided_at": "2026-08-03",
+    "decision_maker": "human_user",
+    "evidence": {
+      "instruction": "この点は小さなことだが，開発の上では，重要なこと．規律として，ガイドするようにしてほしい",
+      "meaning": "自己適用中に得た改善候補の記録、分類、停止判定、route、消費確認を開発規律として常時ガイドする指示"
+    },
+    "scope": "self-application-improvement-candidate-discipline"
+  },
+  "enforcement": {
+    "current_mode": "manual_guidance_and_checklist",
+    "machine_enforcement": false,
+    "reason": "Work 8の手作業Pilot前に製品schema、正式state machine、permit連携、自動Plan編集を導入しないため"
+  },
+  "policy_id": "reviewcompass3-development-policy-v3",
+  "prior_revision": {
+    "record_path": "records/development/development-policy-v2.json",
+    "relation": "supersedes",
+    "sha256": "691ae3ba0c5cf8c7cdccfefc63ce9187aee13ba5b994447c2ebd48d289486fb7"
+  },
+  "record_version": 3,
+  "status": "documented_for_manual_operation",
+  "verification": [
+    {
+      "command": "python3 -m pytest -q",
+      "passed_count": 412,
+      "status": "passed"
+    }
+  ]
+}

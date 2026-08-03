@@ -4,6 +4,8 @@
 
 制定日：2026-08-02
 
+改定日：2026-08-03
+
 ## 目的
 
 ReviewCompass3の品質と追跡可能性を維持しながら、手続き自体の増大によって
@@ -63,6 +65,47 @@ ReviewCompass3自身へ適用する機能は、現行の契約とテストを満
 自己適用の必須経路に置かない。自己適用能力そのものは製品要件として維持するが、
 開発中の全機能を常時自己適用することは要求しない。
 
+## 自己適用で得た改善候補の扱い
+
+自己適用中に見つかった問題、改善案、新機能案は、現行のPlan、Task Contract、Testまたは
+受入基準を直ちに書き換える理由にしない。まず改善候補（`improvement_candidate`）として、
+発生元Work、固定source identity、観測Evidence、影響、提案を記録する。
+
+候補は少なくとも、Implementation不良、Test／oracle不良、Task Contract不良、Requirement不良、
+Intent競合、外部blocker、process改善、product ideaへ分類する。分類に応じて、current Work、
+Upstream Revision、Dependency、Issue Resolution、checkpoint queue、defer、rejectまたはduplicateへ
+routeする。候補はIssueへ自動昇格させず、consumerと後続Outcomeへ接続されるまでclosedにしない。
+
+次に該当する候補は現行Workを`pause_and_triage`し、それ以外はcheckpointまで現行作業を継続してよい。
+
+- safety、security、privacy、権限または許可の妥当性を損なう
+- Acceptanceの真偽、必須Provenance、source／Test／Verdict identityを信頼できなくする
+- 不可逆または外部side effect、開始permit、停止・復旧条件へ影響する
+
+現行のAcceptanceの真偽を変える必要がある場合は、実装都合の軽微修正として扱わず、現行Workを
+停止して版付きのUpstream Revisionへ移る。機械またはAIは必須field、identity、Digest、freshness、
+重複の検査と分類・route候補の提示まで行えるが、Plan、Requirement、Task Contract、Test、permitを
+自動変更しない。意味分類、停止、上流改定、Issue昇格、risk受容、再開はHuman判断とする。
+
+初期は実行チェックリストによる手作業運用とし、Work 8で停止漏れ、誤停止、route時間、未消費候補、
+重複、再発、記録負担を評価する。製品schema、正式state machine、permit連携、自動Plan編集は
+手作業Pilot後の別Task Contractまで導入しない。詳細な分類と決定表は
+`docs/design/2026-08-03-self-application-improvement-routing-memo.md`を参照する。
+
+## 実施報告と実状態の照合
+
+会話、TODO、checklistまたは最終報告に書かれた「実施した」という記述はClaimであり、それだけを
+完了Evidenceにしない。後続状態を変える報告は、実施、結果、判断、提案、未実施へ分け、実施・結果・
+判断Claimを対象identity、固定source、Evidence locator、観測した事後状態へ接続する。
+
+EvidenceがないClaimは`reported_unverified`として未完了のまま残す。報告と事後状態が競合する場合は
+`report_execution_mismatch`として完了判断を停止し、影響を受けるTODO、checkbox、Verdict、projectionを
+staleにする。未実施作業は、提案または予定と区別して明記する。
+
+file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行はcommand、exit code、対象source、
+結果、commitはcommit SHAと対象treeを照合する。外部または不可逆操作はreceiptと独立した事後状態を
+確認する。詳細は`docs/design/2026-08-03-execution-claim-verification-memo.md`を参照する。
+
 ## コード形式
 
 Pythonは4スペースを使用する。その他の言語は標準フォーマッターに従う。
@@ -81,6 +124,8 @@ Pythonは4スペースを使用する。その他の言語は標準フォーマ�
 - レビューの実行時間、外部費用、Evidence Coverage、既知Findingの見逃し
 - 必須Evidenceの消費率、材料不足、責務外Finding、post-write再検出
 - validatorの既知違反検出率、正常例の誤停止、mutation生存数
+- 改善候補の停止漏れと誤停止、route時間、未消費率、重複率、同種問題の再発
+- 完了報告ClaimのEvidence接続率、`reported_unverified`、`report_execution_mismatch`、誤進行の件数
 - 追加した文書、Schema、関門の維持費
 
 コミット数、テスト数、記録数の増加だけを品質の代理指標にしない。
@@ -93,3 +138,10 @@ Pythonは4スペースを使用する。その他の言語は標準フォーマ�
 `changes_input_assumption`、成果物書込みを`writes_artifact`で明示する。前二者では返却値の
 `prior_verdict_stale`が真となり、risk別のvalidator assuranceが必要になる。実行設定と本文が
 競合する場合は本文を優先し、設定を修正する。
+
+改善候補の規律は現時点では本文と実行チェックリストによる手作業運用であり、
+`config/development-policy.json`と`tools.development.policy`はまだ強制しない。機械化はWork 8の
+手作業Pilotで必要性と境界を確認した後に判断する。
+
+実施報告照合も現時点では手作業運用とする。報告Claimの自動抽出、Provenanceとの自動対応、
+完了状態への結線は、Session Log BootstrapとWork 8の評価後に別Task Contractで判断する。

@@ -3,10 +3,10 @@ lifecycle: provisional
 normative_status: consolidated-successor-candidate
 document_role: terminology
 promotion_required: true
-generated_at: 2026-08-02
+generated_at: 2026-08-03
 generated_from:
   - path: records/sources/2026-08-02-source-catalog.json
-    sha256: 8564e95606a8b812bcfacfc6d13f51a67a323b3135a24d8bf9c6c7d43409634c
+    sha256: 1a40adcec2af6c9f2829af9f4a90cc33bfe6d9cb3fd0e1e305014d71356bd6bb
   - path: records/sources/2026-08-02-reviewcompass2-terminology-control.md
     sha256: 0f84865e862f3b7cf0917476157afb5a2185177d158412bb7d6ea4d351a941f6
   - path: docs/current/reviewcompass3-intent-current.md
@@ -17,6 +17,8 @@ generated_from:
     sha256: 125b53a62de2d34198f8e2721f37612b8b1b8fbe3a4714d0133c4cfa80a358fb
   - path: records/sources/2026-08-02-reviewcompass2-cross-cutting-lessons.md
     sha256: b337bbe723dc416c25eb0d94849029c377077172543af1491a31bc1c18d0c7ac
+  - path: docs/design/2026-08-03-current-work-projection-memo.md
+    sha256: 940bff56f749bebdff08698882ca92dbe8505cb4692ba864c8ee7b76b4f01595
 ---
 
 # ReviewCompass3 統合用語集
@@ -105,6 +107,10 @@ classなどの閉じた値は、対応するschemaまたはPolicyを機械正本
   適用する差分。置換規則、理由、Evidence、決定者、期間を持つ。
 - **Design Decision（`design_decision`）**：Task Contractを満たす方法について選択した実装上の
   判断。RequirementまたはTask Contractの意味を変更するauthorityは持たない。
+- **改善候補（`improvement_candidate`）**：自己適用中に見つかった問題、改善案または新機能案を、
+  現行の受入基準を変更する前に固定する記録。発生元Work、固定source、Evidence、影響、分類候補、
+  停止判定、route、consumer、Outcomeを追跡する。Issue、RequirementまたはTask Contractへは
+  自動昇格しない。
 - **正本（`normative_source`）**：ある情報について現時点でauthorityを持つ唯一の記録先。
   `provisional`または`candidate`の文書は、承認されるまで正本ではない。
 - **統合最新版（`consolidated_current`）**：過去文書を削除せず、現在の意味を一つに解決した
@@ -296,6 +302,10 @@ classなどの閉じた値は、対応するschemaまたはPolicyを機械正本
 ## 9. Provenanceと記録
 
 - **Evidence**：主張、判断、検証を裏付ける固定可能な資料または実行結果。
+- **実施報告照合（`execution_claim_verification`）**：会話、TODO、checklistまたは最終報告の実施・
+  結果・判断Claimを、対象identity、固定source、Evidence、観測した事後状態と照合すること。
+  EvidenceがないClaimは`reported_unverified`、報告と事後状態が競合する場合は
+  `report_execution_mismatch`とし、報告文だけを完了根拠にしない。
 - **Provenance**：成果、判断、実行が何から、誰により、どの権限と処理を経て生じたかを示す
   来歴関係の総称。
 - **Operational Provenance**：Requirement、Contract、Context、Run、Attempt、Result、Decision、
@@ -311,6 +321,10 @@ classなどの閉じた値は、対応するschemaまたはPolicyを機械正本
 - **As-Built projection（`as_built_projection`）**：accepted Task ContractのProvenance、Test、
   Design Decision、Implementation、symbolから実装済み機能の説明を再生成する後続能力。
   Requirementsを自動変更する機能ではない。
+- **現在位置プロジェクション（`current_work_projection`）**：固定Plan、Task Contract Portfolio、
+  Work Item、Dependency、Decision、Provenance、Source Snapshot、Test Evidenceから、全体計画上の位置、
+  active作業、次の実行可能作業、blocker、Human判断待ち、staleを決定的に導出する派生view。
+  手編集する状態正本ではなく、初期textと後続UIが同じstructured projectionを利用する。
 
 ## 10. 実装の再利用
 

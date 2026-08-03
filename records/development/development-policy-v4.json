@@ -1,0 +1,62 @@
+{
+  "artifacts": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "d39f9ace409502af79e7bc5fecb87f01c2b142238e8e2e72d66225e16f03eaf4"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "a094926a5c9f981cdb1997b4a8e205da9a333fda51f2876b47e76d53fcf7dc1c"
+    },
+    {
+      "path": "docs/current/reviewcompass3-glossary-current.md",
+      "sha256": "f1e7e9a9c57292fe911217d9b4f5d5b8ed99a881d6f113f9b60db1f0d01b19fa"
+    },
+    {
+      "path": "docs/design/2026-08-03-execution-claim-verification-memo.md",
+      "sha256": "32caf8ea2052b81001a77caa78ffcc3900574ab3bde59a63ee8e3ab8447ad542"
+    },
+    {
+      "path": "docs/development/templates/TODO_NEXT_SESSION.template.md",
+      "sha256": "9e76436a2de0a3a7ce7d5764247e2d8b17bad18b62c190c9e2fd3721fb848870"
+    },
+    {
+      "path": "config/development-policy.json",
+      "sha256": "164fc60cda3315f41d9b6f4f1e86b04590bf6217b90ba7eccbaa87900be2ecc1"
+    }
+  ],
+  "decision": {
+    "approved_for_manual_use": true,
+    "decided_at": "2026-08-03",
+    "decision_maker": "human_user",
+    "evidence": {
+      "instruction": "反映",
+      "meaning": "会話上の実施報告を実状態とEvidenceへ照合し、未検証報告を完了に使わない規律を文書へ反映する指示"
+    },
+    "scope": "execution-claim-verification-discipline"
+  },
+  "enforcement": {
+    "current_mode": "manual_guidance_and_checklist",
+    "machine_enforcement": false,
+    "reason": "Session Log BootstrapとWork 8の評価前にClaim自動抽出、Provenance自動対応、完了state結線を導入しないため"
+  },
+  "policy_id": "reviewcompass3-development-policy-v4",
+  "prior_revision": {
+    "record_path": "records/development/development-policy-v3.json",
+    "relation": "supersedes",
+    "sha256": "d3cc24ed9f158f2cc95c3de35925c874ff265e2a2d1249180f1ad6f59b6a33a9"
+  },
+  "record_version": 4,
+  "status": "documented_for_manual_operation",
+  "verification": [
+    {
+      "command": "python3 -m pytest -q",
+      "passed_count": 412,
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    }
+  ]
+}
