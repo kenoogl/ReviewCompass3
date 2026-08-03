@@ -121,6 +121,11 @@
   - Evidence：`docs/development/2026-08-03-initial-development-checklist.md`、SHA-256
     `a7b7e6cf2af6d27f444a603bff942f95f6d507080deb7ac2687d3cd014f4ed93`
   - 観測した事後状態：v2 path／Digest、snapshot commit、照合件数、v1 path／Digestを再読込した。
+- Claim `EC-014`：Provenance修復snapshotとpost-commit検証を意味単位で分割commitした。
+  - Evidence：commit `ee60e3b4baf74c60da949a9d04d793fb83a61e69`
+    （`Record Work 1 provenance repair snapshot`）、commit
+    `4140213b16d4445db3c15758db57466e81ca9d7b`（`Verify Work 1 fixed input provenance`）
+  - 観測した事後状態：`git show --stat`で第一commit 6 file、第二commit 4 fileを確認した。
 
 ### reported_unverified／contradicted
 
@@ -169,10 +174,13 @@ checklistのWork 1Aで、Layout Baseline Recordと空配置Testの固定作業�
 
 - branch：`main`
 - repair snapshot commit：`ee60e3b4baf74c60da949a9d04d793fb83a61e69`
-- worktree：post-commit verification、Work 1 Evidence v2、checklist、TODOが未commit。
+- Work 1 verification commit：`4140213b16d4445db3c15758db57466e81ca9d7b`
+- handoff base HEAD：`4140213b16d4445db3c15758db57466e81ca9d7b`。本TODOを含むcommitは
+  `git log -1 --format=%H -- TODO_NEXT_SESSION.md`で取得する。
+- worktree：本TODOだけをhandoff commit対象とし、commit後にcleanを再確認する。
 - 本sessionの全Test：`python3 -m pytest -q`、`412 passed`
 - `git diff --check`：通過
-- commit：未実施。利用者から本sessionのcommit指示は受けていない。
+- commit：修復snapshotとpost-commit検証を分割commit済み。
 
 ## 更新規則
 
