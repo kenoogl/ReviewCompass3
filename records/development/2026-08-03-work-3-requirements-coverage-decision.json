@@ -1,0 +1,47 @@
+{
+  "decision_id": "DEC-WORK3-REQUIREMENTS-COVERAGE-2026-08-03-V1",
+  "decided_at": "2026-08-03T17:31:01+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "requirements_coverage_promotion",
+  "decision": "approved",
+  "instruction": "1",
+  "instruction_context": {
+    "meaning": "監査済みWork 3 Requirements Coverage Matrix候補の選択肢1を明示承認",
+    "candidate_id": "RC3-WORK3-REQUIREMENTS-COVERAGE-2026-08-03-V1",
+    "candidate_path": "records/development/2026-08-03-work-3-requirements-coverage-candidate-v1.json",
+    "candidate_sha256": "c529e1495a8ea5a84ac15ae651299a410f6aba627ee115b395a5940aa209cb7e",
+    "evidence_path": "records/development/2026-08-03-work-3-requirements-coverage-evidence-v1.md",
+    "evidence_sha256": "fa4dc0818ff4666a940b8347ee44af39b7262f09386cf903e9775165c5e31508"
+  },
+  "approved_summary": {
+    "requirement_count": 37,
+    "preserve": 15,
+    "adapt": 20,
+    "replace": 2,
+    "defer": 0,
+    "related_added_requirement_count": 13,
+    "reverse_coverage_missing_count": 0
+  },
+  "approved_scope": [
+    "the 37 requirement disposition rows bound to the candidate digest",
+    "the successor and related added requirement relations in those rows",
+    "the preservation of owner, stop, recovery, acceptance and non-goal obligations described by the candidate policy",
+    "completion of the first Work 3 checklist item"
+  ],
+  "excluded_scope": [
+    "promote or modify the Requirements source documents",
+    "promote or modify the current Plan",
+    "complete the remaining three Work 3 checklist items",
+    "approve Work 3 as a whole",
+    "start Work 4 Design",
+    "commit or push repository changes"
+  ],
+  "promotion": {
+    "mode": "external_decision_bound",
+    "candidate_interpretation": "approved_coverage_matrix_snapshot",
+    "requirements_body_state": "unchanged",
+    "plan_state": "provisional_unchanged"
+  },
+  "authority_effect": "closes only the Work 3 existing-37 and added-13 coverage gate and permits the next Work 3 checklist item",
+  "status": "approved_and_effective"
+}

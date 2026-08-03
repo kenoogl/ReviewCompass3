@@ -1,0 +1,52 @@
+{
+  "decision_id": "DEC-WORK3-REQUIREMENTS-ARTIFACT-LAYOUT-2026-08-03-V1",
+  "decided_at": "2026-08-03T18:18:32+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "requirements_artifact_layout_promotion",
+  "decision": "approved",
+  "instruction": "A1、B1",
+  "instruction_context": {
+    "selection": "B1",
+    "meaning": "監査済みWork 3 Requirements配置・authority候補の選択肢1を明示承認",
+    "candidate_id": "RC3-WORK3-REQUIREMENTS-ARTIFACT-LAYOUT-2026-08-03-V1",
+    "candidate_path": "records/development/2026-08-03-work-3-requirements-artifact-layout-candidate-v1.json",
+    "candidate_sha256": "154a4f40487bc52537e87575d063f0c3e0e72b19fa13d2cdcee0e4fc0339e6ed",
+    "evidence_path": "records/development/2026-08-03-work-3-requirements-artifact-layout-evidence-v1.md",
+    "evidence_sha256": "25c7a61e99f04b78ab2732ef70bf507ec161f859085238579f6d0fcb09285871"
+  },
+  "approved_summary": {
+    "artifact_class_count": 7,
+    "fixed_source_count": 10,
+    "stale_rule_count": 5,
+    "legacy_migration_boundary_count": 5,
+    "digest_mismatch_count": 0
+  },
+  "approved_scope": [
+    "the proposed locations and roles for Requirement source, definition, candidate, Decision, Evidence, schema and authority bundle artifacts",
+    "the filename, embedded ID, version and SHA-256 reference rules",
+    "the Decision-bound authority resolution and conflict stop rule",
+    "the source, schema, definition, Decision and locator stale rules",
+    "the no-move legacy binding rule for the existing 37 Requirements",
+    "the requirement to fix schema before structuring the added 13 Requirements",
+    "completion of the Work 3 Requirements artifact placement and authority linkage checklist item"
+  ],
+  "excluded_scope": [
+    "create the proposed directories or schemas",
+    "structure or promote the added 13 Requirements",
+    "move or rewrite the existing 37 Requirement artifacts",
+    "issue the 50-Requirement authority bundle",
+    "promote or modify the current Plan",
+    "complete later Work 3 checklist items or Work 3 as a whole",
+    "commit or push repository changes"
+  ],
+  "promotion": {
+    "mode": "external_decision_bound",
+    "candidate_interpretation": "approved_requirements_artifact_layout_rule_snapshot",
+    "legacy_requirement_state": "unchanged_and_explicitly_bound",
+    "added_13_state": "not_structured",
+    "proposed_directories_state": "not_created",
+    "plan_state": "provisional_unchanged"
+  },
+  "authority_effect": "closes only the Work 3 Requirements artifact placement, naming and authority linkage gate and permits its approved implementation sequence",
+  "status": "approved_and_effective"
+}

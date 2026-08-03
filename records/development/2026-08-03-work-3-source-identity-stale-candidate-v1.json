@@ -1,0 +1,231 @@
+{
+  "candidate_id": "RC3-WORK3-SOURCE-IDENTITY-STALE-2026-08-03-V1",
+  "generated_at": "2026-08-03T17:35:50+09:00",
+  "stage": "initial-development",
+  "work": "Work 3",
+  "status": "human_decision_candidate",
+  "authority": "proposed_only",
+  "fixed_sources": [
+    {
+      "path": "records/development/2026-08-03-work-3-requirements-coverage-completion-evidence-v1.md",
+      "sha256": "bcddaa3e5b4388adba958cc3198c2ac543b2977e8efdcb48c1d440f332023e61"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    },
+    {
+      "path": "docs/design/2026-08-03-source-change-verification-identity-timing-memo.md",
+      "sha256": "08f973be1f4b0134f4a6a48af98fcbad4948bae890178fd8de6ce98d68e8235a"
+    },
+    {
+      "path": "docs/design/2026-08-03-large-complex-software-design-assessment.md",
+      "sha256": "c3845bfa42277f6c0f003d313398bb31f840e5d76e5a21251338723cf94e16b0"
+    },
+    {
+      "path": "docs/design/2026-08-03-parallel-work-introduction-timing-memo.md",
+      "sha256": "3b2604e3510cdb09d49681bd85ea6bf93fb71478fd89bb46042cfb4f4be86d4c"
+    }
+  ],
+  "identity_entities": [
+    {
+      "entity_id": "repository_binding",
+      "display_name": "Repository Binding",
+      "primary_owner": "FEAT-PORTABLE-LIFECYCLE",
+      "supporting_owners": ["FEAT-REVIEW-CONTEXT", "FEAT-WORKFLOW-CONTROL"],
+      "related_requirements": ["REQ-PORTABLE-001", "REQ-PORTABLE-003", "REQ-CONTEXT-004", "REQ-WORKFLOW-005"],
+      "identity_fields": ["project_id", "repository_id", "binding_id", "scm_kind", "repository_root", "checkout_or_worktree"],
+      "stale_triggers": [
+        "the binding resolves to a different repository, checkout or worktree",
+        "the stable project or repository identity no longer matches the stored binding",
+        "a consumer uses a moved branch name or filesystem path as the durable source identity"
+      ],
+      "recovery": [
+        "create a new binding version and re-resolve the checkout",
+        "recapture dependent Source Snapshots and propagate stale closure without overwriting prior bindings"
+      ],
+      "acceptance": [
+        "the same binding fields resolve to the same repository and checkout identity",
+        "a different checkout or worktree has a different binding identity even when it shares a commit",
+        "branch name and repository path are not accepted as the sole durable identity"
+      ],
+      "out_of_scope": ["SCM write operations", "remote repository administration", "treating a branch name as authority"]
+    },
+    {
+      "entity_id": "source_snapshot",
+      "display_name": "Source Snapshot",
+      "primary_owner": "FEAT-REVIEW-CONTEXT",
+      "supporting_owners": ["FEAT-SEMANTIC-TRACE", "FEAT-WORKFLOW-CONTROL"],
+      "related_requirements": ["REQ-CONTEXT-002", "REQ-CONTEXT-004", "REQ-TRACE-002", "REQ-TRACE-004", "REQ-CONTRACT-003", "REQ-WORKFLOW-009"],
+      "identity_fields": ["repository_binding_id", "base_commit", "head_commit", "index_state", "tracked_changes", "included_untracked_files", "content_manifest_digest", "dependency_lock_identity", "capture_time", "exclusion_rules_and_reasons"],
+      "stale_triggers": [
+        "base, HEAD, index, tracked content, included untracked content or dependency lock changes",
+        "a required untracked file is absent from the manifest",
+        "the actual dirty state differs from the recorded state",
+        "the Repository Binding becomes stale",
+        "the manifest or exclusion rule cannot be reproduced"
+      ],
+      "recovery": [
+        "capture a new complete content manifest from the current binding",
+        "preserve the prior snapshot and mark dependent Context, Verification, review, Decision and artifact records stale",
+        "resolve omitted or unexplained files before starting a new Run"
+      ],
+      "acceptance": [
+        "the same normalized manifest and dependency identity produce the same snapshot identity",
+        "changing each identity field independently rejects reuse of the prior snapshot",
+        "dirty, staged and untracked states are represented explicitly",
+        "excluded files have a fixed rule and reason"
+      ],
+      "out_of_scope": ["proving semantic correctness from a digest", "using commit SHA alone for a dirty worktree", "silently excluding untracked files"]
+    },
+    {
+      "entity_id": "change_set",
+      "display_name": "Change Set",
+      "primary_owner": "FEAT-WORKFLOW-CONTROL",
+      "supporting_owners": ["FEAT-SEMANTIC-TRACE", "FEAT-REVIEW-CONTEXT"],
+      "related_requirements": ["REQ-WORKFLOW-001", "REQ-WORKFLOW-002", "REQ-WORKFLOW-007", "REQ-WORKFLOW-008", "REQ-TRACE-004", "REQ-CONTRACT-003"],
+      "identity_fields": ["base_snapshot_id", "candidate_snapshot_id", "added_modified_deleted_renamed_items", "changed_files_and_symbols", "work_item_id", "task_contract_id", "change_semantics", "merge_split_supersedes_relations"],
+      "stale_triggers": [
+        "the base or candidate Source Snapshot changes",
+        "the actual file or symbol delta differs from the recorded delta",
+        "change semantics, Work Item or Contract binding changes",
+        "a merge result differs from the candidate that was verified",
+        "a dependency or conflict-domain decision changes"
+      ],
+      "recovery": [
+        "derive a new Change Set from fixed base and candidate snapshots",
+        "rerun impact closure, selected verification and integration checks",
+        "preserve superseded and split or merged Change Sets as history"
+      ],
+      "acceptance": [
+        "the same base and candidate snapshots produce the same normalized change identity",
+        "add, modify, delete and rename are not conflated",
+        "the Change Set is traceable to its Work Item, Contract and change semantics",
+        "a different merge result cannot reuse the prior Verification or Decision"
+      ],
+      "out_of_scope": ["using branch names as the change identity", "automatic merge or merge queue", "assuming line count defines semantic scope"]
+    },
+    {
+      "entity_id": "verification_run",
+      "display_name": "Verification Run",
+      "primary_owner": "FEAT-HARNESSED-EXECUTION",
+      "supporting_owners": ["FEAT-EVIDENCE-EVALUATION", "FEAT-SEMANTIC-TRACE"],
+      "related_requirements": ["REQ-EXEC-001", "REQ-EXEC-003", "REQ-EXEC-006", "REQ-EVAL-001", "REQ-EVAL-003", "REQ-TRACE-005", "REQ-CONTRACT-005", "REQ-CONTRACT-006"],
+      "identity_fields": ["provider_local_or_ci", "run_id", "attempt_id", "source_snapshot_id", "change_set_id", "test_selection", "command_or_workflow_identity", "environment_identity", "toolchain_identity", "result", "raw_output_digest", "evidence_digest"],
+      "stale_triggers": [
+        "the bound Source Snapshot or Change Set changes",
+        "test selection, command, workflow, environment or toolchain meaning changes",
+        "raw output or Evidence digest does not match",
+        "a CI result targets a different commit or manifest",
+        "a required Test is omitted or the selection oracle becomes stale",
+        "a retry is presented as an overwrite of the prior Attempt"
+      ],
+      "recovery": [
+        "start a new Attempt or Run against the current fixed Snapshot and Change Set",
+        "recapture raw output and validate it before deriving Evidence",
+        "rerun required full or affected tests after selection or environment changes",
+        "retain prior local and CI Attempts without converting provider green status directly into acceptance"
+      ],
+      "acceptance": [
+        "local and CI runs use the same logical fields and remain distinct provider records",
+        "the result can be reproduced or audited from the fixed source, command or workflow, environment and raw output",
+        "a result for another source identity is rejected",
+        "retry and rerun create new Attempt identities"
+      ],
+      "out_of_scope": ["CI initiation or provider management", "CI green as the sole acceptance oracle", "overwriting prior Attempts"]
+    },
+    {
+      "entity_id": "build_artifact",
+      "display_name": "Build Artifact",
+      "primary_owner": "FEAT-PORTABLE-LIFECYCLE",
+      "supporting_owners": ["FEAT-SEMANTIC-TRACE", "FEAT-TASK-CONTRACT-CONTROL"],
+      "related_requirements": ["REQ-PORTABLE-002", "REQ-PORTABLE-003", "REQ-PORTABLE-004", "REQ-CONTRACT-007", "REQ-TRACE-002"],
+      "identity_fields": ["artifact_id", "content_digest", "source_snapshot_id", "change_set_id", "build_run_id", "build_toolchain_identity", "target_platform", "verification_run_ids", "promotion_relation", "rollback_relation"],
+      "stale_triggers": [
+        "artifact content differs from its digest",
+        "source, Change Set, build Run, toolchain or target platform changes",
+        "a required Verification Run becomes stale or does not target the artifact source",
+        "promotion or rollback references a different artifact identity"
+      ],
+      "recovery": [
+        "rebuild from the current fixed source and toolchain",
+        "rerun required Verification for the target platform",
+        "create a new artifact and promotion record while preserving the prior rollback target"
+      ],
+      "acceptance": [
+        "artifact digest and source-to-build-to-verification chain are complete",
+        "promotion and rollback resolve the same immutable artifact identities",
+        "release cannot use an artifact whose source or Verification is stale"
+      ],
+      "out_of_scope": ["release approval from artifact existence alone", "provider-specific package management", "mutating an artifact in place"]
+    }
+  ],
+  "target_consistency_gates": [
+    {
+      "gate_id": "test",
+      "required_bindings": ["source_snapshot", "change_set", "verification_run"],
+      "stale_when": ["source or test execution identity changes", "required selected or full Test evidence is missing"],
+      "recovery": "run a new Verification Attempt against the current fixed source"
+    },
+    {
+      "gate_id": "review",
+      "required_bindings": ["source_snapshot", "change_set", "verification_run"],
+      "stale_when": ["reviewed source, scope, criteria, materials or required Verification changes"],
+      "recovery": "recompute scope and perform a new review or affected review against the current source"
+    },
+    {
+      "gate_id": "decision",
+      "required_bindings": ["source_snapshot", "change_set", "verification_run"],
+      "stale_when": ["the approved target content, Evidence, authority scope or acceptance truth changes"],
+      "recovery": "request a new Human Decision bound to the new target and Evidence digests"
+    },
+    {
+      "gate_id": "commit",
+      "required_bindings": ["repository_binding", "source_snapshot", "change_set", "verification_run"],
+      "stale_when": ["the commit tree differs from the accepted Source Snapshot or includes an unverified Change Set"],
+      "recovery": "capture the commit tree as a new Snapshot and rerun required Verification before integration"
+    },
+    {
+      "gate_id": "release",
+      "required_bindings": ["source_snapshot", "change_set", "verification_run", "build_artifact"],
+      "stale_when": ["source, build, Verification, target platform, promotion or artifact content differs"],
+      "recovery": "rebuild, reverify and issue a new promotion Decision while retaining rollback provenance"
+    }
+  ],
+  "required_relation_chain": [
+    "Requirement",
+    "Task Contract",
+    "Change Set",
+    "Source Snapshot",
+    "Verification Run",
+    "Build Artifact",
+    "Release"
+  ],
+  "initial_scope": [
+    "SCM-independent logical identities",
+    "read-only local Git capture of repository, base, HEAD, index, tracked changes and included untracked files",
+    "local Verification Run identity",
+    "negative fixtures for source mismatch, omitted untracked files, dirty-state mismatch and stale evidence",
+    "identity and relation fields needed for later CI and Build Artifact work"
+  ],
+  "deferred_scope": [
+    "CI adapter until local deployment E2E and a real project need exist",
+    "Build Artifact implementation and promotion until Work 7B",
+    "Git hosting operations, push, pull request creation, merge queue and CI initiation",
+    "provider-specific management UI",
+    "bounded parallel execution until fixed source, conflict domain, owner or lease and integration checkpoint are verified"
+  ],
+  "global_rules": [
+    "commit SHA alone is insufficient for a dirty or partially selected worktree",
+    "branch name is a movable reference and not a durable identity",
+    "old Evidence remains immutable and becomes stale rather than being overwritten",
+    "displayed CI success does not become ReviewCompass3 acceptance without source and Evidence validation",
+    "optional CI does not block a project whose acceptance uses local Verification",
+    "specific Git hosting and CI provider operations are not initial Requirements"
+  ],
+  "approved_effect": "none until a Human Decision is bound to this candidate digest"
+}

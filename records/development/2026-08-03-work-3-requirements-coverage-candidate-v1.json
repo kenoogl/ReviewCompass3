@@ -1,0 +1,95 @@
+{
+  "candidate_id": "RC3-WORK3-REQUIREMENTS-COVERAGE-2026-08-03-V1",
+  "generated_at": "2026-08-03T17:16:36+09:00",
+  "stage": "initial-development",
+  "work": "Work 3",
+  "status": "human_decision_candidate",
+  "authority": "proposed_only",
+  "fixed_sources": [
+    {
+      "path": "records/development/2026-08-03-work-3-requirements-baseline-evidence-v1.md",
+      "sha256": "7fdc24c8063292871761af3c888824f3e3c715689df3a3924c28c7856f9c5a20"
+    },
+    {
+      "path": "records/requirements/review-context-batch-0001.json",
+      "sha256": "8dbcf5af0a9b1ba15c30bc4f3c8b8853000999b597f01b1ae51dc4c26c5c759a"
+    },
+    {
+      "path": "records/requirements/remaining-batches-0002-0009.json",
+      "sha256": "71e21125bf56ad08b0a11af58de9010b528c2a2e9dcd3987e618c6aec095e4c4"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    },
+    {
+      "path": "docs/design/2026-08-02-stage-five-to-task-contract-inheritance.md",
+      "sha256": "b75450300fc6a254843d5353be17d66838553376393d68a0da8f529ab26cdd5e"
+    }
+  ],
+  "classification_policy": {
+    "preserve": "Keep the existing requirement ID, owner, stop, recovery, acceptance and non-goal obligations; related added requirements may consume or compile it without replacing its authority.",
+    "adapt": "Keep the existing requirement ID and safety meaning in a successor version while adding the identity, owner or control relation named by related_added_requirements.",
+    "replace": "Retain the existing requirement as history and preserve its negative behavior in the named successor; replacement does not delete stop, recovery, acceptance or non-goal obligations.",
+    "defer": "Keep the requirement outside the initial active scope with an explicit future owner and entry condition; no row is proposed as defer in this candidate."
+  },
+  "matrix": [
+    {"requirement_id": "REQ-CONTEXT-001", "owner": "FEAT-REVIEW-CONTEXT", "disposition": "replace", "successor": "REQ-CONTRACT-001", "related_added_requirements": ["REQ-CONTRACT-001"], "legacy_acceptance_test": "AT-CONTEXT-001", "successor_test": "AT-TC-CONTEXT-001", "coverage_note": "Replace the seven-field task authority with a versioned Task Contract while preserving missing-field and unresolved-target rejection."},
+    {"requirement_id": "REQ-CONTEXT-002", "owner": "FEAT-REVIEW-CONTEXT", "disposition": "adapt", "successor": "REQ-CONTEXT-002@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-002"], "legacy_acceptance_test": "AT-CONTEXT-002", "successor_test": "AT-TC-CONTEXT-002", "coverage_note": "Add Context Acquisition Plan and obligation identity while preserving source, body, origin and digest validation."},
+    {"requirement_id": "REQ-CONTEXT-003", "owner": "FEAT-REVIEW-CONTEXT", "disposition": "adapt", "successor": "REQ-CONTEXT-003@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-002", "REQ-CONTRACT-003"], "legacy_acceptance_test": "AT-CONTEXT-003", "successor_test": "AT-TC-CONTEXT-003", "coverage_note": "Compile acquisition inputs and verify portfolio coverage while preserving complete scope classification and Human escalation on disagreement."},
+    {"requirement_id": "REQ-CONTEXT-004", "owner": "FEAT-REVIEW-CONTEXT", "disposition": "adapt", "successor": "REQ-CONTEXT-004@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-003"], "legacy_acceptance_test": "AT-CONTEXT-004", "successor_test": "AT-TC-CONTEXT-004", "coverage_note": "Extend freshness to Contract, Plan and Portfolio dependencies while preserving stale-result rejection and history."},
+    {"requirement_id": "REQ-CONTEXT-005", "owner": "FEAT-REVIEW-CONTEXT", "disposition": "preserve", "successor": "REQ-CONTEXT-005", "related_added_requirements": ["REQ-CONTRACT-002"], "legacy_acceptance_test": "AT-CONTEXT-005", "successor_test": "AT-TC-CONTEXT-005", "coverage_note": "Preserve explicit material selection and no implicit LLM additions; compilation supplies obligations but does not decide composition."},
+    {"requirement_id": "REQ-CONTEXT-006", "owner": "FEAT-REVIEW-CONTEXT", "disposition": "adapt", "successor": "REQ-CONTEXT-006@successor-candidate", "related_added_requirements": ["REQ-WORKFLOW-005"], "legacy_acceptance_test": "AT-CONTEXT-006", "successor_test": "AT-TC-CONTEXT-006", "coverage_note": "Bind handoff and freshness to fresh or reopen routing while preserving prior results, unresolved items and restart identity."},
+    {"requirement_id": "REQ-CONTEXT-007", "owner": "FEAT-REVIEW-CONTEXT", "disposition": "preserve", "successor": "REQ-CONTEXT-007", "related_added_requirements": ["REQ-CONTRACT-005"], "legacy_acceptance_test": "AT-CONTEXT-007", "successor_test": "AT-TC-CONTEXT-007", "coverage_note": "Preserve atomic safe storage and post-read verification; Capture Plan adds provenance without owning storage state."},
+    {"requirement_id": "REQ-EXEC-001", "owner": "FEAT-HARNESSED-EXECUTION", "disposition": "adapt", "successor": "REQ-EXEC-001@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-002"], "legacy_acceptance_test": "AT-EXEC-001", "successor_test": "AT-TC-EXEC-001", "coverage_note": "Replace hand-written execution input with compiled plans while preserving permit matching and invalid-transition rejection."},
+    {"requirement_id": "REQ-EXEC-002", "owner": "FEAT-HARNESSED-EXECUTION", "disposition": "preserve", "successor": "REQ-EXEC-002", "related_added_requirements": ["REQ-CONTRACT-001"], "legacy_acceptance_test": "AT-EXEC-002", "successor_test": "AT-TC-EXEC-002", "coverage_note": "Preserve payload, destination, approver, authority and expiry binding; Contract capabilities narrow but never broaden approval."},
+    {"requirement_id": "REQ-EXEC-003", "owner": "FEAT-HARNESSED-EXECUTION", "disposition": "preserve", "successor": "REQ-EXEC-003", "related_added_requirements": ["REQ-CONTRACT-005"], "legacy_acceptance_test": "AT-EXEC-003", "successor_test": "AT-TC-EXEC-003", "coverage_note": "Preserve write-ahead raw capture and terminal failure behavior; Capture Plan requires the corresponding events."},
+    {"requirement_id": "REQ-EXEC-004", "owner": "FEAT-HARNESSED-EXECUTION", "disposition": "adapt", "successor": "REQ-EXEC-004@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-004"], "legacy_acceptance_test": "AT-EXEC-004", "successor_test": "AT-TC-EXEC-004", "coverage_note": "Use the selected Verification Profile to define required roles while preserving complete topology and missing-result rejection."},
+    {"requirement_id": "REQ-EXEC-005", "owner": "FEAT-HARNESSED-EXECUTION", "disposition": "preserve", "successor": "REQ-EXEC-005", "related_added_requirements": ["REQ-CONTRACT-004"], "legacy_acceptance_test": "AT-EXEC-005", "successor_test": "AT-TC-EXEC-005", "coverage_note": "Preserve closed mechanical recovery or Human adjudication and reject implicit semantic repair."},
+    {"requirement_id": "REQ-EXEC-006", "owner": "FEAT-HARNESSED-EXECUTION", "disposition": "adapt", "successor": "REQ-EXEC-006@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-005", "REQ-CONTRACT-006"], "legacy_acceptance_test": "AT-EXEC-006", "successor_test": "AT-TC-EXEC-006", "coverage_note": "Add Contract, Plan, Capture and Evaluation identities while preserving immutable attempt history and reuse rejection on mismatch."},
+    {"requirement_id": "REQ-TRIAGE-001", "owner": "FEAT-REVIEW-TRIAGE", "disposition": "adapt", "successor": "REQ-TRIAGE-001@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-004"], "legacy_acceptance_test": "AT-TRIAGE-001", "successor_test": "AT-TC-TRIAGE-001", "coverage_note": "Separate conformance and challenge result classes while preserving per-role counts, conclusions and raw references."},
+    {"requirement_id": "REQ-TRIAGE-002", "owner": "FEAT-REVIEW-TRIAGE", "disposition": "preserve", "successor": "REQ-TRIAGE-002", "related_added_requirements": ["REQ-CONTRACT-004"], "legacy_acceptance_test": "AT-TRIAGE-002", "successor_test": "AT-TC-TRIAGE-002", "coverage_note": "Preserve duplicate, conflict and independent Finding identity across the separated review classes."},
+    {"requirement_id": "REQ-TRIAGE-003", "owner": "FEAT-REVIEW-TRIAGE", "disposition": "adapt", "successor": "REQ-TRIAGE-003@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-004", "REQ-CONTRACT-005"], "legacy_acceptance_test": "AT-TRIAGE-003", "successor_test": "AT-TC-TRIAGE-003", "coverage_note": "Bind Human adoption to challenge and provenance verdicts while preserving target-digest binding and failed-gate rejection."},
+    {"requirement_id": "REQ-TRACE-001", "owner": "FEAT-SEMANTIC-TRACE", "disposition": "preserve", "successor": "REQ-TRACE-001", "related_added_requirements": ["REQ-CONTRACT-005"], "legacy_acceptance_test": "AT-TRACE-001", "successor_test": "AT-TC-TRACE-001", "coverage_note": "Preserve the closed typed relation vocabulary; Capture Plan adds required event relations within that vocabulary."},
+    {"requirement_id": "REQ-TRACE-002", "owner": "FEAT-SEMANTIC-TRACE", "disposition": "adapt", "successor": "REQ-TRACE-002@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-001", "REQ-CONTRACT-003", "REQ-CONTRACT-008"], "legacy_acceptance_test": "AT-TRACE-002", "successor_test": "AT-TC-TRACE-002", "coverage_note": "Extend forward and reverse coverage through Contract obligations and the deferred As-Built projection without making projection an authority."},
+    {"requirement_id": "REQ-TRACE-003", "owner": "FEAT-SEMANTIC-TRACE", "disposition": "preserve", "successor": "REQ-TRACE-003", "related_added_requirements": ["REQ-CONTRACT-003"], "legacy_acceptance_test": "AT-TRACE-003", "successor_test": "AT-TC-TRACE-003", "coverage_note": "Preserve deterministic fail-closed boundary validation for Portfolio relations and stale closure."},
+    {"requirement_id": "REQ-TRACE-004", "owner": "FEAT-SEMANTIC-TRACE", "disposition": "adapt", "successor": "REQ-TRACE-004@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-003"], "legacy_acceptance_test": "AT-TRACE-004", "successor_test": "AT-TC-TRACE-004", "coverage_note": "Add Contract dependency and Portfolio edges while preserving deterministic impact closure and reached-by reasons."},
+    {"requirement_id": "REQ-TRACE-005", "owner": "FEAT-SEMANTIC-TRACE", "disposition": "adapt", "successor": "REQ-TRACE-005@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-005", "REQ-CONTRACT-008"], "legacy_acceptance_test": "AT-TRACE-005", "successor_test": "AT-TC-TRACE-005", "coverage_note": "Extend provenance from Requirement and compilation to results and deferred projection while preserving failed-verdict propagation."},
+    {"requirement_id": "REQ-SESSION-001", "owner": "FEAT-SESSION-RECORDS", "disposition": "preserve", "successor": "REQ-SESSION-001", "related_added_requirements": ["REQ-CONTRACT-001"], "legacy_acceptance_test": "AT-SESSION-001", "successor_test": "AT-TC-SESSION-001", "coverage_note": "Preserve user-scoped optional ingestion; a Contract may require a source but may not broaden the authorized source universe."},
+    {"requirement_id": "REQ-SESSION-002", "owner": "FEAT-SESSION-RECORDS", "disposition": "preserve", "successor": "REQ-SESSION-002", "related_added_requirements": ["REQ-CONTRACT-005"], "legacy_acceptance_test": "AT-SESSION-002", "successor_test": "AT-TC-SESSION-002", "coverage_note": "Preserve raw, derived, summary, access and retention separation and expose only provenance-bound candidates."},
+    {"requirement_id": "REQ-SESSION-003", "owner": "FEAT-SESSION-RECORDS", "disposition": "preserve", "successor": "REQ-SESSION-003", "related_added_requirements": ["REQ-CONTRACT-003", "REQ-CONTRACT-005"], "legacy_acceptance_test": "AT-SESSION-003", "successor_test": "AT-TC-SESSION-003", "coverage_note": "Preserve append, non-append and disappearance verdicts and connect unresolved mutation to stale and provenance gates."},
+    {"requirement_id": "REQ-WORKFLOW-001", "owner": "FEAT-WORKFLOW-CONTROL", "disposition": "adapt", "successor": "REQ-WORKFLOW-001@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-003", "REQ-WORKFLOW-005", "REQ-WORKFLOW-007"], "legacy_acceptance_test": "AT-WORKFLOW-001", "successor_test": "AT-TC-WORKFLOW-001", "coverage_note": "Select a single active leaf from the Portfolio and route origin or dependencies without losing backlog and stage identity."},
+    {"requirement_id": "REQ-WORKFLOW-002", "owner": "FEAT-WORKFLOW-CONTROL", "disposition": "adapt", "successor": "REQ-WORKFLOW-002@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-002", "REQ-WORKFLOW-007", "REQ-WORKFLOW-008"], "legacy_acceptance_test": "AT-WORKFLOW-002", "successor_test": "AT-TC-WORKFLOW-002", "coverage_note": "Bind permits to compiled Plan and propagate dependency, cycle and controlled termination results to Work Item state."},
+    {"requirement_id": "REQ-WORKFLOW-003", "owner": "FEAT-WORKFLOW-CONTROL", "disposition": "preserve", "successor": "REQ-WORKFLOW-003", "related_added_requirements": ["REQ-CONTRACT-001", "REQ-WORKFLOW-008"], "legacy_acceptance_test": "AT-WORKFLOW-003", "successor_test": "AT-TC-WORKFLOW-003", "coverage_note": "Preserve unauthorized-write rejection and require cleanup or disposition for partial effects during termination."},
+    {"requirement_id": "REQ-WORKFLOW-004", "owner": "FEAT-WORKFLOW-CONTROL", "disposition": "adapt", "successor": "REQ-WORKFLOW-004@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-001", "REQ-WORKFLOW-005", "REQ-WORKFLOW-009"], "legacy_acceptance_test": "AT-WORKFLOW-004", "successor_test": "AT-TC-WORKFLOW-004", "coverage_note": "Self-apply only stable Contracts and deployment, with explicit routing and implementation discovery before green code."},
+    {"requirement_id": "REQ-PORTABLE-001", "owner": "FEAT-PORTABLE-LIFECYCLE", "disposition": "adapt", "successor": "REQ-PORTABLE-001@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-007"], "legacy_acceptance_test": "AT-PORTABLE-001", "successor_test": "AT-TC-PORTABLE-001", "coverage_note": "Add Deployment, Project Binding and Integration identities while preserving supported-platform and logical-root resolution."},
+    {"requirement_id": "REQ-PORTABLE-002", "owner": "FEAT-PORTABLE-LIFECYCLE", "disposition": "preserve", "successor": "REQ-PORTABLE-002", "related_added_requirements": ["REQ-CONTRACT-005", "REQ-CONTRACT-007"], "legacy_acceptance_test": "AT-PORTABLE-002", "successor_test": "AT-TC-PORTABLE-002", "coverage_note": "Preserve atomic writes, prior valid versions and recovery for Contract, event and Integration artifacts."},
+    {"requirement_id": "REQ-PORTABLE-003", "owner": "FEAT-PORTABLE-LIFECYCLE", "disposition": "adapt", "successor": "REQ-PORTABLE-003@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-007"], "legacy_acceptance_test": "AT-PORTABLE-003", "successor_test": "AT-TC-PORTABLE-003", "coverage_note": "Extend lifecycle ownership to Binding, Manifest, version migration and rollback while preserving user-data protection."},
+    {"requirement_id": "REQ-PORTABLE-004", "owner": "FEAT-PORTABLE-LIFECYCLE", "disposition": "preserve", "successor": "REQ-PORTABLE-004", "related_added_requirements": ["REQ-CONTRACT-005"], "legacy_acceptance_test": "AT-PORTABLE-004", "successor_test": "AT-TC-PORTABLE-004", "coverage_note": "Preserve confidentiality, access, retention, deletion and mutation boundaries for provenance capture."},
+    {"requirement_id": "REQ-EVAL-001", "owner": "FEAT-EVIDENCE-EVALUATION", "disposition": "adapt", "successor": "REQ-EVAL-001@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-004", "REQ-CONTRACT-006"], "legacy_acceptance_test": "AT-EVAL-001", "successor_test": "AT-TC-EVAL-001", "coverage_note": "Use fixed Verification and Evaluation Profiles while preserving criteria, evidence and stale-target rejection."},
+    {"requirement_id": "REQ-EVAL-002", "owner": "FEAT-EVIDENCE-EVALUATION", "disposition": "adapt", "successor": "REQ-EVAL-002@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-006"], "legacy_acceptance_test": "AT-EVAL-002", "successor_test": "AT-TC-EVAL-002", "coverage_note": "Bind observations to profile and metric identities while preserving result, interpretation and limitation separation."},
+    {"requirement_id": "REQ-EVAL-003", "owner": "FEAT-EVIDENCE-EVALUATION", "disposition": "preserve", "successor": "REQ-EVAL-003", "related_added_requirements": ["REQ-CONTRACT-006"], "legacy_acceptance_test": "AT-EVAL-003", "successor_test": "AT-TC-EVAL-003", "coverage_note": "Preserve reproducible packages and failed examples; Evaluation Profile supplies versioned recomputation inputs."},
+    {"requirement_id": "REQ-IMPROVE-001", "owner": "FEAT-SELF-IMPROVEMENT", "disposition": "adapt", "successor": "REQ-IMPROVE-001@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-006"], "legacy_acceptance_test": "AT-IMPROVE-001", "successor_test": "AT-TC-IMPROVE-001", "coverage_note": "Bind learning material to evaluation case, condition, trial and comparable identity while preserving conditional use."},
+    {"requirement_id": "REQ-IMPROVE-002", "owner": "FEAT-SELF-IMPROVEMENT", "disposition": "replace", "successor": "REQ-IMPROVE-002@successor-candidate", "related_added_requirements": ["REQ-CONTRACT-003", "REQ-CONTRACT-006", "REQ-WORKFLOW-006"], "legacy_acceptance_test": "AT-IMPROVE-002", "successor_test": "AT-TC-IMPROVE-002", "coverage_note": "Replace direct Workflow setting changes with a versioned Improvement Proposal, Human decision, stale closure and normal owner revision path."}
+  ],
+  "expected_reverse_coverage": [
+    "REQ-CONTRACT-001",
+    "REQ-CONTRACT-002",
+    "REQ-CONTRACT-003",
+    "REQ-CONTRACT-004",
+    "REQ-CONTRACT-005",
+    "REQ-CONTRACT-006",
+    "REQ-CONTRACT-007",
+    "REQ-CONTRACT-008",
+    "REQ-WORKFLOW-005",
+    "REQ-WORKFLOW-006",
+    "REQ-WORKFLOW-007",
+    "REQ-WORKFLOW-008",
+    "REQ-WORKFLOW-009"
+  ],
+  "excluded_candidates": [
+    "REQ-WORKFLOW-010",
+    "REQ-WORKFLOW-011"
+  ],
+  "approved_effect": "none until a Human Decision is bound to this candidate digest"
+}

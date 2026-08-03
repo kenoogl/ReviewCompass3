@@ -1,0 +1,49 @@
+{
+  "decision_id": "DEC-WORK3-SOURCE-IDENTITY-STALE-2026-08-03-V1",
+  "decided_at": "2026-08-03T18:18:32+09:00",
+  "decision_maker": "human_user",
+  "decision_class": "source_identity_stale_promotion",
+  "decision": "approved",
+  "instruction": "A1、B1",
+  "instruction_context": {
+    "selection": "A1",
+    "meaning": "監査済みWork 3 source identity／stale候補の選択肢1を明示承認",
+    "candidate_id": "RC3-WORK3-SOURCE-IDENTITY-STALE-2026-08-03-V1",
+    "candidate_path": "records/development/2026-08-03-work-3-source-identity-stale-candidate-v1.json",
+    "candidate_sha256": "e697ba20409bfe32094103a5a2fa4a68ee0b43f60f12dd440f8bd1e155b871fc",
+    "evidence_path": "records/development/2026-08-03-work-3-source-identity-stale-evidence-v1.md",
+    "evidence_sha256": "3d04943d0174c323d9b5f1feb605eb70ff3e4dc3a779e681bf179d810db16812"
+  },
+  "approved_summary": {
+    "identity_entity_count": 5,
+    "target_consistency_gate_count": 5,
+    "fixed_source_count": 6,
+    "relation_step_count": 7,
+    "unknown_reference_count": 0,
+    "digest_mismatch_count": 0
+  },
+  "approved_scope": [
+    "Repository Binding, Source Snapshot, Change Set, Verification Run and Build Artifact identity boundaries",
+    "stale triggers, recovery, acceptance and out-of-scope rules for those five entities",
+    "Test, review, Decision, commit and release target consistency gates",
+    "the seven-step Requirement-to-Release relation chain",
+    "initial local read-only identity scope and deferred provider operation boundary",
+    "completion of the source, Change Set, Test or CI and Build Artifact identity and stale checklist item"
+  ],
+  "excluded_scope": [
+    "implement CI adapters or Build Artifact handling",
+    "initiate CI, push, pull request or merge queue operations",
+    "promote or modify Requirements or Plan source documents",
+    "approve the Requirements artifact layout except through the separate B1 Decision",
+    "complete later Work 3 checklist items or Work 3 as a whole",
+    "commit or push repository changes"
+  ],
+  "promotion": {
+    "mode": "external_decision_bound",
+    "candidate_interpretation": "approved_identity_and_stale_rule_snapshot",
+    "requirements_body_state": "unchanged",
+    "plan_state": "provisional_unchanged"
+  },
+  "authority_effect": "closes only the Work 3 source identity and stale rule gate",
+  "status": "approved_and_effective"
+}

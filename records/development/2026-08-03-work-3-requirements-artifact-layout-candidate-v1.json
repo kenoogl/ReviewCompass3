@@ -1,0 +1,272 @@
+{
+  "candidate_id": "RC3-WORK3-REQUIREMENTS-ARTIFACT-LAYOUT-2026-08-03-V1",
+  "generated_at": "2026-08-03T17:46:53+09:00",
+  "stage": "initial-development",
+  "work": "Work 3",
+  "status": "human_decision_candidate",
+  "authority": "proposed_only",
+  "origin": {
+    "source_kind": "human_direction_from_side_chat",
+    "summary": "Fix the placement, naming and authority boundary for Requirement bodies, candidates, Decisions, Evidence and schemas before structuring the added 13 Requirements.",
+    "authorized_action": "add this preparation step to Work 3 and prepare a decision candidate",
+    "not_yet_authorized": [
+      "promote this candidate",
+      "move legacy artifacts",
+      "structure or promote the added 13 Requirements"
+    ]
+  },
+  "fixed_sources": [
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ae6bef979192b008a8a71fc090f709279c4bd1f0db159f9faadf947e929156f"
+    },
+    {
+      "path": "docs/current/reviewcompass3-glossary-current.md",
+      "sha256": "f1e7e9a9c57292fe911217d9b4f5d5b8ed99a881d6f113f9b60db1f0d01b19fa"
+    },
+    {
+      "path": "records/development/2026-08-03-work-1a-layout-evidence-v1.md",
+      "sha256": "5d54c7de759388ae81c1fefebcc50c817c0b38ae2bcdc65444f47aa48cc8e899"
+    },
+    {
+      "path": "records/development/2026-08-03-work-3-source-identity-stale-candidate-v1.json",
+      "sha256": "e697ba20409bfe32094103a5a2fa4a68ee0b43f60f12dd440f8bd1e155b871fc"
+    },
+    {
+      "path": "records/development/2026-08-03-work-3-source-identity-stale-evidence-v1.md",
+      "sha256": "3d04943d0174c323d9b5f1feb605eb70ff3e4dc3a779e681bf179d810db16812"
+    },
+    {
+      "path": "docs/requirements/2026-08-02-task-contract-requirements-delta.md",
+      "sha256": "9c69f54aae6b03549844db73aab24aac0d448f856f2b3faf81f2b0549ece9ccd"
+    },
+    {
+      "path": "docs/requirements/review-context-requirements.md",
+      "sha256": "0622d8b1cc80e0c23119b78bd137c90e8e1c621bc0fde2e99f8a82e71e76ac23"
+    },
+    {
+      "path": "docs/requirements/remaining-feature-requirements.md",
+      "sha256": "ec31ce53ce097a8ff8a59a4649d97e4af8d8dd0cbdb8a1a8c7d4e8d2a1f8bcf6"
+    },
+    {
+      "path": "records/requirements/stage-four-user-approval.json",
+      "sha256": "48ea1b075caa628fcfb1f6391d3eb6e51a3584a136d8a5706ecbd8a2cc8cedfc"
+    },
+    {
+      "path": "records/requirements/stage-four-completion.json",
+      "sha256": "c13fab7dae8b81a45e6661aea60172d125abf44b09ccab6c953b6f2ea9a795b0"
+    }
+  ],
+  "problem": {
+    "observed": "Existing Requirement documents and records have usable content but no single rule fixes the separate locations and authority relations of bodies, candidate manifests, Decisions, Evidence and schemas.",
+    "risk": "A new structured record could appear current merely because of its path or filename, or a Decision could approve content other than the record later consumed.",
+    "stop_boundary": "Do not structure or promote the added 13 Requirements until this layout and authority rule has a Human Decision."
+  },
+  "proposed_layout": [
+    {
+      "artifact_class": "human_readable_requirement_source",
+      "directory": "docs/requirements/",
+      "filename_pattern": "<yyyy-mm-dd>-<topic>-requirements[-v<integer>].md",
+      "role": "Human-readable source, rationale or projection. Its directory does not make it normative.",
+      "required_identity": [
+        "document_id",
+        "document_version",
+        "content_digest"
+      ]
+    },
+    {
+      "artifact_class": "structured_requirement_definition",
+      "directory": "records/requirements/definitions/",
+      "filename_pattern": "<requirement-id-lowercase>--v<requirement-version>.json",
+      "role": "Immutable machine-readable Requirement body. Effective authority is resolved externally.",
+      "required_identity": [
+        "record_id",
+        "requirement_id",
+        "requirement_version",
+        "schema_id",
+        "schema_version",
+        "source_refs",
+        "canonical_payload_digest"
+      ]
+    },
+    {
+      "artifact_class": "requirements_candidate_manifest",
+      "directory": "records/requirements/candidates/",
+      "filename_pattern": "<candidate-id-lowercase>.json",
+      "role": "Proposes an exact set of Requirement definition IDs, versions and digests for one Human judgment.",
+      "required_identity": [
+        "candidate_id",
+        "candidate_version",
+        "definition_refs",
+        "schema_refs",
+        "fixed_source_refs",
+        "candidate_digest"
+      ]
+    },
+    {
+      "artifact_class": "requirements_decision_record",
+      "directory": "records/requirements/decisions/",
+      "filename_pattern": "<decision-id-lowercase>.json",
+      "role": "Records Human approval, rejection, revision request, supersession or revocation against exact target and Evidence digests.",
+      "required_identity": [
+        "decision_id",
+        "decision_class",
+        "actor",
+        "authority",
+        "target_candidate_id",
+        "target_candidate_digest",
+        "evidence_refs",
+        "outcome",
+        "decided_at",
+        "scope",
+        "supersedes_or_revokes"
+      ]
+    },
+    {
+      "artifact_class": "requirements_evidence_record",
+      "directory": "records/requirements/evidence/",
+      "filename_pattern": "<evidence-id-lowercase>.<md|json>",
+      "role": "Stores validation, review, coverage, post-write verification and migration observations without making the Requirement authoritative.",
+      "required_identity": [
+        "evidence_id",
+        "evidence_version",
+        "subject_refs",
+        "source_refs",
+        "observations",
+        "result",
+        "recorded_at",
+        "evidence_digest"
+      ]
+    },
+    {
+      "artifact_class": "requirement_schema",
+      "directory": "schemas/requirements/",
+      "filename_pattern": "<schema-id-lowercase>--v<schema-version>.schema.json",
+      "role": "Machine authority for record shape and closed values, not for Requirement acceptance truth.",
+      "required_identity": [
+        "schema_id",
+        "schema_version",
+        "schema_digest",
+        "compatibility",
+        "migration_rule"
+      ]
+    },
+    {
+      "artifact_class": "requirements_authority_bundle",
+      "directory": "records/requirements/authority/",
+      "filename_pattern": "<authority-bundle-id-lowercase>--v<bundle-version>.json",
+      "role": "Lists the exact effective Requirement definitions and their approval Decisions. It is a derived authority map and cannot self-approve.",
+      "required_identity": [
+        "authority_bundle_id",
+        "bundle_version",
+        "definition_refs",
+        "decision_refs",
+        "legacy_authority_bindings",
+        "supersedes",
+        "bundle_digest"
+      ]
+    }
+  ],
+  "global_naming_rules": [
+    "Embedded IDs are canonical; filenames and directories are locators and classification aids only.",
+    "Canonical filenames use lowercase ASCII IDs, two hyphens before a version, and no spaces.",
+    "Requirement IDs keep the REQ-<FEATURE>-<NNN> form; record_id is <requirement_id>@v<requirement_version>.",
+    "A referenced artifact is never renamed or edited in place; a changed artifact receives a new version or a new ID and an explicit supersedes relation.",
+    "Digest algorithm is SHA-256 until an approved migration changes it; every reference records path, logical ID, version and digest.",
+    "Timestamps are metadata and never replace ID, version or digest identity."
+  ],
+  "version_rules": {
+    "requirement_version": "Positive integer that increments for every new immutable Requirement definition record. acceptance_truth_changed states whether the revision changes obligation, stop, recovery, acceptance or non-goal truth.",
+    "candidate_version": "Positive integer scoped to candidate_id; any definition, schema, source or scope change creates a new candidate version and digest.",
+    "schema_version": "Positive integer scoped to schema_id. Existing records retain their recorded schema identity until an approved migration.",
+    "evidence_version": "New observation or rerun creates a new Evidence version; prior Evidence is retained and may become stale.",
+    "decision_version": "Decisions are immutable. Correction, supersession or revocation creates a new decision_id and typed relation.",
+    "bundle_version": "Any change to effective definitions, Decisions or legacy bindings creates a new authority bundle version."
+  },
+  "authority_resolution": {
+    "effective_only_when": [
+      "the Requirement definition validates against its recorded schema ID, version and digest",
+      "an immutable candidate manifest lists the exact definition ID, version and digest",
+      "a valid Human requirements_promotion Decision approves the exact candidate and Evidence digests",
+      "an authority bundle lists the definition and Decision references without duplicate ID and version conflicts",
+      "no later valid Decision supersedes or revokes the approval",
+      "required source, schema and Evidence bindings are not stale"
+    ],
+    "never_sufficient": [
+      "being stored under docs/requirements, records/requirements or a directory named current or approved",
+      "having an approved-looking filename or embedded status without a valid Decision",
+      "a Decision that names an ID but omits the target version or digest",
+      "an Evidence pass result without a promotion Decision"
+    ],
+    "conflict_result": "authority_inconsistent; stop promotion and downstream compilation"
+  },
+  "stale_rules": [
+    {
+      "change": "Requirement definition ID, version or digest changes",
+      "stales": [
+        "candidate validation for the prior target",
+        "review and Evidence that claim the new target",
+        "Decision reuse for the new target",
+        "downstream Contract or Verification compiled from the prior target"
+      ],
+      "recovery": "Create a new candidate, rerun affected validation and review, obtain a new Human Decision, and issue a new authority bundle."
+    },
+    {
+      "change": "Schema meaning or closed values change",
+      "stales": [
+        "validation under the new schema",
+        "migration claims",
+        "affected candidate manifests"
+      ],
+      "recovery": "Retain old records under their recorded schema, define compatibility and migration, validate representative positive, negative and boundary records, then obtain a migration Decision."
+    },
+    {
+      "change": "Fixed source or human-readable source changes",
+      "stales": [
+        "source alignment Evidence",
+        "candidate coverage claims",
+        "acceptance_truth_changed assessment"
+      ],
+      "recovery": "Capture the new source digest, classify semantic effect, and rerun affected coverage and authority checks."
+    },
+    {
+      "change": "Decision is superseded or revoked",
+      "stales": [
+        "authority bundle entries that rely on it",
+        "downstream unexecuted permits or promotion claims"
+      ],
+      "recovery": "Create a new Decision and authority bundle, then recompute downstream stale closure."
+    },
+    {
+      "change": "Only the locator path changes while ID, version and content digest remain identical",
+      "stales": [
+        "locator and reference-integrity Evidence"
+      ],
+      "recovery": "Issue a new locator or authority-bundle version and recheck references; do not infer a semantic Requirement change."
+    }
+  ],
+  "legacy_migration": {
+    "current_rule": "Do not move or rewrite the existing 37 Requirement documents and records in this Work.",
+    "binding": "Treat the existing stage-four approval, completion and fixed source digests as explicit legacy_authority_bindings.",
+    "added_13_rule": "Create the added 13 structured definitions only after this layout candidate is approved and the minimum schema is fixed.",
+    "mixed_bundle_rule": "Before the 50-Requirement set becomes effective, issue one authority bundle that lists the 37 legacy bindings and the 13 new definition, Decision and digest bindings.",
+    "future_migration": "Migration of the 37 legacy Requirements into the new definition format is a separate candidate, validation, Decision and stale-closure Work Item."
+  },
+  "implementation_sequence_after_approval": [
+    "create only the approved directories and a short non-authoritative README explaining locator roles",
+    "create and validate the minimum Requirement definition, candidate, Decision, Evidence and authority-bundle schemas",
+    "create an explicit legacy binding inventory for the existing 37 Requirements",
+    "structure the added 13 Requirements as immutable definitions",
+    "build and audit the 50-Requirement authority bundle",
+    "request a separate Human promotion Decision for the structured Requirements"
+  ],
+  "out_of_scope": [
+    "moving or rewriting existing Requirement artifacts before a migration Decision",
+    "approving or structuring the added 13 Requirements in this candidate",
+    "creating a generic artifact registry or plugin system",
+    "making directory names or symlinks authority",
+    "changing the current Plan or Requirement acceptance truth",
+    "commit or push"
+  ],
+  "approved_effect": "none until a Human Decision is bound to this candidate digest"
+}
