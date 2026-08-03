@@ -12,7 +12,8 @@
 - 現在の工程：Work 3 `verified / completed`、Work 4 `not_started`。完了済みinter-work correctiveと、
   `bootstrap_in_progress`のIssue Resolution早期PilotをPlan／checklistへ反映済み。
 - Issue Resolution早期Pilot：Layout Baseline v2、ReviewCompass3 Project Manifest v2、workflow rootを
-  検証済み。次はPilot Task ContractとImprovement Candidate／Triage Decisionの形状を固定する。
+  検証済み。Task ContractとImprovement Candidate／Triage Decisionの暫定形状をtest-firstで固定済み。
+  次はTODO肥大化という単一subjectのCandidateを作り、Human Triage Decisionを得る。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -21,18 +22,18 @@
 - TODO手戻り候補対策の修正案：`docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
-- activeなTask Contract／Work Item：Plan／checklist reconciliationは本handoffを含むcommit境界で完了する。
-  その後はIssue Resolution早期Pilot Task Contractの作成。
+- activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1`。
+  最初のshape bootstrap作業単位は`verified_completed`。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`db4850b60e0972fbe1e7a79e00b9b777b9b055a404d6d1831cd6a12978b374f7`
+- 進行入口SHA-256：`677161203a70da590b01cbd18dcb873e144f1f34d971637d8e5e8c80d97f4bc2`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-plan-reconciliation-stale-closure-evidence-v1.md`
-- Decision／Evidence SHA-256：`652390b74d0c78bd1b12d8cc5be6be4c6258c5ef68f6ee86f8dd86c5938b127b`
+  `records/development/2026-08-04-issue-resolution-pilot-bootstrap-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`1f2b981301e9a249226de4253f504586cea6f6dc23c5c1d780c53e4ec84b1f37`
 
 ## 実施報告照合
 
@@ -542,6 +543,16 @@
     `652390b74d0c78bd1b12d8cc5be6be4c6258c5ef68f6ee86f8dd86c5938b127b`
   - 観測した事後状態：変更は現在地、inter-work節、初期実装順に限定され、Requirement、NFR接続、
     deferred disposition、Acceptance truthは変更していない。Work 4／7／8を完了扱いにしていない。
+- Claim `EC-118`：Issue Resolution早期Pilotの限定再開Decision、固定Observation、Task Contractを作成した。
+  - Evidence：`records/task-contract/issue-resolution-early-pilot-v1.json`、SHA-256
+    `69e2c73167f930cab48abdcf3bd4d1eafa938aa9b3abaa714d6c3ad5e41c4ed7`
+  - 観測した事後状態：Pilot subjectはTODO肥大化一件、固定source 9件、Issue上限1件である。Observationは
+    Candidate／Issueではなく、TODO compaction前の不変測定値として保持した。
+- Claim `EC-119`：Candidate／Human Triage Decisionの暫定形状とvalidatorをtest-firstで固定した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-bootstrap-completion-evidence-v1.md`、SHA-256
+    `1f2b981301e9a249226de4253f504586cea6f6dc23c5c1d780c53e4ec84b1f37`
+  - 観測した事後状態：同じ15 Testを変更せずREDからGREENへし、固定source 9件と空bootstrap配置をCLIで
+    再検証した。Candidate、Decision、Issueはまだ作成していない。
 
 ### reported_unverified／contradicted
 
@@ -614,7 +625,7 @@
 
 ### 未実施
 
-- `.reviewcompass/workflow/`を使うIssue Resolution早期Pilot recordの作成
+- 固定暫定形状を使う最初のImprovement Candidate、Human Triage Decision、必要な場合のIssue Record作成
 - Deployment Manifest、package builder、原子的切替、rollbackのWork 7実装
 - Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定
 - Project Bindingのdurable保存
@@ -655,35 +666,36 @@
 
 ## 次に行う一作業
 
-Issue Resolution早期PilotのTask Contractと固定sourceを作り、Improvement CandidateとHuman Triage Decisionの
-identity、field、命名、version、Digest規則をtest-firstで固定する。
+固定した暫定形状を使い、TODO肥大化という単一subjectの最初のImprovement Candidateを作成し、Human Triage
+Decisionを得る。Human判断なしにはIssueへ昇格しない。
 
 開始条件：
 
 - work unit transition preflightが`passed`である。
 - Plan SHA-256が`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`、
-  checklist SHA-256が`db4850b60e0972fbe1e7a79e00b9b777b9b055a404d6d1831cd6a12978b374f7`である。
-- Project Manifest v2 Completion Evidence SHA-256が
-  `154d3f5d930b16c9974431568e9430d896f580d99e03c59efffb5fba878ec020`である。
-- `.reviewcompass/workflow/`の初期snapshotが`.gitkeep`一件だけである。
-- 先行PilotメモとTODO routing修正メモの固定Digestが一致する。
+  checklist SHA-256が`677161203a70da590b01cbd18dcb873e144f1f34d971637d8e5e8c80d97f4bc2`である。
+- Task Contract SHA-256が`69e2c73167f930cab48abdcf3bd4d1eafa938aa9b3abaa714d6c3ad5e41c4ed7`、
+  shape bootstrap Completion Evidence SHA-256が
+  `1f2b981301e9a249226de4253f504586cea6f6dc23c5c1d780c53e4ec84b1f37`である。
+- Pilot config、Candidate directory、Triage Decision directoryがvalidatorに合格する。
 
 完了条件：
 
-- Task Contractが対象一件、scope、non-scope、停止条件、Acceptanceを固定する。
-- CandidateとTriage Decisionのidentity、必須field、Digest、参照規則を正常・負例・境界Testへ固定する。
-- Human判断なしのIssue昇格と、TODOへの詳細複製を禁止する。
+- CandidateがObservationと固定EvidenceへDigest付きで接続される。
+- Candidateのclassification、route、consumerは候補として明示され、裁定済みと誤表示されない。
+- Human Triage DecisionがCandidateのfile Digestとcontent Digestへ束縛される。
+- Human判断なしのIssue昇格をvalidatorが拒否する。
 
-後続作業：固定schema候補を使って最初のPilot Improvement CandidateとHuman Triage Decisionを作る。
+後続作業：Humanが`issue_resolution`を選んだ場合だけ、一件のIssue RecordとResolution Planを作る。
 
 ## blocker・Human判断待ち
 
-- blocker：本Plan／checklist reconciliationを含むcommit前は、完了済み作業単位に変更が残るため次作業へ移行しない。
-  当該commit完了と同時に解除する。
-- Human判断待ち：本Plan／checklist reconciliationのlocal commit指示
-- 実行保留：実際のIssue Resolution Pilot record作成。shapeとvalidatorのRED／GREEN後に開始する
+- blocker：work unit transition preflightを正本とする。完了済み作業単位とdirty worktreeが同時に成立する間は、
+  `completed_work_unit_uncommitted`として次作業へ移行しない。
+- Human判断待ち：次作業で作る単一Candidateのdisposition、blocking、consumer、Issue昇格可否
+- 実行保留：最初のCandidate／Triage Decision作成。work unit transition preflight合格後に開始する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
-- 再開条件：checklist、Completion Evidence、Test receiptのDigest一致を確認する
+- 再開条件：work unit transition preflight合格とTask Contract、Completion Evidence、Test receiptの一致を確認する
 
 ## stale・deferred
 
@@ -693,7 +705,7 @@ identity、field、命名、version、Digest規則をtest-firstで固定する�
   その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
   Issue Resolution・実施報告照合の正式automation、汎用Task Registry／plugin system。Issue Resolutionの
-  development限定早期Pilotはartifact shape bootstrap待ちであり、正式schemaまたはWork 8正式Pilotを前倒ししない。
+  development限定早期Pilotはshape bootstrapまで完了したが、正式schemaまたはWork 8正式Pilotを前倒ししない。
 
 ## Git・Test
 
@@ -702,9 +714,8 @@ identity、field、命名、version、Digest規則をtest-firstで固定する�
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Plan／checklist reconciliation関連`37 passed in 0.10s`、Requirement authority
-  `effective / 50 / legacy binding 0`、TODO handoff finding 0
-- 直近の全Test：work unit commit reminder official receiptを機械参照する
+- 直近の関連検証：Issue Resolution shape bootstrap `15 passed in 0.03s`、固定source 9件、bootstrap配置合格
+- 直近の全Test：Issue Resolution bootstrap official receiptを機械参照する
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則

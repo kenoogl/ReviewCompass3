@@ -503,8 +503,8 @@ Evidenceは`records/development/2026-08-04-project-manifest-v2-completion-eviden
 - [x] ReviewCompass2のIssue→Plan経路をReviewCompass3へ継承する早期PilotをHumanが承認した。
 - [x] TODOはactive ID projectionに限定し、詳細候補をdurable Candidate／Issue経路へ分離する案を固定した。
 - [x] Pilot recordの移動させない上位rootを`.reviewcompass/workflow/`へ固定した。
-- [ ] Pilot Task Contractと固定sourceを作成した。
-- [ ] Improvement CandidateとHuman Triage Decisionのidentity、field、命名、version、Digest、参照規則を
+- [x] Pilot Task Contractと固定sourceを作成した。
+- [x] Improvement CandidateとHuman Triage Decisionのidentity、field、命名、version、Digest、参照規則を
       正常・負例・境界Testへ固定した。
 - [ ] 最初のCandidate／Triage Decisionを作り、Human判断なしのIssue昇格を拒否した。
 - [ ] ReviewCompass Issue Record、Resolution Plan、Plan Challenge、Verdictの最初の手作業経路を検証した。
@@ -515,6 +515,13 @@ Evidenceは`records/development/2026-08-04-project-manifest-v2-completion-eviden
 `docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、SHA-256
 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。製品schema、正式state machine、
 Workflow permit、自動Plan編集、automation、Work 8評価は前倒ししない。
+
+Task Contract／暫定shape bootstrap Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-bootstrap-completion-evidence-v1.md`、SHA-256
+`1f2b981301e9a249226de4253f504586cea6f6dc23c5c1d780c53e4ec84b1f37`。固定source 9件を再照合し、同じ
+Pilot Testを変更せず`15 failed`から`15 passed`へした。既存Layout snapshot Testは意図した空directory追加へ
+更新し、関連`27 passed`となった。Candidate、Decision、Issueは未作成である。Pilot全体の完了ではなく、次は
+単一CandidateとHuman Triage Decisionを作成する。
 
 #### Commit／handoff安定化
 
