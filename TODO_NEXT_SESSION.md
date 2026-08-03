@@ -388,6 +388,10 @@
   実executorはLLMによるexact anchor選択となり、実fileと一致せず`apply_patch verification failed`が1回発生した。
   再読込後のpatchは成功した。機械処理候補は見出しidentityからのlocator自動解決、routeは
   `manual_rework_candidate / checkpoint`とし、同種再発時に共通patch helperのTask Contract候補へ昇格する。
+- 今回の候補：commit後の引き継ぎ照合で、固定receipt v2の全Test時間`2.26s`に対し、TODOへ`2.29s`と
+  手入力されていた転記差を検出した。期待executorはreceiptからGit／Test欄を生成する`machine`、実executorは
+  手入力であり、固定Evidenceの値へ訂正した。機械処理候補はreceipt projection、routeは
+  `manual_rework_candidate / checkpoint`とし、同種再発時にTODO更新helperのTask Contract候補へ昇格する。
 
 ### 未実施
 
@@ -462,12 +466,11 @@
 ## Git・Test
 
 - branch：`main`
-- HEAD：`f9adef4`（Work 3恒久対策）
-- 直前の成果commit：`7588766`（NFR）、`cee241b`（deferred監査）、`f9adef4`（恒久対策）
-- remote：push未実施。`origin/main`よりahead 10
-- worktree：Policy v5本文、config、evaluator、Test、Plan参照、TODO／templateを未コミットで保持
+- 直近の成果commit：`601bbb1`（Policy v5）、`f9adef4`（Work 3恒久対策）
+- remote：push未実施。引き継ぎ更新commit後は`origin/main`よりahead 12
+- worktree：Policy v5はcommit済み。引き継ぎ更新commit後はclean
 - 直近の関連Test：Policy責務境界5件を含みgreen
-- 直近の全Test：policy runner receipt、`467 passed in 2.29s`、fallback `false`
+- 直近の全Test：policy runner receipt v2、`467 passed in 2.26s`、fallback `false`
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則
