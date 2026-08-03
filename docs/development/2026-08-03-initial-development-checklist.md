@@ -131,21 +131,25 @@ source catalog 10件、前身inventory 2件を再読込し、全件一致した�
 
 ### 確認項目
 
-- [ ] `CODE_ROOT`、`CONFIG_ROOT`、`PROJECT_ROOT`、`DATA_ROOT`、`STATE_ROOT`、`LOG_ROOT`、
+- [x] `CODE_ROOT`、`CONFIG_ROOT`、`PROJECT_ROOT`、`DATA_ROOT`、`STATE_ROOT`、`LOG_ROOT`、
       `CACHE_ROOT`、`SENSITIVE_ROOT`、`EVALUATION_ROOT`の意味と解決規則を固定した。
-- [ ] Git管理対象、project外data、機密data、生成物、cacheの境界を固定した。
-- [ ] Project ManifestとProject Bindingの最小構造を定めた。
-- [ ] stableとdevelopmentのroot、state、data、cross-write禁止を定めた。
-- [ ] 空配置fixtureを作り、別checkoutとproject移動後の相対参照を確認した。
-- [ ] 端末固有絶対pathが管理成果へ混入しないことを確認した。
-- [ ] 後続の配置変更を通常編集でなくmigrationとして扱う規則を定めた。
+- [x] Git管理対象、project外data、機密data、生成物、cacheの境界を固定した。
+- [x] Project ManifestとProject Bindingの最小構造を定めた。
+- [x] stableとdevelopmentのroot、state、data、cross-write禁止を定めた。
+- [x] 空配置fixtureを作り、別checkoutとproject移動後の相対参照を確認した。
+- [x] 端末固有絶対pathが管理成果へ混入しないことを確認した。
+- [x] 後続の配置変更を通常編集でなくmigrationとして扱う規則を定めた。
 
 ### 完了関門
 
-- [ ] Layout Baseline Recordと空配置Testが固定されている。
-- [ ] project移動、link解決、Manifest／Binding照合がgreenである。
+- [x] Layout Baseline Recordと空配置Testが固定されている。
+- [x] project移動、link解決、Manifest／Binding照合がgreenである。
 
-`Evidence`：未記録
+`Evidence`：`RC3-WORK1A-LAYOUT-2026-08-03-V1`、
+`records/development/2026-08-03-work-1a-layout-evidence-v1.md`、SHA-256
+`5d54c7de759388ae81c1fefebcc50c817c0b38ae2bcdc65444f47aa48cc8e899`。
+Layout一式はcommit `d3add9f2e6bc812bf512a36a24877e29879e9842`へ固定し、targeted
+`7 passed`、全`419 passed`。結果は`verified / completed`。
 
 ## 5. Work 1B：Session Log Bootstrapと現在位置text表示
 
