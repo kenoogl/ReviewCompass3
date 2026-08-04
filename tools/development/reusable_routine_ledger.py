@@ -153,10 +153,13 @@ def persist_reusable_routine_ledger(
     entries,
     relations,
     decision_refs,
+    baseline_version=1,
 ):
     """承認済みentryをreuse rootへnew-only保存しbaselineで束縛する。"""
     _require_sha256(source_snapshot_id, "source snapshot")
     _require_sha256(candidate_list_digest, "candidate list digest")
+    if not isinstance(baseline_version, int) or baseline_version < 1:
+        raise ReusableRoutineLedgerError("ledger baseline version is invalid")
     if not isinstance(entries, tuple) or not isinstance(relations, tuple):
         raise ReusableRoutineLedgerError("ledger records must be tuples")
     if not entries or not decision_refs or not all(
@@ -174,14 +177,14 @@ def persist_reusable_routine_ledger(
     if len(set(identifiers)) != len(identifiers):
         raise ReusableRoutineLedgerError("ledger entry identity is duplicated")
     entry_paths = tuple(
-        root / "entries" / f"{identifier.lower()}--v1.json"
+        root / "entries" / f"{identifier.lower()}--v{baseline_version}.json"
         for identifier in identifiers
     )
     relation_paths = tuple(
-        root / "relations" / f"{document['relation_id'].lower()}--v1.json"
+        root / "relations" / f"{document['relation_id'].lower()}--v{baseline_version}.json"
         for document in relation_documents
     )
-    baseline_path = root / "ledger-baseline--v1.json"
+    baseline_path = root / f"ledger-baseline--v{baseline_version}.json"
     if baseline_path.exists() or any(path.exists() for path in (*entry_paths, *relation_paths)):
         raise ReusableRoutineLedgerError("ledger output already exists")
     for path, document in zip(entry_paths, documents):
@@ -203,7 +206,7 @@ def persist_reusable_routine_ledger(
     baseline = {
         "record_kind": "reusable_routine_ledger_baseline",
         "ledger_id": "RRL-BASELINE",
-        "ledger_version": 1,
+        "ledger_version": baseline_version,
         "source_snapshot_id": source_snapshot_id,
         "candidate_list_digest": candidate_list_digest,
         "entry_refs": entry_refs,

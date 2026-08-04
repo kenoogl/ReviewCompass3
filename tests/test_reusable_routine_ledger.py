@@ -81,7 +81,7 @@ def test_persists_individual_entry_and_digest_bound_baseline_in_reuse_root(
 
     persisted = module.persist_reusable_routine_ledger(
         project_root=project_root,
-        source_snapshot_id=snapshot_id,
+                source_snapshot_id="b" * 64,
         candidate_list_digest="c" * 64,
         entries=(_entry(snapshot_id),),
         relations=(),
@@ -118,7 +118,7 @@ def test_rejects_snapshot_mismatch_and_reuse_root_escape(tmp_path):
     with pytest.raises(module.ReusableRoutineLedgerError, match="snapshot"):
         module.persist_reusable_routine_ledger(
             project_root=project_root,
-            source_snapshot_id=snapshot_id,
+            source_snapshot_id="b" * 64,
             candidate_list_digest="c" * 64,
             entries=(mismatched,),
             relations=(),
@@ -161,6 +161,24 @@ def test_persists_relation_and_binds_its_digest_from_baseline(tmp_path):
     ):
         module.verify_reusable_routine_ledger(persisted=persisted)
 
+
+def test_writes_a_new_baseline_version_without_overwriting_v1(tmp_path):
+    module = _module()
+    project_root = _project(tmp_path)
+    first = module.persist_reusable_routine_ledger(
+        project_root=project_root, source_snapshot_id="b" * 64,
+        candidate_list_digest="c" * 64, entries=(_entry("b" * 64),),
+        relations=(), decision_refs=("DEC-EXAMPLE-001",),
+    )
+    second = module.persist_reusable_routine_ledger(
+        project_root=project_root, source_snapshot_id="d" * 64,
+        candidate_list_digest="e" * 64, entries=(_entry("d" * 64),),
+        relations=(), decision_refs=("DEC-EXAMPLE-002",), baseline_version=2,
+    )
+    assert first.baseline_path.name == "ledger-baseline--v1.json"
+    assert second.baseline_path.name == "ledger-baseline--v2.json"
+    assert first.baseline_path.read_bytes() != second.baseline_path.read_bytes()
+
     manifest = project_root / ".reviewcompass" / "project-manifest.json"
     document = json.loads(manifest.read_text(encoding="utf-8"))
     document["artifact_roots"]["reuse"] = "../escape"
@@ -168,9 +186,9 @@ def test_persists_relation_and_binds_its_digest_from_baseline(tmp_path):
     with pytest.raises(module.ReusableRoutineLedgerError, match="reuse"):
         module.persist_reusable_routine_ledger(
             project_root=project_root,
-            source_snapshot_id=snapshot_id,
+            source_snapshot_id="b" * 64,
             candidate_list_digest="c" * 64,
-            entries=(_entry(snapshot_id),),
+            entries=(_entry("b" * 64),),
             relations=(),
             decision_refs=("DEC-EXAMPLE-001",),
         )
