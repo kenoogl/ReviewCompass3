@@ -1,0 +1,17 @@
+{
+  "receipt_kind": "policy_test_verification_run",
+  "runner_id": "RC3-DEVELOPMENT-TEST-RUNNER",
+  "runner_version": 1,
+  "recorded_at": "2026-08-04T18:12:33+09:00",
+  "suite": "full",
+  "command": ".venv/bin/python3 -m pytest -q",
+  "configured_python": ".venv/bin/python3",
+  "resolved_python": ".venv/bin/python3",
+  "python_version": "3.9.6",
+  "pytest_version": "8.4.2",
+  "fallback_used": false,
+  "status": "passed",
+  "exit_code": 0,
+  "stdout_summary": "675 passed in 4.86s",
+  "stderr": ""
+}

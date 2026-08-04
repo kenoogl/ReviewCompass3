@@ -812,6 +812,12 @@ containing commit後のclean transitionで生成するため、Work 4Aのcheckbo
 machine candidateとsource evidenceを抽出するtoolをGREENにした。actual candidate list、Ledger登録、Human確認は
 containing commit後のfresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未完了である。
 
+`Routine Classification Candidate Persistence GREEN Evidence`：
+`RC3-WORK4A-ROUTINE-CLASSIFICATION-PERSISTENCE-GREEN-2026-08-04-V1`、
+`records/development/2026-08-04-work-4a-routine-classification-persistence-green-evidence-v1.md`。candidate listを
+new-only保存しDigestとre-read comparisonで照合するtoolをGREENにした。actual outputとHuman確認はcontaining commit後の
+fresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未完了である。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred

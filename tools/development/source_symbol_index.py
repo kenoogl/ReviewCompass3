@@ -93,6 +93,17 @@ class RoutineClassificationReport:
     unresolved_reference_forms: tuple
 
 
+@dataclasses.dataclass(frozen=True)
+class PersistedRoutineClassificationCandidates:
+    """external DATA_ROOTへnew-only保存したcandidate listのidentity。"""
+
+    snapshot_id: str
+    project_id: str
+    profile: str
+    path: Path
+    sha256: str
+
+
 def _sha256(content):
     return hashlib.sha256(content).hexdigest()
 
@@ -430,13 +441,13 @@ def _index_document(*, index, project_id, profile):
     }
 
 
-def _write_new_json(path, document):
+def _write_new_json(path, document, *, exists_error):
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
         with path.open("xb") as handle:
             handle.write(_json_bytes(document))
     except FileExistsError as error:
-        raise SourceSnapshotError("source_symbol_baseline_already_exists") from error
+        raise SourceSnapshotError(exists_error) from error
 
 
 def persist_source_symbol_index_baseline(
@@ -479,6 +490,7 @@ def persist_source_symbol_index_baseline(
             project_id=project_id,
             profile=profile,
         ),
+        exists_error="source_symbol_baseline_already_exists",
     )
     _write_new_json(
         index_path,
@@ -487,6 +499,7 @@ def persist_source_symbol_index_baseline(
             project_id=project_id,
             profile=profile,
         ),
+        exists_error="source_symbol_baseline_already_exists",
     )
     return PersistedSourceSymbolIndexBaseline(
         snapshot_id=snapshot.snapshot_id,
@@ -803,3 +816,94 @@ def extract_routine_classification_candidates(*, snapshot, index):
         ),
         unresolved_reference_forms=unresolved,
     )
+
+
+def _routine_classification_document(*, report, project_id, profile):
+    return {
+        "record_kind": "routine_classification_candidates",
+        "schema_version": 1,
+        "project_id": project_id,
+        "profile": profile,
+        "snapshot_id": report.snapshot_id,
+        "candidates": [
+            dataclasses.asdict(candidate) for candidate in report.candidates
+        ],
+        "unresolved_reference_forms": list(
+            report.unresolved_reference_forms
+        ),
+    }
+
+
+def persist_routine_classification_candidates(
+    *,
+    report,
+    data_root,
+    project_id,
+    profile,
+):
+    """candidate listをDATA_ROOTへnew-only保存し、Digestを返す。"""
+    if not isinstance(report, RoutineClassificationReport):
+        raise SourceSnapshotError("routine_classification_report_invalid")
+    if not _SHA256.fullmatch(report.snapshot_id):
+        raise SourceSnapshotError("routine_classification_snapshot_invalid")
+    root = _validate_persistence_identity(
+        data_root=data_root,
+        project_id=project_id,
+        profile=profile,
+    )
+    path = (
+        root
+        / "routine-classification-candidates"
+        / report.snapshot_id
+        / "routine-classification-candidates-v1.json"
+    )
+    if path.exists():
+        raise SourceSnapshotError("routine_classification_candidates_already_exists")
+    _write_new_json(
+        path,
+        _routine_classification_document(
+            report=report,
+            project_id=project_id,
+            profile=profile,
+        ),
+        exists_error="routine_classification_candidates_already_exists",
+    )
+    return PersistedRoutineClassificationCandidates(
+        snapshot_id=report.snapshot_id,
+        project_id=project_id,
+        profile=profile,
+        path=path,
+        sha256=_sha256(path.read_bytes()),
+    )
+
+
+def verify_persisted_routine_classification_candidates(*, persisted, report):
+    """candidate listのDigestと再読込内容を固定reportへ照合する。"""
+    if not isinstance(persisted, PersistedRoutineClassificationCandidates):
+        raise SourceSnapshotError("persisted_routine_classification_candidates_invalid")
+    if not isinstance(report, RoutineClassificationReport):
+        raise SourceSnapshotError("routine_classification_report_invalid")
+    if persisted.snapshot_id != report.snapshot_id:
+        raise SourceSnapshotError("persisted_routine_classification_snapshot_mismatch")
+    try:
+        actual = persisted.path.read_bytes()
+    except OSError as error:
+        raise SourceSnapshotError(
+            "persisted_routine_classification_candidates_missing"
+        ) from error
+    if _sha256(actual) != persisted.sha256:
+        raise SourceSnapshotError(
+            "persisted_routine_classification_candidates_digest_mismatch"
+        )
+    expected = _json_bytes(
+        _routine_classification_document(
+            report=report,
+            project_id=persisted.project_id,
+            profile=persisted.profile,
+        )
+    )
+    if actual != expected:
+        raise SourceSnapshotError(
+            "persisted_routine_classification_candidates_content_mismatch"
+        )
+    return persisted

@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A routine classification candidate persistence Acceptance Test（RED）committed / persistence not_started
+- 現在作業：Work 4A routine classification candidate persistence GREEN committed / actual output not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -41,26 +41,28 @@
 - [Work 4A Routine Classification GREEN Evidence](records/development/2026-08-04-work-4a-routine-classification-green-evidence-v1.md) — SHA-256 `23314842a7f140fa6795049f6726e81ce322dadc753ecb72d14935fba4d2c22e`
 - [Work 4A Routine Classification GREEN Test Receipt](records/development/2026-08-04-work-4a-routine-classification-green-test-receipt-v1.json) — SHA-256 `9e1dc5c9d029c536aa43595f4856d7f76bd2b29bdb99493951def86327ab2ac4`
 - [Work 4A Routine Classification Persistence RED Evidence](records/development/2026-08-04-work-4a-routine-classification-persistence-red-evidence-v1.md) — SHA-256 `5731935181725e26d00e470c9c64f70202b8717627d591dde0afd78e9cd48d7a`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `e6bdb6cf47f61839900644bae055e4bd2abd3266b59dbe2f1f693b4608698155`
+- [Work 4A Routine Classification Persistence GREEN Evidence](records/development/2026-08-04-work-4a-routine-classification-persistence-green-evidence-v1.md) — SHA-256 `ad65a724bb72edead697b9091bd90a25c572fe3f28e1c018248fac59b7e613d5`
+- [Work 4A Routine Classification Persistence GREEN Test Receipt](records/development/2026-08-04-work-4a-routine-classification-persistence-green-test-receipt-v1.json) — SHA-256 `3c611f879fe57576552ebb0dc552a58dc9dcafaae5ed5bb58e4e357db1f5f727`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `5b4cebfb3eb77aa70358307bc45e94bfbff36ee25fee4b722d67e397ed5e30ad`
 
 ## 次に行う一作業
 
-routine classification candidate list persistenceのAcceptance Testを作成し、REDを確認する。
+routine classification candidate persistence GREEN containing commit後、latest Snapshot／Indexとactual candidate listをnew IDとして保存し、re-read comparisonを行う。
 
 開始条件：
 
-- routine classification extractor GREEN containing commitとactual candidate persistence gap
+- routine classification candidate persistence GREEN containing commitとclean transition
 
 完了条件：
 
-- candidate listのnew-only保存、Digest、re-read comparisonをAcceptance Testへ固定する
-- 実装が存在しないためのREDを確認する
+- latest Snapshot／Indexをnew IDとして保存し、actual candidate listを同じSnapshotへ結線する
+- 保存Digest、re-read comparison、candidate identity、unresolved referenceを記録する
 
-後続作業：承認後、clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
+後続作業：actual candidate listをHumanが確認し、Ledger登録とroutine dispositionの範囲を判断する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。persistence GREEN実装はcommitted RED Acceptance Testを入力として開始する。
+- blocker：なし。persistence GREEN containing commitのclean transition後にactual output生成へ進む。
 - Human判断待ち：なし。candidate listの意味的確定、Ledger登録、routine dispositionは後続Human確認まで開始しない。
 
 ## stale・deferred
