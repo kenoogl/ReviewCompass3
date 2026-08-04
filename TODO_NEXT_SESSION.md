@@ -17,7 +17,8 @@
   Issue Record、Resolution Plan v1、Plan Challenge v1を作成し、Humanの修正Decisionに従ってPlan v2を作成した。
   Challenge v2はblocking Finding 0で、HumanがPlan v2を承認した。Task Contract作成前の照合でderived stateの
   中間状態欠落を検出し、Humanが推奨案Aを承認した。Plan v3とChallenge v3は三状態境界を補完して検証済み。
-  HumanがPlan v3を最終承認した。次は本承認作業単位をcommitし、その後Task Contractを別作業単位で作成する。
+  HumanがPlan v3を最終承認した。実装Task Contractは作成・検証済みで、現行stateは
+  `task_contract_commit_pending`。次はTask Contract作業単位をcommitする。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -26,8 +27,8 @@
 - TODO手戻り候補対策の修正案：`docs/design/2026-08-04-todo-rework-candidate-routing-revision-memo.md`、
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
-- activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1`。
-  shape bootstrap、Candidate／Triage、Issue／Plan作業単位は`verified_completed`。
+- activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V1`、
+  state `task_contract_commit_pending`、WI-001 `not_started`。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
 - 進行入口SHA-256：`b4817c685778fdcb831a653f794283a22ab8a87cf26f467f19276bbfce4e35ba`
@@ -36,8 +37,8 @@
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v3-decision.json`
-- Decision／Evidence SHA-256：`31abfa394605915d4abe4fe6f121816a1229669d9c9144b8184edad34d093b95`
+  `records/development/2026-08-04-issue-resolution-pilot-implementation-task-contract-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`591b786b3128bde56d2d4c92af1b5883ec0c2323de5973758dab809f1b64d6f1`
 
 ## 実施報告照合
 
@@ -594,6 +595,11 @@
     `31abfa394605915d4abe4fe6f121816a1229669d9c9144b8184edad34d093b95`
   - 観測した事後状態：DecisionはPlan v3、Challenge v3、公式全557 Test receiptへ結線された。承認作業単位の
     commit後にTask Contract作成を許可し、WI-001、snapshot、TODO compaction、Issue解決は先取りしていない。
+- Claim `EC-127`：Plan v3に結線した実装Task Contractを作成・検証した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-implementation-task-contract-completion-evidence-v1.md`、
+    SHA-256 `591b786b3128bde56d2d4c92af1b5883ec0c2323de5973758dab809f1b64d6f1`
+  - 観測した事後状態：6 Work Itemの順序・coverageはPlan v3と一致し、三状態をworking tree、containing commit、
+    WI-001 RED Evidenceから導出する。専用`5 passed`、公式全`562 passed`、fallback `false`。WI-001は未開始である。
 
 ### reported_unverified／contradicted
 
@@ -666,7 +672,7 @@
 
 ### 未実施
 
-- Plan v2を実施するTask Contract、TODO snapshot／compaction、Resolution Verdict
+- Task Contract containing commit確認、WI-001以降、TODO snapshot／compaction、Resolution Verdict
 - Deployment Manifest、package builder、原子的切替、rollbackのWork 7実装
 - Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定
 - Project Bindingのdurable保存
@@ -707,30 +713,30 @@
 
 ## 次に行う一作業
 
-承認済み`PLAN-PILOT-TODO-GROWTH-001` v3のWI-001、WI-002、WI-006、WI-003、WI-004、WI-005を
-順序付きでrouteする実装Task Contractを作成・検証する。WI-001、snapshot、TODO compactionは開始しない。
+実装Task Contract作成・検証作業単位をcommitし、commit後のread-only照合で同一bytesがHEADに存在すること、
+worktree clean、work unit transition合格を確認する。WI-001は開始しない。
 
 開始条件：
 
-- Plan v3 Approval Decision SHA-256が
-  `31abfa394605915d4abe4fe6f121816a1229669d9c9144b8184edad34d093b95`である。
+- Task Contract SHA-256が`661df56b9f2c78a261e3b345e727bf9cd47bbf09225186c529cceadf32eb56cd`、
+  Completion Evidence SHA-256が`591b786b3128bde56d2d4c92af1b5883ec0c2323de5973758dab809f1b64d6f1`である。
 - Plan v3 SHA-256が`07cd477a463e4536f6aa208153d6fdf401cfd0d8c00909cdc61fea5fdc26c304`、
   Challenge v3 SHA-256が`6a640598a715f4e7dea81e7891da5836a1ee0cf47f962ca9a02fb6eec18e2e67`である。
 
 完了条件：
 
-- Task Contractがexact Plan v3とApproval Decisionのversion、file SHA-256、content Digestへ接続される。
-- 6 Work Itemの順序、三状態境界、TDD、禁止事項、rollback、Human判断関門を移送する。
-- Task Contractの初期stateを`task_contract_commit_pending`とし、実装、TODO圧縮、Issue解決を先取りしない。
+- Task ContractとCompletion Evidenceが同じcontaining commitからbyte-identicalに読める。
+- commit後read-only照合で`implementation_ready`を導出し、worktreeがclean、transitionが`passed`になる。
+- WI-001、snapshot、TODO圧縮、Issue解決を先取りしない。
 
-後続作業：Task Contractを独立検証・commitした後だけ、`implementation_ready`へ進み、別作業単位でWI-001のREDを開始する。
+後続作業：containing commit確認後だけ`implementation_ready`へ進み、別作業単位でWI-001のREDを開始する。
 
 ## blocker・Human判断待ち
 
 - blocker：work unit transition preflightを正本とする。完了済み作業単位とdirty worktreeが同時に成立する間は、
   `completed_work_unit_uncommitted`として次作業へ移行しない。
 - Human判断待ち：現在の次作業に対する追加判断なし
-- 実行保留：実装Task Contract、milestone snapshot、TODO compaction。Plan v3承認作業単位のcommit後に再開する
+- 実行保留：WI-001、milestone snapshot、TODO compaction。Task Contract作業単位のcommit後に再開する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：work unit transition preflight合格とTask Contract、Completion Evidence、Test receiptの一致を確認する
 
@@ -753,8 +759,8 @@
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Issue／Plan／Challenge version 1〜3関連`35 passed in 0.11s`
-- 直近の全Test：Plan v3 official receiptを機械参照する
+- 直近の関連検証：実装Task Contract専用`5 passed in 0.02s`
+- 直近の全Test：`562 passed in 2.57s`、fallback `false`
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

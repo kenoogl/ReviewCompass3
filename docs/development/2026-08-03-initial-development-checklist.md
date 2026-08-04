@@ -562,6 +562,13 @@ HumanはPlan v3を最終承認した。Approval Decisionは
 別作業単位で実装Task Contractを作成する。Task Contract、WI-001、TODO compaction、Resolution Verdictは未実施のため、
 最後のPilot checkboxは未完了のままとする。
 
+実装Task ContractをPlan v3とApproval Decisionへ結線して作成・検証した。Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-implementation-task-contract-completion-evidence-v1.md`、SHA-256
+`591b786b3128bde56d2d4c92af1b5883ec0c2323de5973758dab809f1b64d6f1`。6 Work Item、三状態境界、TDD、禁止事項、
+rollback、Human関門はPlan v3と一致し、専用`5 passed`、公式全`562 passed`である。現行stateは
+`task_contract_commit_pending`で、Task Contract work unitのcommit後までWI-001を開始しない。最後のPilot checkboxは
+未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
