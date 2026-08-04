@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3／commit済みv2試作のrevert提示。
+- 現在の工程：Work 4A rebuild v3／§17 A〜H RED test作成。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design v3。
@@ -22,29 +22,30 @@
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `bf25291e574b659339048185b4313134eb6d20b690f314a6ba2b3401a946dec3`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `9bd03b0fa801fd08335ebb0772de13cd29bffff71ba790053aac96f53f3108ef`
 
 ## 次に行う一作業
 
-commit済みv2試作のrevert対象を提示し、Humanのrevert承認を得る。
+v3設計§17 A〜HのRED testを固定し、実装でGREENにする。
 
 開始条件：
 
 - `DEC-WORK4A-REBUILD-DESIGN-003`によるHuman承認。
-- v3設計・Decision・本handoffを含む設計commit後のclean transition。
+- v2試作revert commit後のclean transition。
 
 完了条件：
 
-- revert対象commit、対象path、保持対象、影響を一度だけ提示する。
-- Humanのrevert承認後、別作業単位でrevertし、revert mapをnew-only保存する。
+- A〜Hの受入testをREDで固定し、期待を緩めずGREENにする。
+- 全testを公式runnerで実行しreceiptを固定する。
+- actual artifactを含めない。
 
-後続作業：v3設計§17 A〜HのRED testを固定し、GREEN、全test、commitまで進める。
+後続作業：actual routineの対象選定とdispositionをHuman判断へ提示する。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：commit済みv2試作のrevert承認。actual artifactの対象routine選定とdispositionは後続。
-- 再開条件：設計commit後のclean transition。
+- Human判断待ち：actual artifactの対象routine選定とdisposition、外部`DATA_ROOT`の初期化。
+- 再開条件：v2 revert commit後のclean transition。
 
 ## stale・deferred
 
@@ -57,8 +58,8 @@ commit済みv2試作のrevert対象を提示し、Humanのrevert承認を得る�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：v3設計commitではTestを実行していない（設計・記録のみの変更）
-- 直近の全Test：venv公式runner `667 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Work 4A v2 E2E `4件`をrevertで削除
+- 直近の全Test：venv公式runner `663 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
