@@ -1,0 +1,200 @@
+{
+  "candidate_classification_classes": [
+    "known",
+    "unknown"
+  ],
+  "change_class": "ordinary",
+  "change_classes": [
+    "ordinary",
+    "security",
+    "authority",
+    "irreversible"
+  ],
+  "confidence_classes": [
+    "high",
+    "medium",
+    "low"
+  ],
+  "content_digest": "72ecf7ba54788a3f4a6a18c59ea416d15dd5cef954d5d17700858e8eb1a78af8",
+  "development_policy_ref": {
+    "digest_algorithm": "sha256",
+    "file_sha256": "9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0",
+    "record_id": "DEVELOPMENT-POLICY",
+    "record_kind": "development_policy",
+    "relative_path": "docs/development/2026-08-02-development-policy.md",
+    "root_kind": "project",
+    "version": 1
+  },
+  "digest_algorithm": "sha256",
+  "disposition_classes": [
+    "reuse",
+    "extend",
+    "merge",
+    "split",
+    "as_is"
+  ],
+  "disposition_source_classes": [
+    "human_decision"
+  ],
+  "evidence_ref_kinds": [
+    "routine_profile_field",
+    "code_reference"
+  ],
+  "extraction_rule_version": 2,
+  "group_condition_grammar": {
+    "combinator": "and_only",
+    "disjunction": false,
+    "fields": [
+      "package",
+      "symbol_kind",
+      "name_prefix",
+      "name_suffix",
+      "is_private",
+      "syntactic_effect_markers",
+      "marker_count",
+      "internal_reference_count",
+      "line_count",
+      "structural_match_group_id",
+      "structure_digest",
+      "responsibility_class_proposal",
+      "candidate_classification",
+      "base_is_exception"
+    ],
+    "operators": [
+      "equals",
+      "not_equals",
+      "in",
+      "contains",
+      "lte",
+      "gte"
+    ],
+    "regular_expression": false
+  },
+  "marker_detection_rules": {
+    "environment": [
+      "os.environ",
+      "os.getenv",
+      "os.putenv"
+    ],
+    "file_read": [
+      "read_text",
+      "read_bytes",
+      "exists",
+      "iterdir",
+      "glob",
+      "rglob",
+      "json.load"
+    ],
+    "file_write": [
+      "write_text",
+      "write_bytes",
+      "mkdir",
+      "unlink",
+      "replace",
+      "rename",
+      "chmod",
+      "shutil.copy",
+      "shutil.copytree",
+      "shutil.move",
+      "shutil.rmtree"
+    ],
+    "global_mutation": [
+      "global",
+      "nonlocal"
+    ],
+    "network": [
+      "urllib.request",
+      "http.client",
+      "socket.socket",
+      "requests.get",
+      "requests.post"
+    ],
+    "process_spawn": [
+      "subprocess.run",
+      "subprocess.Popen",
+      "subprocess.call",
+      "os.system"
+    ]
+  },
+  "policy_id": "POL-WORK4A-FRESHNESS",
+  "policy_version": 2,
+  "record_kind": "work4a_freshness_policy",
+  "responsibility_class_rules": [
+    {
+      "rule_id": "R1",
+      "value": "ownership_unclear",
+      "when": "base_is_exception"
+    },
+    {
+      "rule_id": "R2",
+      "value": "implementation_detail",
+      "when": "nested_function"
+    },
+    {
+      "rule_id": "R3",
+      "value": "implementation_detail",
+      "when": "private_and_module_local"
+    },
+    {
+      "rule_id": "R4",
+      "value": "ownership_unclear",
+      "when": "unreferenced"
+    },
+    {
+      "rule_id": "R5",
+      "value": "public_responsibility",
+      "when": "default"
+    }
+  ],
+  "responsibility_classes": [
+    "public_responsibility",
+    "implementation_detail",
+    "ownership_unclear"
+  ],
+  "revalidation_required_classes": [
+    "security",
+    "authority",
+    "irreversible"
+  ],
+  "schema_version": 2,
+  "syntactic_effect_markers": [
+    "file_read",
+    "file_write",
+    "process_spawn",
+    "network",
+    "environment",
+    "global_mutation"
+  ],
+  "verification_outcome_classes": [
+    "invalid_manifest",
+    "unsafe_root",
+    "unknown_root_kind",
+    "path_traversal",
+    "root_escape",
+    "non_regular_file",
+    "missing_record",
+    "digest_mismatch",
+    "content_digest_mismatch",
+    "identity_mismatch",
+    "unknown_field",
+    "foreign_project_data",
+    "unlinked_candidate",
+    "content_identity_mismatch",
+    "summary_vocabulary_violation",
+    "decision_candidate_mismatch",
+    "stale_observation_reuse",
+    "immutable_violation",
+    "baseline_series_broken",
+    "policy_revalidation_required",
+    "data_root_escape",
+    "observation_tampered",
+    "write_verification_failed",
+    "partial_write_detected",
+    "symbol_id_collision",
+    "marker_detection_flag_missing",
+    "advisory_used_as_authority",
+    "advisory_reference_unresolved",
+    "advisory_evidence_missing",
+    "group_coverage_incomplete"
+  ]
+}

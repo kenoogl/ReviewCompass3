@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.1／実装GREEN。実sourceのRoutine Profile生成へ進む。
+- 現在の工程：Work 4A rebuild v3.1／実sourceのRoutine Profile生成まで完了。routine 966件。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design v3.1 Amendment。
@@ -22,33 +22,33 @@
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
 - [Work 4A Rebuild Design v3.1](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5839e37467aaa7d06ee2e9bde477e6c6a76da57e6f4b8a9653e1c9551cea5e40`
-- [Work 4A v3.1 Acceptance GREEN](records/development/2026-08-04-work-4a-v3-1-acceptance-green-evidence-v1.md) — SHA-256 `40cb0ba68fa4c0042ae22234d5a96c54f25accc03b2adde58d9177c35bdb7de4`
+- [Work 4A v3.1 Routine Profile](records/development/2026-08-04-work-4a-v3-1-actual-routine-profile-evidence-v1.md) — SHA-256 `8481121af2c9066b54d0eb9365ff507003f63166c8b4e6b4f3fbe48f67031294`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `9bd03b0fa801fd08335ebb0772de13cd29bffff71ba790053aac96f53f3108ef`
 
 ## 次に行う一作業
 
-v3.1受入test I1〜I21をREDで固定し、実装でGREENにする。
+LLMによるDisposition Proposal生成の承認をHumanから得る。
 
 開始条件：
 
-- `DEC-WORK4A-REBUILD-DESIGN-004`と`DEC-CONFORMANCE-SCOPE-RELAXATION-001`によるHuman承認。
-- 承認commit後のclean transition。
+- Routine Profile生成containing commit後のclean transition。
+- 生成範囲と生成元記録のHuman承認。
 
 完了条件：
 
-- Policy `policy_version` 2を固定する。
-- I1〜I21をREDで固定し、期待を緩めずGREENにする。
-- 実sourceでRoutine Profileを生成し、機械抽出結果を提示する。
+- 966件のroutineに対する非権威の提案を外部DATA_ROOTへ生成する。
+- 参照範囲と`evidence_refs`の検証を通す。
+- 提案を根拠にEntryを作らない。
 
-後続作業：LLMによるDisposition Proposal生成の別承認をHumanへ求める。
+後続作業：group条件とdispositionのHuman決定、Entry・Relation・Baseline生成。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：LLMによるDisposition Proposal生成の承認。Routine Profile実データ確認後とする。
-- 再開条件：承認commit後のclean transition。
+- Human判断待ち：LLMによるDisposition Proposal生成の承認。Routine Profile実データは提示済み。
+- 再開条件：Routine Profile生成commit後のclean transition。
 
 ## stale・deferred
 
