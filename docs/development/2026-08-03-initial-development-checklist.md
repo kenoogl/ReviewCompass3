@@ -781,15 +781,31 @@ automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る�
 - [ ] legacy Task Contractのhistorical扱いを別status recordとHuman承認必須にする。
 - [ ] 七項目のE2E acceptanceをRED、GREEN、実データの順に通す。
 
+### v3.1：全件labelingの判断材料
+
+- [ ] 対象routine全件をRoutine ProfileとDisposition Proposalの対象にする。private helperも除外しない。
+- [ ] Routine Profileは機械事実だけを持ち、LLM由来のfieldを混入させない。
+- [ ] Disposition Proposalは非権威とし、参照は同一Routine Profile内へ限定し、`evidence_refs`を必須にする。
+- [ ] LLMの提案を根拠にEntryの`disposition`を設定しない。`disposition_source`は`human_decision`のみ。
+- [ ] Humanが確定した処置labelを対象routine全件へ適用する。group条件で展開し、未該当が残れば停止する。
+- [ ] symbol_idの重複を`symbol_id_collision`で停止し、行番号や序数で回避しない。
+- [ ] 除外した構文単位（lambda等）の件数と位置を記録し、黙って落とさない。
+- [ ] I1〜I21のE2E acceptanceをRED、GREEN、実データの順に通す。
+
 ### 完了関門
 
 - [ ] BaselineからDecisionまでのID／version／path／Digest連鎖が閉じている。
 - [ ] source内容IDに基づくfreshnessがHEAD差と内容変更を区別する。
 - [ ] deployment packageがproject artifactと`DATA_ROOT`を含まず、deployment版がartifactをread-only参照できる。
+- [ ] **対象routine全件にHuman確定の処置labelが付いている。**未確定のroutineを残さない。
 - [ ] 最初のImplementation Task Contractへ`implementation_ready`を出せる前提が揃っている。
 
-`Authority`：[Work 4A Rebuild Design v3](../design/2026-08-04-work-4a-rebuild-design-v3-proposal.md)、
-`DEC-WORK4A-REBUILD-DESIGN-003`。v1／v2設計とそのE2E testはstale。v3 E2E RED Test：`tests/test_work4a_rebuild_v3_e2e.py`。
+`Authority`：[Work 4A Rebuild Design v3](../design/2026-08-04-work-4a-rebuild-design-v3-proposal.md)と
+[v3.1 Amendment](../design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md)、
+`DEC-WORK4A-REBUILD-DESIGN-003`、`DEC-WORK4A-REBUILD-DESIGN-004`、
+`DEC-CONFORMANCE-SCOPE-RELAXATION-001`。
+v1／v2設計とそのE2E testはstale。
+E2E Test：`tests/test_work4a_rebuild_v3_e2e.py`、`tests/test_work4a_rebuild_v3_1_e2e.py`。
 
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 

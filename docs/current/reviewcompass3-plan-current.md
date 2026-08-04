@@ -1076,12 +1076,22 @@ Source Symbol Indexへ収録する。Indexはsymbol ID、qualified name、kind�
 visibility、参照関係、Test参照、content Digestを持ち、同じ固定source treeから再生成できることを
 検証する。
 
-再利用判断が必要なroutineはReusable Routine Ledgerへ責務、入出力、side effect、制約、類似候補、
+対象routineはReusable Routine Ledgerへ責務、入出力、side effect、制約、類似候補、
 利用箇所、`active | retired`、後継、統廃合履歴とともに登録する。Index、Ledger、実codeのcoverage、
-freshness、重複候補、retired routineを確認する。全symbolは機械Indexへ収録するが、Humanの意味確認は
-Index生成・対象外規則、coverage統計、public、共有、cross-contract、high-risk、重複候補、retired、
-今回の影響閉包、representative sampleへ限定する。全private helperのLedger entry作成をbaseline完了条件に
-しない。配置baseline、台帳baseline、今回の変更に必要な再利用判断が確定するまで、製品実装codeを
+freshness、重複候補、retired routineを確認する。
+
+**対象routine全件をRoutine ProfileとDisposition Proposalの対象とし、Humanが確定した処置labelを
+全件へ適用する。**private helperを含め、抽出対象の全routineをLedgerへ載せる。
+これは`DEC-WORK4A-REBUILD-DESIGN-004`による方針であり、旧方針
+「全private helperのLedger entry作成をbaseline完了条件にしない」を置き換える。
+
+Humanが全件を一件ずつ読むことは求めない。判断は三層に分ける。機械がRoutine Profile（構文事実）を
+作り、LLMが非権威のDisposition Proposalを作り、Humanが`reuse | extend | merge | split | as_is`を
+確定する。Humanは決定的な条件式でgroupを定義してよく、機械が個別Entryへ展開する。
+どのgroupにも該当しないroutineが残る場合は、既定値で埋めずHumanへ差し戻す。
+LLMの提案を根拠にEntryのdispositionを設定しない。
+
+配置baseline、台帳baseline、今回の変更に必要な再利用判断が確定するまで、製品実装codeを
 追加せず、最初のImplementation Task Contractへ`implementation_ready`を発行しない。
 既存のIndex生成器がない場合は、固定入力と出力schemaを持つ最小bootstrap生成器だけを隔離した
 development toolingとして作成できる。生成器には独立したTestとreviewを要求し、最終Indexへ生成器
@@ -1271,6 +1281,22 @@ legacy reconstructionは含めない。ただし将来必要なidentity、relati
 最初のsliceは単一Contractのmachine-readable Record、決定的再生成、双方向trace、stale検出に
 限定する。Feature集約、LLM説明改善、legacy reconstruction、独立code-only auditはその評価後に
 段階導入する。
+
+#### 例外：Work 4Aの判断材料生成
+
+`DEC-CONFORMANCE-SCOPE-RELAXATION-001`により、旧ReviewCompassの`conformance-evaluation`の責務を
+**Work 4Aの判断材料生成に限って**先行利用する。Work 4Aの対象routineに対するRoutine Profileと
+Disposition Proposalの生成がこれにあたる。
+
+この例外はDeferred Work 9のAs-Built projector、Markdown renderer、Documentation Conformance gateの
+着手を承認しない。Work 4Aの完了条件はWork 9の完了条件を含まない。
+
+例外の下でも次の規律は維持する。生成と適合判定の分離、推定時の既存仕様の遮断、code referenceの保持、
+`draft_only`、意味変更候補のHuman判断への引き渡し、LLM由来記述の非権威扱いと生成元の記録、
+派生物からのDecision・Entry・Baselineの自動生成禁止。
+
+前身repositoryのcodeは複製しない。継承元は
+`records/sources/2026-08-02-reviewcompass-conformance-evaluation.md`の固定commitとDigestで示す。
 
 ### 14.2 AIへの判断委譲
 
