@@ -93,7 +93,7 @@ v3ではdisposition語彙一つが、機械の候補分類とHumanの処置の�
 | static method、class method | 含める | 同上。`symbol_kind`で区別する |
 | property | 含める | 実装を持つ。`symbol_kind: property` |
 | nested function（関数内定義） | 含める | 実装を持つ。ただし親の実装詳細である可能性が高く、`responsibility_class_proposal`の既定は`implementation_detail`。`enclosing_symbol_id`を持つ |
-| lambda | **除外（既定）** | 安定した識別子を持たない。行位置でしか特定できず、行が動くたびにIDが変わりnew-only台帳の同一性が壊れる。件数と位置を`excluded_constructs`へ記録する。§12の未決事項1 |
+| lambda | **除外（既定）** | 安定した識別子を持たない。行位置でしか特定できず、行が動くたびにIDが変わりnew-only台帳の同一性が壊れる。件数と位置を`excluded_constructs`へ記録する。§15の未決事項1 |
 | module直下の代入、定数、import | 除外 | routineではない。件数のみ記録する |
 
 ### 5.1 symbol_idの形式
@@ -109,6 +109,23 @@ v3ではdisposition語彙一つが、機械の候補分類とHumanの処置の�
 
 v3（`extraction_rule_version` 1）は`<path>:<name>`のみでmethodを含まなかった。
 形式が変わるため、既存のCandidate Runとは別のIDになる。§8を参照。
+
+### 5.2 symbol_idの一意性
+
+nested functionを含めると、同一moduleで同じqualnameが複数生じうる。
+条件分岐で同名のnested functionを二度定義する場合、`try`／`except`で同名関数を再定義する場合、
+同名methodを再定義する場合などである。
+
+**同一Routine Profile内でsymbol_idが重複したら`symbol_id_collision`で停止する。**
+
+- 後から現れた定義で黙って上書きしない。
+- 行番号、序数、出現順による識別子の付け足しで回避しない。
+  これらはcodeの増減で移動するため、new-only台帳の同一性を壊す。
+- 重複を検出した場合は、重複したsymbol_idと該当する全`code_reference`を停止理由に含める。
+- 解消はHumanの判断とする。source側の改名か、symbol_id規約の改訂かを選ぶ。
+  規約を改訂する場合は`extraction_rule_version`を上げる。
+
+この規則はCandidate Run、Routine Profile、Entry生成のいずれの段階でも同じである。
 
 ## 6. Routine Profile（機械事実のみ）
 
@@ -154,7 +171,7 @@ v3（`extraction_rule_version` 1）は`<path>:<name>`のみでmethodを含まな
       "internal_reference_count": 3,
       "line_count": 26,
       "structure_digest": "<64桁hex>",
-      "similarity_cluster_id": "SIM-0007",
+      "structural_match_group_id": "STRUCT-MATCH-0007",
       "candidate_classification": "unknown",
       "responsibility_class_proposal": "public_responsibility"
     }
@@ -186,11 +203,23 @@ v3.1では`syntactic_effect_markers`へ改名する。これは**副作用その
 「副作用が無い」ことを意味しない**。この意味をschema上でも表すため、
 `marker_detection.absence_does_not_imply_no_effect`を必須fieldとし、値が`true`でないrecordは拒否する。
 
-### 6.2 類似判定
+### 6.2 構造一致group（旧`similarity_cluster_id`）
 
 `structure_digest`は、識別子名を正規化したAST構造のDigestである。
-`similarity_cluster_id`は同一`structure_digest`を持つroutineへ機械的に割り当てる。
-LLMの類似判断ではなく、決定的に計算する。これにより「重複・統合候補」をgroup条件で機械評価できる。
+`structural_match_group_id`は、**同一の`structure_digest`を持つroutineへ機械的に割り当てるgroup ID**である。
+
+名称を`similarity_cluster_id`から改めたのは、「類似」という語が意味的な近さや統合の結論を
+含意するためである。この値が示すのは次のことだけである。
+
+- **示すこと**：AST構造が正規化後に完全一致した、という構文上の事実。
+- **示さないこと**：責務が同じであること、統合してよいこと、統合すべきこと。
+
+したがって`structural_match_group_id`は**統合の結論ではなく、HumanとLLMが確認するための手掛かり**である。
+同じgroupに入っていても責務が異なる場合があり（定型的な委譲や検査の形が一致しただけの場合）、
+逆に責務が同じでも構造が違えば別groupになる。
+
+この値をgroup条件に使ってよいのは、Humanが個別に確認したうえで`merge`を確定する場合であり、
+値の一致だけで`merge`を自動確定しない。
 
 ## 7. Disposition Proposal（LLMの非権威record）
 
@@ -209,9 +238,12 @@ Routine Profileとは**別record**とする。混ぜない。
   "observation_snapshot_id": "<64桁hex>",
   "source_content_id": "<64桁hex>",
   "generation_provenance": {
+    "provider": "<提供者識別子>",
     "model": "<モデル識別子>",
     "template_id": "WORK4A-DISPOSITION-PROPOSAL-TEMPLATE",
     "template_version": 1,
+    "template_digest": "<64桁hex>",
+    "routine_profile_content_digest": "<64桁hex>",
     "generated_at": "2026-08-05T10:00:00+09:00",
     "output_digest": "<64桁hex>"
   },
@@ -229,7 +261,21 @@ Routine Profileとは**別record**とする。混ぜない。
       "confidence": "medium",
       "reason": "参照検査の入口であり、他routineから3件参照される。責務は単一。",
       "human_review_point": "issue_resolution_post_writeの同名処理と統合すべきかは呼出側の意図に依存する。",
-      "human_review_required": false
+      "human_review_required": false,
+      "evidence_refs": [
+        {
+          "kind": "routine_profile_field",
+          "symbol_id": "tools/development/todo_handoff.py:validate_todo",
+          "field": "internal_reference_count"
+        },
+        {
+          "kind": "code_reference",
+          "symbol_id": "tools/development/issue_resolution_post_write.py:validate_todo_reference_digests",
+          "relative_path": "tools/development/issue_resolution_post_write.py",
+          "start_line": 140,
+          "end_line": 176
+        }
+      ]
     }
   ],
   "content_digest": "<64桁hex>"
@@ -245,6 +291,36 @@ Routine Profileとは**別record**とする。混ぜない。
 - 本文（source code）を転記しない。要約に限る。
 - `generation_provenance`の全fieldを必須とする。欠けるrecordは拒否する。
 - このrecordはEntryの`disposition`の根拠にならない。Human Decisionだけが根拠になる。
+
+### 7.1 参照範囲の制限
+
+`semantic_dependencies`、`similar_routines`、`merge_candidates`に書けるのは、
+**同一Routine Profile（`routine_profile_run_id`が一致するもの）に存在するsymbol IDだけ**である。
+
+- Profileに無いsymbol ID、綴りが違うID、source universe外への参照は
+  `advisory_reference_unresolved`で停止する。
+- 自分自身への参照も停止させる。
+- 存在しないroutineを指す提案を、注記や補正で通さない。
+
+これは、LLMが実在しないroutineを挙げた場合に、その提案が判断材料として流通することを防ぐためである。
+
+### 7.2 根拠参照（`evidence_refs`）
+
+各提案は`evidence_refs`を**必須**とし、少なくとも一件を持つ。空配列は`advisory_evidence_missing`で停止する。
+指せる根拠は次の二種類だけである。
+
+| `kind` | 指すもの | 検証 |
+| --- | --- | --- |
+| `routine_profile_field` | `symbol_id`とProfileのfield名 | Profileに当該symbolが存在し、当該fieldを持つこと |
+| `code_reference` | `symbol_id`と`relative_path`、`start_line`、`end_line` | Profileの同symbolの`code_reference`と完全一致すること |
+
+- `symbol_id`が同一Profileに無ければ`advisory_reference_unresolved`。
+- `field`がProfileのschemaに無ければ`advisory_reference_unresolved`。
+- `code_reference`の値がProfileの値と食い違えば`advisory_reference_unresolved`。
+- `evidence_refs`が空、または`kind`が上記以外なら`advisory_evidence_missing`。
+
+いずれもfail-closedであり、注記で続行しない。
+根拠を持てない提案は、`recommended_disposition`を`null`とし`human_review_required: true`として書く。
 
 ## 8. Attestationの拡張
 
@@ -296,7 +372,7 @@ LLMは類似責務、呼出関係、構文的特徴に基づくgroup候補を提
 | `package`、`symbol_kind`、`name_prefix`、`name_suffix`、`is_private` | Routine Profile |
 | `syntactic_effect_markers`、`marker_count` | Routine Profile |
 | `internal_reference_count`、`line_count` | Routine Profile |
-| `similarity_cluster_id`、`structure_digest` | Routine Profile |
+| `structural_match_group_id`、`structure_digest` | Routine Profile |
 | `responsibility_class_proposal`、`candidate_classification` | Routine Profile |
 | `base_is_exception` | Routine Profile（classのみ） |
 
@@ -311,7 +387,7 @@ LLMは類似責務、呼出関係、構文的特徴に基づくgroup候補を提
 | 例外class群（81件） | `symbol_kind equals class` AND `base_is_exception equals true` | `as_is` |
 | 解析群 | `package equals session_logs` AND `name_prefix equals parse_` | `as_is`または`merge` |
 | 設定・環境変数群 | `syntactic_effect_markers contains environment` | `as_is`。要確認点あり |
-| 重複・統合候補群 | `similarity_cluster_id equals SIM-0007` | `merge` |
+| 構造一致群（統合候補の手掛かり） | `structural_match_group_id equals STRUCT-MATCH-0007` | `merge`候補。個別確認が必要 |
 | 巨大かつ複数痕跡群 | `line_count gte 100` AND `marker_count gte 2` | `split`候補。個別確認 |
 
 目標は、Humanが「このgroupは原則`as_is`、明示した例外だけ別処置」と判断できる形である。
@@ -363,7 +439,10 @@ v3の22件は変更せず維持する。次を追加する。
 - I3 `syntactic_effect_markers`に閉じた語彙外の値があれば拒否する。
 - I4 Routine ProfileにLLM由来のfieldがあれば`unknown_field`で拒否する。
 - I5 `advisory`が`true`でないDisposition Proposalを`advisory_used_as_authority`で拒否する。
-- I6 `generation_provenance`のfieldが欠けるDisposition Proposalを拒否する。
+- I6 `generation_provenance`のfield（`provider`、`model`、`template_id`、`template_version`、
+  `template_digest`、`routine_profile_content_digest`、`generated_at`、`output_digest`）が
+  一つでも欠けるDisposition Proposalを拒否する。
+  `routine_profile_content_digest`が対象Routine Profileの`content_digest`と一致しない場合も拒否する。
 - I7 `recommended_disposition`が`null`かつ`human_review_required`が`true`のProposalは正常に扱える。
 - I8 Disposition Proposalを根拠にEntryの`disposition`を設定しようとすると`advisory_used_as_authority`で停止する。
 - I9 `routine_profile`または`disposition_proposal`の`observation_snapshot_id`がAttestationと
@@ -375,7 +454,18 @@ v3の22件は変更せず維持する。次を追加する。
 - I13 `responsibility_class`の機械初期値は提案であり、Humanの確定値と異なってもEntryはHuman値を採る。
 - I14 抽出規則をv2にすると新しいCandidate Runが作られ、既存Candidate Runは書き換わらない。
 - I15 Attestation schema_version 1の既存recordを読めることを確認する。
-- I16 同一`structure_digest`のroutineが同一`similarity_cluster_id`になる。
+- I16 同一`structure_digest`のroutineが同一`structural_match_group_id`になる。
+  `structural_match_group_id`の一致だけでは`merge`を確定できず、Human Decisionを要する。
+- I17 同一Routine Profile内でsymbol_idが重複した場合、`symbol_id_collision`で停止する。
+  後の定義で上書きせず、行番号や序数による識別子の付け足しで回避しない。
+  停止理由に重複したsymbol_idと全`code_reference`が含まれる。
+- I18 `semantic_dependencies`、`similar_routines`、`merge_candidates`が同一Routine Profileに
+  存在しないsymbol IDを指す場合、`advisory_reference_unresolved`で停止する。自己参照も停止する。
+- I19 `evidence_refs`が空、または`kind`が閉じた語彙外なら`advisory_evidence_missing`で停止する。
+- I20 `evidence_refs`の`code_reference`がRoutine Profileの値と食い違う場合、
+  `advisory_reference_unresolved`で停止する。注記で続行しない。
+- I21 根拠を持てない提案は`recommended_disposition`が`null`かつ`human_review_required`が`true`で
+  あれば受理される。
 
 ## 14. 承認後の実行順序
 
@@ -384,7 +474,7 @@ v3の22件は変更せず維持する。次を追加する。
 1. 本改訂とconformance-evaluation利用範囲の緩和提案のHuman承認。
 2. Policy artifactを`policy_version` 2へ上げ、三軸語彙、group条件の記法、痕跡語彙、
    検出規則を固定する。
-3. I1〜I16をREDで固定する。
+3. I1〜I21をREDで固定する。
 4. Routine Profile生成、抽出規則v2、Attestation schema 2を実装しGREENにする。
 5. 実sourceでRoutine Profileを生成し、**機械抽出列だけ**を提示する。
 6. LLMによるDisposition Proposal生成を、Humanが承認してから実施する。

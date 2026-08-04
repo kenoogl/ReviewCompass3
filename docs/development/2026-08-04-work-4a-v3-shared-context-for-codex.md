@@ -253,7 +253,11 @@ v3ではdisposition語彙一つが、機械の候補分類とHumanの処置の�
 ### 7.2 Routine Profile（機械事実だけの外部record）
 
 記号、code位置、引数と型注記、戻り値、docstring 1行目、行数、被参照数、構文的痕跡、
-構造Digest、類似cluster IDを持つ。**LLM由来のfieldを入れない。**混入は`unknown_field`で拒否する。
+構造Digest、構造一致group IDを持つ。**LLM由来のfieldを入れない。**混入は`unknown_field`で拒否する。
+
+`structural_match_group_id`（旧`similarity_cluster_id`）は、**AST構造が正規化後に完全一致したという
+構文上の事実**だけを示す。責務が同じであること、統合してよいこと、統合すべきことは示さない。
+統合の結論ではなく、HumanとLLMが確認するための手掛かりである。値の一致だけで`merge`を自動確定しない。
 
 `side_effect_markers`は`syntactic_effect_markers`へ改名した。副作用そのものではなく、
 呼出名の構文一致で検出した痕跡だからである。別名輸入も間接呼出も追わない。
@@ -264,9 +268,20 @@ v3ではdisposition語彙一つが、機械の候補分類とHumanの処置の�
 
 Routine Profileとは別recordにする。責務の説明、入出力の意味的要約、意味的依存、類似routine、
 統合候補、`recommended_disposition`、代替候補、`confidence`、`reason`、`human_review_point`、
-`advisory: true`、`human_review_required`を持つ。
+`advisory: true`、`human_review_required`、`evidence_refs`を持つ。
 
-生成元として、モデル、テンプレート版、対象`source_content_id`、生成日時、生成物Digestを記録する。
+**参照範囲を制限する。**`semantic_dependencies`、`similar_routines`、`merge_candidates`に書けるのは、
+同一Routine Profileに存在するsymbol IDだけである。存在しないIDや自己参照は
+`advisory_reference_unresolved`で停止する。LLMが実在しないroutineを挙げた提案を流通させないためである。
+
+**根拠参照を必須にする。**各提案は`evidence_refs`を一件以上持ち、Routine Profileのfieldまたは
+`code_reference`を指す。`code_reference`はProfileの値と完全一致しなければならない。
+空配列や語彙外の`kind`は`advisory_evidence_missing`で停止する。
+根拠を持てない提案は、labelを強制せず`recommended_disposition: null`かつ
+`human_review_required: true`として書く。
+
+生成元は、提供者、モデル、テンプレートIDと版とそのDigest、対象Routine Profileの`content_digest`、
+対象`source_content_id`、生成日時、生成物Digestを必須とする。
 このrecordからDecision、Entry、Baselineを自動生成しない。
 
 ### 7.4 判断をgroup単位にする
@@ -275,7 +290,7 @@ Routine Profileとは別recordにする。責務の説明、入出力の意味�
 **Human Decisionへ渡せるのは機械評価可能な決定的条件式に落とせるものだけ**である。
 条件式はfield・演算子・値の三つ組の連言に限り、自然文でgroupを定義しない。
 
-例：例外class群81件、解析群、環境変数の痕跡を持つ群、同一構造Digestの重複群、
+例：例外class群81件、解析群、環境変数の痕跡を持つ群、同一構造Digestの構造一致群、
 巨大かつ痕跡が複数の群。Humanが「このgroupは原則`as_is`、明示した例外だけ別処置」と
 判断できる形を目標とする。どのgroupにも該当しないroutineが残る場合、既定値で埋めず差し戻す。
 
@@ -284,6 +299,11 @@ Routine Profileとは別recordにする。責務の説明、入出力の意味�
 通常関数、async関数、class、instance／static／class method、property、nested functionを含める。
 lambdaは安定した識別子を持たないため既定で除外し、件数と位置を`excluded_constructs`へ記録する
 （黙って落とさない）。symbol_idはPythonの`__qualname__`規約に合わせる。
+
+nested functionを含めると同一qualnameが重複しうる（条件分岐での同名定義、同名methodの再定義など）。
+**重複は`symbol_id_collision`で停止する。**後の定義で黙って上書きせず、行番号や序数による
+識別子の付け足しでも回避しない。位置番号はcodeの増減で移動し、new-only台帳の同一性を壊すためである。
+解消はHumanの判断（source側の改名か、symbol_id規約の改訂か）とする。
 
 これにより`extraction_rule_version`が2になり、新しいCandidate Runを作る。
 `ee12e9b`のObservationと922件のCandidate Runは歴史記録として保持し、書き換えない。
@@ -329,7 +349,7 @@ lambdaは安定した識別子を持たないため既定で除外し、件数�
 1. 二つの提案のHuman承認（`DEC-WORK4A-REBUILD-DESIGN-004`、`DEC-CONFORMANCE-SCOPE-RELAXATION-001`）と
    未決五点の判断。
 2. Policy artifactを`policy_version` 2へ上げ、三軸語彙・group条件の記法・痕跡語彙・検出規則を固定する。
-3. v3.1受入test I1〜I16をREDで固定する。
+3. v3.1受入test I1〜I21をREDで固定する。
 4. Routine Profile生成、抽出規則v2、Attestation schema 2を実装しGREENにする。
 5. 実sourceでRoutine Profileを生成し、**機械抽出列だけ**を提示する。
 6. LLMによるDisposition Proposal生成を、Humanが承認してから実施する。

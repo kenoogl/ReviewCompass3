@@ -59,6 +59,18 @@ Deferred Work 9のAs-Built projector、Markdown renderer、Documentation Conform
 - LLM由来の記述は非権威（advisory）とし、生成元を記録する。
 - 派生物からDecision、Entry、Baselineを自動生成しない。
 
+v3.1改訂案では、前身の「推定根拠としてcode referenceを保持する」を次の形へ具体化する。
+
+- LLMの各提案は`evidence_refs`を必須とし、Routine Profileのfieldまたは`code_reference`を根拠に指す。
+- 参照先は同一Routine Profile内のsymbol IDに限る。存在しないroutineを指す提案は
+  `advisory_reference_unresolved`で停止する。
+- 根拠を持てない提案は、labelを強制せず`human_review_required: true`として書く。
+- 生成元には、提供者、モデル、テンプレート版とそのDigest、対象Routine ProfileのDigest、
+  生成日時、生成物Digestを必須とする。
+
+これにより「LLMが実在しないroutineを挙げる」「根拠のない提案が判断材料として流通する」ことを
+機械的に止める。
+
 ## 5. 前身codeの扱い
 
 前身repositoryのcodeは複製しない。継承するのは責務と語彙である。
