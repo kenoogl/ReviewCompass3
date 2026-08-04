@@ -71,6 +71,28 @@ class PersistedSourceSymbolIndexBaseline:
     index_sha256: str
 
 
+@dataclasses.dataclass(frozen=True)
+class RoutineClassificationCandidate:
+    """固定Snapshotから抽出した、Human確定前のroutine分類候補。"""
+
+    candidate_id: str
+    snapshot_id: str
+    rule_id: str
+    symbol_ids: tuple
+    evidence: tuple
+    source_evidence: tuple
+    status: str
+
+
+@dataclasses.dataclass(frozen=True)
+class RoutineClassificationReport:
+    """候補と、静的解析で確定できなかった参照形式をまとめる。"""
+
+    snapshot_id: str
+    candidates: tuple
+    unresolved_reference_forms: tuple
+
+
 def _sha256(content):
     return hashlib.sha256(content).hexdigest()
 
@@ -537,3 +559,247 @@ def classify_persisted_source_symbol_index_baseline(
     if persisted.snapshot_id == current_snapshot.snapshot_id:
         return "current"
     return "historical"
+
+
+def _function_nodes_from_body(
+    *,
+    body,
+    module_name,
+    scope=(),
+    direct_class_body=False,
+):
+    for node in body:
+        if isinstance(node, ast.ClassDef):
+            yield from _function_nodes_from_body(
+                body=node.body,
+                module_name=module_name,
+                scope=(*scope, node.name),
+                direct_class_body=True,
+            )
+            continue
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if isinstance(node, ast.AsyncFunctionDef):
+            kind = "async_method" if direct_class_body else "async_function"
+        else:
+            kind = "method" if direct_class_body else "function"
+        qualified_name = ".".join((module_name, *scope, node.name))
+        yield qualified_name, kind, node
+        yield from _function_nodes_from_body(
+            body=node.body,
+            module_name=module_name,
+            scope=(*scope, node.name),
+            direct_class_body=False,
+        )
+
+
+def _candidate(*, snapshot_id, rule_id, symbol_ids, evidence, source_evidence):
+    ordered_ids = tuple(sorted(symbol_ids))
+    return RoutineClassificationCandidate(
+        candidate_id=(
+            f"routine-candidate:{snapshot_id}:{rule_id}:"
+            + ",".join(ordered_ids)
+        ),
+        snapshot_id=snapshot_id,
+        rule_id=rule_id,
+        symbol_ids=ordered_ids,
+        evidence=tuple(sorted(evidence)),
+        source_evidence=tuple(sorted(source_evidence)),
+        status="candidate",
+    )
+
+
+def _static_import_references(snapshot, symbols_by_qualified):
+    references = {symbol_id: set() for symbol_id in symbols_by_qualified.values()}
+    unresolved = set()
+    primary_paths = {item.path for item in snapshot.primary_files}
+    for item in (*snapshot.primary_files, *snapshot.test_reference_files):
+        tree = ast.parse(
+            (snapshot.project_root / item.path).read_text(encoding="utf-8"),
+            filename=item.path,
+        )
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module:
+                for imported in node.names:
+                    qualified_name = f"{node.module}.{imported.name}"
+                    symbol_id = symbols_by_qualified.get(qualified_name)
+                    if symbol_id is not None:
+                        references[symbol_id].add(item.path)
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "getattr"
+            ):
+                unresolved.add(f"dynamic_attribute_lookup:{item.path}")
+    primary_references = {
+        symbol_id: tuple(sorted(paths.intersection(primary_paths)))
+        for symbol_id, paths in references.items()
+    }
+    return references, primary_references, tuple(sorted(unresolved))
+
+
+def _risk_categories(node):
+    categories = set()
+    filesystem_methods = {
+        "write_bytes",
+        "write_text",
+        "mkdir",
+        "unlink",
+        "rmdir",
+        "rename",
+        "replace",
+        "chmod",
+    }
+    for child in ast.walk(node):
+        if not isinstance(child, ast.Call):
+            continue
+        if isinstance(child.func, ast.Attribute):
+            if child.func.attr in filesystem_methods:
+                categories.add("filesystem_write")
+            if (
+                isinstance(child.func.value, ast.Name)
+                and child.func.value.id == "subprocess"
+            ):
+                categories.add("external_process")
+    return tuple(sorted(categories))
+
+
+def _normalized_function_body(node):
+    return ast.dump(
+        ast.Module(body=list(node.body), type_ignores=[]),
+        annotate_fields=True,
+        include_attributes=False,
+    )
+
+
+def extract_routine_classification_candidates(*, snapshot, index):
+    """承認済み規則からHuman確定前の静的候補を決定的に抽出する。"""
+    if not isinstance(index, SourceSymbolIndex):
+        raise SourceSnapshotError("source_symbol_index_invalid")
+    validate_source_snapshot(snapshot=snapshot, project_root=snapshot.project_root)
+    if index.snapshot_id != snapshot.snapshot_id:
+        raise SourceSnapshotError("routine_classification_snapshot_mismatch")
+
+    symbols_by_qualified = {
+        entry.qualified_name: entry.symbol_id for entry in index.entries
+    }
+    symbols_by_id = {entry.symbol_id: entry for entry in index.entries}
+    nodes_by_symbol = {}
+    for item in snapshot.primary_files:
+        source = (snapshot.project_root / item.path).read_text(encoding="utf-8")
+        tree = ast.parse(source, filename=item.path)
+        module_name = _module_name(item.path)
+        for qualified_name, kind, node in _function_nodes_from_body(
+            body=tree.body,
+            module_name=module_name,
+        ):
+            symbol_id = f"py:{item.path}:{qualified_name}:{kind}"
+            if symbol_id in symbols_by_id:
+                nodes_by_symbol[symbol_id] = node
+
+    references, primary_references, unresolved = _static_import_references(
+        snapshot,
+        symbols_by_qualified,
+    )
+    candidates = []
+    for symbol_id, paths in sorted(references.items()):
+        if paths:
+            candidates.append(
+                _candidate(
+                    snapshot_id=snapshot.snapshot_id,
+                    rule_id="public",
+                    symbol_ids=(symbol_id,),
+                    evidence=tuple(f"static_import:{path}" for path in paths),
+                    source_evidence=(
+                        f"definition:{symbols_by_id[symbol_id].source_path}",
+                    ),
+                )
+            )
+    for symbol_id, paths in sorted(primary_references.items()):
+        if len(paths) >= 2:
+            candidates.append(
+                _candidate(
+                    snapshot_id=snapshot.snapshot_id,
+                    rule_id="shared",
+                    symbol_ids=(symbol_id,),
+                    evidence=tuple(f"static_import:{path}" for path in paths),
+                    source_evidence=(
+                        f"definition:{symbols_by_id[symbol_id].source_path}",
+                    ),
+                )
+            )
+    normalized_bodies = {}
+    for symbol_id, node in sorted(nodes_by_symbol.items()):
+        for category in _risk_categories(node):
+            candidates.append(
+                _candidate(
+                    snapshot_id=snapshot.snapshot_id,
+                    rule_id="high_risk",
+                    symbol_ids=(symbol_id,),
+                    evidence=(
+                        f"{category}:{symbols_by_id[symbol_id].source_path}",
+                    ),
+                    source_evidence=(
+                        f"definition:{symbols_by_id[symbol_id].source_path}",
+                    ),
+                )
+            )
+        normalized_bodies.setdefault(
+            (
+                symbols_by_id[symbol_id].kind,
+                symbols_by_id[symbol_id].signature,
+                _normalized_function_body(node),
+            ),
+            [],
+        ).append(symbol_id)
+        docstring = ast.get_docstring(node) or ""
+        if (
+            not references[symbol_id]
+            and "deprecated" in docstring.lower()
+            and "replaced" in docstring.lower()
+        ):
+            candidates.append(
+                _candidate(
+                    snapshot_id=snapshot.snapshot_id,
+                    rule_id="retired_candidate",
+                    symbol_ids=(symbol_id,),
+                    evidence=(
+                        f"deprecation_marker:{symbols_by_id[symbol_id].source_path}",
+                    ),
+                    source_evidence=(
+                        f"definition:{symbols_by_id[symbol_id].source_path}",
+                    ),
+                )
+            )
+    for (_kind, _signature, _body), symbol_ids in sorted(
+        normalized_bodies.items(),
+        key=lambda item: tuple(sorted(item[1])),
+    ):
+        if len(symbol_ids) < 2:
+            continue
+        ordered_ids = tuple(sorted(symbol_ids))
+        candidates.append(
+            _candidate(
+                snapshot_id=snapshot.snapshot_id,
+                rule_id="duplicate_candidate",
+                symbol_ids=ordered_ids,
+                evidence=("normalized_body_and_signature_match",),
+                source_evidence=tuple(
+                    f"definition:{symbols_by_id[symbol_id].source_path}"
+                    for symbol_id in ordered_ids
+                ),
+            )
+        )
+    return RoutineClassificationReport(
+        snapshot_id=snapshot.snapshot_id,
+        candidates=tuple(
+            sorted(
+                candidates,
+                key=lambda candidate: (
+                    candidate.rule_id,
+                    candidate.symbol_ids,
+                ),
+            )
+        ),
+        unresolved_reference_forms=unresolved,
+    )

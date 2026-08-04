@@ -807,6 +807,11 @@ RED Testを変更せず`5 passed`、公式全Testは`657 passed`、fallback `fal
 re-read comparison、current／historical分類を持つversioned toolをGREENにした。current external baselineは
 containing commit後のclean transitionで生成するため、Work 4Aのcheckboxと完了関門は未完了である。
 
+`Routine Classification Extractor GREEN Evidence`：`RC3-WORK4A-ROUTINE-CLASSIFICATION-GREEN-2026-08-04-V1`、
+`records/development/2026-08-04-work-4a-routine-classification-green-evidence-v1.md`。承認済み規則から
+machine candidateとsource evidenceを抽出するtoolをGREENにした。actual candidate list、Ledger登録、Human確認は
+containing commit後のfresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未完了である。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred
