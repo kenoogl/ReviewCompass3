@@ -1,16 +1,20 @@
 # Work 4A Rebuild Design v3.3 Proposal
 
-状態：`awaiting_human_approval`
+状態：`approved_for_implementation`
 対象：Work 4A Reusable Routine Ledger
 基準文書：`docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md`
 関連メモ：`docs/design/2026-08-05-work-4a-llm-analysis-context-memo.md`
-承認記録（予定）：`DEC-WORK4A-REBUILD-DESIGN-006`
+承認記録：`DEC-WORK4A-REBUILD-DESIGN-006`
 
-これはv3.2を置換しない差分提案である。目的は、LLMの意味分析に渡す比較対象を上位件数で
+これはv3.2を置換しない差分である。目的は、LLMの意味分析に渡す比較対象を上位件数で
 切り捨てず、比較の根拠ごとにgroupとして保持・提示することである。
 
-承認されるまで、実装、test、Routine Profileの再生成、Comparison Discoveryの生成、
-外部DATA_ROOTへの追加書込み、LLMによるDisposition Proposal生成を行わない。
+Humanは本設計とあわせて、参照方向の修正を承認した。
+**Comparison DiscoveryだけがRoutine Profileを参照し、Routine ProfileはComparison Discoveryを
+参照しない。**Profile v3は`comparison_discovery_ref`を持たない。
+人が後に採用した組合せだけを、後続のAttestationが結び付ける。
+
+LLMによるDisposition Proposal生成は、実データ確認後の別承認とする。
 
 ## 1. 背景
 
@@ -38,8 +42,14 @@ LLMは、それらが同じ責務か、統合すべきかを説明する。Human
 
 ## 3. Comparison Discovery Record
 
-Routine Profile v2を入力に、外部DATA_ROOTへnew-onlyで`Comparison Discovery Record`を作る。
-Routine Profileそのものへ候補を追記しない。
+Routine Profile v3を入力に、外部DATA_ROOTへnew-onlyで`Comparison Discovery Record`を作る。
+Routine Profileそのものへ候補を追記せず、Profileから
+Discoveryへの参照も持たせない。参照は**Discovery → Profileの一方向だけ**である。
+
+この一方向により、Profile v3を先にnew-onlyで確定し、その後にDiscoveryをnew-onlyで確定できる。
+循環を避けるためのplaceholderや後書きを作らない。
+ProfileとDiscoveryをproject内の権威へ結線しない。後続のHuman DecisionとAttestationが
+必要になった時点だけ、その組を結線する。Attestationが唯一の結線点である。
 
 配置：
 
@@ -87,7 +97,10 @@ Discoveryを読込・参照してはならない。
 | `shared_direct_callee` | 同一の直接calleeを1件以上共有 | 依存が同じだけで、責務は異なり得る |
 | `shared_exception_contract` | raiseまたはcatchの例外名を共有 | 例外名が同じだけでは契約は同じでない |
 | `shared_test_reference` | 同一Test fileから直接参照される | Testの意図や間接検証を示さない |
-| `call_neighborhood` | callerまたはcalleeの集合が決定的閾値以上重なる | 動的呼出や未解決呼出を含まない |
+| `call_neighborhood` | 空でない直接caller/calleeの符号順集合が完全一致する | 動的呼出や未解決呼出を含まない |
+
+`call_neighborhood`は部分一致の任意閾値を導入しない。部分的な共通calleeは
+`shared_direct_callee`で表す。
 
 同一package、同じ引数個数だけではgroupを作らない。これらはgroupの補助的な
 `basis_evidence`としてだけ用いる。
@@ -136,7 +149,8 @@ Profile v2の`semantic_comparison_candidate_ids`と`semantic_candidate_selection
 - 意味的な比較結果ではない。
 - Comparison Discovery生成の唯一の入力にしない。
 - Decision、Entry、Baseline、Disposition Proposalの根拠にしない。
-- Profile v3ではこのfieldを廃止し、`comparison_discovery_ref`だけを持つ。
+- Profile v3ではこのfieldを廃止する。**Profile v3は`comparison_discovery_ref`も持たない。**
+  Discoveryへの参照はProfile側に一切置かない。
 
 Profile v2と既存Observationは書き換えない。v3.3実装はProfile v3とComparison Discovery Recordを
 new-onlyで作る。
@@ -149,6 +163,9 @@ Profile v3をnew-onlyで生成してからComparison Discoveryを作る。
 
 実装後sourceを含まない旧Profile v2へ、後からDiscoveryを結び付けない。これにより
 generator自身を含むsource treeの一貫性を保つ。
+
+再観測の順序はProfile v3が先、Discoveryが後である。Discoveryは自分が参照するProfileの
+run ID、content digest、source content IDを固定する。Profile側は何も書き換えない。
 
 ## 9. 受入条件
 

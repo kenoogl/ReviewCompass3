@@ -7,10 +7,10 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.3／比較候補のgroup設計提案を作成済み、Human承認待ち。v3.2のProfile v2生成は完了（routine 989件）。
+- 現在の工程：Work 4A rebuild v3.3／設計確定。Comparison Discoveryの実装へ進む。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
-- 当面の進行入口：Work 4A Rebuild Design v3.3 Proposal。
+- 当面の進行入口：Work 4A Rebuild Design v3.3。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -31,26 +31,26 @@
 
 ## 次に行う一作業
 
-v3.3の比較候補group設計についてHuman承認を得る。
+K1〜K12をREDで固定し、Profile v3とComparison Discoveryの実装でGREENにする。
 
 開始条件：
 
-- v3.3設計提案のcommit後のclean transition。
-- group根拠、表示class、全member保持、LLM初期表示範囲のHuman承認。
+- `DEC-WORK4A-REBUILD-DESIGN-006`によるHuman承認。
+- 設計確定commit後のclean transition。
 
 完了条件：
 
-- Comparison Discoveryのschema、group根拠、K1〜K12を確定する。
-- 承認後にPolicy v4、RED test、Profile v3とComparison Discoveryの実装へ進む。
-- LLMによるDisposition Proposal生成は、Profile v3とComparison Discoveryの実データ確認後の別承認とする。
+- Policy v4でgrouping ruleと表示classを固定する。
+- K1〜K12と負例をREDで固定し、期待を緩めずGREENにする。
+- 実sourceを再観測し、Profile v3とComparison Discoveryをnew-onlyで生成する。
 
-後続作業：Profile v3とComparison Discoveryの実データ確認、LLMによるDisposition Proposal生成の承認。
+後続作業：group統計の提示、LLMによるDisposition Proposal生成の別承認。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：v3.3比較候補group設計の承認。Profile v2の実データは提示済み。
-- 再開条件：v3.3設計提案のcommit後のclean transition。
+- Human判断待ち：LLMによるDisposition Proposal生成の承認。v3.3の実データ確認後とする。
+- 再開条件：設計確定commit後のclean transition。
 
 ## stale・deferred
 
