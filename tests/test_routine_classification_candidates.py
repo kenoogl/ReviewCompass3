@@ -2,6 +2,7 @@
 
 import dataclasses
 import importlib
+import json
 from pathlib import Path
 import subprocess
 
@@ -170,4 +171,76 @@ def test_rejects_index_with_another_snapshot_identity(tmp_path):
         module.extract_routine_classification_candidates(
             snapshot=snapshot,
             index=invalid_index,
+        )
+
+
+def test_persists_candidate_list_new_only_and_reloads_it(tmp_path):
+    module = _module()
+    project_root = _repository(tmp_path)
+    snapshot, index = _snapshot_and_index(module, project_root)
+    report = module.extract_routine_classification_candidates(
+        snapshot=snapshot,
+        index=index,
+    )
+    data_root = tmp_path / "data"
+
+    persisted = module.persist_routine_classification_candidates(
+        report=report,
+        data_root=data_root,
+        project_id="project-alpha",
+        profile="development",
+    )
+
+    assert persisted.path == (
+        data_root
+        / "routine-classification-candidates"
+        / snapshot.snapshot_id
+        / "routine-classification-candidates-v1.json"
+    )
+    document = json.loads(persisted.path.read_text(encoding="utf-8"))
+    assert document["snapshot_id"] == snapshot.snapshot_id
+    assert document["project_id"] == "project-alpha"
+    assert document["profile"] == "development"
+    assert len(document["candidates"]) == len(report.candidates)
+    assert str(project_root) not in persisted.path.read_text(encoding="utf-8")
+    assert module.verify_persisted_routine_classification_candidates(
+        persisted=persisted,
+        report=report,
+    ) == persisted
+
+    with pytest.raises(
+        module.SourceSnapshotError,
+        match="routine_classification_candidates_already_exists",
+    ):
+        module.persist_routine_classification_candidates(
+            report=report,
+            data_root=data_root,
+            project_id="project-alpha",
+            profile="development",
+        )
+
+
+def test_detects_tampered_persisted_candidate_list(tmp_path):
+    module = _module()
+    project_root = _repository(tmp_path)
+    snapshot, index = _snapshot_and_index(module, project_root)
+    report = module.extract_routine_classification_candidates(
+        snapshot=snapshot,
+        index=index,
+    )
+    persisted = module.persist_routine_classification_candidates(
+        report=report,
+        data_root=tmp_path / "data",
+        project_id="project-alpha",
+        profile="development",
+    )
+
+    persisted.path.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(
+        module.SourceSnapshotError,
+        match="persisted_routine_classification_candidates_digest_mismatch",
+    ):
+        module.verify_persisted_routine_classification_candidates(
+            persisted=persisted,
+            report=report,
         )

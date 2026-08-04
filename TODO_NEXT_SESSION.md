@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A routine classification candidate extractor GREEN committed / actual candidate list not_started
+- 現在作業：Work 4A routine classification candidate persistence Acceptance Test（RED）committed / persistence not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -40,27 +40,27 @@
 - [Work 4A Routine Classification RED Evidence](records/development/2026-08-04-work-4a-routine-classification-red-evidence-v1.md) — SHA-256 `f2e0d06f532217e152327cf25c5b6528f425f4e076d77c47682de1fad721a340`
 - [Work 4A Routine Classification GREEN Evidence](records/development/2026-08-04-work-4a-routine-classification-green-evidence-v1.md) — SHA-256 `23314842a7f140fa6795049f6726e81ce322dadc753ecb72d14935fba4d2c22e`
 - [Work 4A Routine Classification GREEN Test Receipt](records/development/2026-08-04-work-4a-routine-classification-green-test-receipt-v1.json) — SHA-256 `9e1dc5c9d029c536aa43595f4856d7f76bd2b29bdb99493951def86327ab2ac4`
+- [Work 4A Routine Classification Persistence RED Evidence](records/development/2026-08-04-work-4a-routine-classification-persistence-red-evidence-v1.md) — SHA-256 `5731935181725e26d00e470c9c64f70202b8717627d591dde0afd78e9cd48d7a`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `e6bdb6cf47f61839900644bae055e4bd2abd3266b59dbe2f1f693b4608698155`
 
 ## 次に行う一作業
 
-candidate extractorのcontaining commitからlatest Snapshot／Indexをnew IDとして保存し、actual candidate listを
-生成する。
+routine classification candidate list persistenceのAcceptance Testを作成し、REDを確認する。
 
 開始条件：
 
-- routine classification extractor GREEN containing commitとclean transition
+- routine classification extractor GREEN containing commitとactual candidate persistence gap
 
 完了条件：
 
-- latest Snapshot／Indexをnew IDとして保存する
-- actual candidate listを生成し、candidate identityとunresolved referenceを記録する
+- candidate listのnew-only保存、Digest、re-read comparisonをAcceptance Testへ固定する
+- 実装が存在しないためのREDを確認する
 
 後続作業：承認後、clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。actual candidate list生成はGREEN containing commitのclean transitionを入力とする。
+- blocker：なし。persistence GREEN実装はcommitted RED Acceptance Testを入力として開始する。
 - Human判断待ち：なし。candidate listの意味的確定、Ledger登録、routine dispositionは後続Human確認まで開始しない。
 
 ## stale・deferred
