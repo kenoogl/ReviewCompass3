@@ -24,7 +24,8 @@
   `current_issue_plan_revision / blocking`へ固定した。停止・判断作業単位はcommit `64782ec`へ固定済み。
   Plan v4のsnapshot timing境界を10件のTestへ固定し、RED commit `7df9cb9`を確認後、固定Testを変更せず
   version 4 validatorとPlan v4候補をGREENにしてcommit `8f58235`へ固定した。Challenge v4は10 criteria全pass、
-  blocking Finding 0でcommit `07b5617`へ固定され、HumanがPlan v4を承認した。次はTask Contract v2である。
+  blocking Finding 0でcommit `07b5617`へ固定され、HumanがPlan v4を承認した。Approval Decision containing commit
+  `b969200`とclean transition確認後、Task Contract v2の8件のTestを固定し、期待どおりREDを確認した。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -34,18 +35,18 @@
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
 - activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V1`、
-  state `implementation_in_progress / plan_v4_approved / task_contract_v2_pending`、
+  state `implementation_in_progress / task_contract_v2_red_verified / containing_commit_pending`、
   WI-001 `helper_green / actual_snapshot_not_created`、Plan v4 `approved`、Human Decision `containing_commit`。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`36ad1be6f78a1520c126ad52889dadd18b758b71801e14c4fad38ec8e11b1783`
+- 進行入口SHA-256：`47deb223c3ce5c1717414ca237d3907ee60f4ecb8dd321e044492a8bdcc40c11`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-issue-resolution-pilot-plan-v4-approval-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`93cbd5815652777712da087c5ba4be4774da1d2e86972b7cec88336b0346aea3`
+  `records/development/2026-08-04-issue-resolution-pilot-task-contract-v2-red-evidence-v1.md`
+- Decision／Evidence SHA-256：`4f6d9640559ce540da07d04ed8fbc1c167e6e8c84c804de60fc359b5a6cde079`
 
 ## 実施報告照合
 
@@ -677,6 +678,12 @@
   - 観測した事後状態：DecisionはPlan v4、Challenge v4、公式全581 Test receiptへfreshに結線され、
     blocking Finding受容0、warning 0。Task Contract v2の別作業単位作成だけを許可し、実snapshot、WI-002、
     TODO compactionは未開始である。
+- Claim `EC-136`：Task Contract v2の正常・負例・実行順境界をTestへ固定し、REDを確認した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-task-contract-v2-red-evidence-v1.md`
+  - Test：`tests/test_issue_resolution_pilot_implementation_task_contract_v2.py`、SHA-256
+    `afe238e5fa1857e5ea5ea03a5bc20bbd0e7216d3ddbeb16eb6af8e69c3b7aa13`
+  - 観測した事後状態：targeted `8 failed`、全`581 passed, 8 failed`。失敗は専用validator未実装7件と
+    Task Contract v2実体不在1件である。実snapshot、WI-002、TODO compactionは開始していない。
 
 ### reported_unverified／contradicted
 
@@ -795,31 +802,30 @@
 
 ## 次に行う一作業
 
-Plan v4 Approval Decision containing commitをread-only照合後、Task Contract v2の期待境界をtest-firstで固定する。
+Task Contract v2 RED containing commitをread-only照合後、固定Testを変更せずv2実体と専用validatorを作成する。
 
 開始条件：
 
-- Approval Decision SHA-256が`f2e6c6dce6388d97a8903b45165114175c2fbe949ce77ba63e8fb0e14875f9ab`、
-  Completion Evidence SHA-256が`93cbd5815652777712da087c5ba4be4774da1d2e86972b7cec88336b0346aea3`で、
-  HEADからbyte-identicalに読める。
+- RED Test SHA-256が`afe238e5fa1857e5ea5ea03a5bc20bbd0e7216d3ddbeb16eb6af8e69c3b7aa13`で、
+  containing commitからbyte-identicalに読める。
 - worktreeがcleanでtransitionが`passed`である。
 
 完了条件：
 
-- Task Contract v2の正常・負例・境界TestがREDになり、失敗理由がv2実体または専用境界未実装だけである。
-- Plan v4の7 Work Item順、WI-001 completion繰越、WI-007／WI-003 source境界を固定する。
-- RED作業単位ではTask Contract v2実体、実snapshot、WI-002、TODO圧縮、Issue解決を先取りしない。
+- Task Contract v2がPlan v4、Challenge v4、Approval Decisionへfreshに結線される。
+- WI-001 completion繰越、7 Work Item順、WI-007／WI-003 source境界が固定Testを変更せずGREENになる。
+- 公式runner全Testが合格し、実snapshot、WI-002、TODO圧縮、Issue解決を先取りしない。
 
-後続作業：Task Contract v2 RED containing commit後、v2実体を作成・検証する。
+後続作業：Task Contract v2 containing commit後、WI-002 REDへ進む。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。Approval Decision containing commit確認前はTask Contract v2 REDを開始しない。
+- blocker：なし。Task Contract v2 RED containing commit確認前はGREEN実装を開始しない。
 - Human判断待ち：現在のTask Contract v2作業に対する追加判断なし
 - 実行保留：Task Contract v2実体はRED commit後、WI-002はv2 containing commit後まで開始しない。
   実snapshot、TODO compactionは引き続き保留する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
-- 再開条件：Approval Decision containing commit確認、clean worktree、transition合格
+- 再開条件：Task Contract v2 RED containing commit確認、clean worktree、transition合格
 
 ## stale・deferred
 
@@ -840,8 +846,8 @@ Plan v4 Approval Decision containing commitをread-only照合後、Task Contract
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Challenge targeted `8 passed in 0.04s`、Plan v4 targeted `10 passed in 0.03s`
-- 直近の全Test：公式runnerで`581 passed in 2.82s`、fallback `false`
+- 直近の関連検証：Task Contract v2 targeted RED `8 failed in 0.07s`
+- 直近の全Test：raw pytestで既存`581 passed`、新規期待RED `8 failed in 2.69s`
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

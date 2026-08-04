@@ -615,6 +615,13 @@ SHA-256 `93cbd5815652777712da087c5ba4be4774da1d2e86972b7cec88336b0346aea3`。Dec
 公式全581 Test receiptへ結線され、Task Contract v2の別作業単位作成だけを許可した。承認作業単位のcommit後まで
 Task Contract v2を作成せず、最後のPilot checkboxは未完了のままとする。
 
+Plan v4 Approval Decision containing commit `b969200`とclean transitionを確認後、Task Contract v2のPlan v4結線、
+WI-001 completion繰越、7 Work Item順、WI-007／WI-003 source identity境界を8件のTestへ固定した。RED Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-task-contract-v2-red-evidence-v1.md`、Test SHA-256
+`afe238e5fa1857e5ea5ea03a5bc20bbd0e7216d3ddbeb16eb6af8e69c3b7aa13`。targetedは`8 failed`、全体は既存
+`581 passed, 8 failed`で、失敗はTask Contract v2実体不在と専用validator未実装だけである。RED作業単位の
+commit後までv2実体、実snapshot、WI-002、TODO compactionを開始せず、最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
