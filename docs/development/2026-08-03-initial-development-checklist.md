@@ -654,6 +654,12 @@ WI-002 GREEN containing commit `93785da`とclean transitionを確認後、WI-006
 `606 passed, 18 failed`で、失敗は全件専用module未実装だけ。RED commit後までresolver、実snapshot、TODO
 compactionを開始せず、最後のPilot checkboxは未完了のままとする。
 
+WI-006 RED containing commit `5750935`とclean transition確認後、固定18 Testを変更せずstate resolverを実装した。
+Completion Evidenceは`records/development/2026-08-04-issue-resolution-pilot-wi-006-completion-evidence-v1.md`。
+13許可state、最新版選択、Evidence ID、欠落、同version競合、stale、手入力不一致はtargeted `18 passed`、公式全
+`624 passed`、fallback `false`。実snapshotとTODO compactionは未変更。GREEN commit後までWI-007を開始せず、
+最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
