@@ -3,6 +3,7 @@
 import hashlib
 import importlib
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -45,10 +46,11 @@ def test_actual_post_write_and_isolated_restore_rehearsal():
 
 
 def test_rejects_stale_todo_reference_digest():
-    document = (ROOT / "TODO_NEXT_SESSION.md").read_bytes().replace(
-        b"1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6",
+    document = re.sub(
+        rb"(?<=SHA-256 `)[0-9a-f]{64}",
         b"0" * 64,
-        1,
+        (ROOT / "TODO_NEXT_SESSION.md").read_bytes(),
+        count=1,
     )
 
     with pytest.raises(

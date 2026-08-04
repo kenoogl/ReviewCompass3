@@ -507,7 +507,7 @@ Evidenceは`records/development/2026-08-04-project-manifest-v2-completion-eviden
 - [x] Improvement CandidateとHuman Triage Decisionのidentity、field、命名、version、Digest、参照規則を
       正常・負例・境界Testへ固定した。
 - [x] 最初のCandidate／Triage Decisionを作り、Human判断なしのIssue昇格を拒否した。
-- [ ] ReviewCompass Issue Record、Resolution Plan、Plan Challenge、Verdictの最初の手作業経路を検証した。
+- [x] ReviewCompass Issue Record、Resolution Plan、Plan Challenge、Verdictの最初の手作業経路を検証した。
 
 `Evidence`：Early Pilot Decision
 `records/development/2026-08-04-reviewcompass2-issue-path-early-pilot-decision.json`、SHA-256
@@ -694,6 +694,12 @@ Human判断先取り拒否を5件のTestへ固定した。RED `5 failed`からGR
 `verdict_pending`、候補推奨は`resolved`、effective outcomeは`pending_human_decision`。WI-005 containing commit後に
 Resolution VerdictのHuman判断を要求し、最後のPilot checkboxとWork 4復帰は未完了のままとする。
 
+WI-005 containing commit `6da0270`後、Humanは固定候補の推奨、未処理、残余riskを確認し、Verdict `resolved`、
+早期Pilot完了、Work 4復帰を承認した。Closure Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-closure-completion-evidence-v1.md`。Human以外、stale候補binding、
+残余risk未受容の負例を含むtargeted `9 passed`、公式全`643 passed`、fallback `false`。正式製品schema、UI、
+automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
@@ -711,8 +717,8 @@ Resolution VerdictのHuman判断を要求し、最後のPilot checkboxとWork 4�
 
 - [x] 完了済みcorrectiveを固定Evidenceへ接続した。
 - [x] Layout bootstrapをWork 7、session保全をSession Records製品機能、早期PilotをWork 8完了と誤表示していない。
-- [ ] Issue Resolution早期Pilotの限定bootstrapを完了した。
-- [ ] 限定bootstrap完了後、当初順序のWork 4へ戻った。
+- [x] Issue Resolution早期Pilotの限定bootstrapを完了した。
+- [x] 限定bootstrap完了後、当初順序のWork 4へ戻った。
 
 ### Work 4：Designと代表シナリオ
 

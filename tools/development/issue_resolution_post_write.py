@@ -46,6 +46,22 @@ _CANDIDATE_FIELDS = {
     "derived_state",
     "content_digest",
 }
+_VERDICT_FIELDS = {
+    "record_kind",
+    "schema_version",
+    "verdict_id",
+    "verdict_version",
+    "decided_at",
+    "decision_maker",
+    "candidate_ref",
+    "issue_ref",
+    "outcome",
+    "rationale",
+    "accepted_residual_risks",
+    "unresolved_item_dispositions",
+    "evidence_refs",
+    "content_digest",
+}
 
 
 class PostWriteVerificationError(Exception):
@@ -68,6 +84,13 @@ class VerdictCandidateValidation:
     verdict_candidate_id: str
     recommended_outcome: str
     effective_outcome: str
+    derived_state: str
+
+
+@dataclasses.dataclass(frozen=True)
+class ResolutionVerdictValidation:
+    verdict_id: str
+    outcome: str
     derived_state: str
 
 
@@ -273,5 +296,107 @@ def validate_resolution_verdict_candidate(record, *, project_root):
         verdict_candidate_id=record["verdict_candidate_id"],
         recommended_outcome=record["recommendation"],
         effective_outcome=record["effective_outcome"],
+        derived_state=state.state,
+    )
+
+
+def validate_resolution_verdict(record, *, project_root):
+    """Human Verdictを候補、risk処置、resolver終端へ結線する。"""
+
+    if not isinstance(record, dict) or set(record) != _VERDICT_FIELDS:
+        raise PostWriteVerificationError("Resolution Verdict fields are invalid")
+    if (
+        record["record_kind"] != "resolution_verdict"
+        or record["schema_version"] != 1
+        or record["verdict_version"] != 1
+        or record["content_digest"] != canonical_digest(record)
+    ):
+        raise PostWriteVerificationError("Resolution Verdict identity is invalid")
+    if record["decision_maker"] != "Human":
+        raise PostWriteVerificationError(
+            "Human Resolution Verdict is required"
+        )
+    candidate_ref = record["candidate_ref"]
+    if not isinstance(candidate_ref, dict) or set(candidate_ref) != {
+        "path",
+        "sha256",
+        "content_digest",
+    }:
+        raise PostWriteVerificationError(
+            "Verdict candidate binding is stale"
+        )
+    candidate_path = _project_path(project_root, candidate_ref["path"])
+    try:
+        candidate_content = candidate_path.read_bytes()
+        candidate = json.loads(candidate_content.decode("utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise PostWriteVerificationError(
+            "Verdict candidate binding is stale"
+        ) from error
+    if (
+        _sha256(candidate_content) != candidate_ref["sha256"]
+        or candidate.get("content_digest") != candidate_ref["content_digest"]
+    ):
+        raise PostWriteVerificationError(
+            "Verdict candidate binding is stale"
+        )
+    validate_resolution_verdict_candidate(
+        candidate,
+        project_root=project_root,
+    )
+    _validate_ref(record["issue_ref"], project_root)
+    for reference in record["evidence_refs"]:
+        _validate_ref(reference, project_root)
+    if record["outcome"] not in {"resolved", "unresolved"}:
+        raise PostWriteVerificationError("Resolution Verdict outcome is invalid")
+    if record["outcome"] == "resolved" and record[
+        "accepted_residual_risks"
+    ] != candidate["residual_risks"]:
+        raise PostWriteVerificationError(
+            "residual risk disposition is incomplete"
+        )
+    expected_items = {
+        item["item"] for item in candidate["unresolved_items"]
+    }
+    dispositions = record["unresolved_item_dispositions"]
+    if (
+        not isinstance(dispositions, list)
+        or {item.get("item") for item in dispositions} != expected_items
+        or any(
+            item.get("disposition") not in {"checkpoint", "deferred"}
+            for item in dispositions
+        )
+    ):
+        raise PostWriteVerificationError(
+            "unresolved item disposition is incomplete"
+        )
+
+    state_records = [item["record"] for item in candidate["state_chain"]]
+    verification = state_records[-1]
+    state_records.append(
+        {
+            "record_kind": "verdict",
+            "record_id": record["verdict_id"],
+            "record_version": record["verdict_version"],
+            "content_digest": record["content_digest"],
+            "status": record["outcome"],
+            "bindings": {
+                "implementation_verification": verification["content_digest"]
+            },
+        }
+    )
+    try:
+        state = derive_issue_resolution_state(state_records)
+    except IssueResolutionStateError as error:
+        raise PostWriteVerificationError(
+            "Resolution Verdict state is invalid"
+        ) from error
+    if state.state != record["outcome"]:
+        raise PostWriteVerificationError(
+            "Resolution Verdict state is invalid"
+        )
+    return ResolutionVerdictValidation(
+        verdict_id=record["verdict_id"],
+        outcome=record["outcome"],
         derived_state=state.state,
     )

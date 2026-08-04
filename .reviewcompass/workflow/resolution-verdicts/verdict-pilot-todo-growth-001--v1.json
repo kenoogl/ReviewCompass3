@@ -1,0 +1,49 @@
+{
+  "record_kind": "resolution_verdict",
+  "schema_version": 1,
+  "verdict_id": "VERDICT-PILOT-TODO-GROWTH-001-V1",
+  "verdict_version": 1,
+  "decided_at": "2026-08-04T13:20:00+09:00",
+  "decision_maker": "Human",
+  "candidate_ref": {
+    "path": "records/development/2026-08-04-issue-resolution-pilot-resolution-verdict-candidate-v1.json",
+    "sha256": "a2615f5cb27b2126cf1ac78fd750f31bd719e10158ba89cef665e0dedaba1789",
+    "content_digest": "067764f25d85dc7e8966d02eb1bf25cc44a6efeadd0b78cf54a532562d775998"
+  },
+  "issue_ref": {
+    "path": ".reviewcompass/workflow/issues/issue-pilot-todo-growth-001--v1.json",
+    "sha256": "2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a"
+  },
+  "outcome": "resolved",
+  "rationale": "HumanはWI-005の固定Verdict候補、未処理項目、残余riskを確認し、早期Pilotの限定目的が達成されたためresolved、Pilot完了、Work 4復帰を承認した。",
+  "accepted_residual_risks": [
+    "restoreは隔離一時rootでrehearseし、実checkoutに対する破壊的rollbackは実行していない",
+    "共通promptは補助手段であり、再累積防止の正しさはmachine validatorとTestへ依存する",
+    "Verdict候補とPilot artifactはdevelopment限定で、正式製品schemaではない"
+  ],
+  "unresolved_item_dispositions": [
+    {
+      "item": "versioned projection入力のin-place変更拒否writerとtargeted suite名簿",
+      "disposition": "checkpoint"
+    },
+    {
+      "item": "正式製品Issue Resolution schema、UI、automation",
+      "disposition": "deferred"
+    }
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-005-completion-evidence-v1.md",
+      "sha256": "aaa99ee1850e6b278433ff4963f6f8a1a7993a9368a44c13f7e4f56a0970912a"
+    },
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-005-post-write-verification-receipt-v1.json",
+      "sha256": "4dd7b5f3042a0d171f21024ffc73d9248a59e4f8952a9c173c766323d455f652"
+    },
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-005-green-test-receipt-v1.json",
+      "sha256": "42c6f5cb785ed4a8d995b803b0e2f55b0444087f16622a8a45c9f15077268aa4"
+    }
+  ],
+  "content_digest": "efc29f2b21c5e2acfb7fb242236accdecef437857c59d3adc031715a44a1bb73"
+}

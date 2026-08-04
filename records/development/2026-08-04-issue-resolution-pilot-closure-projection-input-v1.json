@@ -1,0 +1,53 @@
+{
+  "updated_on": "2026-08-04",
+  "overall": "Work 1B、Work 2、Work 3とIssue Resolution早期Pilotが完了。当初順序のWork 4へ復帰。",
+  "current_work": "Issue Resolution early Pilot resolved / Work 4 not_started",
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2 completed",
+  "active_issue": {
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+    "state": "resolved",
+    "impact": "Pilot closure境界。Work 4開始を妨げる未処理なし",
+    "next_action": "Work 4開始境界の固定"
+  },
+  "references": [
+    {
+      "label": "Current Plan",
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694"
+    },
+    {
+      "label": "Resolution Verdict",
+      "path": ".reviewcompass/workflow/resolution-verdicts/verdict-pilot-todo-growth-001--v1.json",
+      "sha256": "b8041b86d252c9f4fae921e3fff4aaafeeddc1678bce5d57c3ef22483560854c"
+    },
+    {
+      "label": "Pilot Closure Evidence",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-closure-completion-evidence-v1.md",
+      "sha256": "e7138e9ec849649dfcbabaad465c1e6e29b9d31000ba08fe2627c335f85bb9af"
+    },
+    {
+      "label": "Initial Development Checklist",
+      "path": "docs/development/2026-08-03-initial-development-checklist.md",
+      "sha256": "bba60c332be4adbea623e7ce51c2e86f992cd6402384e99c18fe4b81f2941a31"
+    }
+  ],
+  "next_work": {
+    "action": "Work 4のDesign対象、代表scenario、最小vertical sliceの開始境界を固定する。",
+    "start_conditions": [
+      "Pilot closure containing commitとclean transition",
+      "Current PlanとchecklistのWork 4入口一致"
+    ],
+    "completion_conditions": [
+      "Work 4で設計する対象と非対象の固定",
+      "new_development / fresh最小vertical sliceのAcceptance入口"
+    ],
+    "following": "Work 4のContract、Portfolio、Compiler、Plan bundle、Workflow、Provenance、Deployment設計。"
+  },
+  "blocker": "なし",
+  "human_decision": "なし。Pilot完了とWork 4復帰は承認済み。",
+  "stale": "Pilot中のimplementation_in_progress／verdict_pending projectionはVerdictによりstale。",
+  "deferred": "正式Issue Resolution schema、UI、automation、Work 8正式評価。",
+  "branch": "main",
+  "related_test": "Verdict closureとWI-005 targeted 9 passed",
+  "full_test": "公式runner 643 passed、fallback false"
+}
