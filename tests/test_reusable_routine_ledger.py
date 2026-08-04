@@ -154,6 +154,13 @@ def test_persists_relation_and_binds_its_digest_from_baseline(tmp_path):
     ]
     assert module.verify_reusable_routine_ledger(persisted=persisted) == persisted
 
+    relation_path.unlink()
+    with pytest.raises(
+        module.ReusableRoutineLedgerError,
+        match="relation",
+    ):
+        module.verify_reusable_routine_ledger(persisted=persisted)
+
     manifest = project_root / ".reviewcompass" / "project-manifest.json"
     document = json.loads(manifest.read_text(encoding="utf-8"))
     document["artifact_roots"]["reuse"] = "../escape"

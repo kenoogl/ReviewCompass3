@@ -250,6 +250,10 @@ def verify_reusable_routine_ledger(*, persisted):
     if not isinstance(relation_refs, list) or len(relation_refs) != len(persisted.relation_paths):
         raise ReusableRoutineLedgerError("persisted ledger relation refs are invalid")
     for ref, path, digest in zip(relation_refs, persisted.relation_paths, persisted.relation_sha256s):
-        if ref.get("path") != str(path.relative_to(persisted.root).as_posix()) or _sha256(path.read_bytes()) != digest or ref.get("sha256") != digest:
+        try:
+            actual = _sha256(path.read_bytes())
+        except OSError as error:
+            raise ReusableRoutineLedgerError("persisted ledger relation missing") from error
+        if ref.get("path") != str(path.relative_to(persisted.root).as_posix()) or actual != digest or ref.get("sha256") != digest:
             raise ReusableRoutineLedgerError("persisted ledger relation digest mismatch")
     return persisted
