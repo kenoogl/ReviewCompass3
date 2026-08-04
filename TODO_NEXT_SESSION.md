@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A baseline persistence Human triage approved_committed / versioned tool RED not_started
+- 現在作業：Work 4A baseline persistence Acceptance Test（RED）committed / versioned tool not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -32,6 +32,7 @@
 - [Work 4A Actual Baseline Operation Observation](records/development/2026-08-04-work-4a-actual-baseline-operation-observation-v1.json) — SHA-256 `1c82cbb33c6657e278bbcc63df9fc65b36670120310114c98f3bd42d5c908018`
 - [Work 4A Baseline Persistence Improvement Candidate](records/development/2026-08-04-work-4a-baseline-persistence-improvement-candidate-v1.json) — SHA-256 `d7193d504860229f95de3f7c4f1e9e2515e401e7295c90e26669335c783bac99`
 - [Work 4A Baseline Persistence Triage Decision](records/development/2026-08-04-work-4a-baseline-persistence-triage-decision-v1.json) — SHA-256 `f26a7a685b049b6ce4deb69b18554ebbe21ea75ee233901a074b19a1fa6ab507`
+- [Work 4A Baseline Persistence RED Evidence](records/development/2026-08-04-work-4a-baseline-persistence-red-evidence-v1.md) — SHA-256 `bb9fe5eb2f525dae308db1065b0fc1ce2181805466339ae1e5a74722d72a4f6c`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `dff6b6619da1f39401322e3f556d40c164e2619228d05f676c6fbcb2d9ccc73c`
 
 ## 次に行う一作業
@@ -51,7 +52,7 @@ versioned Snapshot／Index persistence toolのAcceptance Testを作成し、RED�
 
 ## blocker・Human判断待ち
 
-- blocker：なし。versioned persistence toolのRED Testはtriage Decisionを入力として開始する。
+- blocker：なし。GREEN実装はcommitted RED Acceptance Testを入力として開始する。
 - Human判断待ち：なし。初回runtime directory作成は承認済みLayout内の明示操作として次の作業単位で行う。
 
 ## stale・deferred
