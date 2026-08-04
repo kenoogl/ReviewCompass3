@@ -195,6 +195,14 @@ _SCHEMA_BY_VERSION = {
          "marker_detection", "routines", "excluded_constructs", "content_digest"),
         (),
     ),
+    ("work4a_routine_profile", 2): (
+        ("record_kind", "schema_version", "digest_algorithm", "profile_run_id",
+         "observation_snapshot_id", "source_content_id", "extraction_rule_version",
+         "marker_detection", "call_graph_detection", "exception_detection",
+         "test_reference_detection", "public_api_detection", "structural_match_detection",
+         "semantic_comparison_detection", "routines", "excluded_constructs", "content_digest"),
+        (),
+    ),
     ("work4a_disposition_proposal", 1): (
         ("record_kind", "schema_version", "digest_algorithm", "advisory", "proposal_run_id",
          "routine_profile_run_id", "observation_snapshot_id", "source_content_id",
@@ -1294,6 +1302,521 @@ def _annotate_routines(root, files, routines):
             routine["responsibility_class_proposal"] = "ownership_unclear"
         else:
             routine["responsibility_class_proposal"] = "public_responsibility"
+
+
+_ROUTINE_FIELDS_V2 = _ROUTINE_FIELDS + FEATURE_FIELDS_V3
+
+
+def _branch_and_depth(node):
+    """分岐数と最大入れ子深さを構文だけから数える。"""
+
+    branch_nodes = (ast.If, ast.For, ast.AsyncFor, ast.While, ast.comprehension)
+    if hasattr(ast, "Match"):
+        branch_nodes = branch_nodes + (ast.Match,)
+    branches = 0
+    depth = 0
+
+    def walk(current, level):
+        nonlocal branches, depth
+        for child in ast.iter_child_nodes(current):
+            increment = isinstance(child, branch_nodes)
+            if increment:
+                branches += 1
+                depth = max(depth, level + 1)
+                walk(child, level + 1)
+            else:
+                walk(child, level)
+
+    walk(node, 0)
+    for child in ast.walk(node):
+        branches += len(getattr(child, "generators", []) or [])
+    return branches, depth
+
+
+def _exception_names(node):
+    raised, caught, bare = [], [], 0
+    for child in ast.walk(node):
+        if isinstance(child, ast.Raise) and child.exc is not None:
+            target = child.exc.func if isinstance(child.exc, ast.Call) else child.exc
+            name = getattr(target, "id", getattr(target, "attr", None))
+            if name:
+                raised.append(name)
+        elif isinstance(child, ast.ExceptHandler):
+            if child.type is None:
+                bare += 1
+                continue
+            handlers = child.type.elts if isinstance(child.type, ast.Tuple) else [child.type]
+            for handler in handlers:
+                name = getattr(handler, "id", getattr(handler, "attr", None))
+                if name:
+                    caught.append(name)
+    return sorted(set(raised)), sorted(set(caught)), bare
+
+
+def _dynamic_call_markers(node):
+    """解決を試みない動的呼出の痕跡を数える。"""
+
+    count = 0
+    for child in ast.walk(node):
+        if isinstance(child, ast.Call):
+            function = child.func
+            if isinstance(function, ast.Name) and function.id in {
+                "eval", "exec", "getattr", "globals", "locals", "vars", "__import__",
+            }:
+                count += 1
+            elif isinstance(function, ast.Subscript):
+                count += 1
+        elif isinstance(child, ast.Subscript) and isinstance(child.value, ast.Call):
+            function = child.value.func
+            if isinstance(function, ast.Name) and function.id in {"globals", "locals", "vars"}:
+                count += 1
+    return count
+
+
+def _module_exports(project_root, relative_path):
+    tree = ast.parse((Path(project_root) / relative_path).read_text(encoding="utf-8"))
+    exports = set()
+    main_guard_names = set()
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if getattr(target, "id", None) == "__all__" and isinstance(
+                    node.value, (ast.List, ast.Tuple)
+                ):
+                    for element in node.value.elts:
+                        if isinstance(element, ast.Constant) and isinstance(element.value, str):
+                            exports.add(element.value)
+        elif isinstance(node, ast.If):
+            test = node.test
+            if (
+                isinstance(test, ast.Compare)
+                and getattr(test.left, "id", None) == "__name__"
+            ):
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Name):
+                        main_guard_names.add(child.id)
+    return exports, main_guard_names
+
+
+def _package_of(relative_path):
+    parts = relative_path.split("/")
+    return parts[1] if len(parts) > 2 else parts[0]
+
+
+def _signal(value_map, thresholds):
+    high = thresholds["high_any_of"]
+    for field, rule in high.items():
+        if _threshold_matches(value_map.get(field), rule):
+            return "high"
+    low = thresholds["low_all_of"]
+    if all(_threshold_matches(value_map.get(field), rule) for field, rule in low.items()):
+        return "low"
+    return thresholds["otherwise"]
+
+
+def _threshold_matches(actual, rule):
+    operator, expected = rule["operator"], rule["value"]
+    if actual is None:
+        return False
+    if operator == "equals":
+        return actual == expected
+    if operator == "lte":
+        return actual <= expected
+    if operator == "gte":
+        return actual >= expected
+    raise V3ValidationError("unknown_field", operator)
+
+
+def _test_references(project_root, test_root, short_names):
+    """tests配下の直接AST参照だけを集める。範囲外pathは拒否する。"""
+
+    root = Path(project_root).resolve()
+    tests = (root / test_root).resolve()
+    references = {}
+    if not tests.is_dir():
+        return references
+    if root not in tests.parents:
+        raise V3ValidationError("test_reference_out_of_scope", test_root)
+    for path in sorted(tests.rglob("*.py")):
+        if path.is_symlink() or not path.is_file():
+            continue
+        resolved = path.resolve()
+        if tests not in resolved.parents:
+            raise V3ValidationError("test_reference_out_of_scope", str(path))
+        relative = resolved.relative_to(root).as_posix()
+        names = _called_names(ast.parse(resolved.read_text(encoding="utf-8")))
+        for short in names & short_names:
+            references.setdefault(short, set()).add(relative)
+    return references
+
+
+def _semantic_candidates(routine, routines, limit):
+    """同一Profile内から決定的に比較候補を選ぶ。mergeの結論ではない。"""
+
+    scored = []
+    own_package = _package_of(routine["code_reference"]["relative_path"])
+    own_params = len(routine["signature"]["parameters"])
+    own_callees = set(routine["direct_callee_symbol_ids"])
+    own_markers = set(routine["syntactic_effect_markers"])
+    own_exceptions = set(routine["raised_exception_names"]) | set(
+        routine["caught_exception_names"]
+    )
+    for other in routines:
+        if other["symbol_id"] == routine["symbol_id"]:
+            continue
+        reasons = []
+        score = 0
+        if other["structural_match_group_id"] == routine["structural_match_group_id"]:
+            score += 8
+            reasons.append("structural_match_group")
+        if _package_of(other["code_reference"]["relative_path"]) == own_package:
+            score += 2
+            reasons.append("same_package")
+        if len(other["signature"]["parameters"]) == own_params:
+            score += 2
+            reasons.append("same_parameter_count")
+        if own_callees & set(other["direct_callee_symbol_ids"]):
+            score += 2
+            reasons.append("shared_callee")
+        if own_markers & set(other["syntactic_effect_markers"]):
+            score += 1
+            reasons.append("shared_effect_marker")
+        if own_exceptions & (
+            set(other["raised_exception_names"]) | set(other["caught_exception_names"])
+        ):
+            score += 1
+            reasons.append("shared_exception_name")
+        if score >= 4:
+            scored.append((-score, other["symbol_id"], reasons))
+    scored.sort()
+    selected = scored[:limit]
+    reasons = sorted({reason for _score, _symbol, items in selected for reason in items})
+    return [symbol for _score, symbol, _items in selected], reasons
+
+
+def _add_v2_features(project_root, routines, policy_document):
+    """Profile v2の追加featureを決定的に埋める。"""
+
+    root = Path(project_root)
+    by_symbol = {item["symbol_id"]: item for item in routines}
+    short_index = {}
+    for item in routines:
+        short = item["symbol_id"].rsplit(":", 1)[1].split(".")[-1]
+        short_index.setdefault(short, []).append(item["symbol_id"])
+    short_names = set(short_index)
+
+    module_cache = {}
+    for item in routines:
+        relative = item["code_reference"]["relative_path"]
+        if relative not in module_cache:
+            module_cache[relative] = _module_exports(root, relative)
+
+    trees = {}
+    for item in routines:
+        relative = item["code_reference"]["relative_path"]
+        if relative not in trees:
+            trees[relative] = ast.parse((root / relative).read_text(encoding="utf-8"))
+
+    nodes = {}
+    for relative, tree in trees.items():
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                nodes.setdefault(relative, []).append(node)
+
+    def node_for(item):
+        relative = item["code_reference"]["relative_path"]
+        for node in nodes.get(relative, []):
+            end = getattr(node, "end_lineno", node.lineno)
+            if node.lineno == item["code_reference"]["start_line"] and end == item[
+                "code_reference"
+            ]["end_line"]:
+                return node
+        return None
+
+    test_references = _test_references(
+        root, policy_document.get("test_reference_root", TEST_ROOT), short_names
+    )
+    cli_markers = set(policy_document.get("cli_entrypoint_markers", CLI_MARKERS))
+
+    for item in routines:
+        node = node_for(item)
+        if node is None:
+            raise V3ValidationError("identity_mismatch", item["symbol_id"])
+        relative = item["code_reference"]["relative_path"]
+        exports, guard_names = module_cache[relative]
+        short = item["symbol_id"].rsplit(":", 1)[1].split(".")[-1]
+        called = _called_names(node)
+
+        callees = []
+        unresolved = _dynamic_call_markers(node)
+        for name in sorted(called):
+            if name == short:
+                continue
+            targets = short_index.get(name)
+            if targets is None:
+                continue
+            if len(targets) == 1:
+                callees.append(targets[0])
+            else:
+                unresolved += 1
+        item["direct_callee_symbol_ids"] = sorted(set(callees))
+        item["direct_caller_symbol_ids"] = []
+        item["unresolved_direct_call_count"] = unresolved
+
+        raised, caught, bare = _exception_names(node)
+        item["raised_exception_names"] = raised
+        item["caught_exception_names"] = caught
+        item["bare_except_count"] = bare
+
+        branches, depth = _branch_and_depth(node)
+        item["branch_count"] = branches
+        item["max_nesting_depth"] = depth
+        item["return_count"] = sum(1 for child in ast.walk(node) if isinstance(child, ast.Return))
+        item["raise_count"] = sum(1 for child in ast.walk(node) if isinstance(child, ast.Raise))
+        item["try_count"] = sum(1 for child in ast.walk(node) if isinstance(child, ast.Try))
+        item["effect_marker_count"] = len(item["syntactic_effect_markers"])
+        item["complexity_signal"] = _signal(
+            item, policy_document["complexity_signal_thresholds"]
+        )
+
+        paths = sorted(test_references.get(short, ()))
+        item["direct_test_reference_paths"] = paths
+        item["direct_test_reference_count"] = len(paths)
+
+        item["is_private_name"] = short.startswith("_")
+        item["is_exported_by_all"] = short in exports
+        item["cross_package_caller_count"] = 0
+        item["cli_entrypoint_marker"] = bool(called & cli_markers) or short in guard_names
+
+    for item in routines:
+        own_package = _package_of(item["code_reference"]["relative_path"])
+        for callee in item["direct_callee_symbol_ids"]:
+            target = by_symbol[callee]
+            target["direct_caller_symbol_ids"].append(item["symbol_id"])
+            if _package_of(target["code_reference"]["relative_path"]) != own_package:
+                target["cross_package_caller_count"] += 1
+
+    limit = policy_document.get(
+        "semantic_comparison_candidate_limit", SEMANTIC_COMPARISON_CANDIDATE_LIMIT
+    )
+    for item in routines:
+        item["direct_caller_symbol_ids"] = sorted(set(item["direct_caller_symbol_ids"]))
+        item["public_api_signal"] = _signal(
+            item, policy_document["public_api_signal_thresholds"]
+        )
+    for item in routines:
+        candidates, reasons = _semantic_candidates(item, routines, limit)
+        item["semantic_comparison_candidate_ids"] = candidates
+        item["semantic_candidate_selection_reason"] = reasons
+    return routines
+
+
+def validate_routine_profile_v2_document(document, *, policy):
+    """Profile v2のfeatureが宣言した範囲と上限を守ることを検証する。"""
+
+    validate_record_schema(document, record_kind="work4a_routine_profile")
+    if document.get("schema_version") != 2:
+        raise V3ValidationError("identity_mismatch", "schema_version")
+    detection = document["marker_detection"]
+    if detection.get("absence_does_not_imply_no_effect") is not True:
+        raise V3ValidationError("marker_detection_flag_missing", "absence_does_not_imply_no_effect")
+    policy_document = _read_record(Path(policy.path), record_kind="work4a_freshness_policy")
+    limit = policy_document.get(
+        "semantic_comparison_candidate_limit", SEMANTIC_COMPARISON_CANDIDATE_LIMIT
+    )
+    signals = set(policy_document.get("signal_classes", SIGNAL_CLASSES))
+    test_root = policy_document.get("test_reference_root", TEST_ROOT)
+    known = {item["symbol_id"] for item in document["routines"]}
+    seen = set()
+    for routine in document["routines"]:
+        unknown = sorted(set(routine) - set(_ROUTINE_FIELDS_V2))
+        if unknown:
+            raise V3ValidationError("unknown_field", ",".join(unknown))
+        missing = sorted(set(_ROUTINE_FIELDS_V2) - set(routine))
+        if missing:
+            raise V3ValidationError("identity_mismatch", ",".join(missing))
+        if routine["symbol_id"] in seen:
+            raise V3ValidationError("symbol_id_collision", routine["symbol_id"])
+        seen.add(routine["symbol_id"])
+        outside = sorted(set(routine["syntactic_effect_markers"]) - set(SYNTACTIC_EFFECT_MARKERS))
+        if outside:
+            raise V3ValidationError("summary_vocabulary_violation", ",".join(outside))
+        for field in ("direct_callee_symbol_ids", "direct_caller_symbol_ids"):
+            for symbol_id in routine[field]:
+                if symbol_id not in known:
+                    raise V3ValidationError("profile_reference_unresolved", symbol_id)
+        for path in routine["direct_test_reference_paths"]:
+            _reject_unsafe_relative_path(path)
+            if not path.startswith(f"{test_root}/"):
+                raise V3ValidationError("test_reference_out_of_scope", path)
+        candidates = routine["semantic_comparison_candidate_ids"]
+        if len(candidates) > limit or len(set(candidates)) != len(candidates):
+            raise V3ValidationError("summary_vocabulary_violation", "semantic candidates")
+        if routine["symbol_id"] in candidates:
+            raise V3ValidationError("profile_reference_unresolved", "self reference")
+        for candidate in candidates:
+            if candidate not in known:
+                raise V3ValidationError("profile_reference_unresolved", candidate)
+        for field in ("complexity_signal", "public_api_signal"):
+            if routine[field] not in signals:
+                raise V3ValidationError("summary_vocabulary_violation", routine[field])
+    if document["structural_match_detection"]["is_merge_conclusion"] is not False:
+        raise V3ValidationError("summary_vocabulary_violation", "is_merge_conclusion")
+    return document
+
+
+def build_routine_profile_v2(*, observation, policy, known_symbol_ids=()):
+    """機械事実に追加featureを加えたProfile v2を外部DATA_ROOTへ書く。"""
+
+    policy_document = _read_record(policy.path, record_kind="work4a_freshness_policy")
+    rules = policy_document.get("marker_detection_rules", MARKER_DETECTION_RULES)
+    routines, excluded = _collect_routines(observation.project_root, observation.files, rules=rules)
+    known = set(known_symbol_ids)
+    for routine in routines:
+        routine["candidate_classification"] = "known" if routine["symbol_id"] in known else "unknown"
+    routines.sort(key=lambda item: item["symbol_id"])
+    _add_v2_features(observation.project_root, routines, policy_document)
+    document = {
+        "record_kind": "work4a_routine_profile",
+        "schema_version": 2,
+        "digest_algorithm": DIGEST_ALGORITHM,
+        "profile_run_id": "",
+        "observation_snapshot_id": observation.snapshot_id,
+        "source_content_id": observation.source_content_id,
+        "extraction_rule_version": 3,
+        "marker_detection": {
+            "method": "syntactic_call_name_match",
+            "detection_is_syntactic_only": True,
+            "absence_does_not_imply_no_effect": True,
+            "follows_aliases": False,
+            "follows_indirect_calls": False,
+        },
+        "call_graph_detection": {
+            "scope": "same source universe, syntactically resolvable direct calls only",
+            "follows_alias_import": False,
+            "follows_dynamic_attribute": False,
+            "follows_reflection": False,
+            "follows_callback": False,
+            "follows_eval_exec": False,
+            "unresolved_are_counted": True,
+        },
+        "exception_detection": {
+            "records": "names appearing syntactically in raise and except",
+            "infers_propagated_exception": False,
+            "infers_runtime_type": False,
+            "infers_dynamically_built_exception": False,
+        },
+        "test_reference_detection": {
+            "scope": f"{policy_document.get('test_reference_root', TEST_ROOT)}/**/*.py direct AST references only",
+            "covers_string_reference": False,
+            "covers_fixture_indirection": False,
+            "covers_dynamic_import": False,
+            "covers_integration_indirection": False,
+        },
+        "public_api_detection": {
+            "inputs": ["__all__", "cross_package_direct_caller", "cli_syntax_marker"],
+            "proves_public_contract": False,
+        },
+        "structural_match_detection": {
+            "basis": "normalized AST exact match",
+            "is_merge_conclusion": False,
+            "is_confirmation_hint": True,
+        },
+        "semantic_comparison_detection": {
+            "source": "symbol ids in the same routine profile only",
+            "limit": policy_document.get(
+                "semantic_comparison_candidate_limit", SEMANTIC_COMPARISON_CANDIDATE_LIMIT
+            ),
+            "is_merge_conclusion": False,
+        },
+        "routines": routines,
+        "excluded_constructs": excluded,
+    }
+    document["profile_run_id"] = _digest(
+        {key: value for key, value in document.items() if key != "profile_run_id"}
+    )
+    document["content_digest"] = _content_digest(document)
+    validate_routine_profile_v2_document(document, policy=policy)
+    path = _write_new(
+        observation.data_root / WORK_PREFIX / "profiles" / f"{document['profile_run_id']}.json",
+        document,
+        allow_identical=True,
+    )
+    return RoutineProfile(
+        observation=observation,
+        path=path,
+        profile_run_id=document["profile_run_id"],
+        content_digest=document["content_digest"],
+        routine_count=len(routines),
+        excluded_constructs=tuple(excluded),
+    )
+
+
+DECISION_CARD_FIELDS = (
+    "symbol_id",
+    "symbol_kind",
+    "code_reference",
+    "signature",
+    "docstring_first_line",
+    "direct_callee_symbol_ids",
+    "direct_caller_symbol_ids",
+    "unresolved_direct_call_count",
+    "raised_exception_names",
+    "caught_exception_names",
+    "bare_except_count",
+    "branch_count",
+    "return_count",
+    "raise_count",
+    "try_count",
+    "max_nesting_depth",
+    "complexity_signal",
+    "syntactic_effect_markers",
+    "direct_test_reference_paths",
+    "direct_test_reference_count",
+    "is_private_name",
+    "is_exported_by_all",
+    "cross_package_caller_count",
+    "cli_entrypoint_marker",
+    "public_api_signal",
+    "structural_match_group_id",
+    "semantic_comparison_candidate_ids",
+    "semantic_candidate_selection_reason",
+)
+
+
+def build_decision_card(*, routine_profile_document, symbol_id):
+    """Profile v2の値だけから判断カードを作る。source本文は含めない。"""
+
+    for routine in routine_profile_document["routines"]:
+        if routine["symbol_id"] == symbol_id:
+            return {field: routine[field] for field in DECISION_CARD_FIELDS}
+    raise V3ValidationError("profile_reference_unresolved", symbol_id)
+
+
+def select_additional_context(*, routine_profile_document, symbol_id):
+    """判断カードで足りない場合に読む周辺codeを限定して選ぶ。全source treeは選ばない。"""
+
+    by_symbol = {item["symbol_id"]: item for item in routine_profile_document["routines"]}
+    if symbol_id not in by_symbol:
+        raise V3ValidationError("profile_reference_unresolved", symbol_id)
+    target = by_symbol[symbol_id]
+    related = [symbol_id]
+    related.extend(target["direct_callee_symbol_ids"])
+    related.extend(target["direct_caller_symbol_ids"])
+    related.extend(target["semantic_comparison_candidate_ids"])
+    paths = []
+    for item in related:
+        routine = by_symbol.get(item)
+        if routine is None:
+            raise V3ValidationError("profile_reference_unresolved", item)
+        paths.append(routine["code_reference"]["relative_path"])
+    paths.extend(target["direct_test_reference_paths"])
+    return {
+        "symbol_id": symbol_id,
+        "source_paths": sorted(dict.fromkeys(paths)),
+        "related_symbol_ids": sorted(dict.fromkeys(related)),
+        "whole_source_tree": False,
+    }
 
 
 def validate_routine_profile_document(document, *, project_root=None):

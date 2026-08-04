@@ -319,8 +319,10 @@ def test_j7_structural_match_group_is_not_a_merge_conclusion(rebuild, tmp_path):
     assert normalize["structure_digest"] == normalize_text["structure_digest"]
     assert normalize["structural_match_group_id"] == normalize_text["structural_match_group_id"]
     assert "disposition" not in normalize
-    assert "merge" not in json.dumps(document["structural_match_detection"], ensure_ascii=False)
-    assert document["structural_match_detection"]["is_merge_conclusion"] is False
+    detection = document["structural_match_detection"]
+    assert detection["is_merge_conclusion"] is False
+    assert detection["is_confirmation_hint"] is True
+    assert detection["basis"] == "normalized AST exact match"
 
 
 # J8：意味的比較候補は同一Profileから上限10件を決定的に選ぶ

@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.2／設計承認済み。Policy v3固定まで完了。J1〜J10のRED testへ進む。
+- 現在の工程：Work 4A rebuild v3.2／実装GREEN。実sourceのProfile v2生成まで完了（routine 989件）。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design v3.2。
@@ -22,7 +22,7 @@
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
 - [Work 4A Rebuild Design v3.1](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5839e37467aaa7d06ee2e9bde477e6c6a76da57e6f4b8a9653e1c9551cea5e40`
-- [Work 4A v3.1 Routine Profile](records/development/2026-08-04-work-4a-v3-1-actual-routine-profile-evidence-v1.md) — SHA-256 `8481121af2c9066b54d0eb9365ff507003f63166c8b4e6b4f3fbe48f67031294`
+- [Work 4A v3.2 Routine Profile v2](records/development/2026-08-05-work-4a-v3-2-actual-routine-profile-v2-evidence-v1.md) — SHA-256 `737ebf873fd2544a5a799f52339132241d79446019623d66398e471280a0ed35`
 - [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `b157640f940c12d733d237921cad664dbebc4925c592796394f29da1155f5e48`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `b5a18fb4da194779c2a1bf8010e9d1418377d3b30bfc92d5d8336965eeab6d7c`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
@@ -30,26 +30,25 @@
 
 ## 次に行う一作業
 
-J1〜J10をREDで固定し、Profile v2実装でGREENにする。
+LLMによるDisposition Proposal生成の承認をHumanから得る。
 
 開始条件：
 
-- `DEC-WORK4A-REBUILD-DESIGN-005`によるHuman承認。
-- 設計確定commit後のclean transition。
+- Profile v2生成containing commit後のclean transition。
+- 生成範囲、判断カードの渡し方、生成元記録のHuman承認。
 
-完了条件：
+完了データ：
 
-- J1〜J10をREDで固定し、期待を緩めずGREENにする。
-- 実sourceからProfile v2をnew-onlyで生成し、機械抽出結果を提示する。
-- 既存Profile v1、Observation、Candidate Runを書き換えない。
+- Profile v2 routine 989件。判断カードはProfile v2の値から作る。
+- 提案は非権威で、参照は同一Profile内、`evidence_refs`必須。
 
-後続作業：LLMによるDisposition Proposal生成の別承認。
+後続作業：group条件とdispositionのHuman決定、Entry・Relation・Baseline生成。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：LLMによるDisposition Proposal生成の承認。Profile v2の実データ確認後とする。
-- 再開条件：設計確定commit後のclean transition。
+- Human判断待ち：LLMによるDisposition Proposal生成の承認。Profile v2の実データは提示済み。
+- 再開条件：Profile v2生成commit後のclean transition。
 
 ## stale・deferred
 
@@ -62,8 +61,8 @@ J1〜J10をREDで固定し、Profile v2実装でGREENにする。
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Work 4A v3.1 acceptance `21 passed`、v3 acceptance `22 passed`
-- 直近の全Test：venv公式runner `702 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Work 4A v3.2 acceptance `11 passed`、v3.1 `21 passed`、v3 `22 passed`
+- 直近の全Test：venv公式runner `724 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
