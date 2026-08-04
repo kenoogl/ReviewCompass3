@@ -23,7 +23,8 @@
   WI-001先行順序の不整合を検出した。Humanは推奨案を承認し、現行Issue内の
   `current_issue_plan_revision / blocking`へ固定した。停止・判断作業単位はcommit `64782ec`へ固定済み。
   Plan v4のsnapshot timing境界を10件のTestへ固定し、RED commit `7df9cb9`を確認後、固定Testを変更せず
-  version 4 validatorとPlan v4候補をGREENにした。次はChallenge v4を実施する。
+  version 4 validatorとPlan v4候補をGREENにしてcommit `8f58235`へ固定した。Challenge v4は10 criteria全pass、
+  blocking Finding 0、`ready_for_human_approval`で、次はHuman Plan Decisionである。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -33,18 +34,18 @@
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
 - activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V1`、
-  state `implementation_in_progress / current_issue_plan_revision_approved / plan_v4_green`、
-  WI-001 `helper_green / actual_snapshot_not_created`、Plan v4 `validated / containing_commit`。
+  state `implementation_in_progress / plan_v4_approval_pending`、WI-001 `helper_green / actual_snapshot_not_created`、
+  Plan v4 `challenged / ready_for_human_approval`、Challenge v4 `validated / containing_commit`。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`821695773fe699513cffdf6677ac9b6a76052f5c0bc26bda0ca0e45790aa13ee`
+- 進行入口SHA-256：`25ca9b136dda98395a05a72beb17f5a037047b8c65057a9b23eb9b5b619bed71`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-issue-resolution-pilot-plan-v4-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`0d90206a1eaec5a2571ddc732d5fbd341593995562170e4d97fab31e43785720`
+  `records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v4-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`1290ec51776daf55ce43c450c24d665753a6223d975988a94050df8dfce17996`
 
 ## 実施報告照合
 
@@ -658,6 +659,15 @@
   - 観測した事後状態：targeted `10 passed`、公式全`581 passed`、fallback `false`。WI-001 helper、WI-007
     actual snapshot、WI-003 compactionの時点とsource変更時recoveryをvalidatorで強制した。Challenge v4、
     Human Plan Decision、Task Contract v2、実snapshotは未作成である。
+- Claim `EC-134`：Plan Challenge v4を実施し、Human承認可能な状態まで検証した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v4-completion-evidence-v1.md`、
+    SHA-256 `1290ec51776daf55ce43c450c24d665753a6223d975988a94050df8dfce17996`
+  - Challenge：`.reviewcompass/workflow/plan-challenges/challenge-pilot-todo-growth-001--v4.json`、file SHA-256
+    `34ccf304201d5d4ecac320ed2e2648673c5a3fed027b81e31563274210646641`、content Digest
+    `27cc64425968b459d08a4b5e558b0dd461264ba8200287813f030ed8747f8587`
+  - 観測した事後状態：10 criteria全pass、blocking Finding 0、stale binding `false`、overall verdict
+    `ready_for_human_approval`。Challenge targeted `8 passed`、Plan v4 targeted `10 passed`、公式全
+    `581 passed`、fallback `false`。Human Plan DecisionとTask Contract v2は未作成である。
 
 ### reported_unverified／contradicted
 
@@ -776,32 +786,31 @@
 
 ## 次に行う一作業
 
-Plan v4 GREEN containing commitをread-only照合後、Plan Challenge v4を作成し、10 criteria、binding、
-blocking Finding、Human関門を検証する。
+Challenge v4 containing commitをread-only照合後、HumanがPlan v4を承認、要修正、または却下する。
 
 開始条件：
 
-- Plan v4 SHA-256が`d309a2e10de52d093a58a1fefd292fd18b14ed5d6e863fa71a099abce01c6bcd`、
-  Completion Evidence SHA-256が`0d90206a1eaec5a2571ddc732d5fbd341593995562170e4d97fab31e43785720`で、
+- Challenge v4 SHA-256が`34ccf304201d5d4ecac320ed2e2648673c5a3fed027b81e31563274210646641`、
+  Completion Evidence SHA-256が`1290ec51776daf55ce43c450c24d665753a6223d975988a94050df8dfce17996`で、
   HEADからbyte-identicalに読める。
 - worktreeがcleanでtransitionが`passed`である。
 
 完了条件：
 
-- Challenge v4がPlan v4へfreshに結線され、10 criteriaすべてを裁定する。
-- blocking Finding 0なら`ready_for_human_approval`、一件以上なら`changes_required`を機械導出する。
-- Human Plan Decision、Task Contract v2、実snapshot、WI-002、TODO圧縮、Issue解決を先取りしない。
+- Human DecisionがPlan v4とChallenge v4のidentity、Digest、receiptへ結線される。
+- 承認時だけTask Contract v2作成を許可し、要修正／却下時は作成を禁止する。
+- Decision作業単位ではTask Contract v2、実snapshot、WI-002、TODO圧縮、Issue解決を先取りしない。
 
-後続作業：Challenge v4 containing commit後、HumanへPlan v4承認を求める。
+後続作業：Humanが承認した場合、Decision作業単位をcommit後、Task Contract v2を作成する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。Plan v4 GREEN containing commitの確認前はChallenge v4を作成しない。
-- Human判断待ち：Challenge v4完了後のPlan v4承認
-- 実行保留：Challenge v4はGREEN commit後、Task Contract v2はChallenge v4とHuman Plan承認後まで
-  開始しない。実snapshot、WI-002、TODO compactionは引き続き保留する
+- blocker：なし。Challenge v4 containing commitの確認前はHuman Decisionを記録しない。
+- Human判断待ち：Plan v4を承認、要修正、または却下する
+- 実行保留：Task Contract v2はChallenge v4 containing commitとHuman Plan承認後まで開始しない。
+  実snapshot、WI-002、TODO compactionは引き続き保留する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
-- 再開条件：Plan v4 GREEN containing commit確認、clean worktree、transition合格
+- 再開条件：Challenge v4 containing commit確認、clean worktree、transition合格、Human Plan Decision
 
 ## stale・deferred
 
@@ -822,8 +831,8 @@ blocking Finding、Human関門を検証する。
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Plan v4 targeted `10 passed in 0.03s`
-- 直近の全Test：公式runnerで`581 passed in 2.70s`、fallback `false`
+- 直近の関連検証：Challenge targeted `8 passed in 0.04s`、Plan v4 targeted `10 passed in 0.03s`
+- 直近の全Test：公式runnerで`581 passed in 2.82s`、fallback `false`
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

@@ -1,0 +1,82 @@
+{
+  "record_kind": "plan_challenge",
+  "schema_version": 1,
+  "challenge_id": "CHALLENGE-PILOT-TODO-GROWTH-001",
+  "challenge_version": 4,
+  "created_at": "2026-08-04T12:05:00+09:00",
+  "reviewer_kind": "llm_semantic_analysis_with_human_gate",
+  "independence_status": "human_independent_review_pending",
+  "issue_ref": {
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+    "issue_version": 1,
+    "path": ".reviewcompass/workflow/issues/issue-pilot-todo-growth-001--v1.json",
+    "sha256": "2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a",
+    "content_digest": "0389f68d81af61d570177228e246bb481eea97af23d5454c99831f8bc7c72319"
+  },
+  "plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 4,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v4.json",
+    "sha256": "d309a2e10de52d093a58a1fefd292fd18b14ed5d6e863fa71a099abce01c6bcd",
+    "content_digest": "dc44a9c7d3c2da1f68df12e5be93e906d88e46aa996d5577edebb383b5ac3520"
+  },
+  "criteria_results": [
+    {
+      "criterion_id": "obligation_coverage",
+      "verdict": "pass",
+      "rationale": "Plan v4はOBL-001をWI-001 helperとWI-007 actual snapshotへ分け、ACC-008／ORACLE-008／RB-003とACC-001／ORACLE-001／RB-001を各境界へ結線した。他の6 obligationもcoverageを維持する。"
+    },
+    {
+      "criterion_id": "work_item_granularity",
+      "verdict": "pass",
+      "rationale": "WI-001は副作用のないhelper GREEN、WI-007は実snapshot、WI-003はTODO compactionに分離された。WI-007 commitではTODOを変更しないため、完了Work Itemのcommit関門とsource identityを両立できる。"
+    },
+    {
+      "criterion_id": "tdd_closure",
+      "verdict": "pass",
+      "rationale": "Plan v4実体不在とsnapshot timing validator欠落を9件のREDで確認し、固定Test SHA-256を変えず10件GREEN、公式全581件GREENへした。"
+    },
+    {
+      "criterion_id": "prohibition_transfer",
+      "verdict": "pass",
+      "rationale": "WI-002／WI-006 commit前のWI-007開始、WI-007後からWI-003までのsource TODO変更、既存snapshot上書き、未承認Task Contract v2開始を禁止境界として移送できる。"
+    },
+    {
+      "criterion_id": "feasibility_dependencies",
+      "verdict": "pass",
+      "rationale": "routeはWI-001、WI-002、WI-006、WI-007、WI-003、WI-004、WI-005で閉じる。session境界でTODOが変わる場合はWI-003を開始せず新しいversioned snapshotを作るため、独立commit後も実行可能である。"
+    },
+    {
+      "criterion_id": "oracle_quality",
+      "verdict": "pass",
+      "rationale": "ORACLE-001はWI-007作成時とWI-003開始時の二時点でsource、snapshot、manifestのSHA-256、bytes、lines、Claim数を別々に再取得し、古いsnapshotを合格させない。"
+    },
+    {
+      "criterion_id": "rollback_recovery",
+      "verdict": "pass",
+      "rationale": "source変更時はcompactionを停止して新しいsnapshotを作り、compaction後の失敗ではWI-003直前の一意なmanifestへ結線したsnapshotから復元する。helper失敗は実TODOを変えずRB-003で閉じる。"
+    },
+    {
+      "criterion_id": "stale_binding",
+      "verdict": "pass",
+      "rationale": "Challenge v4は現行Issue v1とPlan v4のfile SHA-256およびcontent Digestへ一致し、Plan v1〜v3とTask Contract v1を履歴として変更していない。"
+    },
+    {
+      "criterion_id": "pilot_threshold",
+      "verdict": "pass",
+      "rationale": "12288 bytes上限、12288 bytes合格／12289 bytes拒否、active Issue一件のPilot境界はPlan v4でも維持される。"
+    },
+    {
+      "criterion_id": "entrypoint_authority",
+      "verdict": "pass",
+      "rationale": "CodexとClaudeが同一promptを参照し、root CLAUDE.mdをlink-onlyとする単一authority境界は変更されていない。"
+    }
+  ],
+  "findings": [],
+  "blocking_finding_ids": [],
+  "overall_verdict": "ready_for_human_approval",
+  "stale_binding": false,
+  "human_decision_required": true,
+  "next_action": "HumanはPlan v4を承認、要修正、または却下する。承認前にTask Contract v2、実snapshot、WI-002、TODO compaction、Issue解決を開始しない。",
+  "content_digest": "27cc64425968b459d08a4b5e558b0dd461264ba8200287813f030ed8747f8587"
+}

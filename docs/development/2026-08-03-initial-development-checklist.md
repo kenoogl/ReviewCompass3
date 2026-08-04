@@ -603,6 +603,12 @@ Plan v4候補を作成した。Completion Evidenceは
 `581 passed`、fallback `false`で、Plan v1〜v3、Task Contract v1、実snapshot、TODO compactionは未変更。
 GREEN作業単位のcommit後までChallenge v4を開始せず、最後のPilot checkboxは未完了のままとする。
 
+Plan v4 GREEN containing commit `8f58235`とclean transitionを確認後、Challenge v4を実施した。Completion
+Evidenceは`records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v4-completion-evidence-v1.md`、
+SHA-256 `1290ec51776daf55ce43c450c24d665753a6223d975988a94050df8dfce17996`。10 criteriaは全pass、blocking
+Finding 0、stale binding `false`、`ready_for_human_approval`、公式全`581 passed`、fallback `false`である。
+Challenge作業単位のcommit後にHuman Plan Decisionを要求し、承認前はTask Contract v2を作成しない。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
