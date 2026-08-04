@@ -647,6 +647,13 @@ restore対象pathをroot TODOとsession-handoffsへ限定し、
 実TODO、実snapshot、TODO compactionは未変更である。GREEN作業単位のcommit後までWI-006を開始せず、最後の
 Pilot checkboxは未完了のままとする。
 
+WI-002 GREEN containing commit `93785da`とclean transitionを確認後、WI-006の13許可state、最新版選択、欠落、
+同version競合、stale binding、手入力不一致を18件のTestへ固定した。RED Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-wi-006-red-evidence-v1.md`、Test SHA-256
+`b0fd75602017d9552972e54f4696c9b5f7f8b796d5cfef5b406a2a0ba2579d9c`。targeted `18 failed`、全体は既存
+`606 passed, 18 failed`で、失敗は全件専用module未実装だけ。RED commit後までresolver、実snapshot、TODO
+compactionを開始せず、最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

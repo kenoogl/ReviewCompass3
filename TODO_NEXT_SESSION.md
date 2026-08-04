@@ -31,6 +31,7 @@
   12件のTestを固定し、期待どおりREDを確認した。
   RED commit `7e435d1`後、固定Testを変更せずvalidator／restoreを実装した。path safety 4件もREDからGREENへ
   固定し、targeted `16 passed`、公式全`606 passed`となった。
+  WI-002 GREEN commit `93785da`後、WI-006の18件のstate resolver Testを固定して期待どおりREDを確認した。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -42,17 +43,17 @@
 - activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2`、
   state `implementation_in_progress / task_contract_v2_validated / containing_commit`、
   WI-001 `completed_carried_forward / actual_snapshot_not_created`、
-  WI-002 `completed / containing_commit`、WI-006 `not_started`。
+  WI-002 `completed / containing_commit`、WI-006 `red_verified / containing_commit_pending`。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`9a2ed608c25887a60c7289ddb31066363c4b53f3621ae2a75ea12989cff7e107`
+- 進行入口SHA-256：`934b63dc956333c66198b020f1fd3f2b6c1527fae26073f77230f97a4da4ee2a`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-issue-resolution-pilot-wi-002-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`acaf42d7a8a19396fbfcb95214f55f99aa32a10edda35d7b5ca3e8ff9faad843`
+  `records/development/2026-08-04-issue-resolution-pilot-wi-006-red-evidence-v1.md`
+- Decision／Evidence SHA-256：`98a0e6c72c72e3a5d6bdf88a8a238e19b404cdf39b6be20faf6dd9ef52174609`
 
 ## 実施報告照合
 
@@ -709,6 +710,11 @@
     `0e446f9aa100d8128c32a3ddbcaca601e66aead9548db349b11a9f5adde89a1f`
   - 観測した事後状態：targeted `16 passed`、公式全`606 passed`、fallback `false`。restore対象はroot TODOと
     session-handoffs内へ限定され、実TODO、実snapshot、TODO compactionは未変更である。
+- Claim `EC-140`：WI-006のactive state resolver境界をTestへ固定し、REDを確認した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-wi-006-red-evidence-v1.md`
+  - Test：`tests/test_issue_resolution_state.py`、SHA-256
+    `b0fd75602017d9552972e54f4696c9b5f7f8b796d5cfef5b406a2a0ba2579d9c`
+  - 観測した事後状態：targeted `18 failed`、全`606 passed, 18 failed`。失敗は全件専用module未実装だけである。
 
 ### reported_unverified／contradicted
 
@@ -826,31 +832,30 @@
 
 ## 次に行う一作業
 
-WI-002 GREEN containing commitをread-only照合後、WI-006のderived state resolver境界をtest-firstで固定する。
+WI-006 RED containing commitをread-only照合後、固定Testを変更せずderived state resolverを実装する。
 
 開始条件：
 
-- WI-002実装SHA-256が`0e446f9aa100d8128c32a3ddbcaca601e66aead9548db349b11a9f5adde89a1f`、
-  Test SHA-256が`c5dd608f2561130d3fb46ffa23bb6363e823d65eaa89c89b14a4741e788315a1`で、containing
-  commitからbyte-identicalに読める。
+- WI-006 Test SHA-256が`b0fd75602017d9552972e54f4696c9b5f7f8b796d5cfef5b406a2a0ba2579d9c`で、
+  containing commitからbyte-identicalに読める。
 - worktreeがcleanでtransitionが`passed`である。
 
 完了条件：
 
-- Candidate、Decision、Issue、Challenge、Task、Verdictの許可状態遷移を正常・負例・境界Testへ固定する。
-- 欠落、同version競合、stale binding、手入力不一致を推測せず未確定として拒否する。
-- RED作業単位ではresolver実装、実snapshot、TODO圧縮を先取りしない。
+- 13許可stateを最新非stale recordとEvidence IDから一意に導出する。
+- 欠落、同version競合、stale binding、手入力不一致を`indeterminate`として拒否する。
+- targetedと公式runner全Testを合格させ、実snapshot、TODO圧縮を先取りしない。
 
-後続作業：WI-006 RED containing commit後、固定Testを変更せずresolverを実装する。
+後続作業：WI-006 GREEN containing commit後、WI-007の実snapshot境界を再確認する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。WI-002 GREEN containing commit確認前はWI-006 REDを開始しない。
-- Human判断待ち：現在のWI-006 RED作業に対する追加判断なし
-- 実行保留：resolver実装はWI-006 RED commit後、実snapshotはWI-002とWI-006のcommit後、TODO compactionはWI-007
+- blocker：なし。WI-006 RED containing commit確認前はresolver実装を開始しない。
+- Human判断待ち：現在のWI-006 GREEN作業に対する追加判断なし
+- 実行保留：resolver実装はWI-006 RED commit後、実snapshotはWI-006 GREEN commit後、TODO compactionはWI-007
   containing commit後まで開始しない。
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
-- 再開条件：WI-002 GREEN containing commit確認、clean worktree、transition合格
+- 再開条件：WI-006 RED containing commit確認、clean worktree、transition合格
 
 ## stale・deferred
 
@@ -872,8 +877,8 @@ WI-002 GREEN containing commitをread-only照合後、WI-006のderived state res
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：WI-002 targeted GREEN `16 passed in 0.04s`
-- 直近の全Test：公式runnerで`606 passed in 2.71s`、fallback `false`
+- 直近の関連検証：WI-006 targeted RED `18 failed in 0.11s`
+- 直近の全Test：raw pytestで既存`606 passed`、新規期待RED `18 failed in 2.65s`
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
