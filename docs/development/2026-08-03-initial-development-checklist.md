@@ -772,20 +772,24 @@ automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る�
 
 ## 7. Work 4A：関数台帳baseline
 
-- [ ] 固定Source Snapshotとsymbol identity規則を確定した。
-- [ ] 全関数・methodをSource Symbol Indexへ機械収録した。
-- [ ] coverage、freshness、再生成一致を確認した。
-- [ ] public、共有、cross-contract、high-risk、重複候補、retiredを抽出した。
-- [ ] 対象routineをReusable Routine Ledgerへ登録した。
-- [ ] 今回の実装候補を`reuse | extend | merge | split_with_rationale`へ分類した。
-- [ ] Humanが生成規則、coverage、代表sample、重複、retiredを確認した。
+- [ ] source universe、path、file Digestだけで`source_content_id`を決め、HEADを監査用Observationへ分離した。
+- [ ] Source Observation、Index、Candidate Runを`DATA_ROOT`へ機械生成し、project artifactへ混入させない。
+- [ ] Human DecisionをCandidate RunのID／version／path／Digestへ結ぶ。
+- [ ] Entry、Relation、Baseline Manifestを`artifact_roots.reuse`へnew-only保存する。
+- [ ] 一件追加時に既存Entry／Relationを複製せず、既存Digest refを再利用する。
+- [ ] source内容変更、record改竄、unsafe root、high-risk Policy変更を拒否する。
+- [ ] legacy Task Contractのhistorical扱いを別status recordとHuman承認必須にする。
+- [ ] 七項目のE2E acceptanceをRED、GREEN、実データの順に通す。
 
 ### 完了関門
 
-- [ ] 配置、Index、Ledger、実codeが照合済みである。
+- [ ] BaselineからDecisionまでのID／version／path／Digest連鎖が閉じている。
+- [ ] source内容IDに基づくfreshnessがHEAD差と内容変更を区別する。
+- [ ] deployment packageがproject artifactと`DATA_ROOT`を含まず、deployment版がartifactをread-only参照できる。
 - [ ] 最初のImplementation Task Contractへ`implementation_ready`を出せる前提が揃っている。
 
-`Evidence`：未記録
+`Authority`：[Work 4A Rebuild Design](../design/2026-08-04-work-4a-rebuild-design-proposal.md)、
+`DEC-WORK4A-REBUILD-DESIGN-001`。E2E RED Test：`tests/test_work4a_rebuild_e2e.py`。
 
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 

@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aは再設計済みで、旧patch群を可逆revertした。
-- 現在の工程：Work 4A rebuild／E2E acceptance RED。
+- 現在の工程：Work 4A rebuild／E2E acceptance REDを固定済み。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design。
@@ -22,23 +22,23 @@
 - [Work 4A Rebuild Approval](records/development/2026-08-04-work-4a-rebuild-design-approval-decision-v1.md) — SHA-256 `dfa69cabf35cf5e1c40b26eab6044250b270fcdc9fc8e45b9c9b5e71ffdcdf59`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `7535f96513fdc618a9836ebbe04e3ffd6d93023ca77b09e5b1fe995be93d4e8e`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4e1ffb4dcafc2f92190417191e1bec24cfd5ec2a2cd775402a3f8f7c22886923`
 
 ## 次に行う一作業
 
-Work 4A再設計の七項目を、一つのE2E acceptance test群としてREDで固定する。
+E2E RED testを変更せず、Source ObservationからBaseline freshnessまでの最小identity chainを実装する。
 
 開始条件：
 
 - `DEC-WORK4A-REBUILD-DESIGN-001`によるHuman承認。
-- revert commit後のclean transition。
+- E2E RED acceptance containing commit後のclean transition。
 
 完了条件：
 
-- new-only Entry／Relation／Baseline、content-based freshness、Historical Contract Status、負例を含む受入testが意図どおりREDになる。
-- production implementation、actual artifact、既存patchの部分復元を含めない。
+- Source Observation、Candidate Run、Human Decision、new-only Baselineを同じidentity chainで生成できる。
+- E2E RED testを変更せず、既存patchの部分復元を含めない。
 
-後続作業：RED testを変更せず、最小のidentity chain実装をGREENにする。
+後続作業：改竄、unsafe root、Policy高リスク、Historical Contract Statusの負例をGREENにする。
 
 ## blocker・Human判断待ち
 
