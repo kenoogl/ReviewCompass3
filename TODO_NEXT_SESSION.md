@@ -2,50 +2,36 @@
 
 更新日：2026-08-04
 
-> 人向けの現在位置入口。Workflow stateと完了Evidenceの正本ではない。
+> 人向けの現在位置入口。Workflow stateと完了Evidenceの正本ではない。過去sessionの詳細はここへ累積しない。
 
 ## 現在位置
 
-- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aの旧patch群はrevert済みで、再設計から再開する。
+- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aは再設計済みで、旧patch群を可逆revertした。
 - 現在の工程：Work 4A rebuild／E2E acceptance RED。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
-- 当面の進行入口：[Work 4A Rebuild Design](/docs/design/2026-08-04-work-4a-rebuild-design-proposal.md)
-- 進行入口SHA-256：`233ac821e6f55b34ab31219e55bf9f23b19f2e97d2884e34be6fa191b87dda2a`
-- 現行計画：[Current Plan](/docs/current/reviewcompass3-plan-current.md)
-- 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
-- 現行開発方針：[Development Policy](/docs/development/2026-08-02-development-policy.md)
-- 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- 直近のDecision／Evidence：[DEC-WORK4A-REBUILD-DESIGN-001](/records/development/2026-08-04-work-4a-rebuild-design-approval-decision-v1.md)
-- Decision／Evidence SHA-256：`dfa69cabf35cf5e1c40b26eab6044250b270fcdc9fc8e45b9c9b5e71ffdcdf59`
+- 当面の進行入口：Work 4A Rebuild Design。
 
-## 実施報告照合
+## 現在作業に影響する改善候補／Issue
 
-### verified
+- `ISSUE-PILOT-TODO-GROWTH-001`：resolved。現行Workへの影響なし。TODOは現在の入口だけを表示し、詳細は正本recordを参照する。
 
-- Claim `EC-WORK4A-REBUILD-DESIGN-001`：再設計と、局所patchを禁じる方針をHumanが承認した。
-  - Evidence：`15bf012`、`DEC-WORK4A-REBUILD-DESIGN-001`。
-  - 観測した事後状態：承認済み設計文書がGitに存在する。
-- Claim `EC-WORK4A-REVERT-001`：台帳、候補抽出、局所policy対応の旧patchをrevertし、Layout v3を保持した。
-  - Evidence：revert commit群。
-  - 観測した事後状態：旧Work 4Aのsource index、candidate、ledger実装とrecordが存在しない。
+## 最新のauthority／Evidence
 
-### 手戻り・機械化候補
-
-- 対象操作：関数追加時の台帳更新。期待executor：versioned ledger writer。旧実executor：既存Entryを複製する局所実装。手戻り事象：追加一件で既存recordを複製する設計になった。機械処理候補：E2E acceptanceでnew-only書込みと既存Digest再利用を強制する。route：Work 4A rebuild。
-
-### 未実施
-
-- 七項目のE2E RED acceptance、rebuild実装、actual artifactは未実施。
+- [Work 4A Rebuild Design](docs/design/2026-08-04-work-4a-rebuild-design-proposal.md) — SHA-256 `233ac821e6f55b34ab31219e55bf9f23b19f2e97d2884e34be6fa191b87dda2a`
+- [Work 4A Rebuild Approval](records/development/2026-08-04-work-4a-rebuild-design-approval-decision-v1.md) — SHA-256 `dfa69cabf35cf5e1c40b26eab6044250b270fcdc9fc8e45b9c9b5e71ffdcdf59`
+- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
+- [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `7535f96513fdc618a9836ebbe04e3ffd6d93023ca77b09e5b1fe995be93d4e8e`
 
 ## 次に行う一作業
 
-Work 4A再設計の七項目を一つのE2E acceptance test群としてREDで固定する。
+Work 4A再設計の七項目を、一つのE2E acceptance test群としてREDで固定する。
 
 開始条件：
 
 - `DEC-WORK4A-REBUILD-DESIGN-001`によるHuman承認。
-- reversion commit後のclean transition。
+- revert commit後のclean transition。
 
 完了条件：
 
@@ -68,15 +54,15 @@ Work 4A再設計の七項目を一つのE2E acceptance test群としてREDで固
 ## Git・Test
 
 - branch：`main`
-- commit境界：本handoffを含むcommit完了時点。
-- Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する。
-- worktree：本revert完了・commit時点でcleanにする。
-- 直近の関連Test：revert後に実行する。
-- 直近の全Test：revert後に実行する。
-- 差分検査：revert後に実行する。
+- commit境界：本handoffを含むcommit完了時点
+- Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
+- worktree：本handoffを含むcommit完了時点でclean
+- 直近の関連Test：TODO handoff validation、post-write verification／restore rehearsal合格
+- 直近の全Test：venv公式runner `659 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 差分検査：`git diff --check`合格
 
 ## 更新規則
 
-- 現在位置、実施報告照合、未実施、次の一作業、blocker、stale、Git／Test、参照Digestだけを置き換える。
-- TODOへ過去sessionを累積しない。完了Evidence、Decision、Gitへ詳細を残す。
-- 完了した作業単位が未コミットなら、次作業へ進まない。
+- 現在位置、active Issue、最新Evidence、次の一作業だけを置き換える。
+- 詳細履歴と手戻り候補はdurable Candidate／Issue／Evidenceへ保存し、TODOへ累積しない。
+- 完了済み作業単位が未コミットなら次作業へ進まない。
