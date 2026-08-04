@@ -789,6 +789,12 @@ Work 4Aのcheckboxと完了関門は未完了である。
 `f8cf312392897cb9b5da030ffae15432e0d2a77a58ca8e158d786b66221454d3`。
 Acceptance Test 5件はgenerator module未実装により期待どおりREDである。
 
+`GREEN Evidence`：`RC3-WORK4A-SOURCE-SYMBOL-INDEX-GREEN-2026-08-04-V1`、
+`records/development/2026-08-04-work-4a-source-symbol-index-green-evidence-v1.md`、SHA-256
+`d0cb960280a9411b5358d9d21ee3fc2fc8829bf12ddf0a6f9e7d6180ef56a871`。
+RED Testを変更せず`5 passed`、公式全Testは`657 passed`、fallback `false`である。
+実source treeのIndex、coverage、freshness、Ledgerは未確認のためcheckboxと完了関門は未完了である。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred
