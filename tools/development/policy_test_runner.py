@@ -129,7 +129,7 @@ def _check_version(label, output, policy):
 
 
 def _source_state_digest(project_root, *, excluded_paths=()):
-    ignored = {".git", ".pytest_cache", "__pycache__"}
+    ignored = {".git", ".pytest_cache", ".venv", "__pycache__"}
     excluded = {
         Path(path).resolve()
         for path in excluded_paths
@@ -141,6 +141,10 @@ def _source_state_digest(project_root, *, excluded_paths=()):
         if path.is_file()
         and path.resolve() not in excluded
         and not ignored.intersection(path.relative_to(project_root).parts)
+        and not any(
+            part.endswith(".egg-info")
+            for part in path.relative_to(project_root).parts
+        )
     )
     for path in paths:
         relative = path.relative_to(project_root).as_posix()

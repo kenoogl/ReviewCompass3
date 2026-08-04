@@ -2,9 +2,9 @@
   "runner_id": "RC3-DEVELOPMENT-TEST-RUNNER",
   "runner_version": 1,
   "python": {
-    "command": "python3",
+    "command": ".venv/bin/python3",
     "minimum_version": "3.9",
-    "maximum_exclusive_version": "4.0"
+    "maximum_exclusive_version": "3.10"
   },
   "pytest": {
     "minimum_version": "8.4",
@@ -12,7 +12,7 @@
   },
   "suites": {
     "full": [
-      "python3",
+      ".venv/bin/python3",
       "-m",
       "pytest",
       "-q"

@@ -11,6 +11,7 @@ version = "0.0.1"
 description = "ReviewCompass scratch rebuild"
 requires-python = ">=3.9"
 dependencies = [
+  "PyYAML>=6,<7",
   "platformdirs>=4,<5",
 ]
 

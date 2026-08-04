@@ -36,7 +36,14 @@ def test_actual_post_write_and_isolated_restore_rehearsal():
     assert result.todo_sha256 == hashlib.sha256(before).hexdigest()
     assert result.todo_bytes <= 12288
     assert result.active_ids == ("ISSUE-PILOT-TODO-GROWTH-001",)
-    assert result.reference_count == 4
+    expected_reference_count = len(
+        re.findall(
+            " — SHA-256 `[0-9a-f]{64}`".encode("utf-8"),
+            before,
+        )
+    )
+    assert expected_reference_count >= 1
+    assert result.reference_count == expected_reference_count
     assert result.snapshot_sha256 == (
         "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1"
     )

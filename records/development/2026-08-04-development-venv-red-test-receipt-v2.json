@@ -1,0 +1,19 @@
+{
+  "receipt_kind": "policy_test_verification_run",
+  "runner_id": "RC3-DEVELOPMENT-TEST-RUNNER",
+  "runner_version": 1,
+  "recorded_at": "2026-08-04T13:43:09+09:00",
+  "suite": "full",
+  "command": ".venv/bin/python3 -m pytest -q",
+  "configured_python": ".venv/bin/python3",
+  "resolved_python": ".venv/bin/python3",
+  "python_version": "3.9.6",
+  "pytest_version": "8.4.2",
+  "fallback_used": false,
+  "config_digest": "890380460e063e508145450cf6e80865409d20035dfc2265b99c364f03b8b6ea",
+  "source_state_digest": "99b3421374c2e7347b2533f44866dcdd66f329a873f9888f688f340c2247b296",
+  "status": "failed",
+  "exit_code": 1,
+  "stdout": "........................................................................ [ 11%]\n........................................................................ [ 22%]\n........................................................................ [ 33%]\n........................................................................ [ 44%]\n..................F..................................................... [ 55%]\n........................................................................ [ 66%]\n........................................................................ [ 77%]\n........................................................................ [ 88%]\n........................................................................ [ 99%]\n....                                                                     [100%]\n=================================== FAILURES ===================================\n____________ test_actual_post_write_and_isolated_restore_rehearsal _____________\n\n    def test_actual_post_write_and_isolated_restore_rehearsal():\n        before = (ROOT / \"TODO_NEXT_SESSION.md\").read_bytes()\n    \n        result = _module().verify_post_write(\n            project_root=ROOT,\n            todo_path=\"TODO_NEXT_SESSION.md\",\n            snapshot_path=\"records/session-handoffs/2026-08-04-todo-before-compaction-001.md\",\n            manifest_path=\"records/session-handoffs/2026-08-04-todo-before-compaction-001.manifest.json\",\n            known_active_ids={\"ISSUE-PILOT-TODO-GROWTH-001\"},\n        )\n    \n        assert result.todo_sha256 == hashlib.sha256(before).hexdigest()\n        assert result.todo_bytes <= 12288\n        assert result.active_ids == (\"ISSUE-PILOT-TODO-GROWTH-001\",)\n>       assert result.reference_count == 4\nE       AssertionError: assert 5 == 4\nE        +  where 5 = PostWriteVerification(todo_sha256='a9f64ccdda665f3f85e55e6ababa8d3cc36340823fe7c5d2df472e5cc4abc5ff', todo_bytes=3386,...10a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1', restore_action='restored', current_todo_preserved=True).reference_count\n\ntests/test_issue_resolution_pilot_wi_005.py:39: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_resolution_pilot_wi_005.py::test_actual_post_write_and_isolated_restore_rehearsal\n1 failed, 651 passed in 2.85s\n",
+  "stderr": ""
+}

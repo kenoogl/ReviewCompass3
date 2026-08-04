@@ -713,6 +713,21 @@ automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る�
 `records/development/2026-08-04-work-unit-commit-reminder-completion-evidence-v1.md`、SHA-256
 `b7f8e91520b2664ede24347144004b724c5654d23c5cb318864c1a8530ab35d0`。
 
+#### Development venv baseline
+
+- [x] `.venv`を機械作成し、Git管理対象外へ固定した。
+- [x] pip、setuptools、wheelと全開発依存をexact lockへ固定した。
+- [x] 公式Test runnerを`.venv/bin/python3`へ切り替え、system Python fallbackを禁止した。
+- [x] venv欠落、Python不適合、lock改変、pytest不適合の負例を確認した。
+- [x] system Pythonにだけ存在した未宣言`PyYAML`依存を正式な実行時依存へ修復した。
+- [x] `.venv`とinstall metadataをsource state Digestから除外した。
+- [x] 関連Testと公式全Testをvenv上で再実行した。
+
+`Evidence`：`RC3-DEVELOPMENT-VENV-BASELINE-2026-08-04-V1`、
+`records/development/2026-08-04-development-venv-baseline-completion-evidence-v1.md`。
+関連`22 passed`、公式全`652 passed`、Python `3.9.6`、pytest `8.4.2`、fallback `false`。
+旧system Python receiptは履歴として保持する。本baselineはWork 4／4Aの開始または順序変更を意味しない。
+
 #### Inter-work完了関門
 
 - [x] 完了済みcorrectiveを固定Evidenceへ接続した。

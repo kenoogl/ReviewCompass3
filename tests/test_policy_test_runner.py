@@ -23,7 +23,7 @@ def test_repository_policy_has_one_machine_test_command(runner):
     config = runner.load_config(CONFIG_PATH)
 
     assert runner.command_for(config, "full") == (
-        "python3",
+        ".venv/bin/python3",
         "-m",
         "pytest",
         "-q",
@@ -66,7 +66,7 @@ def test_runner_performs_preflight_test_and_writes_verification_receipt(
     def fake_run(command, **kwargs):
         calls.append(tuple(command))
         if command[-1] == "--version" and "pytest" not in command:
-            return SimpleNamespace(returncode=0, stdout="Python 3.11.9\n", stderr="")
+            return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
         if command[-1] == "--version":
             return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
         return SimpleNamespace(
@@ -87,14 +87,14 @@ def test_runner_performs_preflight_test_and_writes_verification_receipt(
 
     receipt = json.loads(receipt_path.read_text())
     assert calls == [
-        ("python3", "--version"),
-        ("python3", "-m", "pytest", "--version"),
-        ("python3", "-m", "pytest", "-q"),
+        (".venv/bin/python3", "--version"),
+        (".venv/bin/python3", "-m", "pytest", "--version"),
+        (".venv/bin/python3", "-m", "pytest", "-q"),
     ]
     assert result.status == "passed"
     assert receipt["status"] == "passed"
-    assert receipt["command"] == "python3 -m pytest -q"
-    assert receipt["python_version"] == "3.11.9"
+    assert receipt["command"] == ".venv/bin/python3 -m pytest -q"
+    assert receipt["python_version"] == "3.9.6"
     assert receipt["pytest_version"] == "8.4.2"
     assert receipt["fallback_used"] is False
     assert len(receipt["config_digest"]) == 64
@@ -108,8 +108,8 @@ def test_runner_records_failed_test_without_reclassifying_environment(
     config = runner.load_config(CONFIG_PATH)
 
     def fake_run(command, **kwargs):
-        if command == ["python3", "--version"]:
-            return SimpleNamespace(returncode=0, stdout="Python 3.11.9\n", stderr="")
+        if command == [".venv/bin/python3", "--version"]:
+            return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
         if command[-1] == "--version":
             return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
         return SimpleNamespace(returncode=1, stdout="1 failed\n", stderr="")
@@ -125,3 +125,23 @@ def test_runner_records_failed_test_without_reclassifying_environment(
 
     assert result.status == "failed"
     assert result.exit_code == 1
+
+
+def test_source_digest_excludes_local_environment_and_install_metadata(
+    runner,
+    tmp_path,
+):
+    source = tmp_path / "source.py"
+    venv_file = tmp_path / ".venv/lib/python3.9/site-packages/package.py"
+    egg_info = tmp_path / "reviewcompass3.egg-info/PKG-INFO"
+    source.write_text("value = 1\n")
+    venv_file.parent.mkdir(parents=True)
+    venv_file.write_text("first environment\n")
+    egg_info.parent.mkdir(parents=True)
+    egg_info.write_text("first metadata\n")
+
+    before = runner._source_state_digest(tmp_path)
+    venv_file.write_text("changed environment\n")
+    egg_info.write_text("changed metadata\n")
+
+    assert runner._source_state_digest(tmp_path) == before
