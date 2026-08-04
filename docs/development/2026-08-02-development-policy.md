@@ -143,6 +143,17 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 
 ## Commitとhandoffの原子性
 
+## Identity Chain Preflight
+
+source Snapshot、derived output、Ledger、artifact commitのようにidentityが連鎖する実装では、コードまたは
+schemaを書く前に`docs/development/templates/identity-chain-preflight.template.md`を用いる。source内容IDと
+Git HEADなどのprovenanceを混同せず、immutable outputのversion更新、current authority、write後commit、
+re-read、freshness判定までを一つの最小E2EとしてAcceptance Testへ含める。
+
+連鎖の一部だけを実装して、後続recordが旧identityへ結線される場合はGREENまたは完了と報告しない。
+発見時は`improvement_candidate`として記録し、authority、Acceptance、不可逆操作に影響するならHuman判断まで
+現行Workを停止する。
+
 ### 作業単位終端のcommit reminder Pilot
 
 完了した作業単位を未コミットのまま次の作業単位へ進めない。作業単位の完了時と次作業への移行要求時に、
