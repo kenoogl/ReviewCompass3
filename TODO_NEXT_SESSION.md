@@ -7,10 +7,10 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.2／実装GREEN。実sourceのProfile v2生成まで完了（routine 989件）。
+- 現在の工程：Work 4A rebuild v3.3／比較候補のgroup設計提案を作成済み、Human承認待ち。v3.2のProfile v2生成は完了（routine 989件）。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
-- 当面の進行入口：Work 4A Rebuild Design v3.2。
+- 当面の進行入口：Work 4A Rebuild Design v3.3 Proposal。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -24,31 +24,33 @@
 - [Work 4A Rebuild Design v3.1](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5839e37467aaa7d06ee2e9bde477e6c6a76da57e6f4b8a9653e1c9551cea5e40`
 - [Work 4A v3.2 Routine Profile v2](records/development/2026-08-05-work-4a-v3-2-actual-routine-profile-v2-evidence-v1.md) — SHA-256 `737ebf873fd2544a5a799f52339132241d79446019623d66398e471280a0ed35`
 - [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `b157640f940c12d733d237921cad664dbebc4925c592796394f29da1155f5e48`
+- [Work 4A Rebuild Design v3.3 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md) — SHA-256 `6ff0496da864c3b215edfc772ada1b0e4b1a32b7c17f72cf0011fb7b4bef8cd7`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `b5a18fb4da194779c2a1bf8010e9d1418377d3b30bfc92d5d8336965eeab6d7c`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `6a68980e2e0817b9938c5730341660bcaabea4c73238ab280b47658d051d0557`
 
 ## 次に行う一作業
 
-LLMによるDisposition Proposal生成の承認をHumanから得る。
+v3.3の比較候補group設計についてHuman承認を得る。
 
 開始条件：
 
-- Profile v2生成containing commit後のclean transition。
-- 生成範囲、判断カードの渡し方、生成元記録のHuman承認。
+- v3.3設計提案のcommit後のclean transition。
+- group根拠、表示class、全member保持、LLM初期表示範囲のHuman承認。
 
-完了データ：
+完了条件：
 
-- Profile v2 routine 989件。判断カードはProfile v2の値から作る。
-- 提案は非権威で、参照は同一Profile内、`evidence_refs`必須。
+- Comparison Discoveryのschema、group根拠、K1〜K12を確定する。
+- 承認後にPolicy v4、RED test、Profile v3とComparison Discoveryの実装へ進む。
+- LLMによるDisposition Proposal生成は、Profile v3とComparison Discoveryの実データ確認後の別承認とする。
 
-後続作業：group条件とdispositionのHuman決定、Entry・Relation・Baseline生成。
+後続作業：Profile v3とComparison Discoveryの実データ確認、LLMによるDisposition Proposal生成の承認。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：LLMによるDisposition Proposal生成の承認。Profile v2の実データは提示済み。
-- 再開条件：Profile v2生成commit後のclean transition。
+- Human判断待ち：v3.3比較候補group設計の承認。Profile v2の実データは提示済み。
+- 再開条件：v3.3設計提案のcommit後のclean transition。
 
 ## stale・deferred
 
