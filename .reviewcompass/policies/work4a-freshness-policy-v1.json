@@ -1,0 +1,62 @@
+{
+  "change_class": "ordinary",
+  "change_classes": [
+    "ordinary",
+    "security",
+    "authority",
+    "irreversible"
+  ],
+  "content_digest": "f5e2d6340c0e08a0a90a7f237bcc44fc8fd274360cafe204342f1ac32abf0c7d",
+  "development_policy_ref": {
+    "digest_algorithm": "sha256",
+    "file_sha256": "9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0",
+    "record_id": "DEVELOPMENT-POLICY",
+    "record_kind": "development_policy",
+    "relative_path": "docs/development/2026-08-02-development-policy.md",
+    "root_kind": "project",
+    "version": 1
+  },
+  "digest_algorithm": "sha256",
+  "disposition_classes": [
+    "reuse",
+    "extend",
+    "merge",
+    "split",
+    "new"
+  ],
+  "policy_id": "POL-WORK4A-FRESHNESS",
+  "policy_version": 1,
+  "record_kind": "work4a_freshness_policy",
+  "revalidation_required_classes": [
+    "security",
+    "authority",
+    "irreversible"
+  ],
+  "schema_version": 1,
+  "verification_outcome_classes": [
+    "invalid_manifest",
+    "unsafe_root",
+    "unknown_root_kind",
+    "path_traversal",
+    "root_escape",
+    "non_regular_file",
+    "missing_record",
+    "digest_mismatch",
+    "content_digest_mismatch",
+    "identity_mismatch",
+    "unknown_field",
+    "foreign_project_data",
+    "unlinked_candidate",
+    "content_identity_mismatch",
+    "summary_vocabulary_violation",
+    "decision_candidate_mismatch",
+    "stale_observation_reuse",
+    "immutable_violation",
+    "baseline_series_broken",
+    "policy_revalidation_required",
+    "data_root_escape",
+    "observation_tampered",
+    "write_verification_failed",
+    "partial_write_detected"
+  ]
+}
