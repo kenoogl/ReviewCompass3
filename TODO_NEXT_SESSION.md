@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A baseline persistence tool GREEN committed / current external baseline not_started
+- 現在作業：Work 4A routine classification rule candidate committed / Human approval pending
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -35,28 +35,27 @@
 - [Work 4A Baseline Persistence RED Evidence](records/development/2026-08-04-work-4a-baseline-persistence-red-evidence-v1.md) — SHA-256 `bb9fe5eb2f525dae308db1065b0fc1ce2181805466339ae1e5a74722d72a4f6c`
 - [Work 4A Baseline Persistence GREEN Evidence](records/development/2026-08-04-work-4a-baseline-persistence-green-evidence-v1.md) — SHA-256 `db1ef63daad2159d399d9d2680daf0eb89945a62939732fb329dd30e82c12331`
 - [Work 4A Baseline Persistence GREEN Test Receipt](records/development/2026-08-04-work-4a-baseline-persistence-green-test-receipt-v1.json) — SHA-256 `6aaa3834c0f49a4d6f32b942abe0ca47588aa5042ccba05110a51add9a3b235e`
+- [Work 4A Routine Classification Candidate](records/development/2026-08-04-work-4a-routine-classification-candidate-v1.json) — SHA-256 `2b198c5dce8ca530b3c62972b82334df5aa75f75e2c22248556e3069d4fb0c68`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `221069ef3f4d0b9ce5d067a2cd516fdfe061f73e402fbc5f24cc89ac8f7f92c4`
 
 ## 次に行う一作業
 
-versioned persistence toolのcontaining commitから、current Source SnapshotとSource Symbol Indexをexternal
-`DATA_ROOT`へnew-only保存し、再読込・freshnessを照合する。
+routine classification rule candidateをHumanが承認する。
 
 開始条件：
 
-- baseline persistence GREEN containing commitとclean transition
+- current Snapshot／Index inventoryとroutine classification rule candidate
 
 完了条件：
 
-- current HEADのSnapshot／Indexをnew IDとして生成する
-- 保存Digest、re-read comparison、`current`分類、historical output温存を確認する
+- public、shared、high-risk、duplicate candidate、retired candidateの機械候補規則とHuman確定境界を決定する
 
 後続作業：承認後、clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。current baseline生成はGREEN containing commitのclean transitionを入力とする。
-- Human判断待ち：なし。初回runtime directory作成は承認済みLayout内の明示操作として次の作業単位で行う。
+- blocker：なし。Human承認はcommitted classification candidateを入力として行う。
+- Human判断待ち：routine classification rule candidateの承認。承認前に抽出tool、Ledger登録、routine dispositionを開始しない。
 
 ## stale・deferred
 
