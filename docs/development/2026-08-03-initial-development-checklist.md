@@ -735,6 +735,18 @@ automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る�
 - [x] Issue Resolution早期Pilotの限定bootstrapを完了した。
 - [x] 限定bootstrap完了後、当初順序のWork 4へ戻った。
 
+#### Work 4A先行の実行順序Decision
+
+- [x] HumanがWork 4よりWork 4Aを先行する順序変更を承認した。
+- [x] Work 4Aの最初にSource Snapshot identityの最小必須境界を固定し、Work 4全体は先行完了しない境界を定めた。
+- [x] Work 4A完了後に残りのWork 4へ戻ることを固定した。
+
+`Evidence`：`RC3-WORK4A-SEQUENCE-APPROVAL-2026-08-04-V1`、
+`records/development/2026-08-04-work-4a-sequence-approval-decision-v1.json`、SHA-256
+`4a10d09c12f227e67399aad1dc9c1ca8a6c664edcc6bc7f99385edafa7f48f0f`。
+本DecisionはCurrent Plan 17節の初期実装順6・7だけを`Work 4A -> Work 4`へ置き換える。
+見出しの物理配置は安定したWork番号を維持するため移動しない。
+
 ### Work 4：Designと代表シナリオ
 
 - [ ] Contract、Portfolio、Compiler、Plan bundle、Workflow、Provenance、Deploymentを設計した。

@@ -1,0 +1,44 @@
+{
+  "decision_id": "RC3-WORK4A-SEQUENCE-APPROVAL-2026-08-04-V1",
+  "decided_at": "2026-08-04T13:49:23+09:00",
+  "status": "approved_effective",
+  "decision_maker": "human",
+  "instruction": "Work 4Aを先行する",
+  "decision_scope": "initial development execution order",
+  "superseded_sequence": {
+    "authority_path": "docs/current/reviewcompass3-plan-current.md",
+    "authority_sha256": "0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694",
+    "section": "17. 実装へ進む条件 / 初期実装順",
+    "previous_order": [
+      "Work 4",
+      "Work 4A"
+    ],
+    "superseded_items": [
+      6,
+      7
+    ]
+  },
+  "approved_effective_order": [
+    "Work 4A",
+    "Work 4"
+  ],
+  "work_4a_entry_precondition": {
+    "source_path": "docs/design/2026-08-03-source-change-verification-identity-timing-memo.md",
+    "source_sha256": "08f973be1f4b0134f4a6a48af98fcbad4948bae890178fd8de6ce98d68e8235a",
+    "required_boundary": "Work 4Aの最初に、Source Symbol Indexを束縛できる最小のSCM非依存Source Snapshot identity、owner、relation、保存、stale境界を固定する",
+    "scope_limit": "Work 4全体、Change Set全体、Verification全体または製品Runtime実装を先行させない"
+  },
+  "rationale": [
+    "既存symbolと再利用候補を機械的に先に把握し、後続Designで重複実装または誤った配置前提を増やさない",
+    "Work 4Aを品質baselineとして先行させ、後続Designの判断材料を固定する",
+    "Source Snapshot identityの必須前提だけをWork 4A入口へ移し、Work 4全体の先行完了を避ける"
+  ],
+  "constraints": [
+    "本DecisionだけでWork 4またはWork 4Aをcompletedにしない",
+    "全symbol収録は機械生成し、LLMまたはHumanの手入力でIndexを作成しない",
+    "Humanの意味確認は生成規則、coverage、代表sample、public、shared、cross-contract、high-risk、duplicate candidate、retiredへ限定する",
+    "製品実装codeを追加せず、bootstrap generatorが必要な場合はdevelopment toolingとして隔離する",
+    "Work 4A完了後に残りのWork 4へ戻る"
+  ],
+  "next_action": "Work 4Aの固定Source Snapshot、symbol identity、対象source universe、Acceptance境界を一つの開始Evidenceへ固定する"
+}
