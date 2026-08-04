@@ -7,12 +7,13 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Layout Baseline v3 Human approval recorded_committed / actual Work 4A Source Snapshot baseline not_started
+- 現在作業：Work 4A actual Snapshot／Indexをclean HEAD `6258aaf`から生成・照合済み / operation observation・improvement candidate committed
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
 
 - `ISSUE-PILOT-TODO-GROWTH-001`：`resolved`、現行Workへの影響なし。次：project-first runtime rootのLayout Baseline amendment
+- `IC-WORK4A-BASELINE-PERSISTENCE-001`：`untriaged`。actual baselineはhistorical outputとして保存済み。versioned persistence toolとcapture／commit順序のrouteをHumanが後続checkpointで判断する。
 
 ## 最新のauthority／Evidence
 
@@ -28,27 +29,28 @@
 - [Layout Baseline v3 GREEN Evidence](records/development/2026-08-04-layout-baseline-v3-project-first-green-evidence-v1.md) — SHA-256 `9522f2f26a3863b9ab20b428f7fe61d1bdd33a685a19cb289b43c814f3865284`
 - [Layout Baseline v3 GREEN Test Receipt](records/development/2026-08-04-layout-baseline-v3-project-first-green-test-receipt-v1.json) — SHA-256 `f1da6b0909147f0c74ca07409a9bbfea7a2981e4476111b97ce73257d2728ecd`
 - [Layout Baseline v3 Approval Decision](records/development/2026-08-04-layout-baseline-v3-project-first-approval-decision.json) — SHA-256 `793be4403d37806b41696031abf6576c98bc2047f28574e0792d3c6ab8ae6275`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `b6eb1dc55235520e8ce90e99b940f5520c101f0b31ea342dcec4ed8b36ff0231`
+- [Work 4A Actual Baseline Operation Observation](records/development/2026-08-04-work-4a-actual-baseline-operation-observation-v1.json) — SHA-256 `1c82cbb33c6657e278bbcc63df9fc65b36670120310114c98f3bd42d5c908018`
+- [Work 4A Baseline Persistence Improvement Candidate](records/development/2026-08-04-work-4a-baseline-persistence-improvement-candidate-v1.json) — SHA-256 `d7193d504860229f95de3f7c4f1e9e2515e401e7295c90e26669335c783bac99`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `dff6b6619da1f39401322e3f556d40c164e2619228d05f676c6fbcb2d9ccc73c`
 
 ## 次に行う一作業
 
-approved Layout Baseline v3から、ReviewCompass3のdevelopment data rootだけを初期化し、actual Source Snapshotと
-Source Symbol Index baselineを機械生成する。
+actual baseline operation observationとmanual-operation improvement candidateをcommitし、clean containing commitから
+current Source SnapshotとSource Symbol Indexを新規生成する。
 
 開始条件：
 
-- Layout Baseline v3のHuman承認Decision containing commitとclean transition
+- actual baseline operation observationとimprovement candidate containing commitとclean transition
 
 完了条件：
 
-- `~/.reviewcompass3/projects/reviewcompass3/development/data/`だけを明示初期化する
-- clean source treeからactual Source SnapshotとSource Symbol Indexを再生成し、coverage、freshness、再生成一致を記録する
+- clean source treeからcurrent Source SnapshotとSource Symbol Indexを新規生成し、coverage、freshness、再生成一致を記録する
 
 後続作業：承認後、clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。次作業の実runtime directory初期化はv3承認Decisionを入力とする。
+- blocker：なし。次のcurrent baseline再生成はこの記録commitのclean transitionを入力とする。
 - Human判断待ち：なし。初回runtime directory作成は承認済みLayout内の明示操作として次の作業単位で行う。
 
 ## stale・deferred
