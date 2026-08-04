@@ -21,7 +21,8 @@
   からbyte-identicalに確認済み。WI-001の9件のTestを固定して期待どおりREDを確認したため、現行stateは
   `implementation_in_progress`。固定Testを変更せずhelperをGREENにしたが、実snapshot作成前に「圧縮直前TODO」と
   WI-001先行順序の不整合を検出した。Humanは推奨案を承認し、現行Issue内の
-  `current_issue_plan_revision / blocking`へ固定した。次は停止・判断作業単位をcommitする。
+  `current_issue_plan_revision / blocking`へ固定した。停止・判断作業単位はcommit `64782ec`へ固定済み。
+  Plan v4のsnapshot timing境界を10件のTestへ固定してREDを確認し、次はPlan v4候補とvalidatorを作成する。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -31,18 +32,18 @@
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
 - activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V1`、
-  state `implementation_in_progress / current_issue_plan_revision_approved / blocking`、
-  WI-001 `helper_green / actual_snapshot_not_created / work_unit_uncommitted`。
+  state `implementation_in_progress / current_issue_plan_revision_approved / plan_v4_red`、
+  WI-001 `helper_green / actual_snapshot_not_created`、Plan v4 `red_verified / containing_commit`。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`bce1b92a0f3a73b1953078219299c4aab08a19164fa0abe6416b2d92eb6086a9`
+- 進行入口SHA-256：`9bea8beb5beec6cb942012e618f667c4f2fc312d34c1faeacca485849c3a09df`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-triage-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`bcb4083827c6ce2b5de4bb23ec113e2543b006caedd6b8a30edd1421361beee3`
+  `records/development/2026-08-04-issue-resolution-pilot-plan-v4-red-evidence-v1.md`
+- Decision／Evidence SHA-256：`3fe743c2be6e957fabaa1477745c66323c8b5077c9fd0ca83acc1c57a7a15c94`
 
 ## 実施報告照合
 
@@ -639,6 +640,14 @@
   - 観測した事後状態：二件目workflow Candidateの暫定配置で`570 passed, 1 failed`となった。既存state gap経路と
     同じ`records/development/`へCandidate／Decisionを配置し、workflow Candidate／Decisionを各一件へ戻して
     `571 passed in 2.68s`、fallback `false`となった。
+- Claim `EC-132`：Plan v4のsnapshot timing正常・負例・境界Testを固定してREDを確認した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-plan-v4-red-evidence-v1.md`、SHA-256
+    `3fe743c2be6e957fabaa1477745c66323c8b5077c9fd0ca83acc1c57a7a15c94`
+  - Test：`tests/test_issue_resolution_pilot_plan_v4.py`、SHA-256
+    `b33181054cbea1c20feaadf080a6afe5e6880105e56558fb4d9f47b79ae99971`
+  - 観測した事後状態：targeted `1 passed, 9 failed`、全`572 passed, 9 failed`。失敗はPlan v4実体不在1件と
+    version 4専用snapshot timing closure／recovery validator未実装8件で、Plan v1〜v3、Task Contract v1、
+    固定WI-001 Test、実snapshot、TODO compactionは変更していない。
 
 ### reported_unverified／contradicted
 
@@ -757,31 +766,32 @@
 
 ## 次に行う一作業
 
-WI-001 helper、Observation、Improvement Candidate、Human Triage Decision、Pause／Triage Evidence、
-checklist、TODOからなる停止・判断作業単位をcommitし、post-commitで同一bytes、clean worktree、transitionを確認する。
+Plan v4 RED containing commitをread-only照合後、固定Testを変更せずversion 4 snapshot timing validatorと
+Plan v4候補を作成し、targetedと公式全TestをGREENにする。
 
 開始条件：
 
-- Candidate content Digestが`f037398f905ed48973b6a059b5f59bf3b36b6f35097ea819716be7aeda107cc2`、Decision
-  content Digestが`29361f9932fddbea89b2c1d55024b2823c0e48d0c2f8fbf10a03cdfd0e01ebe8`である。
-- 固定WI-001 Test SHA-256が`890f65df6734c314287a4d76c48232874560cb597f66122ab24d47d9e3c66521`で、
-  helper実装に対して`9 passed`である。
+- Plan v4 Test SHA-256が`b33181054cbea1c20feaadf080a6afe5e6880105e56558fb4d9f47b79ae99971`、
+  RED Evidence SHA-256が`3fe743c2be6e957fabaa1477745c66323c8b5077c9fd0ca83acc1c57a7a15c94`で、
+  HEADからbyte-identicalに読める。
+- worktreeがcleanでtransitionが`passed`である。
 
 完了条件：
 
-- commit後に全対象がHEADからbyte-identicalに読め、worktreeがclean、transitionが`passed`になる。
-- Plan v3、Task Contract v1、固定Testをin-place変更していない。
-- Plan v4、Task Contract v2、実snapshot、WI-002、TODO圧縮、Issue解決を先取りしていない。
+- 固定した10 Testを変更せず全件GREENにする。
+- Plan v4がversion 3をin-place変更せず新規配置され、content Digestと全参照が一致する。
+- Challenge v4、Task Contract v2、実snapshot、WI-002、TODO圧縮、Issue解決を先取りしない。
 
-後続作業：containing commit確認後、Plan v4のRED Testと候補を別作業単位で固定する。
+後続作業：Plan v4 GREEN作業単位のcommit後、Challenge v4を実施する。
 
 ## blocker・Human判断待ち
 
-- blocker：完了した停止・判断作業単位が未コミットであるため、Plan v4作成へ進まない。
-- Human判断待ち：現在のcommit前作業に対する追加判断なし
-- 実行保留：Plan v4、Task Contract v2、実snapshot作成、WI-001完了、WI-002以降、TODO compaction
+- blocker：なし。Plan v4 RED containing commitの確認前は候補とvalidatorを作成しない。
+- Human判断待ち：現在のRED作業に対する追加判断なし
+- 実行保留：Plan v4候補／validatorはRED commit後、Challenge v4はGREEN commit後、Task Contract v2は
+  Challenge v4とHuman Plan承認後まで開始しない。実snapshot、WI-002、TODO compactionは引き続き保留する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
-- 再開条件：停止・判断作業単位のcontaining commit確認、clean worktree、transition合格
+- 再開条件：Plan v4 RED containing commit確認、clean worktree、transition合格
 
 ## stale・deferred
 
@@ -802,8 +812,8 @@ checklist、TODOからなる停止・判断作業単位をcommitし、post-commi
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：固定WI-001 Test SHA不変で`9 passed in 0.03s`
-- 直近の全Test：公式runnerで`571 passed in 2.68s`、fallback `false`
+- 直近の関連検証：Plan v4 targeted `1 passed, 9 failed in 0.08s`。期待するRED
+- 直近の全Test：`572 passed, 9 failed in 2.70s`。新規Plan v4の期待する9件だけ失敗
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

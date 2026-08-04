@@ -590,6 +590,12 @@ SHA-256 `bcb4083827c6ce2b5de4bb23ec113e2543b006caedd6b8a30edd1421361beee3`。二
 公式全`571 passed`を確認した。現在の停止・判断作業単位をcommitした後だけ、Plan v4のRED Testと候補作成へ
 進む。最後のPilot checkboxは未完了のままとする。
 
+停止・判断作業単位のcontaining commit `64782ec`とclean transitionを確認後、Plan v4のsnapshot timing境界を
+10件のTestへ固定した。RED Evidenceは`records/development/2026-08-04-issue-resolution-pilot-plan-v4-red-evidence-v1.md`、
+SHA-256 `3fe743c2be6e957fabaa1477745c66323c8b5077c9fd0ca83acc1c57a7a15c94`。targetedは`1 passed, 9 failed`、
+全体は既存を含む`572 passed, 9 failed`で、失敗はPlan v4実体不在とversion 4専用validator未実装だけである。
+RED作業単位のcommit後までPlan v4候補とvalidatorを作成せず、最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
