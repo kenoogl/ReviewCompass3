@@ -837,6 +837,10 @@ Snapshotから再生成するため、現時点でLedger登録またはWork 4A�
 `.reviewcompass/reuse/reusable-routine-ledger/`を候補配置とし、baseline manifest・entry・relationの個別record方式を
 提案した。schemaと配置のHuman承認、RED Acceptance Test、GREEN実装の前にLedger entryを作成しない。
 
+`Reusable Routine Ledger Entry／Baseline GREEN Evidence`：
+`RC3-WORK4A-REUSABLE-ROUTINE-LEDGER-GREEN-2026-08-04-V1`。entryとbaseline manifestの最小保存・Digest照合を
+GREENにした。relation recordとactual entryは未実装であり、Work 4Aのcheckboxと完了関門は未完了である。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred

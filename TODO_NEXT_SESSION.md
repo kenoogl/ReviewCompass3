@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A Reusable Routine Ledger structure proposal v2 committed / schema decision pending
+- 現在作業：Work 4A Reusable Routine Ledger entry／baseline GREEN committed / relation and actual entry not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -53,27 +53,29 @@
 - [Work 4A Cross-contract Classification GREEN Test Receipt](records/development/2026-08-04-work-4a-cross-contract-classification-green-test-receipt-v1.json) — SHA-256 `269d796e0a988998017500ef4ee56d93eaa944a017227725724851dd43277dfa`
 - [Work 4A Ledger Placement Correction Candidate](records/development/2026-08-04-work-4a-ledger-placement-correction-candidate-v1.json) — SHA-256 `d46dd6ac382be2bf314bc78ab5961eea272fedf47af9767f3d6b8be9e1a5323f`
 - [Work 4A Reusable Routine Ledger Structure Proposal v2](records/development/2026-08-04-work-4a-reusable-routine-ledger-structure-proposal-v2.md) — SHA-256 `55d40fa44876ac311e76bc92c961a04a0fdc0fc246fefb8c4b956586d542eaf2`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `b4039e87ef6ad79155e1d187f43f7960098bc34a2b2e181afc9b128164ccb44e`
+- [Work 4A Reusable Routine Ledger Structure Approval Decision](records/development/2026-08-04-work-4a-reusable-routine-ledger-structure-approval-decision-v1.json) — SHA-256 `dfe6da438c0e06dbaa951d203b93550a24816dcf24c7ebb6162d6c94c25ffc43`
+- [Work 4A Reusable Routine Ledger GREEN Evidence](records/development/2026-08-04-work-4a-reusable-routine-ledger-green-evidence-v1.md) — SHA-256 `5c2977353d5694b03d6620de7bf98f41c8e822b7c7aeab30cc327a95027ce526`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `e674966089e15e68ae04f78afc4b8bd6b3d9feabae52daefce9ac7e8175b00c3`
 
 ## 次に行う一作業
 
-Reusable Routine Ledger schemaの配置、individual record方式、必須field、Acceptance境界をHumanが裁定する。
+Ledger entry／baseline GREEN containing commit後、relation schemaとHuman確認済み代表routineのactual Ledger entryを扱う順序を決める。
 
 開始条件：
 
-- Ledger structure proposal v2のcontaining commit
+- Ledger entry／baseline GREEN containing commitとclean transition
 
 完了条件：
 
-- Ledger root、baseline manifest・entry・relationのrecord方式を決める
-- schema RED Acceptance Testの固定入力を決める
+- relation schemaをREDから追加するか、entryのactual保存を先に行うかを決める
+- Humanが代表routineの責務、reuse disposition、side effectを確認する
 
-後続作業：承認後、Ledger schema Acceptance TestをREDから作成する。entry作成とroutine dispositionは後続Human確認とする。
+後続作業：relation schema GREEN後、actual Ledger entryをHumanが確認し、duplicate relationと残りの代表routineを判断する。
 
 ## blocker・Human判断待ち
 
-- blocker：Ledger schemaに対するHuman裁定。裁定前にLedger schema実装またはentry作成へ移らない。
-- Human判断待ち：Ledger root、individual record方式、必須field、Acceptance境界。
+- blocker：relation record未実装。actual entryの対象routineに対するHuman確認も必要である。
+- Human判断待ち：actual entry対象routineの責務、reuse disposition、side effect。
 
 ## stale・deferred
 
