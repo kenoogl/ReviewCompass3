@@ -1,0 +1,45 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-WORK4A-LEDGER-PLACEMENT-CORRECTION-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-04T18:28:03+09:00",
+  "source_work": "Work 4A Reusable Routine Ledger structure proposal",
+  "source_identity": {
+    "kind": "proposal",
+    "path": "records/development/2026-08-04-work-4a-routine-ledger-review-scope-proposal-v1.md",
+    "sha256": "44da73d30038bef4213856066ed148516210bbc740ef73f0df374d8f630e9e04"
+  },
+  "problem": "Ledger review scope proposal v1は配置案を`records/inventories/reusable-routine-ledger/`とした。しかしProject Manifestのartifact_roots.reuseは`.reviewcompass/reuse`であり、Reusable Routine Ledgerの承認済みproject artifact rootはreuseである。",
+  "impact": [
+    "directory名だけで正本性を決めない原則に反して、Manifestと異なる配置を正本候補として提示してしまう",
+    "Ledger artifactを追加した際のProject Artifact SnapshotとAcceptance Testへの影響が見えない",
+    "deployment manifestが選ぶproject artifactの境界とLedgerの配置が一致しない"
+  ],
+  "scope": [
+    "Ledger proposal v2でplacementをManifest reuse rootへ訂正する",
+    "個別entry、relation、baseline manifestのID・version・Digest・Decision結線を定義する",
+    "artifact snapshotとAcceptance Testをschema実装の入力にする"
+  ],
+  "non_scope": [
+    "proposal v1または過去commitの書換え",
+    "Ledger entryの作成、routine disposition、Work 4A完了",
+    "Project Manifestのartifact_roots変更、deployment manifest変更"
+  ],
+  "classification_candidates": [
+    "authority_alignment",
+    "artifact_layout_correction",
+    "acceptance_test_impact"
+  ],
+  "route_candidates": [
+    "current_work_checkpoint",
+    "ledger_schema_proposal"
+  ],
+  "consumer_candidates": [
+    "Work 4A Reusable Routine Ledger baseline",
+    "Project Manifest artifact root validation",
+    "deployment package manifest selection"
+  ],
+  "proposed_action": "`.reviewcompass/reuse/reusable-routine-ledger/`をLedgerの候補rootとするproposal v2を作り、Humanがschemaと配置を承認した後にRED Acceptance Testを作成する。実artifact追加時はreuse rootのSnapshot expectationも同じ作業単位で更新する。",
+  "content_digest": "e7f6efdbbe4b00009b903f3974fe6e9ea3cca64b3c5d36baf114c9385560b532"
+}

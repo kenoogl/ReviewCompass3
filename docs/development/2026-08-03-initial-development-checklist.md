@@ -833,6 +833,10 @@ fresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未
 `tools.<domain>`間のstatic importをcandidateとして抽出する。actual candidate listはcontaining commit後のfresh
 Snapshotから再生成するため、現時点でLedger登録またはWork 4A完了には進まない。
 
+`Reusable Routine Ledger Structure Proposal v2`：Project Manifestのreuse rootと整合する
+`.reviewcompass/reuse/reusable-routine-ledger/`を候補配置とし、baseline manifest・entry・relationの個別record方式を
+提案した。schemaと配置のHuman承認、RED Acceptance Test、GREEN実装の前にLedger entryを作成しない。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred
