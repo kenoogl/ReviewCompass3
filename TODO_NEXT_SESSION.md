@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aは再設計済みで、旧patch群を可逆revertした。
-- 現在の工程：Work 4A rebuild／E2E acceptance REDを固定済み。
+- 現在の工程：Work 4A rebuild／最小identity chain GREEN。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design。
@@ -26,19 +26,19 @@
 
 ## 次に行う一作業
 
-E2E RED testを変更せず、Source ObservationからBaseline freshnessまでの最小identity chainを実装する。
+最小identity chainのE2E実装を独立に確認し、actual artifactへ進む前の不足範囲を分類する。
 
 開始条件：
 
 - `DEC-WORK4A-REBUILD-DESIGN-001`によるHuman承認。
-- E2E RED acceptance containing commit後のclean transition。
+- identity chain GREEN containing commit後のclean transition。
 
 完了条件：
 
-- Source Observation、Candidate Run、Human Decision、new-only Baselineを同じidentity chainで生成できる。
-- E2E RED testを変更せず、既存patchの部分復元を含めない。
+- source content identity、new-only baseline、改竄・unsafe root・high-risk Policy拒否、Historical Contract StatusのE2E結果を独立に照合する。
+- actual artifact、既存patchの部分復元を含めない。
 
-後続作業：改竄、unsafe root、Policy高リスク、Historical Contract Statusの負例をGREENにする。
+後続作業：Human判断を要するactual artifactの対象routineを提示する。
 
 ## blocker・Human判断待ち
 
@@ -57,8 +57,8 @@ E2E RED testを変更せず、Source ObservationからBaseline freshnessまで�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：TODO handoff validation、post-write verification／restore rehearsal合格
-- 直近の全Test：venv公式runner `659 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Work 4A rebuild E2E `4 passed`
+- 直近の全Test：venv公式runner `663 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
