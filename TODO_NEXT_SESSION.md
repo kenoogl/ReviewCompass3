@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.1／設計提案を作成済み、Human承認待ち。Observationと初回Candidate Runは完了済み。v3.1のRoutine ProfileとDisposition Proposalは未着手。
+- 現在の工程：Work 4A rebuild v3.1／設計承認済み。Observationと初回Candidate Runは完了。Policy v2とRoutine Profileは実装着手前。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design v3.1 Amendment。
@@ -21,33 +21,34 @@
 - [Work 4A Rebuild Design v3](docs/design/2026-08-04-work-4a-rebuild-design-v3-proposal.md) — SHA-256 `a9e0419dcac556789e82f6f51292dd70399000f988e0720d240286c9a05c2b37`
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
-- [Work 4A Rebuild Design v3.1 提案](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5056e9d2eb04f53d4f09c69eb93a11998309c45787f0c7b0632f841fe8cf8b12`
-- [conformance-evaluation緩和提案](docs/design/2026-08-04-conformance-evaluation-scope-relaxation-proposal.md) — SHA-256 `67b1bc3b95dd573065367a9f08d13803fe3cdfb5d4f4b6cb9fc110e43aee8416`
+- [Work 4A Rebuild Design v3.1](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5839e37467aaa7d06ee2e9bde477e6c6a76da57e6f4b8a9653e1c9551cea5e40`
+- [Work 4A v3.1 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-1-approval-decision-v1.md) — SHA-256 `06e8b0f28fcdfd398271c9407086fac65c3070b6ae3294a8763f3defa6716540`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `9bd03b0fa801fd08335ebb0772de13cd29bffff71ba790053aac96f53f3108ef`
 
 ## 次に行う一作業
 
-v3.1設計とconformance-evaluation利用範囲のHuman承認を得る。
+v3.1受入test I1〜I21をREDで固定し、実装でGREENにする。
 
 開始条件：
 
-- 提案文書commit後のclean transition。
+- `DEC-WORK4A-REBUILD-DESIGN-004`と`DEC-CONFORMANCE-SCOPE-RELAXATION-001`によるHuman承認。
+- 承認commit後のclean transition。
 
 完了条件：
 
-- v3.1改訂案と緩和提案をHumanが承認または差し戻す。
-- 未決五点（lambda、group条件記法、例外class既定、Proposal生成単位、nested function既定）を判断する。
-- 承認された場合にだけDecision recordを作成する。
+- Policy `policy_version` 2を固定する。
+- I1〜I21をREDで固定し、期待を緩めずGREENにする。
+- 実sourceでRoutine Profileを生成し、機械抽出結果を提示する。
 
-後続作業：Policy v2固定、受入test I1〜I21のRED、Routine Profile実装。
+後続作業：LLMによるDisposition Proposal生成の別承認をHumanへ求める。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：v3.1設計およびconformance-evaluation利用範囲のHuman承認。未決五点の判断。
-- 再開条件：提案文書commit後のclean transition。
+- Human判断待ち：LLMによるDisposition Proposal生成の承認。Routine Profile実データ確認後とする。
+- 再開条件：承認commit後のclean transition。
 
 ## stale・deferred
 

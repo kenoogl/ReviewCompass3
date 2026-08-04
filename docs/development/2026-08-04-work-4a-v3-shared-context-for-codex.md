@@ -14,8 +14,9 @@
 
 - v2設計に「project外の観測をproject相対pathで参照する」という同時に満たせない要求があり、実装が停止した。
 - v3で参照モデルを作り直した。Observation Attestationをproject内に置き、外部への唯一の橋にした。実装は完了しGREEN。
-- いま922件の候補にHumanがラベルを付ける段で、その判断材料の設計（v3.1）と、
-  そこで使う`conformance-evaluation`の利用範囲緩和が、**いずれも提案中でHuman承認前**である。
+- いま922件の候補にHumanがラベルを付ける段である。判断材料の設計（v3.1）と、
+  そこで使う`conformance-evaluation`の利用範囲緩和は**いずれも承認済み**。
+  実装とRoutine Profile生成まで進み、LLMによるDisposition Proposal生成の承認待ちである。
 
 ---
 
@@ -97,15 +98,15 @@ root_kind自体は採用したが、外部位置情報の中だけに置き、�
 | `tools/development/work4a_rebuild_v3.py` | `b2cdcbed4fe13f4d6ce2515e5b48d78055f351e4c47e4091d8c08a62855ae1a2` |
 | `tests/test_work4a_rebuild_v3_e2e.py` | `1b6ee11c89c92e66c5c143e0f79919fc7f0e24adaf5ff79d6f93fd4aa1841476` |
 
-提案文書（Human承認前）：
+v3.1関連（承認済み）：
 
 | file | 状態 |
 | --- | --- |
-| `docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md` | `awaiting_human_approval` |
-| `docs/design/2026-08-04-conformance-evaluation-scope-relaxation-proposal.md` | `awaiting_human_approval` |
+| `docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md` | `approved_for_implementation` |
+| `docs/design/2026-08-04-conformance-evaluation-scope-relaxation-proposal.md` | `approved` |
 
-**どちらもDecisionではない。**承認前に、実装、REDテスト作成、外部`DATA_ROOT`への追加書込み、
-候補再抽出、LLM説明生成、Decision・Entry・Relation・Baselineの作成を行わない。
+**LLMによるDisposition Proposal生成、Decision・Entry・Relation・Baselineの作成は
+別承認を要する。**Routine Profileの実データ確認後にHumanが判断する。
 
 ### 3.3 実データ
 
@@ -172,13 +173,8 @@ HEAD差、採取時刻の古さ、外部fileの存在は判定に使わない。
 | --- | --- |
 | `DEC-WORK4A-REBUILD-DESIGN-002` | v2承認（現在はsuperseded） |
 | `DEC-WORK4A-REBUILD-DESIGN-003` | v3承認。Policy語彙追加、Layout v3従属、v2 supersede |
-
-**未承認**（提案中。Decision recordは存在しない）：
-
-| 予定Decision ID | 提案文書 |
-| --- | --- |
-| `DEC-CONFORMANCE-SCOPE-RELAXATION-001` | `docs/design/2026-08-04-conformance-evaluation-scope-relaxation-proposal.md` |
-| `DEC-WORK4A-REBUILD-DESIGN-004` | `docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md` |
+| `DEC-CONFORMANCE-SCOPE-RELAXATION-001` | conformance-evaluationの二制限をWork 4Aの範囲で緩和 |
+| `DEC-WORK4A-REBUILD-DESIGN-004` | v3.1承認。未決五点を決定（lambda除外、三つ組連言、例外classは`ownership_unclear`、Proposalは全件batch、nested functionは`implementation_detail`） |
 
 処分済みのもの：
 
@@ -200,11 +196,10 @@ HEAD差、採取時刻の古さ、外部fileの存在は判定に使わない。
 1. 管理下で開発したcodeでは、LLM逆推定を通常経路にしない（継承記録§5）
 2. 本Workは初期開発へ入れない（Deferred Work 9）
 
-**この二つをWork 4Aの範囲で緩和することを提案中である。Human承認前であり、まだ緩和されていない。**
-提案文書は`docs/design/2026-08-04-conformance-evaluation-scope-relaxation-proposal.md`。
-承認された場合にだけ`DEC-CONFORMANCE-SCOPE-RELAXATION-001`を作成する。
+**2026-08-04にHumanがこの二つをWork 4Aの範囲で緩和した**
+（`DEC-CONFORMANCE-SCOPE-RELAXATION-001`）。
 
-提案で緩和するのは「使ってよいか」だけである。次の規律は緩和対象に含めず、維持する。
+緩和したのは「使ってよいか」だけである。次の規律は緩和対象に含めず、維持する。
 
 - 文書生成と適合判定を分離する
 - 推定時に既存仕様を遮断し、後段で比較する
@@ -218,13 +213,13 @@ HEAD差、採取時刻の古さ、外部fileの存在は判定に使わない。
 
 ---
 
-## 7. いま議論している問題
+## 7. v3.1で決めたこと
 
 Humanの方針は「台帳には922件すべて載せ、`reuse` `extend` `merge` `split` または`as is`のlabelを付ける。
 人がcodeを見て判断するのは現実的でないので、全codeを調べ、入力・出力・何をしているかの一覧表を作り、
 それを元に分類する」である。
 
-これに対しv3.1改訂案（承認待ち）が提案しているのは次の六点である。
+これに対しv3.1改訂（承認済み）が定めたのは次の六点である。
 
 ### 7.0 三層の役割分担
 

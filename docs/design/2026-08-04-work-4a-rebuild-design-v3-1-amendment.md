@@ -1,14 +1,13 @@
 # Work 4A Rebuild Design v3.1 Amendment
 
-状態：`awaiting_human_approval`
+状態：`approved_for_implementation`
 対象：Work 4A Reusable Routine Ledger
 基準文書：`docs/design/2026-08-04-work-4a-rebuild-design-v3-proposal.md`（`approved_for_implementation`）
-関連提案：`docs/design/2026-08-04-conformance-evaluation-scope-relaxation-proposal.md`（`awaiting_human_approval`）
-承認記録（予定）：`DEC-WORK4A-REBUILD-DESIGN-004`
+関連提案：`docs/design/2026-08-04-conformance-evaluation-scope-relaxation-proposal.md`（`approved`）
+承認記録：`DEC-WORK4A-REBUILD-DESIGN-004`
 
-**これは提案であり、Human承認前である。**本改訂とconformance-evaluation利用範囲の緩和提案は、
-いずれも未承認である。承認されるまで、実装、REDテスト作成、外部`DATA_ROOT`への追加書込み、
-候補再抽出、LLMによる説明生成、Decision・Entry・Relation・Baselineの作成を行わない。
+Humanの承認により、本改訂はv3の差分として実装正本に加わる。
+LLMによるDisposition Proposalの生成は、Routine Profileの実データ確認後の別承認とする。
 
 v3を置き換えず、差分だけを定義する。v3の参照モデル、validation順序、fail-closed条件、
 new-only規則は変更しない。追加するのは、922件の候補にHumanが処置labelを付けるための判断材料と、
@@ -71,11 +70,16 @@ v3ではdisposition語彙一つが、機械の候補分類とHumanの処置の�
   change classは`ordinary`とする（security、authority、不可逆操作のいずれにも触れないため）。
 
 機械が`responsibility_class`へ初期値を置いてよいのは、次の決定的規則による場合だけである。
-規則はPolicy artifactに書き、呼出側の文字列で判定しない。
+規則はPolicy artifactに書き、呼出側の文字列で判定しない。**上から順に、最初に一致したものを採る。**
 
-1. symbol名が`_`で始まる、かつsource universe内の他moduleから参照されない → `implementation_detail`
-2. 上記以外で、source universe内のどこからも参照されない → `ownership_unclear`
-3. それ以外 → `public_responsibility`
+1. 例外class（基底が例外型） → `ownership_unclear`
+2. nested function → `implementation_detail`
+3. symbol名が`_`で始まり、source universe内の他moduleから参照されない → `implementation_detail`
+4. source universe内のどこからも参照されない → `ownership_unclear`
+5. それ以外 → `public_responsibility`
+
+規則1は`DEC-WORK4A-REBUILD-DESIGN-004`の決定による。例外classは責務の帰属がcodeからは決まらないため、
+`implementation_detail`と断定せず`ownership_unclear`としてHumanの確定を要求する。
 
 初期値は提案であり、Humanが変更できる。Humanが確定するまでEntryを作らない。
 
@@ -485,7 +489,22 @@ v3の22件は変更せず維持する。次を追加する。
 するためである。例外class 81件、5行以下の関数92件、非公開393件のうち相当数は、
 機械事実だけでgroup判断できる見込みがある。
 
-## 15. 未決事項
+## 15. 決定事項（提案時の未決五点）
+
+`DEC-WORK4A-REBUILD-DESIGN-004`により次のとおり決定した。本文へ反映済みである。
+
+| # | 論点 | 決定 |
+| --- | --- | --- |
+| 1 | lambdaの扱い | 除外し、件数と位置を`excluded_constructs`へ記録する（§5のとおり） |
+| 2 | group条件式の記法 | 三つ組の連言（AND）のみ。正規表現とORを許さない（§9.1のとおり） |
+| 3 | 例外classの機械初期値 | `ownership_unclear`（§4の規則1） |
+| 4 | Disposition Proposalの生成単位 | 922件全件をbatch生成する |
+| 5 | nested functionの機械初期値 | `implementation_detail`（§4の規則2） |
+
+決定3だけが提案時の推奨と異なる。提案は`implementation_detail`を推奨していたが、
+例外classの責務帰属はcodeから決まらないため、Humanの確定を要求する`ownership_unclear`とした。
+
+## 16. 旧未決事項の原文
 
 1. **lambdaの扱い。**現案は除外し、件数と位置を`excluded_constructs`へ記録する。
    「全て載せる」方針を厳密に取るなら、`<path>:<enclosing>.<lambda#序数>`のような序数IDで

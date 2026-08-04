@@ -1,11 +1,11 @@
 # conformance-evaluation利用範囲の緩和提案
 
-状態：`awaiting_human_approval`
+状態：`approved`
 対象：旧ReviewCompassの`conformance-evaluation`をWork 4Aで利用する範囲
-承認記録（予定）：`DEC-CONFORMANCE-SCOPE-RELAXATION-001`
+承認記録：`DEC-CONFORMANCE-SCOPE-RELAXATION-001`
 
-**これは提案であり、Human承認前である。**承認されるまで、本提案を根拠に逆推定を実行しない。
-承認された場合にだけDecision recordを作成する。
+Humanの承認により、Work 4Aの範囲で逆推定を通常経路として使える。
+§4の規律は緩和対象に含まれず、維持する。
 
 ## 1. 現行の制限
 
@@ -84,14 +84,14 @@ v3.1改訂案では、前身の「推定根拠としてcode referenceを保持�
 - 継承記録は固定source recordであり、本文をin-place変更しない。位置づけの更新は、承認された場合の
   Decision recordを正本とする。
 
-## 7. Humanへの確認事項
+## 7. 承認
 
-1. 上記§3の二点を、Work 4Aの範囲に限って緩和してよいか。
-2. §4の規律を維持することでよいか。緩和すべきものがあれば指示を求める。
-3. 承認する場合、`DEC-CONFORMANCE-SCOPE-RELAXATION-001`として記録してよいか。
+2026-08-04にHumanが§3の二点をWork 4Aの範囲で承認し、§4の規律を維持することを確認した。
+記録は`records/development/2026-08-04-conformance-evaluation-scope-relaxation-decision-v1.md`
+（`DEC-CONFORMANCE-SCOPE-RELAXATION-001`）である。
 
 ## 8. 経緯
 
 2026-08-04の会話で、Humanは「要件と設計を言語モデルで逆推定することを通常経路にしない。
-作業自体を初期開発に入れないを緩めればいいだけのこと」と述べた。
-本提案はその指摘を設計文書へ落としたものであり、承認そのものではない。
+作業自体を初期開発に入れないを緩めればいいだけのこと」と述べ、本提案を作成した。
+その後、v3.1設計改訂とあわせて承認した。
