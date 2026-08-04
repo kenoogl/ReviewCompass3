@@ -789,7 +789,7 @@ automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る�
 - [ ] 最初のImplementation Task Contractへ`implementation_ready`を出せる前提が揃っている。
 
 `Authority`：[Work 4A Rebuild Design v2](../design/2026-08-04-work-4a-rebuild-design-v2-proposal.md)、
-`DEC-WORK4A-REBUILD-DESIGN-002`。v1 E2E testはstaleであり、v2 E2EをREDから作り直す。
+`DEC-WORK4A-REBUILD-DESIGN-002`。v1 E2E testはstale。v2 E2E RED Test：`tests/test_work4a_rebuild_v2_e2e.py`。
 
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
