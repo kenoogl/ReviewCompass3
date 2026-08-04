@@ -172,12 +172,13 @@ def test_writes_a_new_baseline_version_without_overwriting_v1(tmp_path):
     )
     second = module.persist_reusable_routine_ledger(
         project_root=project_root, source_snapshot_id="d" * 64,
-        candidate_list_digest="e" * 64, entries=(_entry("d" * 64),),
+        source_content_id="f" * 64, candidate_list_digest="e" * 64, entries=(_entry("d" * 64),),
         relations=(), decision_refs=("DEC-EXAMPLE-002",), baseline_version=2,
     )
     assert first.baseline_path.name == "ledger-baseline--v1.json"
     assert second.baseline_path.name == "ledger-baseline--v2.json"
     assert first.baseline_path.read_bytes() != second.baseline_path.read_bytes()
+    assert json.loads(second.baseline_path.read_text(encoding="utf-8"))["source_content_id"] == "f" * 64
 
     manifest = project_root / ".reviewcompass" / "project-manifest.json"
     document = json.loads(manifest.read_text(encoding="utf-8"))

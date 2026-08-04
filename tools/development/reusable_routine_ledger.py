@@ -149,6 +149,7 @@ def persist_reusable_routine_ledger(
     *,
     project_root,
     source_snapshot_id,
+    source_content_id=None,
     candidate_list_digest,
     entries,
     relations,
@@ -160,6 +161,10 @@ def persist_reusable_routine_ledger(
     _require_sha256(candidate_list_digest, "candidate list digest")
     if not isinstance(baseline_version, int) or baseline_version < 1:
         raise ReusableRoutineLedgerError("ledger baseline version is invalid")
+    if baseline_version >= 2:
+        _require_sha256(source_content_id, "source content")
+    elif source_content_id is not None:
+        _require_sha256(source_content_id, "source content")
     if not isinstance(entries, tuple) or not isinstance(relations, tuple):
         raise ReusableRoutineLedgerError("ledger records must be tuples")
     if not entries or not decision_refs or not all(
@@ -213,6 +218,8 @@ def persist_reusable_routine_ledger(
         "relation_refs": relation_refs,
         "decision_refs": sorted(set(decision_refs)),
     }
+    if source_content_id is not None:
+        baseline["source_content_id"] = source_content_id
     baseline["content_digest"] = _canonical_digest(baseline)
     _write_new(baseline_path, baseline)
     return PersistedReusableRoutineLedger(
