@@ -1,0 +1,19 @@
+{
+  "content_digest": "719b664d86922fdc69a5be27a128d2e952929585a6338d820008494d078e910c",
+  "created_at": "2026-08-04T12:48:34+09:00",
+  "manifest_kind": "todo_byte_exact_snapshot",
+  "manifest_version": 1,
+  "snapshot": {
+    "bytes": 85219,
+    "path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+    "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1"
+  },
+  "snapshot_id": "TODO-SNAPSHOT-2026-08-04-001",
+  "source": {
+    "bytes": 85219,
+    "claim_count": 123,
+    "lines": 900,
+    "path": "TODO_NEXT_SESSION.md",
+    "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1"
+  }
+}

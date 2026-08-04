@@ -660,6 +660,13 @@ Completion Evidenceは`records/development/2026-08-04-issue-resolution-pilot-wi-
 `624 passed`、fallback `false`。実snapshotとTODO compactionは未変更。GREEN commit後までWI-007を開始せず、
 最後のPilot checkboxは未完了のままとする。
 
+WI-006 GREEN containing commit `6b68c25`とclean transition確認後、WI-007を実施した。Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-wi-007-completion-evidence-v1.md`。source TODO、snapshot、
+manifestを別々に再読込し、SHA-256 `16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1`、
+85219 bytes、900 lines、123 Claimsで一致した。versioned recoveryを含むsnapshot関連`10 passed`、公式全
+`625 passed`、fallback `false`。本作業単位ではTODOを変更せず、containing commit後のsource再照合までWI-003を
+開始しない。最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
