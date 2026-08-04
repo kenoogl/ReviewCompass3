@@ -796,55 +796,6 @@ Work 4Aのcheckboxと完了関門は未完了である。
 `f8cf312392897cb9b5da030ffae15432e0d2a77a58ca8e158d786b66221454d3`。
 Acceptance Test 5件はgenerator module未実装により期待どおりREDである。
 
-`GREEN Evidence`：`RC3-WORK4A-SOURCE-SYMBOL-INDEX-GREEN-2026-08-04-V1`、
-`records/development/2026-08-04-work-4a-source-symbol-index-green-evidence-v1.md`、SHA-256
-`d0cb960280a9411b5358d9d21ee3fc2fc8829bf12ddf0a6f9e7d6180ef56a871`。
-RED Testを変更せず`5 passed`、公式全Testは`657 passed`、fallback `false`である。
-実source treeのIndex、coverage、freshness、Ledgerは未確認のためcheckboxと完了関門は未完了である。
-
-`Baseline Persistence GREEN Evidence`：`RC3-WORK4A-BASELINE-PERSISTENCE-GREEN-2026-08-04-V1`、
-`records/development/2026-08-04-work-4a-baseline-persistence-green-evidence-v1.md`。new-only保存、Digest、
-re-read comparison、current／historical分類を持つversioned toolをGREENにした。current external baselineは
-containing commit後のclean transitionで生成するため、Work 4Aのcheckboxと完了関門は未完了である。
-
-`Routine Classification Extractor GREEN Evidence`：`RC3-WORK4A-ROUTINE-CLASSIFICATION-GREEN-2026-08-04-V1`、
-`records/development/2026-08-04-work-4a-routine-classification-green-evidence-v1.md`。承認済み規則から
-machine candidateとsource evidenceを抽出するtoolをGREENにした。actual candidate list、Ledger登録、Human確認は
-containing commit後のfresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未完了である。
-
-`Routine Classification Candidate Persistence GREEN Evidence`：
-`RC3-WORK4A-ROUTINE-CLASSIFICATION-PERSISTENCE-GREEN-2026-08-04-V1`、
-`records/development/2026-08-04-work-4a-routine-classification-persistence-green-evidence-v1.md`。candidate listを
-new-only保存しDigestとre-read comparisonで照合するtoolをGREENにした。actual outputとHuman確認はcontaining commit後の
-fresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未完了である。
-
-`Routine Classification Input Approval Decision`：
-`DEC-WORK4A-ROUTINE-CLASSIFICATION-INPUT-001`。Snapshot
-`4f01c7f2b0f6b8df03fa360e9aedb3639d972a890a80bbca5fd48b07b28213d7`の144件をHuman確認の入力として承認した。
-これはcandidateの最終分類、Ledger登録、routine変更の承認ではない。次は代表sampleとLedger record境界を提案する。
-
-`Cross-contract Classification Gap Candidate`：
-`IC-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GAP-001`。固定checkboxのcross-contractは現行extractorで未測定であり、
-0件とは扱わない。Humanが最小rule追加またはauthority改定によるdeferを裁定するまで、Ledger登録とWork 4A完了を
-開始しない。
-
-`Cross-contract Classification GREEN Evidence`：
-`RC3-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GREEN-2026-08-04-V1`。Humanが承認した最小ruleにより、異なる
-`tools.<domain>`間のstatic importをcandidateとして抽出する。actual candidate listはcontaining commit後のfresh
-Snapshotから再生成するため、現時点でLedger登録またはWork 4A完了には進まない。
-
-`Reusable Routine Ledger Structure Proposal v2`：Project Manifestのreuse rootと整合する
-`.reviewcompass/reuse/reusable-routine-ledger/`を候補配置とし、baseline manifest・entry・relationの個別record方式を
-提案した。schemaと配置のHuman承認、RED Acceptance Test、GREEN実装の前にLedger entryを作成しない。
-
-`Reusable Routine Ledger Entry／Baseline GREEN Evidence`：
-`RC3-WORK4A-REUSABLE-ROUTINE-LEDGER-GREEN-2026-08-04-V1`。entryとbaseline manifestの最小保存・Digest照合を
-GREENにした。relation recordとactual entryは未実装であり、Work 4Aのcheckboxと完了関門は未完了である。
-
-`Reusable Routine Ledger Relation GREEN Evidence`：
-`RC3-WORK4A-REUSABLE-ROUTINE-LEDGER-RELATION-GREEN-2026-08-04-V1`。relation recordとbaseline Digest結線を
-GREENにした。actual Ledger entry、Humanのroutine disposition、Work 4Aのcheckboxと完了関門は未完了である。
-
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred
