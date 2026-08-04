@@ -609,6 +609,12 @@ SHA-256 `1290ec51776daf55ce43c450c24d665753a6223d975988a94050df8dfce17996`。10 
 Finding 0、stale binding `false`、`ready_for_human_approval`、公式全`581 passed`、fallback `false`である。
 Challenge作業単位のcommit後にHuman Plan Decisionを要求し、承認前はTask Contract v2を作成しない。
 
+Challenge v4 containing commit `07b5617`とclean transitionを確認後、HumanはPlan v4を承認した。Approval
+Completion Evidenceは`records/development/2026-08-04-issue-resolution-pilot-plan-v4-approval-completion-evidence-v1.md`、
+SHA-256 `93cbd5815652777712da087c5ba4be4774da1d2e86972b7cec88336b0346aea3`。DecisionはPlan v4、Challenge v4、
+公式全581 Test receiptへ結線され、Task Contract v2の別作業単位作成だけを許可した。承認作業単位のcommit後まで
+Task Contract v2を作成せず、最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

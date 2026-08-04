@@ -1,0 +1,48 @@
+{
+  "decision_id": "DEC-RC3-ISSUE-PILOT-PLAN-CHALLENGE-V4-2026-08-04",
+  "decision_version": 1,
+  "decided_at": "2026-08-04T12:11:55+09:00",
+  "decision_maker": "human",
+  "decision": "approve_plan",
+  "challenge_ref": {
+    "challenge_id": "CHALLENGE-PILOT-TODO-GROWTH-001",
+    "challenge_version": 4,
+    "path": ".reviewcompass/workflow/plan-challenges/challenge-pilot-todo-growth-001--v4.json",
+    "sha256": "34ccf304201d5d4ecac320ed2e2648673c5a3fed027b81e31563274210646641",
+    "content_digest": "27cc64425968b459d08a4b5e558b0dd461264ba8200287813f030ed8747f8587"
+  },
+  "plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 4,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v4.json",
+    "sha256": "d309a2e10de52d093a58a1fefd292fd18b14ed5d6e863fa71a099abce01c6bcd",
+    "content_digest": "dc44a9c7d3c2da1f68df12e5be93e906d88e46aa996d5577edebb383b5ac3520"
+  },
+  "verification_ref": {
+    "path": "records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v4-test-receipt-v1.json",
+    "sha256": "43f2400acaa6501f611ef45840688cf229d25344841d133343b7e127e4500655",
+    "status": "passed",
+    "test_count": 581
+  },
+  "accepted_blocking_findings": [],
+  "warning_dispositions": [],
+  "authorized_actions": [
+    "create Task Contract version 2 as a separate work unit without modifying Task Contract version 1",
+    "carry forward the committed WI-001 helper GREEN Evidence without recreating the actual snapshot",
+    "route work items in the order WI-001, WI-002, WI-006, WI-007, WI-003, WI-004, WI-005",
+    "require the WI-007 containing commit to leave TODO source unchanged",
+    "reverify WI-007 source identity at WI-003 start and create a new versioned snapshot if it changed"
+  ],
+  "not_authorized": [
+    "create Task Contract version 2 in this Plan approval work unit",
+    "begin WI-002 before the Task Contract version 2 containing commit is verified",
+    "create the actual snapshot before WI-002 and WI-006 are completed and committed",
+    "modify Plan version 4, Challenge version 4, Task Contract version 1, or the fixed WI-001 Test in place",
+    "compact TODO or declare ISSUE-PILOT-TODO-GROWTH-001 resolved",
+    "send project artifacts to an external reviewer",
+    "enable hooks, watchers, schedulers, or background services",
+    "start Work 4 before the Issue Resolution early Pilot completion gate"
+  ],
+  "next_action": "Commit this Plan version 4 approval work unit, then create and verify Task Contract version 2 as a separate work unit.",
+  "content_digest": "e7d1885bfe858d34476ccc376bd8a5657fc6349b31de5fc830fea73d76efc97b"
+}
