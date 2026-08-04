@@ -1,16 +1,17 @@
 # Work 4A Rebuild Design v3.2 Proposal
 
-状態：`awaiting_human_approval`
+状態：`approved_for_implementation`
 対象：Work 4A Reusable Routine Ledger
 基準文書：`docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md`
 関連メモ：`docs/design/2026-08-05-work-4a-llm-analysis-context-memo.md`
-承認記録（予定）：`DEC-WORK4A-REBUILD-DESIGN-005`
+承認記録：`DEC-WORK4A-REBUILD-DESIGN-005`
 
-これはv3.1を置換しない差分提案である。目的は、LLMによるDisposition Proposalの前に、
+これはv3.1を置換しない差分である。目的は、LLMによるDisposition Proposalの前に、
 処置labelを人が判断しやすい機械的特徴をRoutine Profileへ追加することである。
 
-承認されるまで、実装、test、Routine Profileの再生成、外部DATA_ROOTへの書込み、
-LLMによるDisposition Proposal生成を行わない。
+Humanの承認により実装正本に加わる。§8の四点は`DEC-WORK4A-REBUILD-DESIGN-005`で確定し、
+閾値と上限はPolicy artifact v3へ固定した。
+LLMによるDisposition Proposalの生成は、Profile v2の実データ確認後の別承認とする。
 
 ## 1. 背景
 

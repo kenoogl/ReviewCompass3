@@ -60,6 +60,8 @@ VERIFICATION_OUTCOME_CLASSES = (
     "advisory_reference_unresolved",
     "advisory_evidence_missing",
     "group_coverage_incomplete",
+    "profile_reference_unresolved",
+    "test_reference_out_of_scope",
 )
 
 ANNOTATION_CLASSES = ("locator_unresolved", "locator_profile_mismatch")
@@ -164,6 +166,19 @@ _SCHEMA_BY_VERSION = {
          "responsibility_class_rules", "group_condition_grammar", "confidence_classes",
          "evidence_ref_kinds", "extraction_rule_version", "verification_outcome_classes",
          "development_policy_ref", "content_digest"),
+        (),
+    ),
+    ("work4a_freshness_policy", 3): (
+        ("record_kind", "schema_version", "digest_algorithm", "policy_id", "policy_version",
+         "change_class", "change_classes", "revalidation_required_classes",
+         "candidate_classification_classes", "responsibility_classes", "disposition_classes",
+         "disposition_source_classes", "syntactic_effect_markers", "marker_detection_rules",
+         "responsibility_class_rules", "group_condition_grammar", "confidence_classes",
+         "evidence_ref_kinds", "extraction_rule_version", "feature_fields", "signal_classes",
+         "complexity_signal_thresholds", "public_api_signal_thresholds",
+         "semantic_comparison_candidate_limit", "test_reference_root", "cli_entrypoint_markers",
+         "detection_scope", "verification_outcome_classes", "development_policy_ref",
+         "content_digest"),
         (),
     ),
     ("work4a_observation_attestation", 2): (
@@ -861,6 +876,164 @@ def write_freshness_policy_v2(
         "confidence_classes": list(CONFIDENCE_CLASSES),
         "evidence_ref_kinds": list(EVIDENCE_REF_KINDS),
         "extraction_rule_version": 2,
+        "verification_outcome_classes": list(VERIFICATION_OUTCOME_CLASSES),
+        "development_policy_ref": build_project_ref(
+            project_root=root,
+            path=development_policy_path,
+            record_kind="development_policy",
+            record_id="DEVELOPMENT-POLICY",
+            version=1,
+        ),
+    }
+    document["content_digest"] = _content_digest(document)
+    validate_record_schema(document, record_kind="work4a_freshness_policy")
+    path = _write_new(
+        policies / f"work4a-freshness-policy-v{policy_version}.json", document, allow_identical=True
+    )
+    return Policy(policy_id, policy_version, path, document["content_digest"])
+
+
+# v3.2で追加するfeature語彙と検出範囲。Policy v3へ固定する。
+FEATURE_FIELDS_V3 = (
+    "direct_callee_symbol_ids",
+    "direct_caller_symbol_ids",
+    "unresolved_direct_call_count",
+    "raised_exception_names",
+    "caught_exception_names",
+    "bare_except_count",
+    "branch_count",
+    "return_count",
+    "raise_count",
+    "try_count",
+    "max_nesting_depth",
+    "effect_marker_count",
+    "complexity_signal",
+    "direct_test_reference_paths",
+    "direct_test_reference_count",
+    "is_private_name",
+    "is_exported_by_all",
+    "cross_package_caller_count",
+    "cli_entrypoint_marker",
+    "public_api_signal",
+    "semantic_comparison_candidate_ids",
+    "semantic_candidate_selection_reason",
+)
+
+SIGNAL_CLASSES = ("low", "medium", "high")
+SEMANTIC_COMPARISON_CANDIDATE_LIMIT = 10
+TEST_ROOT = "tests"
+CLI_MARKERS = (
+    "argparse.ArgumentParser",
+    "ArgumentParser",
+    "add_argument",
+    "add_parser",
+    "click.command",
+    "typer.Typer",
+)
+
+COMPLEXITY_SIGNAL_THRESHOLDS = {
+    "low_all_of": {
+        "branch_count": {"operator": "lte", "value": 3},
+        "max_nesting_depth": {"operator": "lte", "value": 1},
+        "return_count": {"operator": "lte", "value": 2},
+        "try_count": {"operator": "equals", "value": 0},
+        "effect_marker_count": {"operator": "lte", "value": 1},
+    },
+    "high_any_of": {
+        "branch_count": {"operator": "gte", "value": 10},
+        "max_nesting_depth": {"operator": "gte", "value": 4},
+        "return_count": {"operator": "gte", "value": 6},
+        "try_count": {"operator": "gte", "value": 3},
+        "effect_marker_count": {"operator": "gte", "value": 3},
+    },
+    "otherwise": "medium",
+    "meaning": "split decision ではなく確認優先度の指標",
+}
+
+PUBLIC_API_SIGNAL_THRESHOLDS = {
+    "high_any_of": {
+        "is_exported_by_all": {"operator": "equals", "value": True},
+        "cli_entrypoint_marker": {"operator": "equals", "value": True},
+        "cross_package_caller_count": {"operator": "gte", "value": 2},
+    },
+    "low_all_of": {
+        "is_private_name": {"operator": "equals", "value": True},
+        "is_exported_by_all": {"operator": "equals", "value": False},
+        "cli_entrypoint_marker": {"operator": "equals", "value": False},
+        "cross_package_caller_count": {"operator": "equals", "value": 0},
+    },
+    "otherwise": "medium",
+    "meaning": "公開契約の証明ではなく確認優先度の指標",
+}
+
+DETECTION_SCOPE_V3 = {
+    "call_graph": {
+        "resolves": "same source universe, syntactically resolvable direct calls only",
+        "does_not_follow": ["alias_import", "dynamic_attribute", "reflection", "callback",
+                            "eval", "exec"],
+        "unresolved_are_counted": True,
+    },
+    "exception": {
+        "records": "names appearing syntactically in raise and except",
+        "does_not_infer": ["propagated_exception", "runtime_type", "dynamically_built_exception"],
+    },
+    "test_reference": {
+        "scope": "tests/**/*.py direct AST references only",
+        "does_not_cover": ["string_reference", "fixture_indirection", "dynamic_import",
+                           "integration_test_indirection"],
+        "escape": "reject",
+    },
+    "public_api": {
+        "inputs": ["__all__", "cross_package_direct_caller", "cli_syntax_marker"],
+        "does_not_prove": "public contract",
+    },
+    "semantic_comparison": {
+        "source": "symbol ids in the same routine profile only",
+        "limit": SEMANTIC_COMPARISON_CANDIDATE_LIMIT,
+        "not_a_conclusion": "merge",
+    },
+}
+
+
+def write_freshness_policy_v3(
+    *, project_root, policy_id, policy_version, development_policy_path, change_class
+):
+    """v3.2のPolicy artifact。追加featureの語彙、検出範囲、閾値、上限を固定する。"""
+
+    if change_class not in CHANGE_CLASSES:
+        raise V3ValidationError("unknown_field", f"change_class={change_class}")
+    root = Path(project_root).resolve()
+    policies = _artifact_root(root, "policies")
+    document = {
+        "record_kind": "work4a_freshness_policy",
+        "schema_version": 3,
+        "digest_algorithm": DIGEST_ALGORITHM,
+        "policy_id": policy_id,
+        "policy_version": policy_version,
+        "change_class": change_class,
+        "change_classes": list(CHANGE_CLASSES),
+        "revalidation_required_classes": list(REVALIDATION_REQUIRED_CLASSES),
+        "candidate_classification_classes": list(CANDIDATE_CLASSIFICATION_CLASSES),
+        "responsibility_classes": list(RESPONSIBILITY_CLASSES),
+        "disposition_classes": list(DISPOSITION_CLASSES_V2),
+        "disposition_source_classes": list(DISPOSITION_SOURCE_CLASSES),
+        "syntactic_effect_markers": list(SYNTACTIC_EFFECT_MARKERS),
+        "marker_detection_rules": {
+            marker: list(names) for marker, names in MARKER_DETECTION_RULES.items()
+        },
+        "responsibility_class_rules": [dict(rule) for rule in RESPONSIBILITY_CLASS_RULES],
+        "group_condition_grammar": json.loads(json.dumps(GROUP_CONDITION_GRAMMAR)),
+        "confidence_classes": list(CONFIDENCE_CLASSES),
+        "evidence_ref_kinds": list(EVIDENCE_REF_KINDS),
+        "extraction_rule_version": 3,
+        "feature_fields": list(FEATURE_FIELDS_V3),
+        "signal_classes": list(SIGNAL_CLASSES),
+        "complexity_signal_thresholds": json.loads(json.dumps(COMPLEXITY_SIGNAL_THRESHOLDS)),
+        "public_api_signal_thresholds": json.loads(json.dumps(PUBLIC_API_SIGNAL_THRESHOLDS)),
+        "semantic_comparison_candidate_limit": SEMANTIC_COMPARISON_CANDIDATE_LIMIT,
+        "test_reference_root": TEST_ROOT,
+        "cli_entrypoint_markers": list(CLI_MARKERS),
+        "detection_scope": json.loads(json.dumps(DETECTION_SCOPE_V3)),
         "verification_outcome_classes": list(VERIFICATION_OUTCOME_CLASSES),
         "development_policy_ref": build_project_ref(
             project_root=root,
