@@ -785,11 +785,7 @@ automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る�
 - [ ] 配置、Index、Ledger、実codeが照合済みである。
 - [ ] 最初のImplementation Task Contractへ`implementation_ready`を出せる前提が揃っている。
 
-`Start Boundary Evidence`：`RC3-WORK4A-START-BOUNDARY-2026-08-04-V1`、
-`records/development/2026-08-04-work-4a-start-boundary-evidence-v1.md`、SHA-256
-`65d47954cf8f71b02444b334df8598912c31d19183d70ccec59bc083b1ed7159`。
-これは対象source universe、Source Snapshot／symbol identity規則、次のRED入口だけを固定する。
-Work 4Aのcheckboxと完了関門は未完了である。
+`Evidence`：未記録
 
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 

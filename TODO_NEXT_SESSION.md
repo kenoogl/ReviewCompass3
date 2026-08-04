@@ -6,8 +6,8 @@
 
 ## 現在位置
 
-- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aは再設計済みで、旧実装のrevertを実行中。
-- 現在の工程：Work 4A rebuild／旧patch群の可逆revert。
+- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aの旧patch群はrevert済みで、再設計から再開する。
+- 現在の工程：Work 4A rebuild／E2E acceptance RED。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：[Work 4A Rebuild Design](/docs/design/2026-08-04-work-4a-rebuild-design-proposal.md)
@@ -26,6 +26,9 @@
 - Claim `EC-WORK4A-REBUILD-DESIGN-001`：再設計と、局所patchを禁じる方針をHumanが承認した。
   - Evidence：`15bf012`、`DEC-WORK4A-REBUILD-DESIGN-001`。
   - 観測した事後状態：承認済み設計文書がGitに存在する。
+- Claim `EC-WORK4A-REVERT-001`：台帳、候補抽出、局所policy対応の旧patchをrevertし、Layout v3を保持した。
+  - Evidence：revert commit群。
+  - 観測した事後状態：旧Work 4Aのsource index、candidate、ledger実装とrecordが存在しない。
 
 ### 手戻り・機械化候補
 
@@ -33,28 +36,29 @@
 
 ### 未実施
 
-- 旧patch群のrevert完了、七項目のE2E RED acceptance、rebuild実装、actual artifactは未実施。
+- 七項目のE2E RED acceptance、rebuild実装、actual artifactは未実施。
 
 ## 次に行う一作業
 
-旧Work 4A patch群のrevertを完了し、project-first runtime layoutを保持した状態を確認する。
+Work 4A再設計の七項目を一つのE2E acceptance test群としてREDで固定する。
 
 開始条件：
 
 - `DEC-WORK4A-REBUILD-DESIGN-001`によるHuman承認。
+- reversion commit後のclean transition。
 
 完了条件：
 
-- 台帳、候補抽出、局所policy対応の旧patchがrevertされ、独立承認済みLayout v3は残る。
-- Worktree、参照、関連testを確認し、revert commitを作成する。
+- new-only Entry／Relation／Baseline、content-based freshness、Historical Contract Status、負例を含む受入testが意図どおりREDになる。
+- production implementation、actual artifact、既存patchの部分復元を含めない。
 
-後続作業：七項目のE2E acceptance testをREDとして固定する。
+後続作業：RED testを変更せず、最小のidentity chain実装をGREENにする。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
 - Human判断待ち：なし。設計承認済み。
-- 再開条件：revert commit後のclean transition。
+- 再開条件：RED acceptance containing commit後のclean transition。
 
 ## stale・deferred
 
@@ -67,9 +71,9 @@
 - commit境界：本handoffを含むcommit完了時点。
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する。
 - worktree：本revert完了・commit時点でcleanにする。
-- 直近の関連Test：revert実行中のため未実施。
-- 直近の全Test：revert完了後に再実行する。
-- 差分検査：revert完了後に再実行する。
+- 直近の関連Test：revert後に実行する。
+- 直近の全Test：revert後に実行する。
+- 差分検査：revert後に実行する。
 
 ## 更新規則
 
