@@ -27,7 +27,8 @@
   blocking Finding 0でcommit `07b5617`へ固定され、HumanがPlan v4を承認した。Approval Decision containing commit
   `b969200`とclean transition確認後、Task Contract v2の8件のTestを固定し、期待どおりREDを確認した。RED commit
   `0a8cc73`後、v2実体とvalidatorを作成した。旧Plan表記を拒否する負例を追加してPlan v4結線を補強し、targeted
-  `9 passed`、公式全`590 passed`となった。
+  `9 passed`、公式全`590 passed`となった。Task Contract v2 containing commit `156c823`確認後、WI-002の
+  12件のTestを固定し、期待どおりREDを確認した。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -38,17 +39,18 @@
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
 - activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2`、
   state `implementation_in_progress / task_contract_v2_validated / containing_commit`、
-  WI-001 `completed_carried_forward / actual_snapshot_not_created`、WI-002 `not_started`。
+  WI-001 `completed_carried_forward / actual_snapshot_not_created`、
+  WI-002 `red_verified / containing_commit_pending`。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`ed1f91642a61bde444cff5a8e39a4ad334942f7a15e9775eb6c96825cac5a1b1`
+- 進行入口SHA-256：`43724991e3e4ce60521416df8afc9645fb3b4abcdae9f0d8756d42b32e222e17`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-issue-resolution-pilot-task-contract-v2-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`824f4aeec4d694410e07a22194a70d7e412ffbeda1dbadaf7a3b8128eb890604`
+  `records/development/2026-08-04-issue-resolution-pilot-wi-002-red-evidence-v1.md`
+- Decision／Evidence SHA-256：`f118f47852c0d65dd8d9238b6713aa47a2cbbbb0991883e2cf6b049e4d372071`
 
 ## 実施報告照合
 
@@ -693,6 +695,12 @@
     `248f3f8604d4451e4c2c73d3083ca78bc787c2cf1337ae2194d2aea3b9df163f`
   - 観測した事後状態：旧Plan表記を拒否するTest補正後、targeted `9 passed`、公式全`590 passed`、fallback
     `false`。実snapshot、WI-002、TODO compaction、Issue解決は未実施である。
+- Claim `EC-138`：WI-002のTODO compaction validator／restore境界をTestへ固定し、REDを確認した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-wi-002-red-evidence-v1.md`
+  - Test：`tests/test_todo_compaction.py`、SHA-256
+    `c5dd608f2561130d3fb46ffa23bb6363e823d65eaa89c89b14a4741e788315a1`
+  - 観測した事後状態：targeted `12 failed`、全`590 passed, 12 failed`。失敗は全件期待module未実装だけで、
+    validator／restore実装、実snapshot、TODO compactionは開始していない。
 
 ### reported_unverified／contradicted
 
@@ -769,7 +777,7 @@
 
 ### 未実施
 
-- WI-002以降、WI-001の実snapshot／manifest生成、TODO compaction、Resolution Verdict
+- WI-002 validator／restore実装、WI-006以降、WI-001の実snapshot／manifest生成、TODO compaction、Resolution Verdict
 - Deployment Manifest、package builder、原子的切替、rollbackのWork 7実装
 - Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定
 - Project Bindingのdurable保存
@@ -810,32 +818,30 @@
 
 ## 次に行う一作業
 
-Task Contract v2 containing commitをread-only照合後、WI-002のTODO上限、禁止履歴、active ID、参照、restore境界を
-test-firstで固定する。
+WI-002 RED containing commitをread-only照合後、固定Testを変更せずTODO compaction validator／restoreを実装する。
 
 開始条件：
 
-- Task Contract v2 file SHA-256が`1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6`、
-  content Digestが`248f3f8604d4451e4c2c73d3083ca78bc787c2cf1337ae2194d2aea3b9df163f`で、containing
-  commitからbyte-identicalに読める。
+- WI-002 Test SHA-256が`c5dd608f2561130d3fb46ffa23bb6363e823d65eaa89c89b14a4741e788315a1`で、
+  containing commitからbyte-identicalに読める。
 - worktreeがcleanでtransitionが`passed`である。
 
 完了条件：
 
-- 12288 bytes合格、12289 bytes拒否を含む正常・負例・境界TestがREDになる。
-- 禁止履歴、active ID、参照解決、決定的restoreの期待境界を固定する。
-- RED作業単位ではvalidator／restore実装、実snapshot、TODO圧縮、Issue解決を先取りしない。
+- 12288 bytes境界、禁止履歴、active ID、参照解決、snapshot／manifest Digestを固定Testどおり検査する。
+- restore後にbytesとDigestを再検証し、不一致時は変更前TODOへrollbackする。
+- targetedと公式runner全Testが合格し、実snapshot、TODO圧縮、WI-006を先取りしない。
 
-後続作業：WI-002 RED containing commit後、固定Testを変更せずvalidator／restoreを実装する。
+後続作業：WI-002 GREEN containing commit後、WI-006のderived state resolverをtest-firstで開始する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。Task Contract v2 containing commit確認前はWI-002 REDを開始しない。
-- Human判断待ち：現在のTask Contract v2作業に対する追加判断なし
-- 実行保留：WI-002実装はRED commit後、実snapshotはWI-002とWI-006のcommit後、TODO compactionはWI-007
+- blocker：なし。WI-002 RED containing commit確認前はvalidator／restore実装を開始しない。
+- Human判断待ち：現在のWI-002作業に対する追加判断なし
+- 実行保留：validator／restore実装はRED commit後、実snapshotはWI-002とWI-006のcommit後、TODO compactionはWI-007
   containing commit後まで開始しない。
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
-- 再開条件：Task Contract v2 containing commit確認、clean worktree、transition合格
+- 再開条件：WI-002 RED containing commit確認、clean worktree、transition合格
 
 ## stale・deferred
 
@@ -843,7 +849,8 @@ test-firstで固定する。
   currentはreceipt v2とformal Evidence v2。promotion GREEN receipt v1は負例追加前stateで、currentはv2。
   authority v1はv2にsupersededされた。NFR／deferred候補のidentity再検証は合格し、双方freshでHuman承認済み。
   Plan v2、Challenge v2、Plan v2 Approval Decisionはstate gap発見前の履歴として保持し、Task Contract判断には
-  Plan v3、Challenge v3、Plan v3 Approval Decisionを使用する。
+  Plan v3、Challenge v3、Plan v3 Approval DecisionはPlan v4系へsupersededされ、現行Task Contract判断には
+  Plan v4、Challenge v4、Plan v4 Approval Decisionを使用する。
   その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
   Issue Resolution・実施報告照合の正式automation、汎用Task Registry／plugin system。Issue Resolutionの
@@ -856,8 +863,8 @@ test-firstで固定する。
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Task Contract v2 targeted GREEN `9 passed in 0.03s`
-- 直近の全Test：公式runnerで`590 passed in 2.51s`、fallback `false`
+- 直近の関連検証：WI-002 targeted RED `12 failed in 0.10s`
+- 直近の全Test：raw pytestで既存`590 passed`、新規期待RED `12 failed in 2.92s`
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

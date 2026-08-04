@@ -630,6 +630,14 @@ WI-001 completion繰越、7 Work Item順、WI-007／WI-003 source identity境界
 `590 passed`、fallback `false`。v2作業単位のcommit後までWI-002、実snapshot、TODO compactionを開始せず、
 最後のPilot checkboxは未完了のままとする。
 
+Task Contract v2 containing commit `156c823`とclean transitionを確認後、WI-002のTODO全体12 KiB上限、禁止履歴、
+active ID、参照解決、snapshot Digest、決定的restoreを12件のTestへ固定した。RED Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-wi-002-red-evidence-v1.md`、Test SHA-256
+`c5dd608f2561130d3fb46ffa23bb6363e823d65eaa89c89b14a4741e788315a1`。targetedは`12 failed`、全体は既存
+`590 passed, 12 failed`で、失敗は全件`tools.development.todo_compaction`未実装だけである。RED作業単位の
+commit後までvalidator／restore実装、実snapshot、TODO compactionを開始せず、最後のPilot checkboxは未完了の
+ままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
