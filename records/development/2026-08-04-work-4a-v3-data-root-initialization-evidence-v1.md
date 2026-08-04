@@ -2,8 +2,11 @@
 
 ## 承認
 
-2026-08-04の会話でHumanが、提示した2 directoryの作成だけを承認した。
+2026-08-04の会話でHumanが、提示したwork4a配下directoryの作成だけを承認した。
 提示内容は、解決した実行時root、作成予定の絶対path、初期file無し、作成理由である。
+
+提示時は`observations`と`candidates`の2件として説明したが、実際の作成物は親directory `work4a`を含む
+3 directoryである。本記録は事実に合わせて3 directoryとする。
 
 ## 解決した実行時root
 
@@ -25,13 +28,15 @@ Layout v3の`resolve_project_runtime_layout`と、v3実装の`resolve_data_root`
 
 ## 作成したもの
 
+外部`DATA_ROOT`に3 directoryを作成した。
+
 | 絶対path | 種別 | 作成前 | 作成後 |
 | --- | --- | --- | --- |
-| `.../development/data/work4a/` | directory | 無 | 有（`drwxr-xr-x`） |
+| `.../development/data/work4a/` | directory | 無 | 有（`drwxr-xr-x`）。子はobservationsとcandidatesの2件のみ |
 | `.../development/data/work4a/observations/` | directory | 無 | 有。空 |
 | `.../development/data/work4a/candidates/` | directory | 無 | 有。空 |
 
-初期fileは作成していない。両directoryは空である。
+初期fileは作成していない。`observations`と`candidates`はいずれも空である。
 上位の`~/.reviewcompass3`と`.../development/data`は既存であり、新規作成していない。
 
 ## 触れなかったもの
@@ -45,7 +50,16 @@ Layout v3の`resolve_project_runtime_layout`と、v3実装の`resolve_data_root`
 
 これらはv3のfreshness根拠にも正本にも使わない。
 
-project内へは一切書いていない。stable profileの領域にも触れていない。
+## project内への書込み
+
+project内へ書いたのは、本初期化証跡`records/development/2026-08-04-work-4a-v3-data-root-initialization-evidence-v1.md`
+の1 fileだけである。
+
+実観測（Source Observation）と候補（Candidate Run）のdataはproject内へ書いていない。
+これらは外部`DATA_ROOT`にだけ置く設計であり、この時点ではまだ生成もしていない。
+Attestation、Decision、Entry、Relation、Baselineも作成していない。
+
+stable profileの領域には触れていない。
 
 ## 現在の停止点
 
