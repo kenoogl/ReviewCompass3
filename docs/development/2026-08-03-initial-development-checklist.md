@@ -537,6 +537,13 @@ Issue／Plan Completion Evidenceは
 version 2 validatorへ固定した。関連Testは`33 passed`。Plan Challenge、TODO compaction、Verdictが未実施のため、
 最後のPilot checkboxは未完了のままとする。
 
+Plan Challenge v1はderived state closure欠落をblocking Findingとして検出し、Humanの修正Decision後にPlan v2と
+Challenge v2を作成した。Challenge v2は10基準合格、blocking Finding 0、`ready_for_human_approval`となり、Humanは
+Plan v2を承認した。Approval Decisionは
+`records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v2-decision.json`、SHA-256
+`07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892`。次は別作業単位で実装Task Contractを作成する。
+TODO compactionとResolution Verdictは未実施のため、最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

@@ -15,7 +15,7 @@
   検証済み。Task ContractとImprovement Candidate／Triage Decisionの暫定形状をtest-firstで固定済み。
   単一Candidateを作成し、Humanが`issue_resolution / blocking=false`と一件のIssue昇格を承認した。
   Issue Record、Resolution Plan v1、Plan Challenge v1を作成し、Humanの修正Decisionに従ってPlan v2を作成した。
-  Challenge v2は`ready_for_human_approval`、blocking Finding 0。次はPlan v2のHuman最終判断を固定する。
+  Challenge v2はblocking Finding 0で、HumanがPlan v2を承認した。次は別作業単位で実装Task Contractを作成する。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -34,8 +34,8 @@
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `.reviewcompass/workflow/plan-challenges/challenge-pilot-todo-growth-001--v2.json`
-- Decision／Evidence SHA-256：`ca5b12124d34dd039f73bd9638aabe23eaa47f0112fc3688d089a67f58936b24`
+  `records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v2-decision.json`
+- Decision／Evidence SHA-256：`07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892`
 
 ## 実施報告照合
 
@@ -570,6 +570,11 @@
     `ef17d136479a2f3e8fb6da4c43d8390a3bbd0e8d845672b7429a18d9cf5b3557`
   - 観測した事後状態：Plan v2はderived state closure、12288／12289 bytes境界、link-only Claude入口を持つ。
     Challenge v2は10基準合格、blocking Finding 0、`ready_for_human_approval`で、Human最終判断を先取りしていない。
+- Claim `EC-123`：HumanがPlan v2を最終承認した。
+  - Decision：`records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v2-decision.json`、SHA-256
+    `07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892`
+  - 観測した事後状態：DecisionはPlan v2とChallenge v2のversion、file SHA-256、content Digestへ接続された。
+    実装Task Contract作成だけを次作業として許可し、TODO compaction、Issue解決、Work 4開始は先取りしていない。
 
 ### reported_unverified／contradicted
 
@@ -642,7 +647,7 @@
 
 ### 未実施
 
-- `PLAN-PILOT-TODO-GROWTH-001` v2のHuman最終判断、TODO snapshot／compaction、Resolution Verdict
+- Plan v2を実施するTask Contract、TODO snapshot／compaction、Resolution Verdict
 - Deployment Manifest、package builder、原子的切替、rollbackのWork 7実装
 - Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定
 - Project Bindingのdurable保存
@@ -683,30 +688,31 @@
 
 ## 次に行う一作業
 
-`PLAN-PILOT-TODO-GROWTH-001` v2について、Humanが承認、要修正、または却下を明示し、Decisionを固定する。
-TODO compactionと実装Task Contract作成は行わない。
+承認済み`PLAN-PILOT-TODO-GROWTH-001` v2のWI-001、WI-002、WI-006、WI-003、WI-004、WI-005を
+順序付きでrouteする実装Task Contractを作成・検証する。実装とTODO compactionは開始しない。
 
 開始条件：
 
-- Challenge v2が`ready_for_human_approval`、blocking Finding 0である。
+- Plan v2 Approval Decision SHA-256が
+  `07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892`である。
 - Plan v2 SHA-256が`1aa63a008a9c396a211231185c965300b7f4caa45ef07424796d3b9f6d6482ac`、
   Challenge v2 SHA-256が`ca5b12124d34dd039f73bd9638aabe23eaa47f0112fc3688d089a67f58936b24`である。
 - official Test receipt v2 SHA-256が`82668be805c1daf02532adb7b82f1d05e5db548e7977c633947b2c4f4d17bb81`である。
 
 完了条件：
 
-- Human Decisionがexact Plan v2／Challenge v2 version、file SHA-256、content Digestへ接続される。
-- 承認、要修正、却下のいずれかと理由、次action、非承認範囲を明示する。
-- TODOの圧縮、Task Contract開始、Issue解決を先取りしない。
+- Task Contractがexact Plan v2とApproval Decisionのversion、file SHA-256、content Digestへ接続される。
+- 6 Work Itemの順序、TDD境界、禁止事項、rollback、Human判断関門を移送する。
+- 実装、TODO圧縮、Issue解決を先取りしない。
 
-後続作業：HumanがPlan v2を承認した後だけ、実装Task Contract、milestone snapshot、TODO compactionへ進む。
+後続作業：Task Contractを独立検証・commitした後だけ、WI-001のRED作業へ進む。
 
 ## blocker・Human判断待ち
 
 - blocker：work unit transition preflightを正本とする。完了済み作業単位とdirty worktreeが同時に成立する間は、
   `completed_work_unit_uncommitted`として次作業へ移行しない。
-- Human判断待ち：Plan v2の承認、要修正、または却下
-- 実行保留：Plan承認Decision、実装Task Contract、milestone snapshot、TODO compaction
+- Human判断待ち：現在の次作業に対する追加判断なし
+- 実行保留：実装Task Contract、milestone snapshot、TODO compaction。承認Decision作業単位のcommit後に再開する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：work unit transition preflight合格とTask Contract、Completion Evidence、Test receiptの一致を確認する
 
