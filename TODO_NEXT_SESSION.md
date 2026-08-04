@@ -7,10 +7,10 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：Work 4へ復帰し、最初のReview Task ContractのDesign差分とslice選定へ進む。Work 4Bの再利用・統合Pilotは、Implementation Task Contract前の後続工程。
+- 現在の工程：Work 4／最初のReview Task Contract設計提案を作成済み、Human承認待ち。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
-- 当面の進行入口：Current PlanのWork 4：Design差分と最初のslice選定。
+- 当面の進行入口：Work 4 最初のReview Task Contract設計提案。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -18,6 +18,7 @@
 
 ## 最新のauthority／Evidence
 
+- [Work 4 最初のReview Task Contract設計提案](docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md) — SHA-256 `6e078fa5608f3fcf2ffafc0ad508da0df38bc8bb3e4e3842686db5c1d03c0ea4`
 - [Work 4A Rebuild Design v3](docs/design/2026-08-04-work-4a-rebuild-design-v3-proposal.md) — SHA-256 `a9e0419dcac556789e82f6f51292dd70399000f988e0720d240286c9a05c2b37`
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
@@ -32,25 +33,26 @@
 
 ## 次に行う一作業
 
-Work 4の最初のReview Task Contractに必要なDesign差分と代表scenarioを確認する。
+Work 4設計提案のHuman承認を得る。
 
 開始条件：
 
-- Work 4A early exitのcommit後のclean transition。
-- Work 4の未完了Designと最初のsliceの範囲確認。
+- 設計提案commit後のclean transition。
 
-完了データ：
+完了条件：
 
-- Work 4の代表scenario、Contract境界、Acceptanceの未完了箇所をCurrent Planとchecklistから抽出する。
-- Work 4Bが全件分類を前提にせず、Implementation Task Contract前の再利用検索・記録Pilotであることを確認する。
+- 対象scenario、Contract構造、record順序、負例、Work 5A範囲、Requirement対応をHumanが承認または差し戻す。
+- §9の五点（対象文書範囲、束縛Requirement 14件、warningの扱い、bootstrap実装の位置づけ、
+  Final Challenge分離の実現形）を判断する。
+- 承認された場合にだけDecision Recordを作成する。
 
-後続作業：Work 5A最小Review Task Contract。routineを新設・変更するImplementation Task Contract前に、Work 4B Pilotを行う。
+後続作業：Work 5AのRED受入固定と最小componentの実装。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：なし。Work 4BのLLM説明、処置label、Entry・Relation・Baselineは、対象候補が選ばれた後の別判断とする。
-- 再開条件：本計画更新commit後のclean transition。
+- Human判断待ち：Work 4設計提案の承認と§9の五点。Work 4Aの実データは提示済み。
+- 再開条件：設計提案commit後のclean transition。
 
 ## stale・deferred
 
