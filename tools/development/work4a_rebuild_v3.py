@@ -62,6 +62,9 @@ VERIFICATION_OUTCOME_CLASSES = (
     "group_coverage_incomplete",
     "profile_reference_unresolved",
     "test_reference_out_of_scope",
+    "discovery_profile_mismatch",
+    "member_truncation_detected",
+    "bounded_seed_not_a_basis",
 )
 
 ANNOTATION_CLASSES = ("locator_unresolved", "locator_profile_mismatch")
@@ -195,12 +198,43 @@ _SCHEMA_BY_VERSION = {
          "marker_detection", "routines", "excluded_constructs", "content_digest"),
         (),
     ),
+    ("work4a_freshness_policy", 4): (
+        ("record_kind", "schema_version", "digest_algorithm", "policy_id", "policy_version",
+         "change_class", "change_classes", "revalidation_required_classes",
+         "candidate_classification_classes", "responsibility_classes", "disposition_classes",
+         "disposition_source_classes", "syntactic_effect_markers", "marker_detection_rules",
+         "responsibility_class_rules", "group_condition_grammar", "confidence_classes",
+         "evidence_ref_kinds", "extraction_rule_version", "feature_fields", "signal_classes",
+         "complexity_signal_thresholds", "public_api_signal_thresholds",
+         "semantic_comparison_candidate_limit", "test_reference_root", "cli_entrypoint_markers",
+         "detection_scope", "grouping_rule_version", "basis_kinds", "presentation_classes",
+         "presentation_class_bounds", "representative_limit", "minimum_group_member_count",
+         "bounded_seed_fields", "bounded_seed_policy",
+         "comparison_discovery_reference_direction", "verification_outcome_classes",
+         "development_policy_ref", "content_digest"),
+        (),
+    ),
     ("work4a_routine_profile", 2): (
         ("record_kind", "schema_version", "digest_algorithm", "profile_run_id",
          "observation_snapshot_id", "source_content_id", "extraction_rule_version",
          "marker_detection", "call_graph_detection", "exception_detection",
          "test_reference_detection", "public_api_detection", "structural_match_detection",
          "semantic_comparison_detection", "routines", "excluded_constructs", "content_digest"),
+        (),
+    ),
+    ("work4a_routine_profile", 3): (
+        ("record_kind", "schema_version", "digest_algorithm", "profile_run_id",
+         "observation_snapshot_id", "source_content_id", "extraction_rule_version",
+         "marker_detection", "call_graph_detection", "exception_detection",
+         "test_reference_detection", "public_api_detection", "structural_match_detection",
+         "comparison_discovery_reference", "routines", "excluded_constructs", "content_digest"),
+        (),
+    ),
+    ("work4a_comparison_discovery", 1): (
+        ("record_kind", "schema_version", "digest_algorithm", "discovery_run_id",
+         "routine_profile_run_id", "routine_profile_content_digest", "source_content_id",
+         "grouping_rule_version", "reference_direction", "is_semantic_conclusion",
+         "produces_disposition", "basis_limitations", "groups", "content_digest"),
         (),
     ),
     ("work4a_disposition_proposal", 1): (
@@ -1059,6 +1093,104 @@ def write_freshness_policy_v3(
     return Policy(policy_id, policy_version, path, document["content_digest"])
 
 
+# v3.3のComparison Discovery。閉じたbasis語彙と表示classをPolicy v4へ固定する。
+BASIS_KINDS = (
+    "structural_exact_match",
+    "interface_shape_match",
+    "shared_direct_callee",
+    "shared_exception_contract",
+    "shared_test_reference",
+    "call_neighborhood",
+)
+PRESENTATION_CLASSES = ("focused", "broad", "mass")
+PRESENTATION_CLASS_BOUNDS = {
+    "focused": {"minimum": 2, "maximum": 12},
+    "broad": {"minimum": 13, "maximum": 50},
+    "mass": {"minimum": 51, "maximum": None},
+}
+REPRESENTATIVE_LIMIT = 3
+MINIMUM_GROUP_MEMBER_COUNT = 2
+GROUPING_RULE_VERSION = 1
+BOUNDED_SEED_FIELDS = (
+    "semantic_comparison_candidate_ids",
+    "semantic_candidate_selection_reason",
+)
+BOUNDED_SEED_POLICY = {
+    "readable_as_history": True,
+    "usable_as_discovery_input": False,
+    "usable_as_decision_basis": False,
+    "usable_as_entry_basis": False,
+    "usable_as_disposition_proposal_basis": False,
+}
+
+
+def write_freshness_policy_v4(
+    *, project_root, policy_id, policy_version, development_policy_path, change_class
+):
+    """v3.3のPolicy artifact。grouping ruleと表示classを固定する。"""
+
+    if change_class not in CHANGE_CLASSES:
+        raise V3ValidationError("unknown_field", f"change_class={change_class}")
+    root = Path(project_root).resolve()
+    policies = _artifact_root(root, "policies")
+    document = {
+        "record_kind": "work4a_freshness_policy",
+        "schema_version": 4,
+        "digest_algorithm": DIGEST_ALGORITHM,
+        "policy_id": policy_id,
+        "policy_version": policy_version,
+        "change_class": change_class,
+        "change_classes": list(CHANGE_CLASSES),
+        "revalidation_required_classes": list(REVALIDATION_REQUIRED_CLASSES),
+        "candidate_classification_classes": list(CANDIDATE_CLASSIFICATION_CLASSES),
+        "responsibility_classes": list(RESPONSIBILITY_CLASSES),
+        "disposition_classes": list(DISPOSITION_CLASSES_V2),
+        "disposition_source_classes": list(DISPOSITION_SOURCE_CLASSES),
+        "syntactic_effect_markers": list(SYNTACTIC_EFFECT_MARKERS),
+        "marker_detection_rules": {
+            marker: list(names) for marker, names in MARKER_DETECTION_RULES.items()
+        },
+        "responsibility_class_rules": [dict(rule) for rule in RESPONSIBILITY_CLASS_RULES],
+        "group_condition_grammar": json.loads(json.dumps(GROUP_CONDITION_GRAMMAR)),
+        "confidence_classes": list(CONFIDENCE_CLASSES),
+        "evidence_ref_kinds": list(EVIDENCE_REF_KINDS),
+        "extraction_rule_version": 4,
+        "feature_fields": [
+            field for field in FEATURE_FIELDS_V3 if field not in BOUNDED_SEED_FIELDS
+        ],
+        "signal_classes": list(SIGNAL_CLASSES),
+        "complexity_signal_thresholds": json.loads(json.dumps(COMPLEXITY_SIGNAL_THRESHOLDS)),
+        "public_api_signal_thresholds": json.loads(json.dumps(PUBLIC_API_SIGNAL_THRESHOLDS)),
+        "semantic_comparison_candidate_limit": SEMANTIC_COMPARISON_CANDIDATE_LIMIT,
+        "test_reference_root": TEST_ROOT,
+        "cli_entrypoint_markers": list(CLI_MARKERS),
+        "detection_scope": json.loads(json.dumps(DETECTION_SCOPE_V3)),
+        "grouping_rule_version": GROUPING_RULE_VERSION,
+        "basis_kinds": list(BASIS_KINDS),
+        "presentation_classes": list(PRESENTATION_CLASSES),
+        "presentation_class_bounds": json.loads(json.dumps(PRESENTATION_CLASS_BOUNDS)),
+        "representative_limit": REPRESENTATIVE_LIMIT,
+        "minimum_group_member_count": MINIMUM_GROUP_MEMBER_COUNT,
+        "bounded_seed_fields": list(BOUNDED_SEED_FIELDS),
+        "bounded_seed_policy": json.loads(json.dumps(BOUNDED_SEED_POLICY)),
+        "comparison_discovery_reference_direction": "discovery_to_profile_only",
+        "verification_outcome_classes": list(VERIFICATION_OUTCOME_CLASSES),
+        "development_policy_ref": build_project_ref(
+            project_root=root,
+            path=development_policy_path,
+            record_kind="development_policy",
+            record_id="DEVELOPMENT-POLICY",
+            version=1,
+        ),
+    }
+    document["content_digest"] = _content_digest(document)
+    validate_record_schema(document, record_kind="work4a_freshness_policy")
+    path = _write_new(
+        policies / f"work4a-freshness-policy-v{policy_version}.json", document, allow_identical=True
+    )
+    return Policy(policy_id, policy_version, path, document["content_digest"])
+
+
 def _annotation_text(node):
     return None if node is None else ast.dump(node, annotate_fields=False)
 
@@ -1752,6 +1884,477 @@ def build_routine_profile_v2(*, observation, policy, known_symbol_ids=()):
     )
 
 
+_ROUTINE_FIELDS_V3 = tuple(
+    field for field in _ROUTINE_FIELDS_V2 if field not in BOUNDED_SEED_FIELDS
+)
+
+BASIS_LIMITATIONS = {
+    "structural_exact_match": "正規化ASTの一致であり、同じ責務や統合可能性を示さない。",
+    "interface_shape_match": "signature形の一致であり、同じ業務概念を示さない。",
+    "shared_direct_callee": "依存先が同じだけで、責務は異なり得る。",
+    "shared_exception_contract": "例外名が同じだけでは契約は同じでない。",
+    "shared_test_reference": "Testの意図や間接検証を示さない。",
+    "call_neighborhood": "動的呼出と未解決呼出を含まない。",
+}
+
+
+def validate_routine_profile_v3_document(document, *, policy):
+    """Profile v3を検証する。bounded seedとDiscoveryへの逆参照を持たないこと。"""
+
+    validate_record_schema(document, record_kind="work4a_routine_profile")
+    if document.get("schema_version") != 3:
+        raise V3ValidationError("identity_mismatch", "schema_version")
+    if document.get("extraction_rule_version") != 4:
+        raise V3ValidationError("identity_mismatch", "extraction_rule_version")
+    detection = document["marker_detection"]
+    if detection.get("absence_does_not_imply_no_effect") is not True:
+        raise V3ValidationError("marker_detection_flag_missing", "absence_does_not_imply_no_effect")
+    policy_document = _read_record(Path(policy.path), record_kind="work4a_freshness_policy")
+    signals = set(policy_document.get("signal_classes", SIGNAL_CLASSES))
+    test_root = policy_document.get("test_reference_root", TEST_ROOT)
+    known = {item["symbol_id"] for item in document["routines"]}
+    seen = set()
+    for routine in document["routines"]:
+        unknown = sorted(set(routine) - set(_ROUTINE_FIELDS_V3))
+        if unknown:
+            raise V3ValidationError("unknown_field", ",".join(unknown))
+        missing = sorted(set(_ROUTINE_FIELDS_V3) - set(routine))
+        if missing:
+            raise V3ValidationError("identity_mismatch", ",".join(missing))
+        if routine["symbol_id"] in seen:
+            raise V3ValidationError("symbol_id_collision", routine["symbol_id"])
+        seen.add(routine["symbol_id"])
+        outside = sorted(set(routine["syntactic_effect_markers"]) - set(SYNTACTIC_EFFECT_MARKERS))
+        if outside:
+            raise V3ValidationError("summary_vocabulary_violation", ",".join(outside))
+        for field in ("direct_callee_symbol_ids", "direct_caller_symbol_ids"):
+            for symbol_id in routine[field]:
+                if symbol_id not in known:
+                    raise V3ValidationError("profile_reference_unresolved", symbol_id)
+        for path in routine["direct_test_reference_paths"]:
+            _reject_unsafe_relative_path(path)
+            if not path.startswith(f"{test_root}/"):
+                raise V3ValidationError("test_reference_out_of_scope", path)
+        for field in ("complexity_signal", "public_api_signal"):
+            if routine[field] not in signals:
+                raise V3ValidationError("summary_vocabulary_violation", routine[field])
+    if document["comparison_discovery_reference"]["profile_references_discovery"] is not False:
+        raise V3ValidationError("unknown_field", "profile_references_discovery")
+    return document
+
+
+def build_routine_profile_v3(*, observation, policy, known_symbol_ids=()):
+    """Profile v3。bounded seedを持たず、Discoveryへの参照も持たない。"""
+
+    policy_document = _read_record(policy.path, record_kind="work4a_freshness_policy")
+    rules = policy_document.get("marker_detection_rules", MARKER_DETECTION_RULES)
+    routines, excluded = _collect_routines(observation.project_root, observation.files, rules=rules)
+    known = set(known_symbol_ids)
+    for routine in routines:
+        routine["candidate_classification"] = "known" if routine["symbol_id"] in known else "unknown"
+    routines.sort(key=lambda item: item["symbol_id"])
+    _add_v2_features(observation.project_root, routines, policy_document)
+    for routine in routines:
+        for field in BOUNDED_SEED_FIELDS:
+            routine.pop(field, None)
+    document = {
+        "record_kind": "work4a_routine_profile",
+        "schema_version": 3,
+        "digest_algorithm": DIGEST_ALGORITHM,
+        "profile_run_id": "",
+        "observation_snapshot_id": observation.snapshot_id,
+        "source_content_id": observation.source_content_id,
+        "extraction_rule_version": 4,
+        "marker_detection": {
+            "method": "syntactic_call_name_match",
+            "detection_is_syntactic_only": True,
+            "absence_does_not_imply_no_effect": True,
+            "follows_aliases": False,
+            "follows_indirect_calls": False,
+        },
+        "call_graph_detection": {
+            "scope": "same source universe, syntactically resolvable direct calls only",
+            "follows_alias_import": False,
+            "follows_dynamic_attribute": False,
+            "follows_reflection": False,
+            "follows_callback": False,
+            "follows_eval_exec": False,
+            "unresolved_are_counted": True,
+        },
+        "exception_detection": {
+            "records": "names appearing syntactically in raise and except",
+            "infers_propagated_exception": False,
+            "infers_runtime_type": False,
+            "infers_dynamically_built_exception": False,
+        },
+        "test_reference_detection": {
+            "scope": f"{policy_document.get('test_reference_root', TEST_ROOT)}/**/*.py direct AST references only",
+            "covers_string_reference": False,
+            "covers_fixture_indirection": False,
+            "covers_dynamic_import": False,
+            "covers_integration_indirection": False,
+        },
+        "public_api_detection": {
+            "inputs": ["__all__", "cross_package_direct_caller", "cli_syntax_marker"],
+            "proves_public_contract": False,
+        },
+        "structural_match_detection": {
+            "basis": "normalized AST exact match",
+            "is_merge_conclusion": False,
+            "is_confirmation_hint": True,
+        },
+        "comparison_discovery_reference": {
+            "profile_references_discovery": False,
+            "direction": "discovery_to_profile_only",
+            "bounded_seed_removed": True,
+        },
+        "routines": routines,
+        "excluded_constructs": excluded,
+    }
+    document["profile_run_id"] = _digest(
+        {key: value for key, value in document.items() if key != "profile_run_id"}
+    )
+    document["content_digest"] = _content_digest(document)
+    validate_routine_profile_v3_document(document, policy=policy)
+    path = _write_new(
+        observation.data_root / WORK_PREFIX / "profiles" / f"{document['profile_run_id']}.json",
+        document,
+        allow_identical=True,
+    )
+    return RoutineProfile(
+        observation=observation,
+        path=path,
+        profile_run_id=document["profile_run_id"],
+        content_digest=document["content_digest"],
+        routine_count=len(routines),
+        excluded_constructs=tuple(excluded),
+    )
+
+
+@dataclasses.dataclass(frozen=True)
+class ComparisonDiscovery:
+    path: Path
+    discovery_run_id: str
+    content_digest: str
+    routine_profile_run_id: str
+    group_count: int
+
+
+def _interface_shape(routine):
+    parameters = tuple(
+        (item["kind"], item["name"] is not None, item["annotation"], item["has_default"])
+        for item in routine["signature"]["parameters"]
+    )
+    return json.dumps(
+        [routine["symbol_kind"], list(parameters), routine["signature"]["returns_annotation"]],
+        ensure_ascii=False, sort_keys=True,
+    )
+
+
+def _grouped(routines, key_function):
+    buckets = {}
+    for routine in routines:
+        for key in key_function(routine):
+            buckets.setdefault(key, []).append(routine["symbol_id"])
+    return buckets
+
+
+def _presentation_class(count, bounds):
+    for name in PRESENTATION_CLASSES:
+        rule = bounds[name]
+        minimum, maximum = rule["minimum"], rule["maximum"]
+        if count >= minimum and (maximum is None or count <= maximum):
+            return name
+    raise V3ValidationError("summary_vocabulary_violation", f"member_count={count}")
+
+
+def _discovery_groups(routines, policy_document):
+    minimum = policy_document.get("minimum_group_member_count", MINIMUM_GROUP_MEMBER_COUNT)
+    limit = policy_document.get("representative_limit", REPRESENTATIVE_LIMIT)
+    bounds = policy_document.get("presentation_class_bounds", PRESENTATION_CLASS_BOUNDS)
+    by_symbol = {item["symbol_id"]: item for item in routines}
+
+    definitions = (
+        (
+            "structural_exact_match",
+            lambda routine: [("structure_digest", routine["structure_digest"])],
+        ),
+        (
+            "interface_shape_match",
+            lambda routine: [("interface_shape", _interface_shape(routine))],
+        ),
+        (
+            "shared_direct_callee",
+            lambda routine: [("callee", callee) for callee in routine["direct_callee_symbol_ids"]],
+        ),
+        (
+            "shared_exception_contract",
+            lambda routine: [("raised", name) for name in routine["raised_exception_names"]]
+            + [("caught", name) for name in routine["caught_exception_names"]],
+        ),
+        (
+            "shared_test_reference",
+            lambda routine: [("test_path", path) for path in routine["direct_test_reference_paths"]],
+        ),
+        (
+            "call_neighborhood",
+            lambda routine: [
+                (
+                    "neighborhood",
+                    json.dumps(
+                        {
+                            "callees": routine["direct_callee_symbol_ids"],
+                            "callers": routine["direct_caller_symbol_ids"],
+                        },
+                        ensure_ascii=False, sort_keys=True,
+                    ),
+                )
+            ]
+            if routine["direct_callee_symbol_ids"] or routine["direct_caller_symbol_ids"]
+            else [],
+        ),
+    )
+
+    groups = []
+    for basis_kind, key_function in definitions:
+        buckets = _grouped(routines, key_function)
+        for key, members in sorted(buckets.items()):
+            unique = sorted(set(members))
+            if len(unique) < minimum:
+                continue
+            evidence = {key[0]: key[1]}
+            packages = sorted({_package_of(by_symbol[m]["code_reference"]["relative_path"])
+                               for m in unique})
+            arities = sorted({len(by_symbol[m]["signature"]["parameters"]) for m in unique})
+            evidence["package"] = packages
+            evidence["parameter_count"] = arities
+            groups.append(
+                {
+                    "group_id": "",
+                    "basis_kind": basis_kind,
+                    "basis_evidence": evidence,
+                    "basis_limitation": BASIS_LIMITATIONS[basis_kind],
+                    "member_symbol_ids": unique,
+                    "member_count": len(unique),
+                    "presentation_class": _presentation_class(len(unique), bounds),
+                    "representative_symbol_ids": sorted(unique[:limit]),
+                    "is_semantic_conclusion": False,
+                }
+            )
+    counters = {}
+    prefixes = {
+        "structural_exact_match": "STRUCT",
+        "interface_shape_match": "IFACE",
+        "shared_direct_callee": "CALLEE",
+        "shared_exception_contract": "EXC",
+        "shared_test_reference": "TEST",
+        "call_neighborhood": "NEIGH",
+    }
+    for group in groups:
+        prefix = prefixes[group["basis_kind"]]
+        counters[prefix] = counters.get(prefix, 0) + 1
+        group["group_id"] = f"CG-{prefix}-{counters[prefix]:04d}"
+    return groups
+
+
+def validate_comparison_discovery_document(
+    document, *, routine_profile_document, policy
+):
+    """Discoveryが参照するProfileと一致し、memberを切り捨てないことを検証する。"""
+
+    validate_record_schema(document, record_kind="work4a_comparison_discovery")
+    policy_document = _read_record(Path(policy.path), record_kind="work4a_freshness_policy")
+    basis_kinds = set(policy_document.get("basis_kinds", BASIS_KINDS))
+    classes = set(policy_document.get("presentation_classes", PRESENTATION_CLASSES))
+    bounds = policy_document.get("presentation_class_bounds", PRESENTATION_CLASS_BOUNDS)
+    limit = policy_document.get("representative_limit", REPRESENTATIVE_LIMIT)
+    minimum = policy_document.get("minimum_group_member_count", MINIMUM_GROUP_MEMBER_COUNT)
+
+    if (
+        document["routine_profile_run_id"] != routine_profile_document["profile_run_id"]
+        or document["routine_profile_content_digest"] != routine_profile_document["content_digest"]
+        or document["source_content_id"] != routine_profile_document["source_content_id"]
+    ):
+        raise V3ValidationError("discovery_profile_mismatch", document["routine_profile_run_id"])
+    if document["is_semantic_conclusion"] is not False:
+        raise V3ValidationError("summary_vocabulary_violation", "is_semantic_conclusion")
+    if document["produces_disposition"] is not False:
+        raise V3ValidationError("summary_vocabulary_violation", "produces_disposition")
+    for kind in basis_kinds:
+        if kind not in document["basis_limitations"]:
+            raise V3ValidationError("summary_vocabulary_violation", kind)
+
+    known = {item["symbol_id"] for item in routine_profile_document["routines"]}
+    identifiers = set()
+    for group in document["groups"]:
+        if group["basis_kind"] not in basis_kinds:
+            raise V3ValidationError("summary_vocabulary_violation", group["basis_kind"])
+        if group["presentation_class"] not in classes:
+            raise V3ValidationError("summary_vocabulary_violation", group["presentation_class"])
+        if group["group_id"] in identifiers:
+            raise V3ValidationError("symbol_id_collision", group["group_id"])
+        identifiers.add(group["group_id"])
+        members = group["member_symbol_ids"]
+        for member in members:
+            if member not in known:
+                raise V3ValidationError("profile_reference_unresolved", member)
+        if members != sorted(members) or len(set(members)) != len(members):
+            raise V3ValidationError("member_truncation_detected", group["group_id"])
+        if group["member_count"] != len(members) or len(members) < minimum:
+            raise V3ValidationError("member_truncation_detected", group["group_id"])
+        if group["presentation_class"] != _presentation_class(len(members), bounds):
+            raise V3ValidationError("summary_vocabulary_violation", group["group_id"])
+        representatives = group["representative_symbol_ids"]
+        if len(representatives) > limit or not set(representatives) <= set(members):
+            raise V3ValidationError("member_truncation_detected", group["group_id"])
+        if group["is_semantic_conclusion"] is not False or not group["basis_limitation"]:
+            raise V3ValidationError("summary_vocabulary_violation", group["group_id"])
+        if "disposition" in group:
+            raise V3ValidationError("unknown_field", "disposition")
+    return document
+
+
+def build_comparison_discovery(*, observation, routine_profile, policy):
+    """Profile v3を入力にComparison Discoveryをnew-onlyで作る。Profileは書き換えない。"""
+
+    policy_document = _read_record(policy.path, record_kind="work4a_freshness_policy")
+    profile_document = _read_record(routine_profile.path, record_kind="work4a_routine_profile")
+    if profile_document.get("schema_version") != 3:
+        raise V3ValidationError("discovery_profile_mismatch", "routine profile v3 required")
+    if profile_document["source_content_id"] != observation.source_content_id:
+        raise V3ValidationError("discovery_profile_mismatch", "source_content_id")
+    groups = _discovery_groups(profile_document["routines"], policy_document)
+    document = {
+        "record_kind": "work4a_comparison_discovery",
+        "schema_version": 1,
+        "digest_algorithm": DIGEST_ALGORITHM,
+        "discovery_run_id": "",
+        "routine_profile_run_id": profile_document["profile_run_id"],
+        "routine_profile_content_digest": profile_document["content_digest"],
+        "source_content_id": profile_document["source_content_id"],
+        "grouping_rule_version": policy_document.get(
+            "grouping_rule_version", GROUPING_RULE_VERSION
+        ),
+        "reference_direction": "discovery_to_profile_only",
+        "is_semantic_conclusion": False,
+        "produces_disposition": False,
+        "basis_limitations": dict(BASIS_LIMITATIONS),
+        "groups": groups,
+    }
+    document["discovery_run_id"] = _digest(
+        {key: value for key, value in document.items() if key != "discovery_run_id"}
+    )
+    document["content_digest"] = _content_digest(document)
+    validate_comparison_discovery_document(
+        document, routine_profile_document=profile_document, policy=policy
+    )
+    path = _write_new(
+        observation.data_root / WORK_PREFIX / "comparison-discoveries"
+        / f"{document['discovery_run_id']}.json",
+        document,
+        allow_identical=True,
+    )
+    return ComparisonDiscovery(
+        path=path,
+        discovery_run_id=document["discovery_run_id"],
+        content_digest=document["content_digest"],
+        routine_profile_run_id=document["routine_profile_run_id"],
+        group_count=len(groups),
+    )
+
+
+def reject_bounded_seed_basis(evidence_refs, *, policy):
+    """bounded seedを根拠に使う参照を拒否する。"""
+
+    policy_document = _read_record(Path(policy.path), record_kind="work4a_freshness_policy")
+    forbidden = set(policy_document.get("bounded_seed_fields", BOUNDED_SEED_FIELDS))
+    for reference in evidence_refs:
+        if reference.get("field") in forbidden:
+            raise V3ValidationError("bounded_seed_not_a_basis", reference.get("field"))
+    return evidence_refs
+
+
+def _groups_for_symbol(comparison_discovery_document, symbol_id):
+    return [
+        group
+        for group in comparison_discovery_document["groups"]
+        if symbol_id in group["member_symbol_ids"]
+    ]
+
+
+def build_llm_initial_input(
+    *, routine_profile_document, comparison_discovery_document, symbol_id
+):
+    """LLMの初期入力。判断カードとgroup要約だけで、source本文を含めない。"""
+
+    if comparison_discovery_document["routine_profile_run_id"] != routine_profile_document[
+        "profile_run_id"
+    ]:
+        raise V3ValidationError("discovery_profile_mismatch", "profile_run_id")
+    card = build_decision_card(
+        routine_profile_document=routine_profile_document, symbol_id=symbol_id
+    )
+    summaries = [
+        {
+            "group_id": group["group_id"],
+            "basis_kind": group["basis_kind"],
+            "basis_evidence": group["basis_evidence"],
+            "basis_limitation": group["basis_limitation"],
+            "member_count": group["member_count"],
+            "presentation_class": group["presentation_class"],
+            "representative_symbol_ids": group["representative_symbol_ids"],
+            "member_record_reference": {
+                "record_kind": "work4a_comparison_discovery",
+                "discovery_run_id": comparison_discovery_document["discovery_run_id"],
+                "group_id": group["group_id"],
+            },
+        }
+        for group in _groups_for_symbol(comparison_discovery_document, symbol_id)
+    ]
+    return {
+        "decision_card": card,
+        "comparison_groups": summaries,
+        "whole_source_tree": False,
+        "includes_source_body": False,
+    }
+
+
+def record_additional_read(
+    *, routine_profile_document, comparison_discovery_document, symbol_id, group_ids, reason
+):
+    """追加読込の範囲と理由をprovenanceとして残す。全source treeは選ばない。"""
+
+    if not isinstance(reason, str) or not reason.strip():
+        raise V3ValidationError("advisory_evidence_missing", "reason")
+    by_symbol = {item["symbol_id"]: item for item in routine_profile_document["routines"]}
+    if symbol_id not in by_symbol:
+        raise V3ValidationError("profile_reference_unresolved", symbol_id)
+    groups = {
+        group["group_id"]: group for group in comparison_discovery_document["groups"]
+    }
+    symbols = {symbol_id}
+    for group_id in group_ids:
+        group = groups.get(group_id)
+        if group is None:
+            raise V3ValidationError("profile_reference_unresolved", group_id)
+        symbols.update(group["member_symbol_ids"])
+    paths = set()
+    for item in sorted(symbols):
+        routine = by_symbol.get(item)
+        if routine is None:
+            raise V3ValidationError("profile_reference_unresolved", item)
+        paths.add(routine["code_reference"]["relative_path"])
+        paths.update(routine["direct_test_reference_paths"])
+    return {
+        "symbol_id": symbol_id,
+        "group_ids": sorted(group_ids),
+        "reason": reason,
+        "symbol_ids": sorted(symbols),
+        "source_paths": sorted(paths),
+        "whole_source_tree": False,
+    }
+
+
 DECISION_CARD_FIELDS = (
     "symbol_id",
     "symbol_kind",
@@ -1789,7 +2392,10 @@ def build_decision_card(*, routine_profile_document, symbol_id):
 
     for routine in routine_profile_document["routines"]:
         if routine["symbol_id"] == symbol_id:
-            return {field: routine[field] for field in DECISION_CARD_FIELDS}
+            # Profile v3はbounded seedを持たないため、存在するfieldだけを載せる。
+            return {
+                field: routine[field] for field in DECISION_CARD_FIELDS if field in routine
+            }
     raise V3ValidationError("profile_reference_unresolved", symbol_id)
 
 
