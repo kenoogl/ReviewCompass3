@@ -7,14 +7,14 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A representative review／Ledger scope proposal committed / cross-contract decision pending
+- 現在作業：Work 4A cross-contract classification GREEN committed / actual candidate recapture not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
 
 - `ISSUE-PILOT-TODO-GROWTH-001`：`resolved`、現行Workへの影響なし。次：project-first runtime rootのLayout Baseline amendment
 - `IC-WORK4A-BASELINE-PERSISTENCE-001`：`checkpoint approved`。versioned persistence toolをWork 4A内でTDD実装する。early PilotへのIssue追加はしない。
-- `IC-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GAP-001`：`open / blocking human decision`。cross-contract候補は未測定であり、0件と扱わない。
+- `IC-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GAP-001`：`accepted / implementation in progress`。最小ruleのGREENを確認し、fresh actual candidate captureを待つ。
 
 ## 最新のauthority／Evidence
 
@@ -47,27 +47,30 @@
 - [Work 4A Routine Classification Input Approval Decision](records/development/2026-08-04-work-4a-routine-classification-input-approval-decision-v1.json) — SHA-256 `0abac76a331a74871c9ee67e483d3dfd096fcf9097923f86561958cabf87556f`
 - [Work 4A Cross-contract Classification Gap Candidate](records/development/2026-08-04-work-4a-cross-contract-classification-gap-candidate-v1.json) — SHA-256 `083d0f5cdf4e4f985f9eb69a23013355509bb50ec22fe081eb343bfbd167962b`
 - [Work 4A Routine Ledger Review Scope Proposal](records/development/2026-08-04-work-4a-routine-ledger-review-scope-proposal-v1.md) — SHA-256 `44da73d30038bef4213856066ed148516210bbc740ef73f0df374d8f630e9e04`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `089847ee05b082c62019cc7578945e8423890be46c6a90a63d92581eec713aab`
+- [Work 4A Cross-contract Classification Approval Decision](records/development/2026-08-04-work-4a-cross-contract-classification-approval-decision-v1.json) — SHA-256 `d9c279c905bf4be9ed0199edaa586c089c159b8adfb1841c6fff4548a9a8b235`
+- [Work 4A Cross-contract Classification GREEN Evidence](records/development/2026-08-04-work-4a-cross-contract-classification-green-evidence-v1.md) — SHA-256 `ef2804d4c3fe5827ea0dc336bed09179156a965499f8f55e43688899332a3fcf`
+- [Work 4A Cross-contract Classification GREEN Test Receipt](records/development/2026-08-04-work-4a-cross-contract-classification-green-test-receipt-v1.json) — SHA-256 `269d796e0a988998017500ef4ee56d93eaa944a017227725724851dd43277dfa`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `2e2b9e315674598eacc3bb05325cf53a48a26c128715c3c829567c6e6a1ed7bd`
 
 ## 次に行う一作業
 
-cross-contract classification gapに対し、Work 4Aへ最小ruleを追加するか、authority改定のうえdeferするかをHumanが裁定する。
+cross-contract classification GREEN containing commit後、latest Snapshot／Indexとactual candidate listをnew IDとして保存し、re-read comparisonを行う。
 
 開始条件：
 
-- `IC-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GAP-001`とLedger review scope proposalのcontaining commit
+- cross-contract classification GREEN containing commitとclean transition
 
 完了条件：
 
-- cross-contractを追加する場合の最小rule、Evidence、RED／GREEN範囲を決める
-- deferする場合のauthority改定範囲とWork 4A完了条件への影響を決める
+- latest Snapshot／Indexとcandidate listを同じSnapshot IDへnew-only保存する
+- 保存Digest、re-read comparison、cross-contract candidate count、unresolved referenceを記録する
 
-後続作業：Humanがcross-contractのrouteと、representative Ledger review対象・個別record方式を判断する。
+後続作業：Humanがfresh candidate listを確認し、representative Ledger review対象・個別record方式を判断する。
 
 ## blocker・Human判断待ち
 
-- blocker：cross-contractのrouteに対するHuman裁定。裁定前にLedger登録またはWork 4A完了へ移らない。
-- Human判断待ち：cross-contractの`add minimal rule | defer by authority amendment`、およびrepresentative Ledger review対象・配置案。
+- blocker：なし。cross-contract GREEN containing commitのclean transition後にactual candidate recaptureへ進む。
+- Human判断待ち：なし。fresh candidate listの意味的確認、Ledger登録、routine dispositionは後続Human確認まで開始しない。
 
 ## stale・deferred
 

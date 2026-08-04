@@ -651,6 +651,13 @@ def _static_import_references(snapshot, symbols_by_qualified):
     return references, primary_references, tuple(sorted(unresolved))
 
 
+def _contract_domain(path):
+    parts = PurePosixPath(path).parts
+    if len(parts) < 3 or parts[0] != "tools":
+        return None
+    return parts[1]
+
+
 def _risk_categories(node):
     categories = set()
     filesystem_methods = {
@@ -736,6 +743,35 @@ def extract_routine_classification_candidates(*, snapshot, index):
                     rule_id="shared",
                     symbol_ids=(symbol_id,),
                     evidence=tuple(f"static_import:{path}" for path in paths),
+                    source_evidence=(
+                        f"definition:{symbols_by_id[symbol_id].source_path}",
+                    ),
+                )
+            )
+    for symbol_id, paths in sorted(primary_references.items()):
+        definition_domain = _contract_domain(
+            symbols_by_id[symbol_id].source_path
+        )
+        if definition_domain is None:
+            continue
+        cross_contract_paths = tuple(
+            path
+            for path in paths
+            if (
+                _contract_domain(path) is not None
+                and _contract_domain(path) != definition_domain
+            )
+        )
+        if cross_contract_paths:
+            candidates.append(
+                _candidate(
+                    snapshot_id=snapshot.snapshot_id,
+                    rule_id="cross_contract",
+                    symbol_ids=(symbol_id,),
+                    evidence=tuple(
+                        f"static_import:{path}"
+                        for path in cross_contract_paths
+                    ),
                     source_evidence=(
                         f"definition:{symbols_by_id[symbol_id].source_path}",
                     ),

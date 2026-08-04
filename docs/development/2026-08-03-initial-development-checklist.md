@@ -828,6 +828,11 @@ fresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未
 0件とは扱わない。Humanが最小rule追加またはauthority改定によるdeferを裁定するまで、Ledger登録とWork 4A完了を
 開始しない。
 
+`Cross-contract Classification GREEN Evidence`：
+`RC3-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GREEN-2026-08-04-V1`。Humanが承認した最小ruleにより、異なる
+`tools.<domain>`間のstatic importをcandidateとして抽出する。actual candidate listはcontaining commit後のfresh
+Snapshotから再生成するため、現時点でLedger登録またはWork 4A完了には進まない。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred

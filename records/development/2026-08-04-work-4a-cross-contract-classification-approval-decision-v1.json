@@ -1,0 +1,41 @@
+{
+  "record_kind": "human_approval_decision",
+  "schema_version": 1,
+  "decision_id": "DEC-WORK4A-CROSS-CONTRACT-CLASSIFICATION-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-04T18:28:03+09:00",
+  "decision_maker": "human",
+  "instruction": "1を実施",
+  "candidate_ref": {
+    "candidate_id": "IC-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GAP-001",
+    "candidate_version": 1,
+    "path": "records/development/2026-08-04-work-4a-cross-contract-classification-gap-candidate-v1.json",
+    "sha256": "083d0f5cdf4e4f985f9eb69a23013355509bb50ec22fe081eb343bfbd167962b",
+    "content_digest": "b8f9b260bfd0c4ea7d9f0adb3453a4fe0deab083724ea4948dfb456505cc5162"
+  },
+  "status": "approved_effective",
+  "effective_rule": {
+    "rule_id": "cross_contract",
+    "machine_candidate": "Git追跡済み`tools/<domain>/...`のroutineが、異なる`<domain>`に属するprimary source moduleからstatic importされること",
+    "source_evidence": [
+      "definition path",
+      "cross-domain static import path"
+    ],
+    "excluded_from_candidate": [
+      "dynamic attribute lookupまたは動的importだけの参照",
+      "test referenceだけの参照",
+      "同一domain内のstatic import",
+      "`tools/<module>.py`のようにdomainを持たないpath"
+    ]
+  },
+  "permitted_next_action": [
+    "Acceptance TestのRED／GREEN実装",
+    "GREEN containing commit後のfresh Snapshotからactual candidate listを再生成する"
+  ],
+  "prohibited_next_action": [
+    "cross-contract candidateをfinal VerdictまたはLedger登録として扱う",
+    "call graph、動的import解決、Test reference parserをこのruleへ含める",
+    "candidateを理由にroutineを削除、rename、mergeまたは公開API化する"
+  ],
+  "content_digest": "99f88cdd3fb94d55ae31a9a45b5425ffead0de211381fa241c4d672e5437e0a2"
+}

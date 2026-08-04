@@ -70,6 +70,19 @@ def use_b(value):
         "tools/other.py": '''def same():
     return "other"
 ''',
+        "tools/alpha/api.py": '''def cross_contract(value):
+    return value
+''',
+        "tools/alpha/internal_consumer.py": '''from tools.alpha.api import cross_contract
+
+def use_internal(value):
+    return cross_contract(value)
+''',
+        "tools/beta/consumer.py": '''from tools.alpha.api import cross_contract
+
+def use_cross_contract(value):
+    return cross_contract(value)
+''',
         "tests/test_api.py": '''from tools.api import public_api
 
 def test_public_api():
@@ -132,6 +145,9 @@ def test_extracts_deterministic_machine_candidates_with_source_evidence(
     same_api = "py:tools/api.py:tools.api.same:function"
     same_other = "py:tools/other.py:tools.other.same:function"
     unused_helper = "py:tools/api.py:tools.api.unused_helper:function"
+    cross_contract = (
+        "py:tools/alpha/api.py:tools.alpha.api.cross_contract:function"
+    )
 
     assert first == second
     assert first.snapshot_id == snapshot.snapshot_id
@@ -142,6 +158,9 @@ def test_extracts_deterministic_machine_candidates_with_source_evidence(
     )
     assert candidates[("high_risk", (write_log,))].evidence == (
         "filesystem_write:tools/api.py",
+    )
+    assert candidates[("cross_contract", (cross_contract,))].evidence == (
+        "static_import:tools/beta/consumer.py",
     )
     assert candidates[
         ("duplicate_candidate", (duplicate_one, duplicate_two))
