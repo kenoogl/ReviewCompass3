@@ -33,6 +33,7 @@ class SourceFile:
 @dataclasses.dataclass(frozen=True)
 class SourceSnapshot:
     snapshot_id: str
+    source_content_id: str
     head: str
     universe: SourceUniverse
     primary_files: tuple
@@ -219,6 +220,16 @@ def _snapshot_payload(*, head, universe, primary_files, test_reference_files):
     }
 
 
+def _source_content_payload(*, universe, primary_files, test_reference_files):
+    return {
+        "primary_files": [dataclasses.asdict(item) for item in primary_files],
+        "test_reference_files": [
+            dataclasses.asdict(item) for item in test_reference_files
+        ],
+        "universe": dataclasses.asdict(universe),
+    }
+
+
 def capture_source_snapshot(*, project_root, universe):
     """cleanなGit worktreeから追跡済みPython sourceを固定する。"""
 
@@ -243,8 +254,16 @@ def capture_source_snapshot(*, project_root, universe):
             test_reference_files=test_reference_files,
         )
     )
+    source_content_id = _canonical_digest(
+        _source_content_payload(
+            universe=normalized_universe,
+            primary_files=primary_files,
+            test_reference_files=test_reference_files,
+        )
+    )
     return SourceSnapshot(
         snapshot_id=snapshot_id,
+        source_content_id=source_content_id,
         head=head,
         universe=normalized_universe,
         primary_files=primary_files,
@@ -293,6 +312,13 @@ def validate_source_snapshot(*, snapshot, project_root):
     )
     if _canonical_digest(payload) != snapshot.snapshot_id:
         raise SourceSnapshotError("source_snapshot_identity_mismatch")
+    content_payload = _source_content_payload(
+        universe=universe,
+        primary_files=snapshot.primary_files,
+        test_reference_files=snapshot.test_reference_files,
+    )
+    if _canonical_digest(content_payload) != snapshot.source_content_id:
+        raise SourceSnapshotError("source_content_identity_mismatch")
     return snapshot
 
 
@@ -418,6 +444,7 @@ def _snapshot_document(*, snapshot, project_id, profile):
         "project_id": project_id,
         "profile": profile,
         "snapshot_id": snapshot.snapshot_id,
+        "source_content_id": snapshot.source_content_id,
         "head": snapshot.head,
         "universe": dataclasses.asdict(snapshot.universe),
         "primary_files": [

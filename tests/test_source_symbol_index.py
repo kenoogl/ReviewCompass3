@@ -76,6 +76,35 @@ def test_captures_clean_source_snapshot_deterministically(tmp_path):
     assert all(len(item.content_sha256) == 64 for item in first.primary_files)
 
 
+def test_keeps_source_content_identity_when_only_non_source_commit_changes(
+    tmp_path,
+):
+    module = _module()
+    project_root = _repository(
+        tmp_path,
+        {
+            "tools/alpha.py": "def alpha():\n    return 1\n",
+            "tests/test_alpha.py": "def test_alpha():\n    assert True\n",
+            "notes.md": "first\n",
+        },
+    )
+    first = module.capture_source_snapshot(
+        project_root=project_root,
+        universe=_universe(module),
+    )
+    (project_root / "notes.md").write_text("second\n", encoding="utf-8")
+    _git(project_root, "add", "notes.md")
+    _git(project_root, "commit", "-qm", "non-source change")
+    second = module.capture_source_snapshot(
+        project_root=project_root,
+        universe=_universe(module),
+    )
+
+    assert first.head != second.head
+    assert first.snapshot_id != second.snapshot_id
+    assert first.source_content_id == second.source_content_id
+
+
 def test_rejects_dirty_or_untracked_source_before_snapshot_capture(tmp_path):
     module = _module()
     project_root = _repository(
