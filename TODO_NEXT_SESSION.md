@@ -50,7 +50,7 @@ actual artifactの対象routine候補とdispositionをHuman判断へ提示する
 
 ## stale・deferred
 
-- stale：v1設計、v2設計、v1／v2 E2E test、`c4bfb57`と`33218e0`の試作module、旧Work 4AのSource Snapshot、Index、Candidate、Ledger、Policy状態を根拠にしたEvidence。v3 E2EがGREENになるまで再利用しない。
+- stale：v1設計、v2設計、旧Work 4AのSource Snapshot、Index、Candidate、Ledger、Policy状態を根拠にしたEvidence。v1／v2試作moduleとE2E testはworking treeから撤去済み。
 - deferred：正式Issue Resolution schema、UI、automation、Work 8正式評価。
 
 ## Git・Test
@@ -60,7 +60,7 @@ actual artifactの対象routine候補とdispositionをHuman判断へ提示する
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - 直近の関連Test：Work 4A v3 acceptance `22 passed`
-- 直近の全Test：venv公式runner `685 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の全Test：venv公式runner `681 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
