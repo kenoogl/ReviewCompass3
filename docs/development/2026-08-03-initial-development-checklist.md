@@ -530,6 +530,13 @@ Candidate／Triage Completion Evidenceは
 CandidateのID、version、file Digest、content Digestへ束縛され、関連Testは`16 passed`となった。Issue Record、
 Resolution Plan、Plan Challenge、TODO compactionは未実施であり、最後のPilot checkboxは未完了のままとする。
 
+Issue／Plan Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-issue-plan-completion-evidence-v1.md`、SHA-256
+`a1efb8ff5bb7027f604774a27cc5681bc4d6f6e0cf1931727407361803d7fa61`。承認済みIssue一件とResolution Plan一件を
+別identityで作成し、Human promotion、固定参照、Issue obligation、作業項目、Acceptance、oracle、rollbackを
+version 2 validatorへ固定した。関連Testは`33 passed`。Plan Challenge、TODO compaction、Verdictが未実施のため、
+最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

@@ -13,8 +13,8 @@
   `bootstrap_in_progress`のIssue Resolution早期PilotをPlan／checklistへ反映済み。
 - Issue Resolution早期Pilot：Layout Baseline v2、ReviewCompass3 Project Manifest v2、workflow rootを
   検証済み。Task ContractとImprovement Candidate／Triage Decisionの暫定形状をtest-firstで固定済み。
-  単一Candidateを作成し、Humanが`issue_resolution / blocking=false`と一件のIssue昇格を承認した。次は
-  `ISSUE-PILOT-TODO-GROWTH-001`のIssue RecordとResolution Planを作る。
+  単一Candidateを作成し、Humanが`issue_resolution / blocking=false`と一件のIssue昇格を承認した。
+  Issue RecordとResolution Planを作成・検証済み。次はPlan Challengeで内容を裁定する。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -24,17 +24,17 @@
   SHA-256 `e156a3b055b19b70bfb9bbe77d1af444ee30ecfcfbf47a7d436096dddcb571b3`。詳細は耐久Candidate／
   Issue経路へ分離し、TODOはactive ID projectionだけにする案。実装保留。
 - activeなTask Contract／Work Item：`TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1`。
-  shape bootstrapとCandidate／Triage作業単位は`verified_completed`。
+  shape bootstrap、Candidate／Triage、Issue／Plan作業単位は`verified_completed`。
 - 製品実装code：capture、projection、text、durable writer、E2E orchestration、完了NEXT遷移を実装
 - 当面の進行入口：`docs/development/2026-08-03-initial-development-checklist.md`
-- 進行入口SHA-256：`ff279f6ea92bb297ca5e6059532aec6ef2a96131b991d940b19f852811f4321d`
+- 進行入口SHA-256：`b4817c685778fdcb831a653f794283a22ab8a87cf26f467f19276bbfce4e35ba`
 - 現行計画：`docs/current/reviewcompass3-plan-current.md`
 - 現行計画SHA-256：`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-issue-resolution-pilot-candidate-triage-completion-evidence-v1.md`
-- Decision／Evidence SHA-256：`9ebfe80bb351f6c09a0d27508c70988ce1fe24593324209423e94e9d94bea523`
+  `records/development/2026-08-04-issue-resolution-pilot-issue-plan-completion-evidence-v1.md`
+- Decision／Evidence SHA-256：`a1efb8ff5bb7027f604774a27cc5681bc4d6f6e0cf1931727407361803d7fa61`
 
 ## 実施報告照合
 
@@ -559,6 +559,11 @@
     SHA-256 `9ebfe80bb351f6c09a0d27508c70988ce1fe24593324209423e94e9d94bea523`
   - 観測した事後状態：DecisionはCandidateのID、version、file Digest、content Digestへ束縛され、
     `ISSUE-PILOT-TODO-GROWTH-001 / nonblocking`を承認した。Issue RecordとPlanは未作成である。
+- Claim `EC-121`：承認済みIssue一件とResolution Plan一件を別identityで作成した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-issue-plan-completion-evidence-v1.md`、
+    SHA-256 `a1efb8ff5bb7027f604774a27cc5681bc4d6f6e0cf1931727407361803d7fa61`
+  - 観測した事後状態：IssueはObservation、Candidate、Human DecisionへDigest付きで接続された。Planは
+    Issue obligation 5件、Work Item 5件、Acceptance 6件、oracle 6件、rollback 2件を持ち、Challenge未承認である。
 
 ### reported_unverified／contradicted
 
@@ -631,7 +636,7 @@
 
 ### 未実施
 
-- 承認済み`ISSUE-PILOT-TODO-GROWTH-001`のIssue Record、Resolution Plan、Plan Challenge、Verdict
+- `PLAN-PILOT-TODO-GROWTH-001`のPlan Challenge、TODO snapshot／compaction、Resolution Verdict
 - Deployment Manifest、package builder、原子的切替、rollbackのWork 7実装
 - Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定
 - Project Bindingのdurable保存
@@ -672,33 +677,34 @@
 
 ## 次に行う一作業
 
-承認済み`ISSUE-PILOT-TODO-GROWTH-001`のIssue RecordとResolution Planを作成する。TODO compactionは行わず、
-Plan ChallengeのHuman判断材料を作る。
+`PLAN-PILOT-TODO-GROWTH-001`へPlan Challengeを実施し、Issue obligation coverage、作業粒度、TDD closure、
+禁止事項、12 KiB上限、Claude入口、依存、oracle、rollbackのHuman判断材料を作る。TODO compactionは行わない。
 
 開始条件：
 
 - work unit transition preflightが`passed`である。
 - Plan SHA-256が`0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`、
-  checklist SHA-256が`ff279f6ea92bb297ca5e6059532aec6ef2a96131b991d940b19f852811f4321d`である。
-- Candidate／Triage Completion Evidence SHA-256が
-  `9ebfe80bb351f6c09a0d27508c70988ce1fe24593324209423e94e9d94bea523`である。
-- CandidateとHuman Triage Decisionがvalidatorに合格し、Issue IDが一件に限定されている。
+  checklist SHA-256が`b4817c685778fdcb831a653f794283a22ab8a87cf26f467f19276bbfce4e35ba`である。
+- Issue／Plan Completion Evidence SHA-256が
+  `a1efb8ff5bb7027f604774a27cc5681bc4d6f6e0cf1931727407361803d7fa61`である。
+- Issue file SHA-256が`2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a`、
+  Plan file SHA-256が`2d753a371913b9d38bef570283a7122ea3ed08d96d041c3020943e1389a738d5`である。
 
 完了条件：
 
-- Issue RecordがCandidate、Human Decision、固定ObservationへDigest付きで接続される。
-- Resolution Planがscope、prohibition、Acceptance、oracle、rollbackを明記する。
-- Plan Challenge用の判断材料を作るが、Human承認を先取りしない。
+- Challengeがexact Issue／Plan versionとDigestへ接続される。
+- obligation coverage、作業粒度、TDD closure、禁止事項、実現可能性、oracle、rollbackを評価する。
+- blocking Findingと修正要否を明示し、Human承認を先取りしない。
 - TODOの圧縮または過去内容の削除を行わない。
 
-後続作業：HumanがPlan Challengeを承認した後だけ、milestone snapshotとTODO compactionを行う。
+後続作業：HumanがPlan Challengeを承認した後だけ、実装Task Contract、milestone snapshot、TODO compactionへ進む。
 
 ## blocker・Human判断待ち
 
 - blocker：work unit transition preflightを正本とする。完了済み作業単位とdirty worktreeが同時に成立する間は、
   `completed_work_unit_uncommitted`として次作業へ移行しない。
-- Human判断待ち：Issue／Plan作成後のPlan Challenge承認
-- 実行保留：Issue Record／Resolution Plan作成。work unit transition preflight合格後に開始する
+- Human判断待ち：Plan Challenge作成後のPlan承認、修正、または却下
+- 実行保留：Plan Challenge作成。work unit transition preflight合格後に開始する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：work unit transition preflight合格とTask Contract、Completion Evidence、Test receiptの一致を確認する
 
@@ -710,7 +716,7 @@ Plan ChallengeのHuman判断材料を作る。
   その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
   Issue Resolution・実施報告照合の正式automation、汎用Task Registry／plugin system。Issue Resolutionの
-  development限定早期Pilotはshape bootstrapまで完了したが、正式schemaまたはWork 8正式Pilotを前倒ししない。
+  development限定早期PilotはIssue／Plan作成まで完了したが、正式schemaまたはWork 8正式Pilotを前倒ししない。
 
 ## Git・Test
 
@@ -719,8 +725,8 @@ Plan ChallengeのHuman判断材料を作る。
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Candidate／Triage validator合格、Issue Resolution Pilot関連`16 passed in 0.03s`
-- 直近の全Test：Candidate／Triage official receiptを機械参照する
+- 直近の関連検証：Issue／Plan validator合格、version 1／2関連`33 passed in 0.08s`
+- 直近の全Test：Issue／Plan official receiptを機械参照する
 - 差分検査：最終post-write verificationで再実行する
 
 ## 更新規則
