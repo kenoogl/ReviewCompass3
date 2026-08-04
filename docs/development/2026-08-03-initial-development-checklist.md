@@ -841,6 +841,10 @@ Snapshotから再生成するため、現時点でLedger登録またはWork 4A�
 `RC3-WORK4A-REUSABLE-ROUTINE-LEDGER-GREEN-2026-08-04-V1`。entryとbaseline manifestの最小保存・Digest照合を
 GREENにした。relation recordとactual entryは未実装であり、Work 4Aのcheckboxと完了関門は未完了である。
 
+`Reusable Routine Ledger Relation GREEN Evidence`：
+`RC3-WORK4A-REUSABLE-ROUTINE-LEDGER-RELATION-GREEN-2026-08-04-V1`。relation recordとbaseline Digest結線を
+GREENにした。actual Ledger entry、Humanのroutine disposition、Work 4Aのcheckboxと完了関門は未完了である。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred

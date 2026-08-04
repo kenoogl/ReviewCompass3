@@ -56,6 +56,22 @@ def _entry(snapshot_id):
     }
 
 
+def _relation(snapshot_id):
+    return {
+        "record_kind": "reusable_routine_relation",
+        "relation_id": "RRL-REL-MATERIAL-DOCUMENT",
+        "relation_version": 1,
+        "source_snapshot_id": snapshot_id,
+        "relation_kind": "duplicate_candidate",
+        "participant_symbol_ids": [
+            "py:tools/bootstrap/closed_payload.py:tools.bootstrap.closed_payload._material_document:function",
+            "py:tools/bootstrap/material_bundle.py:tools.bootstrap.material_bundle._material_document:function",
+        ],
+        "rationale": "normalized body and signature match",
+        "decision_refs": ["DEC-EXAMPLE-001"],
+    }
+
+
 def test_persists_individual_entry_and_digest_bound_baseline_in_reuse_root(
     tmp_path,
 ):
@@ -108,6 +124,35 @@ def test_rejects_snapshot_mismatch_and_reuse_root_escape(tmp_path):
             relations=(),
             decision_refs=("DEC-EXAMPLE-001",),
         )
+
+
+def test_persists_relation_and_binds_its_digest_from_baseline(tmp_path):
+    module = _module()
+    project_root = _project(tmp_path)
+    snapshot_id = "b" * 64
+
+    persisted = module.persist_reusable_routine_ledger(
+        project_root=project_root,
+        source_snapshot_id=snapshot_id,
+        candidate_list_digest="c" * 64,
+        entries=(_entry(snapshot_id),),
+        relations=(_relation(snapshot_id),),
+        decision_refs=("DEC-EXAMPLE-001",),
+    )
+
+    root = project_root / ".reviewcompass" / "reuse" / "reusable-routine-ledger"
+    relation_path = root / "relations" / "rrl-rel-material-document--v1.json"
+    assert persisted.relation_paths == (relation_path,)
+    baseline = json.loads(persisted.baseline_path.read_text(encoding="utf-8"))
+    assert baseline["relation_refs"] == [
+        {
+            "relation_id": "RRL-REL-MATERIAL-DOCUMENT",
+            "relation_version": 1,
+            "path": "relations/rrl-rel-material-document--v1.json",
+            "sha256": persisted.relation_sha256s[0],
+        }
+    ]
+    assert module.verify_reusable_routine_ledger(persisted=persisted) == persisted
 
     manifest = project_root / ".reviewcompass" / "project-manifest.json"
     document = json.loads(manifest.read_text(encoding="utf-8"))

@@ -22,6 +22,8 @@ class PersistedReusableRoutineLedger:
     baseline_sha256: str
     entry_paths: tuple
     entry_sha256s: tuple
+    relation_paths: tuple
+    relation_sha256s: tuple
 
 
 def _json_bytes(value):
@@ -119,6 +121,30 @@ def _write_new(path, document):
         raise ReusableRoutineLedgerError("ledger output already exists") from error
 
 
+def _relation_document(relation, source_snapshot_id):
+    required = {
+        "record_kind", "relation_id", "relation_version", "source_snapshot_id",
+        "relation_kind", "participant_symbol_ids", "rationale", "decision_refs",
+    }
+    if not isinstance(relation, dict) or set(relation) != required:
+        raise ReusableRoutineLedgerError("relation fields are invalid")
+    if relation["record_kind"] != "reusable_routine_relation":
+        raise ReusableRoutineLedgerError("relation kind is invalid")
+    if _IDENTIFIER.fullmatch(relation["relation_id"] or "") is None:
+        raise ReusableRoutineLedgerError("relation identity is invalid")
+    if not isinstance(relation["relation_version"], int) or relation["relation_version"] < 1:
+        raise ReusableRoutineLedgerError("relation version is invalid")
+    if relation["source_snapshot_id"] != source_snapshot_id:
+        raise ReusableRoutineLedgerError("relation snapshot mismatch")
+    if relation["relation_kind"] not in {"duplicate_candidate", "alias", "successor", "intentional_separation"}:
+        raise ReusableRoutineLedgerError("relation type is invalid")
+    if len(relation["participant_symbol_ids"]) < 2 or not relation["rationale"] or not relation["decision_refs"]:
+        raise ReusableRoutineLedgerError("relation evidence is missing")
+    document = dict(relation)
+    document["content_digest"] = _canonical_digest(relation)
+    return document
+
+
 def persist_reusable_routine_ledger(
     *,
     project_root,
@@ -133,8 +159,6 @@ def persist_reusable_routine_ledger(
     _require_sha256(candidate_list_digest, "candidate list digest")
     if not isinstance(entries, tuple) or not isinstance(relations, tuple):
         raise ReusableRoutineLedgerError("ledger records must be tuples")
-    if relations:
-        raise ReusableRoutineLedgerError("ledger relations are not implemented")
     if not entries or not decision_refs or not all(
         isinstance(value, str) and value for value in decision_refs
     ):
@@ -143,6 +167,9 @@ def persist_reusable_routine_ledger(
     documents = tuple(
         _entry_document(entry, source_snapshot_id) for entry in entries
     )
+    relation_documents = tuple(
+        _relation_document(relation, source_snapshot_id) for relation in relations
+    )
     identifiers = tuple(document["entry_id"] for document in documents)
     if len(set(identifiers)) != len(identifiers):
         raise ReusableRoutineLedgerError("ledger entry identity is duplicated")
@@ -150,12 +177,19 @@ def persist_reusable_routine_ledger(
         root / "entries" / f"{identifier.lower()}--v1.json"
         for identifier in identifiers
     )
+    relation_paths = tuple(
+        root / "relations" / f"{document['relation_id'].lower()}--v1.json"
+        for document in relation_documents
+    )
     baseline_path = root / "ledger-baseline--v1.json"
-    if baseline_path.exists() or any(path.exists() for path in entry_paths):
+    if baseline_path.exists() or any(path.exists() for path in (*entry_paths, *relation_paths)):
         raise ReusableRoutineLedgerError("ledger output already exists")
     for path, document in zip(entry_paths, documents):
         _write_new(path, document)
     entry_sha256s = tuple(_sha256(path.read_bytes()) for path in entry_paths)
+    for path, document in zip(relation_paths, relation_documents):
+        _write_new(path, document)
+    relation_sha256s = tuple(_sha256(path.read_bytes()) for path in relation_paths)
     entry_refs = [
         {
             "entry_id": document["entry_id"],
@@ -165,6 +199,7 @@ def persist_reusable_routine_ledger(
         }
         for document, path, digest in zip(documents, entry_paths, entry_sha256s)
     ]
+    relation_refs = [{"relation_id": document["relation_id"], "relation_version": document["relation_version"], "path": str(path.relative_to(root).as_posix()), "sha256": digest} for document, path, digest in zip(relation_documents, relation_paths, relation_sha256s)]
     baseline = {
         "record_kind": "reusable_routine_ledger_baseline",
         "ledger_id": "RRL-BASELINE",
@@ -172,7 +207,7 @@ def persist_reusable_routine_ledger(
         "source_snapshot_id": source_snapshot_id,
         "candidate_list_digest": candidate_list_digest,
         "entry_refs": entry_refs,
-        "relation_refs": [],
+        "relation_refs": relation_refs,
         "decision_refs": sorted(set(decision_refs)),
     }
     baseline["content_digest"] = _canonical_digest(baseline)
@@ -183,6 +218,8 @@ def persist_reusable_routine_ledger(
         baseline_sha256=_sha256(baseline_path.read_bytes()),
         entry_paths=entry_paths,
         entry_sha256s=entry_sha256s,
+        relation_paths=relation_paths,
+        relation_sha256s=relation_sha256s,
     )
 
 
@@ -209,4 +246,10 @@ def verify_reusable_routine_ledger(*, persisted):
             raise ReusableRoutineLedgerError("persisted ledger entry missing") from error
         if actual != digest or ref.get("sha256") != digest:
             raise ReusableRoutineLedgerError("persisted ledger entry digest mismatch")
+    relation_refs = baseline.get("relation_refs")
+    if not isinstance(relation_refs, list) or len(relation_refs) != len(persisted.relation_paths):
+        raise ReusableRoutineLedgerError("persisted ledger relation refs are invalid")
+    for ref, path, digest in zip(relation_refs, persisted.relation_paths, persisted.relation_sha256s):
+        if ref.get("path") != str(path.relative_to(persisted.root).as_posix()) or _sha256(path.read_bytes()) != digest or ref.get("sha256") != digest:
+            raise ReusableRoutineLedgerError("persisted ledger relation digest mismatch")
     return persisted

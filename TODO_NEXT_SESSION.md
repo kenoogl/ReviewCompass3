@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A Reusable Routine Ledger entry／baseline GREEN committed / relation and actual entry not_started
+- 現在作業：Work 4A Reusable Routine Ledger relation GREEN committed / actual Ledger not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -55,26 +55,26 @@
 - [Work 4A Reusable Routine Ledger Structure Proposal v2](records/development/2026-08-04-work-4a-reusable-routine-ledger-structure-proposal-v2.md) — SHA-256 `55d40fa44876ac311e76bc92c961a04a0fdc0fc246fefb8c4b956586d542eaf2`
 - [Work 4A Reusable Routine Ledger Structure Approval Decision](records/development/2026-08-04-work-4a-reusable-routine-ledger-structure-approval-decision-v1.json) — SHA-256 `dfe6da438c0e06dbaa951d203b93550a24816dcf24c7ebb6162d6c94c25ffc43`
 - [Work 4A Reusable Routine Ledger GREEN Evidence](records/development/2026-08-04-work-4a-reusable-routine-ledger-green-evidence-v1.md) — SHA-256 `5c2977353d5694b03d6620de7bf98f41c8e822b7c7aeab30cc327a95027ce526`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `e674966089e15e68ae04f78afc4b8bd6b3d9feabae52daefce9ac7e8175b00c3`
+- [Work 4A Reusable Routine Ledger Relation GREEN Evidence](records/development/2026-08-04-work-4a-reusable-routine-ledger-relation-green-evidence-v1.md) — SHA-256 `ddbb8a25f52accf499d3c75854a1a3bc3cef09c25b6fde67b98dd446d7610a2a`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `ac12fba483ce8eae5bfebc6f0c195adaac46967990d667f51443f95182e3d3b9`
 
 ## 次に行う一作業
 
-Ledger entry／baseline GREEN containing commit後、relation schemaとHuman確認済み代表routineのactual Ledger entryを扱う順序を決める。
+Ledger relation GREEN containing commit後、Human確認済み代表routineとduplicate relationをactual Ledgerとしてnew-only保存する。
 
 開始条件：
 
-- Ledger entry／baseline GREEN containing commitとclean transition
+- Ledger relation GREEN containing commitとclean transition
 
 完了条件：
 
-- relation schemaをREDから追加するか、entryのactual保存を先に行うかを決める
 - Humanが代表routineの責務、reuse disposition、side effectを確認する
 
-後続作業：relation schema GREEN後、actual Ledger entryをHumanが確認し、duplicate relationと残りの代表routineを判断する。
+後続作業：actual Ledger entryをHumanが確認し、duplicate relationと残りの代表routineを判断する。
 
 ## blocker・Human判断待ち
 
-- blocker：relation record未実装。actual entryの対象routineに対するHuman確認も必要である。
+- blocker：actual Ledger entryの対象routineに対するHuman確認が必要である。
 - Human判断待ち：actual entry対象routineの責務、reuse disposition、side effect。
 
 ## stale・deferred
