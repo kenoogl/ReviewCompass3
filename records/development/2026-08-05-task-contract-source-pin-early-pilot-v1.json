@@ -1,0 +1,28 @@
+{
+  "applicable_lifecycle_statuses": [
+    "completed",
+    "completed_carried_forward",
+    "superseded",
+    "historical"
+  ],
+  "content_digest": "2d13bfb9b61c2341e6a648465271667d6abc0266d5d225c3769c7eebb4320c1e",
+  "digest_algorithm": "sha256",
+  "effect": "歴史状態のTask Contractにだけ使用できる。active statusのcontractへ適用してはならない。",
+  "pin_record_id": "TCSP-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1",
+  "pin_record_version": 1,
+  "pins": [
+    {
+      "commit": "c475becb3ebf3f3cb9e362d64bab79606ed3719d",
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "reason": "受理時点のCurrent Plan。Current Planは更新可能な文書のため、working treeではなく受理時点のGit blobで検証する。",
+      "sha256": "0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694"
+    }
+  ],
+  "record_kind": "task_contract_source_pin",
+  "recorded_at": "2026-08-05",
+  "schema_version": 1,
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1",
+  "task_contract_path": "records/task-contract/issue-resolution-early-pilot-v1.json",
+  "task_contract_sha256": "69e2c73167f930cab48abdcf3bd4d1eafa938aa9b3abaa714d6c3ad5e41c4ed7",
+  "unpinned_source_policy": "verify_working_tree"
+}

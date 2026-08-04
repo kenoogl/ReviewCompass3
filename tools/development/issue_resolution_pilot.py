@@ -5,6 +5,7 @@ import dataclasses
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path
 
 
@@ -199,21 +200,174 @@ def load_config(path):
     return config
 
 
+HISTORICAL_LIFECYCLE_STATUSES = (
+    "completed",
+    "completed_carried_forward",
+    "superseded",
+    "historical",
+)
+STALE_LIFECYCLE_STATUS = "active_stale"
+_LIFECYCLE_STATUS_KIND = "task_contract_lifecycle_status"
+_SOURCE_PIN_KIND = "task_contract_source_pin"
+_RECORD_ROOT = "records/development"
+
+
+def _development_records(project_root, record_kind):
+    root = Path(project_root) / _RECORD_ROOT
+    if not root.is_dir():
+        return []
+    found = []
+    for path in sorted(root.glob("*.json")):
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(document, dict) and document.get("record_kind") == record_kind:
+            found.append(document)
+    return found
+
+
+def load_task_contract_lifecycle_status(contract_path, *, project_root):
+    """対象contractのlifecycle status recordを引く。無ければNoneを返す。"""
+
+    contract_path = Path(contract_path)
+    relative = contract_path.resolve().relative_to(Path(project_root).resolve()).as_posix()
+    digest = _sha256_file(contract_path)
+    found = [
+        document
+        for document in _development_records(project_root, _LIFECYCLE_STATUS_KIND)
+        if document.get("task_contract_path") == relative
+    ]
+    if not found:
+        return None
+    if len(found) > 1:
+        raise PilotValidationError("source_pin_mismatch: conflicting lifecycle status records")
+    document = found[0]
+    if document.get("task_contract_sha256") != digest:
+        raise PilotValidationError(
+            "source_pin_mismatch: lifecycle status is bound to another contract digest"
+        )
+    return document
+
+
+def _load_source_pins(contract_path, *, project_root, lifecycle_status):
+    contract_path = Path(contract_path)
+    relative = contract_path.resolve().relative_to(Path(project_root).resolve()).as_posix()
+    digest = _sha256_file(contract_path)
+    pins = {}
+    seen = False
+    for document in _development_records(project_root, _SOURCE_PIN_KIND):
+        if document.get("task_contract_path") != relative:
+            continue
+        seen = True
+        if document.get("task_contract_sha256") != digest:
+            raise PilotValidationError(
+                "source_pin_mismatch: pin is bound to another contract digest"
+            )
+        applicable = document.get("applicable_lifecycle_statuses")
+        if not isinstance(applicable, list) or lifecycle_status not in applicable:
+            raise PilotValidationError(
+                "source_pin_mismatch: pin is not applicable to this lifecycle status"
+            )
+        for pin in document.get("pins", []):
+            path = pin.get("path")
+            if path in pins and pins[path] != pin:
+                raise PilotValidationError(
+                    "source_pin_mismatch: conflicting pins for the same fixed source"
+                )
+            pins[path] = pin
+    if not seen:
+        return None
+    return pins
+
+
+def _pinned_blob_sha256(project_root, commit, relative_path):
+    if not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{40}", commit):
+        raise PilotValidationError("pin_unresolvable: commit is invalid")
+    _safe_relative_path(relative_path)
+    result = subprocess.run(
+        ("git", "cat-file", "blob", f"{commit}:{relative_path}"),
+        cwd=str(project_root),
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0 or not result.stdout:
+        raise PilotValidationError("pin_unresolvable: commit or blob is unavailable")
+    return hashlib.sha256(result.stdout).hexdigest()
+
+
+def validate_fixed_sources_for_contract(path, *, project_root):
+    """lifecycle statusに応じて固定sourceを検証する。
+
+    active：working treeと一致することを要求する。
+    歴史状態：source pinがある固定sourceを受理時点のGit blobで検証する。
+    `active_stale`：source pinで有効化せず停止する。
+    """
+
+    contract = _load_json(path, "Pilot Task Contract")
+    if not isinstance(contract.get("fixed_sources"), list) or not contract["fixed_sources"]:
+        raise PilotValidationError("Pilot Task Contract scope is invalid")
+    status_record = load_task_contract_lifecycle_status(path, project_root=project_root)
+    lifecycle_status = (
+        status_record["lifecycle_status"] if status_record else contract.get("status")
+    )
+
+    if lifecycle_status == STALE_LIFECYCLE_STATUS:
+        raise PilotValidationError(
+            "stale_fixed_source: contract is active but its fixed source changed"
+        )
+
+    if lifecycle_status not in HISTORICAL_LIFECYCLE_STATUSES:
+        for reference in contract["fixed_sources"]:
+            _validate_file_reference(reference, project_root, "fixed source")
+        return len(contract["fixed_sources"]), 0
+
+    pins = _load_source_pins(
+        path, project_root=project_root, lifecycle_status=lifecycle_status
+    )
+    if pins is None:
+        raise PilotValidationError("pin_unresolvable: historical contract has no source pin")
+    resolved = 0
+    for reference in contract["fixed_sources"]:
+        _require_exact_fields(reference, ("path", "sha256"), "fixed source")
+        relative_path = _safe_relative_path(reference["path"]).as_posix()
+        pin = pins.get(relative_path)
+        if pin is None:
+            _validate_file_reference(reference, project_root, "fixed source")
+            continue
+        if pin.get("sha256") != reference["sha256"]:
+            raise PilotValidationError(
+                "source_pin_mismatch: pin digest differs from the fixed source"
+            )
+        if _pinned_blob_sha256(project_root, pin.get("commit"), relative_path) != reference[
+            "sha256"
+        ]:
+            raise PilotValidationError("source_pin_mismatch: pinned blob digest differs")
+        resolved += 1
+    return len(contract["fixed_sources"]), resolved
+
+
 def validate_task_contract_sources(path, *, project_root):
     contract = _load_json(path, "Pilot Task Contract")
     if (
-        contract.get("task_contract_id")
-        != "TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1"
-        or contract.get("status") != "active"
-        or not isinstance(contract.get("fixed_sources"), list)
+        not isinstance(contract.get("fixed_sources"), list)
         or not contract["fixed_sources"]
-        or "one Pilot subject: TODO history accumulation and oversized handoff"
-        not in contract.get("in_scope", [])
+        or contract.get("status") != "active"
     ):
         raise PilotValidationError("Pilot Task Contract scope is invalid")
-    for reference in contract["fixed_sources"]:
-        _validate_file_reference(reference, project_root, "fixed source")
-    return len(contract["fixed_sources"])
+    if contract.get("task_contract_id") == "TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1":
+        if (
+            "one Pilot subject: TODO history accumulation and oversized handoff"
+            not in contract.get("in_scope", [])
+        ):
+            raise PilotValidationError("Pilot Task Contract scope is invalid")
+    count, _resolved = validate_fixed_sources_for_contract(path, project_root=project_root)
+    return count
+
+
+def count_resolved_source_pins(path, *, project_root):
+    _count, resolved = validate_fixed_sources_for_contract(path, project_root=project_root)
+    return resolved
 
 
 def validate_implementation_task_contract_v2(record, *, project_root):
@@ -1491,7 +1645,11 @@ def main(argv=None):
             "fixed_source_count": validate_task_contract_sources(
                 args.path,
                 project_root=project_root,
-            )
+            ),
+            "pin_resolved_count": count_resolved_source_pins(
+                args.path,
+                project_root=project_root,
+            ),
         }
     print(json.dumps(output, ensure_ascii=False, sort_keys=True))
     return 0

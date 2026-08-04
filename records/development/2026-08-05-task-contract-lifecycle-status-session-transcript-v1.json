@@ -1,0 +1,21 @@
+{
+  "content_digest": "0259a4c21b8ce823521976462a7c3fb3db14532433b32e4613b15d50ea218ea5",
+  "digest_algorithm": "sha256",
+  "effect": "activeのままstaleとして停止させる。source pinで有効化してはならない。解消はWork 4Aと分離した別作業とする。",
+  "grounds": [
+    {
+      "note": "fixed sourceが固定するDigest d37a60ab273520f8…に対し、現在のfile Digestは9078276d7ba1f540…であり不一致。revert commit 3bca31cで内容が戻ったことによる。",
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0"
+    }
+  ],
+  "lifecycle_status": "active_stale",
+  "record_kind": "task_contract_lifecycle_status",
+  "recorded_at": "2026-08-05",
+  "schema_version": 1,
+  "status_record_id": "TCLS-RC3-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-03-V1",
+  "status_record_version": 1,
+  "task_contract_id": "TC-RC3-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-03-V1",
+  "task_contract_path": "records/task-contract/session-transcript-eventual-preservation-v1.json",
+  "task_contract_sha256": "981e7cb1e7344f576afe3dbaf9fee94462e353980e4944b7fd2bd33401e595cf"
+}

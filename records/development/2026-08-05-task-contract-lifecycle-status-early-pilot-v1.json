@@ -1,0 +1,26 @@
+{
+  "content_digest": "03662ade36ec5c0c20e6342f813827e88868d040a661ea1271101edbe7040bf3",
+  "digest_algorithm": "sha256",
+  "effect": "本recordは対象Task Contract fileを変更しない。fixed source検証を歴史状態として扱う根拠に限って用いる。",
+  "grounds": [
+    {
+      "note": "後続Task Contract v2がparent_contract_refでearly-pilot v1を参照し、同一SHA-256を固定している。",
+      "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json",
+      "sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6"
+    },
+    {
+      "note": "同v2のwork_items[0].status_at_creationがcompleted_carried_forwardであり、carried_forward_workがWI-001をcontaining_commit 64782ecへ結んでいる。",
+      "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json",
+      "sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6"
+    }
+  ],
+  "lifecycle_status": "completed_carried_forward",
+  "record_kind": "task_contract_lifecycle_status",
+  "recorded_at": "2026-08-05",
+  "schema_version": 1,
+  "status_record_id": "TCLS-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1",
+  "status_record_version": 1,
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1",
+  "task_contract_path": "records/task-contract/issue-resolution-early-pilot-v1.json",
+  "task_contract_sha256": "69e2c73167f930cab48abdcf3bd4d1eafa938aa9b3abaa714d6c3ad5e41c4ed7"
+}
