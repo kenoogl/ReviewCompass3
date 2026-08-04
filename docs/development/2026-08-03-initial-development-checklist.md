@@ -784,6 +784,11 @@ automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る�
 これは対象source universe、Source Snapshot／symbol identity規則、次のRED入口だけを固定する。
 Work 4Aのcheckboxと完了関門は未完了である。
 
+`RED Evidence`：`RC3-WORK4A-SOURCE-SYMBOL-INDEX-RED-2026-08-04-V1`、
+`records/development/2026-08-04-work-4a-source-symbol-index-red-evidence-v1.md`、SHA-256
+`f8cf312392897cb9b5da030ffae15432e0d2a77a58ca8e158d786b66221454d3`。
+Acceptance Test 5件はgenerator module未実装により期待どおりREDである。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred

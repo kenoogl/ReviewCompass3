@@ -7,12 +7,12 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A start boundary completed_uncommitted / Source Symbol Index RED not_started
+- 現在作業：Work 4A Source Symbol Index Acceptance RED completed_uncommitted / generator not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-PILOT-TODO-GROWTH-001`：`resolved`、現行Workへの影響なし。次：Source Symbol IndexのRED Acceptance Test
+- `ISSUE-PILOT-TODO-GROWTH-001`：`resolved`、現行Workへの影響なし。次：Source Symbol Index generatorの最小実装
 
 ## 最新のauthority／Evidence
 
@@ -20,32 +20,33 @@
 - [Development venv Baseline Evidence](records/development/2026-08-04-development-venv-baseline-completion-evidence-v1.md) — SHA-256 `896c827068417d0bed3154b1651f517f50d054d4c3b32a63e19b18f77306be93`
 - [Work 4A Sequence Decision](records/development/2026-08-04-work-4a-sequence-approval-decision-v1.json) — SHA-256 `4a10d09c12f227e67399aad1dc9c1ca8a6c664edcc6bc7f99385edafa7f48f0f`
 - [Work 4A Start Boundary Evidence](records/development/2026-08-04-work-4a-start-boundary-evidence-v1.md) — SHA-256 `65d47954cf8f71b02444b334df8598912c31d19183d70ccec59bc083b1ed7159`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `43a414b041486b3e4446c3b15a631ceb94127cd25f386dedef9588d4d2f8a013`
+- [Work 4A Source Symbol Index RED Evidence](records/development/2026-08-04-work-4a-source-symbol-index-red-evidence-v1.md) — SHA-256 `f8cf312392897cb9b5da030ffae15432e0d2a77a58ca8e158d786b66221454d3`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `98e275ea7e41bb886a4ff21d19b8300d893e06e42d8a91338a55fd3d3b259c52`
 
 ## 次に行う一作業
 
-Source Symbol IndexのAcceptance Testを作成し、bootstrap generator未実装のREDを確認する。
+RED Acceptance Testを変更せず、Source Symbol Index bootstrap generatorの最小実装を行う。
 
 開始条件：
 
-- Work 4A Start Boundary Evidence containing commitとclean transition
+- Source Symbol Index RED containing commitとclean transition
 - venv bootstrapがPython 3.9.6、pytest 8.4.2でverified
 
 完了条件：
 
-- clean／dirty、対象／除外、欠落Digest、再生成一致、symbol identity衝突のAcceptance Test
-- generator未実装による期待理由のRED
+- SourceUniverse、Snapshot capture／validation、AST Index generationがRED Testを変更せずgreenにする
+- Ledger、visibility、参照関係、Human意味確認、製品Runtimeを追加しない
 
-後続作業：RED Testを変更せず、最小bootstrap generatorを実装する。
+後続作業：Source Symbol Indexのcoverage、freshness、再生成一致を確認する。
 
 ## blocker・Human判断待ち
 
-- blocker：`completed_work_unit_uncommitted`。Start Boundary Evidenceのcommit完了までRED Testへ移らない。
+- blocker：`completed_work_unit_uncommitted`。RED Acceptance Testのcommit完了までgenerator実装へ移らない。
 - Human判断待ち：なし。Work 4A先行と最小identity境界は承認済み。
 
 ## stale・deferred
 
-- stale：開始前commit `0880b54`の観測はStart Boundary Evidenceを含むcommit後に再利用しない。Current Plan 17節の初期実装順6・7はSequence Decisionの範囲だけsuperseded。
+- stale：開始前commit `0880b54`の観測はStart Boundary Evidenceを含むcommit後に再利用しない。RED前の公式全Test `652 passed`は新規RED Test追加によりstale。Current Plan 17節の初期実装順6・7はSequence Decisionの範囲だけsuperseded。
 - deferred：正式Issue Resolution schema、UI、automation、Work 8正式評価。
 
 ## Git・Test
@@ -54,8 +55,8 @@ Source Symbol IndexのAcceptance Testを作成し、bootstrap generator未実装
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Sequence Decision、TODO参照、restore rehearsal targeted 5 passed
-- 直近の全Test：venv公式runner 652 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Source Symbol Index Acceptance `5 failed`（expected RED）
+- 直近の全Test：RED前のvenv公式runner 652 passed、Python 3.9.6、pytest 8.4.2、fallback false（stale）
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
