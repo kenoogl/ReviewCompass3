@@ -1,0 +1,53 @@
+{
+  "updated_on": "2026-08-04",
+  "overall": "Work 1B、Work 2、Work 3完了。Work 4前のIssue Resolution早期PilotはResolution Verdict待ち。",
+  "current_work": "WI-005 completed / commit pending / verdict_pending",
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2",
+  "active_issue": {
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+    "state": "verdict_pending",
+    "impact": "早期Pilot完了とWork 4復帰のHuman関門",
+    "next_action": "WI-005 containing commit"
+  },
+  "references": [
+    {
+      "label": "Task Contract v2",
+      "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json",
+      "sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6"
+    },
+    {
+      "label": "Current Plan",
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694"
+    },
+    {
+      "label": "Resolution Verdict Candidate",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-resolution-verdict-candidate-v1.json",
+      "sha256": "a2615f5cb27b2126cf1ac78fd750f31bd719e10158ba89cef665e0dedaba1789"
+    },
+    {
+      "label": "WI-005 Completion Evidence",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-005-completion-evidence-v1.md",
+      "sha256": "aaa99ee1850e6b278433ff4963f6f8a1a7993a9368a44c13f7e4f56a0970912a"
+    }
+  ],
+  "next_work": {
+    "action": "WI-005の完了作業単位をcommitする。",
+    "start_conditions": [
+      "WI-005 Test、post-write receipt、Verdict候補、Completion Evidenceの整合",
+      "TODO validatorとcommit安定検査の合格"
+    ],
+    "completion_conditions": [
+      "WI-005 containing commit",
+      "clean transitionとTODO不変のread-only照合"
+    ],
+    "following": "Resolution Verdict候補をHumanがresolved／unresolvedとして判断する。"
+  },
+  "blocker": "なし",
+  "human_decision": "Resolution Verdict候補の推奨resolved、未処理、残余riskを確認して判断する。",
+  "stale": "Plan v1-v3、Task Contract v1、WI-005前のimplementation_in_progress projectionはstale。",
+  "deferred": "正式Issue Resolution schema、UI、automation、Work 8正式評価。",
+  "branch": "main",
+  "related_test": "WI-005 targeted 5 passed、post-write／restore／state合格",
+  "full_test": "公式runner 639 passed、fallback false"
+}

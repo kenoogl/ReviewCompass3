@@ -1,0 +1,277 @@
+"""WI-005のpost-write検証、隔離restore rehearsal、Verdict候補検証。"""
+
+import dataclasses
+import hashlib
+import json
+import re
+import tempfile
+from pathlib import Path
+
+from tools.development.issue_resolution_state import (
+    IssueResolutionStateError,
+    derive_issue_resolution_state,
+)
+from tools.development.todo_compaction import (
+    restore_todo_from_snapshot,
+    validate_compacted_todo,
+)
+from tools.development.todo_handoff import (
+    validate_commit_stable_git_section,
+)
+
+
+_REFERENCE = re.compile(
+    r"^- \[[^\]\n]+\]\((?P<path>[^)\n]+)\)"
+    r" — SHA-256 `(?P<digest>[0-9a-f]{64})`$",
+    re.MULTILINE,
+)
+_CANDIDATE_FIELDS = {
+    "record_kind",
+    "schema_version",
+    "verdict_candidate_id",
+    "candidate_version",
+    "created_at",
+    "issue_ref",
+    "plan_ref",
+    "task_contract_ref",
+    "verification_refs",
+    "acceptance_results",
+    "unresolved_items",
+    "residual_risks",
+    "recommendation",
+    "recommendation_rationale",
+    "human_decision_required",
+    "effective_outcome",
+    "state_chain",
+    "derived_state",
+    "content_digest",
+}
+
+
+class PostWriteVerificationError(Exception):
+    """WI-005の固定検証境界を満たさない。"""
+
+
+@dataclasses.dataclass(frozen=True)
+class PostWriteVerification:
+    todo_sha256: str
+    todo_bytes: int
+    active_ids: tuple
+    reference_count: int
+    snapshot_sha256: str
+    restore_action: str
+    current_todo_preserved: bool
+
+
+@dataclasses.dataclass(frozen=True)
+class VerdictCandidateValidation:
+    verdict_candidate_id: str
+    recommended_outcome: str
+    effective_outcome: str
+    derived_state: str
+
+
+def _sha256(content):
+    return hashlib.sha256(content).hexdigest()
+
+
+def canonical_digest(record):
+    payload = {
+        key: value
+        for key, value in record.items()
+        if key != "content_digest"
+    }
+    return _sha256(
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+    )
+
+
+def _project_path(project_root, relative_path):
+    root = Path(project_root).resolve()
+    path = Path(relative_path)
+    if path.is_absolute() or not path.parts:
+        raise PostWriteVerificationError("project reference is invalid")
+    resolved = (root / path).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError as error:
+        raise PostWriteVerificationError(
+            "project reference is invalid"
+        ) from error
+    return resolved
+
+
+def _validate_ref(reference, project_root):
+    if not isinstance(reference, dict) or set(reference) != {
+        "path",
+        "sha256",
+    }:
+        raise PostWriteVerificationError("record reference is invalid")
+    path = _project_path(project_root, reference["path"])
+    try:
+        content = path.read_bytes()
+    except OSError as error:
+        raise PostWriteVerificationError(
+            "record reference is invalid"
+        ) from error
+    if _sha256(content) != reference["sha256"]:
+        raise PostWriteVerificationError("record reference is stale")
+
+
+def validate_todo_reference_digests(document, *, project_root):
+    """TODOに表示したpathとDigestを実fileへ照合する。"""
+
+    if not isinstance(document, bytes):
+        raise PostWriteVerificationError("TODO must be bytes")
+    try:
+        text = document.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise PostWriteVerificationError("TODO is not UTF-8") from error
+    matches = tuple(_REFERENCE.finditer(text))
+    if not matches:
+        raise PostWriteVerificationError("TODO reference digest is missing")
+    for match in matches:
+        relative_path = match.group("path")
+        expected = match.group("digest")
+        path = _project_path(project_root, relative_path)
+        try:
+            actual = _sha256(path.read_bytes())
+        except OSError as error:
+            raise PostWriteVerificationError(
+                "TODO reference digest mismatch"
+            ) from error
+        if actual != expected:
+            raise PostWriteVerificationError(
+                "TODO reference digest mismatch"
+            )
+    return len(matches)
+
+
+def verify_post_write(
+    *,
+    project_root,
+    todo_path,
+    snapshot_path,
+    manifest_path,
+    known_active_ids,
+):
+    """現行TODOを再読込し、checkout外の一時rootで復元をrehearseする。"""
+
+    root = Path(project_root).resolve()
+    todo = _project_path(root, todo_path)
+    before = todo.read_bytes()
+    compact = validate_compacted_todo(
+        before,
+        project_root=root,
+        known_active_ids=known_active_ids,
+    )
+    stable = validate_commit_stable_git_section(before.decode("utf-8"))
+    if stable.status != "passed":
+        raise PostWriteVerificationError("TODO commit stability failed")
+    reference_count = validate_todo_reference_digests(
+        before,
+        project_root=root,
+    )
+    snapshot = _project_path(root, snapshot_path)
+    manifest = _project_path(root, manifest_path)
+
+    with tempfile.TemporaryDirectory() as temporary:
+        rehearsal_root = Path(temporary)
+        rehearsal_todo = rehearsal_root / todo_path
+        rehearsal_snapshot = rehearsal_root / snapshot_path
+        rehearsal_manifest = rehearsal_root / manifest_path
+        rehearsal_todo.parent.mkdir(parents=True, exist_ok=True)
+        rehearsal_snapshot.parent.mkdir(parents=True, exist_ok=True)
+        rehearsal_manifest.parent.mkdir(parents=True, exist_ok=True)
+        rehearsal_todo.write_bytes(before)
+        rehearsal_snapshot.write_bytes(snapshot.read_bytes())
+        rehearsal_manifest.write_bytes(manifest.read_bytes())
+        restored = restore_todo_from_snapshot(
+            project_root=rehearsal_root,
+            source_path=todo_path,
+            snapshot_path=snapshot_path,
+            manifest_path=manifest_path,
+        )
+        rehearsal_todo.write_bytes(before)
+        if rehearsal_todo.read_bytes() != before:
+            raise PostWriteVerificationError(
+                "current TODO recovery mismatch"
+            )
+
+    preserved = todo.read_bytes() == before
+    if not preserved:
+        raise PostWriteVerificationError("current TODO was modified")
+    return PostWriteVerification(
+        todo_sha256=_sha256(before),
+        todo_bytes=compact.bytes_count,
+        active_ids=compact.active_ids,
+        reference_count=reference_count,
+        snapshot_sha256=restored.source_sha256,
+        restore_action=restored.action,
+        current_todo_preserved=preserved,
+    )
+
+
+def validate_resolution_verdict_candidate(record, *, project_root):
+    """Human判断前のVerdict候補とEvidence／state bindingを検証する。"""
+
+    if not isinstance(record, dict) or set(record) != _CANDIDATE_FIELDS:
+        raise PostWriteVerificationError("Verdict candidate fields are invalid")
+    if (
+        record["record_kind"] != "resolution_verdict_candidate"
+        or record["schema_version"] != 1
+        or record["candidate_version"] != 1
+        or record["content_digest"] != canonical_digest(record)
+    ):
+        raise PostWriteVerificationError("Verdict candidate identity is invalid")
+    for reference in (
+        record["issue_ref"],
+        record["plan_ref"],
+        record["task_contract_ref"],
+        *record["verification_refs"],
+    ):
+        _validate_ref(reference, project_root)
+    if (
+        not isinstance(record["acceptance_results"], list)
+        or not record["acceptance_results"]
+        or any(
+            result.get("status") != "passed"
+            for result in record["acceptance_results"]
+        )
+    ):
+        raise PostWriteVerificationError("Acceptance result is invalid")
+    if not isinstance(record["unresolved_items"], list) or not record["unresolved_items"]:
+        raise PostWriteVerificationError("unresolved item record is required")
+    if not isinstance(record["residual_risks"], list) or not record["residual_risks"]:
+        raise PostWriteVerificationError("residual risk is required")
+    if (
+        record["human_decision_required"] is not True
+        or record["effective_outcome"] != "pending_human_decision"
+    ):
+        raise PostWriteVerificationError("Human decision is required")
+    if record["recommendation"] not in {"resolved", "unresolved"}:
+        raise PostWriteVerificationError("recommendation is invalid")
+
+    state_records = []
+    for item in record["state_chain"]:
+        if not isinstance(item, dict) or set(item) != {"source_ref", "record"}:
+            raise PostWriteVerificationError("state chain is invalid")
+        _validate_ref(item["source_ref"], project_root)
+        state_records.append(item["record"])
+    try:
+        state = derive_issue_resolution_state(state_records)
+    except IssueResolutionStateError as error:
+        raise PostWriteVerificationError("state chain is invalid") from error
+    if state.state != "verdict_pending" or record["derived_state"] != state.state:
+        raise PostWriteVerificationError("state chain is invalid")
+    return VerdictCandidateValidation(
+        verdict_candidate_id=record["verdict_candidate_id"],
+        recommended_outcome=record["recommendation"],
+        effective_outcome=record["effective_outcome"],
+        derived_state=state.state,
+    )

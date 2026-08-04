@@ -1,0 +1,112 @@
+{
+  "record_kind": "resolution_verdict_candidate",
+  "schema_version": 1,
+  "verdict_candidate_id": "RVC-PILOT-TODO-GROWTH-001-V1",
+  "candidate_version": 1,
+  "created_at": "2026-08-04T13:13:23+09:00",
+  "issue_ref": {
+    "path": ".reviewcompass/workflow/issues/issue-pilot-todo-growth-001--v1.json",
+    "sha256": "2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a"
+  },
+  "plan_ref": {
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v4.json",
+    "sha256": "d309a2e10de52d093a58a1fefd292fd18b14ed5d6e863fa71a099abce01c6bcd"
+  },
+  "task_contract_ref": {
+    "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json",
+    "sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6"
+  },
+  "verification_refs": [
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-005-post-write-verification-receipt-v1.json",
+      "sha256": "4dd7b5f3042a0d171f21024ffc73d9248a59e4f8952a9c173c766323d455f652"
+    },
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-005-green-test-receipt-v1.json",
+      "sha256": "42c6f5cb785ed4a8d995b803b0e2f55b0444087f16622a8a45c9f15077268aa4"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "acceptance_id": "ACC-002",
+      "status": "passed",
+      "evidence": "TODO 2893 bytes、禁止履歴0"
+    },
+    {
+      "acceptance_id": "ACC-003",
+      "status": "passed",
+      "evidence": "active Issue一件、参照Digest 4件合格"
+    },
+    {
+      "acceptance_id": "ACC-005",
+      "status": "passed",
+      "evidence": "共通prompt一件、Codex／Claude一参照"
+    },
+    {
+      "acceptance_id": "ACC-006",
+      "status": "passed",
+      "evidence": "隔離restore rehearsal合格、現行TODO不変、公式全639 Test合格、fallback false"
+    }
+  ],
+  "unresolved_items": [
+    {
+      "item": "versioned projection入力のin-place変更拒否writerとtargeted suite名簿",
+      "status": "checkpoint_candidate",
+      "scope_effect": "Pilot解決を妨げない局所的な機械化候補"
+    },
+    {
+      "item": "正式製品Issue Resolution schema、UI、automation",
+      "status": "deferred",
+      "scope_effect": "Work 8以降の正式評価対象"
+    }
+  ],
+  "residual_risks": [
+    "restoreは隔離一時rootでrehearseし、実checkoutに対する破壊的rollbackは実行していない",
+    "共通promptは補助手段であり、再累積防止の正しさはmachine validatorとTestへ依存する",
+    "Verdict候補とPilot artifactはdevelopment限定で、正式製品schemaではない"
+  ],
+  "recommendation": "resolved",
+  "recommendation_rationale": "TODOの復元可能性を保った圧縮、active Issue projection、履歴再累積validator、共通入口、post-write検証が固定Acceptanceを満たした。残余項目はPilot scope外またはcheckpointであり、本Issueの目的を未達にしない。",
+  "human_decision_required": true,
+  "effective_outcome": "pending_human_decision",
+  "state_chain": [
+    {
+      "source_ref": {"path": ".reviewcompass/workflow/improvement-candidates/ic-pilot-todo-growth-001--v1.json", "sha256": "9b9896758b616a9e6571ad7aa518821f2d812c179a1a9b7b327a8f55b2309854"},
+      "record": {"record_kind": "candidate", "record_id": "IC-PILOT-TODO-GROWTH-001", "record_version": 1, "content_digest": "d4ef84bc8cc7d2b7d3e812f87a7ebac19521e1edf502f220a89ad75d656cc83c", "status": "open", "bindings": {}}
+    },
+    {
+      "source_ref": {"path": ".reviewcompass/workflow/triage-decisions/dec-pilot-todo-growth-001--v1.json", "sha256": "1ab1dc6708000ef439a8207d20dacf93375a452203613d8f068700a9c02373fe"},
+      "record": {"record_kind": "triage_decision", "record_id": "DEC-PILOT-TODO-GROWTH-001", "record_version": 1, "content_digest": "3d00aa2f458eec1ad6d248b0867358bb72383f0b267dfc181df80a0ed5d9e046", "status": "promote_to_issue", "bindings": {"candidate": "d4ef84bc8cc7d2b7d3e812f87a7ebac19521e1edf502f220a89ad75d656cc83c"}}
+    },
+    {
+      "source_ref": {"path": ".reviewcompass/workflow/issues/issue-pilot-todo-growth-001--v1.json", "sha256": "2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a"},
+      "record": {"record_kind": "issue", "record_id": "ISSUE-PILOT-TODO-GROWTH-001", "record_version": 1, "content_digest": "0389f68d81af61d570177228e246bb481eea97af23d5454c99831f8bc7c72319", "status": "open", "bindings": {"triage_decision": "3d00aa2f458eec1ad6d248b0867358bb72383f0b267dfc181df80a0ed5d9e046"}}
+    },
+    {
+      "source_ref": {"path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v4.json", "sha256": "d309a2e10de52d093a58a1fefd292fd18b14ed5d6e863fa71a099abce01c6bcd"},
+      "record": {"record_kind": "plan", "record_id": "PLAN-PILOT-TODO-GROWTH-001", "record_version": 4, "content_digest": "dc44a9c7d3c2da1f68df12e5be93e906d88e46aa996d5577edebb383b5ac3520", "status": "proposed", "bindings": {"issue": "0389f68d81af61d570177228e246bb481eea97af23d5454c99831f8bc7c72319"}}
+    },
+    {
+      "source_ref": {"path": ".reviewcompass/workflow/plan-challenges/challenge-pilot-todo-growth-001--v4.json", "sha256": "34ccf304201d5d4ecac320ed2e2648673c5a3fed027b81e31563274210646641"},
+      "record": {"record_kind": "challenge", "record_id": "CHALLENGE-PILOT-TODO-GROWTH-001", "record_version": 4, "content_digest": "27cc64425968b459d08a4b5e558b0dd461264ba8200287813f030ed8747f8587", "status": "ready_for_human_approval", "bindings": {"plan": "dc44a9c7d3c2da1f68df12e5be93e906d88e46aa996d5577edebb383b5ac3520"}}
+    },
+    {
+      "source_ref": {"path": "records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v4-decision.json", "sha256": "f2e6c6dce6388d97a8903b45165114175c2fbe949ce77ba63e8fb0e14875f9ab"},
+      "record": {"record_kind": "plan_approval", "record_id": "DEC-RC3-ISSUE-PILOT-PLAN-CHALLENGE-V4-2026-08-04", "record_version": 1, "content_digest": "e7d1885bfe858d34476ccc376bd8a5657fc6349b31de5fc830fea73d76efc97b", "status": "approve_plan", "bindings": {"challenge": "27cc64425968b459d08a4b5e558b0dd461264ba8200287813f030ed8747f8587"}}
+    },
+    {
+      "source_ref": {"path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json", "sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6"},
+      "record": {"record_kind": "task_contract", "record_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2", "record_version": 2, "content_digest": "248f3f8604d4451e4c2c73d3083ca78bc787c2cf1337ae2194d2aea3b9df163f", "status": "fixed", "bindings": {"plan_approval": "e7d1885bfe858d34476ccc376bd8a5657fc6349b31de5fc830fea73d76efc97b"}, "in_working_tree": true, "in_head": true}
+    },
+    {
+      "source_ref": {"path": "records/development/2026-08-04-issue-resolution-pilot-wi-001-red-evidence-v1.md", "sha256": "b7b4b38b6aa983a219d554d8da341bbc4b1a1c8a303710ab84446f8820c45218"},
+      "record": {"record_kind": "work_start", "record_id": "WI-001-RED-EVIDENCE-V1", "record_version": 1, "content_digest": "b7b4b38b6aa983a219d554d8da341bbc4b1a1c8a303710ab84446f8820c45218", "status": "accepted", "bindings": {"task_contract": "248f3f8604d4451e4c2c73d3083ca78bc787c2cf1337ae2194d2aea3b9df163f"}}
+    },
+    {
+      "source_ref": {"path": "records/development/2026-08-04-issue-resolution-pilot-wi-005-post-write-verification-receipt-v1.json", "sha256": "4dd7b5f3042a0d171f21024ffc73d9248a59e4f8952a9c173c766323d455f652"},
+      "record": {"record_kind": "implementation_verification", "record_id": "WI-005-POST-WRITE-VERIFICATION-V1", "record_version": 1, "content_digest": "4dd7b5f3042a0d171f21024ffc73d9248a59e4f8952a9c173c766323d455f652", "status": "accepted", "bindings": {"work_start": "b7b4b38b6aa983a219d554d8da341bbc4b1a1c8a303710ab84446f8820c45218"}}
+    }
+  ],
+  "derived_state": "verdict_pending",
+  "content_digest": "067764f25d85dc7e8966d02eb1bf25cc44a6efeadd0b78cf54a532562d775998"
+}

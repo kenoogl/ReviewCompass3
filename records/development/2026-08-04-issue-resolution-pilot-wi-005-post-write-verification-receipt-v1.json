@@ -1,0 +1,25 @@
+{
+  "receipt_kind": "issue_resolution_post_write_verification",
+  "receipt_version": 1,
+  "recorded_at": "2026-08-04T13:13:23+09:00",
+  "todo": {
+    "path": "TODO_NEXT_SESSION.md",
+    "sha256": "388ccc4699a8aa1438a4f04b6ce88abc73ef07e5fd9664c87763056d2bd24769",
+    "bytes": 2893,
+    "active_ids": [
+      "ISSUE-PILOT-TODO-GROWTH-001"
+    ],
+    "reference_count": 4,
+    "reference_digest_status": "passed",
+    "commit_stable_status": "passed"
+  },
+  "restore_rehearsal": {
+    "execution_root": "isolated_temporary_directory",
+    "snapshot_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+    "manifest_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.manifest.json",
+    "snapshot_sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+    "restore_action": "restored",
+    "current_todo_preserved": true
+  },
+  "status": "passed"
+}

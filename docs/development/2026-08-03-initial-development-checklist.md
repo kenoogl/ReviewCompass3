@@ -687,6 +687,13 @@ WI-003 containing commit `416e4e1`とclean transition後、WI-004の共通prompt
 維持したままWI-005入口へ機械更新した。WI-004 containing commitとclean transition後だけWI-005へ進み、最後のPilot
 checkboxは未完了のままとする。
 
+WI-004 containing commit `665d9f6`とclean transition後、WI-005のpost-write、隔離restore、参照Digest、Verdict候補、
+Human判断先取り拒否を5件のTestへ固定した。RED `5 failed`からGREEN `5 passed`、公式全`639 passed`、fallback
+`false`。Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-wi-005-completion-evidence-v1.md`。機械導出stateは
+`verdict_pending`、候補推奨は`resolved`、effective outcomeは`pending_human_decision`。WI-005 containing commit後に
+Resolution VerdictのHuman判断を要求し、最後のPilot checkboxとWork 4復帰は未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

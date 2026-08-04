@@ -6,46 +6,46 @@
 
 ## 現在位置
 
-- 全体：Work 1B、Work 2、Work 3完了。Work 4前のIssue Resolution早期Pilotを実施中。
-- 現在作業：WI-004 common TODO prompt completed / commit pending
+- 全体：Work 1B、Work 2、Work 3完了。Work 4前のIssue Resolution早期PilotはResolution Verdict待ち。
+- 現在作業：WI-005 completed / commit pending / verdict_pending
 - Task Contract：`TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-PILOT-TODO-GROWTH-001`：`implementation_in_progress`、影響：root TODO handoffとPilot完了境界、次：WI-005
+- `ISSUE-PILOT-TODO-GROWTH-001`：`verdict_pending`、影響：早期Pilot完了とWork 4復帰のHuman関門、次：WI-005 containing commit
 
 ## 最新のauthority／Evidence
 
 - [Task Contract v2](records/task-contract/issue-resolution-todo-compaction-implementation-v2.json) — SHA-256 `1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
-- [Pre-compaction Snapshot Manifest](records/session-handoffs/2026-08-04-todo-before-compaction-001.manifest.json) — SHA-256 `395337e57cd73ccb16bec4e009761f780f4631444e12f081b55e1d7c6ed40963`
-- [WI-003 Completion Evidence](records/development/2026-08-04-issue-resolution-pilot-wi-003-completion-evidence-v1.md) — SHA-256 `9b0c9e62d353edf54fec82419d2e2adc8188ef0493e31792ea81d6adb05c614c`
+- [Resolution Verdict Candidate](records/development/2026-08-04-issue-resolution-pilot-resolution-verdict-candidate-v1.json) — SHA-256 `a2615f5cb27b2126cf1ac78fd750f31bd719e10158ba89cef665e0dedaba1789`
+- [WI-005 Completion Evidence](records/development/2026-08-04-issue-resolution-pilot-wi-005-completion-evidence-v1.md) — SHA-256 `aaa99ee1850e6b278433ff4963f6f8a1a7993a9368a44c13f7e4f56a0970912a`
 
 ## 次に行う一作業
 
-WI-005のpost-write検証、restore rehearsal、Pilot測定、Resolution Verdict候補をtest-firstで実施する。
+WI-005の完了作業単位をcommitする。
 
 開始条件：
 
-- WI-004 containing commitとclean transition
-- WI-003とWI-004のcompleted／committed確認
+- WI-005 Test、post-write receipt、Verdict候補、Completion Evidenceの整合
+- TODO validatorとcommit安定検査の合格
 
 完了条件：
 
-- post-write再読込、validator、参照、restore rehearsal、公式全Testの合格
-- 未処理と残余riskを記録したResolution Verdict候補
+- WI-005 containing commit
+- clean transitionとTODO不変のread-only照合
 
-後続作業：Resolution VerdictのHuman判断。承認後に早期Pilotを閉じる。
+後続作業：Resolution Verdict候補をHumanがresolved／unresolvedとして判断する。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：現在なし。Resolution VerdictでHuman判断が必要。
+- Human判断待ち：Resolution Verdict候補の推奨resolved、未処理、残余riskを確認して判断する。
 
 ## stale・deferred
 
-- stale：Plan v1-v3とTask Contract v1はPlan v4／Task Contract v2へsuperseded。
-- deferred：正式Issue Resolution automation、画面UI、Work 4以降の製品工程。
+- stale：Plan v1-v3、Task Contract v1、WI-005前のimplementation_in_progress projectionはstale。
+- deferred：正式Issue Resolution schema、UI、automation、Work 8正式評価。
 
 ## Git・Test
 
@@ -53,8 +53,8 @@ WI-005のpost-write検証、restore rehearsal、Pilot測定、Resolution Verdict
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：共通prompt／入口3 passed、TODO projection 6 passed
-- 直近の全Test：634 passed（WI-004 TODO更新前）
+- 直近の関連Test：WI-005 targeted 5 passed、post-write／restore／state合格
+- 直近の全Test：公式runner 639 passed、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
