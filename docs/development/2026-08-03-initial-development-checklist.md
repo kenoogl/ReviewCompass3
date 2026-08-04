@@ -770,42 +770,38 @@ automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る�
 
 `Evidence`：未記録
 
-## 7. Work 4A：関数台帳baseline
+## 7. Work 4A：再利用探索baseline（早期完了）
 
-- [ ] source universe、path、file Digestだけで`source_content_id`を決め、HEADを監査用Observationへ分離した。
-- [ ] Source Observation、Index、Candidate Runを`DATA_ROOT`へ機械生成し、project artifactへ混入させない。
-- [ ] Human DecisionをCandidate RunのID／version／path／Digestへ結ぶ。
-- [ ] Entry、Relation、Baseline Manifestを`artifact_roots.reuse`へnew-only保存する。
-- [ ] 一件追加時に既存Entry／Relationを複製せず、既存Digest refを再利用する。
-- [ ] source内容変更、record改竄、unsafe root、high-risk Policy変更を拒否する。
-- [ ] legacy Task Contractのhistorical扱いを別status recordとHuman承認必須にする。
-- [ ] 七項目のE2E acceptanceをRED、GREEN、実データの順に通す。
-
-### v3.1：全件labelingの判断材料
-
-- [ ] 対象routine全件をRoutine ProfileとDisposition Proposalの対象にする。private helperも除外しない。
-- [ ] Routine Profileは機械事実だけを持ち、LLM由来のfieldを混入させない。
-- [ ] Disposition Proposalは非権威とし、参照は同一Routine Profile内へ限定し、`evidence_refs`を必須にする。
-- [ ] LLMの提案を根拠にEntryの`disposition`を設定しない。`disposition_source`は`human_decision`のみ。
-- [ ] Humanが確定した処置labelを対象routine全件へ適用する。group条件で展開し、未該当が残れば停止する。
-- [ ] symbol_idの重複を`symbol_id_collision`で停止し、行番号や序数で回避しない。
-- [ ] 除外した構文単位（lambda等）の件数と位置を記録し、黙って落とさない。
-- [ ] I1〜I21のE2E acceptanceをRED、GREEN、実データの順に通す。
+- [x] source universeを再観測し、source content IDとObservationを外部`DATA_ROOT`へnew-only生成した。
+- [x] Routine Profile v3を生成し、routine 1003件の機械的特徴を記録した。
+- [x] Comparison Discoveryを生成し、682 groupの全memberを外部recordへ保持した。表示は代表最大3件に限定した。
+- [x] ProfileとDiscoveryのidentity不一致、member切捨て、語彙外group、旧bounded seedの権威利用を
+  acceptance testで拒否した。
+- [x] v3.3 acceptance 15件、全test 739件を通した。LLM処理、Human処置label、Entry、Relation、
+  Baselineは作成していない。
 
 ### 完了関門
 
-- [ ] BaselineからDecisionまでのID／version／path／Digest連鎖が閉じている。
-- [ ] source内容IDに基づくfreshnessがHEAD差と内容変更を区別する。
-- [ ] deployment packageがproject artifactと`DATA_ROOT`を含まず、deployment版がartifactをread-only参照できる。
-- [ ] **対象routine全件にHuman確定の処置labelが付いている。**未確定のroutineを残さない。
-- [ ] 最初のImplementation Task Contractへ`implementation_ready`を出せる前提が揃っている。
+- [x] 実sourceから再生成可能なReuse Discovery baselineがあり、比較候補を上限で失わない。
+- [x] 機械的groupを意味的統合の結論として扱わない境界がTestとEvidenceで固定されている。
+- [x] `DEC-WORK4A-EARLY-EXIT-001`により、全件分類・全件台帳化をWork 4Aの完了条件からWork 4Bへ移した。
 
-`Authority`：[Work 4A Rebuild Design v3](../design/2026-08-04-work-4a-rebuild-design-v3-proposal.md)と
+`Authority`：[Work 4A Rebuild Design v3](../design/2026-08-04-work-4a-rebuild-design-v3-proposal.md)、
 [v3.1 Amendment](../design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md)、
-`DEC-WORK4A-REBUILD-DESIGN-003`、`DEC-WORK4A-REBUILD-DESIGN-004`、
-`DEC-CONFORMANCE-SCOPE-RELAXATION-001`。
-v1／v2設計とそのE2E testはstale。
-E2E Test：`tests/test_work4a_rebuild_v3_e2e.py`、`tests/test_work4a_rebuild_v3_1_e2e.py`。
+[v3.3 Proposal](../design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md)、
+`DEC-WORK4A-REBUILD-DESIGN-003`、`004`、`006`、`DEC-WORK4A-EARLY-EXIT-001`。
+Evidence：`records/development/2026-08-05-work-4a-v3-3-actual-comparison-discovery-evidence-v1.md`。
+E2E Test：`tests/test_work4a_rebuild_v3_e2e.py`、`tests/test_work4a_rebuild_v3_1_e2e.py`、
+`tests/test_work4a_rebuild_v3_2_e2e.py`、`tests/test_work4a_rebuild_v3_3_e2e.py`。
+
+### Work 4B：再利用・統合の運用Pilot
+
+- [ ] 新規・変更routineの対象範囲で、既存routine検索を実装前に実施し、結果を記録する。
+- [ ] 必要なcandidateだけについて、Humanが処置labelを確定し、Entry・Relation・Baselineをnew-onlyで記録する。
+- [ ] 共通候補ごとに振る舞いTestを固定し、共通部品への段階移行と旧実装の削除判断を独立Work Itemで行う。
+- [ ] Work 5Bの内部Implementation Task Contract Pilotで、再利用検索と台帳更新のgateを実証する。
+
+Work 4Bは全routineの一括分類を前提にしない。LLMの説明・Disposition Proposalは別承認後のみ使用する。
 
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 

@@ -1069,33 +1069,31 @@ Consumption Closure、post-write verification、session source復元検証を既
 Testは最初のReview Task Contractに必要な範囲を先に完成させる。範囲外はowner、依存、着手条件、
 後継候補を持つ`deferred`とし、その詳細化を最初のE2Eの前提にしない。
 
-### Work 4A：関数台帳baseline
+### Work 4A：再利用探索baseline（早期完了）
 
-配置baselineを入力にSource Snapshotとsymbol identity規則を固定し、既存の全関数・methodを機械的な
-Source Symbol Indexへ収録する。Indexはsymbol ID、qualified name、kind、source path、signature、
-visibility、参照関係、Test参照、content Digestを持ち、同じ固定source treeから再生成できることを
-検証する。
+Work 4Aは、既存routineを機械的に発見・比較できる基盤を作る工程である。全routineの意味的分類、
+全Entryの作成、共通化リファクタリングを完了条件にしない。
 
-対象routineはReusable Routine Ledgerへ責務、入出力、side effect、制約、類似候補、
-利用箇所、`active | retired`、後継、統廃合履歴とともに登録する。Index、Ledger、実codeのcoverage、
-freshness、重複候補、retired routineを確認する。
+Routine Profile v3とComparison Discoveryにより、source content ID、symbol ID、signature、
+構文的操作痕跡、直接caller/callee、例外、Test参照、公開API指標、構造一致、比較groupを
+再生成可能な形で得る。比較groupは全memberを外部recordに保持し、表示上限だけを代表3件へ限定する。
+機械的共通性は`merge`または`split`の結論ではない。
 
-**対象routine全件をRoutine ProfileとDisposition Proposalの対象とし、Humanが確定した処置labelを
-全件へ適用する。**private helperを含め、抽出対象の全routineをLedgerへ載せる。
-これは`DEC-WORK4A-REBUILD-DESIGN-004`による方針であり、旧方針
-「全private helperのLedger entry作成をbaseline完了条件にしない」を置き換える。
+`DEC-WORK4A-EARLY-EXIT-001`により、実sourceのProfile v3とComparison Discoveryが検証済みであることを
+Work 4Aの完了Evidenceとする。これによりWork 4へ戻り、最初のReview Task ContractのDesignを進められる。
 
-Humanが全件を一件ずつ読むことは求めない。判断は三層に分ける。機械がRoutine Profile（構文事実）を
-作り、LLMが非権威のDisposition Proposalを作り、Humanが`reuse | extend | merge | split | as_is`を
-確定する。Humanは決定的な条件式でgroupを定義してよく、機械が個別Entryへ展開する。
-どのgroupにも該当しないroutineが残る場合は、既定値で埋めずHumanへ差し戻す。
-LLMの提案を根拠にEntryのdispositionを設定しない。
+### Work 4B：再利用・統合の運用Pilot
 
-配置baseline、台帳baseline、今回の変更に必要な再利用判断が確定するまで、製品実装codeを
-追加せず、最初のImplementation Task Contractへ`implementation_ready`を発行しない。
-既存のIndex生成器がない場合は、固定入力と出力schemaを持つ最小bootstrap生成器だけを隔離した
-development toolingとして作成できる。生成器には独立したTestとreviewを要求し、最終Indexへ生成器
-自身を収録する。正式Runtime能力への流用は別Task Contractなしに行わない。
+Work 4Bは、Work 4Aの探索結果を実際の品質・保守性改善へ結び付ける後続工程である。全routineを
+一括分類せず、新規・変更実装の対象範囲、および価値・riskの高いcandidate groupから進める。
+
+各対象では、既存部品の検索、必要ならLLMによる限定的な非権威説明、Humanによる処置labelの確定、
+Entry・Relation・Baselineの更新、共通部品への段階移行、振る舞いTest、旧実装の削除判断を一つの
+小さなWork Itemとして扱う。Discovery groupだけで統合を確定しない。
+
+新しいroutineを追加または既存routineを変更するImplementation Task Contractは、対象範囲の既存routineを
+検索し、その結果を記録してから開始する。全1003 routineの台帳化は開始条件にしない。LLMの説明、
+意味判断、Entry作成、旧実装の削除は、必要な別承認とTestなしに自動実行しない。
 
 ### Work 5A：最小Review Task Contract happy path
 
@@ -1449,8 +1447,8 @@ deploymentの導入条件は14.3を優先する。
 - Layout Baselineが固定され、空の配置fixtureで相対参照、Manifest、Binding、project移動を確認済みである。
 - Session Log Bootstrapでraw／派生物の分離、capture deadline、source availability、mutation、
   restore fixtureが確認済みであり、Work 2以降のEvidenceを記録できる。
-- Source Symbol Indexの初期baseline、coverage、freshnessと、public、共有、high-risk、重複候補、retired、
-  影響範囲に必要なReusable Routine Ledger判断がHuman確認済みである。
+- Reuse Discovery baselineが実sourceから再生成され、public、共有、high-risk、重複候補、影響範囲を
+  機械的に探索できる。意味的なLedger判断と全件台帳化はWork 4Bへ分離されている。
 - Issue Resolution Pathの暫定owner、routing、手作業Pilotの記録項目と評価項目が定義され、
   製品schema、正式Requirement、permitが14.4のDeferred Workへ分離されている。
 - Evidence Extraction Contract、Consumption Closure、Assurance Obligation Matrix、Validator
@@ -1475,7 +1473,7 @@ deploymentの導入条件は14.3を優先する。
 ## 17. 実装へ進む条件
 
 HumanがIntent統合最新版、統合用語集、新しい第5段相当、Layout Baseline、Session Log Bootstrap、
-関数台帳baseline、最小Review Task Contractを承認した後、Work 5Aに必要な薄いvertical sliceだけを
+Reuse Discovery baseline、最小Review Task Contractを承認した後、Work 5Aに必要な薄いvertical sliceだけを
 実装する。
 初期vertical sliceではDelegation Authorizationを
 発行せず、判断をHuman modeで行う。設計全体を巨大な基盤として先行実装しない。
@@ -1488,12 +1486,13 @@ HumanがIntent統合最新版、統合用語集、新しい第5段相当、Layou
 4. Work 2とWork 3でIntent、Requirementsを確定する
 5. Work 3完了後のinter-work correctiveを閉じ、限定したIssue Resolution早期Pilot bootstrapを行う
 6. Work 4へ戻り、最初のsliceのDesignを確定する
-7. Work 4AでSource Symbol IndexとReusable Routine Ledgerの初期baselineを固定する
+7. Work 4AでReuse Discovery baselineを固定し、完了後にWork 4へ戻る
 8. 最小Contract schema、validator、一種類のContractから一つのbundleと6 typed viewを作るCompilerを実装する
 9. Context、Workflow permit、Harness stub、Traceの最小interfaceとhappy pathを通す
 10. Conformance、Final Challenge、Human decision、Decision Record、Provenance verdictを通す
 11. Work 6Aの中核negative pathをgreenにする
-12. Work 5Bの内部Implementation Task Contract Pilotで台帳gateを実証する
+12. Work 4Bの最小Pilotで対象routineの再利用検索と記録方法を確認し、Work 5Bの内部Implementation
+    Task Contract Pilotでそのgateを実証する
 13. Work 7Aの`local_integrated`最小deployment E2Eを通す
 14. Work 8のevaluation、Issue手作業Pilot、並行作業のshadow評価を行う
 15. 開始条件を満たす場合だけWork 8Aの`bounded_parallel`実並行Pilotを行い、満たさない場合は

@@ -6,11 +6,11 @@
 
 ## 現在位置
 
-- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.3／実装GREEN。実sourceのProfile v3とComparison Discovery生成まで完了（routine 1003件、group 682件）。
+- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
+- 現在の工程：Work 4へ復帰し、最初のReview Task ContractのDesign差分とslice選定へ進む。Work 4Bの再利用・統合Pilotは、Implementation Task Contract前の後続工程。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
-- 当面の進行入口：Work 4A Rebuild Design v3.3。
+- 当面の進行入口：Current PlanのWork 4：Design差分と最初のslice選定。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -25,35 +25,36 @@
 - [Work 4A v3.3 Comparison Discovery](records/development/2026-08-05-work-4a-v3-3-actual-comparison-discovery-evidence-v1.md) — SHA-256 `2cbefe548462d5c05a4cdba263decc074739d0933e4fe8fa688b219e92fd5d02`
 - [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `b157640f940c12d733d237921cad664dbebc4925c592796394f29da1155f5e48`
 - [Work 4A Rebuild Design v3.3 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md) — SHA-256 `b99edf3b9561da34bd4c0bd8a8e86418c36be18e202eef4f408d9b2e0392e538`
-- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `b5a18fb4da194779c2a1bf8010e9d1418377d3b30bfc92d5d8336965eeab6d7c`
+- [Work 4A Early Exit / Work 4B Decision](records/development/2026-08-05-work-4a-early-completion-and-4b-decision-v1.md) — SHA-256 `68899660b1162b0fb00e5e2b604b3c3c4831c7cc0a32eebfe9541fd0d441a29e`
+- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `fe26afde36acd46b8485a25eccd2c5cc36a44a0546ca00f1af129ac8a4edd52b`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `6a68980e2e0817b9938c5730341660bcaabea4c73238ab280b47658d051d0557`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `b63e6e059fefc9511ed9409b7286efa41a607c95882a53776716625ffcd924a7`
 
 ## 次に行う一作業
 
-Comparison Discoveryの実データをHumanが確認し、LLMによるDisposition Proposal生成を承認する。
+Work 4の最初のReview Task Contractに必要なDesign差分と代表scenarioを確認する。
 
 開始条件：
 
-- Profile v3とDiscovery生成containing commit後のclean transition。
-- 生成範囲、初期入力の内容、追加読込のprovenanceのHuman承認。
+- Work 4A early exitのcommit後のclean transition。
+- Work 4の未完了Designと最初のsliceの範囲確認。
 
 完了データ：
 
-- routine 1003件、group 682件。`focused` 602、`broad` 72、`mass` 8。
-- 初期入力は判断カードとgroup要約だけで、source本文と全member一覧を含めない。
+- Work 4の代表scenario、Contract境界、Acceptanceの未完了箇所をCurrent Planとchecklistから抽出する。
+- Work 4Bが全件分類を前提にせず、Implementation Task Contract前の再利用検索・記録Pilotであることを確認する。
 
-後続作業：group条件とdispositionのHuman決定、Entry・Relation・Baseline生成。
+後続作業：Work 5A最小Review Task Contract。routineを新設・変更するImplementation Task Contract前に、Work 4B Pilotを行う。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：LLMによるDisposition Proposal生成の承認。v3.3の実データは提示済み。
-- 再開条件：Profile v3とDiscovery生成commit後のclean transition。
+- Human判断待ち：なし。Work 4BのLLM説明、処置label、Entry・Relation・Baselineは、対象候補が選ばれた後の別判断とする。
+- 再開条件：本計画更新commit後のclean transition。
 
 ## stale・deferred
 
-- stale：v1設計、v2設計、旧Work 4AのSource Snapshot、Index、Candidate、Ledger、Policy状態を根拠にしたEvidence。v1／v2試作moduleとE2E testはworking treeから撤去済み。
+- stale：v1設計、v2設計、旧Work 4AのSource Snapshot、Index、Candidate、Ledger、Policy状態を根拠にしたEvidence。全routineの意味的分類・全件台帳化をWork 4A完了条件とする旧計画。v1／v2試作moduleとE2E testはworking treeから撤去済み。
 - deferred：正式Issue Resolution schema、UI、automation、Work 8正式評価。
 
 ## Git・Test
