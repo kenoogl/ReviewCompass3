@@ -1,0 +1,32 @@
+{
+  "constraints": [
+    "Human approved representative baseline"
+  ],
+  "consumers": [
+    "tools.bootstrap.review_pipeline"
+  ],
+  "content_digest": "d541341baeb2bf9d8d20b96e0919774d8969ef02e7eae838cc2a0f76ead2a6f7",
+  "decision_refs": [
+    "DEC-WORK4A-REPRESENTATIVE-LEDGER-001"
+  ],
+  "entry_id": "RRL-REVIEW-CONTRACT",
+  "entry_version": 1,
+  "inputs": [
+    "validated input"
+  ],
+  "lifecycle": "active",
+  "outputs": [
+    "documented output"
+  ],
+  "record_kind": "reusable_routine_entry",
+  "responsibility": "review contract materialization",
+  "reuse_disposition": "reuse",
+  "side_effects": [],
+  "source_snapshot_id": "7806b871d51f54669e4238ee183d902b986f931048fe02f5f400a025ba3fbafb",
+  "symbol_bindings": [
+    {
+      "content_sha256": "2ff3dca5fe2dc5d4e044c9ecc43df05b62c3c00b7077cf91b783ff11383cd373",
+      "symbol_id": "py:tools/bootstrap/review_contract.py:tools.bootstrap.review_contract.materialize_review_contract:function"
+    }
+  ]
+}

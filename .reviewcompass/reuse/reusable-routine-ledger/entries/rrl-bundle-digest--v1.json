@@ -1,0 +1,32 @@
+{
+  "constraints": [
+    "Human approved representative baseline"
+  ],
+  "consumers": [
+    "tools.bootstrap.bundle_verification"
+  ],
+  "content_digest": "f4058362c42e931cf23c8971f3b065955133bcd35fdfd5a01bedee02bf15fcef",
+  "decision_refs": [
+    "DEC-WORK4A-REPRESENTATIVE-LEDGER-001"
+  ],
+  "entry_id": "RRL-BUNDLE-DIGEST",
+  "entry_version": 1,
+  "inputs": [
+    "validated input"
+  ],
+  "lifecycle": "active",
+  "outputs": [
+    "documented output"
+  ],
+  "record_kind": "reusable_routine_entry",
+  "responsibility": "material bundle digest",
+  "reuse_disposition": "reuse",
+  "side_effects": [],
+  "source_snapshot_id": "7806b871d51f54669e4238ee183d902b986f931048fe02f5f400a025ba3fbafb",
+  "symbol_bindings": [
+    {
+      "content_sha256": "0b9b3ae410e265b451d03e3576220a1d1a0b2184722990f610476f3b8b3931e9",
+      "symbol_id": "py:tools/bootstrap/material_bundle.py:tools.bootstrap.material_bundle.calculate_bundle_digest:function"
+    }
+  ]
+}
