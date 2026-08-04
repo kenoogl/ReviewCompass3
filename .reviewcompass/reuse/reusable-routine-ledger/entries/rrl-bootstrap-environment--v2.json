@@ -1,0 +1,34 @@
+{
+  "constraints": [
+    "Human approved representative baseline"
+  ],
+  "consumers": [
+    "development bootstrap"
+  ],
+  "content_digest": "45994bc1461c2be8c77950e5e1be940b2b4cbd35fdf5decb71062b68d181d8c4",
+  "decision_refs": [
+    "DEC-WORK4A-REPRESENTATIVE-LEDGER-001"
+  ],
+  "entry_id": "RRL-BOOTSTRAP-ENVIRONMENT",
+  "entry_version": 1,
+  "inputs": [
+    "validated input"
+  ],
+  "lifecycle": "active",
+  "outputs": [
+    "documented output"
+  ],
+  "record_kind": "reusable_routine_entry",
+  "responsibility": "development environment bootstrap",
+  "reuse_disposition": "reuse",
+  "side_effects": [
+    "filesystem_write"
+  ],
+  "source_snapshot_id": "bef7451dc09143eec3259459dc3af1c7308412702a6f843b5eed6aba7f9979ca",
+  "symbol_bindings": [
+    {
+      "content_sha256": "8310fdeaabc9526888246de8f7c6eabe08ac1d8d0026a0f645e5bd252a660b12",
+      "symbol_id": "py:tools/development/bootstrap_environment.py:tools.development.bootstrap_environment.bootstrap_environment:function"
+    }
+  ]
+}

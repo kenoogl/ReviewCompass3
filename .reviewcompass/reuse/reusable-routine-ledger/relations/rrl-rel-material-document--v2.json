@@ -1,0 +1,16 @@
+{
+  "content_digest": "8766356192dc85b6bbdd058d034a00fb3e4aca5d48382581eaf5946ab2a82cfd",
+  "decision_refs": [
+    "DEC-WORK4A-REPRESENTATIVE-LEDGER-001"
+  ],
+  "participant_symbol_ids": [
+    "py:tools/bootstrap/closed_payload.py:tools.bootstrap.closed_payload._material_document:function",
+    "py:tools/bootstrap/material_bundle.py:tools.bootstrap.material_bundle._material_document:function"
+  ],
+  "rationale": "Human approved: do not merge at this time",
+  "record_kind": "reusable_routine_relation",
+  "relation_id": "RRL-REL-MATERIAL-DOCUMENT",
+  "relation_kind": "intentional_separation",
+  "relation_version": 1,
+  "source_snapshot_id": "bef7451dc09143eec3259459dc3af1c7308412702a6f843b5eed6aba7f9979ca"
+}
