@@ -569,6 +569,12 @@ rollback、Human関門はPlan v3と一致し、専用`5 passed`、公式全`562 
 `task_contract_commit_pending`で、Task Contract work unitのcommit後までWI-001を開始しない。最後のPilot checkboxは
 未完了のままとする。
 
+Task Contract containing commitを確認後、WI-001のbyte-exact snapshot／別manifest／再読込／改変拒否を9件のTestへ
+固定した。RED Evidenceは`records/development/2026-08-04-issue-resolution-pilot-wi-001-red-evidence-v1.md`、SHA-256
+`b7b4b38b6aa983a219d554d8da341bbc4b1a1c8a303710ab84446f8820c45218`。targetedは`9 failed`、全体は既存
+`562 passed, 9 failed`で、失敗は全件期待module未実装だけである。実TODO、snapshot、manifest、実装codeは未変更。
+RED作業単位のcommit後まで実装を開始せず、最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
