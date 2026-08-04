@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Project-first runtime root memo completed_uncommitted / Layout Baseline amendment not_started
+- 現在作業：Project-first runtime root Layout Baseline v3 candidate・resolver GREEN committed / Human approval pending
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -23,6 +23,10 @@
 - [Work 4A Source Symbol Index RED Evidence](records/development/2026-08-04-work-4a-source-symbol-index-red-evidence-v1.md) — SHA-256 `f8cf312392897cb9b5da030ffae15432e0d2a77a58ca8e158d786b66221454d3`
 - [Work 4A Source Symbol Index GREEN Evidence](records/development/2026-08-04-work-4a-source-symbol-index-green-evidence-v1.md) — SHA-256 `d0cb960280a9411b5358d9d21ee3fc2fc8829bf12ddf0a6f9e7d6180ef56a871`
 - [Project-first Runtime Root Memo](docs/design/2026-08-04-project-first-runtime-root-memo.md) — SHA-256 `b1306fd2202b8562dae86acff0dd003ca2b9e9029dd5208e21e1e24e59d5e474`
+- [Layout Baseline v3 Project-first Candidate](records/development/2026-08-04-layout-baseline-v3-project-first-candidate.json) — SHA-256 `4f469acd6c3122c2c7e5a83224f5cc610ffe309b561a369697ea669ccf7b7f38`
+- [Layout Baseline v3 RED Evidence](records/development/2026-08-04-layout-baseline-v3-project-first-red-evidence-v1.md) — SHA-256 `278a4f4cd9de499702181104b9313b4cf895725f0039f10f2258390e3959f992`
+- [Layout Baseline v3 GREEN Evidence](records/development/2026-08-04-layout-baseline-v3-project-first-green-evidence-v1.md) — SHA-256 `9522f2f26a3863b9ab20b428f7fe61d1bdd33a685a19cb289b43c814f3865284`
+- [Layout Baseline v3 GREEN Test Receipt](records/development/2026-08-04-layout-baseline-v3-project-first-green-test-receipt-v1.json) — SHA-256 `f1da6b0909147f0c74ca07409a9bbfea7a2981e4476111b97ce73257d2728ecd`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `b6eb1dc55235520e8ce90e99b940f5520c101f0b31ea342dcec4ed8b36ff0231`
 
 ## 次に行う一作業
@@ -31,7 +35,6 @@ project-first runtime rootを現行Layout Baselineへ適合するversioned candi
 
 開始条件：
 
-- Project-first Runtime Root Memo containing commitとclean transition
 - 現行Layout Baselineとの非互換点、migration要否、deployment除外を明示
 
 完了条件：
@@ -43,8 +46,8 @@ project-first runtime rootを現行Layout Baselineへ適合するversioned candi
 
 ## blocker・Human判断待ち
 
-- blocker：`completed_work_unit_uncommitted`。Runtime Root Memoのcommit完了までLayout Baseline amendmentへ移らない。
-- Human判断待ち：Layout Baseline candidateの承認。Memoは現行Baselineを置換しない。
+- blocker：なし。Human承認後までcandidateはcurrent baselineへ昇格しない。
+- Human判断待ち：Layout Baseline v3 candidateの承認。Memoおよびcandidateは現行Baselineを置換しない。
 
 ## stale・deferred
 
@@ -57,8 +60,8 @@ project-first runtime rootを現行Layout Baselineへ適合するversioned candi
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Source Symbol Index Acceptance `5 passed`
-- 直近の全Test：venv公式runner 657 passed、Python 3.9.6、pytest 8.4.2、fallback false（本memo作成前）
+- 直近の関連Test：Project-first Runtime Layout v3 Acceptance `7 passed`、Layout Baseline互換 `12 passed`
+- 直近の全Test：venv公式runner 664 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

@@ -3,6 +3,7 @@
 import dataclasses
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 
@@ -54,6 +55,15 @@ BINDING_FIELDS = {
     "validation",
 }
 ENVIRONMENT_ROLES = {"stable", "development"}
+PROJECT_RUNTIME_PROFILES = {"development", "runtime"}
+PROJECT_RUNTIME_ROOT_KINDS = {
+    "data",
+    "state",
+    "cache",
+    "logs",
+    "evaluation",
+    "sensitive",
+}
 ENVIRONMENT_VARIABLES = {
     name: f"REVIEWCOMPASS3_{name.upper()}"
     for name in EXTERNAL_ROOTS
@@ -68,6 +78,17 @@ _TEXT_ABSOLUTE = re.compile(
 @dataclasses.dataclass(frozen=True)
 class LayoutResolution:
     environment_role: str
+    roots: dict
+
+
+@dataclasses.dataclass(frozen=True)
+class ProjectRuntimeLayoutResolution:
+    """v3のproject-first runtime配置。解決だけではdirectoryを作らない。"""
+
+    runtime_root: Path
+    config_root: Path
+    project_id: str
+    profile: str
     roots: dict
 
 
@@ -158,6 +179,12 @@ def load_layout_baseline(record_path):
             "deployment_package_policy",
             "project_artifact_policy",
         }
+    elif version == (3, 3):
+        expected = required | {
+            "deployment_package_policy",
+            "project_artifact_policy",
+            "project_runtime_layout",
+        }
     else:
         raise LayoutError("Unsupported Layout Baseline version")
     if set(record) != expected:
@@ -171,7 +198,7 @@ def load_layout_baseline(record_path):
         "external_roots": sorted(EXTERNAL_ROOTS),
     }:
         raise LayoutError("Layout Baseline Git boundary is invalid")
-    if version == (2, 2):
+    if version in {(2, 2), (3, 3)}:
         if record["project_artifact_policy"] != {
             "canonical_root_name": "workflow",
             "canonical_project_artifact_move": "prohibited",
@@ -185,7 +212,7 @@ def load_layout_baseline(record_path):
             "semantic_data_migration": "exceptional_human_approved",
         }:
             raise LayoutError("Layout Baseline Project Artifact policy is invalid")
-        if record["deployment_package_policy"] != {
+        deployment_policy = {
             "source_selection": "manifest_allowlist",
             "deployment_package_replaceable": True,
             "runtime_projection_rebuildable": True,
@@ -194,8 +221,38 @@ def load_layout_baseline(record_path):
                 ".reviewcompass/project-manifest.json",
                 ".reviewcompass/workflow",
             ],
-        }:
+        }
+        if version == (3, 3):
+            deployment_policy["runtime_root_included"] = False
+        if record["deployment_package_policy"] != deployment_policy:
             raise LayoutError("Layout Baseline deployment package policy is invalid")
+    if version == (3, 3):
+        if record["project_runtime_layout"] != {
+            "runtime_root": {
+                "default_home_relative_path": ".reviewcompass3",
+                "resolution_precedence": [
+                    "explicit_cli",
+                    "versioned_user_setting",
+                    "allowlisted_environment",
+                    "home_default",
+                ],
+                "environment_variable": "REVIEWCOMPASS3_RUNTIME_ROOT",
+            },
+            "project_id_source": "project_manifest.stable_explicit_id",
+            "profiles": ["development", "runtime"],
+            "project_relative_prefix": "projects",
+            "root_kinds": [
+                "data",
+                "state",
+                "cache",
+                "logs",
+                "evaluation",
+                "sensitive",
+            ],
+            "creation": "explicit_requested_kinds_only",
+            "binding_directory": "deferred_until_concurrent_checkout_need",
+        }:
+            raise LayoutError("Layout Baseline project-first runtime policy is invalid")
     return record
 
 
@@ -256,6 +313,64 @@ def resolve_layout(
         environment_role=environment_role,
         roots=roots,
     )
+
+
+def resolve_project_runtime_layout(
+    baseline,
+    *,
+    runtime_root,
+    project_id,
+    profile,
+):
+    """v3の外部runtime pathを副作用なしで解決する。"""
+    policy = baseline.get("project_runtime_layout")
+    if not isinstance(policy, dict):
+        raise LayoutError("Project-first runtime Layout policy is required")
+    if _IDENTIFIER.fullmatch(project_id or "") is None:
+        raise LayoutError("Project runtime project identity is invalid")
+    if profile not in PROJECT_RUNTIME_PROFILES:
+        raise LayoutError("Project runtime profile is invalid")
+    root = _absolute_path(runtime_root, name="runtime_root")
+    prefix = policy["project_relative_prefix"]
+    project_profile_root = root / prefix / project_id / profile
+    roots = {
+        kind: project_profile_root / kind
+        for kind in policy["root_kinds"]
+    }
+    return ProjectRuntimeLayoutResolution(
+        runtime_root=root,
+        config_root=root / "config",
+        project_id=project_id,
+        profile=profile,
+        roots=roots,
+    )
+
+
+def initialize_project_runtime_layout(resolution, *, requested_kinds):
+    """要求されたv3 runtime rootだけを作成する。"""
+    if not isinstance(resolution, ProjectRuntimeLayoutResolution):
+        raise LayoutError("Project runtime layout resolution is required")
+    kinds = list(requested_kinds)
+    if not kinds or len(set(kinds)) != len(kinds):
+        raise LayoutError("Project runtime root kinds must be a non-empty unique list")
+    if set(kinds) - PROJECT_RUNTIME_ROOT_KINDS:
+        raise LayoutError("Project runtime root kind is invalid")
+    if set(kinds) - set(resolution.roots):
+        raise LayoutError("Project runtime root kind is not defined by policy")
+
+    root_mode = 0o700 if os.name != "nt" else 0o777
+    resolution.runtime_root.mkdir(parents=True, exist_ok=True, mode=root_mode)
+    if os.name != "nt":
+        resolution.runtime_root.chmod(0o700)
+    created = {}
+    for kind in kinds:
+        target = resolution.roots[kind]
+        mode = 0o700 if kind == "sensitive" and os.name != "nt" else 0o777
+        target.mkdir(parents=True, exist_ok=True, mode=mode)
+        if kind == "sensitive" and os.name != "nt":
+            target.chmod(0o700)
+        created[kind] = target
+    return created
 
 
 def validate_environment_isolation(stable, development):
@@ -370,6 +485,17 @@ def validate_deployment_package_layout(package_root, baseline):
             raise LayoutError(
                 "Deployment package contains a prohibited Project Artifact path"
             )
+    if policy.get("runtime_root_included") is False:
+        runtime_policy = baseline.get("project_runtime_layout")
+        if not isinstance(runtime_policy, dict):
+            raise LayoutError("Project-first runtime Layout policy is required")
+        relative = _safe_relative(
+            runtime_policy["runtime_root"]["default_home_relative_path"],
+            field="runtime_root.default_home_relative_path",
+        )
+        target = root.joinpath(*relative.parts)
+        if target.exists() or target.is_symlink():
+            raise LayoutError("Deployment package contains a runtime root")
     return True
 
 
