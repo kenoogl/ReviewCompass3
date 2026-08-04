@@ -1,0 +1,48 @@
+{
+  "decision_id": "DEC-RC3-ISSUE-PILOT-TASK-CONTRACT-STATE-GAP-2026-08-04",
+  "decision_version": 1,
+  "decided_at": "2026-08-04T09:55:55+09:00",
+  "decision_maker": "human",
+  "decision": "approve_option_a",
+  "candidate_ref": {
+    "candidate_id": "IC-RC3-ISSUE-PILOT-TASK-CONTRACT-STATE-GAP-001",
+    "candidate_version": 1,
+    "path": "records/development/2026-08-04-issue-resolution-pilot-task-contract-state-gap-candidate-v1.json",
+    "sha256": "b8300b13fed8af8c95cee424a1478aaedfaa085a27d9dcb6512c48ea15c6e632",
+    "content_digest": "ef90692b097f46610c21d2996ce07792331df295fc8ef1e45d1b8670afc642e9"
+  },
+  "selected_option": {
+    "option_id": "A",
+    "label": "add explicit pre-implementation states",
+    "required_states": [
+      "task_contract_commit_pending",
+      "implementation_ready",
+      "implementation_in_progress"
+    ],
+    "transition_boundary": "Enter implementation_in_progress only when WI-001 RED work begins after the Task Contract containing commit is verified."
+  },
+  "superseded_plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 2,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v2.json",
+    "sha256": "1aa63a008a9c396a211231185c965300b7f4caa45ef07424796d3b9f6d6482ac",
+    "content_digest": "488f1d89c16a6cda649623663e8e595d70f71eec280f50be7a8663b7a7a3a699"
+  },
+  "authorized_actions": [
+    "create Plan version 3 without modifying Plan version 2",
+    "add task_contract_commit_pending and implementation_ready transition rules",
+    "retain implementation_in_progress only for WI-001 RED work after containing commit verification",
+    "add normal, negative, and boundary tests for the three states",
+    "perform Plan Challenge version 3"
+  ],
+  "not_authorized": [
+    "approve Plan version 3 before Challenge version 3 and a separate Human decision",
+    "create or activate the implementation Task Contract",
+    "begin WI-001, snapshot TODO, or compact TODO",
+    "modify Plan version 2 or Challenge version 2 in place",
+    "declare the Issue resolved",
+    "send project artifacts to an external reviewer"
+  ],
+  "next_action": "Create Plan version 3, perform Challenge version 3, and request the final Human Plan decision.",
+  "content_digest": "cd89e947e2885d8ea605a1d6056df4dafa9f0b490f0c8fc1d586dd2d2fd4641e"
+}

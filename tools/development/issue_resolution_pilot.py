@@ -783,6 +783,43 @@ def validate_resolution_plan(record, *, path, project_root, config):
             raise PilotValidationError(
                 "Plan entrypoint authority is incomplete"
             )
+    if record["plan_version"] >= 3:
+        states = (
+            "task_contract_commit_pending",
+            "implementation_ready",
+            "implementation_in_progress",
+        )
+        acceptance_by_id = {
+            item["acceptance_id"]: item["criterion"]
+            for item in record["acceptance"]
+        }
+        transition = acceptance_by_id["ACC-007"]
+        if (
+            any(state not in transition for state in states)
+            or [transition.index(state) for state in states]
+            != sorted(transition.index(state) for state in states)
+        ):
+            raise PilotValidationError(
+                "Plan pre-implementation state closure is incomplete"
+            )
+        oracle_by_id = {
+            item["oracle_id"]: item
+            for item in record["oracles"]
+        }
+        oracle = oracle_by_id["ORACLE-007"]
+        oracle_text = f'{oracle["method"]} {oracle["expected"]}'
+        if any(state not in oracle_text for state in states):
+            raise PilotValidationError(
+                "Plan pre-implementation state oracle is incomplete"
+            )
+        if not any(
+            "containing commit" in prohibition
+            and "WI-001" in prohibition
+            for prohibition in record["prohibitions"]
+        ):
+            raise PilotValidationError(
+                "Plan Task Contract commit gate is incomplete"
+            )
     _validate_content_digest(record)
     return ValidationResult(
         record_kind=record["record_kind"],

@@ -1,0 +1,79 @@
+{
+  "candidate_id": "IC-RC3-ISSUE-PILOT-TASK-CONTRACT-STATE-GAP-001",
+  "candidate_version": 1,
+  "recorded_at": "2026-08-04T09:48:21+09:00",
+  "candidate_kind": "plan_acceptance_gap",
+  "source_work": "create the implementation Task Contract for PLAN-PILOT-TODO-GROWTH-001 version 2",
+  "source_refs": [
+    {
+      "kind": "resolution_plan",
+      "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v2.json",
+      "sha256": "1aa63a008a9c396a211231185c965300b7f4caa45ef07424796d3b9f6d6482ac",
+      "record_id": "PLAN-PILOT-TODO-GROWTH-001",
+      "record_version": 2,
+      "content_digest": "488f1d89c16a6cda649623663e8e595d70f71eec280f50be7a8663b7a7a3a699"
+    },
+    {
+      "kind": "plan_challenge",
+      "path": ".reviewcompass/workflow/plan-challenges/challenge-pilot-todo-growth-001--v2.json",
+      "sha256": "ca5b12124d34dd039f73bd9638aabe23eaa47f0112fc3688d089a67f58936b24",
+      "record_id": "CHALLENGE-PILOT-TODO-GROWTH-001",
+      "record_version": 2,
+      "content_digest": "cf69d0a74b968f6f7656ba6f75307a59369006da791dd3822885e54154aa07e8"
+    },
+    {
+      "kind": "human_plan_decision",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v2-decision.json",
+      "sha256": "07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892",
+      "record_id": "DEC-RC3-ISSUE-PILOT-PLAN-CHALLENGE-V2-2026-08-04",
+      "record_version": 1,
+      "content_digest": "b7594f7566fa44565612abdb098cb6caf3a3e56747d919939a6ab2aaa6f93559"
+    }
+  ],
+  "problem": "Plan version 2 defines task_contract_pending only when no Task Contract exists and implementation_in_progress only when a Task is active. It does not define the state of a created and verified Task Contract before its containing commit and before WI-001 begins.",
+  "impact": [
+    "creating the Task Contract would require an unapproved derived state",
+    "using implementation_in_progress would falsely report that WI-001 has begun",
+    "using task_contract_pending would conflict with the existence of the Task Contract",
+    "Challenge version 2 obligation_coverage and oracle_quality pass results are incomplete for this boundary"
+  ],
+  "evidence": {
+    "search_command": "rg --hidden -n task_contract_pending|implementation_in_progress|activation_pending|task_contract_ready|ready_for_implementation|current_work_item .",
+    "result": "Only ACC-007 in Plan version 2 defines the relevant states; no intermediate state or resolver rule exists.",
+    "artifact_changes_before_detection": []
+  },
+  "stop_decision": {
+    "stop_current_work": true,
+    "reason": "The gap affects Acceptance truth and current-state authority; the Task Contract must not choose a state that the approved Plan does not define."
+  },
+  "options": [
+    {
+      "option_id": "A",
+      "label": "add explicit pre-implementation states",
+      "description": "Create Plan version 3 with task_contract_commit_pending for an uncommitted contract and implementation_ready for a committed verified contract; enter implementation_in_progress only when WI-001 begins.",
+      "tradeoff": "Requires Plan version 3, Challenge version 3, and a new Human Plan decision before Task Contract creation."
+    },
+    {
+      "option_id": "B",
+      "label": "treat contract creation as implementation start",
+      "description": "Create the contract as active and immediately derive implementation_in_progress.",
+      "tradeoff": "Conflicts with the approved separate work-unit and commit-before-implementation boundary."
+    },
+    {
+      "option_id": "C",
+      "label": "reuse task_contract_pending",
+      "description": "Keep task_contract_pending while a non-active Task Contract already exists.",
+      "tradeoff": "Makes the state name and ACC-007 condition inaccurate and weakens deterministic interpretation."
+    }
+  ],
+  "recommended_option": "A",
+  "route": "current_issue_plan_revision",
+  "not_authorized": [
+    "modify Plan version 2 or Challenge version 2 in place",
+    "create the implementation Task Contract before the state gap is resolved",
+    "begin WI-001, snapshot TODO, or compact TODO",
+    "promote this candidate as a second Issue subject"
+  ],
+  "next_action": "Obtain Human authorization to create Plan version 3, perform Challenge version 3, and request a new Plan decision.",
+  "content_digest": "ef90692b097f46610c21d2996ce07792331df295fc8ef1e45d1b8670afc642e9"
+}
