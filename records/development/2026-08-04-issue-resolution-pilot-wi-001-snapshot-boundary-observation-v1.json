@@ -1,0 +1,33 @@
+{
+  "observation_id": "OBS-RC3-TODO-SNAPSHOT-BOUNDARY-2026-08-04-V1",
+  "observed_at": "2026-08-04T11:38:55+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "WI-001 snapshot timing conflicts with pre-compaction source identity",
+  "source": {
+    "path": "TODO_NEXT_SESSION.md",
+    "sha256": "38c8dab2778ff505ed5fd99fcaa671b267baa738cbf27a990602b49b45139d7f"
+  },
+  "machine_observations": {
+    "todo_bytes": 73533,
+    "todo_lines": 784,
+    "todo_claims": 110,
+    "plan_sha256": "07cd477a463e4536f6aa208153d6fdf401cfd0d8c00909cdc61fea5fdc26c304",
+    "task_contract_sha256": "661df56b9f2c78a261e3b345e727bf9cd47bbf09225186c529cceadf32eb56cd",
+    "red_test_sha256": "890f65df6734c314287a4d76c48232874560cb597f66122ab24d47d9e3c66521",
+    "implementation_sha256": "a2c7010844146d2c5a2f44bc5ac1be8a2f6389cef33c9eb68079e6440d61f783",
+    "targeted_test_result": "9 passed in 0.03s",
+    "actual_snapshot_created": false
+  },
+  "problem": "Plan v3 ACC-001 requires the snapshot to represent the TODO immediately before compaction, but Task Contract v1 orders WI-001 completion before WI-002 and WI-006. The required handoff updates during those committed work units change TODO_NEXT_SESSION.md, while the fixed WI-001 Test correctly rejects a source changed after snapshot. A snapshot created now therefore cannot remain the pre-compaction source accepted by ACC-001.",
+  "impact": [
+    "WI-001 cannot truthfully satisfy ACC-001 by creating the actual snapshot at its current sequence position",
+    "WI-003 cannot later reload the same snapshot against the then-current TODO after required handoff updates",
+    "rollback could restore an earlier handoff instead of the TODO immediately before compaction"
+  ],
+  "boundary": [
+    "do not create the actual snapshot or mark WI-001 complete",
+    "do not modify Plan v3, Task Contract v1, or the fixed RED Test in place",
+    "retain the green helper implementation as uncommitted work pending Human triage",
+    "treat the mismatch as Acceptance-affecting and pause current Work"
+  ]
+}

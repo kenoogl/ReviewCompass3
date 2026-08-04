@@ -1,0 +1,84 @@
+{
+  "candidate_id": "IC-RC3-ISSUE-PILOT-WI-001-SNAPSHOT-BOUNDARY-001",
+  "candidate_version": 1,
+  "recorded_at": "2026-08-04T11:38:55+09:00",
+  "candidate_kind": "plan_acceptance_and_work_item_order_gap",
+  "source_work": "implement WI-001 for PLAN-PILOT-TODO-GROWTH-001 version 3",
+  "source_refs": [
+    {
+      "kind": "observation",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-observation-v1.json",
+      "sha256": "53891d8fc134caa48185f62b77e435679d13bb90e8723bf5b337600dea9cdec3",
+      "record_id": "OBS-RC3-TODO-SNAPSHOT-BOUNDARY-2026-08-04-V1",
+      "record_version": 1
+    },
+    {
+      "kind": "resolution_plan",
+      "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v3.json",
+      "sha256": "07cd477a463e4536f6aa208153d6fdf401cfd0d8c00909cdc61fea5fdc26c304",
+      "record_id": "PLAN-PILOT-TODO-GROWTH-001",
+      "record_version": 3,
+      "content_digest": "7a530ea650c907aae6fd49848167e5596df1f46180cc8d454579c393443ddd3d"
+    },
+    {
+      "kind": "task_contract",
+      "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v1.json",
+      "sha256": "661df56b9f2c78a261e3b345e727bf9cd47bbf09225186c529cceadf32eb56cd",
+      "record_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V1",
+      "record_version": 1,
+      "content_digest": "e4d6c11e02efa57d2952eea2935d13bd60005204a4784d4aec5cf814dd2afc76"
+    },
+    {
+      "kind": "fixed_test",
+      "path": "tests/test_todo_snapshot.py",
+      "sha256": "890f65df6734c314287a4d76c48232874560cb597f66122ab24d47d9e3c66521"
+    }
+  ],
+  "problem": "Plan version 3 ACC-001 requires the snapshot to identify the TODO immediately before compaction, but Task Contract version 1 completes WI-001 before WI-002 and WI-006. Required TODO handoff updates during those work units change the source identity, and the fixed WI-001 Test correctly rejects a source changed after snapshot.",
+  "impact": [
+    "WI-001 cannot truthfully satisfy ACC-001 at its current sequence position",
+    "WI-003 cannot reload the same source-bound snapshot after required handoff updates",
+    "rollback could restore an earlier handoff instead of the TODO immediately before compaction"
+  ],
+  "evidence": {
+    "targeted_test": "9 passed in 0.03s with fixed Test SHA-256 890f65df6734c314287a4d76c48232874560cb597f66122ab24d47d9e3c66521",
+    "actual_snapshot_created": false,
+    "placement_correction": "A provisional second workflow Candidate caused the official full suite to fail because the early Pilot permits exactly one workflow Candidate subject. The current-Issue revision record is therefore kept under records/development, matching the earlier state-gap revision path.",
+    "failed_receipt_path": "records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-triage-green-test-receipt-v1.json",
+    "failed_receipt_sha256": "2efd2942026bddff0cb8944b22f5945fd1ce56bf7131bc89db0b18806349978c"
+  },
+  "stop_decision": {
+    "stop_current_work": true,
+    "reason": "The gap affects Acceptance truth and rollback source identity; the actual snapshot must not be created under the current ordering."
+  },
+  "options": [
+    {
+      "option_id": "A",
+      "label": "split helper implementation from final snapshot capture",
+      "description": "Limit WI-001 to helper implementation and GREEN, then add a versioned Work Item that captures and reloads the actual TODO after WI-002 and WI-006 are committed and immediately before WI-003.",
+      "tradeoff": "Requires Plan version 4, Challenge version 4, a new Human Plan decision, and Task Contract version 2."
+    },
+    {
+      "option_id": "B",
+      "label": "freeze TODO after WI-001",
+      "description": "Create the snapshot now and prohibit all TODO handoff updates until compaction.",
+      "tradeoff": "Conflicts with the required session handoff process and hides active work state."
+    },
+    {
+      "option_id": "C",
+      "label": "create multiple snapshots",
+      "description": "Create a WI-001 snapshot now and another authoritative snapshot immediately before compaction.",
+      "tradeoff": "Creates ambiguous restore authority unless the Plan adds explicit supersession and final-source rules."
+    }
+  ],
+  "recommended_option": "A",
+  "route": "current_issue_plan_revision",
+  "not_authorized": [
+    "modify Plan version 3, Task Contract version 1, or the fixed WI-001 Test in place",
+    "create the actual snapshot before the ordering gap is resolved",
+    "begin WI-002 or compact TODO",
+    "promote this candidate as a second Issue subject"
+  ],
+  "next_action": "Record the Human approval of option A, commit this stopping work unit, then create Plan version 4 and Challenge version 4 before Task Contract version 2.",
+  "content_digest": "f037398f905ed48973b6a059b5f59bf3b36b6f35097ea819716be7aeda107cc2"
+}

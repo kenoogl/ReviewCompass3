@@ -1,0 +1,19 @@
+{
+  "receipt_kind": "policy_test_verification_run",
+  "runner_id": "RC3-DEVELOPMENT-TEST-RUNNER",
+  "runner_version": 1,
+  "recorded_at": "2026-08-04T11:47:50+09:00",
+  "suite": "full",
+  "command": "python3 -m pytest -q",
+  "configured_python": "python3",
+  "resolved_python": "/usr/bin/python3",
+  "python_version": "3.9.6",
+  "pytest_version": "8.4.2",
+  "fallback_used": false,
+  "config_digest": "5a5ff957f6971ac2375214a8777bb1f654f9733ca5bad277f6e9f6122b0bd118",
+  "source_state_digest": "569ce5971808b658406e338efb1c43a82a2bf5bc1439c944e744ebd41f2fb725",
+  "status": "failed",
+  "exit_code": 1,
+  "stdout": "........................................................................ [ 12%]\n........................................................................ [ 25%]\n........................................................................ [ 37%]\n....F................................................................... [ 50%]\n........................................................................ [ 63%]\n........................................................................ [ 75%]\n........................................................................ [ 88%]\n...................................................................      [100%]\n=================================== FAILURES ===================================\n_________ test_repository_contains_only_the_single_valid_pilot_subject _________\n\n    def test_repository_contains_only_the_single_valid_pilot_subject():\n        pilot = _module()\n        config = pilot.load_config(CONFIG_PATH)\n        candidate_files = sorted(CANDIDATE_PATH.parent.glob(\"*.json\"))\n        decision_files = sorted(\n            (\n                PROJECT_ROOT\n                / config[\"directories\"][\"human_triage_decision\"]\n            ).glob(\"*.json\")\n        )\n    \n>       assert candidate_files == [CANDIDATE_PATH]\nE       AssertionError: assert [PosixPath('/...01--v1.json')] == [PosixPath('/...01--v1.json')]\nE         \nE         Left contains one more item: PosixPath('/Users/Daily/Development/ReviewCompass3/.reviewcompass/workflow/improvement-candidates/ic-pilot-todo-snapshot-boundary-001--v1.json')\nE         Use -v to get more diff\n\ntests/test_issue_resolution_pilot.py:182: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_issue_resolution_pilot.py::test_repository_contains_only_the_single_valid_pilot_subject\n1 failed, 570 passed in 2.72s\n",
+  "stderr": ""
+}

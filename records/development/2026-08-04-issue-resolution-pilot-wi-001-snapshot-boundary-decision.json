@@ -1,0 +1,45 @@
+{
+  "decision_id": "DEC-RC3-ISSUE-PILOT-WI-001-SNAPSHOT-BOUNDARY-2026-08-04",
+  "decision_version": 1,
+  "decided_at": "2026-08-04T11:45:04+09:00",
+  "decision_maker": "human",
+  "decision": "approve_option_a",
+  "candidate_ref": {
+    "candidate_id": "IC-RC3-ISSUE-PILOT-WI-001-SNAPSHOT-BOUNDARY-001",
+    "candidate_version": 1,
+    "path": "records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-candidate-v1.json",
+    "sha256": "9bc2bb3d921902cd46cd56607290fb71b9681400784725ee8bd7de9ecfc87a35",
+    "content_digest": "f037398f905ed48973b6a059b5f59bf3b36b6f35097ea819716be7aeda107cc2"
+  },
+  "selected_option": {
+    "option_id": "A",
+    "label": "split helper implementation from final snapshot capture",
+    "required_boundary": "WI-001 ends with helper GREEN; actual TODO snapshot and manifest are created and reloaded after WI-002 and WI-006 are committed and immediately before WI-003."
+  },
+  "superseded_plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 3,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v3.json",
+    "sha256": "07cd477a463e4536f6aa208153d6fdf401cfd0d8c00909cdc61fea5fdc26c304",
+    "content_digest": "7a530ea650c907aae6fd49848167e5596df1f46180cc8d454579c393443ddd3d"
+  },
+  "authorized_actions": [
+    "create Plan version 4 without modifying Plan version 3",
+    "limit WI-001 to snapshot helper implementation and fixed-Test GREEN",
+    "add an independent actual-snapshot Work Item after committed WI-002 and WI-006 and immediately before WI-003",
+    "add normal, negative, and boundary tests for the revised ordering and source identity",
+    "perform Plan Challenge version 4",
+    "create Task Contract version 2 only after Plan version 4 Challenge and separate Human Plan approval"
+  ],
+  "not_authorized": [
+    "approve Plan version 4 before Challenge version 4 and a separate Human decision",
+    "create Task Contract version 2 before Plan version 4 approval",
+    "create the actual TODO snapshot under Task Contract version 1",
+    "begin WI-002 or compact TODO",
+    "modify Plan version 3, Task Contract version 1, or the fixed WI-001 Test in place",
+    "declare the Issue resolved",
+    "promote a second workflow Issue subject"
+  ],
+  "next_action": "Commit the stopping and revision-decision work unit, then create Plan version 4 RED Test and candidate as a separate work unit.",
+  "content_digest": "29361f9932fddbea89b2c1d55024b2823c0e48d0c2f8fbf10a03cdfd0e01ebe8"
+}

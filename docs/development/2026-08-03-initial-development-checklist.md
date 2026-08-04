@@ -575,6 +575,21 @@ Task Contract containing commitを確認後、WI-001のbyte-exact snapshot／別
 `562 passed, 9 failed`で、失敗は全件期待module未実装だけである。実TODO、snapshot、manifest、実装codeは未変更。
 RED作業単位のcommit後まで実装を開始せず、最後のPilot checkboxは未完了のままとする。
 
+固定Testを変更せずsnapshot helperを実装し、targeted `9 passed`を確認したが、実snapshot作成前にPlan v3
+ACC-001の「圧縮直前TODO」とTask Contract v1のWI-001先行順序が、必須TODO更新により両立しないことを検出した。
+Pause Evidenceは`records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-pause-evidence-v1.md`、
+SHA-256 `727975c1293976959449360e2d1af10ad749b3cf4b7d4e94c8daba8f0bfe76ce`。実snapshot／manifestとTODO compactionは
+未実施で、Acceptanceへ影響するため`pause_and_triage`とし、版付きUpstream RevisionのHuman判断を待つ。
+
+Humanは推奨案を承認し、Decision
+`records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-decision.json`で
+`current_issue_plan_revision / blocking`を固定した。Triage Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-triage-completion-evidence-v1.md`、
+SHA-256 `bcb4083827c6ce2b5de4bb23ec113e2543b006caedd6b8a30edd1421361beee3`。二件目workflow Candidate配置は
+単一subject Testで`570 passed, 1 failed`となり、current Issue内改定recordを`records/development/`へ戻して
+公式全`571 passed`を確認した。現在の停止・判断作業単位をcommitした後だけ、Plan v4のRED Testと候補作成へ
+進む。最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
