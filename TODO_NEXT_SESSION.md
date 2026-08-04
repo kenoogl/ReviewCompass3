@@ -1,16 +1,16 @@
 # TODO_NEXT_SESSION
 
-更新日：2026-08-04
+更新日：2026-08-05
 
 > 人向けの現在位置入口。Workflow stateと完了Evidenceの正本ではない。過去sessionの詳細はここへ累積しない。
 
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.1／実sourceのRoutine Profile生成まで完了。routine 966件。
+- 現在の工程：Work 4A rebuild v3.2／追加特徴の設計提案を作成済み、Human承認待ち。v3.1のRoutine Profile生成は完了（routine 966件）。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
-- 当面の進行入口：Work 4A Rebuild Design v3.1 Amendment。
+- 当面の進行入口：Work 4A Rebuild Design v3.2 Proposal。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -23,32 +23,33 @@
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
 - [Work 4A Rebuild Design v3.1](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5839e37467aaa7d06ee2e9bde477e6c6a76da57e6f4b8a9653e1c9551cea5e40`
 - [Work 4A v3.1 Routine Profile](records/development/2026-08-04-work-4a-v3-1-actual-routine-profile-evidence-v1.md) — SHA-256 `8481121af2c9066b54d0eb9365ff507003f63166c8b4e6b4f3fbe48f67031294`
+- [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `db357e22e84047882d5e5090bb20f849d614db582db303c50152e28454d96360`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `b5a18fb4da194779c2a1bf8010e9d1418377d3b30bfc92d5d8336965eeab6d7c`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `6a68980e2e0817b9938c5730341660bcaabea4c73238ab280b47658d051d0557`
 
 ## 次に行う一作業
 
-LLMによるDisposition Proposal生成の承認をHumanから得る。
+v3.2の追加特徴設計についてHuman承認を得る。
 
 開始条件：
 
-- Routine Profile生成containing commit後のclean transition。
-- 生成範囲と生成元記録のHuman承認。
+- v3.2設計提案のcommit後のclean transition。
+- 追加特徴、抽出範囲、受入条件のHuman承認。
 
 完了条件：
 
-- 966件のroutineに対する非権威の提案を外部DATA_ROOTへ生成する。
-- 参照範囲と`evidence_refs`の検証を通す。
-- 提案を根拠にEntryを作らない。
+- Profile v2のschema、検出範囲、J1〜J10を確定する。
+- 承認後にPolicy v3、RED test、Profile v2実装へ進む。
+- LLMによるDisposition Proposal生成は、Profile v2の実データ確認後の別承認とする。
 
-後続作業：group条件とdispositionのHuman決定、Entry・Relation・Baseline生成。
+後続作業：Profile v2の実データ確認、LLMによるDisposition Proposal生成の承認。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：LLMによるDisposition Proposal生成の承認。Routine Profile実データは提示済み。
-- 再開条件：Routine Profile生成commit後のclean transition。
+- Human判断待ち：v3.2追加特徴設計の承認。Routine Profile v1実データは提示済み。
+- 再開条件：v3.2設計提案のcommit後のclean transition。
 
 ## stale・deferred
 
