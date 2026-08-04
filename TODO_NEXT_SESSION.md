@@ -7,12 +7,12 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A Source Symbol Index generator GREEN completed_uncommitted / actual baseline capture not_started
+- 現在作業：Project-first runtime root memo completed_uncommitted / Layout Baseline amendment not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-PILOT-TODO-GROWTH-001`：`resolved`、現行Workへの影響なし。次：actual Source SnapshotとSource Symbol Index baseline
+- `ISSUE-PILOT-TODO-GROWTH-001`：`resolved`、現行Workへの影響なし。次：project-first runtime rootのLayout Baseline amendment
 
 ## 最新のauthority／Evidence
 
@@ -22,32 +22,33 @@
 - [Work 4A Start Boundary Evidence](records/development/2026-08-04-work-4a-start-boundary-evidence-v1.md) — SHA-256 `65d47954cf8f71b02444b334df8598912c31d19183d70ccec59bc083b1ed7159`
 - [Work 4A Source Symbol Index RED Evidence](records/development/2026-08-04-work-4a-source-symbol-index-red-evidence-v1.md) — SHA-256 `f8cf312392897cb9b5da030ffae15432e0d2a77a58ca8e158d786b66221454d3`
 - [Work 4A Source Symbol Index GREEN Evidence](records/development/2026-08-04-work-4a-source-symbol-index-green-evidence-v1.md) — SHA-256 `d0cb960280a9411b5358d9d21ee3fc2fc8829bf12ddf0a6f9e7d6180ef56a871`
+- [Project-first Runtime Root Memo](docs/design/2026-08-04-project-first-runtime-root-memo.md) — SHA-256 `b1306fd2202b8562dae86acff0dd003ca2b9e9029dd5208e21e1e24e59d5e474`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `b6eb1dc55235520e8ce90e99b940f5520c101f0b31ea342dcec4ed8b36ff0231`
 
 ## 次に行う一作業
 
-clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
+project-first runtime rootを現行Layout Baselineへ適合するversioned candidateとして具体化する。
 
 開始条件：
 
-- Source Symbol Index GREEN containing commitとclean transition
-- venv bootstrapがPython 3.9.6、pytest 8.4.2でverified
+- Project-first Runtime Root Memo containing commitとclean transition
+- 現行Layout Baselineとの非互換点、migration要否、deployment除外を明示
 
 完了条件：
 
-- Snapshot ID、primary／Test-reference manifest、全function／method Indexを実source treeから保存する
-- coverage、freshness、再生成一致を機械確認する
+- logical root resolver、project／profile isolation、権限、deployment package除外のcandidateを作成する
+- Work 4A actual baseline保存先を`reviewcompass3 / development / data`として解決できる
 
-後続作業：public、shared、high-risk、重複候補、retiredの機械抽出を追加する。
+後続作業：承認後、clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
 
 ## blocker・Human判断待ち
 
-- blocker：`completed_work_unit_uncommitted`。GREEN generatorのcommit完了までactual baseline captureへ移らない。
-- Human判断待ち：なし。Work 4A先行と最小identity境界は承認済み。
+- blocker：`completed_work_unit_uncommitted`。Runtime Root Memoのcommit完了までLayout Baseline amendmentへ移らない。
+- Human判断待ち：Layout Baseline candidateの承認。Memoは現行Baselineを置換しない。
 
 ## stale・deferred
 
-- stale：開始前commit `0880b54`の観測はStart Boundary Evidenceを含むcommit後に再利用しない。実source treeのIndex観測はGREEN containing commitまで未採取。Current Plan 17節の初期実装順6・7はSequence Decisionの範囲だけsuperseded。
+- stale：開始前commit `0880b54`の観測はStart Boundary Evidenceを含むcommit後に再利用しない。actual Source Symbol Indexの保存先はLayout amendmentまで未確定。Current Plan 17節の初期実装順6・7はSequence Decisionの範囲だけsuperseded。
 - deferred：正式Issue Resolution schema、UI、automation、Work 8正式評価。
 
 ## Git・Test
@@ -57,7 +58,7 @@ clean containing commitからactual Source SnapshotとSource Symbol Index baseli
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - 直近の関連Test：Source Symbol Index Acceptance `5 passed`
-- 直近の全Test：venv公式runner 657 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の全Test：venv公式runner 657 passed、Python 3.9.6、pytest 8.4.2、fallback false（本memo作成前）
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
