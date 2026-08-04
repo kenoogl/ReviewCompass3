@@ -1,0 +1,29 @@
+{
+  "record_kind": "human_approval_decision",
+  "schema_version": 1,
+  "decision_id": "DEC-WORK4A-ROUTINE-CLASSIFICATION-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-04T15:56:15+09:00",
+  "decision_maker": "human",
+  "instruction": "承認",
+  "candidate_ref": {
+    "candidate_id": "RC3-WORK4A-ROUTINE-CLASSIFICATION-2026-08-04-V1",
+    "path": "records/development/2026-08-04-work-4a-routine-classification-candidate-v1.json",
+    "sha256": "2b198c5dce8ca530b3c62972b82334df5aa75f75e2c22248556e3069d4fb0c68",
+    "content_digest": "1afebb415d6c7d825a8267fa20544a86beb6aa09a3bda10971fba41d90d1de2d"
+  },
+  "status": "approved_effective",
+  "effective_rules": [
+    "machine output is a candidate list with rule hit and source evidence, never a semantic verdict",
+    "public, shared, high-risk, duplicate candidate and retired candidate use the approved evidence boundaries",
+    "terminal-name match, underscore convention, static-reference absence or module-path name alone cannot decide a classification",
+    "Reusable Routine Ledger registration and reuse disposition require a later Human confirmation"
+  ],
+  "permitted_next_action": "approved classification rulesのcontaining commit後、candidate extractorのAcceptance TestをREDから作成する。",
+  "prohibited_next_action": [
+    "candidate classificationをfinal VerdictまたはLedger登録として扱う",
+    "routineの削除、rename、mergeまたは公開API化",
+    "call graph、risk classifier、Test reference parserの仕様をHuman判断なしに拡張する"
+  ],
+  "content_digest": "2373b7a58be998d38b95c84454eda09ea3a0c0721401fda811a325c0078319b6"
+}

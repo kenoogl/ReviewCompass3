@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A routine classification rule candidate committed / Human approval pending
+- 現在作業：Work 4A routine classification Human approval recorded_committed / candidate extractor RED not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -36,26 +36,28 @@
 - [Work 4A Baseline Persistence GREEN Evidence](records/development/2026-08-04-work-4a-baseline-persistence-green-evidence-v1.md) — SHA-256 `db1ef63daad2159d399d9d2680daf0eb89945a62939732fb329dd30e82c12331`
 - [Work 4A Baseline Persistence GREEN Test Receipt](records/development/2026-08-04-work-4a-baseline-persistence-green-test-receipt-v1.json) — SHA-256 `6aaa3834c0f49a4d6f32b942abe0ca47588aa5042ccba05110a51add9a3b235e`
 - [Work 4A Routine Classification Candidate](records/development/2026-08-04-work-4a-routine-classification-candidate-v1.json) — SHA-256 `2b198c5dce8ca530b3c62972b82334df5aa75f75e2c22248556e3069d4fb0c68`
+- [Work 4A Routine Classification Approval Decision](records/development/2026-08-04-work-4a-routine-classification-approval-decision-v1.json) — SHA-256 `2b7eccb4c55927369c49fadd34ebb84b3f99d6b95b512e5ec2a3c3cece9fe251`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `221069ef3f4d0b9ce5d067a2cd516fdfe061f73e402fbc5f24cc89ac8f7f92c4`
 
 ## 次に行う一作業
 
-routine classification rule candidateをHumanが承認する。
+routine classification candidate extractorのAcceptance Testを作成し、REDを確認する。
 
 開始条件：
 
-- current Snapshot／Index inventoryとroutine classification rule candidate
+- routine classification approval Decision containing commitとclean transition
 
 完了条件：
 
-- public、shared、high-risk、duplicate candidate、retired candidateの機械候補規則とHuman確定境界を決定する
+- approved ruleからcandidate listとsource evidenceを生成するAcceptance Testを作成する
+- 実装が存在しないためのREDを確認する
 
 後続作業：承認後、clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。Human承認はcommitted classification candidateを入力として行う。
-- Human判断待ち：routine classification rule candidateの承認。承認前に抽出tool、Ledger登録、routine dispositionを開始しない。
+- blocker：なし。candidate extractor RED Testはcommitted approval Decisionを入力として開始する。
+- Human判断待ち：なし。candidate listの意味的確定、Ledger登録、routine dispositionは後続Human確認まで開始しない。
 
 ## stale・deferred
 
