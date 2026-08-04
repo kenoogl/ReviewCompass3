@@ -820,6 +820,95 @@ def validate_resolution_plan(record, *, path, project_root, config):
             raise PilotValidationError(
                 "Plan Task Contract commit gate is incomplete"
             )
+    if record["plan_version"] >= 4:
+        work_items = {
+            item["work_item_id"]: item
+            for item in record["work_items"]
+        }
+        helper = work_items.get("WI-001", {})
+        snapshot = work_items.get("WI-007", {})
+        projection = work_items.get("WI-003", {})
+        acceptance_by_id = {
+            item["acceptance_id"]: item["criterion"]
+            for item in record["acceptance"]
+        }
+        oracle_by_id = {
+            item["oracle_id"]: item
+            for item in record["oracles"]
+        }
+        route = " ".join(record["task_contract_route_candidates"])
+        expected_order = (
+            "WI-001",
+            "WI-002",
+            "WI-006",
+            "WI-007",
+            "WI-003",
+            "WI-004",
+            "WI-005",
+        )
+        snapshot_acceptance = acceptance_by_id.get("ACC-001", "")
+        snapshot_oracle = oracle_by_id.get("ORACLE-001", {})
+        oracle_text = (
+            f'{snapshot_oracle.get("method", "")} '
+            f'{snapshot_oracle.get("expected", "")}'
+        )
+        source_guard = any(
+            "WI-007再読込合格後" in prohibition
+            and "WI-003" in prohibition
+            and "source TODOを変更しない" in prohibition
+            for prohibition in record["prohibitions"]
+        )
+        acceptance_tokens = (
+            "WI-002",
+            "WI-006",
+            "containing commit",
+            "WI-003直前",
+            "WI-007 commitではTODOを変更せず",
+            "source identity",
+        )
+        oracle_tokens = (
+            "WI-007",
+            "WI-003",
+            "source",
+            "snapshot",
+            "manifest",
+        )
+        if (
+            tuple(item["work_item_id"] for item in record["work_items"])
+            != expected_order
+            or "helper" not in helper.get("objective", "")
+            or "実snapshot" in helper.get("objective", "")
+            or helper.get("acceptance_ids") != ["ACC-008"]
+            or helper.get("oracle_ids") != ["ORACLE-008"]
+            or helper.get("rollback_step_ids") != ["RB-003"]
+            or snapshot.get("depends_on") != ["WI-002", "WI-006"]
+            or snapshot.get("acceptance_ids") != ["ACC-001"]
+            or snapshot.get("oracle_ids") != ["ORACLE-001"]
+            or snapshot.get("rollback_step_ids") != ["RB-001"]
+            or "WI-007" not in projection.get("depends_on", [])
+            or not source_guard
+            or any(
+                token not in snapshot_acceptance
+                for token in acceptance_tokens
+            )
+            or any(token not in oracle_text for token in oracle_tokens)
+            or any(identifier not in route for identifier in expected_order)
+            or [route.index(identifier) for identifier in expected_order]
+            != sorted(route.index(identifier) for identifier in expected_order)
+        ):
+            raise PilotValidationError(
+                "Plan snapshot timing closure is incomplete"
+            )
+        if not any(
+            "WI-007後にTODOが変わった場合" in recovery
+            and "WI-003を開始せず" in recovery
+            and "上書きせず" in recovery
+            and "versioned snapshot" in recovery
+            for recovery in record["recovery"]
+        ):
+            raise PilotValidationError(
+                "Plan snapshot timing recovery is incomplete"
+            )
     _validate_content_digest(record)
     return ValidationResult(
         record_kind=record["record_kind"],

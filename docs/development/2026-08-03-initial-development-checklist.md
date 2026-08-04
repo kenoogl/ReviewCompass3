@@ -596,6 +596,13 @@ SHA-256 `3fe743c2be6e957fabaa1477745c66323c8b5077c9fd0ca83acc1c57a7a15c94`。tar
 全体は既存を含む`572 passed, 9 failed`で、失敗はPlan v4実体不在とversion 4専用validator未実装だけである。
 RED作業単位のcommit後までPlan v4候補とvalidatorを作成せず、最後のPilot checkboxは未完了のままとする。
 
+Plan v4 RED containing commit `7df9cb9`とclean transitionを確認後、固定Testを変更せずversion 4 validatorと
+Plan v4候補を作成した。Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-plan-v4-completion-evidence-v1.md`、SHA-256
+`0d90206a1eaec5a2571ddc732d5fbd341593995562170e4d97fab31e43785720`。targeted `10 passed`、公式全
+`581 passed`、fallback `false`で、Plan v1〜v3、Task Contract v1、実snapshot、TODO compactionは未変更。
+GREEN作業単位のcommit後までChallenge v4を開始せず、最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
