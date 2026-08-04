@@ -24,7 +24,7 @@
 - [Work 4A Rebuild Design v3.1](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5839e37467aaa7d06ee2e9bde477e6c6a76da57e6f4b8a9653e1c9551cea5e40`
 - [Work 4A v3.2 Routine Profile v2](records/development/2026-08-05-work-4a-v3-2-actual-routine-profile-v2-evidence-v1.md) — SHA-256 `737ebf873fd2544a5a799f52339132241d79446019623d66398e471280a0ed35`
 - [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `b157640f940c12d733d237921cad664dbebc4925c592796394f29da1155f5e48`
-- [Work 4A Rebuild Design v3.3 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md) — SHA-256 `6ff0496da864c3b215edfc772ada1b0e4b1a32b7c17f72cf0011fb7b4bef8cd7`
+- [Work 4A Rebuild Design v3.3 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md) — SHA-256 `b99edf3b9561da34bd4c0bd8a8e86418c36be18e202eef4f408d9b2e0392e538`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `b5a18fb4da194779c2a1bf8010e9d1418377d3b30bfc92d5d8336965eeab6d7c`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `6a68980e2e0817b9938c5730341660bcaabea4c73238ab280b47658d051d0557`
