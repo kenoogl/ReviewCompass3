@@ -1,0 +1,53 @@
+{
+  "updated_on": "2026-08-04",
+  "overall": "Work 1B、Work 2、Work 3完了。Work 4前のIssue Resolution早期Pilotを実施中。",
+  "current_work": "WI-003 TODO compaction completed / containing commit",
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2",
+  "active_issue": {
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+    "state": "implementation_in_progress",
+    "impact": "root TODO handoffとPilot完了境界",
+    "next_action": "WI-004"
+  },
+  "references": [
+    {
+      "label": "Task Contract v2",
+      "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json",
+      "sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6"
+    },
+    {
+      "label": "Current Plan",
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694"
+    },
+    {
+      "label": "Pre-compaction Snapshot Manifest",
+      "path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.manifest.json",
+      "sha256": "395337e57cd73ccb16bec4e009761f780f4631444e12f081b55e1d7c6ed40963"
+    },
+    {
+      "label": "WI-007 Completion Evidence",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-007-completion-evidence-v1.md",
+      "sha256": "de119e28ac4c93ef1971a6001c0b217ff07ad4366990e94f25fcd1e091d6d04c"
+    }
+  ],
+  "next_work": {
+    "action": "WI-004の共通TODO更新promptとCodex／Claude参照境界をtest-firstで実装する。",
+    "start_conditions": [
+      "WI-003 containing commitとclean transition",
+      "圧縮後TODO validatorと参照整合の再確認"
+    ],
+    "completion_conditions": [
+      "共通prompt一件と各入口の参照一件",
+      "CLAUDE.mdに独立したTODO意味規則がない"
+    ],
+    "following": "WI-005 post-write verificationとResolution Verdict候補"
+  },
+  "blocker": "なし",
+  "human_decision": "現在なし。Resolution VerdictでHuman判断が必要。",
+  "stale": "Plan v1-v3とTask Contract v1はPlan v4／Task Contract v2へsuperseded。",
+  "deferred": "正式Issue Resolution automation、画面UI、Work 4以降の製品工程。",
+  "branch": "main",
+  "related_test": "TODO projection 6 passed、snapshot関連10 passed",
+  "full_test": "公式runner 631 passed、fallback false（TODO書換え前）"
+}

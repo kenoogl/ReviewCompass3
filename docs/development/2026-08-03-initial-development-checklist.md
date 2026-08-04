@@ -673,6 +673,13 @@ Test SHA-256 `c284b442c36b7bc46681a9a154038980b122ffd33001e1023d704ac69badbaf4`�
 `625 passed, 5 failed`で、失敗は専用module未実装だけ。本RED commitではTODOを変更せず、source SHA-256
 `16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1`を維持する。
 
+WI-003 RED containing commit `05b0c98`後にsource identity一致を再確認し、root TODOを機械生成して85,219 bytes、
+900 lines、123 Claimsから2,824 bytes、64 lines、詳細Claim 0、active Issue 1件へ圧縮した。Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-wi-003-completion-evidence-v1.md`。実templateとの結合不足を
+書込み前検査で検出し、repository template結合Testを追加して修正前`1 failed`、修正後は関連`38 passed`、公式全
+`631 passed`、fallback `false`。WI-007 snapshot／manifestは不変で、WI-003 containing commitとclean transition後に
+WI-004へ進む。最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

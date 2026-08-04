@@ -34,6 +34,17 @@
 - 直近のDecision／Evidence：`{{pathまたはなし}}`
 - Decision／Evidence SHA-256：`{{sha256またはなし}}`
 
+## 現在作業に影響する改善候補／Issue
+
+- ID：`{{activeなimprovement_candidate／Issue IDまたはなし}}`
+- state：`{{stateまたはなし}}`
+- 現行作業への影響：`{{影響またはなし}}`
+- 次action：`{{次actionまたはなし}}`
+
+## 最新のauthority／Evidence
+
+- [{{authority／Evidence名}}]({{path}}) — SHA-256：`{{sha256}}`
+
 ## 実施報告照合
 
 ### verified
