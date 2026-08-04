@@ -823,6 +823,11 @@ fresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未
 `4f01c7f2b0f6b8df03fa360e9aedb3639d972a890a80bbca5fd48b07b28213d7`の144件をHuman確認の入力として承認した。
 これはcandidateの最終分類、Ledger登録、routine変更の承認ではない。次は代表sampleとLedger record境界を提案する。
 
+`Cross-contract Classification Gap Candidate`：
+`IC-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GAP-001`。固定checkboxのcross-contractは現行extractorで未測定であり、
+0件とは扱わない。Humanが最小rule追加またはauthority改定によるdeferを裁定するまで、Ledger登録とWork 4A完了を
+開始しない。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred

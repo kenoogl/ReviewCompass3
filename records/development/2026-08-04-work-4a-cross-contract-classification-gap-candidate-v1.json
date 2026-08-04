@@ -1,0 +1,49 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-WORK4A-CROSS-CONTRACT-CLASSIFICATION-GAP-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-04T18:20:19+09:00",
+  "source_work": "Work 4A routine classification representative review preparation",
+  "source_identity": {
+    "kind": "actual_candidate_list",
+    "project_id": "reviewcompass3",
+    "profile": "development",
+    "snapshot_id": "4f01c7f2b0f6b8df03fa360e9aedb3639d972a890a80bbca5fd48b07b28213d7",
+    "logical_path": "DATA_ROOT/routine-classification-candidates/4f01c7f2b0f6b8df03fa360e9aedb3639d972a890a80bbca5fd48b07b28213d7/routine-classification-candidates-v1.json",
+    "sha256": "19cb5030a61da25570432ebbf90d255f7a7d9dde7612692f02d6412aac0bb63a"
+  },
+  "problem": "Work 4Aの固定完了条件はcross-contract候補の抽出を要求するが、現行の承認済み分類規則とextractorにはcross-contract rule ID、入力証拠、negative case、出力件数がない。したがってactual candidate listのcross-contract件数を0件と解釈できない。",
+  "impact": [
+    "Work 4Aの分類coverageを完了と報告できない",
+    "Ledger登録範囲をpublic、shared、high-risk、duplicateだけから十分であると確定できない",
+    "cross-contract boundaryを持つroutineの再利用判断を見落とす可能性がある"
+  ],
+  "scope": [
+    "cross-contractの最小意味境界とsource evidenceのHuman承認",
+    "Acceptance Testの正例、負例、境界例",
+    "candidate extractorのrule ID、出力、actual capture再生成"
+  ],
+  "non_scope": [
+    "現行144候補のfinal VerdictまたはLedger自動登録",
+    "call graph全体、Contract compiler、製品Runtimeの実装",
+    "既存routineの削除、rename、mergeまたは公開API化",
+    "Human承認なしのCurrent Planまたは完了条件の緩和"
+  ],
+  "classification_candidates": [
+    "acceptance_coverage_gap",
+    "routine_classification_scope",
+    "implementation_candidate"
+  ],
+  "route_candidates": [
+    "current_work_blocking_human_decision",
+    "acceptance_test_extension"
+  ],
+  "consumer_candidates": [
+    "Work 4A function ledger baseline",
+    "Reusable Routine Ledger registration scope",
+    "first Implementation Task Contract discovery"
+  ],
+  "proposed_action": "Humanがcross-contractをWork 4Aのまま最小ruleとして追加するか、authorityを改定して明示的にdeferするかを裁定する。前者を採用する場合は、RED Acceptance Test、Human承認、GREEN実装、fresh Snapshotからのactual candidate list再生成を行う。",
+  "content_digest": "b8f9b260bfd0c4ea7d9f0adb3453a4fe0deab083724ea4948dfb456505cc5162"
+}
