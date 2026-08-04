@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Work 4A baseline persistence Acceptance Test（RED）committed / versioned tool not_started
+- 現在作業：Work 4A baseline persistence tool GREEN committed / current external baseline not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -33,26 +33,29 @@
 - [Work 4A Baseline Persistence Improvement Candidate](records/development/2026-08-04-work-4a-baseline-persistence-improvement-candidate-v1.json) — SHA-256 `d7193d504860229f95de3f7c4f1e9e2515e401e7295c90e26669335c783bac99`
 - [Work 4A Baseline Persistence Triage Decision](records/development/2026-08-04-work-4a-baseline-persistence-triage-decision-v1.json) — SHA-256 `f26a7a685b049b6ce4deb69b18554ebbe21ea75ee233901a074b19a1fa6ab507`
 - [Work 4A Baseline Persistence RED Evidence](records/development/2026-08-04-work-4a-baseline-persistence-red-evidence-v1.md) — SHA-256 `bb9fe5eb2f525dae308db1065b0fc1ce2181805466339ae1e5a74722d72a4f6c`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `dff6b6619da1f39401322e3f556d40c164e2619228d05f676c6fbcb2d9ccc73c`
+- [Work 4A Baseline Persistence GREEN Evidence](records/development/2026-08-04-work-4a-baseline-persistence-green-evidence-v1.md) — SHA-256 `db1ef63daad2159d399d9d2680daf0eb89945a62939732fb329dd30e82c12331`
+- [Work 4A Baseline Persistence GREEN Test Receipt](records/development/2026-08-04-work-4a-baseline-persistence-green-test-receipt-v1.json) — SHA-256 `6aaa3834c0f49a4d6f32b942abe0ca47588aa5042ccba05110a51add9a3b235e`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `221069ef3f4d0b9ce5d067a2cd516fdfe061f73e402fbc5f24cc89ac8f7f92c4`
 
 ## 次に行う一作業
 
-versioned Snapshot／Index persistence toolのAcceptance Testを作成し、REDを確認する。
+versioned persistence toolのcontaining commitから、current Source SnapshotとSource Symbol Indexをexternal
+`DATA_ROOT`へnew-only保存し、再読込・freshnessを照合する。
 
 開始条件：
 
-- baseline persistence triage Decision containing commitとclean transition
+- baseline persistence GREEN containing commitとclean transition
 
 完了条件：
 
-- new-only保存、output Digest、re-read comparison、historical output明示のAcceptance Testを作成する
-- 実装が存在しないためのREDを確認する
+- current HEADのSnapshot／Indexをnew IDとして生成する
+- 保存Digest、re-read comparison、`current`分類、historical output温存を確認する
 
 後続作業：承認後、clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。GREEN実装はcommitted RED Acceptance Testを入力として開始する。
+- blocker：なし。current baseline生成はGREEN containing commitのclean transitionを入力とする。
 - Human判断待ち：なし。初回runtime directory作成は承認済みLayout内の明示操作として次の作業単位で行う。
 
 ## stale・deferred

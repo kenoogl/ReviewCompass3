@@ -802,6 +802,11 @@ Acceptance Test 5件はgenerator module未実装により期待どおりREDで�
 RED Testを変更せず`5 passed`、公式全Testは`657 passed`、fallback `false`である。
 実source treeのIndex、coverage、freshness、Ledgerは未確認のためcheckboxと完了関門は未完了である。
 
+`Baseline Persistence GREEN Evidence`：`RC3-WORK4A-BASELINE-PERSISTENCE-GREEN-2026-08-04-V1`、
+`records/development/2026-08-04-work-4a-baseline-persistence-green-evidence-v1.md`。new-only保存、Digest、
+re-read comparison、current／historical分類を持つversioned toolをGREENにした。current external baselineは
+containing commit後のclean transitionで生成するため、Work 4Aのcheckboxと完了関門は未完了である。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred

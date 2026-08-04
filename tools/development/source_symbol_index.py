@@ -10,6 +10,8 @@ from pathlib import Path, PurePosixPath
 
 
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
+_IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
+_PERSISTENCE_PROFILES = {"development", "runtime"}
 
 
 class SourceSnapshotError(Exception):
@@ -56,6 +58,19 @@ class SourceSymbolIndex:
     entries: tuple
 
 
+@dataclasses.dataclass(frozen=True)
+class PersistedSourceSymbolIndexBaseline:
+    """external DATA_ROOTへnew-only保存したSnapshot／Indexのidentity。"""
+
+    snapshot_id: str
+    project_id: str
+    profile: str
+    snapshot_path: Path
+    index_path: Path
+    snapshot_sha256: str
+    index_sha256: str
+
+
 def _sha256(content):
     return hashlib.sha256(content).hexdigest()
 
@@ -69,6 +84,18 @@ def _canonical_digest(value):
             sort_keys=True,
         ).encode("utf-8")
     )
+
+
+def _json_bytes(value):
+    return (
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    ).encode("utf-8")
 
 
 def _git(project_root, *arguments):
@@ -338,3 +365,175 @@ def generate_source_symbol_index(*, snapshot):
         snapshot_id=snapshot.snapshot_id,
         entries=symbols,
     )
+
+
+def _validate_persistence_identity(*, data_root, project_id, profile):
+    root = Path(data_root)
+    if not root.is_absolute():
+        raise SourceSnapshotError("source_symbol_baseline_data_root_not_absolute")
+    if _IDENTIFIER.fullmatch(project_id or "") is None:
+        raise SourceSnapshotError("source_symbol_baseline_project_identity_invalid")
+    if profile not in _PERSISTENCE_PROFILES:
+        raise SourceSnapshotError("source_symbol_baseline_profile_invalid")
+    return root.resolve()
+
+
+def _snapshot_document(*, snapshot, project_id, profile):
+    return {
+        "record_kind": "source_snapshot",
+        "schema_version": 1,
+        "project_id": project_id,
+        "profile": profile,
+        "snapshot_id": snapshot.snapshot_id,
+        "head": snapshot.head,
+        "universe": dataclasses.asdict(snapshot.universe),
+        "primary_files": [
+            dataclasses.asdict(item) for item in snapshot.primary_files
+        ],
+        "test_reference_files": [
+            dataclasses.asdict(item)
+            for item in snapshot.test_reference_files
+        ],
+    }
+
+
+def _index_document(*, index, project_id, profile):
+    return {
+        "record_kind": "source_symbol_index",
+        "schema_version": 1,
+        "project_id": project_id,
+        "profile": profile,
+        "snapshot_id": index.snapshot_id,
+        "entries": [dataclasses.asdict(item) for item in index.entries],
+    }
+
+
+def _write_new_json(path, document):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with path.open("xb") as handle:
+            handle.write(_json_bytes(document))
+    except FileExistsError as error:
+        raise SourceSnapshotError("source_symbol_baseline_already_exists") from error
+
+
+def persist_source_symbol_index_baseline(
+    *,
+    snapshot,
+    index,
+    data_root,
+    project_id,
+    profile,
+):
+    """Snapshot／IndexをDATA_ROOTへnew-onlyで保存し、Digestを返す。"""
+    if not isinstance(index, SourceSymbolIndex):
+        raise SourceSnapshotError("source_symbol_index_invalid")
+    validate_source_snapshot(snapshot=snapshot, project_root=snapshot.project_root)
+    if index.snapshot_id != snapshot.snapshot_id:
+        raise SourceSnapshotError("source_symbol_index_snapshot_mismatch")
+    root = _validate_persistence_identity(
+        data_root=data_root,
+        project_id=project_id,
+        profile=profile,
+    )
+    snapshot_path = (
+        root
+        / "source-snapshots"
+        / snapshot.snapshot_id
+        / "source-snapshot-v1.json"
+    )
+    index_path = (
+        root
+        / "source-symbol-indexes"
+        / snapshot.snapshot_id
+        / "source-symbol-index-v1.json"
+    )
+    if snapshot_path.exists() or index_path.exists():
+        raise SourceSnapshotError("source_symbol_baseline_already_exists")
+    _write_new_json(
+        snapshot_path,
+        _snapshot_document(
+            snapshot=snapshot,
+            project_id=project_id,
+            profile=profile,
+        ),
+    )
+    _write_new_json(
+        index_path,
+        _index_document(
+            index=index,
+            project_id=project_id,
+            profile=profile,
+        ),
+    )
+    return PersistedSourceSymbolIndexBaseline(
+        snapshot_id=snapshot.snapshot_id,
+        project_id=project_id,
+        profile=profile,
+        snapshot_path=snapshot_path,
+        index_path=index_path,
+        snapshot_sha256=_sha256(snapshot_path.read_bytes()),
+        index_sha256=_sha256(index_path.read_bytes()),
+    )
+
+
+def verify_persisted_source_symbol_index_baseline(
+    *,
+    persisted,
+    snapshot,
+    index,
+):
+    """保存物のDigestと内容を、固定Snapshot／Indexへ再読込照合する。"""
+    if not isinstance(persisted, PersistedSourceSymbolIndexBaseline):
+        raise SourceSnapshotError("persisted_source_symbol_index_invalid")
+    if not isinstance(index, SourceSymbolIndex):
+        raise SourceSnapshotError("source_symbol_index_invalid")
+    validate_source_snapshot(snapshot=snapshot, project_root=snapshot.project_root)
+    if (
+        persisted.snapshot_id != snapshot.snapshot_id
+        or index.snapshot_id != snapshot.snapshot_id
+    ):
+        raise SourceSnapshotError("persisted_source_symbol_index_snapshot_mismatch")
+    try:
+        snapshot_bytes = persisted.snapshot_path.read_bytes()
+        index_bytes = persisted.index_path.read_bytes()
+    except OSError as error:
+        raise SourceSnapshotError("persisted_source_symbol_index_missing") from error
+    if _sha256(snapshot_bytes) != persisted.snapshot_sha256:
+        raise SourceSnapshotError("persisted_source_snapshot_digest_mismatch")
+    if _sha256(index_bytes) != persisted.index_sha256:
+        raise SourceSnapshotError("persisted_source_symbol_index_digest_mismatch")
+    expected_snapshot = _json_bytes(
+        _snapshot_document(
+            snapshot=snapshot,
+            project_id=persisted.project_id,
+            profile=persisted.profile,
+        )
+    )
+    expected_index = _json_bytes(
+        _index_document(
+            index=index,
+            project_id=persisted.project_id,
+            profile=persisted.profile,
+        )
+    )
+    if snapshot_bytes != expected_snapshot:
+        raise SourceSnapshotError("persisted_source_snapshot_content_mismatch")
+    if index_bytes != expected_index:
+        raise SourceSnapshotError("persisted_source_symbol_index_content_mismatch")
+    return persisted
+
+
+def classify_persisted_source_symbol_index_baseline(
+    *,
+    persisted,
+    current_snapshot,
+):
+    """保存baselineが指定された現在Snapshotと同一かを副作用なく示す。"""
+    if not isinstance(persisted, PersistedSourceSymbolIndexBaseline):
+        raise SourceSnapshotError("persisted_source_symbol_index_invalid")
+    if not isinstance(current_snapshot, SourceSnapshot):
+        raise SourceSnapshotError("source_snapshot_invalid")
+    if persisted.snapshot_id == current_snapshot.snapshot_id:
+        return "current"
+    return "historical"
