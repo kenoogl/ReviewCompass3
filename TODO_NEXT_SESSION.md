@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3／§17 A〜H RED test作成。
+- 現在の工程：Work 4A rebuild v3／§17 A〜H GREEN。actual artifactは未着手。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design v3。
@@ -20,26 +20,27 @@
 
 - [Work 4A Rebuild Design v3](docs/design/2026-08-04-work-4a-rebuild-design-v3-proposal.md) — SHA-256 `a9e0419dcac556789e82f6f51292dd70399000f988e0720d240286c9a05c2b37`
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
+- [Work 4A v3 Acceptance GREEN](records/development/2026-08-04-work-4a-v3-acceptance-green-evidence-v1.md) — SHA-256 `2fe731bc558a69c7b85f16ef2e28a18daa762ca9e805ab4a0560fb3e93896326`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `9bd03b0fa801fd08335ebb0772de13cd29bffff71ba790053aac96f53f3108ef`
 
 ## 次に行う一作業
 
-v3設計§17 A〜HのRED testを固定し、実装でGREENにする。
+actual artifactの対象routine候補とdispositionをHuman判断へ提示する。
 
 開始条件：
 
-- `DEC-WORK4A-REBUILD-DESIGN-003`によるHuman承認。
-- v2試作revert commit後のclean transition。
+- v3 acceptance GREEN containing commit後のclean transition。
+- 外部`DATA_ROOT`初期化のHuman承認。
 
 完了条件：
 
-- A〜Hの受入testをREDで固定し、期待を緩めずGREENにする。
-- 全testを公式runnerで実行しreceiptを固定する。
-- actual artifactを含めない。
+- 実sourceからObservation、Candidate Runを機械生成する。
+- 対象routineとdispositionをHumanが承認する。
+- actual Attestation、Decision、Entry、Baselineをnew-only作成する。
 
-後続作業：actual routineの対象選定とdispositionをHuman判断へ提示する。
+後続作業：source再採取とfreshness receiptを固定し、Work 4A完了をHuman承認へ出す。
 
 ## blocker・Human判断待ち
 
@@ -58,8 +59,8 @@ v3設計§17 A〜HのRED testを固定し、実装でGREENにする。
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Work 4A v2 E2E `4件`をrevertで削除
-- 直近の全Test：venv公式runner `663 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Work 4A v3 acceptance `22 passed`
+- 直近の全Test：venv公式runner `685 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
