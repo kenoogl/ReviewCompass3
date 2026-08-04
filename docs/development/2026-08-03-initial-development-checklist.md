@@ -818,6 +818,11 @@ containing commit後のfresh Snapshotに対して行うため、Work 4Aのcheckb
 new-only保存しDigestとre-read comparisonで照合するtoolをGREENにした。actual outputとHuman確認はcontaining commit後の
 fresh Snapshotに対して行うため、Work 4Aのcheckboxと完了関門は未完了である。
 
+`Routine Classification Input Approval Decision`：
+`DEC-WORK4A-ROUTINE-CLASSIFICATION-INPUT-001`。Snapshot
+`4f01c7f2b0f6b8df03fa360e9aedb3639d972a890a80bbca5fd48b07b28213d7`の144件をHuman確認の入力として承認した。
+これはcandidateの最終分類、Ledger登録、routine変更の承認ではない。次は代表sampleとLedger record境界を提案する。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred
