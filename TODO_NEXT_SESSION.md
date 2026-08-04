@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.3／設計確定。Comparison Discoveryの実装へ進む。
+- 現在の工程：Work 4A rebuild v3.3／実装GREEN。実sourceのProfile v3とComparison Discovery生成まで完了（routine 1003件、group 682件）。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design v3.3。
@@ -22,7 +22,7 @@
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
 - [Work 4A Rebuild Design v3.1](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5839e37467aaa7d06ee2e9bde477e6c6a76da57e6f4b8a9653e1c9551cea5e40`
-- [Work 4A v3.2 Routine Profile v2](records/development/2026-08-05-work-4a-v3-2-actual-routine-profile-v2-evidence-v1.md) — SHA-256 `737ebf873fd2544a5a799f52339132241d79446019623d66398e471280a0ed35`
+- [Work 4A v3.3 Comparison Discovery](records/development/2026-08-05-work-4a-v3-3-actual-comparison-discovery-evidence-v1.md) — SHA-256 `2cbefe548462d5c05a4cdba263decc074739d0933e4fe8fa688b219e92fd5d02`
 - [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `b157640f940c12d733d237921cad664dbebc4925c592796394f29da1155f5e48`
 - [Work 4A Rebuild Design v3.3 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md) — SHA-256 `b99edf3b9561da34bd4c0bd8a8e86418c36be18e202eef4f408d9b2e0392e538`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `b5a18fb4da194779c2a1bf8010e9d1418377d3b30bfc92d5d8336965eeab6d7c`
@@ -31,26 +31,25 @@
 
 ## 次に行う一作業
 
-K1〜K12をREDで固定し、Profile v3とComparison Discoveryの実装でGREENにする。
+Comparison Discoveryの実データをHumanが確認し、LLMによるDisposition Proposal生成を承認する。
 
 開始条件：
 
-- `DEC-WORK4A-REBUILD-DESIGN-006`によるHuman承認。
-- 設計確定commit後のclean transition。
+- Profile v3とDiscovery生成containing commit後のclean transition。
+- 生成範囲、初期入力の内容、追加読込のprovenanceのHuman承認。
 
-完了条件：
+完了データ：
 
-- Policy v4でgrouping ruleと表示classを固定する。
-- K1〜K12と負例をREDで固定し、期待を緩めずGREENにする。
-- 実sourceを再観測し、Profile v3とComparison Discoveryをnew-onlyで生成する。
+- routine 1003件、group 682件。`focused` 602、`broad` 72、`mass` 8。
+- 初期入力は判断カードとgroup要約だけで、source本文と全member一覧を含めない。
 
-後続作業：group統計の提示、LLMによるDisposition Proposal生成の別承認。
+後続作業：group条件とdispositionのHuman決定、Entry・Relation・Baseline生成。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：LLMによるDisposition Proposal生成の承認。v3.3の実データ確認後とする。
-- 再開条件：設計確定commit後のclean transition。
+- Human判断待ち：LLMによるDisposition Proposal生成の承認。v3.3の実データは提示済み。
+- 再開条件：Profile v3とDiscovery生成commit後のclean transition。
 
 ## stale・deferred
 
@@ -63,8 +62,8 @@ K1〜K12をREDで固定し、Profile v3とComparison Discoveryの実装でGREEN�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Work 4A v3.2 acceptance `11 passed`、v3.1 `21 passed`、v3 `22 passed`
-- 直近の全Test：venv公式runner `724 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Work 4A v3.3 acceptance `15 passed`、v3.2 `11 passed`、v3.1 `21 passed`、v3 `22 passed`
+- 直近の全Test：venv公式runner `739 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
