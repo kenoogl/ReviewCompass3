@@ -667,6 +667,12 @@ manifestを別々に再読込し、SHA-256 `16010a165c010fa8a25cea5ab0f119907345
 `625 passed`、fallback `false`。本作業単位ではTODOを変更せず、containing commit後のsource再照合までWI-003を
 開始しない。最後のPilot checkboxは未完了のままとする。
 
+WI-007 containing commit `b10cd09`後にsource identity一致とclean transitionを再確認し、WI-003 projection rendererの
+5 Testを固定した。RED Evidenceは`records/development/2026-08-04-issue-resolution-pilot-wi-003-red-evidence-v1.md`、
+Test SHA-256 `c284b442c36b7bc46681a9a154038980b122ffd33001e1023d704ac69badbaf4`。targeted `5 failed`、全体は
+`625 passed, 5 failed`で、失敗は専用module未実装だけ。本RED commitではTODOを変更せず、source SHA-256
+`16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1`を維持する。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
