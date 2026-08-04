@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aはv3設計を承認済みで、v1 patch群を可逆revert済み。
-- 現在の工程：Work 4A rebuild v3.1／設計承認済み。Observationと初回Candidate Runは完了。Policy v2とRoutine Profileは実装着手前。
+- 現在の工程：Work 4A rebuild v3.1／実装GREEN。実sourceのRoutine Profile生成へ進む。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
 - 当面の進行入口：Work 4A Rebuild Design v3.1 Amendment。
@@ -22,7 +22,7 @@
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
 - [Work 4A Rebuild Design v3.1](docs/design/2026-08-04-work-4a-rebuild-design-v3-1-amendment.md) — SHA-256 `5839e37467aaa7d06ee2e9bde477e6c6a76da57e6f4b8a9653e1c9551cea5e40`
-- [Work 4A v3.1 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-1-approval-decision-v1.md) — SHA-256 `06e8b0f28fcdfd398271c9407086fac65c3070b6ae3294a8763f3defa6716540`
+- [Work 4A v3.1 Acceptance GREEN](records/development/2026-08-04-work-4a-v3-1-acceptance-green-evidence-v1.md) — SHA-256 `40cb0ba68fa4c0042ae22234d5a96c54f25accc03b2adde58d9177c35bdb7de4`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `9bd03b0fa801fd08335ebb0772de13cd29bffff71ba790053aac96f53f3108ef`
@@ -61,8 +61,8 @@ v3.1受入test I1〜I21をREDで固定し、実装でGREENにする。
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Work 4A v3 acceptance `22 passed`
-- 直近の全Test：venv公式runner `681 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Work 4A v3.1 acceptance `21 passed`、v3 acceptance `22 passed`
+- 直近の全Test：venv公式runner `702 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

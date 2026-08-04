@@ -54,6 +54,12 @@ VERIFICATION_OUTCOME_CLASSES = (
     "observation_tampered",
     "write_verification_failed",
     "partial_write_detected",
+    "symbol_id_collision",
+    "marker_detection_flag_missing",
+    "advisory_used_as_authority",
+    "advisory_reference_unresolved",
+    "advisory_evidence_missing",
+    "group_coverage_incomplete",
 )
 
 ANNOTATION_CLASSES = ("locator_unresolved", "locator_profile_mismatch")
@@ -104,7 +110,7 @@ _SCHEMA = {
         ("record_kind", "schema_version", "digest_algorithm", "candidate_run_id",
          "observation_snapshot_id", "source_content_id", "source_universe_id",
          "source_universe_version", "candidates", "content_digest"),
-        (),
+        ("extraction_rule_version",),
     ),
     "work4a_observation_attestation": (
         ("record_kind", "schema_version", "digest_algorithm", "attestation_id",
@@ -146,6 +152,144 @@ _SCHEMA = {
          "human_decision_id", "outcome", "permits_current_start", "content_digest"),
         (),
     ),
+}
+
+# v3.1で追加・変更したschema。record_kindとschema_versionの組で引く。
+_SCHEMA_BY_VERSION = {
+    ("work4a_freshness_policy", 2): (
+        ("record_kind", "schema_version", "digest_algorithm", "policy_id", "policy_version",
+         "change_class", "change_classes", "revalidation_required_classes",
+         "candidate_classification_classes", "responsibility_classes", "disposition_classes",
+         "disposition_source_classes", "syntactic_effect_markers", "marker_detection_rules",
+         "responsibility_class_rules", "group_condition_grammar", "confidence_classes",
+         "evidence_ref_kinds", "extraction_rule_version", "verification_outcome_classes",
+         "development_policy_ref", "content_digest"),
+        (),
+    ),
+    ("work4a_observation_attestation", 2): (
+        ("record_kind", "schema_version", "digest_algorithm", "attestation_id",
+         "attestation_version", "project_id", "profile", "source_universe_id",
+         "source_universe_version", "source_universe_ref", "policy_ref", "source_content_id",
+         "observation", "candidate_run", "candidate_summary", "supersedes_attestation",
+         "content_digest"),
+        ("routine_profile", "disposition_proposal"),
+    ),
+    ("work4a_routine_profile", 1): (
+        ("record_kind", "schema_version", "digest_algorithm", "profile_run_id",
+         "observation_snapshot_id", "source_content_id", "extraction_rule_version",
+         "marker_detection", "routines", "excluded_constructs", "content_digest"),
+        (),
+    ),
+    ("work4a_disposition_proposal", 1): (
+        ("record_kind", "schema_version", "digest_algorithm", "advisory", "proposal_run_id",
+         "routine_profile_run_id", "observation_snapshot_id", "source_content_id",
+         "generation_provenance", "proposals", "content_digest"),
+        (),
+    ),
+}
+
+_ROUTINE_FIELDS = (
+    "symbol_id",
+    "symbol_kind",
+    "enclosing_symbol_id",
+    "code_reference",
+    "signature",
+    "docstring_first_line",
+    "syntactic_effect_markers",
+    "internal_reference_count",
+    "line_count",
+    "structure_digest",
+    "structural_match_group_id",
+    "candidate_classification",
+    "responsibility_class_proposal",
+)
+
+_PROPOSAL_FIELDS = (
+    "symbol_id",
+    "responsibility_summary",
+    "input_summary",
+    "output_summary",
+    "semantic_dependencies",
+    "similar_routines",
+    "merge_candidates",
+    "recommended_disposition",
+    "alternative_dispositions",
+    "confidence",
+    "reason",
+    "human_review_point",
+    "human_review_required",
+    "evidence_refs",
+)
+
+_PROVENANCE_FIELDS = (
+    "provider",
+    "model",
+    "template_id",
+    "template_version",
+    "template_digest",
+    "routine_profile_content_digest",
+    "generated_at",
+    "output_digest",
+)
+
+SYMBOL_KINDS = (
+    "function",
+    "async_function",
+    "class",
+    "method",
+    "static_method",
+    "class_method",
+    "property",
+    "nested_function",
+)
+
+CANDIDATE_CLASSIFICATION_CLASSES = ("known", "unknown")
+RESPONSIBILITY_CLASSES = ("public_responsibility", "implementation_detail", "ownership_unclear")
+DISPOSITION_CLASSES_V2 = ("reuse", "extend", "merge", "split", "as_is")
+DISPOSITION_SOURCE_CLASSES = ("human_decision",)
+CONFIDENCE_CLASSES = ("high", "medium", "low")
+EVIDENCE_REF_KINDS = ("routine_profile_field", "code_reference")
+SYNTACTIC_EFFECT_MARKERS = (
+    "file_read",
+    "file_write",
+    "process_spawn",
+    "network",
+    "environment",
+    "global_mutation",
+)
+
+# 呼出名の構文一致だけで検出する。別名輸入も間接呼出も追わない。
+MARKER_DETECTION_RULES = {
+    "file_read": ["read_text", "read_bytes", "exists", "iterdir", "glob", "rglob", "json.load"],
+    "file_write": [
+        "write_text", "write_bytes", "mkdir", "unlink", "replace", "rename", "chmod",
+        "shutil.copy", "shutil.copytree", "shutil.move", "shutil.rmtree",
+    ],
+    "process_spawn": ["subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"],
+    "network": ["urllib.request", "http.client", "socket.socket", "requests.get", "requests.post"],
+    "environment": ["os.environ", "os.getenv", "os.putenv"],
+    "global_mutation": ["global", "nonlocal"],
+}
+
+RESPONSIBILITY_CLASS_RULES = (
+    {"rule_id": "R1", "when": "base_is_exception", "value": "ownership_unclear"},
+    {"rule_id": "R2", "when": "nested_function", "value": "implementation_detail"},
+    {"rule_id": "R3", "when": "private_and_module_local", "value": "implementation_detail"},
+    {"rule_id": "R4", "when": "unreferenced", "value": "ownership_unclear"},
+    {"rule_id": "R5", "when": "default", "value": "public_responsibility"},
+)
+
+GROUP_CONDITION_GRAMMAR = {
+    "combinator": "and_only",
+    "operators": ["equals", "not_equals", "in", "contains", "lte", "gte"],
+    "fields": [
+        "package", "symbol_kind", "name_prefix", "name_suffix", "is_private",
+        "syntactic_effect_markers", "marker_count", "internal_reference_count",
+        "line_count", "structural_match_group_id", "structure_digest",
+        "responsibility_class_proposal", "candidate_classification", "base_is_exception",
+    ],
+    "regular_expression": False,
+    "disjunction": False,
 }
 
 
@@ -202,6 +346,16 @@ class Candidates:
     symbol_id_list_digest: str
     candidate_count: int
     classification_counts: dict
+
+
+@dataclasses.dataclass(frozen=True)
+class RoutineProfile:
+    observation: "Observation"
+    path: Path
+    profile_run_id: str
+    content_digest: str
+    routine_count: int
+    excluded_constructs: tuple
 
 
 @dataclasses.dataclass(frozen=True)
@@ -299,7 +453,8 @@ def validate_record_schema(document, *, record_kind):
         raise V3ValidationError("identity_mismatch", record_kind)
     if document.get("record_kind") != record_kind:
         raise V3ValidationError("identity_mismatch", record_kind)
-    known = _SCHEMA.get(record_kind)
+    versioned = _SCHEMA_BY_VERSION.get((record_kind, document.get("schema_version")))
+    known = versioned if versioned is not None else _SCHEMA.get(record_kind)
     if known is None:
         raise V3ValidationError("identity_mismatch", record_kind)
     required, optional = known
@@ -675,30 +830,644 @@ def capture_observation(
     )
 
 
+def write_freshness_policy_v2(
+    *, project_root, policy_id, policy_version, development_policy_path, change_class
+):
+    """v3.1のPolicy artifact。三軸語彙、痕跡語彙、検出規則、group条件文法を固定する。"""
+
+    if change_class not in CHANGE_CLASSES:
+        raise V3ValidationError("unknown_field", f"change_class={change_class}")
+    root = Path(project_root).resolve()
+    policies = _artifact_root(root, "policies")
+    document = {
+        "record_kind": "work4a_freshness_policy",
+        "schema_version": 2,
+        "digest_algorithm": DIGEST_ALGORITHM,
+        "policy_id": policy_id,
+        "policy_version": policy_version,
+        "change_class": change_class,
+        "change_classes": list(CHANGE_CLASSES),
+        "revalidation_required_classes": list(REVALIDATION_REQUIRED_CLASSES),
+        "candidate_classification_classes": list(CANDIDATE_CLASSIFICATION_CLASSES),
+        "responsibility_classes": list(RESPONSIBILITY_CLASSES),
+        "disposition_classes": list(DISPOSITION_CLASSES_V2),
+        "disposition_source_classes": list(DISPOSITION_SOURCE_CLASSES),
+        "syntactic_effect_markers": list(SYNTACTIC_EFFECT_MARKERS),
+        "marker_detection_rules": {
+            marker: list(names) for marker, names in MARKER_DETECTION_RULES.items()
+        },
+        "responsibility_class_rules": [dict(rule) for rule in RESPONSIBILITY_CLASS_RULES],
+        "group_condition_grammar": json.loads(json.dumps(GROUP_CONDITION_GRAMMAR)),
+        "confidence_classes": list(CONFIDENCE_CLASSES),
+        "evidence_ref_kinds": list(EVIDENCE_REF_KINDS),
+        "extraction_rule_version": 2,
+        "verification_outcome_classes": list(VERIFICATION_OUTCOME_CLASSES),
+        "development_policy_ref": build_project_ref(
+            project_root=root,
+            path=development_policy_path,
+            record_kind="development_policy",
+            record_id="DEVELOPMENT-POLICY",
+            version=1,
+        ),
+    }
+    document["content_digest"] = _content_digest(document)
+    validate_record_schema(document, record_kind="work4a_freshness_policy")
+    path = _write_new(
+        policies / f"work4a-freshness-policy-v{policy_version}.json", document, allow_identical=True
+    )
+    return Policy(policy_id, policy_version, path, document["content_digest"])
+
+
+def _annotation_text(node):
+    return None if node is None else ast.dump(node, annotate_fields=False)
+
+
+def _signature(node):
+    if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return {"parameters": [], "returns_annotation": None}
+    arguments = node.args
+    parameters = []
+    positional = list(getattr(arguments, "posonlyargs", [])) + list(arguments.args)
+    defaults = list(arguments.defaults)
+    offset = len(positional) - len(defaults)
+    for index, argument in enumerate(positional):
+        parameters.append({
+            "name": argument.arg,
+            "kind": "positional",
+            "annotation": _annotation_text(argument.annotation),
+            "has_default": index >= offset,
+        })
+    if arguments.vararg is not None:
+        parameters.append({
+            "name": arguments.vararg.arg, "kind": "var_positional",
+            "annotation": _annotation_text(arguments.vararg.annotation), "has_default": False,
+        })
+    for argument, default in zip(arguments.kwonlyargs, arguments.kw_defaults):
+        parameters.append({
+            "name": argument.arg, "kind": "keyword_only",
+            "annotation": _annotation_text(argument.annotation),
+            "has_default": default is not None,
+        })
+    if arguments.kwarg is not None:
+        parameters.append({
+            "name": arguments.kwarg.arg, "kind": "var_keyword",
+            "annotation": _annotation_text(arguments.kwarg.annotation), "has_default": False,
+        })
+    return {"parameters": parameters, "returns_annotation": _annotation_text(node.returns)}
+
+
+def _structure_signature(node):
+    """識別子名を落としたAST構造。構文一致の判定にだけ使う。"""
+
+    children = [
+        _structure_signature(child)
+        for child in ast.iter_child_nodes(node)
+        if not isinstance(child, (ast.Load, ast.Store, ast.Del))
+    ]
+    return [type(node).__name__, children]
+
+
+def _called_names(node):
+    """呼出名とattribute参照を構文的に集める。別名輸入と間接呼出は追わない。"""
+
+    names = set()
+    for child in ast.walk(node):
+        if isinstance(child, ast.Attribute):
+            parts = []
+            current = child
+            while isinstance(current, ast.Attribute):
+                parts.append(current.attr)
+                current = current.value
+            if isinstance(current, ast.Name):
+                parts.append(current.id)
+            names.add(".".join(reversed(parts)))
+            names.add(child.attr)
+        elif isinstance(child, ast.Name):
+            names.add(child.id)
+        elif isinstance(child, ast.Global):
+            names.add("global")
+        elif isinstance(child, ast.Nonlocal):
+            names.add("nonlocal")
+    return names
+
+
+def _effect_markers(node, rules):
+    names = _called_names(node)
+    markers = []
+    for marker in SYNTACTIC_EFFECT_MARKERS:
+        for candidate in rules.get(marker, ()):
+            if candidate in names:
+                markers.append(marker)
+                break
+    return markers
+
+
+def _base_is_exception(node):
+    if not isinstance(node, ast.ClassDef):
+        return False
+    for base in node.bases:
+        name = base.attr if isinstance(base, ast.Attribute) else getattr(base, "id", "")
+        if name.endswith("Error") or name in {"Exception", "BaseException", "Warning"}:
+            return True
+    return False
+
+
+def _method_kind(node):
+    decorators = set()
+    for decorator in node.decorator_list:
+        if isinstance(decorator, ast.Name):
+            decorators.add(decorator.id)
+        elif isinstance(decorator, ast.Attribute):
+            decorators.add(decorator.attr)
+    if "staticmethod" in decorators:
+        return "static_method"
+    if "classmethod" in decorators:
+        return "class_method"
+    if "property" in decorators:
+        return "property"
+    return "method"
+
+
+def _collect_routines(project_root, files, *, rules=None):
+    """v3.1の抽出規則。実装を持つ構文単位を集め、除外分は件数と位置を残す。"""
+
+    rules = rules or MARKER_DETECTION_RULES
+    root = Path(project_root)
+    routines = []
+    excluded = {
+        "lambda": {"construct": "lambda", "count": 0, "reason": "no_stable_identifier",
+                   "locations": []},
+        "module_level_assignment": {"construct": "module_level_assignment", "count": 0,
+                                    "reason": "not_a_routine", "locations": []},
+        "import": {"construct": "import", "count": 0, "reason": "not_a_routine", "locations": []},
+    }
+    seen = {}
+
+    def record(node, symbol_id, symbol_kind, enclosing, relative):
+        end = getattr(node, "end_lineno", node.lineno)
+        reference = {
+            "relative_path": relative,
+            "start_line": node.lineno,
+            "end_line": end,
+        }
+        if symbol_id in seen:
+            seen[symbol_id].append(reference)
+            raise V3ValidationError(
+                "symbol_id_collision",
+                f"{symbol_id} at {json.dumps(seen[symbol_id], ensure_ascii=False)}",
+            )
+        seen[symbol_id] = [reference]
+        routines.append({
+            "symbol_id": symbol_id,
+            "symbol_kind": symbol_kind,
+            "enclosing_symbol_id": enclosing,
+            "code_reference": reference,
+            "signature": _signature(node),
+            "docstring_first_line": (ast.get_docstring(node) or "").split("\n")[0] or None,
+            "syntactic_effect_markers": _effect_markers(node, rules),
+            "internal_reference_count": 0,
+            "line_count": end - node.lineno + 1,
+            "structure_digest": _digest(_structure_signature(node)),
+            "structural_match_group_id": "",
+            "candidate_classification": "unknown",
+            "responsibility_class_proposal": "",
+            "_base_is_exception": _base_is_exception(node),
+            "_short_name": symbol_id.rsplit(":", 1)[1].split(".")[-1],
+        })
+
+    def walk_function_body(node, qualname, relative):
+        for child in node.body:
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                nested = f"{qualname}.<locals>.{child.name}"
+                record(child, f"{relative}:{nested}", "nested_function",
+                       f"{relative}:{qualname}", relative)
+                walk_function_body(child, nested, relative)
+            else:
+                for grandchild in ast.walk(child):
+                    if isinstance(grandchild, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        nested = f"{qualname}.<locals>.{grandchild.name}"
+                        record(grandchild, f"{relative}:{nested}", "nested_function",
+                               f"{relative}:{qualname}", relative)
+                        walk_function_body(grandchild, nested, relative)
+
+    for item in files:
+        relative = item["path"]
+        tree = ast.parse((root / relative).read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Lambda):
+                excluded["lambda"]["count"] += 1
+                excluded["lambda"]["locations"].append(
+                    {"relative_path": relative, "start_line": node.lineno}
+                )
+        for node in tree.body:
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                excluded["import"]["count"] += 1
+            elif isinstance(node, (ast.Assign, ast.AnnAssign)):
+                excluded["module_level_assignment"]["count"] += 1
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                kind = "async_function" if isinstance(node, ast.AsyncFunctionDef) else "function"
+                record(node, f"{relative}:{node.name}", kind, None, relative)
+                walk_function_body(node, node.name, relative)
+            elif isinstance(node, ast.ClassDef):
+                record(node, f"{relative}:{node.name}", "class", None, relative)
+                for child in node.body:
+                    if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        qualname = f"{node.name}.{child.name}"
+                        record(child, f"{relative}:{qualname}", _method_kind(child),
+                               f"{relative}:{node.name}", relative)
+                        walk_function_body(child, qualname, relative)
+
+    _annotate_routines(root, files, routines)
+    return routines, [excluded[key] for key in sorted(excluded)]
+
+
+def _annotate_routines(root, files, routines):
+    """被参照数、構造一致group、責務classの初期値を決定的に埋める。"""
+
+    occurrences = {}
+    for item in files:
+        text = (Path(root) / item["path"]).read_text(encoding="utf-8")
+        tree = ast.parse(text)
+        for node in ast.walk(tree):
+            name = None
+            if isinstance(node, ast.Name):
+                name = node.id
+            elif isinstance(node, ast.Attribute):
+                name = node.attr
+            if name:
+                occurrences.setdefault(name, []).append(item["path"])
+
+    groups = {}
+    for routine in sorted(routines, key=lambda item: item["symbol_id"]):
+        digest = routine["structure_digest"]
+        if digest not in groups:
+            groups[digest] = f"STRUCT-MATCH-{len(groups):04d}"
+
+    for routine in routines:
+        short = routine.pop("_short_name")
+        exception = routine.pop("_base_is_exception")
+        own = routine["code_reference"]["relative_path"]
+        places = occurrences.get(short, [])
+        routine["internal_reference_count"] = max(0, len(places) - 1)
+        other_modules = [place for place in places if place != own]
+        routine["structural_match_group_id"] = groups[routine["structure_digest"]]
+        if exception:
+            routine["responsibility_class_proposal"] = "ownership_unclear"
+        elif routine["symbol_kind"] == "nested_function":
+            routine["responsibility_class_proposal"] = "implementation_detail"
+        elif short.startswith("_") and not other_modules:
+            routine["responsibility_class_proposal"] = "implementation_detail"
+        elif not places or routine["internal_reference_count"] == 0:
+            routine["responsibility_class_proposal"] = "ownership_unclear"
+        else:
+            routine["responsibility_class_proposal"] = "public_responsibility"
+
+
+def validate_routine_profile_document(document, *, project_root=None):
+    """Routine Profileが機械事実だけを持つことを検証する。"""
+
+    validate_record_schema(document, record_kind="work4a_routine_profile")
+    detection = document["marker_detection"]
+    if detection.get("absence_does_not_imply_no_effect") is not True:
+        raise V3ValidationError("marker_detection_flag_missing", "absence_does_not_imply_no_effect")
+    if detection.get("detection_is_syntactic_only") is not True:
+        raise V3ValidationError("marker_detection_flag_missing", "detection_is_syntactic_only")
+    seen = set()
+    for routine in document["routines"]:
+        unknown = sorted(set(routine) - set(_ROUTINE_FIELDS))
+        if unknown:
+            raise V3ValidationError("unknown_field", ",".join(unknown))
+        missing = sorted(set(_ROUTINE_FIELDS) - set(routine))
+        if missing:
+            raise V3ValidationError("identity_mismatch", ",".join(missing))
+        if routine["symbol_id"] in seen:
+            raise V3ValidationError("symbol_id_collision", routine["symbol_id"])
+        seen.add(routine["symbol_id"])
+        if routine["symbol_kind"] not in SYMBOL_KINDS:
+            raise V3ValidationError("summary_vocabulary_violation", routine["symbol_kind"])
+        outside = sorted(set(routine["syntactic_effect_markers"]) - set(SYNTACTIC_EFFECT_MARKERS))
+        if outside:
+            raise V3ValidationError("summary_vocabulary_violation", ",".join(outside))
+        if routine["candidate_classification"] not in CANDIDATE_CLASSIFICATION_CLASSES:
+            raise V3ValidationError(
+                "summary_vocabulary_violation", routine["candidate_classification"]
+            )
+        if routine["responsibility_class_proposal"] not in RESPONSIBILITY_CLASSES:
+            raise V3ValidationError(
+                "summary_vocabulary_violation", routine["responsibility_class_proposal"]
+            )
+    return document
+
+
+def build_routine_profile(*, observation, policy, known_symbol_ids=()):
+    """機械事実だけのRoutine Profileを外部DATA_ROOTへ書く。"""
+
+    policy_document = _read_record(policy.path, record_kind="work4a_freshness_policy")
+    rules = policy_document.get("marker_detection_rules", MARKER_DETECTION_RULES)
+    routines, excluded = _collect_routines(observation.project_root, observation.files, rules=rules)
+    known = set(known_symbol_ids)
+    for routine in routines:
+        routine["candidate_classification"] = "known" if routine["symbol_id"] in known else "unknown"
+    routines.sort(key=lambda item: item["symbol_id"])
+    document = {
+        "record_kind": "work4a_routine_profile",
+        "schema_version": 1,
+        "digest_algorithm": DIGEST_ALGORITHM,
+        "profile_run_id": "",
+        "observation_snapshot_id": observation.snapshot_id,
+        "source_content_id": observation.source_content_id,
+        "extraction_rule_version": 2,
+        "marker_detection": {
+            "method": "syntactic_call_name_match",
+            "detection_is_syntactic_only": True,
+            "absence_does_not_imply_no_effect": True,
+            "follows_aliases": False,
+            "follows_indirect_calls": False,
+        },
+        "routines": routines,
+        "excluded_constructs": excluded,
+    }
+    document["profile_run_id"] = _digest(
+        {key: value for key, value in document.items() if key != "profile_run_id"}
+    )
+    document["content_digest"] = _content_digest(document)
+    validate_routine_profile_document(document)
+    path = _write_new(
+        observation.data_root / WORK_PREFIX / "profiles" / f"{document['profile_run_id']}.json",
+        document,
+        allow_identical=True,
+    )
+    return RoutineProfile(
+        observation=observation,
+        path=path,
+        profile_run_id=document["profile_run_id"],
+        content_digest=document["content_digest"],
+        routine_count=len(routines),
+        excluded_constructs=tuple(excluded),
+    )
+
+
+def validate_disposition_proposal_document(
+    document, *, routine_profile_document, policy
+):
+    """LLM由来の提案が非権威であり、根拠と参照範囲を満たすことを検証する。"""
+
+    validate_record_schema(document, record_kind="work4a_disposition_proposal")
+    if document.get("advisory") is not True:
+        raise V3ValidationError("advisory_used_as_authority", "advisory")
+    policy_document = _read_record(Path(policy.path), record_kind="work4a_freshness_policy")
+    dispositions = set(policy_document["disposition_classes"])
+    confidences = set(policy_document.get("confidence_classes", CONFIDENCE_CLASSES))
+    kinds = set(policy_document.get("evidence_ref_kinds", EVIDENCE_REF_KINDS))
+
+    provenance = document["generation_provenance"]
+    missing = sorted(set(_PROVENANCE_FIELDS) - set(provenance))
+    if missing:
+        raise V3ValidationError("identity_mismatch", ",".join(missing))
+    unknown = sorted(set(provenance) - set(_PROVENANCE_FIELDS))
+    if unknown:
+        raise V3ValidationError("unknown_field", ",".join(unknown))
+    if provenance["routine_profile_content_digest"] != routine_profile_document["content_digest"]:
+        raise V3ValidationError("content_digest_mismatch", "routine_profile_content_digest")
+    if document["routine_profile_run_id"] != routine_profile_document["profile_run_id"]:
+        raise V3ValidationError("identity_mismatch", "routine_profile_run_id")
+    if document["observation_snapshot_id"] != routine_profile_document["observation_snapshot_id"]:
+        raise V3ValidationError("unlinked_candidate", "observation_snapshot_id")
+
+    known = {item["symbol_id"]: item for item in routine_profile_document["routines"]}
+    for proposal in document["proposals"]:
+        unknown_fields = sorted(set(proposal) - set(_PROPOSAL_FIELDS))
+        if unknown_fields:
+            raise V3ValidationError("unknown_field", ",".join(unknown_fields))
+        absent = sorted(set(_PROPOSAL_FIELDS) - set(proposal))
+        if absent:
+            raise V3ValidationError("identity_mismatch", ",".join(absent))
+        symbol_id = proposal["symbol_id"]
+        if symbol_id not in known:
+            raise V3ValidationError("advisory_reference_unresolved", symbol_id)
+        for field in ("semantic_dependencies", "similar_routines", "merge_candidates"):
+            for reference in proposal[field]:
+                if reference == symbol_id:
+                    raise V3ValidationError(
+                        "advisory_reference_unresolved", f"{field}: self reference"
+                    )
+                if reference not in known:
+                    raise V3ValidationError("advisory_reference_unresolved", f"{field}: {reference}")
+        recommended = proposal["recommended_disposition"]
+        if recommended is not None and recommended not in dispositions:
+            raise V3ValidationError("summary_vocabulary_violation", str(recommended))
+        if recommended is None and proposal["human_review_required"] is not True:
+            raise V3ValidationError("advisory_evidence_missing", "human_review_required")
+        for alternative in proposal["alternative_dispositions"]:
+            if alternative not in dispositions:
+                raise V3ValidationError("summary_vocabulary_violation", alternative)
+        if proposal["confidence"] not in confidences:
+            raise V3ValidationError("summary_vocabulary_violation", proposal["confidence"])
+        evidence = proposal["evidence_refs"]
+        if not evidence:
+            raise V3ValidationError("advisory_evidence_missing", symbol_id)
+        for reference in evidence:
+            kind = reference.get("kind")
+            if kind not in kinds:
+                raise V3ValidationError("advisory_evidence_missing", str(kind))
+            target = reference.get("symbol_id")
+            if target not in known:
+                raise V3ValidationError("advisory_reference_unresolved", str(target))
+            if kind == "routine_profile_field":
+                if reference.get("field") not in _ROUTINE_FIELDS:
+                    raise V3ValidationError(
+                        "advisory_reference_unresolved", str(reference.get("field"))
+                    )
+            else:
+                actual = known[target]["code_reference"]
+                for key in ("relative_path", "start_line", "end_line"):
+                    if reference.get(key) != actual[key]:
+                        raise V3ValidationError("advisory_reference_unresolved", f"{target}:{key}")
+    return document
+
+
+def validate_attestation_sections(
+    *, attestation_snapshot_id, routine_profile_document, disposition_proposal_document
+):
+    """Attestationへ載せる二節が同じ観測に属することを検証する。"""
+
+    for section in (routine_profile_document, disposition_proposal_document):
+        if section is None:
+            continue
+        if section.get("observation_snapshot_id") != attestation_snapshot_id:
+            raise V3ValidationError("unlinked_candidate", section.get("record_kind"))
+    if disposition_proposal_document is not None:
+        if disposition_proposal_document.get("advisory") is not True:
+            raise V3ValidationError("advisory_used_as_authority", "advisory")
+    return True
+
+
+def _group_field_value(routine, field):
+    relative = routine["code_reference"]["relative_path"]
+    short = routine["symbol_id"].rsplit(":", 1)[1].split(".")[-1]
+    if field == "package":
+        parts = relative.split("/")
+        return parts[1] if len(parts) > 1 else parts[0]
+    if field == "name_prefix":
+        return short
+    if field == "name_suffix":
+        return short
+    if field == "is_private":
+        return short.startswith("_")
+    if field == "marker_count":
+        return len(routine["syntactic_effect_markers"])
+    if field == "base_is_exception":
+        return routine["responsibility_class_proposal"] == "ownership_unclear"
+    return routine.get(field)
+
+
+def _condition_matches(routine, condition):
+    grammar = GROUP_CONDITION_GRAMMAR
+    if sorted(condition) != ["field", "operator", "value"]:
+        raise V3ValidationError("unknown_field", ",".join(sorted(condition)))
+    if condition["field"] not in grammar["fields"]:
+        raise V3ValidationError("unknown_field", condition["field"])
+    if condition["operator"] not in grammar["operators"]:
+        raise V3ValidationError("unknown_field", condition["operator"])
+    actual = _group_field_value(routine, condition["field"])
+    expected = condition["value"]
+    operator = condition["operator"]
+    if operator == "equals":
+        if condition["field"] == "name_prefix":
+            return isinstance(actual, str) and actual.startswith(expected)
+        if condition["field"] == "name_suffix":
+            return isinstance(actual, str) and actual.endswith(expected)
+        return actual == expected
+    if operator == "not_equals":
+        return actual != expected
+    if operator == "in":
+        return actual in expected
+    if operator == "contains":
+        return expected in (actual or [])
+    if operator == "lte":
+        return actual is not None and actual <= expected
+    return actual is not None and actual >= expected
+
+
+def expand_group_rules(
+    *, routine_profile_document, policy, group_rules, explicit_targets=()
+):
+    """group条件をroutineへ適用する。取りこぼしがあれば展開しない。"""
+
+    policy_document = _read_record(Path(policy.path), record_kind="work4a_freshness_policy")
+    dispositions = set(policy_document["disposition_classes"])
+    classes = set(policy_document["responsibility_classes"])
+    explicit = {item["symbol_id"]: item for item in explicit_targets}
+    known = {item["symbol_id"] for item in routine_profile_document["routines"]}
+    unresolved = sorted(set(explicit) - known)
+    if unresolved:
+        raise V3ValidationError("advisory_reference_unresolved", ",".join(unresolved))
+
+    assignments = []
+    uncovered = []
+    for routine in routine_profile_document["routines"]:
+        symbol_id = routine["symbol_id"]
+        if symbol_id in explicit:
+            target = explicit[symbol_id]
+            assignments.append({
+                "symbol_id": symbol_id,
+                "responsibility_class": target["responsibility_class"],
+                "disposition": target["disposition"],
+                "applied_group_rule_id": None,
+                "disposition_source": "human_decision",
+            })
+            continue
+        matched = None
+        for rule in group_rules:
+            if all(_condition_matches(routine, condition) for condition in rule["conditions"]):
+                matched = rule
+                break
+        if matched is None:
+            uncovered.append(symbol_id)
+            continue
+        assignments.append({
+            "symbol_id": symbol_id,
+            "responsibility_class": matched["responsibility_class"],
+            "disposition": matched["disposition"],
+            "applied_group_rule_id": matched["group_rule_id"],
+            "disposition_source": "human_decision",
+        })
+    if uncovered:
+        raise V3ValidationError("group_coverage_incomplete", ",".join(sorted(uncovered)))
+    for assignment in assignments:
+        if assignment["responsibility_class"] not in classes:
+            raise V3ValidationError(
+                "summary_vocabulary_violation", assignment["responsibility_class"]
+            )
+        if assignment["disposition"] not in dispositions:
+            raise V3ValidationError("summary_vocabulary_violation", assignment["disposition"])
+    return assignments
+
+
+def build_entry_documents(*, project_root, policy, assignments):
+    """Entryの入力を検証する。dispositionの出所がHuman Decision以外なら停止する。"""
+
+    policy_document = _read_record(Path(policy.path), record_kind="work4a_freshness_policy")
+    sources = set(policy_document.get("disposition_source_classes", DISPOSITION_SOURCE_CLASSES))
+    dispositions = set(policy_document["disposition_classes"])
+    classes = set(policy_document["responsibility_classes"])
+    entries = []
+    for assignment in assignments:
+        source = assignment.get("disposition_source")
+        if source not in sources:
+            raise V3ValidationError("advisory_used_as_authority", str(source))
+        if assignment["disposition"] not in dispositions:
+            raise V3ValidationError("summary_vocabulary_violation", assignment["disposition"])
+        if assignment["responsibility_class"] not in classes:
+            raise V3ValidationError(
+                "summary_vocabulary_violation", assignment["responsibility_class"]
+            )
+        entries.append(dict(assignment))
+    return entries
+
+
 def symbol_id_list_digest(symbol_ids):
     """候補symbol IDの一覧Digest。外部fileが消えても同一性を照合できる。"""
 
     return _digest({"symbol_ids": sorted(symbol_ids)})
 
 
-def _extract_symbol_ids(project_root, files):
-    symbols = []
-    for item in files:
-        path = Path(project_root) / item["path"]
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in tree.body:
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                symbols.append(f"{item['path']}:{node.name}")
-    return tuple(sorted(symbols))
+def _extract_symbol_ids(project_root, files, *, extraction_rule_version=1):
+    if extraction_rule_version == 1:
+        symbols = []
+        for item in files:
+            path = Path(project_root) / item["path"]
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in tree.body:
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    symbols.append(f"{item['path']}:{node.name}")
+        return tuple(sorted(symbols))
+    routines, _excluded = _collect_routines(project_root, files)
+    return tuple(sorted(item["symbol_id"] for item in routines))
 
 
-def build_candidate_run(*, observation, known_symbol_ids=()):
+def _candidate_classification(symbol, known, extraction_rule_version):
+    if extraction_rule_version >= 2:
+        return "known" if symbol in known else "unknown"
+    return "reuse" if symbol in known else "new"
+
+
+def build_candidate_run(*, observation, known_symbol_ids=(), extraction_rule_version=None):
     """観測から候補を機械抽出する。既存Entryのsymbolだけをreuseへ分類する。"""
 
+    if extraction_rule_version is None:
+        policy_document = _read_record(observation.policy_path)
+        extraction_rule_version = policy_document.get("extraction_rule_version", 1)
     known = set(known_symbol_ids)
-    symbols = _extract_symbol_ids(observation.project_root, observation.files)
+    symbols = _extract_symbol_ids(
+        observation.project_root, observation.files,
+        extraction_rule_version=extraction_rule_version,
+    )
     candidates = [
-        {"classification": "reuse" if symbol in known else "new", "symbol_id": symbol}
+        {
+            "classification": _candidate_classification(symbol, known, extraction_rule_version),
+            "symbol_id": symbol,
+        }
         for symbol in symbols
     ]
     counts = {}
@@ -713,6 +1482,7 @@ def build_candidate_run(*, observation, known_symbol_ids=()):
         "source_content_id": observation.source_content_id,
         "source_universe_id": observation.universe_id,
         "source_universe_version": observation.universe_version,
+        "extraction_rule_version": extraction_rule_version,
         "candidates": candidates,
     }
     document["candidate_run_id"] = _digest(
@@ -738,6 +1508,14 @@ def build_candidate_run(*, observation, known_symbol_ids=()):
     )
 
 
+def _summary_vocabulary(policy_document):
+    """候補要約の分類keyに使える語彙。Policyが宣言したものだけを許す。"""
+
+    allowed = list(policy_document["disposition_classes"])
+    allowed.extend(policy_document.get("candidate_classification_classes", ()))
+    return tuple(dict.fromkeys(allowed))
+
+
 def validate_attestation_document(document, *, project_id, disposition_classes):
     """Attestation内部の同一性と要約語彙を検証する。"""
 
@@ -759,7 +1537,12 @@ def validate_attestation_document(document, *, project_id, disposition_classes):
     summary = document["candidate_summary"]
     if summary.get("sensitive_content_included") is not False:
         raise V3ValidationError("summary_vocabulary_violation", "sensitive_content_included")
-    unknown = sorted(set(summary["classification_counts"]) - set(disposition_classes))
+    # 分類keyの軸は、候補実行が宣言した抽出規則versionで決まる。
+    if candidate.get("extraction_rule_version", 1) >= 2:
+        allowed = set(CANDIDATE_CLASSIFICATION_CLASSES)
+    else:
+        allowed = set(disposition_classes)
+    unknown = sorted(set(summary["classification_counts"]) - allowed)
     if unknown:
         raise V3ValidationError("summary_vocabulary_violation", ",".join(unknown))
     if summary["candidate_count"] != sum(summary["classification_counts"].values()):
@@ -767,7 +1550,9 @@ def validate_attestation_document(document, *, project_id, disposition_classes):
     return document
 
 
-def write_attestation(*, project_root, observation, candidates):
+def write_attestation(
+    *, project_root, observation, candidates, routine_profile=None, disposition_proposal=None
+):
     root = Path(project_root).resolve()
     manifest = _read_manifest(root)
     if observation.project_id != manifest["project_id"]:
@@ -820,6 +1605,7 @@ def write_attestation(*, project_root, observation, candidates):
             "observation_snapshot_id": observation.snapshot_id,
             "source_content_id": candidates.source_content_id,
             "content_digest": candidates.content_digest,
+            "extraction_rule_version": _read_record(candidates.path)["extraction_rule_version"],
             "advisory_locator": _build_locator(
                 data_root=observation.data_root,
                 path=candidates.path,
@@ -835,11 +1621,52 @@ def write_attestation(*, project_root, observation, candidates):
         },
         "supersedes_attestation": None,
     }
+    if routine_profile is not None or disposition_proposal is not None:
+        document["schema_version"] = 2
+    if routine_profile is not None:
+        profile_document = _read_record(
+            routine_profile.path, record_kind="work4a_routine_profile"
+        )
+        proposal_document = None
+        if disposition_proposal is not None:
+            proposal_document = _read_record(
+                disposition_proposal.path, record_kind="work4a_disposition_proposal"
+            )
+        validate_attestation_sections(
+            attestation_snapshot_id=observation.snapshot_id,
+            routine_profile_document=profile_document,
+            disposition_proposal_document=proposal_document,
+        )
+        document["routine_profile"] = {
+            "record_kind": "work4a_routine_profile",
+            "profile_run_id": profile_document["profile_run_id"],
+            "content_digest": profile_document["content_digest"],
+            "extraction_rule_version": profile_document["extraction_rule_version"],
+            "advisory_locator": _build_locator(
+                data_root=observation.data_root,
+                path=routine_profile.path,
+                profile=observation.profile,
+                project_id=manifest["project_id"],
+            ),
+        }
+        if proposal_document is not None:
+            document["disposition_proposal"] = {
+                "record_kind": "work4a_disposition_proposal",
+                "proposal_run_id": proposal_document["proposal_run_id"],
+                "content_digest": proposal_document["content_digest"],
+                "advisory": True,
+                "advisory_locator": _build_locator(
+                    data_root=observation.data_root,
+                    path=disposition_proposal.path,
+                    profile=observation.profile,
+                    project_id=manifest["project_id"],
+                ),
+            }
     document["content_digest"] = _content_digest(document)
     validate_attestation_document(
         document,
         project_id=manifest["project_id"],
-        disposition_classes=policy_document["disposition_classes"],
+        disposition_classes=_summary_vocabulary(policy_document),
     )
     path = _write_new(
         _ledger_root(root) / "attestations" / f"obsatt-{observation.snapshot_id}--v1.json",
@@ -946,7 +1773,7 @@ def append_baseline(
     attestation_document = validate_attestation_document(
         _read_record(attestation.path, record_kind="work4a_observation_attestation"),
         project_id=manifest["project_id"],
-        disposition_classes=policy_document["disposition_classes"],
+        disposition_classes=_summary_vocabulary(policy_document),
     )
     decision_document = validate_decision_against_attestation(
         _read_record(decision.path, record_kind="work4a_operational_decision"),
@@ -1166,7 +1993,7 @@ def validate_current(*, project_root, runtime_root=None, profile=None):
     attestation_document = validate_attestation_document(
         _read_record(attestation_path),
         project_id=manifest["project_id"],
-        disposition_classes=policy_document["disposition_classes"],
+        disposition_classes=_summary_vocabulary(policy_document),
     )
     validate_decision_against_attestation(_read_record(decision_path), attestation_document)
 

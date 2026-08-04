@@ -472,7 +472,10 @@ def test_i13_human_value_overrides_machine_proposal(rebuild, tmp_path):
 
 def test_i14_rule_v2_creates_new_candidate_run(rebuild, tmp_path):
     chain = _profile_chain(rebuild, tmp_path)
-    first = rebuild.build_candidate_run(observation=chain.observation)
+    # 既存のCandidate Runは規則v1で作られている。
+    first = rebuild.build_candidate_run(
+        observation=chain.observation, extraction_rule_version=1
+    )
     second = rebuild.build_candidate_run(
         observation=chain.observation, extraction_rule_version=2
     )
