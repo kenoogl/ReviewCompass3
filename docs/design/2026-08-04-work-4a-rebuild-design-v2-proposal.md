@@ -1,7 +1,14 @@
 # Work 4A Rebuild Design v2 Proposal
 
-状態：`approved_for_implementation`
+状態：`superseded_for_implementation`
 対象：Work 4A Reusable Routine Ledger
+
+> `DEC-WORK4A-REBUILD-DESIGN-003`により、実装の正本は
+> `docs/design/2026-08-04-work-4a-rebuild-design-v3-proposal.md`へ移った。
+> 本文書は履歴として保持する。外部`DATA_ROOT`参照方式（§1の`ref`定義と§4・§5の結線）に設計矛盾があり、
+> この方式を実装、actual artifact、Work 4A完了の根拠に使わない。
+> v3が継承した規則（canonical Digest、source universe、Policy、new-only、current Baseline導出、
+> legacy Task Contract）はv3 §3に明記する。
 
 これはv1で未定義だったPolicy、source universe、legacy Task Contract、current Baselineを固定する改訂案である。
 Human承認によりv1を`superseded_for_implementation`とし、このv2だけを実装の正本にする。
