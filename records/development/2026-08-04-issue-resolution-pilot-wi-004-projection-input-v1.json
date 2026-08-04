@@ -1,0 +1,53 @@
+{
+  "updated_on": "2026-08-04",
+  "overall": "Work 1B、Work 2、Work 3完了。Work 4前のIssue Resolution早期Pilotを実施中。",
+  "current_work": "WI-004 common TODO prompt completed / commit pending",
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2",
+  "active_issue": {
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+    "state": "implementation_in_progress",
+    "impact": "root TODO handoffとPilot完了境界",
+    "next_action": "WI-005"
+  },
+  "references": [
+    {
+      "label": "Task Contract v2",
+      "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json",
+      "sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6"
+    },
+    {
+      "label": "Current Plan",
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694"
+    },
+    {
+      "label": "Pre-compaction Snapshot Manifest",
+      "path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.manifest.json",
+      "sha256": "395337e57cd73ccb16bec4e009761f780f4631444e12f081b55e1d7c6ed40963"
+    },
+    {
+      "label": "WI-003 Completion Evidence",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-003-completion-evidence-v1.md",
+      "sha256": "9b0c9e62d353edf54fec82419d2e2adc8188ef0493e31792ea81d6adb05c614c"
+    }
+  ],
+  "next_work": {
+    "action": "WI-005のpost-write検証、restore rehearsal、Pilot測定、Resolution Verdict候補をtest-firstで実施する。",
+    "start_conditions": [
+      "WI-004 containing commitとclean transition",
+      "WI-003とWI-004のcompleted／committed確認"
+    ],
+    "completion_conditions": [
+      "post-write再読込、validator、参照、restore rehearsal、公式全Testの合格",
+      "未処理と残余riskを記録したResolution Verdict候補"
+    ],
+    "following": "Resolution VerdictのHuman判断。承認後に早期Pilotを閉じる。"
+  },
+  "blocker": "なし",
+  "human_decision": "現在なし。Resolution VerdictでHuman判断が必要。",
+  "stale": "Plan v1-v3とTask Contract v1はPlan v4／Task Contract v2へsuperseded。",
+  "deferred": "正式Issue Resolution automation、画面UI、Work 4以降の製品工程。",
+  "branch": "main",
+  "related_test": "共通prompt／入口3 passed、TODO projection 6 passed",
+  "full_test": "634 passed（WI-004 TODO更新前）"
+}

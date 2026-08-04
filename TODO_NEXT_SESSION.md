@@ -7,35 +7,35 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3完了。Work 4前のIssue Resolution早期Pilotを実施中。
-- 現在作業：WI-003 TODO compaction completed / containing commit
+- 現在作業：WI-004 common TODO prompt completed / commit pending
 - Task Contract：`TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-PILOT-TODO-GROWTH-001`：`implementation_in_progress`、影響：root TODO handoffとPilot完了境界、次：WI-004
+- `ISSUE-PILOT-TODO-GROWTH-001`：`implementation_in_progress`、影響：root TODO handoffとPilot完了境界、次：WI-005
 
 ## 最新のauthority／Evidence
 
 - [Task Contract v2](records/task-contract/issue-resolution-todo-compaction-implementation-v2.json) — SHA-256 `1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - [Pre-compaction Snapshot Manifest](records/session-handoffs/2026-08-04-todo-before-compaction-001.manifest.json) — SHA-256 `395337e57cd73ccb16bec4e009761f780f4631444e12f081b55e1d7c6ed40963`
-- [WI-007 Completion Evidence](records/development/2026-08-04-issue-resolution-pilot-wi-007-completion-evidence-v1.md) — SHA-256 `de119e28ac4c93ef1971a6001c0b217ff07ad4366990e94f25fcd1e091d6d04c`
+- [WI-003 Completion Evidence](records/development/2026-08-04-issue-resolution-pilot-wi-003-completion-evidence-v1.md) — SHA-256 `9b0c9e62d353edf54fec82419d2e2adc8188ef0493e31792ea81d6adb05c614c`
 
 ## 次に行う一作業
 
-WI-004の共通TODO更新promptとCodex／Claude参照境界をtest-firstで実装する。
+WI-005のpost-write検証、restore rehearsal、Pilot測定、Resolution Verdict候補をtest-firstで実施する。
 
 開始条件：
 
-- WI-003 containing commitとclean transition
-- 圧縮後TODO validatorと参照整合の再確認
+- WI-004 containing commitとclean transition
+- WI-003とWI-004のcompleted／committed確認
 
 完了条件：
 
-- 共通prompt一件と各入口の参照一件
-- CLAUDE.mdに独立したTODO意味規則がない
+- post-write再読込、validator、参照、restore rehearsal、公式全Testの合格
+- 未処理と残余riskを記録したResolution Verdict候補
 
-後続作業：WI-005 post-write verificationとResolution Verdict候補
+後続作業：Resolution VerdictのHuman判断。承認後に早期Pilotを閉じる。
 
 ## blocker・Human判断待ち
 
@@ -53,8 +53,8 @@ WI-004の共通TODO更新promptとCodex／Claude参照境界をtest-firstで実�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：TODO projection 6 passed、snapshot関連10 passed
-- 直近の全Test：公式runner 631 passed、fallback false（TODO書換え前）
+- 直近の関連Test：共通prompt／入口3 passed、TODO projection 6 passed
+- 直近の全Test：634 passed（WI-004 TODO更新前）
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

@@ -680,6 +680,13 @@ WI-003 RED containing commit `05b0c98`後にsource identity一致を再確認し
 `631 passed`、fallback `false`。WI-007 snapshot／manifestは不変で、WI-003 containing commitとclean transition後に
 WI-004へ進む。最後のPilot checkboxは未完了のままとする。
 
+WI-003 containing commit `416e4e1`とclean transition後、WI-004の共通prompt、AGENTS一参照、Claude link-only入口、
+第二authority拒否を3件のTestへ固定した。REDは`1 passed, 2 failed`、実装後はtargeted `3 passed`、公式全
+`634 passed`、fallback `false`。Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-wi-004-completion-evidence-v1.md`。root TODOはactive Issue一件を
+維持したままWI-005入口へ機械更新した。WI-004 containing commitとclean transition後だけWI-005へ進み、最後のPilot
+checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

@@ -7,12 +7,7 @@
 - 当面の開発作業は`docs/development/2026-08-03-initial-development-checklist.md`を開始入口とし、
   authority文書との一致を確認して、未完了の先頭工程から進める。
 - checklistのcheckboxだけを完了根拠にせず、各節の固定Evidenceを確認する。
-- session開始時にルートの`TODO_NEXT_SESSION.md`を読み、終了時に現行更新欄へ実施内容、次作業、
-  blocker、Human判断待ち、Git／Test結果、Evidence linkを反映する。
-- TODOの新規作成または構造を復元する場合は、
-  `docs/development/templates/TODO_NEXT_SESSION.template.md`を使用する。
-- `TODO_NEXT_SESSION.md`は人向けの引き継ぎ入口とし、Workflow stateまたは完了Evidenceの正本にしない。
-- TODOへ過去sessionを累積せず、独立保持が必要なmilestoneだけ`records/session-handoffs/`へ移す。
+- `TODO_NEXT_SESSION.md`の読取、作成、更新、検証は、唯一の共通手順`docs/development/prompts/todo-handoff-update.md`に従う。
 - 作業後に、実施内容と確認結果を報告する。
 - 「実施した」という報告だけを完了根拠にしない。実施、結果、判断、提案、未実施を分け、
   実施・結果・判断にはpath、diff、Digest、command結果、commit SHA、receiptまたはDecisionを対応付ける。
@@ -62,9 +57,6 @@
 - 各コミットは、目的と確認結果を独立して説明できる意味的・論理的な単位に分ける。
 - ファイル数だけを基準に分割せず、途中状態が不整合またはテスト失敗になる分割はしない。
 - 利用者が一括コミットまたは分割方法を指定した場合は、その指定を優先する。
-- 最終コミット前にTODOのGit欄をcommit安定形式へ更新し、
-  `python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`を合格させる。
-- TODOのGit欄には、そのTODOを含むコミット自身のSHA、固定ahead／behind件数、push済否、
-  未コミットsnapshotを記録しない。これらはGitから機械取得する。
+- 最終コミット前のhandoff更新と検査も、上記の共通手順に従う。
 - コミット後はread-only照合だけを行い、自己SHAまたはremote状態の転記だけを目的とする
   追加コミットを作らない。guarded commitは使用しない。
