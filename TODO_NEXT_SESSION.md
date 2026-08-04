@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baselineが完了。Human判断によりWork 4AをWork 4より先行する。
-- 現在作業：Project-first runtime root Layout Baseline v3 candidate・resolver GREEN committed / Human approval pending
+- 現在作業：Layout Baseline v3 Human approval recorded_committed / actual Work 4A Source Snapshot baseline not_started
 - Task Contract：activeなし
 
 ## 現在作業に影響する改善候補／Issue
@@ -27,27 +27,29 @@
 - [Layout Baseline v3 RED Evidence](records/development/2026-08-04-layout-baseline-v3-project-first-red-evidence-v1.md) — SHA-256 `278a4f4cd9de499702181104b9313b4cf895725f0039f10f2258390e3959f992`
 - [Layout Baseline v3 GREEN Evidence](records/development/2026-08-04-layout-baseline-v3-project-first-green-evidence-v1.md) — SHA-256 `9522f2f26a3863b9ab20b428f7fe61d1bdd33a685a19cb289b43c814f3865284`
 - [Layout Baseline v3 GREEN Test Receipt](records/development/2026-08-04-layout-baseline-v3-project-first-green-test-receipt-v1.json) — SHA-256 `f1da6b0909147f0c74ca07409a9bbfea7a2981e4476111b97ce73257d2728ecd`
+- [Layout Baseline v3 Approval Decision](records/development/2026-08-04-layout-baseline-v3-project-first-approval-decision.json) — SHA-256 `793be4403d37806b41696031abf6576c98bc2047f28574e0792d3c6ab8ae6275`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `b6eb1dc55235520e8ce90e99b940f5520c101f0b31ea342dcec4ed8b36ff0231`
 
 ## 次に行う一作業
 
-project-first runtime rootを現行Layout Baselineへ適合するversioned candidateとして具体化する。
+approved Layout Baseline v3から、ReviewCompass3のdevelopment data rootだけを初期化し、actual Source Snapshotと
+Source Symbol Index baselineを機械生成する。
 
 開始条件：
 
-- 現行Layout Baselineとの非互換点、migration要否、deployment除外を明示
+- Layout Baseline v3のHuman承認Decision containing commitとclean transition
 
 完了条件：
 
-- logical root resolver、project／profile isolation、権限、deployment package除外のcandidateを作成する
-- Work 4A actual baseline保存先を`reviewcompass3 / development / data`として解決できる
+- `~/.reviewcompass3/projects/reviewcompass3/development/data/`だけを明示初期化する
+- clean source treeからactual Source SnapshotとSource Symbol Indexを再生成し、coverage、freshness、再生成一致を記録する
 
 後続作業：承認後、clean containing commitからactual Source SnapshotとSource Symbol Index baselineを機械生成する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。Human承認後までcandidateはcurrent baselineへ昇格しない。
-- Human判断待ち：Layout Baseline v3 candidateの承認。Memoおよびcandidateは現行Baselineを置換しない。
+- blocker：なし。次作業の実runtime directory初期化はv3承認Decisionを入力とする。
+- Human判断待ち：なし。初回runtime directory作成は承認済みLayout内の明示操作として次の作業単位で行う。
 
 ## stale・deferred
 

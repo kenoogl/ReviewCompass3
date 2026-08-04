@@ -171,6 +171,13 @@ ReviewCompass3自己適用projectのManifest v2 bootstrapは
 `reviewcompass3`、workflow root、相対document link 5件、端末固有絶対path finding 0を確認し、公式全Testは
 `501 passed in 2.24s`、fallback `false`。Project Bindingのdurable保存とdeployment lifecycleは未実施のまま。
 
+2026-08-04 successor：project-first runtime rootを追加したLayout Baseline v3をHumanが承認した。
+現行authorityは`records/development/2026-08-04-layout-baseline-v3-project-first-approval-decision.json`、SHA-256
+`793be4403d37806b41696031abf6576c98bc2047f28574e0792d3c6ab8ae6275`である。
+`~/.reviewcompass3/projects/<project-id>/<development|runtime>/`にprofileを物理分離し、必要なrootだけを
+明示作成する。candidate内の`status: candidate`は履歴内容として保持する。既存v2 caller、data、migrationは
+変更せず、Work 4Aのactual Source Snapshot保存を次作業とする。
+
 ## 5. Work 1B：Session Log Bootstrapと現在位置text表示
 
 ### Session Evidence

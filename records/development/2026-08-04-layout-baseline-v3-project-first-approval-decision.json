@@ -1,0 +1,54 @@
+{
+  "decision_id": "RC3-LAYOUT-BASELINE-V3-PROJECT-FIRST-APPROVAL-DECISION-2026-08-04-V1",
+  "decided_at": "2026-08-04T15:30:44+09:00",
+  "status": "approved_effective",
+  "decision_maker": "human",
+  "instruction": "承認",
+  "approved_target": {
+    "path": "records/development/2026-08-04-layout-baseline-v3-project-first-candidate.json",
+    "sha256": "4f469acd6c3122c2c7e5a83224f5cc610ffe309b561a369697ea669ccf7b7f38",
+    "record_id": "RC3-LAYOUT-BASELINE-2026-08-04-V3-PROJECT-FIRST-CANDIDATE",
+    "effective_layout_version": 3,
+    "authority_status": "current"
+  },
+  "verification": {
+    "green_evidence": {
+      "path": "records/development/2026-08-04-layout-baseline-v3-project-first-green-evidence-v1.md",
+      "sha256": "9522f2f26a3863b9ab20b428f7fe61d1bdd33a685a19cb289b43c814f3865284"
+    },
+    "official_test_receipt": {
+      "path": "records/development/2026-08-04-layout-baseline-v3-project-first-green-test-receipt-v1.json",
+      "sha256": "f1da6b0909147f0c74ca07409a9bbfea7a2981e4476111b97ce73257d2728ecd",
+      "result": "664 passed in 3.71s",
+      "fallback_used": false
+    }
+  },
+  "effective_rules": [
+    "the default runtime root is home-relative .reviewcompass3 and is never included in Git or a deployment package",
+    "runtime paths are project-first under projects/<stable explicit project-id>/<profile>",
+    "development and runtime profiles are physically isolated; they are a v3 runtime-layout concept and do not alter legacy v2 roles",
+    "data, state, cache, logs, evaluation and sensitive are separated under each project profile",
+    "directory creation is explicit and limited to requested root kinds; resolution itself does not write directories",
+    "Unix runtime root and sensitive directory are mode 0700; Windows user-only ACL application remains a platform-native follow-up",
+    "binding-id directories, automatic data migration, retention automation and profile-selection UI remain deferred",
+    "existing v2 data is not copied, overwritten, deleted or migrated by this approval"
+  ],
+  "previous_authority": {
+    "path": "records/development/2026-08-04-layout-baseline-v2-approval-decision.json",
+    "sha256": "856345948af57bcfa373eb2766768d9c38078d7ba5fe65b0d76d68e452ceaa7e",
+    "record_id": "RC3-LAYOUT-BASELINE-V2-APPROVAL-DECISION-2026-08-04-V1",
+    "new_status": "historical_verified",
+    "superseded_scope": "current Layout selection; v2 direct-root resolution remains supported for existing callers",
+    "preserved_evidence": {
+      "path": "records/development/2026-08-04-layout-baseline-v2-verification-candidate-v1.md",
+      "sha256": "b3088a530b2150ebde4ed8c8b5c2b50ae763d4c9635758548e2934dbab5c1fbc"
+    }
+  },
+  "immutability": {
+    "approved_candidate_is_not_rewritten": true,
+    "candidate_filename_and_embedded_status_are_historical_content": true,
+    "current_authority_is_established_by_this_external_decision": true,
+    "v1_and_v2_records_and_evidence_are_not_deleted_or_edited": true
+  },
+  "next_action": "after this containing commit, explicitly initialize only reviewcompass3/development/data and mechanically capture the actual Source Snapshot and Source Symbol Index baseline"
+}
