@@ -544,6 +544,24 @@ Plan v2を承認した。Approval Decisionは
 `07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892`。次は別作業単位で実装Task Contractを作成する。
 TODO compactionとResolution Verdictは未実施のため、最後のPilot checkboxは未完了のままとする。
 
+Task Contract作成前の照合で、Plan v2のderived state表に「作成・検証済みだが未commit／未開始のTask Contract」状態が
+ないことを検出した。Candidateは
+`records/development/2026-08-04-issue-resolution-pilot-task-contract-state-gap-candidate-v1.json`、SHA-256
+`b8300b13fed8af8c95cee424a1478aaedfaa085a27d9dcb6512c48ea15c6e632`。Acceptance truthへ影響するためTask Contract作成を
+停止し、Plan v2を上書きせずPlan v3修正をHuman判断待ちとする。最後のPilot checkboxは未完了のままとする。
+
+Humanが推奨案Aを承認し、Plan v3へ`task_contract_commit_pending`、`implementation_ready`、
+`implementation_in_progress`の境界、containing commit関門、三状態oracleを追加した。Challenge v3は10基準合格、
+blocking Finding 0、`ready_for_human_approval`である。RED／GREEN Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-plan-v3-red-evidence-v1.md`。Task Contract作成と実装は未開始で、
+Plan v3の最終Human判断まで最後のPilot checkboxを未完了に維持する。
+
+HumanはPlan v3を最終承認した。Approval Decisionは
+`records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v3-decision.json`、SHA-256
+`31abfa394605915d4abe4fe6f121816a1229669d9c9144b8184edad34d093b95`。Plan v3 Approval作業単位をcommitした後、
+別作業単位で実装Task Contractを作成する。Task Contract、WI-001、TODO compaction、Resolution Verdictは未実施のため、
+最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

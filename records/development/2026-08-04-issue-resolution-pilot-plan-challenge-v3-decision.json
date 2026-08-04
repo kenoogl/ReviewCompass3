@@ -1,0 +1,48 @@
+{
+  "decision_id": "DEC-RC3-ISSUE-PILOT-PLAN-CHALLENGE-V3-2026-08-04",
+  "decision_version": 1,
+  "decided_at": "2026-08-04T10:47:28+09:00",
+  "decision_maker": "human",
+  "decision": "approve_plan",
+  "challenge_ref": {
+    "challenge_id": "CHALLENGE-PILOT-TODO-GROWTH-001",
+    "challenge_version": 3,
+    "path": ".reviewcompass/workflow/plan-challenges/challenge-pilot-todo-growth-001--v3.json",
+    "sha256": "6a640598a715f4e7dea81e7891da5836a1ee0cf47f962ca9a02fb6eec18e2e67",
+    "content_digest": "98d39878b6b98b3d5f35b555eecc5f52540923b967fc9eecf962a040f6245e97"
+  },
+  "plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 3,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v3.json",
+    "sha256": "07cd477a463e4536f6aa208153d6fdf401cfd0d8c00909cdc61fea5fdc26c304",
+    "content_digest": "7a530ea650c907aae6fd49848167e5596df1f46180cc8d454579c393443ddd3d"
+  },
+  "verification_ref": {
+    "path": "records/development/2026-08-04-issue-resolution-pilot-plan-v3-candidate-test-receipt-v1.json",
+    "sha256": "756edf669f9151f182f18a55fa8adf0f302531a91399efb6b551e9a14a17cde1",
+    "status": "passed",
+    "test_count": 557
+  },
+  "accepted_blocking_findings": [],
+  "warning_dispositions": [],
+  "authorized_actions": [
+    "create a separate implementation Task Contract from Plan version 3 work items",
+    "represent an uncommitted Task Contract as task_contract_commit_pending",
+    "verify the Task Contract containing commit before entering implementation_ready",
+    "begin implementation_in_progress only when WI-001 RED work starts in a later work unit",
+    "route work items in the order WI-001, WI-002, WI-006, WI-003, WI-004, WI-005"
+  ],
+  "not_authorized": [
+    "create the implementation Task Contract in the Plan approval work unit",
+    "begin WI-001 before the Task Contract containing commit is verified",
+    "snapshot or compact TODO in the Plan approval work unit",
+    "modify Plan version 3 or Challenge version 3 in place",
+    "declare ISSUE-PILOT-TODO-GROWTH-001 resolved before a Resolution Verdict",
+    "send project artifacts to an external reviewer",
+    "enable hooks, watchers, schedulers, or background services",
+    "start Work 4 before the Issue Resolution early Pilot completion gate"
+  ],
+  "next_action": "Commit this Plan version 3 approval work unit, then create and verify the implementation Task Contract as a separate work unit.",
+  "content_digest": "3509ec2c1171472b5c9eb2e3add538013e947d6bbc54dd33d9c87f3851819c88"
+}

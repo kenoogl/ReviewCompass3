@@ -15,7 +15,9 @@
   検証済み。Task ContractとImprovement Candidate／Triage Decisionの暫定形状をtest-firstで固定済み。
   単一Candidateを作成し、Humanが`issue_resolution / blocking=false`と一件のIssue昇格を承認した。
   Issue Record、Resolution Plan v1、Plan Challenge v1を作成し、Humanの修正Decisionに従ってPlan v2を作成した。
-  Challenge v2はblocking Finding 0で、HumanがPlan v2を承認した。次は別作業単位で実装Task Contractを作成する。
+  Challenge v2はblocking Finding 0で、HumanがPlan v2を承認した。Task Contract作成前の照合でderived stateの
+  中間状態欠落を検出し、Humanが推奨案Aを承認した。Plan v3とChallenge v3は三状態境界を補完して検証済み。
+  HumanがPlan v3を最終承認した。次は本承認作業単位をcommitし、その後Task Contractを別作業単位で作成する。
 - work unit commit reminder Pilot：実装・検証・commit済み。以後、完了済み作業単位が未コミットなら
   `completed_work_unit_uncommitted`として次作業への移行を停止する。
 - デプロイ／Project Artifact境界corrective：`approved_effective`。Approval Decisionは
@@ -34,8 +36,8 @@
 - 現行開発方針：`docs/development/2026-08-02-development-policy.md`
 - 現行開発方針SHA-256：`9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
 - 直近のDecision／Evidence：
-  `records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v2-decision.json`
-- Decision／Evidence SHA-256：`07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892`
+  `records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v3-decision.json`
+- Decision／Evidence SHA-256：`31abfa394605915d4abe4fe6f121816a1229669d9c9144b8184edad34d093b95`
 
 ## 実施報告照合
 
@@ -575,6 +577,23 @@
     `07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892`
   - 観測した事後状態：DecisionはPlan v2とChallenge v2のversion、file SHA-256、content Digestへ接続された。
     実装Task Contract作成だけを次作業として許可し、TODO compaction、Issue解決、Work 4開始は先取りしていない。
+- Claim `EC-124`：Task Contract作成前にPlan v2のderived state境界欠落を検出し、作成を停止した。
+  - Candidate：`records/development/2026-08-04-issue-resolution-pilot-task-contract-state-gap-candidate-v1.json`、SHA-256
+    `b8300b13fed8af8c95cee424a1478aaedfaa085a27d9dcb6512c48ea15c6e632`
+  - 観測した事後状態：repository内の定義はTask Contract未作成の`task_contract_pending`とactive Taskの
+    `implementation_in_progress`だけで、作成・検証済みかつ未commit／未開始の状態は存在しない。Task Contract、
+    WI-001、snapshot、TODO compactionは未作成・未開始のままである。
+- Claim `EC-125`：Humanが推奨案Aを承認し、Plan v3とChallenge v3を作成・検証した。
+  - Evidence：`records/development/2026-08-04-issue-resolution-pilot-plan-v3-red-evidence-v1.md`、SHA-256
+    `591523aafa4ded9f46042351a213d191b8b6636d2a0365cf38869ecaec93a55f`
+  - 観測した事後状態：Plan v3は`task_contract_commit_pending`、`implementation_ready`、
+    `implementation_in_progress`をcontaining commitとWI-001 RED開始で分離した。Challenge v3は10基準合格、
+    blocking Finding 0、`ready_for_human_approval`で、Task Contractは未作成である。
+- Claim `EC-126`：HumanがPlan v3を最終承認した。
+  - Decision：`records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v3-decision.json`、SHA-256
+    `31abfa394605915d4abe4fe6f121816a1229669d9c9144b8184edad34d093b95`
+  - 観測した事後状態：DecisionはPlan v3、Challenge v3、公式全557 Test receiptへ結線された。承認作業単位の
+    commit後にTask Contract作成を許可し、WI-001、snapshot、TODO compaction、Issue解決は先取りしていない。
 
 ### reported_unverified／contradicted
 
@@ -688,31 +707,30 @@
 
 ## 次に行う一作業
 
-承認済み`PLAN-PILOT-TODO-GROWTH-001` v2のWI-001、WI-002、WI-006、WI-003、WI-004、WI-005を
-順序付きでrouteする実装Task Contractを作成・検証する。実装とTODO compactionは開始しない。
+承認済み`PLAN-PILOT-TODO-GROWTH-001` v3のWI-001、WI-002、WI-006、WI-003、WI-004、WI-005を
+順序付きでrouteする実装Task Contractを作成・検証する。WI-001、snapshot、TODO compactionは開始しない。
 
 開始条件：
 
-- Plan v2 Approval Decision SHA-256が
-  `07e6d865d27c86d9f039b5742092efcf1429656f38ec4ac3ddfc23e697d4f892`である。
-- Plan v2 SHA-256が`1aa63a008a9c396a211231185c965300b7f4caa45ef07424796d3b9f6d6482ac`、
-  Challenge v2 SHA-256が`ca5b12124d34dd039f73bd9638aabe23eaa47f0112fc3688d089a67f58936b24`である。
-- official Test receipt v2 SHA-256が`82668be805c1daf02532adb7b82f1d05e5db548e7977c633947b2c4f4d17bb81`である。
+- Plan v3 Approval Decision SHA-256が
+  `31abfa394605915d4abe4fe6f121816a1229669d9c9144b8184edad34d093b95`である。
+- Plan v3 SHA-256が`07cd477a463e4536f6aa208153d6fdf401cfd0d8c00909cdc61fea5fdc26c304`、
+  Challenge v3 SHA-256が`6a640598a715f4e7dea81e7891da5836a1ee0cf47f962ca9a02fb6eec18e2e67`である。
 
 完了条件：
 
-- Task Contractがexact Plan v2とApproval Decisionのversion、file SHA-256、content Digestへ接続される。
-- 6 Work Itemの順序、TDD境界、禁止事項、rollback、Human判断関門を移送する。
-- 実装、TODO圧縮、Issue解決を先取りしない。
+- Task Contractがexact Plan v3とApproval Decisionのversion、file SHA-256、content Digestへ接続される。
+- 6 Work Itemの順序、三状態境界、TDD、禁止事項、rollback、Human判断関門を移送する。
+- Task Contractの初期stateを`task_contract_commit_pending`とし、実装、TODO圧縮、Issue解決を先取りしない。
 
-後続作業：Task Contractを独立検証・commitした後だけ、WI-001のRED作業へ進む。
+後続作業：Task Contractを独立検証・commitした後だけ、`implementation_ready`へ進み、別作業単位でWI-001のREDを開始する。
 
 ## blocker・Human判断待ち
 
 - blocker：work unit transition preflightを正本とする。完了済み作業単位とdirty worktreeが同時に成立する間は、
   `completed_work_unit_uncommitted`として次作業へ移行しない。
 - Human判断待ち：現在の次作業に対する追加判断なし
-- 実行保留：実装Task Contract、milestone snapshot、TODO compaction。承認Decision作業単位のcommit後に再開する
+- 実行保留：実装Task Contract、milestone snapshot、TODO compaction。Plan v3承認作業単位のcommit後に再開する
 - 後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation
 - 再開条件：work unit transition preflight合格とTask Contract、Completion Evidence、Test receiptの一致を確認する
 
@@ -721,6 +739,8 @@
 - stale：permanent remediation receipt v1とunified formal Evidence v1はrunner修正前stateのため判断対象外。
   currentはreceipt v2とformal Evidence v2。promotion GREEN receipt v1は負例追加前stateで、currentはv2。
   authority v1はv2にsupersededされた。NFR／deferred候補のidentity再検証は合格し、双方freshでHuman承認済み。
+  Plan v2、Challenge v2、Plan v2 Approval Decisionはstate gap発見前の履歴として保持し、Task Contract判断には
+  Plan v3、Challenge v3、Plan v3 Approval Decisionを使用する。
   その他の旧candidate／sessionは従来どおりsuperseded保持する。
 - deferred：画面UI、As-Built projection、AI判断委譲、shared／distributed deployment、改善候補・
   Issue Resolution・実施報告照合の正式automation、汎用Task Registry／plugin system。Issue Resolutionの
@@ -733,9 +753,8 @@
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - private raw／逐語録／cursor／Provenance／ledgerはrepository外で、Git対象外
-- 直近の関連検証：Issue／Plan／Challenge version 1／2関連`30 passed in 0.09s`
-- 直近の全Test：`552 passed in 2.34s`、receipt SHA-256
-  `82668be805c1daf02532adb7b82f1d05e5db548e7977c633947b2c4f4d17bb81`
+- 直近の関連検証：Issue／Plan／Challenge version 1〜3関連`35 passed in 0.11s`
+- 直近の全Test：Plan v3 official receiptを機械参照する
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
