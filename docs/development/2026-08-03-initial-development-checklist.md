@@ -622,6 +622,14 @@ WI-001 completion繰越、7 Work Item順、WI-007／WI-003 source identity境界
 `581 passed, 8 failed`で、失敗はTask Contract v2実体不在と専用validator未実装だけである。RED作業単位の
 commit後までv2実体、実snapshot、WI-002、TODO compactionを開始せず、最後のPilot checkboxは未完了のままとする。
 
+Task Contract v2 RED containing commit `0a8cc73`とclean transitionを確認後、旧Testを弱めずv2実体と専用validatorを
+作成した。意味照合でv1由来goalの旧`Plan v3`表記を検出したため、要求誤解時の修正规則に従ってPlan v4へ補正し、
+旧表記を拒否する負例を追加した。Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-task-contract-v2-completion-evidence-v1.md`。Plan v4結線、
+WI-001 completion繰越、7 Work Item順、WI-007／WI-003 source identity境界はtargeted `9 passed`、公式全
+`590 passed`、fallback `false`。v2作業単位のcommit後までWI-002、実snapshot、TODO compactionを開始せず、
+最後のPilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

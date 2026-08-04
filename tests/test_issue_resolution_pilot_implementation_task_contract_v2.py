@@ -154,6 +154,10 @@ def _contract_v2():
     )
     record["task_contract_version"] = 2
     record["created_at"] = "2026-08-04T12:20:00+09:00"
+    record["goal"] = (
+        "承認済みPlan v4をtest-firstで実施し、TODO_NEXT_SESSION.mdを"
+        "復元可能性とauthorityを保った短いactive Issue入口へ一回だけ圧縮する。"
+    )
     record["supersedes_contract_ref"] = {
         "task_contract_id": previous["task_contract_id"],
         "task_contract_version": previous["task_contract_version"],
@@ -300,6 +304,18 @@ def test_rejects_task_contract_v2_without_wi001_completion():
     with pytest.raises(
         _module().PilotValidationError,
         match="WI-001 carry-forward",
+    ):
+        _validate(record)
+
+
+def test_rejects_task_contract_v2_with_stale_goal_plan_version():
+    record = _contract_v2()
+    record["goal"] = record["goal"].replace("Plan v4", "Plan v3")
+    record["content_digest"] = _canonical_digest(record)
+
+    with pytest.raises(
+        _module().PilotValidationError,
+        match="Task Contract v2 Plan authority",
     ):
         _validate(record)
 

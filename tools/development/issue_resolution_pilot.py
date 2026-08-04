@@ -216,6 +216,264 @@ def validate_task_contract_sources(path, *, project_root):
     return len(contract["fixed_sources"])
 
 
+def validate_implementation_task_contract_v2(record, *, project_root):
+    """Plan v4を実行する版付きTask Contractの固定境界を検証する。"""
+
+    project_root = Path(project_root)
+    if (
+        record.get("task_contract_id")
+        != "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2"
+        or record.get("task_contract_version") != 2
+        or record.get("contract_status") != "fixed_pending_containing_commit"
+        or record.get("current_state_at_creation")
+        != "task_contract_commit_pending"
+    ):
+        raise PilotValidationError("Task Contract v2 identity is invalid")
+
+    def load_reference(reference, identity_fields):
+        expected_fields = (*identity_fields, "path", "sha256", "content_digest")
+        try:
+            _require_exact_fields(
+                reference,
+                expected_fields,
+                "Task Contract v2 reference",
+            )
+            path = _validate_file_reference(
+                {
+                    "path": reference["path"],
+                    "sha256": reference["sha256"],
+                },
+                project_root,
+                "Task Contract v2 reference",
+            )
+            target = _load_json(path, "Task Contract v2 reference")
+            if target.get("content_digest") != reference["content_digest"]:
+                raise PilotValidationError(
+                    "Task Contract v2 reference identity is stale"
+                )
+            for field in identity_fields:
+                if target.get(field) != reference[field]:
+                    raise PilotValidationError(
+                        "Task Contract v2 reference identity is stale"
+                    )
+            return target
+        except PilotValidationError as error:
+            if "Task Contract v2 reference" in str(error):
+                raise
+            raise PilotValidationError(
+                "Task Contract v2 reference is invalid"
+            ) from error
+
+    parent_reference = record.get("parent_contract_ref")
+    try:
+        _require_exact_fields(
+            parent_reference,
+            ("task_contract_id", "path", "sha256"),
+            "Task Contract v2 reference",
+        )
+        parent_path = _validate_file_reference(
+            {
+                "path": parent_reference["path"],
+                "sha256": parent_reference["sha256"],
+            },
+            project_root,
+            "Task Contract v2 reference",
+        )
+        parent = _load_json(parent_path, "Task Contract v2 parent")
+        if parent.get("task_contract_id") != parent_reference["task_contract_id"]:
+            raise PilotValidationError(
+                "Task Contract v2 reference identity is stale"
+            )
+    except PilotValidationError as error:
+        raise PilotValidationError(
+            "Task Contract v2 reference is invalid"
+        ) from error
+    issue = load_reference(
+        record.get("issue_ref"),
+        ("issue_id", "issue_version"),
+    )
+    previous = load_reference(
+        record.get("supersedes_contract_ref"),
+        ("task_contract_id", "task_contract_version"),
+    )
+    plan = load_reference(
+        record.get("plan_ref"),
+        ("plan_id", "plan_version"),
+    )
+    challenge = load_reference(
+        record.get("challenge_ref"),
+        ("challenge_id", "challenge_version"),
+    )
+    decision = load_reference(
+        record.get("approval_decision_ref"),
+        ("decision_id", "decision_version"),
+    )
+    if (
+        previous.get("task_contract_version") != 1
+        or issue.get("issue_id") != "ISSUE-PILOT-TODO-GROWTH-001"
+        or plan.get("plan_version") != 4
+        or challenge.get("challenge_version") != 4
+        or challenge.get("overall_verdict") != "ready_for_human_approval"
+        or challenge.get("blocking_finding_ids") != []
+        or decision.get("decision") != "approve_plan"
+        or decision.get("plan_ref", {}).get("content_digest")
+        != plan.get("content_digest")
+        or decision.get("challenge_ref", {}).get("content_digest")
+        != challenge.get("content_digest")
+    ):
+        raise PilotValidationError("Task Contract v2 reference is invalid")
+    if (
+        "Plan v4" not in record.get("goal", "")
+        or "Plan v3" in record.get("goal", "")
+    ):
+        raise PilotValidationError(
+            "Task Contract v2 Plan authority is stale"
+        )
+
+    fixed_sources = record.get("fixed_sources")
+    if not isinstance(fixed_sources, list) or not fixed_sources:
+        raise PilotValidationError("Task Contract v2 reference is invalid")
+    for reference in fixed_sources:
+        if not isinstance(reference, dict):
+            raise PilotValidationError("Task Contract v2 reference is invalid")
+        try:
+            fixed_path = _validate_file_reference(
+                {
+                    "path": reference["path"],
+                    "sha256": reference["sha256"],
+                },
+                project_root,
+                "Task Contract v2 reference",
+            )
+            if "content_digest" in reference:
+                fixed_record = _load_json(
+                    fixed_path,
+                    "Task Contract v2 fixed source",
+                )
+                if fixed_record.get("content_digest") != reference["content_digest"]:
+                    raise PilotValidationError(
+                        "Task Contract v2 reference identity is stale"
+                    )
+        except (KeyError, PilotValidationError) as error:
+            raise PilotValidationError(
+                "Task Contract v2 reference is invalid"
+            ) from error
+
+    carried = record.get("carried_forward_work")
+    if not isinstance(carried, dict):
+        raise PilotValidationError("WI-001 carry-forward is invalid")
+    carry_references = (
+        ("source_contract_ref", ("task_contract_id", "task_contract_version")),
+        ("test_ref", ()),
+        ("implementation_ref", ()),
+        ("evidence_ref", ()),
+    )
+    try:
+        for field, identity_fields in carry_references:
+            reference = carried[field]
+            if identity_fields:
+                load_reference(reference, identity_fields)
+            else:
+                _validate_file_reference(
+                    reference,
+                    project_root,
+                    "WI-001 carry-forward reference",
+                )
+    except (KeyError, PilotValidationError) as error:
+        raise PilotValidationError("WI-001 carry-forward is invalid") from error
+    if (
+        carried.get("work_item_id") != "WI-001"
+        or carried.get("status") != "completed_carried_forward"
+        or carried.get("containing_commit")
+        != "64782ec4e94422462e093f7492d9f87197b37a6d"
+        or carried.get("actual_snapshot_created") is not False
+    ):
+        raise PilotValidationError("WI-001 carry-forward is invalid")
+
+    expected_order = (
+        "WI-001",
+        "WI-002",
+        "WI-006",
+        "WI-007",
+        "WI-003",
+        "WI-004",
+        "WI-005",
+    )
+    work_items = record.get("work_items")
+    if (
+        not isinstance(work_items, list)
+        or tuple(item.get("work_item_id") for item in work_items)
+        != expected_order
+        or [item.get("sequence") for item in work_items]
+        != list(range(1, 8))
+    ):
+        raise PilotValidationError("Task Contract v2 work item order is invalid")
+    plan_items = {
+        item["work_item_id"]: item
+        for item in plan.get("work_items", [])
+        if isinstance(item, dict) and "work_item_id" in item
+    }
+    transfer_fields = (
+        "depends_on",
+        "objective",
+        "obligation_ids",
+        "acceptance_ids",
+        "oracle_ids",
+        "rollback_step_ids",
+    )
+    for item in work_items:
+        source = plan_items.get(item["work_item_id"])
+        if source is None or any(
+            item.get(field) != source.get(field)
+            for field in transfer_fields
+        ):
+            raise PilotValidationError(
+                "Task Contract v2 work item transfer is invalid"
+            )
+        expected_status = (
+            "completed_carried_forward"
+            if item["work_item_id"] == "WI-001"
+            else "not_started"
+        )
+        if item.get("status_at_creation") != expected_status:
+            raise PilotValidationError(
+                "Task Contract v2 work item status is invalid"
+            )
+
+    items_by_id = {item["work_item_id"]: item for item in work_items}
+    wi007_completion = items_by_id["WI-007"].get("completion_condition", "")
+    wi003_start = items_by_id["WI-003"].get("start_condition", "")
+    prohibitions = record.get("prohibitions", [])
+    if (
+        not isinstance(prohibitions, list)
+        or not any(
+            "Task Contract v2" in value
+            and "containing commit確認前にWI-002" in value
+            for value in prohibitions
+        )
+        or "TODOを変更せず" not in wi007_completion
+        or "source identity" not in wi007_completion
+        or "WI-007 containing commit" not in wi003_start
+        or "source identity再読込一致" not in wi003_start
+        or "clean worktree" not in wi003_start
+        or any(
+            item.get("work_item_id") != "WI-001"
+            and item.get("status_at_creation") != "not_started"
+            for item in work_items
+        )
+    ):
+        raise PilotValidationError(
+            "Task Contract v2 execution boundary is incomplete"
+        )
+
+    _validate_content_digest(record)
+    return ValidationResult(
+        record_kind="implementation_task_contract",
+        record_id=record["task_contract_id"],
+        content_digest=record["content_digest"],
+    )
+
+
 def validate_bootstrap_layout(*, project_root, config):
     project_root = Path(project_root)
     for relative in config["directories"].values():

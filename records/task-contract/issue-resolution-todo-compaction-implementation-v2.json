@@ -1,0 +1,322 @@
+{
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2",
+  "task_contract_version": 2,
+  "created_at": "2026-08-04T12:20:00+09:00",
+  "owner": "reviewcompass3-development",
+  "contract_status": "fixed_pending_containing_commit",
+  "current_state_at_creation": "task_contract_commit_pending",
+  "goal": "承認済みPlan v4をtest-firstで実施し、TODO_NEXT_SESSION.mdを復元可能性とauthorityを保った短いactive Issue入口へ一回だけ圧縮する。",
+  "parent_contract_ref": {
+    "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1",
+    "path": "records/task-contract/issue-resolution-early-pilot-v1.json",
+    "sha256": "69e2c73167f930cab48abdcf3bd4d1eafa938aa9b3abaa714d6c3ad5e41c4ed7"
+  },
+  "issue_ref": {
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+    "issue_version": 1,
+    "path": ".reviewcompass/workflow/issues/issue-pilot-todo-growth-001--v1.json",
+    "sha256": "2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a",
+    "content_digest": "0389f68d81af61d570177228e246bb481eea97af23d5454c99831f8bc7c72319"
+  },
+  "plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 4,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v4.json",
+    "sha256": "d309a2e10de52d093a58a1fefd292fd18b14ed5d6e863fa71a099abce01c6bcd",
+    "content_digest": "dc44a9c7d3c2da1f68df12e5be93e906d88e46aa996d5577edebb383b5ac3520"
+  },
+  "challenge_ref": {
+    "challenge_id": "CHALLENGE-PILOT-TODO-GROWTH-001",
+    "challenge_version": 4,
+    "path": ".reviewcompass/workflow/plan-challenges/challenge-pilot-todo-growth-001--v4.json",
+    "sha256": "34ccf304201d5d4ecac320ed2e2648673c5a3fed027b81e31563274210646641",
+    "content_digest": "27cc64425968b459d08a4b5e558b0dd461264ba8200287813f030ed8747f8587"
+  },
+  "approval_decision_ref": {
+    "decision_id": "DEC-RC3-ISSUE-PILOT-PLAN-CHALLENGE-V4-2026-08-04",
+    "decision_version": 1,
+    "path": "records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v4-decision.json",
+    "sha256": "f2e6c6dce6388d97a8903b45165114175c2fbe949ce77ba63e8fb0e14875f9ab",
+    "content_digest": "e7d1885bfe858d34476ccc376bd8a5657fc6349b31de5fc830fea73d76efc97b"
+  },
+  "fixed_sources": [
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-decision.json",
+      "sha256": "51689b54884e15a7e75256a7ee734a4fda1d8a1c20be7b289c3b5d8ee435add3",
+      "content_digest": "29361f9932fddbea89b2c1d55024b2823c0e48d0c2f8fbf10a03cdfd0e01ebe8"
+    },
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-plan-v4-green-test-receipt-v1.json",
+      "sha256": "d2db2b6a2b2ecf6a8254954853e8c46d45630e207e70cd3612afce73f6c15418"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0"
+    }
+  ],
+  "state_projection": {
+    "authority": "machine-derived from repository and fixed work Evidence; never hand-entered into TODO",
+    "rules": [
+      {
+        "state": "task_contract_commit_pending",
+        "condition": "this exact Task Contract v2 exists in the working tree but is not byte-identical at its path in HEAD"
+      },
+      {
+        "state": "implementation_ready",
+        "condition": "this exact Task Contract v2 is byte-identical at its path in HEAD and no accepted WI-001 completion Evidence exists"
+      },
+      {
+        "state": "implementation_in_progress",
+        "condition": "the Task Contract v2 containing commit is verified and accepted carried-forward WI-001 completion Evidence exists"
+      }
+    ],
+    "conflict_rule": "missing, stale, conflicting, or hand-entered state input returns indeterminate and stops projection",
+    "commit_stability": "the containing commit transition is derived without modifying this Task Contract or TODO after commit"
+  },
+  "work_items": [
+    {
+      "sequence": 1,
+      "work_item_id": "WI-001",
+      "depends_on": [],
+      "objective": "TODO byte-exact snapshot helperを固定Testに対してGREENにする。",
+      "obligation_ids": [
+        "OBL-001"
+      ],
+      "acceptance_ids": [
+        "ACC-008"
+      ],
+      "oracle_ids": [
+        "ORACLE-008"
+      ],
+      "rollback_step_ids": [
+        "RB-003"
+      ],
+      "status_at_creation": "completed_carried_forward",
+      "tdd_boundary": "固定snapshot helper TestのRED containing commitを変更せずGREENにする",
+      "start_condition": "Task Contract v1 containing commit確認済み",
+      "completion_condition": "固定Test 9件GREEN、実snapshot不在、completion Evidenceとcontaining commit一致"
+    },
+    {
+      "sequence": 2,
+      "work_item_id": "WI-002",
+      "depends_on": [
+        "WI-001"
+      ],
+      "objective": "TODO上限、禁止履歴、active ID、参照を検査するvalidatorとrestore処理をtest-firstで実装する。",
+      "obligation_ids": [
+        "OBL-003"
+      ],
+      "acceptance_ids": [
+        "ACC-004"
+      ],
+      "oracle_ids": [
+        "ORACLE-004"
+      ],
+      "rollback_step_ids": [
+        "RB-002"
+      ],
+      "status_at_creation": "not_started",
+      "tdd_boundary": "12288 bytes合格、12289 bytes拒否を含む正常・負例・境界Testを先にREDへする",
+      "start_condition": "Task Contract v2 containing commit、WI-001繰越Evidence、clean transition確認済み",
+      "completion_condition": "既知違反fixtureだけを意図した理由で拒否し、決定的restoreが一致する"
+    },
+    {
+      "sequence": 3,
+      "work_item_id": "WI-006",
+      "depends_on": [
+        "WI-002"
+      ],
+      "objective": "Candidate、Decision、Issue、Challenge、Task、Verdictからactive stateを導出するresolverをtest-firstで実装する。",
+      "obligation_ids": [
+        "OBL-006"
+      ],
+      "acceptance_ids": [
+        "ACC-007"
+      ],
+      "oracle_ids": [
+        "ORACLE-007"
+      ],
+      "rollback_step_ids": [
+        "RB-002"
+      ],
+      "status_at_creation": "not_started",
+      "tdd_boundary": "全許可遷移、欠落、競合、stale、手入力不一致を先にREDへする",
+      "start_condition": "WI-002 completed and committed",
+      "completion_condition": "最新の非stale固定recordだけから一意stateと根拠IDsを返し、負例を推測しない"
+    },
+    {
+      "sequence": 4,
+      "work_item_id": "WI-007",
+      "depends_on": [
+        "WI-002",
+        "WI-006"
+      ],
+      "objective": "WI-003直前のTODOをbyte-exact snapshotと別manifestへ機械作成し、再読込する。",
+      "obligation_ids": [
+        "OBL-001"
+      ],
+      "acceptance_ids": [
+        "ACC-001"
+      ],
+      "oracle_ids": [
+        "ORACLE-001"
+      ],
+      "rollback_step_ids": [
+        "RB-001"
+      ],
+      "status_at_creation": "not_started",
+      "tdd_boundary": "source一致、source変更、既存出力衝突、versioned再作成境界を実行前に固定する",
+      "start_condition": "WI-002とWI-006 completed and committed、clean worktree、最新TODO source identity確認",
+      "completion_condition": "snapshot／manifest再読込一致、containing commitはTODOを変更せず、WI-003用source identityを固定"
+    },
+    {
+      "sequence": 5,
+      "work_item_id": "WI-003",
+      "depends_on": [
+        "WI-001",
+        "WI-002",
+        "WI-006",
+        "WI-007"
+      ],
+      "objective": "templateからroot TODOを再生成し、active Issue projectionと最新入口だけを残す。",
+      "obligation_ids": [
+        "OBL-002"
+      ],
+      "acceptance_ids": [
+        "ACC-002",
+        "ACC-003"
+      ],
+      "oracle_ids": [
+        "ORACLE-002",
+        "ORACLE-003"
+      ],
+      "rollback_step_ids": [
+        "RB-001"
+      ],
+      "status_at_creation": "not_started",
+      "tdd_boundary": "生成器とprojection validatorの期待出力を固定し、source再照合後だけTODOへ書く",
+      "start_condition": "WI-007 containing commit確認、TODO source identity再読込一致、clean worktree",
+      "completion_condition": "TODOは12288 bytes以下、active Issue一件、過去Claim・詳細履歴0、全参照解決済み"
+    },
+    {
+      "sequence": 6,
+      "work_item_id": "WI-004",
+      "depends_on": [
+        "WI-002"
+      ],
+      "objective": "一つの短いTODO更新promptを作り、AGENTS.mdとClaude互換入口から参照する。",
+      "obligation_ids": [
+        "OBL-004"
+      ],
+      "acceptance_ids": [
+        "ACC-005"
+      ],
+      "oracle_ids": [
+        "ORACLE-005"
+      ],
+      "rollback_step_ids": [
+        "RB-002"
+      ],
+      "status_at_creation": "not_started",
+      "tdd_boundary": "共通prompt一件、各入口参照一件、CLAUDE.md第二authority拒否Testを先にREDへする",
+      "start_condition": "WI-002 completed and committed",
+      "completion_condition": "重複TODO意味規則0で、CodexとClaude入口が同じpromptだけを参照する"
+    },
+    {
+      "sequence": 7,
+      "work_item_id": "WI-005",
+      "depends_on": [
+        "WI-003",
+        "WI-004"
+      ],
+      "objective": "post-write検証、復元rehearsal、Pilot測定、Resolution Verdict候補を作る。",
+      "obligation_ids": [
+        "OBL-005"
+      ],
+      "acceptance_ids": [
+        "ACC-006"
+      ],
+      "oracle_ids": [
+        "ORACLE-006"
+      ],
+      "rollback_step_ids": [
+        "RB-001"
+      ],
+      "status_at_creation": "not_started",
+      "tdd_boundary": "post-write、restore rehearsal、stale閉包、Verdict入力の受入条件を実施前に固定する",
+      "start_condition": "WI-003 and WI-004 completed and committed",
+      "completion_condition": "公式全Test、再読込、参照、restoreが合格し、Verdict候補が残余riskを記録する"
+    }
+  ],
+  "prohibitions": [
+    "Task Contract v2のcontaining commit確認前にWI-002を開始しない",
+    "完了済みWork Itemを未コミットのまま次Work Itemへ進めない",
+    "WI-002とWI-006のcommit前にWI-007の実snapshotを作成しない",
+    "WI-007 containing commitでTODO sourceを変更しない",
+    "WI-007後にsource identityが変わった場合はWI-003を開始せず新しいversioned snapshotを作る",
+    "active state、Digest、bytes、lines、Claim数をLLMの手入力で正本化しない",
+    "Plan v4、Challenge v4、Approval Decision、Task Contract v1、固定WI-001 Testをin-place変更しない",
+    "green TestまたはcommitだけでIssueをresolvedにしない",
+    "外部送信、hook、watcher、scheduler、background serviceを有効化しない"
+  ],
+  "human_gates": [
+    "PlanまたはTask Contractの意味変更、Acceptance変更、risk受容はHuman Decisionを要求する",
+    "Resolution VerdictによるIssue解決はHuman判断を要求する",
+    "外部送信、不可逆操作、Work 4移行は別のHuman指示を要求する"
+  ],
+  "rollback": [
+    {
+      "rollback_step_id": "RB-001",
+      "trigger": "TODO書換え後のvalidator、参照、Test、restore rehearsalのいずれかが失敗する",
+      "action": "決定的restore helperでbyte-exact snapshotをTODO_NEXT_SESSION.mdへ戻す",
+      "verification": "復元後TODOのSHAとbytesがmanifestに一致し、旧validatorが合格する"
+    },
+    {
+      "rollback_step_id": "RB-002",
+      "trigger": "validator、resolver、prompt、入口が誤拒否、state推測、第二authorityを生む",
+      "action": "TODOを書き換えず当該Work Itemを未完了へ戻し、Candidateとしてrouteする",
+      "verification": "固定sourceが不変で公式Testが合格し、次のHuman判断またはPlan versionへ接続される"
+    }
+  ],
+  "out_of_scope": [
+    "正式製品Issue Resolution schema、UI、automation",
+    "本Issue以外のCandidateまたはIssue処置",
+    "Work 4、Work 7、Work 8の完了",
+    "private transcript、retention、暗号化、backupの変更",
+    "自動commit、push、hook、scheduler、external tracker"
+  ],
+  "next_action": "Commit and verify this exact Task Contract v2, derive implementation_in_progress from carried-forward WI-001 Evidence, then begin WI-002 RED as a separate work unit.",
+  "content_digest": "248f3f8604d4451e4c2c73d3083ca78bc787c2cf1337ae2194d2aea3b9df163f",
+  "supersedes_contract_ref": {
+    "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V1",
+    "task_contract_version": 1,
+    "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v1.json",
+    "sha256": "661df56b9f2c78a261e3b345e727bf9cd47bbf09225186c529cceadf32eb56cd",
+    "content_digest": "e4d6c11e02efa57d2952eea2935d13bd60005204a4784d4aec5cf814dd2afc76"
+  },
+  "carried_forward_work": {
+    "work_item_id": "WI-001",
+    "status": "completed_carried_forward",
+    "containing_commit": "64782ec4e94422462e093f7492d9f87197b37a6d",
+    "source_contract_ref": {
+      "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V1",
+      "task_contract_version": 1,
+      "path": "records/task-contract/issue-resolution-todo-compaction-implementation-v1.json",
+      "sha256": "661df56b9f2c78a261e3b345e727bf9cd47bbf09225186c529cceadf32eb56cd",
+      "content_digest": "e4d6c11e02efa57d2952eea2935d13bd60005204a4784d4aec5cf814dd2afc76"
+    },
+    "test_ref": {
+      "path": "tests/test_todo_snapshot.py",
+      "sha256": "890f65df6734c314287a4d76c48232874560cb597f66122ab24d47d9e3c66521"
+    },
+    "implementation_ref": {
+      "path": "tools/development/todo_snapshot.py",
+      "sha256": "a2c7010844146d2c5a2f44bc5ac1be8a2f6389cef33c9eb68079e6440d61f783"
+    },
+    "evidence_ref": {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-wi-001-snapshot-boundary-triage-completion-evidence-v1.md",
+      "sha256": "bcb4083827c6ce2b5de4bb23ec113e2543b006caedd6b8a30edd1421361beee3"
+    },
+    "actual_snapshot_created": false
+  }
+}
