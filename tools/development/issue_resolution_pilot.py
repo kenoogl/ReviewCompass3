@@ -23,6 +23,7 @@ _SHA256 = re.compile(r"[0-9a-f]{64}")
 _CANDIDATE_ID = re.compile(r"IC-[A-Z0-9]+(?:-[A-Z0-9]+)+")
 _DECISION_ID = re.compile(r"DEC-[A-Z0-9]+(?:-[A-Z0-9]+)+")
 _ISSUE_ID = re.compile(r"ISSUE-[A-Z0-9]+(?:-[A-Z0-9]+)+")
+_PLAN_ID = re.compile(r"PLAN-[A-Z0-9]+(?:-[A-Z0-9]+)+")
 _TIMESTAMP = re.compile(
     r"[0-9]{4}-[0-9]{2}-[0-9]{2}T"
     r"[0-9]{2}:[0-9]{2}:[0-9]{2}(?:Z|[+-][0-9]{2}:[0-9]{2})"
@@ -84,6 +85,20 @@ def _require_text_list(value, label):
         raise PilotValidationError(f"{label} must be a non-empty text list")
 
 
+def _require_optional_text_list(value, label):
+    if not isinstance(value, list) or any(
+        not isinstance(item, str) or not item.strip() for item in value
+    ):
+        raise PilotValidationError(f"{label} must be a text list")
+
+
+def _require_structured_list(value, fields, label):
+    if not isinstance(value, list) or not value:
+        raise PilotValidationError(f"{label} must be a non-empty list")
+    for item in value:
+        _require_exact_fields(item, fields, label)
+
+
 def _safe_relative_path(value):
     if not isinstance(value, str) or not value:
         raise PilotValidationError("artifact path is invalid")
@@ -133,15 +148,20 @@ def load_config(path):
         raise PilotValidationError("Pilot config fields are invalid")
     if (
         config["pilot_id"] != "RC3-DEVELOPMENT-ISSUE-RESOLUTION-PILOT"
-        or config["pilot_version"] != 1
+        or config["pilot_version"] not in {1, 2}
         or config["pilot_mode"] != "development_only_provisional"
         or config["maximum_issue_subjects"] != 1
     ):
         raise PilotValidationError("Pilot identity or scope is invalid")
-    if set(config["directories"]) != {
+    expected_directories = {
         "improvement_candidate",
         "human_triage_decision",
-    }:
+    }
+    if config["pilot_version"] == 2:
+        expected_directories.update(
+            {"issue_record", "issue_resolution_plan"}
+        )
+    if set(config["directories"]) != expected_directories:
         raise PilotValidationError("Pilot directories are invalid")
     if set(config["record_fields"]) != set(config["directories"]):
         raise PilotValidationError("Pilot record fields are invalid")
@@ -363,6 +383,355 @@ def validate_triage_decision(record, *, path, project_root, config):
     )
 
 
+def validate_issue(record, *, path, project_root, config):
+    if "issue_record" not in config["record_fields"]:
+        raise PilotValidationError("Issue Record is unavailable in this config")
+    _require_exact_fields(
+        record,
+        config["record_fields"]["issue_record"],
+        "Issue Record",
+    )
+    if record["record_kind"] != "issue_record":
+        raise PilotValidationError("record kind is invalid")
+    if record["schema_version"] != 1:
+        raise PilotValidationError("schema version is invalid")
+    if (
+        not isinstance(record["issue_id"], str)
+        or not _ISSUE_ID.fullmatch(record["issue_id"])
+        or record["issue_version"] != 1
+        or not isinstance(record["created_at"], str)
+        or not _TIMESTAMP.fullmatch(record["created_at"])
+    ):
+        raise PilotValidationError("Issue identity is invalid")
+    source = record["source_identity"]
+    _require_exact_fields(
+        source,
+        ("kind", "source_id", "source_version", "path", "sha256"),
+        "source identity",
+    )
+    if (
+        source["kind"] != "observation"
+        or not isinstance(source["source_id"], str)
+        or not source["source_id"].startswith("OBS-")
+        or source["source_version"] != 1
+    ):
+        raise PilotValidationError("source reference identity is invalid")
+    _validate_file_reference(
+        {"path": source["path"], "sha256": source["sha256"]},
+        project_root,
+        "source reference",
+    )
+    candidate_ref = record["candidate_ref"]
+    _require_exact_fields(
+        candidate_ref,
+        (
+            "candidate_id",
+            "candidate_version",
+            "path",
+            "sha256",
+            "content_digest",
+        ),
+        "candidate reference",
+    )
+    candidate_path = _validate_file_reference(
+        {"path": candidate_ref["path"], "sha256": candidate_ref["sha256"]},
+        project_root,
+        "candidate reference",
+    )
+    candidate = _load_json(candidate_path, "referenced Candidate")
+    validate_candidate(
+        candidate,
+        path=candidate_ref["path"],
+        project_root=project_root,
+        config=config,
+    )
+    if (
+        candidate_ref["candidate_id"] != candidate["candidate_id"]
+        or candidate_ref["candidate_version"]
+        != candidate["candidate_version"]
+        or candidate_ref["content_digest"] != candidate["content_digest"]
+        or source != candidate["source_identity"]
+    ):
+        raise PilotValidationError("candidate reference identity is stale")
+    decision_ref = record["triage_decision_ref"]
+    _require_exact_fields(
+        decision_ref,
+        (
+            "decision_id",
+            "decision_version",
+            "path",
+            "sha256",
+            "content_digest",
+        ),
+        "triage decision reference",
+    )
+    decision_path = _validate_file_reference(
+        {"path": decision_ref["path"], "sha256": decision_ref["sha256"]},
+        project_root,
+        "triage decision reference",
+    )
+    decision = _load_json(decision_path, "referenced Triage Decision")
+    validate_triage_decision(
+        decision,
+        path=decision_ref["path"],
+        project_root=project_root,
+        config=config,
+    )
+    if (
+        decision_ref["decision_id"] != decision["decision_id"]
+        or decision_ref["decision_version"] != decision["decision_version"]
+        or decision_ref["content_digest"] != decision["content_digest"]
+    ):
+        raise PilotValidationError("triage decision reference identity is stale")
+    promotion = decision["issue_promotion"]
+    if (
+        decision["disposition"] != "issue_resolution"
+        or promotion["approved"] is not True
+        or promotion["issue_id"] != record["issue_id"]
+        or decision["candidate_ref"]["candidate_id"]
+        != candidate_ref["candidate_id"]
+        or decision["candidate_ref"]["content_digest"]
+        != candidate_ref["content_digest"]
+    ):
+        raise PilotValidationError("Issue promotion is not Human-approved")
+    expected_path = _expected_record_path(
+        config,
+        "issue_record",
+        record["issue_id"],
+        record["issue_version"],
+    )
+    if path != expected_path:
+        raise PilotValidationError("record path does not match Issue identity")
+    for field in (
+        "source_work",
+        "problem",
+        "motivation",
+        "owner_candidate",
+        "route_candidate",
+    ):
+        _require_text(record[field])
+    for field in (
+        "impact",
+        "scope",
+        "non_scope",
+        "related_files",
+        "related_units",
+    ):
+        _require_text_list(record[field], field)
+    for related_file in record["related_files"]:
+        _safe_relative_path(related_file)
+    if not isinstance(record["evidence_refs"], list) or not record[
+        "evidence_refs"
+    ]:
+        raise PilotValidationError("Evidence references are invalid")
+    for reference in record["evidence_refs"]:
+        _validate_file_reference(reference, project_root, "Evidence reference")
+    _validate_content_digest(record)
+    return ValidationResult(
+        record_kind=record["record_kind"],
+        record_id=record["issue_id"],
+        content_digest=record["content_digest"],
+    )
+
+
+def _structured_ids(records, id_field, label):
+    identifiers = []
+    for record in records:
+        _require_text(record[id_field])
+        identifiers.append(record[id_field])
+    if len(identifiers) != len(set(identifiers)):
+        raise PilotValidationError(f"{label} IDs are duplicated")
+    return set(identifiers)
+
+
+def validate_resolution_plan(record, *, path, project_root, config):
+    if "issue_resolution_plan" not in config["record_fields"]:
+        raise PilotValidationError(
+            "Issue Resolution Plan is unavailable in this config"
+        )
+    _require_exact_fields(
+        record,
+        config["record_fields"]["issue_resolution_plan"],
+        "Issue Resolution Plan",
+    )
+    if record["record_kind"] != "issue_resolution_plan":
+        raise PilotValidationError("record kind is invalid")
+    if record["schema_version"] != 1:
+        raise PilotValidationError("schema version is invalid")
+    if (
+        not isinstance(record["plan_id"], str)
+        or not _PLAN_ID.fullmatch(record["plan_id"])
+        or record["plan_version"] != 1
+        or not isinstance(record["created_at"], str)
+        or not _TIMESTAMP.fullmatch(record["created_at"])
+    ):
+        raise PilotValidationError("Plan identity is invalid")
+    issue_ref = record["issue_ref"]
+    _require_exact_fields(
+        issue_ref,
+        (
+            "issue_id",
+            "issue_version",
+            "path",
+            "sha256",
+            "content_digest",
+        ),
+        "Issue reference",
+    )
+    issue_path = _validate_file_reference(
+        {"path": issue_ref["path"], "sha256": issue_ref["sha256"]},
+        project_root,
+        "Issue reference",
+    )
+    issue = _load_json(issue_path, "referenced Issue")
+    validate_issue(
+        issue,
+        path=issue_ref["path"],
+        project_root=project_root,
+        config=config,
+    )
+    if (
+        issue_ref["issue_id"] != issue["issue_id"]
+        or issue_ref["issue_version"] != issue["issue_version"]
+        or issue_ref["content_digest"] != issue["content_digest"]
+    ):
+        raise PilotValidationError("Issue reference identity is stale")
+    expected_path = _expected_record_path(
+        config,
+        "issue_resolution_plan",
+        record["plan_id"],
+        record["plan_version"],
+    )
+    if path != expected_path:
+        raise PilotValidationError("record path does not match Plan identity")
+    _require_text(record["goal"])
+    for field in (
+        "scope",
+        "non_scope",
+        "prohibitions",
+        "dependencies",
+        "risks",
+        "deployment",
+        "recovery",
+        "task_contract_route_candidates",
+    ):
+        _require_text_list(record[field], field)
+    _require_structured_list(
+        record["issue_obligations"],
+        ("obligation_id", "statement", "source_field"),
+        "issue obligations",
+    )
+    _require_structured_list(
+        record["work_items"],
+        (
+            "work_item_id",
+            "objective",
+            "depends_on",
+            "obligation_ids",
+            "expected_outcome",
+            "acceptance_ids",
+            "oracle_ids",
+            "rollback_step_ids",
+        ),
+        "work items",
+    )
+    _require_structured_list(
+        record["acceptance"],
+        ("acceptance_id", "criterion"),
+        "Acceptance",
+    )
+    _require_structured_list(
+        record["oracles"],
+        ("oracle_id", "kind", "method", "expected"),
+        "oracles",
+    )
+    _require_structured_list(
+        record["rollback"],
+        ("rollback_step_id", "trigger", "action", "verification"),
+        "rollback",
+    )
+    obligation_ids = _structured_ids(
+        record["issue_obligations"],
+        "obligation_id",
+        "issue obligations",
+    )
+    work_item_ids = _structured_ids(
+        record["work_items"],
+        "work_item_id",
+        "work items",
+    )
+    acceptance_ids = _structured_ids(
+        record["acceptance"],
+        "acceptance_id",
+        "Acceptance",
+    )
+    oracle_ids = _structured_ids(record["oracles"], "oracle_id", "oracles")
+    rollback_ids = _structured_ids(
+        record["rollback"],
+        "rollback_step_id",
+        "rollback",
+    )
+    covered_obligations = set()
+    covered_acceptance = set()
+    covered_oracles = set()
+    covered_rollback = set()
+    for obligation in record["issue_obligations"]:
+        _require_text(obligation["statement"])
+        _require_text(obligation["source_field"])
+    for acceptance in record["acceptance"]:
+        _require_text(acceptance["criterion"])
+    for oracle in record["oracles"]:
+        for field in ("kind", "method", "expected"):
+            _require_text(oracle[field])
+    for rollback in record["rollback"]:
+        for field in ("trigger", "action", "verification"):
+            _require_text(rollback[field])
+    for work_item in record["work_items"]:
+        _require_text(work_item["objective"])
+        _require_text(work_item["expected_outcome"])
+        _require_optional_text_list(work_item["depends_on"], "depends_on")
+        for field in (
+            "obligation_ids",
+            "acceptance_ids",
+            "oracle_ids",
+            "rollback_step_ids",
+        ):
+            _require_text_list(work_item[field], field)
+        referenced = {
+            "depends_on": set(work_item["depends_on"]),
+            "obligation_ids": set(work_item["obligation_ids"]),
+            "acceptance_ids": set(work_item["acceptance_ids"]),
+            "oracle_ids": set(work_item["oracle_ids"]),
+            "rollback_step_ids": set(work_item["rollback_step_ids"]),
+        }
+        if (
+            not referenced["depends_on"].issubset(work_item_ids)
+            or work_item["work_item_id"] in referenced["depends_on"]
+            or not referenced["obligation_ids"].issubset(obligation_ids)
+            or not referenced["acceptance_ids"].issubset(acceptance_ids)
+            or not referenced["oracle_ids"].issubset(oracle_ids)
+            or not referenced["rollback_step_ids"].issubset(rollback_ids)
+        ):
+            raise PilotValidationError("Plan coverage reference is unknown")
+        covered_obligations.update(referenced["obligation_ids"])
+        covered_acceptance.update(referenced["acceptance_ids"])
+        covered_oracles.update(referenced["oracle_ids"])
+        covered_rollback.update(referenced["rollback_step_ids"])
+    if (
+        covered_obligations != obligation_ids
+        or covered_acceptance != acceptance_ids
+        or covered_oracles != oracle_ids
+        or covered_rollback != rollback_ids
+    ):
+        raise PilotValidationError("Plan coverage is incomplete")
+    _validate_content_digest(record)
+    return ValidationResult(
+        record_kind=record["record_kind"],
+        record_id=record["plan_id"],
+        content_digest=record["content_digest"],
+    )
+
+
 def validate_record_file(path, *, project_root, config):
     project_root = Path(project_root)
     path = Path(path)
@@ -381,6 +750,20 @@ def validate_record_file(path, *, project_root, config):
         )
     if record.get("record_kind") == "human_triage_decision":
         return validate_triage_decision(
+            record,
+            path=relative_path,
+            project_root=project_root,
+            config=config,
+        )
+    if record.get("record_kind") == "issue_record":
+        return validate_issue(
+            record,
+            path=relative_path,
+            project_root=project_root,
+            config=config,
+        )
+    if record.get("record_kind") == "issue_resolution_plan":
+        return validate_resolution_plan(
             record,
             path=relative_path,
             project_root=project_root,

@@ -1,0 +1,84 @@
+{
+  "record_kind": "issue_record",
+  "schema_version": 1,
+  "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+  "issue_version": 1,
+  "created_at": "2026-08-04T08:56:45+09:00",
+  "source_work": "inter-work/issue-resolution-early-pilot",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-TODO-GROWTH-2026-08-04-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-04-todo-growth-pilot-observation-v1.json",
+    "sha256": "7d3e472f84d20e19d28a1c0e5c1c3d894b10e851fe3e7164cc2b7302fc00f67b"
+  },
+  "candidate_ref": {
+    "candidate_id": "IC-PILOT-TODO-GROWTH-001",
+    "candidate_version": 1,
+    "path": ".reviewcompass/workflow/improvement-candidates/ic-pilot-todo-growth-001--v1.json",
+    "sha256": "9b9896758b616a9e6571ad7aa518821f2d812c179a1a9b7b327a8f55b2309854",
+    "content_digest": "d4ef84bc8cc7d2b7d3e812f87a7ebac19521e1edf502f220a89ad75d656cc83c"
+  },
+  "triage_decision_ref": {
+    "decision_id": "DEC-PILOT-TODO-GROWTH-001",
+    "decision_version": 1,
+    "path": ".reviewcompass/workflow/triage-decisions/dec-pilot-todo-growth-001--v1.json",
+    "sha256": "1ab1dc6708000ef439a8207d20dacf93375a452203613d8f068700a9c02373fe",
+    "content_digest": "3d00aa2f458eec1ad6d248b0867358bb72383f0b267dfc181df80a0ed5d9e046"
+  },
+  "problem": "人向けの現在位置入口であるTODO_NEXT_SESSION.mdに、過去sessionの完了Claim、解決済み手戻り、詳細Evidence説明が累積している。新しい問題の記録先もTODOのままでは、改善活動そのものがTODOをさらに肥大化させる。",
+  "motivation": "現在位置、activeな判断待ち、次の一作業を短時間で復元できるhandoffへ戻し、詳細な問題と履歴はDigestで結ばれたCandidate、Issue、Decision、Evidenceへ分離する。",
+  "impact": [
+    "current stateと次の一作業を読むために過去履歴全体を走査する必要がある",
+    "解決済み情報とactiveな義務が混在し、見落としと誤再開の可能性が上がる",
+    "手戻り候補を記録するほどTODO更新量と照合コストが増える",
+    "CodexとClaudeの入口ごとに異なる短縮指示を置くと運用が再分岐する"
+  ],
+  "scope": [
+    "現行TODOの完全なmilestone snapshotと復元可能性の確保",
+    "root TODOを現在位置、active Issue ID、blocker、Human判断、次作業、最新Test、Evidence入口へ縮小する",
+    "TODOへの履歴再累積を機械検出するvalidatorと正常・負例・境界Test",
+    "CodexとClaudeが参照できる短い共通TODO更新指示",
+    "post-write verificationとResolution Verdictによる結果確認"
+  ],
+  "non_scope": [
+    "他の過去手戻り候補の一括Issue化または全履歴の個別移行",
+    "正式な製品Issue Resolution schema、state machine、Workflow permit、UI、外部tracker",
+    "Work 4製品Design、Work 7 deployment lifecycle、Work 8正式評価の完了",
+    "Plan Challenge前のTODO圧縮、履歴削除、唯一Evidenceの置換",
+    "Human判断なしのPlan承認またはResolution Verdict"
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/development/2026-08-04-todo-growth-pilot-observation-v1.json",
+      "sha256": "7d3e472f84d20e19d28a1c0e5c1c3d894b10e851fe3e7164cc2b7302fc00f67b"
+    },
+    {
+      "path": ".reviewcompass/workflow/improvement-candidates/ic-pilot-todo-growth-001--v1.json",
+      "sha256": "9b9896758b616a9e6571ad7aa518821f2d812c179a1a9b7b327a8f55b2309854"
+    },
+    {
+      "path": ".reviewcompass/workflow/triage-decisions/dec-pilot-todo-growth-001--v1.json",
+      "sha256": "1ab1dc6708000ef439a8207d20dacf93375a452203613d8f068700a9c02373fe"
+    },
+    {
+      "path": "records/development/2026-08-04-issue-resolution-pilot-candidate-triage-completion-evidence-v1.md",
+      "sha256": "9ebfe80bb351f6c09a0d27508c70988ce1fe24593324209423e94e9d94bea523"
+    }
+  ],
+  "related_files": [
+    "TODO_NEXT_SESSION.md",
+    "docs/development/templates/TODO_NEXT_SESSION.template.md",
+    "AGENTS.md",
+    "tools/development/todo_handoff.py",
+    "tools/development/issue_resolution_pilot.py"
+  ],
+  "related_units": [
+    "TC-RC3-ISSUE-RESOLUTION-EARLY-PILOT-2026-08-04-V1",
+    "IC-PILOT-TODO-GROWTH-001",
+    "DEC-PILOT-TODO-GROWTH-001"
+  ],
+  "owner_candidate": "reviewcompass3-development",
+  "route_candidate": "issue_resolution_plan",
+  "content_digest": "0389f68d81af61d570177228e246bb481eea97af23d5454c99831f8bc7c72319"
+}

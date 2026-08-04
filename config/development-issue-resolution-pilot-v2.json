@@ -1,0 +1,128 @@
+{
+  "pilot_id": "RC3-DEVELOPMENT-ISSUE-RESOLUTION-PILOT",
+  "pilot_version": 2,
+  "pilot_mode": "development_only_provisional",
+  "maximum_issue_subjects": 1,
+  "directories": {
+    "improvement_candidate": ".reviewcompass/workflow/improvement-candidates",
+    "human_triage_decision": ".reviewcompass/workflow/triage-decisions",
+    "issue_record": ".reviewcompass/workflow/issues",
+    "issue_resolution_plan": ".reviewcompass/workflow/resolution-plans"
+  },
+  "record_fields": {
+    "improvement_candidate": [
+      "record_kind",
+      "schema_version",
+      "candidate_id",
+      "candidate_version",
+      "created_at",
+      "source_work",
+      "source_identity",
+      "problem",
+      "impact",
+      "scope",
+      "non_scope",
+      "classification_candidates",
+      "route_candidates",
+      "consumer_candidates",
+      "evidence_refs",
+      "proposed_action",
+      "content_digest"
+    ],
+    "human_triage_decision": [
+      "record_kind",
+      "schema_version",
+      "decision_id",
+      "decision_version",
+      "decided_at",
+      "decision_maker",
+      "candidate_ref",
+      "disposition",
+      "blocking",
+      "rationale",
+      "selected_consumer",
+      "next_action",
+      "issue_promotion",
+      "content_digest"
+    ],
+    "issue_record": [
+      "record_kind",
+      "schema_version",
+      "issue_id",
+      "issue_version",
+      "created_at",
+      "source_work",
+      "source_identity",
+      "candidate_ref",
+      "triage_decision_ref",
+      "problem",
+      "motivation",
+      "impact",
+      "scope",
+      "non_scope",
+      "evidence_refs",
+      "related_files",
+      "related_units",
+      "owner_candidate",
+      "route_candidate",
+      "content_digest"
+    ],
+    "issue_resolution_plan": [
+      "record_kind",
+      "schema_version",
+      "plan_id",
+      "plan_version",
+      "created_at",
+      "issue_ref",
+      "goal",
+      "scope",
+      "non_scope",
+      "prohibitions",
+      "dependencies",
+      "issue_obligations",
+      "work_items",
+      "acceptance",
+      "oracles",
+      "risks",
+      "deployment",
+      "rollback",
+      "recovery",
+      "task_contract_route_candidates",
+      "content_digest"
+    ]
+  },
+  "classification_candidates": [
+    "implementation",
+    "test_or_oracle",
+    "task_contract",
+    "requirement",
+    "intent",
+    "external_blocker",
+    "process_improvement",
+    "product_idea"
+  ],
+  "dispositions": [
+    "current_work",
+    "upstream_revision",
+    "dependency",
+    "issue_resolution",
+    "checkpoint",
+    "defer",
+    "reject",
+    "duplicate"
+  ],
+  "todo_projection": {
+    "heading": "## 現在作業に影響する改善候補／Issue",
+    "maximum_entries": 5,
+    "maximum_section_bytes": 1024,
+    "forbidden_document_markers": [
+      "### 手戻り・機械化候補"
+    ],
+    "forbidden_section_markers": [
+      "problem:",
+      "evidence_refs",
+      "期待executor",
+      "実executor"
+    ]
+  }
+}
