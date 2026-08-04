@@ -638,6 +638,15 @@ active ID、参照解決、snapshot Digest、決定的restoreを12件のTestへ�
 commit後までvalidator／restore実装、実snapshot、TODO compactionを開始せず、最後のPilot checkboxは未完了の
 ままとする。
 
+WI-002 RED containing commit `7e435d1`とclean transitionを確認後、固定12 Testを変更せず
+`tools/development/todo_compaction.py`を実装した。Completion Evidenceは
+`records/development/2026-08-04-issue-resolution-pilot-wi-002-completion-evidence-v1.md`。12288 bytes境界、
+禁止履歴、active ID、参照解決、snapshot／manifest Digest、byte-exact restore、失敗時rollbackはtargeted
+`12 passed`。restore対象path限定を別Test 4件でREDからGREENへ固定し、公式全`606 passed`、fallback `false`。
+restore対象pathをroot TODOとsession-handoffsへ限定し、
+実TODO、実snapshot、TODO compactionは未変更である。GREEN作業単位のcommit後までWI-006を開始せず、最後の
+Pilot checkboxは未完了のままとする。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
