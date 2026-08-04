@@ -7,10 +7,10 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3が完了。Work 4Aは再設計済みで、旧patch群を可逆revertした。
-- 現在の工程：Work 4A rebuild／最小identity chain GREEN。
+- 現在の工程：Work 4A rebuild v2／実装開始条件の固定。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
-- 当面の進行入口：Work 4A Rebuild Design。
+- 当面の進行入口：Work 4A Rebuild Design v2。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -18,37 +18,37 @@
 
 ## 最新のauthority／Evidence
 
-- [Work 4A Rebuild Design](docs/design/2026-08-04-work-4a-rebuild-design-proposal.md) — SHA-256 `233ac821e6f55b34ab31219e55bf9f23b19f2e97d2884e34be6fa191b87dda2a`
-- [Work 4A Rebuild Approval](records/development/2026-08-04-work-4a-rebuild-design-approval-decision-v1.md) — SHA-256 `dfa69cabf35cf5e1c40b26eab6044250b270fcdc9fc8e45b9c9b5e71ffdcdf59`
+- [Work 4A Rebuild Design v2](docs/design/2026-08-04-work-4a-rebuild-design-v2-proposal.md) — SHA-256 `dfe045f6da57c13f6b42ac41ad18a8c477be07e5eb26eb721cfab88912a7429a`
+- [Work 4A Rebuild v2 Approval](records/development/2026-08-04-work-4a-rebuild-design-v2-approval-decision-v1.md) — SHA-256 `fc2fcc232aba35f660c80afb6fc6b437ef0d4f48a1829d1061df53a0f3d5be2a`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4e1ffb4dcafc2f92190417191e1bec24cfd5ec2a2cd775402a3f8f7c22886923`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `010d60fc5cd765e0304bf6a6c8949061a0910f54597ca69c186e0325886eebc0`
 
 ## 次に行う一作業
 
-最小identity chainのE2E実装を独立に確認し、actual artifactへ進む前の不足範囲を分類する。
+v2のPolicy artifact schema、source universe record、revert mapを仕様として固定する。
 
 開始条件：
 
-- `DEC-WORK4A-REBUILD-DESIGN-001`によるHuman承認。
-- identity chain GREEN containing commit後のclean transition。
+- `DEC-WORK4A-REBUILD-DESIGN-002`によるHuman承認。
+- v1試作をactual artifactの根拠に使わない。
 
 完了条件：
 
-- source content identity、new-only baseline、改竄・unsafe root・high-risk Policy拒否、Historical Contract StatusのE2E結果を独立に照合する。
-- actual artifact、既存patchの部分復元を含めない。
+- Policy、source universe、revert mapのidentity・配置・validator入力を固定する。
+- production implementation、actual artifact、既存patchの部分復元を含めない。
 
-後続作業：Human判断を要するactual artifactの対象routineを提示する。
+後続作業：v2 E2E acceptanceをREDへ改訂する。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：なし。設計承認済み。
-- 再開条件：RED acceptance containing commit後のclean transition。
+- Human判断待ち：なし。v2設計承認済み。
+- 再開条件：v2 RED acceptance containing commit後のclean transition。
 
 ## stale・deferred
 
-- stale：旧Work 4AのSource Snapshot、Index、Candidate、Ledger、Policy状態を根拠にしたEvidence。rebuild E2EがGREENになるまで再利用しない。
+- stale：v1設計、v1 E2E test、`c4bfb57`試作module、旧Work 4AのSource Snapshot、Index、Candidate、Ledger、Policy状態を根拠にしたEvidence。v2 E2EがGREENになるまで再利用しない。
 - deferred：正式Issue Resolution schema、UI、automation、Work 8正式評価。
 
 ## Git・Test
