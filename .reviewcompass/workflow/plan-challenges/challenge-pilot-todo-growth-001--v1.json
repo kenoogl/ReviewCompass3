@@ -1,0 +1,106 @@
+{
+  "record_kind": "plan_challenge",
+  "schema_version": 1,
+  "challenge_id": "CHALLENGE-PILOT-TODO-GROWTH-001",
+  "challenge_version": 1,
+  "created_at": "2026-08-04T09:09:07+09:00",
+  "reviewer_kind": "llm_semantic_analysis_with_human_gate",
+  "independence_status": "human_independent_review_pending",
+  "issue_ref": {
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+    "issue_version": 1,
+    "path": ".reviewcompass/workflow/issues/issue-pilot-todo-growth-001--v1.json",
+    "sha256": "2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a",
+    "content_digest": "0389f68d81af61d570177228e246bb481eea97af23d5454c99831f8bc7c72319"
+  },
+  "plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 1,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v1.json",
+    "sha256": "2d753a371913b9d38bef570283a7122ea3ed08d96d041c3020943e1389a738d5",
+    "content_digest": "d6c3f3f8a050242c63b4fc6d1d127926cd12426cfb4a8fd736dbd43bdded2768"
+  },
+  "criteria_results": [
+    {
+      "criterion_id": "obligation_coverage",
+      "verdict": "block",
+      "rationale": "IssueとTask ContractはTODOへderived stateを表示するが、Plan v1はstate導出をobligation、Work Item、Acceptanceへ移送していない。"
+    },
+    {
+      "criterion_id": "work_item_granularity",
+      "verdict": "pass",
+      "rationale": "5 Work Itemはsnapshot、validator、compaction、shared prompt、post-write verificationへ分かれ、依存とexpected outcomeを持つ。"
+    },
+    {
+      "criterion_id": "tdd_closure",
+      "verdict": "pass",
+      "rationale": "validatorとrestoreはtest-firstで実装し、compactionはその合格後に開始する順序が固定されている。"
+    },
+    {
+      "criterion_id": "prohibition_transfer",
+      "verdict": "pass",
+      "rationale": "Challenge前compaction禁止、Evidence喪失禁止、手作業copy禁止、Plan完了だけのIssue close禁止がPlanへ移送されている。"
+    },
+    {
+      "criterion_id": "feasibility_dependencies",
+      "verdict": "pass",
+      "rationale": "Human Challenge、clean worktree、固定Digest、snapshot再読込を開始依存として明記し、各Work Itemも順序依存を持つ。"
+    },
+    {
+      "criterion_id": "oracle_quality",
+      "verdict": "warn",
+      "rationale": "size、history、known ID、reference、Testのoracleはあるが、ORACLE-003は自由入力stateがauthorityから導出されたことを検査しない。"
+    },
+    {
+      "criterion_id": "rollback_recovery",
+      "verdict": "pass",
+      "rationale": "byte-exact snapshot、決定的restore、Digest再照合、未解決Verdict維持、Plan新version化が定められている。"
+    },
+    {
+      "criterion_id": "stale_binding",
+      "verdict": "pass",
+      "rationale": "Challengeは現行Issue v1とPlan v1のfile SHA-256およびcontent Digestへ一致している。"
+    },
+    {
+      "criterion_id": "pilot_threshold",
+      "verdict": "warn",
+      "rationale": "12288 bytesは現行template 4529 bytesへ余裕を持つPilot値だが、生成後TODOの境界fixtureによる校正前である。"
+    },
+    {
+      "criterion_id": "entrypoint_authority",
+      "verdict": "warn",
+      "rationale": "共通prompt一件への参照方針は妥当だが、新しいroot CLAUDE.mdが第二authorityにならないlink-only制約をHumanが明示承認する必要がある。"
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "PC-BLOCK-001",
+      "severity": "blocking",
+      "criterion_id": "obligation_coverage",
+      "statement": "Plan v1はTODO projectionのstateをcurrent Candidate、Triage Decision、Plan Challenge、Task Contract、Verdictから決定的に導出する義務、作業、Acceptance、oracleを欠いている。現validatorは既知IDとstate token形式だけを検査し、手入力された誤stateを合格させる。",
+      "required_action": "Plan v2へderived state obligationを追加し、state導出Work Item、許可遷移、authority参照、stale／手入力stateの負例、Acceptance、oracleを明記して再Challengeする。"
+    },
+    {
+      "finding_id": "PC-WARN-001",
+      "severity": "warning",
+      "criterion_id": "pilot_threshold",
+      "statement": "12 KiB上限はtemplateに対する余裕を持つが、実際のcompact TODO fixtureで未校正である。",
+      "required_action": "HumanがPilot上限として承認し、12288 bytes合格と12289 bytes拒否の境界Testを要求するか、生成fixtureに基づきPlan v2で変更する。"
+    },
+    {
+      "finding_id": "PC-WARN-002",
+      "severity": "warning",
+      "criterion_id": "entrypoint_authority",
+      "statement": "root CLAUDE.mdは現在存在せず、新規作成時にAGENTS.mdと競合する独立規則を持つ可能性がある。",
+      "required_action": "Humanがlink-only入口を承認し、CLAUDE.mdには共通promptへの参照以外のTODO意味規則を置かないTestを要求するか、別のClaude adapterを指定する。"
+    }
+  ],
+  "blocking_finding_ids": [
+    "PC-BLOCK-001"
+  ],
+  "overall_verdict": "changes_required",
+  "stale_binding": false,
+  "human_decision_required": true,
+  "next_action": "HumanはPlan v1を承認せず、blocking Findingを受け入れてPlan v2修復を指示するか、threshold／Claude入口を変更するか、Pilotを却下する。",
+  "content_digest": "6e1a30dd80dc12e346207bfc1cb48a1fcfab6b3a9a57038ed939b130629c4882"
+}

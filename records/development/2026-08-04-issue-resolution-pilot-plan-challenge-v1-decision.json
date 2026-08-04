@@ -1,0 +1,53 @@
+{
+  "decision_id": "DEC-RC3-ISSUE-PILOT-PLAN-CHALLENGE-V1-2026-08-04",
+  "decision_version": 1,
+  "decided_at": "2026-08-04T09:11:57+09:00",
+  "decision_maker": "human",
+  "decision": "revise_plan",
+  "challenge_ref": {
+    "challenge_id": "CHALLENGE-PILOT-TODO-GROWTH-001",
+    "challenge_version": 1,
+    "path": ".reviewcompass/workflow/plan-challenges/challenge-pilot-todo-growth-001--v1.json",
+    "sha256": "5aa608c63f372a18b860196e327af0cdc301f004401ca24f04eb07238cdcf6f3",
+    "content_digest": "6e1a30dd80dc12e346207bfc1cb48a1fcfab6b3a9a57038ed939b130629c4882"
+  },
+  "plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 1,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v1.json",
+    "sha256": "2d753a371913b9d38bef570283a7122ea3ed08d96d041c3020943e1389a738d5",
+    "content_digest": "d6c3f3f8a050242c63b4fc6d1d127926cd12426cfb4a8fd736dbd43bdded2768"
+  },
+  "accepted_blocking_findings": [
+    "PC-BLOCK-001"
+  ],
+  "warning_dispositions": [
+    {
+      "finding_id": "PC-WARN-001",
+      "disposition": "accept_pilot_threshold_with_boundary_tests",
+      "rationale": "12288 bytesをPilot上限として維持し、12288 bytes合格と12289 bytes拒否を要求する。"
+    },
+    {
+      "finding_id": "PC-WARN-002",
+      "disposition": "accept_link_only_claude_entry",
+      "rationale": "root CLAUDE.mdは共通promptへの参照だけを持ち、独立したTODO意味規則を持たない。"
+    }
+  ],
+  "authorized_actions": [
+    "create Plan version 2 without modifying Plan version 1",
+    "add derived state obligation, resolver work item, Acceptance, oracle, transition rules, and negative tests",
+    "retain the 12288 byte Pilot limit with exact boundary tests",
+    "retain a link-only root CLAUDE.md proposal with second-authority rejection tests",
+    "perform Plan Challenge version 2"
+  ],
+  "not_authorized": [
+    "approve Plan version 1",
+    "approve Plan version 2 before Challenge version 2 and a separate Human decision",
+    "compact or delete TODO content",
+    "start the implementation Task Contract or Delivery Work Item",
+    "declare the Issue resolved",
+    "send project artifacts to an external reviewer"
+  ],
+  "next_action": "Create Plan version 2, perform Challenge version 2, and request the final Human Plan decision.",
+  "content_digest": "103d6e90be8ac90967c77fcf6ab08757583553bf053e651e2bf90d1959248b61"
+}

@@ -1,0 +1,82 @@
+{
+  "record_kind": "plan_challenge",
+  "schema_version": 1,
+  "challenge_id": "CHALLENGE-PILOT-TODO-GROWTH-001",
+  "challenge_version": 2,
+  "created_at": "2026-08-04T09:18:16+09:00",
+  "reviewer_kind": "llm_semantic_analysis_with_human_gate",
+  "independence_status": "human_independent_review_pending",
+  "issue_ref": {
+    "issue_id": "ISSUE-PILOT-TODO-GROWTH-001",
+    "issue_version": 1,
+    "path": ".reviewcompass/workflow/issues/issue-pilot-todo-growth-001--v1.json",
+    "sha256": "2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a",
+    "content_digest": "0389f68d81af61d570177228e246bb481eea97af23d5454c99831f8bc7c72319"
+  },
+  "plan_ref": {
+    "plan_id": "PLAN-PILOT-TODO-GROWTH-001",
+    "plan_version": 2,
+    "path": ".reviewcompass/workflow/resolution-plans/plan-pilot-todo-growth-001--v2.json",
+    "sha256": "1aa63a008a9c396a211231185c965300b7f4caa45ef07424796d3b9f6d6482ac",
+    "content_digest": "488f1d89c16a6cda649623663e8e595d70f71eec280f50be7a8663b7a7a3a699"
+  },
+  "criteria_results": [
+    {
+      "criterion_id": "obligation_coverage",
+      "verdict": "pass",
+      "rationale": "Plan v2はOBL-006、WI-006、ACC-007、ORACLE-007を追加し、active state導出をTODO再生成WI-003の前提へ結線した。"
+    },
+    {
+      "criterion_id": "work_item_granularity",
+      "verdict": "pass",
+      "rationale": "state resolverを独立WI-006とし、validator実装後、TODO再生成前という依存順序が明確である。"
+    },
+    {
+      "criterion_id": "tdd_closure",
+      "verdict": "pass",
+      "rationale": "resolver、境界、第二authority拒否を負例を含むtest-first対象とし、compaction前に機械検証する。"
+    },
+    {
+      "criterion_id": "prohibition_transfer",
+      "verdict": "pass",
+      "rationale": "手入力stateの正本化、欠落・競合・stale入力からの推測、CLAUDE.mdの第二authorityを明示禁止した。"
+    },
+    {
+      "criterion_id": "feasibility_dependencies",
+      "verdict": "pass",
+      "rationale": "WI-006はWI-002後、WI-003前に配置され、固定recordとclean worktreeを開始依存として維持している。"
+    },
+    {
+      "criterion_id": "oracle_quality",
+      "verdict": "pass",
+      "rationale": "ORACLE-007が許可遷移、欠落、競合、stale、手入力不一致を検査し、根拠record IDsを伴う一意stateだけを許可する。"
+    },
+    {
+      "criterion_id": "rollback_recovery",
+      "verdict": "pass",
+      "rationale": "state resolver誤推測をRB-002 triggerへ加え、TODO書換え前の復帰と次Plan version化を維持した。"
+    },
+    {
+      "criterion_id": "stale_binding",
+      "verdict": "pass",
+      "rationale": "Challenge v2は現行Issue v1とPlan v2のfile SHA-256およびcontent Digestへ一致している。"
+    },
+    {
+      "criterion_id": "pilot_threshold",
+      "verdict": "pass",
+      "rationale": "Human Decisionに従い12288 bytes上限を維持し、ACC-002とORACLE-002が12288 bytes合格と12289 bytes拒否を固定した。"
+    },
+    {
+      "criterion_id": "entrypoint_authority",
+      "verdict": "pass",
+      "rationale": "Human Decisionに従いroot CLAUDE.mdをlink-only入口とし、独立TODO意味規則を負例で拒否するAcceptanceとoracleを固定した。"
+    }
+  ],
+  "findings": [],
+  "blocking_finding_ids": [],
+  "overall_verdict": "ready_for_human_approval",
+  "stale_binding": false,
+  "human_decision_required": true,
+  "next_action": "HumanはPlan v2を承認、要修正、または却下する。承認前にTask Contract作成、TODO compaction、Issue解決を開始しない。",
+  "content_digest": "cf69d0a74b968f6f7656ba6f75307a59369006da791dd3822885e54154aa07e8"
+}

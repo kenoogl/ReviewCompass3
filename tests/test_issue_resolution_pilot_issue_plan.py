@@ -313,26 +313,44 @@ def test_v2_config_adds_only_issue_and_resolution_plan_records():
     )
 
 
-def test_repository_contains_one_valid_issue_and_plan():
+def test_repository_contains_one_issue_and_contiguous_plan_versions():
     pilot = _module()
     config = pilot.load_config(CONFIG_PATH)
     issue_files = sorted(ISSUE_PATH.parent.glob("*.json"))
     plan_files = sorted(PLAN_PATH.parent.glob("*.json"))
 
     assert issue_files == [ISSUE_PATH]
-    assert plan_files == [PLAN_PATH]
+    assert PLAN_PATH in plan_files
     issue_result = pilot.validate_record_file(
         ISSUE_PATH,
         project_root=PROJECT_ROOT,
         config=config,
     )
-    plan_result = pilot.validate_record_file(
-        PLAN_PATH,
-        project_root=PROJECT_ROOT,
-        config=config,
-    )
+    plan_records = [
+        json.loads(path.read_text(encoding="utf-8"))
+        for path in plan_files
+    ]
+    plan_results = [
+        pilot.validate_record_file(
+            path,
+            project_root=PROJECT_ROOT,
+            config=config,
+        )
+        for path in plan_files
+    ]
     assert issue_result.record_id == "ISSUE-PILOT-TODO-GROWTH-001"
-    assert plan_result.record_id == "PLAN-PILOT-TODO-GROWTH-001"
+    assert {
+        record["plan_id"]
+        for record in plan_records
+    } == {"PLAN-PILOT-TODO-GROWTH-001"}
+    assert [
+        record["plan_version"]
+        for record in plan_records
+    ] == list(range(1, len(plan_records) + 1))
+    assert {
+        result.record_id
+        for result in plan_results
+    } == {"PLAN-PILOT-TODO-GROWTH-001"}
 
 
 def test_validates_issue_against_human_promotion(tmp_path):

@@ -24,6 +24,19 @@ _CANDIDATE_ID = re.compile(r"IC-[A-Z0-9]+(?:-[A-Z0-9]+)+")
 _DECISION_ID = re.compile(r"DEC-[A-Z0-9]+(?:-[A-Z0-9]+)+")
 _ISSUE_ID = re.compile(r"ISSUE-[A-Z0-9]+(?:-[A-Z0-9]+)+")
 _PLAN_ID = re.compile(r"PLAN-[A-Z0-9]+(?:-[A-Z0-9]+)+")
+_CHALLENGE_ID = re.compile(r"CHALLENGE-[A-Z0-9]+(?:-[A-Z0-9]+)+")
+_PLAN_CHALLENGE_CRITERIA = {
+    "obligation_coverage",
+    "work_item_granularity",
+    "tdd_closure",
+    "prohibition_transfer",
+    "feasibility_dependencies",
+    "oracle_quality",
+    "rollback_recovery",
+    "stale_binding",
+    "pilot_threshold",
+    "entrypoint_authority",
+}
 _TIMESTAMP = re.compile(
     r"[0-9]{4}-[0-9]{2}-[0-9]{2}T"
     r"[0-9]{2}:[0-9]{2}:[0-9]{2}(?:Z|[+-][0-9]{2}:[0-9]{2})"
@@ -148,7 +161,7 @@ def load_config(path):
         raise PilotValidationError("Pilot config fields are invalid")
     if (
         config["pilot_id"] != "RC3-DEVELOPMENT-ISSUE-RESOLUTION-PILOT"
-        or config["pilot_version"] not in {1, 2}
+        or config["pilot_version"] not in {1, 2, 3}
         or config["pilot_mode"] != "development_only_provisional"
         or config["maximum_issue_subjects"] != 1
     ):
@@ -157,10 +170,12 @@ def load_config(path):
         "improvement_candidate",
         "human_triage_decision",
     }
-    if config["pilot_version"] == 2:
+    if config["pilot_version"] >= 2:
         expected_directories.update(
             {"issue_record", "issue_resolution_plan"}
         )
+    if config["pilot_version"] == 3:
+        expected_directories.add("plan_challenge")
     if set(config["directories"]) != expected_directories:
         raise PilotValidationError("Pilot directories are invalid")
     if set(config["record_fields"]) != set(config["directories"]):
@@ -561,7 +576,9 @@ def validate_resolution_plan(record, *, path, project_root, config):
     if (
         not isinstance(record["plan_id"], str)
         or not _PLAN_ID.fullmatch(record["plan_id"])
-        or record["plan_version"] != 1
+        or not isinstance(record["plan_version"], int)
+        or isinstance(record["plan_version"], bool)
+        or record["plan_version"] < 1
         or not isinstance(record["created_at"], str)
         or not _TIMESTAMP.fullmatch(record["created_at"])
     ):
@@ -724,10 +741,239 @@ def validate_resolution_plan(record, *, path, project_root, config):
         or covered_rollback != rollback_ids
     ):
         raise PilotValidationError("Plan coverage is incomplete")
+    if record["plan_version"] >= 2:
+        work_items = {
+            item["work_item_id"]: item
+            for item in record["work_items"]
+        }
+        required_closure = (
+            "OBL-006" in obligation_ids
+            and "WI-006" in work_item_ids
+            and "ACC-007" in acceptance_ids
+            and "ORACLE-007" in oracle_ids
+        )
+        resolver = work_items.get("WI-006", {})
+        projection = work_items.get("WI-003", {})
+        if (
+            not required_closure
+            or resolver.get("obligation_ids") != ["OBL-006"]
+            or resolver.get("acceptance_ids") != ["ACC-007"]
+            or resolver.get("oracle_ids") != ["ORACLE-007"]
+            or "WI-006" not in projection.get("depends_on", [])
+        ):
+            raise PilotValidationError(
+                "Plan derived state closure is incomplete"
+            )
+        acceptance_by_id = {
+            item["acceptance_id"]: item["criterion"]
+            for item in record["acceptance"]
+        }
+        boundary = acceptance_by_id["ACC-002"]
+        if (
+            "12288 bytes合格" not in boundary
+            or "12289 bytes拒否" not in boundary
+        ):
+            raise PilotValidationError("Plan Pilot boundary is incomplete")
+        entrypoint = acceptance_by_id["ACC-005"]
+        if (
+            "link-only" not in entrypoint
+            or "独立したTODO意味規則" not in entrypoint
+            or "拒否" not in entrypoint
+        ):
+            raise PilotValidationError(
+                "Plan entrypoint authority is incomplete"
+            )
     _validate_content_digest(record)
     return ValidationResult(
         record_kind=record["record_kind"],
         record_id=record["plan_id"],
+        content_digest=record["content_digest"],
+    )
+
+
+def validate_plan_challenge(record, *, path, project_root, config):
+    if "plan_challenge" not in config["record_fields"]:
+        raise PilotValidationError("Plan Challenge is unavailable in this config")
+    _require_exact_fields(
+        record,
+        config["record_fields"]["plan_challenge"],
+        "Plan Challenge",
+    )
+    if record["record_kind"] != "plan_challenge":
+        raise PilotValidationError("record kind is invalid")
+    if record["schema_version"] != 1:
+        raise PilotValidationError("schema version is invalid")
+    if (
+        not isinstance(record["challenge_id"], str)
+        or not _CHALLENGE_ID.fullmatch(record["challenge_id"])
+        or not isinstance(record["challenge_version"], int)
+        or isinstance(record["challenge_version"], bool)
+        or record["challenge_version"] < 1
+        or not isinstance(record["created_at"], str)
+        or not _TIMESTAMP.fullmatch(record["created_at"])
+    ):
+        raise PilotValidationError("Challenge identity is invalid")
+    if record["reviewer_kind"] != "llm_semantic_analysis_with_human_gate":
+        raise PilotValidationError("Challenge reviewer kind is invalid")
+    if record["independence_status"] not in {
+        "human_independent_review_pending",
+        "independent_review_completed",
+    }:
+        raise PilotValidationError("Challenge independence status is invalid")
+    issue_ref = record["issue_ref"]
+    _require_exact_fields(
+        issue_ref,
+        (
+            "issue_id",
+            "issue_version",
+            "path",
+            "sha256",
+            "content_digest",
+        ),
+        "Issue reference",
+    )
+    issue_path = _validate_file_reference(
+        {"path": issue_ref["path"], "sha256": issue_ref["sha256"]},
+        project_root,
+        "Issue reference",
+    )
+    issue = _load_json(issue_path, "referenced Issue")
+    validate_issue(
+        issue,
+        path=issue_ref["path"],
+        project_root=project_root,
+        config=config,
+    )
+    if (
+        issue_ref["issue_id"] != issue["issue_id"]
+        or issue_ref["issue_version"] != issue["issue_version"]
+        or issue_ref["content_digest"] != issue["content_digest"]
+    ):
+        raise PilotValidationError("Issue reference identity is stale")
+    plan_ref = record["plan_ref"]
+    _require_exact_fields(
+        plan_ref,
+        (
+            "plan_id",
+            "plan_version",
+            "path",
+            "sha256",
+            "content_digest",
+        ),
+        "Plan reference",
+    )
+    plan_path = _validate_file_reference(
+        {"path": plan_ref["path"], "sha256": plan_ref["sha256"]},
+        project_root,
+        "Plan reference",
+    )
+    plan = _load_json(plan_path, "referenced Resolution Plan")
+    validate_resolution_plan(
+        plan,
+        path=plan_ref["path"],
+        project_root=project_root,
+        config=config,
+    )
+    if (
+        plan_ref["plan_id"] != plan["plan_id"]
+        or plan_ref["plan_version"] != plan["plan_version"]
+        or plan_ref["content_digest"] != plan["content_digest"]
+        or plan["issue_ref"]["issue_id"] != issue_ref["issue_id"]
+        or plan["issue_ref"]["content_digest"]
+        != issue_ref["content_digest"]
+    ):
+        raise PilotValidationError("Plan reference identity is stale")
+    expected_path = _expected_record_path(
+        config,
+        "plan_challenge",
+        record["challenge_id"],
+        record["challenge_version"],
+    )
+    if path != expected_path:
+        raise PilotValidationError(
+            "record path does not match Challenge identity"
+        )
+    _require_structured_list(
+        record["criteria_results"],
+        ("criterion_id", "verdict", "rationale"),
+        "Plan Challenge criteria",
+    )
+    criteria = {}
+    for result in record["criteria_results"]:
+        criterion_id = result["criterion_id"]
+        _require_text(criterion_id)
+        if criterion_id in criteria:
+            raise PilotValidationError("Plan Challenge criteria are duplicated")
+        if result["verdict"] not in {"pass", "warn", "block"}:
+            raise PilotValidationError("Plan Challenge criterion verdict is invalid")
+        _require_text(result["rationale"])
+        criteria[criterion_id] = result["verdict"]
+    if set(criteria) != _PLAN_CHALLENGE_CRITERIA:
+        raise PilotValidationError("Plan Challenge criteria are incomplete")
+    if not isinstance(record["findings"], list):
+        raise PilotValidationError("Plan Challenge findings are invalid")
+    findings = {}
+    for finding in record["findings"]:
+        _require_exact_fields(
+            finding,
+            (
+                "finding_id",
+                "severity",
+                "criterion_id",
+                "statement",
+                "required_action",
+            ),
+            "Plan Challenge Finding",
+        )
+        finding_id = finding["finding_id"]
+        _require_text(finding_id)
+        if finding_id in findings:
+            raise PilotValidationError("Plan Challenge Finding IDs are duplicated")
+        if finding["severity"] not in {"blocking", "warning", "note"}:
+            raise PilotValidationError("Plan Challenge Finding severity is invalid")
+        if finding["criterion_id"] not in criteria:
+            raise PilotValidationError("Plan Challenge Finding criterion is unknown")
+        _require_text(finding["statement"])
+        _require_text(finding["required_action"])
+        findings[finding_id] = finding
+    _require_optional_text_list(
+        record["blocking_finding_ids"],
+        "blocking_finding_ids",
+    )
+    blocking_ids = {
+        finding_id
+        for finding_id, finding in findings.items()
+        if finding["severity"] == "blocking"
+    }
+    if set(record["blocking_finding_ids"]) != blocking_ids:
+        raise PilotValidationError("blocking Finding identity is inconsistent")
+    blocking_criteria = {
+        criterion_id
+        for criterion_id, verdict in criteria.items()
+        if verdict == "block"
+    }
+    finding_blocking_criteria = {
+        findings[finding_id]["criterion_id"]
+        for finding_id in blocking_ids
+    }
+    if blocking_criteria != finding_blocking_criteria:
+        raise PilotValidationError("blocking Finding does not cover block criteria")
+    if not isinstance(record["stale_binding"], bool):
+        raise PilotValidationError("stale binding value is invalid")
+    if record["human_decision_required"] is not True:
+        raise PilotValidationError("Human decision is required")
+    expected_verdict = (
+        "changes_required"
+        if blocking_ids or record["stale_binding"]
+        else "ready_for_human_approval"
+    )
+    if record["overall_verdict"] != expected_verdict:
+        raise PilotValidationError("Plan Challenge overall verdict is inconsistent")
+    _require_text(record["next_action"])
+    _validate_content_digest(record)
+    return ValidationResult(
+        record_kind=record["record_kind"],
+        record_id=record["challenge_id"],
         content_digest=record["content_digest"],
     )
 
@@ -764,6 +1010,13 @@ def validate_record_file(path, *, project_root, config):
         )
     if record.get("record_kind") == "issue_resolution_plan":
         return validate_resolution_plan(
+            record,
+            path=relative_path,
+            project_root=project_root,
+            config=config,
+        )
+    if record.get("record_kind") == "plan_challenge":
+        return validate_plan_challenge(
             record,
             path=relative_path,
             project_root=project_root,
