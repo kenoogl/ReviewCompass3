@@ -9,7 +9,7 @@
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
 - 現在の工程：過去TODO候補41件のHuman triageは完了し、Issue Intake V4の限定拡張はHuman承認のうえ検証を閉じた。未判断は0件である。
 - 正式Issue：3件、いずれも`registered`かつnonblockingで未着手。active Issueは0件。`ISSUE-HTC-C9F6C917`はPlan提案v2の§3最小縦切り（operation inventory、permission preflight、execution receipt）だけをHuman承認のうえ実装済みで、receipt改竄検出の訂正も完了している（execution receipt schema v2）。Issue全体はcloseしていない。旧v1提案は履歴として保持する。
-- 各Issueの対象：`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。`ISSUE-HTC-66C3E6CA`は`registered`かつnonblockingのままで、Plan提案がHuman承認待ちである。
+- 各Issueの対象：`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。`ISSUE-HTC-66C3E6CA`は`registered`かつnonblockingのままで、Plan提案はHuman承認済みである。TODO最小縦切りを実装中で、受領証の集計、TODO用材料の収集、更新経路の切替の順に進める。
 - 通常commitの運用：意味単位commitを最小ガード付きで自律化した。push、tag、amend、rebase、reset、force push、履歴書換え、方針変更、段完了、意味的裁定、不可逆操作、外部送信、権限の迂回はHuman明示承認のままである。
 - Task Contract固定sourceの状態解決：歴史状態は受理時点のGit blob、現在有効状態はworking tree、`active_stale`は停止のまま、という三状態をv1／v2共通のresolverで扱う。
 - activeなTask Contract／Work Item：なし。
@@ -30,19 +30,16 @@
 - [機械操作routing v2 承認Decision](records/development/2026-08-05-machine-operation-routing-v2-approval-decision-v1.md) — SHA-256 `c73cdc69b3ca3251b9de9480867c9677e0de4312f7bedff138a407af297cd969`
 - [receipt整合性 訂正Decision](records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-correction-decision-v1.md) — SHA-256 `f73f06e12f464a27ded059522e37015acbd2f9487d7d65d55ed96823a6f8033b`
 - [receipt整合性 訂正GREEN Evidence（有効な完了根拠）](records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-green-evidence-v1.md) — SHA-256 `b6255b0a7de3bcd90b62745ff934a957dba94b3870bc847517f1dbde36a430ea`
-- [機械操作routing v2 初回GREEN Evidence（stale、履歴）](records/development/2026-08-05-machine-operation-routing-v2-green-evidence-v1.md) — SHA-256 `e4f8d9f865e6b6d35e7d00a21eba54c13b1ed331fca3183827b1262d285d88eb`
 - [機械操作routing Plan提案 v2（§3のみ承認済み）](docs/design/2026-08-05-machine-operation-routing-issue-plan-proposal-v2.md) — SHA-256 `e01c3aaf8039377da2b43dab7f735d28a2f86bf10aa83f5bb22e5dd1eefa8572`
-- [機械操作routing Plan提案 v1（superseded、履歴）](docs/design/2026-08-05-machine-operation-routing-issue-plan-proposal.md) — SHA-256 `722e9448971bcf3e97423ab1b9b137ca202f1f1c0ed7afdd92a619738e608bfa`
 - [Issue Intake V4 承認Decision](records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md) — SHA-256 `019879235577b39489e4383cd0fa092c562631d3c1b1e1ffa311056c8d1d9f7c`
 - [Issue Intake V4 閉鎖Evidence](records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md) — SHA-256 `b942a9d17ea4c2818c6adb5f3ceabc0063f9b447c7ddb88ccc5baf3d1302d60e`
-- [定型記録生成 Plan提案（Human承認待ち）](docs/design/2026-08-05-record-generation-issue-plan-proposal.md) — SHA-256 `746576704f683dba27ce832d64f4a1ad510de211b30f145c9c513ae836d9082d`
+- [定型記録生成 Plan承認Decision](records/development/2026-08-05-record-generation-issue-plan-approval-decision-v1.md) — SHA-256 `c4bf61d7f2493f38a48601659efab8300b68b23e40b37fb808ea2f4cf440943b`
+- [定型記録生成 Plan提案（承認済み）](docs/design/2026-08-05-record-generation-issue-plan-proposal.md) — SHA-256 `79ed49831ebd9b69c9713fcd71becfaa1d85f7fd97759e5fff373f99126a2a7c`
 - [Plan提案作成後の全test receipt](records/development/2026-08-05-record-generation-issue-plan-proposal-test-receipt-v1.json) — SHA-256 `d2320449185d783860312a3cc4b5b232a60d861bf5bf123f4794aaefc9927b92`
 - [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
 - [Work 5A 実Review受理 v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-evidence.md) — SHA-256 `2e8335877202c8d5d1be07978b84ef6b3834ac5a207d5afa1184daddc719acdc`
-- [Work 5A 受理record bundle v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-records.json) — SHA-256 `64d75f3568078ef419cf74c3b72632352d07e63449b98fdb1608b17257184e7b`
 - [Provenance閉包 無効化record](records/development/2026-08-05-work5a-provenance-closure-invalidation-v1.json) — SHA-256 `f3ba011f5490059d96b8f21429cadc8016a9332415d79c59f546447a9c018a29`
 - [Work 5A 最初の実Review Run](records/development/2026-08-05-work5a-first-real-review-run-evidence-v1.md) — SHA-256 `cdc4c4d8ad08a6f0d8373ea56d46018e070618ba2152ade7ac4dd09d72808b50`
-- [Work 5A 実Review Run record bundle](records/development/2026-08-05-work5a-first-real-review-run-records-v1.json) — SHA-256 `658e5ba98d6023085709733f91130a8b64acd674b3c9ca497b3f23784d588447`
 - [Work 5A GREEN Evidence](records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md) — SHA-256 `57feb4e7fa08924c00307dec997f2b12285641b168925825225e6a596b63fbae`
 - [Work 4 最初のslice設計承認](records/development/2026-08-05-work4-first-review-contract-design-approval-decision-v1.md) — SHA-256 `3048a52ccab59815f92b6fc3d1bd88b0ca8bd5d7a5117ad223d7139dab287675`
 - [Work 4 最初のReview Task Contract設計提案](docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md) — SHA-256 `14901323a958d686ba0ad0aed62b20b7b7d79908afcced08dc90f72fdb3d2054`
@@ -54,12 +51,12 @@
 
 ## 次に行う一作業
 
-`ISSUE-HTC-66C3E6CA`のPlan提案に対するHuman判断を受ける。
+`DEC-RECORD-GENERATION-PLAN-001`に従い、TODO最小縦切りをTest先行で実装する。
 
 開始条件：
 
-- Plan提案のcommit後のclean transition。
-- 最初の対象を案Aに限定する可否、公式Test receiptとして何を受け付けるか、生成済みTODOの更新をどのcommitへ含めるか、案Bへ拡張する条件、実装着手可否のHuman判断。
+- 承認recordのcommit後のclean transition。
+- Planの固定input digestが現状と一致していること。
 
 完了データ：
 
@@ -70,7 +67,7 @@
 - Issue Intake V4は開発用・暫定の限定機能としてHuman承認済みで、実地検証は閉鎖済みである。
 - `ISSUE-HTC-C9F6C917`のPlan提案v2は`approved_for_development_implementation`だが、承認範囲は§3だけである。旧v1提案は状態を変えずに履歴として残す。正式Issue Resolution PlanとTask Contractは作っていない。
 - §3の実装（`tools/development/operation_routing.py`）は完了し、receipt改竄検出の訂正も適用済み。初回のGREEN Evidenceとreceiptはstaleとして履歴に残し、有効な完了根拠は訂正Decisionと訂正GREEN Evidenceである。構造化argv executor、cache root固定、既存直接操作の移行、host側tool構文、外部送信は未実施である。
-- `ISSUE-HTC-66C3E6CA`のPlan提案は`awaiting_human_approval`である。正式Plan、Decision、Task Contractは作っておらず、定型記録生成、TODO renderer、receipt parser、監査集計も実装していない。
+- `ISSUE-HTC-66C3E6CA`のPlan提案は`approved_for_development_implementation`である。承認範囲はTODOの最小縦切りだけで、Evidence／Decisionへの一般化は承認していない。正式Issue Resolution Plan、Task Contract、Workflow permitは作らない。
 - `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものであり、C9 Plan提案の承認ではない。
 - 正式Issue正本：`.reviewcompass/workflow/issues-v4/`（V4 issue_record schema version 2）
 
@@ -79,7 +76,7 @@
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：`ISSUE-HTC-66C3E6CA`のPlan提案の採否（最初の対象、receiptの受付範囲、更新commitの置き方、拡張条件、実装着手可否）と、`ISSUE-HTC-C9F6C917`の後続範囲に着手するかどうかの判断。§3最小縦切りは承認・実装済みで、Issue全体はcloseしていない。過去TODO候補41件のHuman triageとV4検証閉鎖は完了している。`ISSUE-HTC-BEB5E0BD`、`ISSUE-HTC-C9F6C917`、`ISSUE-HTC-66C3E6CA`はいずれも`registered`かつnonblockingのままで、作業を開始していない。
+- Human判断待ち：`ISSUE-HTC-C9F6C917`の後続範囲に着手するかどうかの判断。`ISSUE-HTC-66C3E6CA`はPlan承認済みで、Evidence／Decisionへの拡張はTODOでの実運用が手入力訂正なしで複数回通ってから判断する。§3最小縦切りは承認・実装済みで、Issue全体はcloseしていない。過去TODO候補41件のHuman triageとV4検証閉鎖は完了している。`ISSUE-HTC-BEB5E0BD`、`ISSUE-HTC-C9F6C917`、`ISSUE-HTC-66C3E6CA`はいずれも`registered`かつnonblockingのままで、作業を開始していない。
 - 再開条件：判断recordのcommit後のclean transition。
 
 ## stale・deferred

@@ -1,12 +1,32 @@
 # 定型記録生成 IssueのPlan提案
 
-状態：`awaiting_human_approval`
+状態：`approved_for_development_implementation`
 対象Issue：`ISSUE-HTC-66C3E6CA`
 指示：`records/session-handoffs/2026-08-05-codex-to-claude-design-record-generation-issue-plan.md`
 
-**これは正式なIssue Resolution Plan、Decision、Task Contractではない。**Humanが承認するまで、
-定型記録生成、TODO renderer、receipt parser、監査集計を実装しない。RED testも作らない。
-既存recordの書換え、Git操作、外部送信も行わない。`ISSUE-HTC-66C3E6CA`のstateは`registered`のままである。
+## 実施状態注記（2026-08-05）
+
+この節だけが提案後に追記した現在の状態である。以降の本文は提案時点のまま残しており、
+全面的な時制の書き換えはしていない。
+
+- Humanは§6の5点をまとめて承諾した。承認recordは
+  `records/development/2026-08-05-record-generation-issue-plan-approval-decision-v1.md`
+  （`DEC-RECORD-GENERATION-PLAN-001`）である。
+  1. 最初の対象はTODOだけに限定する（案A）。
+  2. Test件数はstdoutを正規表現で読まず、公式Test receiptの構造化集計から得る。
+  3. 自動生成したTODOは作業本体と同じ意味単位commitへ含め、TODOだけの追加commitを作らない。
+  4. Evidence／Decisionへの拡張は、TODOで複数回の実運用が手入力訂正なしで通ってからHumanが判断する。
+  5. 実装はTest先行で、受領証の集計、TODO用材料の収集、更新経路の切替の順に分ける。
+- 承認範囲はTODOの最小縦切りだけである。Evidence／Decisionへの一般化（案B）は承認していない。
+- 本書は**正式なIssue Resolution PlanまたはTask Contractへ昇格していない**。
+  Workflow permitも作らない。
+- `ISSUE-HTC-66C3E6CA`のIssue recordの状態は`registered`のまま変更しない。
+
+以下は提案時点の本文である。
+
+**これは正式なIssue Resolution Plan、Decision、Task Contractではない。**承認していない範囲について、
+Evidence／Decisionの自動生成、既存recordの一括書換え、Git操作、外部送信は行わない。
+`ISSUE-HTC-66C3E6CA`のstateは`registered`のままである。
 
 ## 0. 固定入力（作成時の実値）
 
