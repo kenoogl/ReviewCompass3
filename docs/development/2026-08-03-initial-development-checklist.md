@@ -897,6 +897,29 @@ Definition Challengeは`passed`、blocking Finding 0件であり、Contract vers
 公式全`1007 passed`。Current Work Projectionの正式record写像と、同じTestを変更しないrefactor後再確認は
 未完了のまま残す。
 
+上記2項目のdeferをHumanが承認した。Decisionは
+`records/development/2026-08-06-work5a-current-work-projection-routing-decision-v1.md`
+（`DEC-WORK5A-PROJECTION-ROUTING-001`）、提案正本は
+`docs/design/2026-08-06-work5a-current-work-projection-routing-proposal.md`、SHA-256
+`c061be7d5abd1f428497f59d2b4ccc352b699d657d038d11f1d359a76e587809`である。
+
+defer理由：現在の正式recordには、Current Work Projectionに必要なStage、開発Work、Work Item、
+dependency／cycle、pause／resume、session lifecycle、次作業を権威的に表すrecordがない。現在の
+Review Task Contractは一文書reviewの実行経路であり、開発全体の現在位置authorityではない。
+このまま部分実装すると、bootstrap eventまたはTODOを第二正本にする、未承認のPortfolio／Work Item／
+Workflow state schemaをWork 5Aへ追加する、または欠けたStage・Work・next actionを推測することになり、
+第二正本の禁止、小さなE2E縦切り、欠測時fail-closedの方針に反する。
+
+再開条件：少なくとも次が固定された後に再開する。(1) Stage／Work／Work Item identityとstate owner、
+(2) Plan、Portfolio、Work Item、Task Contractの型付きrelation、(3) dependency、cycle、pause／resume、
+termination、Human decision、staleの正式record、(4) 次の実行可能作業を導出するWorkflow規則、
+(5) 欠測、競合、stale、表示器failureを区別するnegative test。再開時もprojectionは派生viewとし、
+手編集可能な状態正本、独立status database、UI固有authorityを作らない。
+
+次工程：Current Plan §17の初期実装順11に従い、Work 6Aの中核negative pathをRED fixtureとして固定する。
+この承認はWork 6AのGREEN実装、正式projection schema、Portfolio／Work Item schema、UI、automationを
+承認しない。Work 5Aの2項目は未完了のまま保持し、段完了にもしない。
+
 ## 9. Work 6A：初期sliceのnegative path
 
 - [ ] Contract／Requirement／Plan／Context／Provenance欠落を検出する。
