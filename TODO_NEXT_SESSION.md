@@ -7,10 +7,10 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：Work 4／最初のReview Task Contract設計提案を作成済み、Human承認待ち。
+- 現在の工程：Work 5A／最小Review Task Contractの実装。Work 4の最初のslice設計は承認済み。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：未着手。
-- 当面の進行入口：Work 4 最初のReview Task Contract設計提案。
+- 当面の進行入口：Work 5A 最小Review Task Contract。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -18,7 +18,8 @@
 
 ## 最新のauthority／Evidence
 
-- [Work 4 最初のReview Task Contract設計提案](docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md) — SHA-256 `9314c82f0526c3a3a465f31184a29e0e3209c22f7b9655507985a124e4d53220`
+- [Work 4 最初のslice設計承認](records/development/2026-08-05-work4-first-review-contract-design-approval-decision-v1.md) — SHA-256 `3048a52ccab59815f92b6fc3d1bd88b0ca8bd5d7a5117ad223d7139dab287675`
+- [Work 4 最初のReview Task Contract設計提案](docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md) — SHA-256 `14901323a958d686ba0ad0aed62b20b7b7d79908afcced08dc90f72fdb3d2054`
 - [Work 4A Rebuild Design v3](docs/design/2026-08-04-work-4a-rebuild-design-v3-proposal.md) — SHA-256 `a9e0419dcac556789e82f6f51292dd70399000f988e0720d240286c9a05c2b37`
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
@@ -27,31 +28,32 @@
 - [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `b157640f940c12d733d237921cad664dbebc4925c592796394f29da1155f5e48`
 - [Work 4A Rebuild Design v3.3 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md) — SHA-256 `b99edf3b9561da34bd4c0bd8a8e86418c36be18e202eef4f408d9b2e0392e538`
 - [Work 4A Early Exit / Work 4B Decision](records/development/2026-08-05-work-4a-early-completion-and-4b-decision-v1.md) — SHA-256 `68899660b1162b0fb00e5e2b604b3c3c4831c7cc0a32eebfe9541fd0d441a29e`
-- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `fe26afde36acd46b8485a25eccd2c5cc36a44a0546ca00f1af129ac8a4edd52b`
+- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `df5590903bd0a77cde65450b506843cc19ccb05538c4c59e15cd8ac1463db983`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `b63e6e059fefc9511ed9409b7286efa41a607c95882a53776716625ffcd924a7`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `c986951795330931842f01173cf3919e09da37900d4b34adfd006cfdde8337a7`
 
 ## 次に行う一作業
 
-Work 4設計提案のHuman承認を得る。
+A1〜A11、B1〜B10、C1〜C4をREDで固定し、`tools/task_contract/`の最小Runtime実装でGREENにする。
 
 開始条件：
 
-- 設計提案commit後のclean transition。
+- `DEC-WORK4-FIRST-REVIEW-CONTRACT-DESIGN-001`によるHuman承認。
+- 設計確定commit後のclean transition。
 
 完了条件：
 
-- 対象scenario、Contract構造、record順序、負例、Work 5A範囲、Requirement対応をHumanが承認または差し戻す。
-- §9の五点と§11.3の後続評価三点を判断する。
-- 承認された場合にだけDecision Recordを作成する。
+- 受入25件をREDで固定し、期待を緩めずGREENにする。
+- Requirement binding からaccepted artifactまでのrecordを、identity・version・Digest・上流参照付きで作る。
+- 実文書へのreview run、Human decision、accepted artifactを作らない。
 
-後続作業：Work 5AのRED受入固定と最小componentの実装。E2以降の後続評価は別作業単位とする。
+後続作業：実review runの承認、後続評価E2以降の別承認。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：Work 4設計提案の承認と§9の五点。Work 4Aの実データは提示済み。
-- 再開条件：設計提案commit後のclean transition。
+- Human判断待ち：実review runの実施承認。後続評価E2、E4、E5の開始承認。
+- 再開条件：設計確定commit後のclean transition。
 
 ## stale・deferred
 

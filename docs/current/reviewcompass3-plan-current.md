@@ -1095,6 +1095,13 @@ Entry・Relation・Baselineの更新、共通部品への段階移行、振る�
 検索し、その結果を記録してから開始する。全1003 routineの台帳化は開始条件にしない。LLMの説明、
 意味判断、Entry作成、旧実装の削除は、必要な別承認とTestなしに自動実行しない。
 
+### Work 4：最初のslice設計の承認状態
+
+`DEC-WORK4-FIRST-REVIEW-CONTRACT-DESIGN-001`により、最初のReview Task Contractの設計
+（`docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md`）が承認され、
+Work 5Aの実装へ進める。これはWork 4全体、Work 5A、Work 4Bの完了を意味しない。
+提案§11の後続評価E2〜E7は`deferred`である。
+
 ### Work 5A：最小Review Task Contract happy path
 
 ```text

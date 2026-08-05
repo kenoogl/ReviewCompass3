@@ -803,6 +803,14 @@ E2E Test：`tests/test_work4a_rebuild_v3_e2e.py`、`tests/test_work4a_rebuild_v3
 
 Work 4Bは全routineの一括分類を前提にしない。LLMの説明・Disposition Proposalは別承認後のみ使用する。
 
+### Work 4：最初のslice設計の承認
+
+- [x] 最初のReview Task Contractの設計提案をHumanが承認した（`DEC-WORK4-FIRST-REVIEW-CONTRACT-DESIGN-001`）。
+- [x] 対象は`docs/`配下の一文書、束縛Requirementは16件、残り34件は`deferred`と確定した。
+- [x] 後続評価E2〜E7を`deferred`とし、E2・E4・E5の開始に別途Human判断を要すると確定した。
+
+本承認はWork 4全体、Work 5A、Work 4Bの完了を意味しない。
+
 ## 8. Work 5A：最小Review Task Contractの定義とhappy path
 
 ### Contractとred

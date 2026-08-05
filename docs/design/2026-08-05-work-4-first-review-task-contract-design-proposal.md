@@ -1,6 +1,6 @@
 # Work 4：最初のReview Task Contract設計提案
 
-状態：`awaiting_human_approval`
+状態：`approved_for_implementation`
 対象：Current Plan §13の「最初のTask Contract」
 基準文書：`docs/current/reviewcompass3-plan-current.md`（Work 4、4A、4B、5A、6A、§13、§17）、
 `docs/design/2026-08-02-task-contract-design-amendment.md`、
@@ -8,9 +8,9 @@
 `records/development/2026-08-05-work-4a-early-completion-and-4b-decision-v1.md`
 Requirement正本：`records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json`（50件）
 
-**これはDecision Recordではない。**本提案の承認は、Work 5Aで実装する範囲を確定するためのもので
-あり、製品実装、Requirement改訂、Task Contractの発行を含まない。
-承認されるまで、code、test、schema、policy、Task Contract、外部`DATA_ROOT`を作成・変更しない。
+**これはDecision Recordではない。**承認記録は`DEC-WORK4-FIRST-REVIEW-CONTRACT-DESIGN-001`である。
+Humanは2026-08-05に本提案を承認し、§9の五点を固定した。Work 5Aの実装範囲はこの提案に限る。
+§11のE2〜E7は`deferred`であり、E2、E4、E5の開始にはそれぞれ別途Human判断が必要である。
 
 ## 1. 対象scenario、利用者、入力、出力、非目標
 
