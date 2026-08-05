@@ -1,0 +1,288 @@
+{
+  "acceptance_decision_ref": {
+    "decision_id": "DEC-WORK5A-CONTRACT-V2-REVIEW-ACCEPTANCE-001",
+    "path": "records/development/2026-08-06-work5a-contract-v2-review-acceptance-decision-v1.md",
+    "sha256": "a1f09018348ca21997dc9103e3996317197f85d3b311bc266b6fc0a9ef0bfc8b"
+  },
+  "acceptance_scope": "受理したのは最小Review経路の実行結果である。対象文書の内容の完全性、または一般的な品質保証を意味しない。",
+  "bundle_kind": "contract_v2_review_acceptance",
+  "bundle_version": 1,
+  "contract_version_accepted": 2,
+  "provenance_shape": {
+    "closed_by": "accepted_artifact",
+    "edge_count": 10,
+    "node_count": 11,
+    "node_roles": [
+      "requirement_binding",
+      "review_task_contract",
+      "definition_challenge_verdict",
+      "contract_approval",
+      "compile_verdict",
+      "context_manifest",
+      "workflow_permit",
+      "finding_set",
+      "conformance_verdict",
+      "final_challenge_verdict",
+      "human_decision"
+    ],
+    "self_edge_present": false,
+    "terminal_node_role": "human_decision"
+  },
+  "recorded_at": "2026-08-06T06:42:16+0900",
+  "records": {
+    "accepted_artifact": {
+      "content_digest": "606df3638f02a8747417a32e51c0ee3c730732c4da0a394f65c079dde827261c",
+      "decision_ref": {
+        "content_digest": "0feea7519d0bd7c3362dc867282f0b866c26a0ec1eb0bd3f0cd7815e44371d1c",
+        "digest_algorithm": "sha256",
+        "record_id": "HD-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "record_kind": "human_decision",
+        "record_version": 1
+      },
+      "provenance_ref": {
+        "content_digest": "9e4a06cdaf83a1544c2308c4ebb620c4e04790a881157839b8c60e64c992df5d",
+        "digest_algorithm": "sha256",
+        "record_id": "PV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "record_kind": "provenance_verdict",
+        "record_version": 1
+      },
+      "record_id": "AA-CM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+      "record_kind": "accepted_artifact",
+      "record_version": 1,
+      "target_paths": [
+        "docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md"
+      ]
+    },
+    "human_decision": {
+      "conformance_ref": {
+        "content_digest": "fb6ddb28d4e499d837aab4aaba903bcb1ecad68aed31230c3719374b385e5f46",
+        "digest_algorithm": "sha256",
+        "record_id": "CFV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "record_kind": "conformance_verdict",
+        "record_version": 1
+      },
+      "content_digest": "0feea7519d0bd7c3362dc867282f0b866c26a0ec1eb0bd3f0cd7815e44371d1c",
+      "decided_at": "2026-08-06T06:37:41+09:00",
+      "decision": "approved",
+      "decision_class": "review_acceptance",
+      "final_challenge_ref": {
+        "content_digest": "a3e7887474142b6024484f14553ebfb6b13cede5295d10e6e5c644abd436d3e6",
+        "digest_algorithm": "sha256",
+        "record_id": "FCV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "record_kind": "final_challenge_verdict",
+        "record_version": 1
+      },
+      "finding_set_ref": {
+        "content_digest": "59788c36ae787e014a2d360adfde84b67da0c7bae028bbc5144452a70bb51054",
+        "digest_algorithm": "sha256",
+        "record_id": "FS-CM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "record_kind": "finding_set",
+        "record_version": 1
+      },
+      "human_id": "kenoogl",
+      "owner": "human_decision_owner",
+      "record_id": "HD-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+      "record_kind": "human_decision",
+      "record_version": 1,
+      "target_digest": "149ae4a5f28d9ccd0378d31312b2b3965ed1d3aaa31599ed98b249f080348354"
+    },
+    "provenance_verdict": {
+      "closure": {
+        "closed_by": "accepted_artifact",
+        "self_edge_present": false,
+        "terminal_node_role": "human_decision"
+      },
+      "content_digest": "9e4a06cdaf83a1544c2308c4ebb620c4e04790a881157839b8c60e64c992df5d",
+      "record_id": "PV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+      "record_kind": "provenance_verdict",
+      "record_version": 1,
+      "status": "verified",
+      "verified_edges": [
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "requirement_binding"
+          },
+          "to": {
+            "node_role": "review_task_contract"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "review_task_contract"
+          },
+          "to": {
+            "node_role": "definition_challenge_verdict"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "definition_challenge_verdict"
+          },
+          "to": {
+            "node_role": "contract_approval"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "contract_approval"
+          },
+          "to": {
+            "node_role": "compile_verdict"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "compile_verdict"
+          },
+          "to": {
+            "node_role": "context_manifest"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "context_manifest"
+          },
+          "to": {
+            "node_role": "workflow_permit"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "workflow_permit"
+          },
+          "to": {
+            "node_role": "finding_set"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "finding_set"
+          },
+          "to": {
+            "node_role": "conformance_verdict"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "conformance_verdict"
+          },
+          "to": {
+            "node_role": "final_challenge_verdict"
+          }
+        },
+        {
+          "edge_kind": "precedes",
+          "from": {
+            "node_role": "final_challenge_verdict"
+          },
+          "to": {
+            "node_role": "human_decision"
+          }
+        }
+      ],
+      "verified_nodes": [
+        {
+          "content_digest": "831217a7c3850fb711427ddc2c6aaf686b9155338e34dfa406a6fbc9f7af68de",
+          "digest_algorithm": "sha256",
+          "node_role": "requirement_binding",
+          "record_id": "RB-FIRST-REVIEW-CONTRACT",
+          "record_kind": "requirement_binding",
+          "record_version": 1
+        },
+        {
+          "content_digest": "cfa129d3afce155a683fed7e7da07c3272fb89922264edf79c239b6d3846cfb4",
+          "digest_algorithm": "sha256",
+          "node_role": "review_task_contract",
+          "record_id": "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "review_task_contract",
+          "record_version": 2
+        },
+        {
+          "content_digest": "d951862f9ab8b760afe796a4356a1a89cc6dd8053bb597768b4916b7cde4a967",
+          "digest_algorithm": "sha256",
+          "node_role": "definition_challenge_verdict",
+          "record_id": "DCV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "definition_challenge_verdict",
+          "record_version": 1
+        },
+        {
+          "content_digest": "af4209029b2d11f53d9abf0e3ed67dd8d182c1177dfe1625507f03bcb2095b25",
+          "digest_algorithm": "sha256",
+          "node_role": "contract_approval",
+          "record_id": "CA-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "contract_approval",
+          "record_version": 1
+        },
+        {
+          "content_digest": "ad45ebba3659d5ea34751d103bd1fde96b075162bc00a6cabc2aa5b85b8ac332",
+          "digest_algorithm": "sha256",
+          "node_role": "compile_verdict",
+          "record_id": "CV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "compile_verdict",
+          "record_version": 1
+        },
+        {
+          "content_digest": "149ae4a5f28d9ccd0378d31312b2b3965ed1d3aaa31599ed98b249f080348354",
+          "digest_algorithm": "sha256",
+          "node_role": "context_manifest",
+          "record_id": "CM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "context_manifest",
+          "record_version": 1
+        },
+        {
+          "content_digest": "03b8b0d4c691db8f0f4b4f72c5bde7f0de0a9b31814dd85e2e143c90c57a72b5",
+          "digest_algorithm": "sha256",
+          "node_role": "workflow_permit",
+          "record_id": "WP-CM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "workflow_permit",
+          "record_version": 1
+        },
+        {
+          "content_digest": "59788c36ae787e014a2d360adfde84b67da0c7bae028bbc5144452a70bb51054",
+          "digest_algorithm": "sha256",
+          "node_role": "finding_set",
+          "record_id": "FS-CM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "finding_set",
+          "record_version": 1
+        },
+        {
+          "content_digest": "fb6ddb28d4e499d837aab4aaba903bcb1ecad68aed31230c3719374b385e5f46",
+          "digest_algorithm": "sha256",
+          "node_role": "conformance_verdict",
+          "record_id": "CFV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "conformance_verdict",
+          "record_version": 1
+        },
+        {
+          "content_digest": "a3e7887474142b6024484f14553ebfb6b13cede5295d10e6e5c644abd436d3e6",
+          "digest_algorithm": "sha256",
+          "node_role": "final_challenge_verdict",
+          "record_id": "FCV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "final_challenge_verdict",
+          "record_version": 1
+        },
+        {
+          "content_digest": "0feea7519d0bd7c3362dc867282f0b866c26a0ec1eb0bd3f0cd7815e44371d1c",
+          "digest_algorithm": "sha256",
+          "node_role": "human_decision",
+          "record_id": "HD-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+          "record_kind": "human_decision",
+          "record_version": 1
+        }
+      ]
+    }
+  },
+  "review_run_ref": {
+    "path": "records/development/2026-08-06-work5a-contract-v2-review-run-records-v1.json",
+    "sha256": "51f93bc14e47a3fe2e78eec8daa875930153ecb9d0c1031c12af800eeb723979"
+  }
+}

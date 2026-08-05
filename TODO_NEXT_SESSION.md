@@ -6,8 +6,8 @@
 
 ## 現在位置
 
-- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AはDefinition Challenge実装と初回Runに続き、HumanがContract version 2を承認し、version 2のReview RunをFinal Challengeまで実施した。
-- 現在作業：Work 5A Contract version 2 Review Run完了。`contract_approval`は`approved`、compileは`compiled`、Findingは0件、ConformanceとFinal Challengeはいずれも`passed`である。Human review acceptance待ちで停止しており、`human_decision`、Provenance、accepted artifactは作っていない。
+- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AはDefinition Challengeの設計・実装・初回Runに続き、Contract version 2のReview経路をaccepted artifactまで通した。
+- 現在作業：Contract version 2のReview経路がaccepted artifactまで完了。HumanがReview結果を受理し、`human_decision`（`approved`）、11 node・10 edgeの`provenance_verdict`（`verified`）、`accepted_artifact`をnew-onlyで作成した。受理したのは最小Review経路の実行結果であり、対象文書の品質保証ではない。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,9 @@
 
 ## 最新のauthority／Evidence
 
+- [Contract v2 Review受理Evidence](records/development/2026-08-06-work5a-contract-v2-review-acceptance-evidence-v1.md) — SHA-256 `3edf6f88bd85619c9e75868f066ddc1d0b66c41e842d27cd05abffac64d9bed5`
+- [Contract v2 Review受理records](records/development/2026-08-06-work5a-contract-v2-review-acceptance-records-v1.json) — SHA-256 `151c63c838850a3da319b5f1eaa8cf0d02379aed85b0a592f124e3624c275354`
+- [Contract v2 Review受理Decision](records/development/2026-08-06-work5a-contract-v2-review-acceptance-decision-v1.md) — SHA-256 `a1f09018348ca21997dc9103e3996317197f85d3b311bc266b6fc0a9ef0bfc8b`
 - [Contract v2 Review Run Evidence](records/development/2026-08-06-work5a-contract-v2-review-run-evidence-v1.md) — SHA-256 `49d2df92e02c21491b0bf57c6bf31bd77b3beff1c41757863dcec9fa62af735b`
 - [Contract v2 Review Run records](records/development/2026-08-06-work5a-contract-v2-review-run-records-v1.json) — SHA-256 `51f93bc14e47a3fe2e78eec8daa875930153ecb9d0c1031c12af800eeb723979`
 - [Contract v2 承認Decision](records/development/2026-08-06-work5a-contract-v2-approval-decision-v1.md) — SHA-256 `58063dbb46794a87a4d93f490706e93e366b68ffb029d4ea019f29d20f559c16`
@@ -33,29 +36,28 @@
 
 ## 次に行う一作業
 
-CodexがContract version 2のReview Runを独立検証し、Review結果をHumanへ提示する。
+CodexがClaudeの受理recordを独立検証する。
 
 開始条件：
 
-- Review Run recordsとEvidenceを含むcommitがcleanであること
+- 受理records、Evidence、機械生成済みTODOを含むcommitがcleanであること
 - HumanがClaudeの作業終了をCodexへ知らせること
 
 完了条件：
 
-- Codexが12 recordのcontent digest、上流参照、owner分離、未実行stepを独立検証すること
-- Final Challenge `passed`・Finding 0件という結果をHumanへ提示すること
+- Codexが3 recordのcontent digest、11 node・10 edgeのProvenance、accepted artifactの参照とtarget pathを独立検証すること
 
-後続作業：Review結果に対するHumanの受理判断。受理する場合だけ`human_decision`を作り、その後にProvenanceとaccepted artifactへ進む。判断前はいずれも作らない。
+後続作業：Codexの独立検証が終わるまで、後続Workを選択も開始もしない。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。Review RunはFinal Challengeまで完了しており、Codexの独立検証を待つ。
-- Human判断待ち：Review結果を受理するかどうか。Findingは0件、ConformanceとFinal Challengeはいずれも`passed`である。受理判断が出るまで、`human_decision`、Provenance、accepted artifactを作らない。
+- blocker：なし。受理recordまで完了しており、Codexの独立検証を待つ。
+- Human判断待ち：なし。Review結果の受理は`DEC-WORK5A-CONTRACT-V2-REVIEW-ACCEPTANCE-001`で完了している。後続Workの選択はCodexの独立検証後に行う。
 
 ## stale・deferred
 
 - stale：旧pause_and_triage表示とupstream_revision判断待ちは、採用Decision `DEC-WORK5A-DEFINITION-CONTRACT-APPROVAL-GATE-001`により置換済み。Contract version 2の承認待ち表示も`DEC-WORK5A-CONTRACT-V2-APPROVAL-001`により解消済みで、現在の判断根拠に使わない。
-- deferred：Review結果受理後のProvenanceとaccepted artifact、Work 5A Current Work Projection正式record写像、refactor後再確認、Work 6A、Architecture Policy、Challenge Policy、risk catalog、隣接Contract検査、汎用Challenge framework、UI、automation、Work 8正式評価。
+- deferred：後続Workの選択と開始、Work 5A Current Work Projection正式record写像、refactor後再確認、Work 6A、Architecture Policy、Challenge Policy、risk catalog、隣接Contract検査、汎用Challenge framework、UI、automation、Work 8正式評価。
 
 ## Git・Test
 
