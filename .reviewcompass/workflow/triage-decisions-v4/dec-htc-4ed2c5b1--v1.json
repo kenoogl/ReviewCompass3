@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-4ED2C5B1",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:17:35+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-4ED2C5B1",
+    "candidate_content_digest": "81ccb05b5c3a800ea653d5ca071f1b163be43a3c211d99a5aeb342b9b173eed5"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "dependency",
+  "blocking": false,
+  "rationale": "会話記録の手動収集、durable cursor、突き合わせ、限定captureは完了している。一方でcapture後に追記された会話は次の手動突き合わせ対象として残り続けるため、未解決かつ再発する。ただし自動実行は、生会話記録の保存方針が決まるまで実施しないという判断であり、この候補単独では解けない。正式Issue`ISSUE-HTC-BEB5E0BD`の方針決定に依存するため、独立した正式Issueへは昇格しない。",
+  "next_action": "正式Issue`ISSUE-HTC-BEB5E0BD`の保存方針が決まった後に、自動化の要否を再判定する。それまでscheduler、hook、background serviceは有効化しない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "94f292c44acab60e61887bbba2328ce7c508bf08a522fb7dc91238323ef45911"
+}

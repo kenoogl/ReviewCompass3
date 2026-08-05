@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-BEB5E0BD",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:17:35+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-BEB5E0BD",
+    "candidate_content_digest": "f47191101eb6471043f641d5b4a4ef268b4ea13c9510dc2951f3281d4ed23f3e"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "high",
+    "priority": "high",
+    "promote_to_issue": true
+  },
+  "disposition": "issue_resolution",
+  "blocking": false,
+  "rationale": "生の会話記録について、長期保存の期間、削除の扱い、application-layer暗号化、backupの運用方針がいずれも未決定である。方針が無いまま記録が増え続けるため未解決であり、記録が増えるたびに同じ判断が必要になるため再発する。個人情報と安全性に関わるため影響は高く、優先順位も高い。ただし現在進行中のWorkを止める性質ではないためblockingにはしない。正式Issueとして登録し、追跡する。",
+  "next_action": "このIssueをPlan化するかどうかをHumanが判断する。暗号化、backup、retention変更、自動化の実装は開始しない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": true,
+    "issue_id": "ISSUE-HTC-BEB5E0BD"
+  },
+  "content_digest": "bf372984bb1a85b146802c721ae983362107f73aa2cc440fa54a0e450d74e20d"
+}

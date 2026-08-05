@@ -1,0 +1,24 @@
+{
+  "record_kind": "issue_record",
+  "schema_version": 2,
+  "issue_id": "ISSUE-HTC-BEB5E0BD",
+  "issue_version": 1,
+  "created_at": "2026-08-05T13:17:35+09:00",
+  "state": "registered",
+  "problem": "生会話記録の保存期間、削除、application-layer暗号化、backupの方針が未決定である。",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-BEB5E0BD",
+    "candidate_content_digest": "f47191101eb6471043f641d5b4a4ef268b4ea13c9510dc2951f3281d4ed23f3e"
+  },
+  "triage_decision_ref": {
+    "decision_id": "DEC-HTC-BEB5E0BD",
+    "decision_version": 1,
+    "path": ".reviewcompass/workflow/triage-decisions-v4/dec-htc-beb5e0bd--v1.json",
+    "sha256": "ac95dcdd4cb9064418dc3a386ccf834730d43059952194f9b055cd893227e133",
+    "content_digest": "bf372984bb1a85b146802c721ae983362107f73aa2cc440fa54a0e450d74e20d"
+  },
+  "content_digest": "f207a48da548f2fc224f9bd975836e90f823c00d1f3437ee90a490df73ae210c"
+}

@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-CD984CD0",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:17:35+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-CD984CD0",
+    "candidate_content_digest": "2a195fec603d34702fa174e1c2d48c4d2dbc6174b41ff11fc8f14160f2fb64d4"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "high",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "dependency",
+  "blocking": false,
+  "rationale": "2026-09-03の保存期間見直し、暗号化、自動実行の有効化は、いずれも後続のHuman判断待ちのまま残っている。扱う対象が生会話記録であるため影響は高いが、これらは正式Issue`ISSUE-HTC-BEB5E0BD`の方針決定へ与える入力であり、単独で先に決めるべきものではない。よって独立した正式Issueへは昇格せず、優先順位は低くする。",
+  "next_action": "2026-09-03、または正式Issue`ISSUE-HTC-BEB5E0BD`のPlan作成時に、保存期間・暗号化・自動化の扱いを再確認する。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "6c9a116068b374d758d99668034721d310be20e39a082766a9cb2154571367d7"
+}
