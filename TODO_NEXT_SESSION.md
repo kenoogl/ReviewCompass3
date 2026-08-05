@@ -15,7 +15,7 @@
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
-- Evidence参照：`## 最新のauthority／Evidence`節の参照は機械計測で25件である。件数の訂正記録は`records/development/2026-08-05-todo-evidence-reference-count-correction-v1.md`。
+- Evidence参照：`## 最新のauthority／Evidence`節の参照は機械計測で28件である。件数の訂正記録は`records/development/2026-08-05-todo-evidence-reference-count-correction-v1.md`。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -23,6 +23,9 @@
 
 ## 最新のauthority／Evidence
 
+- [読み取り専用argv executor 承認Decision](records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-decision-v1.md) — SHA-256 `2982646b43a74d856d9b18af527b743b10ac3d8874f03ee39afba825752a8864`
+- [機械操作routing 後続Plan提案（§2.1／§3.2のみ承認済み）](docs/design/2026-08-05-machine-operation-routing-follow-on-plan-proposal.md) — SHA-256 `d5877f9668cc75a00a25b79d0fad9050c7ae3dd243047a4c61ba6e776fceb571`
+- [承認記録時点の全test receipt](records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-test-receipt-v1.json) — SHA-256 `85f411ad3083ee7580e140dce3d0c858bebf4ad1e3ae3a2c032ce9122f5d0d39`
 - [V4 Issue永続化 GREEN](records/development/2026-08-05-v4-issue-persistence-green-evidence-v1.md) — SHA-256 `3ae17b4b5828429ee8c7f1b6dfbc3b80d9439da4bace685542cee3845640b731`
 - [正式Issue record 会話記録方針](.reviewcompass/workflow/issues-v4/issue-htc-beb5e0bd--v1.json) — SHA-256 `a4a1511e609005193a3d127080a3eabf4f56a67529c5bd9b4e0f55b467422d62`
 - [正式Issue record 機械操作の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-c9f6c917--v1.json) — SHA-256 `66cfe50ce79136bca5e92b35b72502cedfb8b6f6f3e20ade1e027bcbf1fec0ed`
@@ -51,25 +54,24 @@
 
 ## 次に行う一作業
 
-`ISSUE-HTC-C9F6C917`後続範囲のPlan提案に対するHuman判断を受ける。提案はHuman承認待ちであり、
-実装承認ではない。
+`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`で承認された読み取り専用argv executor
+最小sliceを、Test先行で実装する。
 
 開始条件：
 
 - 本handoffを含むcommit後のclean transition。
-- 下の4点についてHumanが判断すること。
+- 承認範囲を超えないこと。cache root、移行、書込み、externalは対象外のままとする。
 
-Human判断点：
+未承認のまま残るHuman判断点：
 
-- argv executorの許容操作種別と実行責任の境界。
 - cache rootの配置と、削除するか保持するかの方針。
-- 移行対象の優先順と、最初の実装sliceの承認可否。
+- 移行対象の優先順。
 - host側tool構文と外部送信を本Issueで扱わないことの確認。
 
 完了データ：
 
 - 過去TODO候補41件は全件triage済み。正式Issueは3件で、正本は`.reviewcompass/workflow/issues-v4/`である。
-- `ISSUE-HTC-C9F6C917`は§3最小縦切りだけ承認・実装済みで、`registered`かつnonblockingのままである。後続範囲は未実施で、Plan提案`docs/design/2026-08-05-machine-operation-routing-follow-on-plan-proposal.md`がHuman承認待ちである。推奨した段階順は、設計固定→RED test→argv executor最小slice→cache root最小slice→移行inventory→操作種別ごとの段階移行である。
+- `ISSUE-HTC-C9F6C917`は§3最小縦切りが承認・実装済みで、`registered`かつnonblockingのままである。後続Plan全体は`awaiting_human_approval`のままだが、読み取り専用argv executor最小sliceだけは`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`で実装承認された。実行templateは`git status --porcelain`だけで、cache root、既存操作の移行、書込み、externalは対象外である。
 - `ISSUE-HTC-66C3E6CA`はTODO最小縦切りだけ承認・実装済み。案Bは未承認である。
 - `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものである。
 

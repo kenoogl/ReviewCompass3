@@ -4,6 +4,27 @@
 対象Issue：`ISSUE-HTC-C9F6C917`
 指示：`records/session-handoffs/2026-08-05-codex-to-claude-plan-machine-operation-routing-follow-on.md`
 
+## 実施状態注記（2026-08-05）
+
+この節だけが提案後に追記した現在の状態である。以降の本文は提案時点のまま残している。
+
+- **本Plan全体の状態は`awaiting_human_approval`のままである。** cache root、既存直接操作の移行、
+  host境界の確認を含むPlan全体は未承認である。
+- Humanは`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`
+  （`records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-decision-v1.md`）
+  により、**§2.1と§3.2に定めたargv executor最小sliceだけ**を実装承認した。
+- 承認された範囲の内訳。
+  - 実行templateは`git status --porcelain`だけ。`--`の後ろにpathspecを0個以上置ける。
+  - inventoryの全操作が`read_only`である場合だけ起動できる。
+  - `operation_routing.py`のinventory／preflight／receiptをそのまま利用し、executorは
+    権限を判定・付与・再分類しない。
+- **対象外のまま**：cache rootの固定、既存直接操作の移行、Git metadata書込み、project成果物書込み、
+  external操作、host側tool構文、外部送信、環境変数設定、既存call siteの置換。
+- `ISSUE-HTC-C9F6C917`のstateは`registered`のままである。正式なIssue Resolution Plan、
+  Task Contract、Workflow permitは作らない。
+
+以下は提案時点の本文である。
+
 **これは実装許可ではない。**正式なIssue Resolution Plan、Decision、Task Contractでもない。
 Humanが承認するまで、argv executor、cache root、移行inventory、Git／shell操作の置換を実装しない。
 RED testも作らない。`ISSUE-HTC-C9F6C917`のstateは`registered`のままである。
