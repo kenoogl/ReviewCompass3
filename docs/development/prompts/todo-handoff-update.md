@@ -21,7 +21,10 @@
 
    `python3 tools/development/work_unit_transition.py --work-status completed`
 
-   `completed_work_unit_uncommitted`なら次作業を開始せず、コミットを利用者へ確認する。
+   `completed_work_unit_uncommitted`なら、`DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`の最小条件
+   （意味的に完結した単位、明示pathだけのstage、`git diff --check`と該当test／validatorの合格、
+   commit後のread-only照合）を満たす意味単位コミットを機械処理で行い、その後にtransitionを再実行する。
+   最小条件を満たせないときだけ次作業を開始せず停止して報告する。
 7. Git欄はcommit安定形式にする。TODOを含むcommit自身のSHA、固定ahead／behind、push済否、
    未コミット状態を書かない。commit後はread-onlyで再照合し、Git状態転記だけの追加commitを作らない。
 

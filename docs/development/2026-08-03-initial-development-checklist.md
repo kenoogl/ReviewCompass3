@@ -725,13 +725,23 @@ Plan化・実装、Work 8評価は引き続き承認範囲外である。上記�
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
 - [x] commit後はread-only照合だけを行い、guarded commit、amend、hookを使わない規則を固定した。
 - [x] 完了済み作業単位が未コミットなら、次作業を停止してHumanへリマインドするPilotを実装した。
-- [x] 自動commit、push、rebase、reset、履歴書換えをPilot対象外に維持した。
+- [x] 通常commitを最小ガード付きで自律化し、push、tag、amend、rebase、reset、force push、
+      履歴書換えはHuman明示承認のまま維持した。
 
 `Evidence`：commit handoff Completion
 `records/development/2026-08-04-commit-handoff-stability-completion-evidence-v1.md`、SHA-256
 `a0e03f686c9879416798ed58a56e610f59e0fb775a9c4c73fb61a16a623ea077`。work unit reminder Completionは
 `records/development/2026-08-04-work-unit-commit-reminder-completion-evidence-v1.md`、SHA-256
 `b7f8e91520b2664ede24347144004b724c5654d23c5cb318864c1a8530ab35d0`。
+
+旧「自動commit、push、rebase、reset、履歴書換えをPilot対象外に維持した」というclaimは、通常commitの
+扱いだけを置換した。Humanは、意味的に完結した単位であること、明示pathだけをstageすること、
+`git diff --check`と該当test／validatorに合格すること、commit後にread-onlyで照合することの4条件を
+満たす通常commitについて、毎回の明示指示を不要とした。push、tag、amend、rebase、reset、force push、
+履歴書換え、方針変更、段完了、意味的裁定、不可逆操作、外部送信、権限の迂回はHuman明示承認のままである。
+guarded commit、hook、コミットごとの承認file、巨大なcommit manifestは導入しない。Decisionは
+`records/development/2026-08-05-semantic-commit-minimal-guards-decision-v1.md`
+（`DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`）。
 
 #### Development venv baseline
 

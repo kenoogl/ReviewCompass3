@@ -150,8 +150,28 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 `completed_work_unit_uncommitted`として次作業への遷移を停止し、Humanへコミットをリマインドする。
 作業中のdirty差分だけではこの状態に分類しない。
 
-Pilotではコミットを自動実行せず、従来どおりHumanの明示指示を必要とする。push、guarded commit、hook、
-amend、rebase、reset、履歴書換えは対象外とする。遷移前の機械検査には
+通常の開発作業のコミットは、次の最小条件をすべて満たす場合、コミットごとのHuman明示指示なしに行う。
+正本は`records/development/2026-08-05-semantic-commit-minimal-guards-decision-v1.md`
+（`DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`）とする。
+
+1. 一つの目的と確認結果を独立して説明できる、意味的に完結した作業単位である。
+2. stage対象は明示したrepository-relative pathの列挙だけである。`git add -A`、`git add .`、
+   範囲外fileの一括追加を使わない。
+3. `git diff --check`と、変更に応じたtest／validatorを実行して合格している。
+   `TODO_NEXT_SESSION.md`を含める場合は`python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`も
+   合格している。
+4. commit後はread-onlyで状態を照合し、完了済み作業単位を未コミットのまま次の作業へ渡さない。
+
+自律化するのは上記の**通常commitだけ**である。次は引き続きHumanの明示承認を必要とする。
+
+- 方針変更、段完了、意味的裁定、不可逆操作、外部送信
+- push、tag、amend、rebase、reset、force push、履歴書換え
+- sandboxまたはhostの権限の迂回
+
+**置換済みの旧制限**：「Pilotではコミットを自動実行せず、従来どおりHumanの明示指示を必要とする」という
+旧方針は、上の最小ガードへ置換した。push、guarded commit、hook、amend、rebase、reset、履歴書換えを
+対象外とする点は変更していない。guarded commit、hook、コミットごとの恒久的な承認file、巨大な
+commit manifestは導入しない。遷移前の機械検査には
 `python3 tools/development/work_unit_transition.py --work-status completed`を使用する。
 
 最終コミットに`TODO_NEXT_SESSION.md`の引き継ぎ更新を含める場合、TODOのGit欄は、そのコミット完了と

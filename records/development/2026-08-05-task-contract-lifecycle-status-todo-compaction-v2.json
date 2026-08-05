@@ -1,0 +1,26 @@
+{
+  "content_digest": "2792fbc915241b10efc1b713f04b7761289b1a0ac601ebf80dbbec1a5e002e85",
+  "digest_algorithm": "sha256",
+  "effect": "本recordは対象Task Contract fileを変更しない。固定source検証を歴史状態として扱う根拠に限って用いる。目的、受入条件、当時のfixed source Digestは変更しない。",
+  "grounds": [
+    {
+      "note": "v2のTask Contract完了Evidenceが存在し、実装作業は完了済みである。",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-task-contract-v2-completion-evidence-v1.md",
+      "sha256": "824f4aeec4d694410e07a22194a70d7e412ffbeda1dbadaf7a3b8128eb890604"
+    },
+    {
+      "note": "早期Pilotの閉鎖Evidenceにより、TODO compactionを含む一連の作業は完了しWork 4へ戻っている。現行Workではない。",
+      "path": "records/development/2026-08-04-issue-resolution-pilot-closure-completion-evidence-v1.md",
+      "sha256": "e7138e9ec849649dfcbabaad465c1e6e29b9d31000ba08fe2627c335f85bb9af"
+    }
+  ],
+  "lifecycle_status": "historical",
+  "record_kind": "task_contract_lifecycle_status",
+  "recorded_at": "2026-08-05",
+  "schema_version": 1,
+  "status_record_id": "TCLS-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2",
+  "status_record_version": 1,
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2",
+  "task_contract_path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json",
+  "task_contract_sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6"
+}

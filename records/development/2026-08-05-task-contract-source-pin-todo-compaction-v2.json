@@ -1,0 +1,28 @@
+{
+  "applicable_lifecycle_statuses": [
+    "completed",
+    "completed_carried_forward",
+    "superseded",
+    "historical"
+  ],
+  "content_digest": "ac6670d083e251d1a15e15588bdf17651e2d4e4e7b2686ea42ef61aa9167eb5e",
+  "digest_algorithm": "sha256",
+  "effect": "歴史状態のTask Contractにだけ使用できる。active statusのcontractへ適用してはならない。",
+  "pin_record_id": "TCSP-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2-POLICY",
+  "pin_record_version": 1,
+  "pins": [
+    {
+      "commit": "063236512845bde1bc8574c9507bba77f917fade",
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "reason": "受理時点の開発方針文書。方針文書は更新される文書のため、working treeではなく受理時点のGit blobで検証する。",
+      "sha256": "9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0"
+    }
+  ],
+  "record_kind": "task_contract_source_pin",
+  "recorded_at": "2026-08-05",
+  "schema_version": 1,
+  "task_contract_id": "TC-RC3-ISSUE-RESOLUTION-TODO-COMPACTION-2026-08-04-V2",
+  "task_contract_path": "records/task-contract/issue-resolution-todo-compaction-implementation-v2.json",
+  "task_contract_sha256": "1fb3608e0aa0daabec3680f8913bb28a3ea5ade87acb1d9402d75174098a67a6",
+  "unpinned_source_policy": "verify_working_tree"
+}

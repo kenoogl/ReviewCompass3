@@ -275,4 +275,5 @@ def test_cli_reports_pin_resolution_without_removing_existing_keys(capsys):
     assert exit_code == 0
     output = json.loads(capsys.readouterr().out)
     assert output["fixed_source_count"] == 9
-    assert output["pin_resolved_count"] == 1
+    # Current Planに加えて開発方針文書もpinしたため、解決されるpinは2件である。
+    assert output["pin_resolved_count"] == 2

@@ -1,6 +1,7 @@
 """Issue Resolution TODO compaction実装Task Contractの機械検証。"""
 
 import hashlib
+import importlib
 import json
 from pathlib import Path
 
@@ -49,7 +50,6 @@ def test_contract_digest_and_fixed_references_are_current():
         contract["plan_ref"],
         contract["challenge_ref"],
         contract["approval_decision_ref"],
-        *contract["fixed_sources"],
     ]
 
     assert contract["content_digest"] == _canonical_digest(contract)
@@ -63,6 +63,16 @@ def test_contract_digest_and_fixed_references_are_current():
             continue
         record = _load(PROJECT_ROOT / reference["path"])
         assert record["content_digest"] == reference["content_digest"]
+
+    # 固定sourceは、lifecycle statusとsource pinを解決する共通resolverで検証する。
+    # 歴史状態の契約では、受理時点のGit blobまたは明示された`verify_working_tree`で
+    # 照合する。stale判定を緩めるものではなく、pinの無い変更済みsourceは停止する。
+    pilot = importlib.import_module("tools.development.issue_resolution_pilot")
+    count, resolved = pilot.validate_fixed_sources_for_contract(
+        CONTRACT_PATH, project_root=PROJECT_ROOT
+    )
+    assert count == len(contract["fixed_sources"])
+    assert resolved >= 1
 
 
 def test_contract_is_bound_to_approved_plan_v3():

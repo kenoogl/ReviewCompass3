@@ -1025,7 +1025,7 @@ CI providerの操作機能は初期要件へ入れない。
 | work | state | 実施範囲 | 未完了境界 |
 |---|---|---|---|
 | Session transcript eventual preservation | `verified / completed` | Codex exec／rollout／Claudeの3 source kind adapter、manual collector、durable cursor、reconcile、現在のCodex Desktop taskだけの限定実ログcapture | background automation、過去Codex／Claude log capture、長期retention、削除、暗号化、backup |
-| Commit／handoff stability | `verified / completed` | commit安定TODO、post-commit read-only照合、完了済み・未コミット時の次作業停止Pilot | 自動commit、push、hook、履歴書換え |
+| Commit／handoff stability | `verified / completed` | commit安定TODO、post-commit read-only照合、完了済み・未コミット時の次作業停止Pilot、意味単位commitの自律化と最小ガード（意味的完結、明示pathのstage、`git diff --check`と該当test／validator、post-commit read-only照合） | push、hook、履歴書換え |
 | Deployment／Project Artifact boundary | `approved_effective / bootstrap_completed` | Layout Baseline v2、Project Manifest v2、移動させない`.reviewcompass/workflow/` root | Deployment Manifest、package builder、原子的切替、rollback、durable Project Binding |
 | ReviewCompass Issue Resolution early Pilot | `verified / limited_extension_completed` | ReviewCompass2 Issue→Plan経路の継承、TODO routing修正案、Project Artifact上位root、Issue Intake V4限定拡張（複数`registered` Issueの受付、過去TODO候補41件のHuman triage、active Issue最大1件） | 正式製品schema、UI、automation、3正式IssueのPlan化・実装、Work 8評価 |
 

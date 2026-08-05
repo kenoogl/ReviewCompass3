@@ -8,7 +8,10 @@
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
 - 現在の工程：過去TODO候補41件のHuman triageは完了し、Issue Intake V4の限定拡張はHuman承認のうえ検証を閉じた。未判断は0件である。
-- 正式Issue：3件、いずれも`registered`かつnonblockingで未着手。active Issueは0件。`ISSUE-HTC-C9F6C917`のPlan提案はHuman承認待ちであり、正式Planではない。`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。
+- 正式Issue：3件、いずれも`registered`かつnonblockingで未着手。active Issueは0件。`ISSUE-HTC-C9F6C917`のPlan提案は全体としてHuman判断待ちであり、正式Planではない。
+- 各Issueの対象：`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。
+- 通常commitの運用：意味単位commitを最小ガード付きで自律化した。push、tag、amend、rebase、reset、force push、履歴書換え、方針変更、段完了、意味的裁定、不可逆操作、外部送信、権限の迂回はHuman明示承認のままである。
+- Task Contract固定sourceの状態解決：歴史状態は受理時点のGit blob、現在有効状態はworking tree、`active_stale`は停止のまま、という三状態をv1／v2共通のresolverで扱う。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
@@ -23,10 +26,11 @@
 - [正式Issue record 会話記録方針](.reviewcompass/workflow/issues-v4/issue-htc-beb5e0bd--v1.json) — SHA-256 `a4a1511e609005193a3d127080a3eabf4f56a67529c5bd9b4e0f55b467422d62`
 - [正式Issue record 機械操作の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-c9f6c917--v1.json) — SHA-256 `66cfe50ce79136bca5e92b35b72502cedfb8b6f6f3e20ade1e027bcbf1fec0ed`
 - [正式Issue record 記録生成の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-66c3e6ca--v1.json) — SHA-256 `56e0911d6f565915ca0ad7737eae7befbb30d686d344eb5367ecc95598a8c732`
+- [意味単位commit最小ガード Decision](records/development/2026-08-05-semantic-commit-minimal-guards-decision-v1.md) — SHA-256 `07eb9cbcd1e4e1b33aff787f597a45db1be6913a0685d76f8db1169adf965d23`
 - [機械操作routing Plan提案（Human承認待ち）](docs/design/2026-08-05-machine-operation-routing-issue-plan-proposal.md) — SHA-256 `722e9448971bcf3e97423ab1b9b137ca202f1f1c0ed7afdd92a619738e608bfa`
 - [Issue Intake V4 承認Decision](records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md) — SHA-256 `019879235577b39489e4383cd0fa092c562631d3c1b1e1ffa311056c8d1d9f7c`
 - [Issue Intake V4 閉鎖Evidence](records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md) — SHA-256 `b942a9d17ea4c2818c6adb5f3ceabc0063f9b447c7ddb88ccc5baf3d1302d60e`
-- [Plan提案作成後の全test receipt](records/development/2026-08-05-machine-operation-routing-issue-plan-proposal-test-receipt-v1.json) — SHA-256 `ab00e2d552361377b4a116b9607305daf37e31d3102da95ea7fadd135b0ae849`
+- [最小ガード確定後の全test receipt](records/development/2026-08-05-semantic-commit-minimal-guards-green-test-receipt-v1.json) — SHA-256 `62c9b0bb0571ca615b77e858cfd525c0a17490a42a9c46c810e4dd488e23c9e8`
 - [V4 Human triage永続化 GREEN](records/development/2026-08-05-v4-human-triage-persistence-green-evidence-v1.md) — SHA-256 `41fcbbbd6acc278055dd3e43e64fcb0c603627319eae1fb13b853262bda305d7`
 - [過去TODO候補 Human triage資料](records/development/2026-08-05-historical-todo-intake-triage-material-v1.md) — SHA-256 `b2ad5195ffd041a527b8d92f5847606bddcdb5876cacbca05a9a9c304b39efdb`
 - [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
@@ -47,9 +51,9 @@
 - [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `b157640f940c12d733d237921cad664dbebc4925c592796394f29da1155f5e48`
 - [Work 4A Rebuild Design v3.3 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md) — SHA-256 `b99edf3b9561da34bd4c0bd8a8e86418c36be18e202eef4f408d9b2e0392e538`
 - [Work 4A Early Exit / Work 4B Decision](records/development/2026-08-05-work-4a-early-completion-and-4b-decision-v1.md) — SHA-256 `68899660b1162b0fb00e5e2b604b3c3c4831c7cc0a32eebfe9541fd0d441a29e`
-- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `57cff08c6624ffb86d94e18b22bb77c635329e9e140dec4f125704b327c33f50`
-- [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `65f34c1094c5881cb46128ee1e81eb54f7904202ac0feebfe469adb077624bd1`
+- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `6100ea7b6f0fa0ec025e076eadcd322609a0019222ad9c81045bb6ab827cca2f`
+- [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `0d34880353f06f50c7623282c765717348c8776938dc3113e28fdad4e9f8ac18`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `7e7a2971fe67640dcccf21adddbf3da917201ec94c2bec1767a6caa1322212f5`
 
 ## 次に行う一作業
 
@@ -67,7 +71,8 @@
   `.reviewcompass/workflow/triage-decisions-v4/`のV4 human triage decision（schema version 2）である。
 - 判断済み41件（全件）。うち正式Issueへ昇格したのは`HTC-BEB5E0BD`、`HTC-C9F6C917`、`HTC-66C3E6CA`の3件である。
 - Issue Intake V4は開発用・暫定の限定機能としてHuman承認済みで、実地検証は閉鎖済みである。
-- `ISSUE-HTC-C9F6C917`のPlan提案は`awaiting_human_approval`である。正式Plan、Decision、Task Contractは作っていない。
+- `ISSUE-HTC-C9F6C917`のPlan提案は`awaiting_human_approval`のままである。正式Plan、Decision、Task Contractは作っていない。
+- `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものであり、C9 Plan提案の承認ではない。
 - 正式Issue正本：`.reviewcompass/workflow/issues-v4/`（V4 issue_record schema version 2）
 
 後続作業：承認された場合の最小縦切りの実装着手判断。承認まで実装、RED test、runner・config・policy変更は行わない。
