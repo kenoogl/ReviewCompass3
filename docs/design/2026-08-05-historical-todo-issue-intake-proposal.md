@@ -45,22 +45,25 @@ FAILED tests/test_issue_resolution_pilot.py::test_repository_contains_only_the_s
 これらは`pilot_version` 2／3のconfigで検証できる形のまま残す。
 新しいversionのvalidatorは、旧versionの記録をversionごとの規則で読む。旧記録を新規則で再判定しない。
 
-### 1.2 新しいversionと三つの上限を分ける
+### 1.2 新しいversionと上限の置き方
 
 `config/development-issue-resolution-pilot-v4.json`を新規に作る（v2、v3は変更しない）。
 現行の`maximum_issue_subjects: 1`は、**「登録できる件数」と「同時に着手できる件数」を
-区別していない**。これを三つに分ける。
+区別していない**。V4では区別し、**登録済みIssue数に上限を置かない。**
 
-| 設定 | 意味 | 提案値 |
+| 設定 | 意味 | 値 |
 | --- | --- | --- |
-| `maximum_registered_issues` | 登録して保持できるIssueの総数 | 12（§8のHuman判断） |
+| 登録済みIssue数 | 発見して保存したIssueの総数 | **上限なし** |
 | `maximum_active_issues` | 同時に`in_progress`にできるIssue数 | **1** |
 | `maximum_active_leaves` | 同時に開始できるWork Item数 | **1**（既存の`single_active_leaf`と一致） |
 
-登録件数だけを増やし、**着手は一件のままとする。**これによりWork 5Aの
-`single_active_leaf`および並行禁止と矛盾しない。
+上限を置くのは「同時に手を動かす数」だけである。問題を見つけたら件数を気にせず登録でき、
+着手は常に一件に絞る。これによりWork 5Aの`single_active_leaf`および並行禁止と矛盾しない。
 
-`pilot_version` 4のconfigは、旧`maximum_issue_subjects`を持たない。
+`registered`、`untriaged`、`deferred`、`suspended`のIssueは、**作業中Issue数に数えない。**
+数えるのは`in_progress`だけである（§1.4）。
+
+`pilot_version` 4のconfigは、旧`maximum_issue_subjects`も`maximum_registered_issues`も持たない。
 validatorはversionごとに必須fieldを切り替える。旧versionでは`maximum_issue_subjects == 1`の
 検査を維持する。
 
@@ -69,6 +72,65 @@ validatorはversionごとに必須fieldを切り替える。旧versionでは`max
 現在の受入testは候補file数を1に固定している。v4では、候補の総数ではなく
 **「未triageの候補が滞留していないか」**を検査対象にする。
 具体的には、各候補が`triage_decision_ref`を持つか、`untriaged`として明示されているかを見る。
+
+### 1.4 Issueの状態と、作業中上限への算入
+
+| 状態 | 意味 | 同時作業中上限への算入 |
+| --- | --- | --- |
+| `registered`／`untriaged` | 発見・保存されたが人の裁定前 | 算入しない |
+| `deferred` | 人が後回しと決めた | 算入しない |
+| `in_progress` | 現在、解決作業をしている | **算入する。常に最大1件** |
+| `suspended` | 別の阻害問題のため中断した | 算入しない |
+| `resolved`／`rejected` | 終了した | 算入しない |
+
+#### 既存語彙との対応
+
+既存recordは`issue_record`に`state`を持たず、進行はTODOと`resolution_verdict`の
+`outcome`（`resolved`）で表していた。上表の状態語彙はV4で新設する。
+
+| V4の状態 | 既存記録での表れ方 |
+| --- | --- |
+| `registered`／`untriaged` | `triage_decision_ref`が無い候補 |
+| `deferred` | triage decisionの`disposition: defer` |
+| `in_progress` | 明示的な表現なし（TODOのactive表示だけ） |
+| `suspended` | 表現なし（V4で新設） |
+| `resolved` | `resolution_verdict.outcome: resolved` |
+| `rejected` | triage decisionの`disposition: reject` |
+
+`state`は`issue_record`のschema版上げ（`schema_version` 2）を必要とする。
+**名称だけを既存recordへ遡及適用しない。**既存の
+`ISSUE-PILOT-TODO-GROWTH-001`は`schema_version` 1のまま保持し、V4のstateを後から書き込まない。
+既存Issueの現在状態は、既存`resolution_verdict`の`outcome`から読む。
+
+### 1.5 新しい問題が見つかった場合の中断規則
+
+新しい問題の発見で作業が行き詰まらないようにする。
+
+1. 新しい問題は、現在`in_progress`のIssueがあっても**登録できる**。登録に上限は無い。
+2. 新しいIssueが現行作業を止める阻害要因**でない**限り、現行Issueを中断しない。
+   新しいIssueは`registered`のまま置く。
+3. 阻害要因である場合だけ、現行Issueを`suspended`へ移し、新しいIssueを唯一の
+   `in_progress`にできる。
+4. **新しいIssueの登録だけで、現行Issueを自動中断してはならない。**
+   中断は`blocks`関係の登録とHumanの裁定を伴う。
+5. 元のIssueの再開には、阻害Issueが`resolved`であること、または**Humanの明示的な再開裁定**を
+   必須にする。機械が自動で再開しない。
+
+### 1.6 阻害関係の循環を禁止し、根本原因へエスカレーションする
+
+`blocks`を有向関係として定義する。`A blocks B`は「Bを進めるにはAの解決が必要」を意味する。
+
+- 関係を追加するたびに、有向循環を機械が検出する。**自己循環（`A blocks A`）も拒否する。**
+- `A → B → A`のような循環を検出した場合、機械は個別Issueを相互に再開して往復させない。
+- 検出時は、循環に含まれるIssueをすべて`suspended`にし、**作業中Issueを0件にする。**
+- 機械は`root_cause_escalation_candidate`を作ってよい。ただし、根本原因Issueへの昇格、
+  優先順位、既存Issueの統合・再開は**Humanだけが決める**。
+- Humanが根本原因Issueを承認した場合だけ、それを唯一の`in_progress`にできる。
+  根本原因Issueの解決またはHumanの裁定なしに、循環に含まれたIssueを再開できない。
+
+**循環は、個別修正を増やす合図ではない。**「AのためにBが要る、BのためにAが要る」という状態は、
+一件ずつ直しても終わらない。依存関係の切り方、設計、方針のいずれかを根本から見直す必要がある、
+という信号として扱う。だから機械は往復を止め、作業中を0件にして、Humanの判断へ渡す。
 
 ## 2. source universeと抽出規則
 
@@ -207,11 +269,12 @@ Issueが増えてもTODOの表示量を増やさない。既存の`todo_projecti
 | 表示単位 | active Issueだけを行として表示する。`maximum_entries` 5を超えない |
 | 総量 | `maximum_section_bytes` 1024を超えない |
 | 禁止marker | `### 手戻り・機械化候補`、`problem:`、`evidence_refs`、`期待executor`、`実executor`をTODOへ書かない |
-| 登録済みIssue | 件数だけを表示する。個別の説明を書かない |
+| 登録済みIssue | 個別の説明を書かない。**件数の表示も必須にしない** |
 | 詳細 | すべてrecord側に置き、TODOはIDと入口だけを示す |
 
-登録12件・active 1件なら、TODOには「active 1件、登録12件」とactive 1件の入口だけが出る。
-これが「Issueを増やしてもTODOが再肥大しない」ことの機械的な担保である。
+登録が何件あっても、TODOに出るのは`in_progress`の入口だけである。
+登録件数を書くかどうかは任意とし、書く場合も一行の数値に留める。
+これが「Issueを何件登録してもTODOが再肥大しない」ことの機械的な担保である。
 
 ## 5. TDD受入条件
 
@@ -222,10 +285,18 @@ Issueが増えてもTODOの表示量を増やさない。既存の`todo_projecti
 - I1：固定snapshotから複数候補を決定的に抽出できる。同じ入力から同じ候補IDと件数になる。
 - I2：既存の解決済みIssue（`ISSUE-PILOT-TODO-GROWTH-001`）と新しい候補が共存できる。
   旧記録を書き換えない。
-- I3：Humanが選んだ複数Issueを登録でき、`maximum_registered_issues`の範囲に収まる。
-- I4：登録が複数でも`maximum_active_issues`は1のまま、active leafも1のままである。
-- I5：TODO projectionが`maximum_entries`と`maximum_section_bytes`を超えない。
-- I6：`pilot_version` 2／3の既存記録が、旧versionの規則で引き続き検証を通る。
+- I3：**登録済みIssueが何件あっても登録が成功する。**登録数に上限判定を行わない。
+- I4：`registered`、`untriaged`、`deferred`、`suspended`のIssueが複数あっても、
+  `in_progress`が一件なら有効である。
+- I5：**非阻害の新規Issueを登録しても、現行の`in_progress`が中断されない。**
+  新規Issueは`registered`のまま置かれる。
+- I6：阻害Issueへ切り替えると、旧Issueが`suspended`、新Issueだけが`in_progress`になる。
+- I7：阻害Issueが`resolved`になった後、またはHumanの再開裁定があった後だけ、
+  `suspended`のIssueを再開できる。
+- I8：TODO projectionが`maximum_entries`と`maximum_section_bytes`を超えない。
+  登録件数の表示が無くても合格する。
+- I9：`pilot_version` 2／3の既存記録が、旧versionの規則で引き続き検証を通る。
+  既存IssueへV4の`state`を書き込まない。
 
 ### 負例
 
@@ -236,10 +307,17 @@ Issueが増えてもTODOの表示量を増やさない。既存の`todo_projecti
 - J5：既存Issueと同一主題の候補を、`duplicate_suspect`を立てずに登録すると拒否する。
 - J6：`human_fields.promote_to_issue`が`null`のままIssueを作ろうとすると拒否する
   （Human裁定なしの自動Issue化）。
-- J7：`maximum_active_issues`を超えて着手しようとすると拒否する。
+- J7：**二件目の`in_progress`を開始しようとすると拒否する。**
 - J8：`maximum_active_leaves`を超えてWork Itemを開始しようとすると拒否する。
-- J9：`maximum_registered_issues`を超えて登録しようとすると拒否する。
-- J10：TODOへ禁止markerを書き込もうとすると拒否する。
+- J9：**新規Issueの登録だけで現行Issueを`suspended`にしようとすると拒否する。**
+  中断は`blocks`関係とHumanの裁定を伴う。
+- J10：**自己循環（`A blocks A`）を拒否する。**
+- J11：**二Issue以上の`blocks`循環（`A → B → A`）を拒否し、作業中Issueを0件にする。**
+  循環に含まれるIssueを機械が相互に再開しない。
+- J12：**Human裁定なしに`root_cause_escalation_candidate`をIssue化しようとすると拒否する。**
+- J13：**根本原因Issueの`resolved`またはHumanの裁定なしに、循環に含まれたIssueを再開しようと
+  すると拒否する。**
+- J14：TODOへ禁止markerを書き込もうとすると拒否する。
 
 ## 6. 段階的実施計画
 
@@ -247,12 +325,13 @@ Issueが増えてもTODOの表示量を増やさない。既存の`todo_projecti
 | --- | --- | --- | --- |
 | 1 | 本設計の承認、§8の判断 | — | **必要** |
 | 2 | I1〜I6、J1〜J10のRED固定 | 既存testを弱める必要が生じたら停止 | 不要 |
-| 3 | `pilot_version` 4のschema／config／validator実装 | 旧versionの検証が壊れたら停止 | 不要 |
+| 3 | `pilot_version` 4のschema／config／validator実装（state、`blocks`、循環検出を含む） | 旧versionの検証が壊れたら停止 | 不要 |
 | 4 | GREEN。**このとき§0の失敗も解消する** | 一件でも失敗したら停止 | 不要 |
 | 5 | 固定snapshotから候補一覧を機械生成し、Humanへ提示 | 候補0件、またはDigest不一致なら停止 | 不要（提示で停止） |
 | 6 | Human triage（一括／個別） | 一件でも`human_fields`が未記入なら停止 | **必要** |
 | 7 | 昇格を選んだ候補だけをIssue化 | `promote_to_issue`が真でないものを含めたら停止 | **必要** |
-| 8 | Plan化と着手 | active 1件を超えたら停止 | 不要 |
+| 8 | Plan化と着手 | `in_progress`が1件を超えたら停止。`blocks`循環を検出したら作業中0件で停止 | 不要 |
+| 9 | 循環検出時の根本原因Issueの承認 | Human裁定が無ければ再開しない | **必要** |
 
 単位4で§0の失敗が解消する理由は、v4のvalidatorが候補file数ではなく
 「未triage候補の滞留」を見る形へ変わるためである。testを緩めるのではなく、
@@ -268,6 +347,7 @@ Issueが増えてもTODOの表示量を増やさない。既存の`todo_projecti
 - 複数Work Itemの並行実行
 - Issue Resolutionの正式schemaとpermit（Deferred Workのまま）
 - 既存Issue、Plan、Verdictの再判定
+- `blocks`循環の自動解決。機械は検出と停止までを行い、解き方はHumanが決める
 
 ## 8. Human判断が必要な点
 
@@ -275,9 +355,11 @@ Issueが増えてもTODOの表示量を増やさない。既存の`todo_projecti
    単位4まで失敗を残したまま進めるか、それとも先に候補recordを一時退避して
    GREENへ戻してから進めるか。設計者の推奨は前者（v4導入で正しく解消する）である。
    ただし、その間は全testがGREENでないため、他作業のcommit境界に影響する。
-2. **`maximum_registered_issues`の値。**提案は12。snapshotの採用見出しから見込まれる候補数
-   （未実施7、残余risk 17前後、blocker数件）に対し、Humanが昇格を選ぶ件数の上限である。
-3. **候補IDの体系。**`HTC-0001`形式でよいか。既存の`IC-`とは別体系にするか。
+2. **候補IDの体系。**`HTC-0001`形式でよいか。既存の`IC-`とは別体系にするか。
+3. **`state`導入に伴う`issue_record`の`schema_version` 2化。**既存Issueを version 1のまま
+   保持し、V4のstateを遡及適用しない方針でよいか。
+
+登録済みIssue数の上限は、Humanの決定により**設けない**。判断事項から外した。
 
 ## 9. 本提案で行っていないこと
 
