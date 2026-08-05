@@ -1,0 +1,53 @@
+{
+  "approval_decision": {
+    "decision_id": "DEC-WORK5A-PROVENANCE-CLOSURE-REPAIR-001",
+    "relative_path": "records/development/2026-08-05-work5a-provenance-closure-repair-approval-decision-v1.md"
+  },
+  "containing_commit": "9e8cf00",
+  "content_digest": "c7393b61918ded3a4f7042f0cd00d63a67fe467fa63d36740cc714dfe9d0d3a0",
+  "digest_algorithm": "sha256",
+  "existing_record_overwritten": false,
+  "history_rewrite": false,
+  "invalidated": [
+    {
+      "content_digest": "7975c7619dbca8c95fd249303dba47e46e0d8ec681e386866e1dddfbfa38aae0",
+      "outcome": "invalidated_not_authoritative",
+      "record_id": "PV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+      "record_kind": "provenance_verdict",
+      "record_version": 1
+    },
+    {
+      "content_digest": "6c4c690a39bbf0b1a845432e8dfe6c8f155598927e74e92d51a51eb28c7d9d4c",
+      "outcome": "invalidated_not_authoritative",
+      "record_id": "AA-CM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+      "record_kind": "accepted_artifact",
+      "record_version": 1
+    }
+  ],
+  "invalidation_id": "INV-WORK5A-PROVENANCE-CLOSURE-001",
+  "invalidation_version": 1,
+  "not_invalidated": [
+    {
+      "content_digest": "a240921a70a40837efa2d45ee83def0059c125a2a343b7eb415841ddce65d8af",
+      "reason": "不整合が無い。Humanの承認判断は有効であり失われていない。案Aでそのまま再利用する。",
+      "record_id": "HD-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+      "record_kind": "human_decision",
+      "record_version": 1
+    },
+    {
+      "reason": "Requirement bindingからFinal Challengeまでの9 recordに不整合が無い。",
+      "record_kind": "upstream_nine_records",
+      "relative_path": "records/development/2026-08-05-work5a-first-real-review-run-records-v1.json",
+      "sha256": "658e5ba98d6023085709733f91130a8b64acd674b3c9ca497b3f23784d588447"
+    }
+  ],
+  "reason": "provenance_verdictの最終edgeがto: provenance_verdictでありながら、to_digestにhuman_decisionのDigestを持つ。toとto_digestが別recordを指す。recordが自分自身のDigestを内容へ含めることは不動点になり構造上成立しないため、局所修正ではなく形式の変更で直す。",
+  "record_kind": "record_invalidation",
+  "recorded_at": "2026-08-05",
+  "revert_performed": false,
+  "schema_version": 1,
+  "source_bundle": {
+    "relative_path": "records/development/2026-08-05-work5a-first-real-review-acceptance-records-v1.json",
+    "sha256": "23bb76d7c7f3a31d6a5459174222280441910478b5a537a8027bdb3c195921ce"
+  }
+}
