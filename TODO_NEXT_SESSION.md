@@ -36,7 +36,7 @@
 - [Work 4A Early Exit / Work 4B Decision](records/development/2026-08-05-work-4a-early-completion-and-4b-decision-v1.md) — SHA-256 `68899660b1162b0fb00e5e2b604b3c3c4831c7cc0a32eebfe9541fd0d441a29e`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `df5590903bd0a77cde65450b506843cc19ccb05538c4c59e15cd8ac1463db983`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `c986951795330931842f01173cf3919e09da37900d4b34adfd006cfdde8337a7`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `c95ca09fe43a1c8d39f82426396f4cbac7645e18927e5d21e8d01887b2777fdf`
 
 ## 次に行う一作業
 

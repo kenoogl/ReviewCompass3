@@ -815,29 +815,35 @@ Work 4Bは全routineの一括分類を前提にしない。LLMの説明・Dispos
 
 ### Contractとred
 
-- [ ] 一種類のReview Task Contractを固定Requirementから定義した。
-- [ ] Responsibility、Boundary、Context、Capability、Output、Acceptance、Provenance、Escalationを定めた。
+- [x] 一種類のReview Task Contractを固定Requirementから定義した。
+- [x] Responsibility、Boundary、Context、Capability、Output、Acceptance、Provenance、Escalationを定めた。
 - [ ] Definition Challengeを通し、Contractの粒度と依存を確認した。
-- [ ] Acceptance Testとnegative fixtureを先に作成した。
-- [ ] 実装がなければ期待理由で失敗するredを確認した。
+- [x] Acceptance Testとnegative fixtureを先に作成した。
+- [x] 実装がなければ期待理由で失敗するredを確認した。
 
 ### green実装
 
-- [ ] 最小schemaとvalidatorを実装した。
-- [ ] 一Contractから一Plan bundleと6 typed viewを生成した。
-- [ ] Context Manifest、Workflow permit、Harness stub、Traceを接続した。
-- [ ] deterministic stub reviewerからConformanceとFinal Challengeを生成した。
-- [ ] Human decision、Decision Record、Provenance verdict、accepted artifactを接続した。
-- [ ] read-only local GitのSource SnapshotとChange Setを接続した。
+- [x] 最小schemaとvalidatorを実装した。
+- [x] 一Contractから一Plan bundleと6 typed viewを生成した。
+- [x] Context Manifest、Workflow permit、Harness stub、Traceを接続した。
+- [x] deterministic stub reviewerからConformanceとFinal Challengeを生成した。
+- [x] Human decision、Decision Record、Provenance verdict、accepted artifactを接続した。
+- [x] read-only local GitのSource SnapshotとChange Setを接続した。
 - [ ] bootstrap Current Work Projectionを正式recordへ写像し、textとmachine-readable出力の同値を確認した。
 - [ ] 同じTestを変更せずgreenにし、refactor後も再確認した。
 
 ### 完了関門
 
-- [ ] Requirementからaccepted artifactまで一つのE2Eがgreenである。
-- [ ] 汎用DSL、plugin、任意Task orchestration、画面UIを実装していない。
+- [x] Requirementからaccepted artifactまで一つのE2Eがgreenである。
+- [x] 汎用DSL、plugin、任意Task orchestration、画面UIを実装していない。
 
-`Evidence`：未記録
+`Evidence`：
+`records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md`、
+`records/development/2026-08-05-work5a-first-real-review-acceptance-v2-evidence.md`、
+`records/development/2026-08-05-work5a-provenance-closure-invalidation-v1.json`、
+`records/development/2026-08-05-work5a-provenance-closure-repair-green-evidence-v1.md`。
+最終確認は公式venv runnerの`777 passed`。Definition Challenge、Current Work Projectionの正式record写像、
+テストを変更しないrefactor後再確認は未完了のまま残す。
 
 ## 9. Work 6A：初期sliceのnegative path
 
