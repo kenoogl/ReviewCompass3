@@ -1152,7 +1152,9 @@ def test_l6_repository_issue_set_is_consistent(intake, config):
     )
     assert len(stored) == len(effective)
     if stored:
-        assert list(effective) == [SESSION_POLICY_CANDIDATE]
+        # V4は登録済みIssue数に上限を置かない。Issueの追加を禁止せず、
+        # 既存の会話記録Issueが残り内容が変わらないことだけを固定する。
+        assert SESSION_POLICY_CANDIDATE in effective
         issue = effective[SESSION_POLICY_CANDIDATE]
         assert issue["issue_id"] == SESSION_POLICY_ISSUE_ID
         assert issue["problem"] == SESSION_POLICY_PROBLEM

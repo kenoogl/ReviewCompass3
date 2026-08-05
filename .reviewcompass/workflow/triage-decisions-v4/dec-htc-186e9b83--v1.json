@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-186E9B83",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:40:55+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-186E9B83",
+    "candidate_content_digest": "2aa672216ac89be2b6fcfded754d837cd04146b8ee0bbe5296e5a37ab69f5de2"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "high",
+    "priority": "high",
+    "promote_to_issue": false
+  },
+  "disposition": "defer",
+  "blocking": false,
+  "rationale": "この候補は、検索語に含まれるバッククォートをshellが解釈してしまい、検索が一度失敗した観測である。コマンドの引用は決定的に決まる手順であり、都度文字列として組み立てるべきものではない。この候補は単独で直すのではなく、根本原因Issue`ISSUE-HTC-C9F6C917`で扱う。ここでの`defer`は問題を放置するという意味ではない。同じ根本原因を別のIssueとして重複登録しない、という意味である。未解決であり再発もするため影響と優先順位は高いが、現在進行中のWorkを止める性質ではないためblockingにはしない。",
+  "next_action": "根本原因Issue`ISSUE-HTC-C9F6C917`の扱いが決まるまで、この候補を個別に着手しない。個別のIssue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "2ea6da2c95ac3ae69ad04dd1885331feed5e4b9533d3fb897150cf3b14dc9283"
+}

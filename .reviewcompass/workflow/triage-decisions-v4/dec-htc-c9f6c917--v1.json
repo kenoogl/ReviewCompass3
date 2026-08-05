@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-C9F6C917",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:40:55+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-C9F6C917",
+    "candidate_content_digest": "380fb83e6bf42b5e7e6a82ae14d3fb6026342eec3bddf9d71d1da0fed9ea8fe0"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "high",
+    "priority": "high",
+    "promote_to_issue": true
+  },
+  "disposition": "issue_resolution",
+  "blocking": false,
+  "rationale": "この候補は、`.git`が読み取り専用だと事前に分かっていたのに通常権限で`git add`を実行して止まった観測である。単発の操作ミスとして個別に直すのではなく、共通の原因を追跡する。共通の原因は、LLMが機械操作の実行手順を都度その場で文字列として組み立てていることである。権限の選択、コマンドの引用、shellの特殊変数、ツール呼出の構文、Python cacheの書込み先はいずれも決定的に決まる手順であり、機械側の定型処理が扱うべきものである。同じ原因の観測として`HTC-477EA1A4`、`HTC-186E9B83`、`HTC-9DCE8503`、`HTC-A5D1BCCA`の4候補があり、これらは個別のIssueにせず、この`ISSUE-HTC-C9F6C917`で一緒に扱う。未解決であり再発もするため影響と優先順位は高いが、現在進行中のWorkを止める性質ではないためblockingにはしない。このIssueは、sandboxの承認そのものを迂回したり無効にしたりするためのものではない。必要な権限を最初の実行の前に決め、定型の手順として実行するための追跡である。",
+  "next_action": "正式Issue`ISSUE-HTC-C9F6C917`として登録し、Plan化するかどうかをHumanが判断する。Git、shell、Python cacheの自動化は実装しない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": true,
+    "issue_id": "ISSUE-HTC-C9F6C917"
+  },
+  "content_digest": "76a10c2cb7f21cee8657797e3720965754ec5ef6e687311dbac2fcee52e7889c"
+}

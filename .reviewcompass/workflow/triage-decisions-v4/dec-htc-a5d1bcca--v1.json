@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-A5D1BCCA",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:40:55+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-A5D1BCCA",
+    "candidate_content_digest": "27e0319409fa360dcfc1be6291e29cd3fd5fc5a0d34df206ac299035cdad7532"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "high",
+    "priority": "high",
+    "promote_to_issue": false
+  },
+  "disposition": "defer",
+  "blocking": false,
+  "rationale": "この候補は、並列実行するツール呼出の構文をLLMが誤記し、構文エラーが一度発生した観測である。ツール呼出の構文は決定的に決まる手順であり、都度手書きすべきものではない。この候補は単独で直すのではなく、根本原因Issue`ISSUE-HTC-C9F6C917`で扱う。ここでの`defer`は問題を放置するという意味ではない。同じ根本原因を別のIssueとして重複登録しない、という意味である。未解決であり再発もするため影響と優先順位は高いが、現在進行中のWorkを止める性質ではないためblockingにはしない。",
+  "next_action": "根本原因Issue`ISSUE-HTC-C9F6C917`の扱いが決まるまで、この候補を個別に着手しない。個別のIssue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "bb8d1e61b97fdce601f170a958b03e6cd65b0e4ac6b4421b6c1907d01f759848"
+}
