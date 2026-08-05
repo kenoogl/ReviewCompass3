@@ -260,7 +260,7 @@ Work 5AのRuntime componentとして昇格させない。
 
 ## 7. Requirement → Contract obligation → 受入testの対応
 
-根拠のない新Requirementを作らない。既存50件のうち、本Contractが直接束縛するのは次の14件とする。
+根拠のない新Requirementを作らない。既存50件のうち、本Contractが直接束縛するのは次の16件とする。
 
 | Requirement | Contract obligation | 受入test（Work 5A） |
 | --- | --- | --- |
@@ -279,11 +279,9 @@ Work 5AのRuntime componentとして昇格させない。
 | `REQ-TRACE-005` | Provenanceを型付き辺で連結しverdict生成 | A9 verdict `verified`／B8 辺欠落で停止 |
 | `REQ-TRIAGE-003` | Human決定を対象Digestへ束縛 | A7 Digest束縛／B9 不一致を拒否 |
 | `REQ-WORKFLOW-005` | `new_development / fresh`を独立に固定 | A10 二軸の記録 |
+| `REQ-WORKFLOW-004` | ReviewCompass3自身の文書を、通常のContract、Context、Harness、Triage、Trace、Workflow関門でreviewする。自己対象の特例や関門迂回を許さない | A11 自己対象でも通常経路・関門を迂回しない |
 
-`REQ-WORKFLOW-004`（自身の成果物にも同じ契約を適用）は、本Contractが
-ReviewCompass3自身の文書を対象とすることで満たす。受入testはA1〜A10全体で示す。
-
-残る35件は本Contractで束縛せず、`deferred`としてowner・着手条件を保つ。
+残る34件は本Contractで束縛せず、`deferred`としてowner・着手条件を保つ。
 新しい義務を発明せず、既存Requirementの範囲内に収める。
 
 ## 8. Work 5A用の受入条件案
@@ -302,6 +300,7 @@ ReviewCompass3自身の文書を対象とすることで満たす。受入test�
 - A8：Capture Planが実行前に生成される。
 - A9：Provenance verdictが`verified`になり、accepted artifactが確定する。
 - A10：`origin`と`continuation`が独立に記録される。
+- A11：自己対象のreviewでも通常経路と関門を迂回せず、自己対象の特例を作らない。
 
 ### 8.2 負例
 
