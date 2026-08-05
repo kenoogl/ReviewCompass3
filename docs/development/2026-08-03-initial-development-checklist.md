@@ -865,7 +865,7 @@ Work 4Bは全routineの一括分類を前提にしない。LLMの説明・Dispos
 
 - [x] 一種類のReview Task Contractを固定Requirementから定義した。
 - [x] Responsibility、Boundary、Context、Capability、Output、Acceptance、Provenance、Escalationを定めた。
-- [ ] Definition Challengeを通し、Contractの粒度と依存を確認した。
+- [x] Definition Challengeを通し、Contractの粒度と依存を確認した。
 - [x] Acceptance Testとnegative fixtureを先に作成した。
 - [x] 実装がなければ期待理由で失敗するredを確認した。
 
@@ -889,9 +889,13 @@ Work 4Bは全routineの一括分類を前提にしない。LLMの説明・Dispos
 `records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md`、
 `records/development/2026-08-05-work5a-first-real-review-acceptance-v2-evidence.md`、
 `records/development/2026-08-05-work5a-provenance-closure-invalidation-v1.json`、
-`records/development/2026-08-05-work5a-provenance-closure-repair-green-evidence-v1.md`。
-最終確認は公式venv runnerの`777 passed`。Definition Challenge、Current Work Projectionの正式record写像、
-テストを変更しないrefactor後再確認は未完了のまま残す。
+`records/development/2026-08-05-work5a-provenance-closure-repair-green-evidence-v1.md`、
+`records/development/2026-08-05-work5a-definition-challenge-first-run-evidence-v1.md`、
+`records/development/2026-08-06-work5a-contract-v2-review-acceptance-evidence-v1.md`。
+Definition Challengeは`passed`、blocking Finding 0件であり、Contract version 2のReview経路は
+11 node・10 edgeのProvenanceとaccepted artifactまで完了した。Codexの独立再確認は関連`83 passed`、
+公式全`1007 passed`。Current Work Projectionの正式record写像と、同じTestを変更しないrefactor後再確認は
+未完了のまま残す。
 
 ## 9. Work 6A：初期sliceのnegative path
 
