@@ -51,25 +51,25 @@
 
 ## 次に行う一作業
 
-次の作業候補を提示し、人の選択を待つ。選択があるまで新しい実装へ着手しない。
+`ISSUE-HTC-C9F6C917`後続範囲のPlan提案に対するHuman判断を受ける。提案はHuman承認待ちであり、
+実装承認ではない。
 
 開始条件：
 
 - 本handoffを含むcommit後のclean transition。
-- 下の候補から人が一つを選ぶこと。
+- 下の4点についてHumanが判断すること。
 
-作業候補：
+Human判断点：
 
-- 候補A：`ISSUE-HTC-C9F6C917`の後続範囲。構造化argv executor、cache root固定、既存直接操作の移行順。
-- 候補B：`ISSUE-HTC-BEB5E0BD`のPlan化。会話記録の保存期間、削除、暗号化、backupの方針。
-- 候補C：`ISSUE-HTC-66C3E6CA`のEvidence／Decisionへの拡張（案B）。TODOでの実運用が手入力訂正なしで
-  複数回通ってから判断する条件付きである。
-- 候補D：Work 5A 最小Review Task Contractの継続。当面の進行入口として残っている。
+- argv executorの許容操作種別と実行責任の境界。
+- cache rootの配置と、削除するか保持するかの方針。
+- 移行対象の優先順と、最初の実装sliceの承認可否。
+- host側tool構文と外部送信を本Issueで扱わないことの確認。
 
 完了データ：
 
 - 過去TODO候補41件は全件triage済み。正式Issueは3件で、正本は`.reviewcompass/workflow/issues-v4/`である。
-- `ISSUE-HTC-C9F6C917`は§3最小縦切りだけ承認・実装済み。後続範囲は未実施である。
+- `ISSUE-HTC-C9F6C917`は§3最小縦切りだけ承認・実装済みで、`registered`かつnonblockingのままである。後続範囲は未実施で、Plan提案`docs/design/2026-08-05-machine-operation-routing-follow-on-plan-proposal.md`がHuman承認待ちである。推奨した段階順は、設計固定→RED test→argv executor最小slice→cache root最小slice→移行inventory→操作種別ごとの段階移行である。
 - `ISSUE-HTC-66C3E6CA`はTODO最小縦切りだけ承認・実装済み。案Bは未承認である。
 - `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものである。
 
