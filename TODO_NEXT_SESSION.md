@@ -6,8 +6,8 @@
 
 ## 現在位置
 
-- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AはDefinition Challenge設計とHuman Contract approval gateの採用を終え、Claude実装handoffを固定した。
-- 現在作業：Work 5A Definition Challenge。Codexの設計・指示作成は完了し、HumanがClaudeへ実装指示書を渡して完了連絡を待つ段階である。Codexは実装を行わず、Claude完了後に独立検証する。
+- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AはDefinition Challenge設計とHuman Contract approval gateの採用に続き、実装と初回Runまで到達した。
+- 現在作業：Work 5A Definition Challenge。ClaudeがRED、GREEN、初回Definition Challenge Runを実施した。初回Runは`passed`、blocking Finding 0件である。`contract_approval`は作らず、Contract version 2のHuman承認前で停止している。Codexの独立検証待ちである。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,9 @@
 
 ## 最新のauthority／Evidence
 
+- [初回Definition Challenge Run Evidence](records/development/2026-08-05-work5a-definition-challenge-first-run-evidence-v1.md) — SHA-256 `ad7b82ae74cec8655c205191feb4bf89801353eb8c7838f239f8b1c7da4c6658`
+- [初回Definition Challenge Run records](records/development/2026-08-05-work5a-definition-challenge-first-run-records-v1.json) — SHA-256 `aace8f35b79cbe4e3113433b55e903e86e0171f04738b180e1728eb83bd93ca6`
+- [Definition Challenge GREEN Evidence](records/development/2026-08-05-work5a-definition-challenge-green-evidence-v1.md) — SHA-256 `3db6b9fe112dc0ab54e2f8edf981a8ba00dd0c94f02be30c38f7c7aa6105a397`
 - [Claude向けDefinition Challenge実装指示](records/session-handoffs/2026-08-05-codex-to-claude-work5a-definition-challenge-implementation.md) — SHA-256 `520d3220fc190c27b69161d4a5e8cafd446a5a6d63e04e72c3d094b220fd6961`
 - [approval gate採用Decision](records/development/2026-08-05-work5a-definition-challenge-contract-approval-gate-adoption-decision-v1.md) — SHA-256 `90f4f8a82041955c0fc4125b88fdd9ab80658a13a22f6eb1027fcbc4f35e2ac3`
 - [approval gate Amendment](docs/design/2026-08-05-work5a-definition-challenge-contract-approval-gate-amendment-v1.md) — SHA-256 `881a9192322e1e1176d3b453dfa121b6dea1a99a6e1c438ad637fc209ed5d0da`
@@ -27,24 +30,24 @@
 
 ## 次に行う一作業
 
-HumanがClaudeへDefinition Challenge実装指示書を渡し、Claudeの作業終了後にCodexへ知らせる。
+CodexがClaudeのcommitと初回Definition Challenge Runを独立検証し、Contract version 2のHuman承認要否を提示する。
 
 開始条件：
 
-- commit `be82301`の実装指示書と、開始基準commit `6b6c989`の固定資料をClaudeが読めること
-- Claude開始時のworktreeに他者の未コミット変更が無いこと
+- Claudeの3 commit（既存Test修正、GREEN実装、初回Run）がcleanであること
+- HumanがClaudeの作業終了をCodexへ知らせること
 
 完了条件：
 
-- Claudeが指示書の停止境界まで実施し、RED、GREEN、初回Runのcommitと完了報告を作ること
-- HumanがClaudeの作業終了をCodexへ知らせること
+- Codexが差分、Digest、RED／GREEN／全Test、初回Runのidentityとverdictを独立検証すること
+- Contract version 2を承認するかどうかの判断材料をHumanへ提示すること
 
-後続作業：CodexがClaudeのcommit、差分、Digest、RED／GREEN／全Test、初回Definition Challenge Runを独立検証し、Contract version 2のHuman承認要否を提示する。
+後続作業：Humanが承認する場合だけ`contract_approval`を作り、その後にversion 2のcompileと新しいReview Runへ進む。承認前はcompile、Plan bundle、accepted artifactを作らない。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。実装作業はClaudeへの受け渡し待ちであり、Codexは完了通知まで実装しない。
-- Human判断待ち：現在は指示書のClaudeへの受け渡しだけ。初回Definition Challenge Runがpassedの場合、後続でContract version 2を承認するかHumanが判断する。
+- blocker：なし。実装と初回Runは完了しており、Codexの独立検証を待つ。
+- Human判断待ち：Contract version 2を承認するかどうか。初回Definition Challenge Runは`passed`、blocking Finding 0件である。承認recordが作られるまで、compile、Review Run、accepted artifactへ進まない。
 
 ## stale・deferred
 
@@ -57,8 +60,8 @@ HumanがClaudeへDefinition Challenge実装指示書を渡し、Claudeの作業�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：既存Work 5A `tests/test_first_review_task_contract_e2e.py`を再実行し`38 passed`（0.15秒）。Definition Challengeの新TestはClaudeがREDから作成する。
-- 直近の全Test：venv公式runner `962 passed`、Python 3.9.6、pytest 8.4.2、fallback false（今回は再実行していない）。
+- 直近の関連Test：Definition Challenge `tests/test_work5a_definition_challenge.py` `45 passed`、既存Work 5A `tests/test_first_review_task_contract_e2e.py` `38 passed`
+- 直近の全Test：venv公式runner `1007 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

@@ -1,0 +1,427 @@
+{
+  "authority_inputs": {
+    "docs/design/2026-08-05-work5a-definition-challenge-contract-approval-gate-amendment-v1.md": "881a9192322e1e1176d3b453dfa121b6dea1a99a6e1c438ad637fc209ed5d0da",
+    "docs/design/2026-08-05-work5a-definition-challenge-proposal.md": "4d8f3fdf8d85b3513cc08575f12e92a80e617e51dff2329c02cf9d84399bfd4f",
+    "records/development/2026-08-05-work5a-definition-challenge-approval-decision-v1.md": "9ca6a0f75c00f2979437fceca225ede10d28c84f1578a1624db0f04747d7214d",
+    "records/development/2026-08-05-work5a-definition-challenge-contract-approval-gate-adoption-decision-v1.md": "90f4f8a82041955c0fc4125b88fdd9ab80658a13a22f6eb1027fcbc4f35e2ac3",
+    "records/session-handoffs/2026-08-05-codex-to-claude-work5a-definition-challenge-implementation.md": "520d3220fc190c27b69161d4a5e8cafd446a5a6d63e04e72c3d094b220fd6961"
+  },
+  "bundle_kind": "definition_challenge_first_run",
+  "bundle_version": 1,
+  "contract_version_under_challenge": 2,
+  "digest_verification": {
+    "contract_supersedes_v1": {
+      "content_digest": "e67dc0d175510d22fbb657556361757f0b147ca7dcaddbe8941c3a9cc939ed98",
+      "digest_algorithm": "sha256",
+      "record_id": "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+      "record_kind": "review_task_contract",
+      "record_version": 1
+    },
+    "material_file_count": 19,
+    "material_files_reverified": true,
+    "verdict_contract_ref_matches": true,
+    "verdict_material_set_ref_matches": true
+  },
+  "executed_steps": [
+    "requirement_binding",
+    "draft_review_task_contract_v2",
+    "definition_challenge_material_set",
+    "definition_challenge_verdict"
+  ],
+  "not_executed_steps": [
+    "contract_approval",
+    "compile_verdict",
+    "plan_bundle",
+    "context_manifest",
+    "workflow_permit",
+    "finding_set",
+    "conformance_verdict",
+    "final_challenge_verdict",
+    "human_decision",
+    "provenance_verdict",
+    "accepted_artifact"
+  ],
+  "recorded_at": "2026-08-06T06:12:09+0900",
+  "records": {
+    "definition_challenge_material_set": {
+      "content_digest": "d90b9f5efb12bd8bc3b58174f8c323017356194133481bfa9e2f2fe30a778816",
+      "contract_ref": {
+        "content_digest": "cfa129d3afce155a683fed7e7da07c3272fb89922264edf79c239b6d3846cfb4",
+        "digest_algorithm": "sha256",
+        "record_id": "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "record_kind": "review_task_contract",
+        "record_version": 2
+      },
+      "digest_algorithm": "sha256",
+      "files": [
+        {
+          "relative_path": "docs/current/reviewcompass3-plan-current.md",
+          "sha256": "1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f"
+        },
+        {
+          "relative_path": "docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md",
+          "sha256": "14901323a958d686ba0ad0aed62b20b7b7d79908afcced08dc90f72fdb3d2054"
+        },
+        {
+          "relative_path": "docs/development/2026-08-02-development-policy.md",
+          "sha256": "0d34880353f06f50c7623282c765717348c8776938dc3113e28fdad4e9f8ac18"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-001--v1.json",
+          "sha256": "fa9af04fb83b5c61da03556e4acfec9e89421c60089b268d797b531c67c5e753"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-002--v1.json",
+          "sha256": "3b8b25ee890277a3c158e52d071e0be7220f9590669379c4d09358e4c428bd4a"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-003--v1.json",
+          "sha256": "1d87a0b0a70b3a8e4dc98de70425769f9ebb35bcbfbfb932b80e10699bc97821"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-004--v1.json",
+          "sha256": "2d1e2ec7d8c86d122536399f89d0f4d8c51e0f10407b8444beca94abe2e14454"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-005--v1.json",
+          "sha256": "212d11d8e568d9c7f1efbfca81d40040637c87b08081d50618068b6f6d79f402"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-001--v1.json",
+          "sha256": "d183c9c1392ac37fc61771fadfa97f4d0bbe119c832741a9d208fa637dd3ea8b"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-002--v1.json",
+          "sha256": "2050007260726a60204a79846a4406c467899c807fa31eacb576493e66580c62"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-003--v1.json",
+          "sha256": "1d87b64d4e2c3f47065bf048ab5944d4ebf5ee380f1ed1c5e7b13e7cde9b1a01"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-004--v1.json",
+          "sha256": "5b0835fd9fb50eee64952575f3a98d9f1d2f43e4f9f82037c5a7abdc66985ebf"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-005--v1.json",
+          "sha256": "de25d196e7dcbf755f0a027f89e1c322d3551d303c2472a5d76a3d6e14eab069"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-exec-001--v1.json",
+          "sha256": "c37e02e5000d8fe128c894fdfbb229164410beaef40780a60a7483b66969c9da"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-trace-002--v1.json",
+          "sha256": "02bb14f54b69e7b03e30f6bbdca0dab3748a4e63c0b0e8dc240545709b5fa2f0"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-trace-005--v1.json",
+          "sha256": "c1c3049b37d0a8e625de95e81fd256942a588a8d0ff79ab1085debd4fd0749e4"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-triage-003--v1.json",
+          "sha256": "55aa6b6d241709e5754013e3bfc13a32610ec7de82ed7c52b16d2eaf882a1010"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-workflow-004--v1.json",
+          "sha256": "6cfb1755abaef54ca03903773d770d5e8d8d9da41eebc405c0731d9becfffa2b"
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-workflow-005--v1.json",
+          "sha256": "9ac49171d08fbcc79fe00bac17d4c926c6f2dc6a1068e40f3e0c16876d8a9186"
+        }
+      ],
+      "record_id": "DCM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+      "record_kind": "definition_challenge_material_set",
+      "record_version": 1,
+      "records": []
+    },
+    "definition_challenge_verdict": {
+      "blocking_count": 0,
+      "checks": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8"
+      ],
+      "content_digest": "d951862f9ab8b760afe796a4356a1a89cc6dd8053bb597768b4916b7cde4a967",
+      "contract_ref": {
+        "content_digest": "cfa129d3afce155a683fed7e7da07c3272fb89922264edf79c239b6d3846cfb4",
+        "digest_algorithm": "sha256",
+        "record_id": "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "record_kind": "review_task_contract",
+        "record_version": 2
+      },
+      "findings": [],
+      "material_set_ref": {
+        "content_digest": "d90b9f5efb12bd8bc3b58174f8c323017356194133481bfa9e2f2fe30a778816",
+        "digest_algorithm": "sha256",
+        "record_id": "DCM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "record_kind": "definition_challenge_material_set",
+        "record_version": 1
+      },
+      "owner": "definition_challenge_owner",
+      "record_id": "DCV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+      "record_kind": "definition_challenge_verdict",
+      "record_version": 1,
+      "requirement_binding_ref": {
+        "content_digest": "831217a7c3850fb711427ddc2c6aaf686b9155338e34dfa406a6fbc9f7af68de",
+        "digest_algorithm": "sha256",
+        "record_id": "RB-FIRST-REVIEW-CONTRACT",
+        "record_kind": "requirement_binding",
+        "record_version": 1
+      },
+      "status": "passed"
+    },
+    "requirement_binding": {
+      "content_digest": "831217a7c3850fb711427ddc2c6aaf686b9155338e34dfa406a6fbc9f7af68de",
+      "record_id": "RB-FIRST-REVIEW-CONTRACT",
+      "record_kind": "requirement_binding",
+      "record_version": 1,
+      "requirements": [
+        {
+          "relative_path": "records/requirements/definitions/req-context-001--v1.json",
+          "requirement_id": "REQ-CONTEXT-001",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-002--v1.json",
+          "requirement_id": "REQ-CONTEXT-002",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-003--v1.json",
+          "requirement_id": "REQ-CONTEXT-003",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-004--v1.json",
+          "requirement_id": "REQ-CONTEXT-004",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-context-005--v1.json",
+          "requirement_id": "REQ-CONTEXT-005",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-001--v1.json",
+          "requirement_id": "REQ-CONTRACT-001",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-002--v1.json",
+          "requirement_id": "REQ-CONTRACT-002",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-003--v1.json",
+          "requirement_id": "REQ-CONTRACT-003",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-004--v1.json",
+          "requirement_id": "REQ-CONTRACT-004",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-contract-005--v1.json",
+          "requirement_id": "REQ-CONTRACT-005",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-exec-001--v1.json",
+          "requirement_id": "REQ-EXEC-001",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-trace-002--v1.json",
+          "requirement_id": "REQ-TRACE-002",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-trace-005--v1.json",
+          "requirement_id": "REQ-TRACE-005",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-triage-003--v1.json",
+          "requirement_id": "REQ-TRIAGE-003",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-workflow-004--v1.json",
+          "requirement_id": "REQ-WORKFLOW-004",
+          "requirement_version": 1
+        },
+        {
+          "relative_path": "records/requirements/definitions/req-workflow-005--v1.json",
+          "requirement_id": "REQ-WORKFLOW-005",
+          "requirement_version": 1
+        }
+      ],
+      "unreceived_requirement_ids": []
+    },
+    "review_task_contract": {
+      "acceptance": [
+        "every_bound_requirement_has_receiver",
+        "conformance_passed",
+        "final_challenge_passed",
+        "human_decision_bound_to_target_digest",
+        "provenance_verified",
+        "definition_challenge_passed",
+        "contract_approval_recorded"
+      ],
+      "allowed_capabilities": {
+        "call_llm": false,
+        "compute_digest": true,
+        "external_transmission": false,
+        "git_write": false,
+        "read_fixed_snapshot": true,
+        "run_deterministic_reviewer": true,
+        "write_artifact": false
+      },
+      "boundary": {
+        "gate_bypass_allowed": false,
+        "self_application": true,
+        "source_universe": "fixed_source_snapshot",
+        "target_paths": [
+          "docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md"
+        ],
+        "writes_artifact": false
+      },
+      "content_digest": "cfa129d3afce155a683fed7e7da07c3272fb89922264edf79c239b6d3846cfb4",
+      "context_obligations": [
+        "OBL-CONTEXT-DECLARATION",
+        "OBL-MATERIAL-BUNDLE",
+        "OBL-SCOPE-CONTRACT",
+        "OBL-CONTEXT-FRESHNESS",
+        "OBL-EXPLICIT-MATERIAL-ONLY"
+      ],
+      "escalation": {
+        "conformance_failed": "stop",
+        "context_incomplete": "context_incomplete",
+        "context_stale": "stale",
+        "contract_approval_missing": "not_compilable",
+        "contract_approval_rejected": "stop",
+        "definition_challenge_failed": "stop",
+        "final_challenge_failed": "stop",
+        "human_rejected": "stop",
+        "requirement_missing": "not_compilable",
+        "source_changed": "stale"
+      },
+      "expected_output": {
+        "finding_fields": [
+          "finding_id",
+          "severity",
+          "target_ref",
+          "requirement_ref",
+          "rule_id",
+          "description"
+        ],
+        "finding_severity_classes": [
+          "error",
+          "warning",
+          "info"
+        ]
+      },
+      "identity": {
+        "continuation": "fresh",
+        "contract_type": "review_task_contract",
+        "origin": "new_development",
+        "scheduler_policy": "single_active_leaf",
+        "task_contract_id": "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+        "task_contract_version": 2
+      },
+      "preconditions": [
+        "requirement_binding_resolved",
+        "source_snapshot_fixed",
+        "contract_compiled",
+        "workflow_permitted",
+        "single_active_leaf_free"
+      ],
+      "provenance_obligations": {
+        "capture_plan_before_execution": true,
+        "decision_class": "review_acceptance",
+        "required_edges": [
+          "requirement_binding",
+          "review_task_contract",
+          "definition_challenge_verdict",
+          "contract_approval",
+          "compile_verdict",
+          "context_manifest",
+          "workflow_permit",
+          "finding_set",
+          "conformance_verdict",
+          "final_challenge_verdict",
+          "human_decision"
+        ]
+      },
+      "record_id": "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2",
+      "record_kind": "review_task_contract",
+      "record_version": 2,
+      "requirement_binding_ref": {
+        "content_digest": "831217a7c3850fb711427ddc2c6aaf686b9155338e34dfa406a6fbc9f7af68de",
+        "digest_algorithm": "sha256",
+        "record_id": "RB-FIRST-REVIEW-CONTRACT",
+        "record_kind": "requirement_binding",
+        "record_version": 1
+      },
+      "requirement_ids": [
+        "REQ-CONTEXT-001",
+        "REQ-CONTEXT-002",
+        "REQ-CONTEXT-003",
+        "REQ-CONTEXT-004",
+        "REQ-CONTEXT-005",
+        "REQ-CONTRACT-001",
+        "REQ-CONTRACT-002",
+        "REQ-CONTRACT-003",
+        "REQ-CONTRACT-004",
+        "REQ-CONTRACT-005",
+        "REQ-EXEC-001",
+        "REQ-TRACE-002",
+        "REQ-TRACE-005",
+        "REQ-TRIAGE-003",
+        "REQ-WORKFLOW-004",
+        "REQ-WORKFLOW-005"
+      ],
+      "requirement_receivers": {
+        "REQ-CONTEXT-001": "context_obligations",
+        "REQ-CONTEXT-002": "context_obligations",
+        "REQ-CONTEXT-003": "boundary",
+        "REQ-CONTEXT-004": "preconditions",
+        "REQ-CONTEXT-005": "context_obligations",
+        "REQ-CONTRACT-001": "identity",
+        "REQ-CONTRACT-002": "expected_output",
+        "REQ-CONTRACT-003": "acceptance",
+        "REQ-CONTRACT-004": "acceptance",
+        "REQ-CONTRACT-005": "provenance_obligations",
+        "REQ-EXEC-001": "preconditions",
+        "REQ-TRACE-002": "responsibility",
+        "REQ-TRACE-005": "provenance_obligations",
+        "REQ-TRIAGE-003": "escalation",
+        "REQ-WORKFLOW-004": "boundary",
+        "REQ-WORKFLOW-005": "identity"
+      },
+      "responsibility": "固定した一件の文書変更が束縛Requirementへ適合するかを判定し、不適合を構造化Findingとして返す。文書を書き換えず、Requirementを改訂しない。",
+      "review_owners": {
+        "conformance": "conformance_owner",
+        "contract_approval": "contract_approval_owner",
+        "definition_challenge": "definition_challenge_owner",
+        "final_challenge": "final_challenge_owner",
+        "human_decision": "human_decision_owner"
+      },
+      "supersedes": {
+        "content_digest": "e67dc0d175510d22fbb657556361757f0b147ca7dcaddbe8941c3a9cc939ed98",
+        "digest_algorithm": "sha256",
+        "record_id": "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+        "record_kind": "review_task_contract",
+        "record_version": 1
+      }
+    }
+  }
+}
