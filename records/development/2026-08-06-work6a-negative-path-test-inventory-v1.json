@@ -1,0 +1,450 @@
+{
+  "record_kind": "work6a_negative_path_test_inventory",
+  "record_version": 1,
+  "recorded_at": "2026-08-06T08:53:06+0900",
+  "approved_decision": {
+    "decision_id": "DEC-WORK5A-PROJECTION-ROUTING-001",
+    "path": "records/development/2026-08-06-work5a-current-work-projection-routing-decision-v1.md",
+    "sha256": "f084b471d3fe4ba40a9c6a7a5e3882fa78090da54c7e9b19b04547dde5307eda"
+  },
+  "proposal": {
+    "path": "docs/design/2026-08-06-work5a-current-work-projection-routing-proposal.md",
+    "sha256": "c061be7d5abd1f428497f59d2b4ccc352b699d657d038d11f1d359a76e587809"
+  },
+  "scope_note": "本inventoryはWork 6A項目と既存Testの対応を機械抽出と意味判断で記録したものである。承認範囲はRED固定までであり、GREEN実装、正式Current Work Projection写像、新schema、新moduleは含まない。",
+  "extraction_rules": {
+    "checklist_items": "`docs/development/2026-08-03-initial-development-checklist.md`の見出し`## 9. Work 6A：初期sliceのnegative path`から次の`## `見出しまでの`- [ ] `／`- [x] `行。",
+    "plan_items": "`docs/current/reviewcompass3-plan-current.md`の見出し`### Work 6A：初期sliceのnegative path`から次の`### `見出しまでの`- `行。折返し継続行は同一項目へ連結した。",
+    "test_functions": "`tests/test_*.py`をPython ASTで解析し、`test_`で始まる関数定義名を採る。",
+    "classification": "3区分は機械抽出ではなく意味判断で付けた。`covered_by_existing_test`は当該項目の中核negative pathを直接assertする既存testが存在する場合に限り、部分被覆はrationaleへ残余を明記した。"
+  },
+  "counts": {
+    "checklist_items": 11,
+    "plan_items": 28,
+    "test_files_including_new": 139,
+    "test_files_excluding_new": 138,
+    "test_functions_including_new": 820,
+    "test_functions_excluding_new": 814,
+    "red_test_functions_added_now": 6
+  },
+  "fixed_sources": [
+    {
+      "path": "docs/development/2026-08-03-initial-development-checklist.md",
+      "sha256": "1bd743b0fd110342900996199b2a81eaf2b42440f28318f931e43a78b039a550"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f"
+    },
+    {
+      "path": "tools/development/session_log_bootstrap.py",
+      "sha256": "55a7c38b8d60101d709f21196f06db1943325e8d149b8c68aad69055158ac5c3"
+    },
+    {
+      "path": "tests/test_work6a_current_work_projection_negative.py",
+      "sha256": "25a76b7ba39dc032c3e30204cf9d83377129d9b530ab4eeb90dd0f5a199ade0f"
+    },
+    {
+      "path": "records/development/2026-08-06-work5a-current-work-projection-routing-decision-v1.md",
+      "sha256": "f084b471d3fe4ba40a9c6a7a5e3882fa78090da54c7e9b19b04547dde5307eda"
+    },
+    {
+      "path": "docs/design/2026-08-06-work5a-current-work-projection-routing-proposal.md",
+      "sha256": "c061be7d5abd1f428497f59d2b4ccc352b699d657d038d11f1d359a76e587809"
+    }
+  ],
+  "checklist": [
+    {
+      "id": "CL-6A-01",
+      "classification": "covered_by_existing_test",
+      "rationale": "Contract節欠落、未受領Requirement義務、Context宣言欠落、Provenance辺破損の負例がTask Contract経路のredとして既に固定され緑化済み。",
+      "text": "Contract／Requirement／Plan／Context／Provenance欠落を検出する。",
+      "tests": [
+        "tests/test_first_review_task_contract_e2e.py::test_b1_missing_contract_section_is_not_compilable",
+        "tests/test_first_review_task_contract_e2e.py::test_b2_unreceived_obligation_stops",
+        "tests/test_first_review_task_contract_e2e.py::test_b3_missing_context_declaration_stops",
+        "tests/test_first_review_task_contract_e2e.py::test_b8_broken_provenance_edge_is_not_verified",
+        "tests/test_work5a_definition_challenge.py::test_h1_unreceived_bound_requirement_is_blocking",
+        "tests/test_work5a_definition_challenge.py::test_h2_empty_contract_section_is_blocking",
+        "tests/test_work5a_definition_challenge.py::test_h7_missing_material_stops_without_issuing_a_verdict",
+        "tests/test_work5a_definition_challenge.py::test_h10_provenance_without_the_challenge_node_is_rejected",
+        "tests/test_work5a_definition_challenge.py::test_h12_missing_contract_approval_is_not_compilable",
+        "tests/test_work5a_definition_challenge.py::test_h16_provenance_without_the_approval_node_is_rejected"
+      ]
+    },
+    {
+      "id": "CL-6A-02",
+      "classification": "covered_by_existing_test",
+      "rationale": "permitなしRun、permission不足での停止、permissionの無断付与・再分類の禁止、stale観測の再利用停止、未成功assignmentだけの再開が既存redで区別されている。残余：optional観測欠測だけを対象にした専用負例は未被覆。",
+      "text": "permission過剰、stale、crash、optional観測欠測を区別する。",
+      "tests": [
+        "tests/test_first_review_task_contract_e2e.py::test_b7_run_without_permit_is_rejected",
+        "tests/test_first_review_task_contract_e2e.py::test_b4_context_digest_change_makes_result_stale",
+        "tests/test_operation_routing_v2.py::test_missing_permission_stops_before_any_callback",
+        "tests/test_operation_routing_v2.py::test_execution_runs_only_when_attestation_covers_every_permission",
+        "tests/test_structured_argv_executor.py::test_executor_does_not_grant_or_reclassify_permissions",
+        "tests/test_work4a_rebuild_v3_e2e.py::test_e1_stale_observation_reuse_stops",
+        "tests/test_bootstrap_review_resume.py::test_resumes_only_unsuccessful_assignment_and_preserves_history"
+      ]
+    },
+    {
+      "id": "CL-6A-03",
+      "classification": "covered_by_existing_test",
+      "rationale": "独立checkが違反を検出しない場合にfailedを返すtestと、validator変更で旧verdictをstale化するtestが既にあり、見逃しと誤停止の双方を固定している。",
+      "text": "validatorの既知違反見逃しと正常例誤停止を検出する。",
+      "tests": [
+        "tests/test_bootstrap_review_assurance.py::test_detects_all_independent_mutations_and_failures",
+        "tests/test_bootstrap_review_assurance.py::test_reports_failed_when_independent_check_is_not_detected",
+        "tests/test_development_policy.py::test_validator_change_adds_assurance_and_stales_prior_verdict",
+        "tests/test_development_policy.py::test_high_risk_validator_change_adds_independent_assurance"
+      ]
+    },
+    {
+      "id": "CL-6A-04",
+      "classification": "out_of_approved_scope",
+      "rationale": "reopen identity、termination、上流改定、maintenance義務変更を判定する正式Work Item／Workflow state recordが未承認である。cycleはIssue Intake側に部分的負例があるだけで、Work Item依存graphの負例は書けない。案A承認範囲外。",
+      "text": "maintenance、reopen、上流改定、dependency、cycle、terminationを検証する。",
+      "tests": []
+    },
+    {
+      "id": "CL-6A-05",
+      "classification": "covered_by_existing_test",
+      "rationale": "Snapshot不一致、Evidence欠落、code reference不一致、snapshot後のsource変更が既存redで拒否されている。",
+      "text": "Source Snapshot、Change Set、Test Evidenceの不一致を拒否する。",
+      "tests": [
+        "tests/test_work4a_rebuild_v3_1_e2e.py::test_i9_snapshot_mismatch_stops",
+        "tests/test_work4a_rebuild_v3_1_e2e.py::test_i19_missing_evidence_stops",
+        "tests/test_work4a_rebuild_v3_1_e2e.py::test_i20_code_reference_mismatch_stops",
+        "tests/test_todo_snapshot.py::test_rejects_tampered_snapshot",
+        "tests/test_todo_snapshot.py::test_rejects_source_changed_after_snapshot"
+      ]
+    },
+    {
+      "id": "CL-6A-06",
+      "classification": "out_of_approved_scope",
+      "rationale": "retired routineの復活を表す語がtools／testsに1件も存在せず（機械grep 0件）、関数台帳のstale判定も未実装である。実装を伴う新規範囲で、案A承認範囲外。",
+      "text": "関数台帳stale、理由なし新規routine、retired routine復活を拒否する。",
+      "tests": []
+    },
+    {
+      "id": "CL-6A-07",
+      "classification": "out_of_approved_scope",
+      "rationale": "escalationを名前に持つtestが0件で、外部side effectの部分成功はWork 7の`local_integrated` deployment範囲である。案A承認範囲外。",
+      "text": "部分side effect後のcompensation／reconciliation／Human escalation欠落を検出する。",
+      "tests": []
+    },
+    {
+      "id": "CL-6A-08",
+      "classification": "red_added_now",
+      "rationale": "案Aの4分類そのもの。第二正本化、欠測推測、stale誤表示、Digest競合誤表示を今回のRED test 6件で固定した。GREEN実装は未承認。",
+      "text": "Current Work Projectionの第二正本化、欠測推測、stale／競合の正常表示を検出する。",
+      "tests": [
+        "tests/test_work6a_current_work_projection_negative.py::test_hand_editable_handoff_is_not_accepted_as_authority",
+        "tests/test_work6a_current_work_projection_negative.py::test_stale_freshness_is_not_displayed_as_complete",
+        "tests/test_work6a_current_work_projection_negative.py::test_missing_freshness_is_not_guessed_as_current",
+        "tests/test_work6a_current_work_projection_negative.py::test_fixed_input_without_valid_digest_is_not_ignored",
+        "tests/test_work6a_current_work_projection_negative.py::test_conflicting_digests_for_one_identity_are_inconsistent",
+        "tests/test_work6a_current_work_projection_negative.py::test_stale_input_text_does_not_assert_a_normal_next_action"
+      ]
+    },
+    {
+      "id": "CL-6A-09",
+      "classification": "covered_by_existing_test",
+      "rationale": "表示器failureで捕捉物とauthorityを破棄しないこと、authority欠落を表示器failureと混同しないことが既に緑で固定されている。今回は重複させない。",
+      "text": "表示器だけのfailureで有効成果を破棄しないことを確認する。",
+      "tests": [
+        "tests/test_session_bootstrap_e2e.py::test_display_failure_does_not_discard_valid_capture_or_authority",
+        "tests/test_session_bootstrap_e2e.py::test_missing_authority_is_incomplete_not_a_display_failure"
+      ]
+    },
+    {
+      "id": "CL-6A-10",
+      "classification": "out_of_approved_scope",
+      "rationale": "Final Challenge経路の存在とerror findingによるaccepted artifact阻止は緑だが、「Contract適合かつ上位Intent毀損」を対象にした専用負例fixtureは未整備である。Intent正本recordが未承認のため案A承認範囲外。",
+      "text": "Contract適合でも上位Intent／Requirementを損なう成果をFinal Challengeで検出する。",
+      "tests": []
+    },
+    {
+      "id": "CL-6A-11",
+      "classification": "out_of_approved_scope",
+      "rationale": "段の完了条件。今回のRED 6件は意図的に失敗させているため全Test通過は成立せず、成立にはGREEN実装が要る。GREEN実装は未承認。",
+      "text": "全Test、risk別Verification、post-write verificationを通す。",
+      "tests": []
+    }
+  ],
+  "plan": [
+    {
+      "id": "PL-6A-01",
+      "classification": "covered_by_existing_test",
+      "rationale": "Contract節欠落、未受領Requirement義務、Context宣言欠落、Provenance辺破損の負例がTask Contract経路のredとして既に固定され緑化済み。",
+      "text": "Contract／Requirement／Plan／Context／Provenanceの欠落",
+      "tests": [
+        "tests/test_first_review_task_contract_e2e.py::test_b1_missing_contract_section_is_not_compilable",
+        "tests/test_first_review_task_contract_e2e.py::test_b2_unreceived_obligation_stops",
+        "tests/test_first_review_task_contract_e2e.py::test_b3_missing_context_declaration_stops",
+        "tests/test_first_review_task_contract_e2e.py::test_b8_broken_provenance_edge_is_not_verified",
+        "tests/test_work5a_definition_challenge.py::test_h1_unreceived_bound_requirement_is_blocking",
+        "tests/test_work5a_definition_challenge.py::test_h2_empty_contract_section_is_blocking",
+        "tests/test_work5a_definition_challenge.py::test_h7_missing_material_stops_without_issuing_a_verdict",
+        "tests/test_work5a_definition_challenge.py::test_h10_provenance_without_the_challenge_node_is_rejected",
+        "tests/test_work5a_definition_challenge.py::test_h12_missing_contract_approval_is_not_compilable",
+        "tests/test_work5a_definition_challenge.py::test_h16_provenance_without_the_approval_node_is_rejected"
+      ]
+    },
+    {
+      "id": "PL-6A-02",
+      "classification": "covered_by_existing_test",
+      "rationale": "判断のない項目をunclassifiedのままblockする、未分類sourceをblocking unknownに保つ、不完全・混在review setを拒否する負例が既にある。残余：採用Findingのconsumer欠落だけを対象にした専用負例は未被覆。",
+      "text": "Evidence候補の未分類、採用Findingのconsumer欠落、材料不足の正常扱い",
+      "tests": [
+        "tests/test_extraction_destination_classification.py::test_keeps_items_without_judgment_unclassified_and_blocked",
+        "tests/test_extraction_population.py::test_keeps_unclassified_sources_as_blocking_unknown",
+        "tests/test_extraction_seven_axes.py::test_blocks_and_isolates_unclassifiable_or_unsubstantiated_candidates",
+        "tests/test_bootstrap_review_triage.py::test_rejects_incomplete_or_mixed_review_sets"
+      ]
+    },
+    {
+      "id": "PL-6A-03",
+      "classification": "covered_by_existing_test",
+      "rationale": "permitなしRunの拒否、permission不足での事前停止、未知の承認actionを持つpolicyの拒否、書込みへのpost-write verification要求が既存redで固定されている。",
+      "text": "宣言だけでenforcement、permit効果、復旧、Evidenceがない規則",
+      "tests": [
+        "tests/test_first_review_task_contract_e2e.py::test_b7_run_without_permit_is_rejected",
+        "tests/test_operation_routing_v2.py::test_missing_permission_stops_before_any_callback",
+        "tests/test_development_policy.py::test_rejects_policy_with_unknown_approval_action",
+        "tests/test_development_policy.py::test_artifact_write_requires_post_write_verification"
+      ]
+    },
+    {
+      "id": "PL-6A-04",
+      "classification": "covered_by_existing_test",
+      "rationale": "独立checkが違反を検出しない場合にfailedを返すtestと、validator変更で旧verdictをstale化するtestが既にあり、見逃しと誤停止の双方を固定している。",
+      "text": "既知違反を見逃すvalidator、正常fixtureの誤停止、validator変更後の旧verdict再利用",
+      "tests": [
+        "tests/test_bootstrap_review_assurance.py::test_detects_all_independent_mutations_and_failures",
+        "tests/test_bootstrap_review_assurance.py::test_reports_failed_when_independent_check_is_not_detected",
+        "tests/test_development_policy.py::test_validator_change_adds_assurance_and_stales_prior_verdict",
+        "tests/test_development_policy.py::test_high_risk_validator_change_adds_independent_assurance"
+      ]
+    },
+    {
+      "id": "PL-6A-05",
+      "classification": "covered_by_existing_test",
+      "rationale": "書込み後verificationの必須化と、post-restore verification不一致でのroll backが既存redで固定されている。",
+      "text": "書込み後だけ現れる不整合のpost-write verification欠落",
+      "tests": [
+        "tests/test_development_policy.py::test_artifact_write_requires_post_write_verification",
+        "tests/test_issue_resolution_pilot_wi_005.py::test_actual_post_write_and_isolated_restore_rehearsal",
+        "tests/test_todo_compaction.py::test_rolls_back_when_post_restore_verification_mismatches"
+      ]
+    },
+    {
+      "id": "PL-6A-06",
+      "classification": "out_of_approved_scope",
+      "rationale": "実施報告だけを完了扱いしないための正式Claim recordが未実装である。近接する既存redはdirty worktreeでの次work阻止に留まる。案A承認範囲外。",
+      "text": "実施報告だけでfile変更、Test、commit、外部操作または文書反映を完了にする",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-07",
+      "classification": "out_of_approved_scope",
+      "rationale": "`reported_unverified`と`report_execution_mismatch`はdocsに定義があるだけで、toolsとtestsに実装参照が0件である（機械grep）。新規実装を伴うため案A承認範囲外。",
+      "text": "EvidenceのないClaimを`reported_unverified`にせず完了へ使う、または報告と事後状態の競合を`report_execution_mismatch`として停止しない",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-08",
+      "classification": "covered_by_existing_test",
+      "rationale": "permitなしRun、permission不足での停止、permissionの無断付与・再分類の禁止、stale観測の再利用停止、未成功assignmentだけの再開が既存redで区別されている。残余：optional観測欠測だけを対象にした専用負例は未被覆。",
+      "text": "permission過剰、stale、crash再開、optional観測欠測",
+      "tests": [
+        "tests/test_first_review_task_contract_e2e.py::test_b7_run_without_permit_is_rejected",
+        "tests/test_first_review_task_contract_e2e.py::test_b4_context_digest_change_makes_result_stale",
+        "tests/test_operation_routing_v2.py::test_missing_permission_stops_before_any_callback",
+        "tests/test_operation_routing_v2.py::test_execution_runs_only_when_attestation_covers_every_permission",
+        "tests/test_structured_argv_executor.py::test_executor_does_not_grant_or_reclassify_permissions",
+        "tests/test_work4a_rebuild_v3_e2e.py::test_e1_stale_observation_reuse_stops",
+        "tests/test_bootstrap_review_resume.py::test_resumes_only_unsuccessful_assignment_and_preserves_history"
+      ]
+    },
+    {
+      "id": "PL-6A-09",
+      "classification": "red_added_now",
+      "rationale": "案Aの4分類そのもの。checklist CL-6A-08と同一対象を、今回のRED test 6件で固定した。",
+      "text": "Current Work Projectionが第二の状態正本になる、欠測を推測で埋める、またはstale／競合入力を正常表示する",
+      "tests": [
+        "tests/test_work6a_current_work_projection_negative.py::test_hand_editable_handoff_is_not_accepted_as_authority",
+        "tests/test_work6a_current_work_projection_negative.py::test_stale_freshness_is_not_displayed_as_complete",
+        "tests/test_work6a_current_work_projection_negative.py::test_missing_freshness_is_not_guessed_as_current",
+        "tests/test_work6a_current_work_projection_negative.py::test_fixed_input_without_valid_digest_is_not_ignored",
+        "tests/test_work6a_current_work_projection_negative.py::test_conflicting_digests_for_one_identity_are_inconsistent",
+        "tests/test_work6a_current_work_projection_negative.py::test_stale_input_text_does_not_assert_a_normal_next_action"
+      ]
+    },
+    {
+      "id": "PL-6A-10",
+      "classification": "out_of_approved_scope",
+      "rationale": "escalationを名前に持つtestが0件で、外部side effectの部分成功はWork 7の`local_integrated` deployment範囲である。案A承認範囲外。",
+      "text": "外部side effectの部分成功後にcompensation／reconciliationまたはHuman escalationがない",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-11",
+      "classification": "out_of_approved_scope",
+      "rationale": "Final Challenge経路の存在とerror findingによるaccepted artifact阻止は緑だが、「Contract適合かつ上位Intent毀損」を対象にした専用負例fixtureは未整備である。Intent正本recordが未承認のため案A承認範囲外。",
+      "text": "Contract適合だが上位RequirementまたはIntentを損なう成果",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-12",
+      "classification": "out_of_approved_scope",
+      "rationale": "reopenを名前に持つtestが0件で、maintenance義務変更を判定するrecordも未承認である。既存のobligation源trace testは正例側の網羅であって本項目の負例ではない。案A承認範囲外。",
+      "text": "maintenance義務変更、reopen identity欠落",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-13",
+      "classification": "out_of_approved_scope",
+      "rationale": "実装不良を上流変更で通す経路の判定にはRequirement改定recordとその上下関係が要る。正式Portfolio／Work Item未承認のため案A承認範囲外。",
+      "text": "実装不良を上流変更で通す、意味変更を軽微修正で閉じる",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-14",
+      "classification": "out_of_approved_scope",
+      "rationale": "改善候補の記録・分類recordが未実装である。Plan、Contract、Test、受入基準の変更を伴うため案A承認範囲外（DecisionはContract／Requirement／Plan／Policyの変更を非承認）。",
+      "text": "改善候補を記録・分類せず現行Plan、Contract、Testまたは受入基準を変更する",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-15",
+      "classification": "covered_by_existing_test",
+      "rationale": "非blocking issueが現行を中断しないこと、blocking切替が前作業を中断すること、解決またはHuman rulingなしに再開しないこと、Human以外のresolution verdictを拒否することが既存redで固定されている。",
+      "text": "blocking候補を継続する、非blocking候補を無条件に割り込ませる、またはconsumerとOutcomeなしで閉じる",
+      "tests": [
+        "tests/test_issue_intake_v4.py::test_i5_registering_non_blocking_issue_does_not_suspend",
+        "tests/test_issue_intake_v4.py::test_i6_blocking_switch_suspends_previous",
+        "tests/test_issue_intake_v4.py::test_i7_resume_after_blocker_resolved_or_human_ruling",
+        "tests/test_issue_resolution_pilot_verdict_closure.py::test_rejects_non_human_resolution_verdict"
+      ]
+    },
+    {
+      "id": "PL-6A-16",
+      "classification": "covered_by_existing_test",
+      "rationale": "機械提案がHuman値を上書きしないこと、executorがpermissionを付与・再分類しないこと、候補単独では権限を生まないこと、material actionにHuman承認が要ることが固定されている。",
+      "text": "AIまたは機械のroute提案がPlan、Requirement、Contract、Testまたはpermitを自動変更する",
+      "tests": [
+        "tests/test_work4a_rebuild_v3_1_e2e.py::test_i13_human_value_overrides_machine_proposal",
+        "tests/test_work4a_rebuild_v3_1_e2e.py::test_i8_proposal_cannot_authorize_entry_disposition",
+        "tests/test_issue_intake_v4.py::test_j14_candidate_alone_grants_no_authority",
+        "tests/test_structured_argv_executor.py::test_executor_does_not_grant_or_reclassify_permissions",
+        "tests/test_development_policy.py::test_material_actions_require_human_approval"
+      ]
+    },
+    {
+      "id": "PL-6A-17",
+      "classification": "covered_by_existing_test",
+      "rationale": "review ownerの共有拒否、warningのみでもHuman decisionを要求すること、high risk validator変更への独立assurance追加が既存redで固定されている。",
+      "text": "high profileの独立reviewまたはHuman gate欠落",
+      "tests": [
+        "tests/test_first_review_task_contract_e2e.py::test_b5_same_owner_for_conformance_and_challenge_is_rejected",
+        "tests/test_first_review_task_contract_e2e.py::test_c2_warning_only_still_requires_human_decision",
+        "tests/test_work5a_definition_challenge.py::test_h5_shared_review_owner_is_blocking",
+        "tests/test_development_policy.py::test_high_risk_validator_change_adds_independent_assurance"
+      ]
+    },
+    {
+      "id": "PL-6A-18",
+      "classification": "covered_by_existing_test",
+      "rationale": "policyまたはdecision欠落での停止、security policy変更時の再検証要求、未知のunpinned source policyでの停止が既存redで固定されている。",
+      "text": "Policy Overlayの根拠欠落",
+      "tests": [
+        "tests/test_work4a_rebuild_v3_e2e.py::test_g1_missing_policy_or_decision_stops",
+        "tests/test_work4a_rebuild_v3_e2e.py::test_g2_security_policy_change_requires_revalidation",
+        "tests/test_task_contract_source_resolution.py::test_unknown_unpinned_source_policy_stops"
+      ]
+    },
+    {
+      "id": "PL-6A-19",
+      "classification": "out_of_approved_scope",
+      "rationale": "retired routineの語がtools／testsに0件で、関数Indexのstale判定も未実装である。checklist CL-6A-06と同一対象。案A承認範囲外。",
+      "text": "stale Index、類似判断なし、理由なし分離、retired routine無断復活",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-20",
+      "classification": "covered_by_existing_test",
+      "rationale": "permitがactive leafを1件に限ること、second active leafの拒否、self cycleと2 issue cycleの拒否、cycle中の再開制限が既存redで固定されている。",
+      "text": "blocking依存、active leaf誤り、cycle中Run",
+      "tests": [
+        "tests/test_first_review_task_contract_e2e.py::test_a5_permit_allows_a_single_active_leaf",
+        "tests/test_issue_intake_v4.py::test_j8_second_active_leaf_is_rejected",
+        "tests/test_issue_intake_v4.py::test_j10_self_cycle_is_rejected_and_not_persisted",
+        "tests/test_issue_intake_v4.py::test_j11_two_issue_cycle_is_rejected_and_suspends_all",
+        "tests/test_issue_intake_v4.py::test_j15_resume_within_cycle_requires_resolution_or_ruling"
+      ]
+    },
+    {
+      "id": "PL-6A-21",
+      "classification": "out_of_approved_scope",
+      "rationale": "`bounded_parallel`は未着手で、Work 8A（条件付き）の範囲である。既存の同時開始拒否は単一候補の直列化に留まり、conflict domain判定は未実装。案A承認範囲外。",
+      "text": "同じconflict domainの同時開始、独立性不明時の並行許可、source identity変更後の旧並行性判断再利用",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-22",
+      "classification": "out_of_approved_scope",
+      "rationale": "lease、checkpoint再割当て、並行merge後のIntegration再検証はWork 7／Work 8Aの範囲で、対応実装が存在しない。案A承認範囲外。",
+      "text": "lease切れ後の二重実行、checkpoint照合なしの再割当て、並行merge後のstale／Integration再検証欠落",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-23",
+      "classification": "covered_by_existing_test",
+      "rationale": "working tree不一致での停止、未知commitへのpin停止、fixed source変更での停止、dirty worktreeでの次work阻止が既存redで固定されている。",
+      "text": "Test後のsource変更、別commitのVerification採用、対象untracked file欠落、dirty workspaceのclean扱い",
+      "tests": [
+        "tests/test_task_contract_source_resolution.py::test_active_contract_stops_on_working_tree_mismatch",
+        "tests/test_task_contract_source_pin.py::test_pin_with_unknown_commit_stops",
+        "tests/test_task_contract_source_pin.py::test_active_contract_stops_when_fixed_source_changes",
+        "tests/test_work_unit_transition.py::test_blocks_next_work_and_reminds_when_completed_work_is_dirty",
+        "tests/test_work_unit_transition.py::test_preflight_ignores_local_claude_reports_but_blocks_work_artifacts"
+      ]
+    },
+    {
+      "id": "PL-6A-24",
+      "classification": "out_of_approved_scope",
+      "rationale": "affected-test selectionと影響graphが未実装で、Work 8のEvaluation Pilot比較対象である。案A承認範囲外。",
+      "text": "staleまたは欠落した影響graphによるTest選択、依存閉包・tool・environment不一致のEvidence再利用",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-25",
+      "classification": "out_of_approved_scope",
+      "rationale": "PL-6A-24と同じ選択器が未実装のため、その見逃し後のstale化も書けない。Work 8範囲。",
+      "text": "affected-test selectionの見逃しを検出しても選択器、再利用Evidence、下流Verdictをstaleにしない",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-26",
+      "classification": "out_of_approved_scope",
+      "rationale": "budgetを扱うtestが0件（機械grep）で、増分Indexと全再生成のdrift検出も未実装。Work 8範囲で案A承認範囲外。",
+      "text": "budget超過時の必須Test黙示省略、増分Indexと固定source全再生成のdrift未検出",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-27",
+      "classification": "out_of_approved_scope",
+      "rationale": "cancelしたRequirementの充足判定とclose-scope処理が未実装である。正式Requirement stateの承認が要るため案A承認範囲外。",
+      "text": "cancelしたRequirementの誤充足、未処理close-scope",
+      "tests": []
+    },
+    {
+      "id": "PL-6A-28",
+      "classification": "out_of_approved_scope",
+      "rationale": "旧設計replace時のfailure verdictと後継testの要求は、正式Work Item遷移recordを前提とする。案A承認範囲外。",
+      "text": "旧設計replace時のfailure verdictまたは後継test欠落",
+      "tests": []
+    }
+  ]
+}
