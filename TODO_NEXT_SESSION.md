@@ -15,6 +15,7 @@
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
+- Evidence参照：`## 最新のauthority／Evidence`節の参照は機械計測で25件である。件数の訂正記録は`records/development/2026-08-05-todo-evidence-reference-count-correction-v1.md`。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -50,25 +51,27 @@
 
 ## 次に行う一作業
 
-`DEC-RECORD-GENERATION-PLAN-001`に従い、TODO最小縦切りをTest先行で実装する。
+次の作業候補を提示し、人の選択を待つ。選択があるまで新しい実装へ着手しない。
 
 開始条件：
 
-- 承認recordのcommit後のclean transition。
-- Planの固定input digestが現状と一致していること。
+- 本handoffを含むcommit後のclean transition。
+- 下の候補から人が一つを選ぶこと。
+
+作業候補：
+
+- 候補A：`ISSUE-HTC-C9F6C917`の後続範囲。構造化argv executor、cache root固定、既存直接操作の移行順。
+- 候補B：`ISSUE-HTC-BEB5E0BD`のPlan化。会話記録の保存期間、削除、暗号化、backupの方針。
+- 候補C：`ISSUE-HTC-66C3E6CA`のEvidence／Decisionへの拡張（案B）。TODOでの実運用が手入力訂正なしで
+  複数回通ってから判断する条件付きである。
+- 候補D：Work 5A 最小Review Task Contractの継続。当面の進行入口として残っている。
 
 完了データ：
 
-- 候補一覧：`records/development/2026-08-05-historical-todo-intake-candidates-v1.json`（41件、重複疑い0件）
-- 候補一覧の`human_fields`は生成時の未記入観測として全件`null`のまま保持する。判断正本は
-  `.reviewcompass/workflow/triage-decisions-v4/`のV4 human triage decision（schema version 2）である。
-- 判断済み41件（全件）。うち正式Issueへ昇格したのは`HTC-BEB5E0BD`、`HTC-C9F6C917`、`HTC-66C3E6CA`の3件である。
-- Issue Intake V4は開発用・暫定の限定機能としてHuman承認済みで、実地検証は閉鎖済みである。
-- `ISSUE-HTC-C9F6C917`のPlan提案v2は`approved_for_development_implementation`だが、承認範囲は§3だけである。旧v1提案は状態を変えずに履歴として残す。正式Issue Resolution PlanとTask Contractは作っていない。
-- §3の実装（`tools/development/operation_routing.py`）は完了し、receipt改竄検出の訂正も適用済み。初回のGREEN Evidenceとreceiptはstaleとして履歴に残し、有効な完了根拠は訂正Decisionと訂正GREEN Evidenceである。構造化argv executor、cache root固定、既存直接操作の移行、host側tool構文、外部送信は未実施である。
-- `ISSUE-HTC-66C3E6CA`のPlan提案は`approved_for_development_implementation`である。承認範囲はTODOの最小縦切りだけで、Evidence／Decisionへの一般化は承認していない。正式Issue Resolution Plan、Task Contract、Workflow permitは作らない。
-- `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものであり、C9 Plan提案の承認ではない。
-- 正式Issue正本：`.reviewcompass/workflow/issues-v4/`（V4 issue_record schema version 2）
+- 過去TODO候補41件は全件triage済み。正式Issueは3件で、正本は`.reviewcompass/workflow/issues-v4/`である。
+- `ISSUE-HTC-C9F6C917`は§3最小縦切りだけ承認・実装済み。後続範囲は未実施である。
+- `ISSUE-HTC-66C3E6CA`はTODO最小縦切りだけ承認・実装済み。案Bは未承認である。
+- `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものである。
 
 後続作業：後続範囲の個別Plan。着手が承認されるまで、argv executor、cache root固定、既存直接操作の置換、host側tool構文、外部送信は行わない。
 
