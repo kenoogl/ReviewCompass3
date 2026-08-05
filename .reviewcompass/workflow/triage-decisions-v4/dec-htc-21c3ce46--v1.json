@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-21C3CE46",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T12:49:31+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-21C3CE46",
+    "candidate_content_digest": "a22e1a440d4fb5ccc771293d35be2f9ce73892455c381789825da2628779914e"
+  },
+  "human_fields": {
+    "unresolved": false,
+    "recurrence": false,
+    "impact": "not_applicable",
+    "priority": "not_applicable",
+    "promote_to_issue": false
+  },
+  "disposition": "historical_completed",
+  "blocking": false,
+  "rationale": "この候補は、実snapshotとTODO compactionの開始を特定のcommitの後まで保留するという、当時の実行順序の記録である。WI-006は`6b68c25`で実装済みであり、WI-007のsnapshotは`b10cd09`で保存済み、TODO compactionは`416e4e1`で完了済みである。よって当時の開始・再開条件はすでに満たされており、現在解くべき問題は残っていない。未解決ではなく再発もしないため、影響と優先順位は該当なしとし、正式Issueへは昇格しない。",
+  "next_action": "候補bundleを変更せず、この判断recordを当時の完了済み手順の記録として保持する。正式Issue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "be9369e4411321fc81bc2ec859066af3b6e489d4e218c9bb7182d0c08f399c84"
+}

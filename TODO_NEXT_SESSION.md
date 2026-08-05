@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：Issue Intake V4実装GREEN。過去TODOの候補一覧を提示し、Human triage待ち。
+- 現在の工程：V4 Human triage永続化GREEN。過去TODO候補41件のうち4件をHuman判断済みrecordとして保存。残り37件はHuman triage待ち。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
@@ -18,6 +18,8 @@
 
 ## 最新のauthority／Evidence
 
+- [V4 Human triage永続化 GREEN](records/development/2026-08-05-v4-human-triage-persistence-green-evidence-v1.md) — SHA-256 `41fcbbbd6acc278055dd3e43e64fcb0c603627319eae1fb13b853262bda305d7`
+- [過去TODO候補 Human triage資料](records/development/2026-08-05-historical-todo-intake-triage-material-v1.md) — SHA-256 `b2ad5195ffd041a527b8d92f5847606bddcdb5876cacbca05a9a9c304b39efdb`
 - [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
 - [Issue Intake V4 GREEN](records/development/2026-08-05-issue-intake-v4-green-evidence-v1.md) — SHA-256 `28809b220e8e5b16f3f643c8994ea9bdeb73ac83d3e506daaea6baceb751e75f`
 - [Work 5A 実Review受理 v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-evidence.md) — SHA-256 `2e8335877202c8d5d1be07978b84ef6b3834ac5a207d5afa1184daddc719acdc`
@@ -42,26 +44,29 @@
 
 ## 次に行う一作業
 
-過去TODO候補41件に対するHuman triageを受ける。
+残り37候補に対するHuman triageを受ける。
 
 開始条件：
 
-- 候補一覧commit後のclean transition。
+- 判断recordのcommit後のclean transition。
 - 未解決・再発性・影響・priority・Issue昇格のHuman判断。
 
 完了データ：
 
 - 候補一覧：`records/development/2026-08-05-historical-todo-intake-candidates-v1.json`
 - 41件（未実施7、残余risk15、手戻り・機械化候補14、blocker・Human判断待ち5）。重複疑い0件。
-- `human_fields`はすべて`null`。正式Issueへ昇格していない。
+- 候補一覧の`human_fields`は生成時の未記入観測として全件`null`のまま保持する。判断正本は
+  `.reviewcompass/workflow/triage-decisions-v4/`のV4 human triage decision（schema version 2）である。
+- 判断済み4件：`HTC-14D810C7`、`HTC-1AB699F7`、`HTC-21C3CE46`、`HTC-6ABDDC35`。いずれも
+  `historical_completed`、`promote_to_issue: false`、`blocking: false`。正式Issueへ昇格していない。
 
 後続作業：Humanが昇格を選んだ候補だけのIssue化、Plan化。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：過去TODO候補41件のtriage。昇格、priority、統合、根本原因Issue化はHumanが決める。
-- 再開条件：候補一覧commit後のclean transition。
+- Human判断待ち：過去TODO候補のうち残り37件のtriage。昇格、priority、統合、根本原因Issue化はHumanが決める。
+- 再開条件：判断recordのcommit後のclean transition。
 
 ## stale・deferred
 
@@ -74,8 +79,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Issue Intake V4 `25 passed`
-- 直近の全Test：venv公式runner `802 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Issue Intake V4 `32 passed`
+- 直近の全Test：venv公式runner `809 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
