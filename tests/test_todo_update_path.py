@@ -630,3 +630,163 @@ def test_cli_never_calls_git(update_path):
         "subprocess", '"git"', "'git'", "os.system", "shell=True", "Popen",
     ):
         assert forbidden not in source
+
+
+# ------------------------------------------------- transaction境界（例外復元）
+#
+# 指示：records/session-handoffs/
+#       2026-08-05-codex-to-claude-repair-todo-update-transaction-boundary.md
+#
+# 一時receiptで書き始めた後、最終receiptの検証が成功するまで更新は確定しない。
+# `Exception`を継承する失敗ではTODOを必ず元bytesへ戻す。
+
+
+def _raising_phases(*, fail_on, error=None):
+    """指定した段で例外を送出する実行器。呼出し順を記録する。"""
+
+    calls = []
+
+    def run_official_tests(phase):
+        calls.append(phase)
+        if phase == fail_on:
+            raise error or RuntimeError(f"{phase} run unavailable")
+        return _receipt(7)
+
+    run_official_tests.calls = calls
+    return run_official_tests
+
+
+def test_second_run_exception_restores_the_todo(update_path, tmp_path):
+    root, todo = _issue_workspace(tmp_path)
+    before = todo.read_bytes()
+    runner = _raising_phases(fail_on="second")
+
+    with pytest.raises(update_path.TodoUpdatePathError) as error:
+        update_path.run_two_phase_update(
+            project_root=root, todo_path=todo, run_official_tests=runner
+        )
+
+    assert runner.calls == ["first", "second"]
+    assert todo.read_bytes() == before, "最終確認まで更新は確定しない"
+    assert error.value.code in update_path.STOP_CODES
+
+
+def test_first_run_exception_never_touches_the_todo(update_path, tmp_path):
+    root, todo = _issue_workspace(tmp_path)
+    before = todo.read_bytes()
+    runner = _raising_phases(fail_on="first")
+
+    with pytest.raises(update_path.TodoUpdatePathError) as error:
+        update_path.run_two_phase_update(
+            project_root=root, todo_path=todo, run_official_tests=runner
+        )
+
+    assert runner.calls == ["first"], "1回目が失敗したら2回目を呼ばない"
+    assert todo.read_bytes() == before
+    assert error.value.code in update_path.STOP_CODES
+
+
+def test_unexpected_exception_inside_the_update_restores_the_todo(
+    update_path, tmp_path
+):
+    root, todo = _issue_workspace(tmp_path)
+    before = todo.read_bytes()
+    runner = _phases(_receipt(7), _receipt(7))
+
+    def exploding_verify(path, project_root):
+        raise ValueError("verifier exploded")
+
+    with pytest.raises(update_path.TodoUpdatePathError):
+        update_path.run_two_phase_update(
+            project_root=root, todo_path=todo, run_official_tests=runner,
+            verify=exploding_verify,
+        )
+
+    assert todo.read_bytes() == before
+
+
+def test_keyboard_interrupt_is_not_swallowed(update_path, tmp_path):
+    """`KeyboardInterrupt`と`SystemExit`は捕捉しない。"""
+
+    root, todo = _issue_workspace(tmp_path)
+    runner = _raising_phases(fail_on="second", error=KeyboardInterrupt())
+
+    with pytest.raises(KeyboardInterrupt):
+        update_path.run_two_phase_update(
+            project_root=root, todo_path=todo, run_official_tests=runner
+        )
+
+    source = Path(update_path.__file__).read_text(encoding="utf-8")
+    assert "except BaseException" not in source
+
+
+def _unreadable_final_execute(calls, *, missing_phase="second"):
+    """2回目のreceipt fileを読めない状態にする実行器。"""
+
+    def execute(*, config, project_root, suite, receipt_path):
+        index = len(calls)
+        target = Path(project_root) / receipt_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if index == (1 if missing_phase == "second" else 0):
+            calls.append({"receipt_path": str(receipt_path)})
+            # pathは返すが、fileを作らない。
+            return SimpleNamespace(
+                status="passed", exit_code=0, receipt_path=str(target)
+            )
+        receipt = _receipt(7)
+        target.write_text(json.dumps(receipt, ensure_ascii=False), encoding="utf-8")
+        calls.append({"receipt_path": str(receipt_path)})
+        return SimpleNamespace(status="passed", exit_code=0, receipt_path=str(target))
+
+    return execute
+
+
+def test_unreadable_final_receipt_restores_the_todo(update_path, tmp_path, capsys):
+    root, todo = _cli_workspace(tmp_path)
+    before = todo.read_bytes()
+    calls = []
+
+    exit_code = _cli(
+        update_path, root,
+        "--first-receipt", "records/development/first.json",
+        "--final-receipt", "records/development/final.json",
+        execute=_unreadable_final_execute(calls),
+    )
+
+    output = json.loads(capsys.readouterr().out)
+    assert exit_code != 0
+    assert output["status"] == "stopped"
+    assert len(calls) == 2
+    assert todo.read_bytes() == before
+
+
+def test_cli_reports_a_second_run_exception_as_a_stop(update_path, tmp_path, capsys):
+    root, todo = _cli_workspace(tmp_path)
+    before = todo.read_bytes()
+    calls = []
+
+    def exploding_execute(*, config, project_root, suite, receipt_path):
+        calls.append(str(receipt_path))
+        if len(calls) == 2:
+            raise RuntimeError("second run unavailable")
+        target = Path(project_root) / receipt_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            json.dumps(_receipt(7), ensure_ascii=False), encoding="utf-8"
+        )
+        return SimpleNamespace(status="passed", exit_code=0, receipt_path=str(target))
+
+    exit_code = _cli(
+        update_path, root,
+        "--first-receipt", "records/development/first.json",
+        "--final-receipt", "records/development/final.json",
+        execute=exploding_execute,
+    )
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+    assert exit_code != 0
+    assert output["status"] == "stopped"
+    assert "Traceback" not in captured.out
+    assert len(calls) == 2
+    assert todo.read_bytes() == before
