@@ -174,14 +174,31 @@ def _reference_target(project_root, relative_path):
     return target
 
 
+def evidence_section_bounds(lines):
+    """Evidence節の範囲を返す。見出しの次行から、次の`## `見出しの直前までである。
+
+    節外のlinkは、この更新経路では収集も更新もDigest検証もしない。
+    """
+
+    starts = [index for index, line in enumerate(lines) if line == EVIDENCE_HEADING]
+    if len(starts) != 1:
+        raise TodoRecordGenerationError("todo_heading_invalid", EVIDENCE_HEADING)
+    start = starts[0] + 1
+    end = len(lines)
+    for index in range(start, len(lines)):
+        if lines[index].startswith("## "):
+            end = index
+            break
+    return start, end
+
+
 def collect_reference_digests(document, *, project_root):
-    """Evidence節のlinkを読み、参照fileのbytesからDigestを計算し直す。"""
+    """Evidence節**の中だけ**のlinkを読み、参照fileのbytesからDigestを計算し直す。"""
 
     lines = document.splitlines()
-    if lines.count(EVIDENCE_HEADING) != 1:
-        raise TodoRecordGenerationError("todo_heading_invalid", EVIDENCE_HEADING)
+    start, end = evidence_section_bounds(lines)
     collected = []
-    for line in lines:
+    for line in lines[start:end]:
         matched = _REFERENCE.match(line)
         if matched is None:
             continue
@@ -198,6 +215,20 @@ def collect_reference_digests(document, *, project_root):
     if not collected:
         raise TodoRecordGenerationError("todo_heading_invalid", "no reference link")
     return tuple(collected)
+
+
+def verify_reference_digests(document, *, project_root):
+    """Evidence節に限定して、参照Digestが実bytesと一致することを確かめる。
+
+    歴史的なglobal validatorとは別経路である。節外のlinkは対象にしない。
+    """
+
+    for reference in collect_reference_digests(document, project_root=project_root):
+        if reference["sha256"] != reference["recorded_sha256"]:
+            raise TodoRecordGenerationError(
+                "reference_digest_mismatch", reference["path"]
+            )
+    return True
 
 
 def build_todo_candidate(*, todo_path, receipt, project_root):
@@ -220,6 +251,7 @@ def build_todo_candidate(*, todo_path, receipt, project_root):
         raise TodoRecordGenerationError("todo_line_invalid", str(len(targets)))
 
     full_test_line = build_full_test_line(receipt)
+    evidence_start, evidence_end = evidence_section_bounds(plain)
     references = collect_reference_digests(document, project_root=project_root)
     for reference in references:
         if reference["sha256"] != reference["recorded_sha256"]:
@@ -235,12 +267,14 @@ def build_todo_candidate(*, todo_path, receipt, project_root):
         if index == targets[0]:
             updated.append(full_test_line + ending)
             continue
-        matched = _REFERENCE.match(stripped)
-        if matched is not None:
-            updated.append(
-                f"- [{matched.group('label')}]({matched.group('path')}) — "
-                f"SHA-256 `{digests[matched.group('path')]}`" + ending
-            )
-            continue
+        # Evidence節の外にある同形式のlinkは、Digestを含めてbytesを保つ。
+        if evidence_start <= index < evidence_end:
+            matched = _REFERENCE.match(stripped)
+            if matched is not None:
+                updated.append(
+                    f"- [{matched.group('label')}]({matched.group('path')}) — "
+                    f"SHA-256 `{digests[matched.group('path')]}`" + ending
+                )
+                continue
         updated.append(raw)
     return "".join(updated).encode("utf-8")

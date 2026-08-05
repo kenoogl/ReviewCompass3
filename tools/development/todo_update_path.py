@@ -16,15 +16,14 @@
 このmoduleはGit操作をしない。commitするかどうかは呼び出す側の判断である。
 """
 
+import json
 import os
+import re
 from pathlib import Path
 
 from tools.development import todo_compaction
 from tools.development import todo_handoff
 from tools.development import todo_record_generation
-from tools.development.issue_resolution_post_write import (
-    validate_todo_reference_digests,
-)
 
 
 #: 二段確認で完全一致を要求するfield。
@@ -37,6 +36,20 @@ COMPARED_FIELDS = (
     "status",
 )
 
+#: active IDの許可一覧を得る正本root。TODO本文は正本にしない。
+ISSUE_ROOTS = (
+    ".reviewcompass/workflow/issues",
+    ".reviewcompass/workflow/issues-v4",
+)
+
+#: record_kindごとに、IDを読むfield。未知のrecord_kindは停止する。
+ISSUE_ID_FIELDS = {
+    "issue_record": "issue_id",
+    "issue": "record_id",
+}
+
+_ISSUE_ID = re.compile(r"ISSUE-[A-Z0-9]+(?:-[A-Z0-9]+)*")
+
 STOP_CODES = (
     "todo_candidate_failed",
     "todo_write_failed",
@@ -44,6 +57,7 @@ STOP_CODES = (
     "todo_verification_failed",
     "receipt_summary_mismatch",
     "todo_restore_failed",
+    "issue_root_invalid",
 )
 
 
@@ -75,8 +89,46 @@ def compare_receipts(first, second):
     return True
 
 
+def load_known_active_issue_ids(project_root):
+    """許可するactive IDを、project内の既存Issue正本からだけ得る。
+
+    TODO本文は正本にしない。root直下の通常`.json`だけを読み、symlink、JSON不正、
+    未知のrecord_kind、IDの欠落・重複・不正では停止する。別directoryは拾わない。
+    """
+
+    root = Path(project_root)
+    known = set()
+    for relative in ISSUE_ROOTS:
+        directory = root / relative
+        if not directory.is_dir():
+            continue
+        for path in sorted(directory.glob("*.json")):
+            if path.is_symlink() or not path.is_file():
+                raise TodoUpdatePathError("issue_root_invalid", str(path))
+            try:
+                record = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError, UnicodeDecodeError) as error:
+                raise TodoUpdatePathError("issue_root_invalid", str(path)) from error
+            if not isinstance(record, dict):
+                raise TodoUpdatePathError("issue_root_invalid", str(path))
+            field = ISSUE_ID_FIELDS.get(record.get("record_kind"))
+            if field is None:
+                raise TodoUpdatePathError(
+                    "issue_root_invalid", f"{path}: {record.get('record_kind')}"
+                )
+            issue_id = record.get(field)
+            if not isinstance(issue_id, str) or not _ISSUE_ID.fullmatch(issue_id):
+                raise TodoUpdatePathError("issue_root_invalid", f"{path}: {issue_id}")
+            if issue_id in known:
+                raise TodoUpdatePathError("issue_root_invalid", f"{path}: {issue_id}")
+            known.add(issue_id)
+    if not known:
+        raise TodoUpdatePathError("issue_root_invalid", "no issue record")
+    return known
+
+
 def default_verify(todo_path, project_root):
-    """repositoryの既存validatorをそのまま通す。"""
+    """repositoryの既存validatorと、Evidence節に限定したDigest照合を通す。"""
 
     document = Path(todo_path).read_bytes()
     stable = todo_handoff.validate_commit_stable_git_section(
@@ -89,27 +141,12 @@ def default_verify(todo_path, project_root):
     todo_compaction.validate_compacted_todo(
         document,
         project_root=project_root,
-        known_active_ids=todo_compaction_known_active_ids(document),
+        known_active_ids=load_known_active_issue_ids(project_root),
     )
-    validate_todo_reference_digests(document, project_root=project_root)
+    todo_record_generation.verify_reference_digests(
+        document.decode("utf-8"), project_root=project_root
+    )
     return True
-
-
-def todo_compaction_known_active_ids(document):
-    """TODOが示すactive IDを、そのTODO自身から読む。
-
-    圧縮validatorはactive IDの集合を外から受け取る。ここでは更新前後で集合を変えないことだけを
-    確かめたいので、文書中の記法からそのまま拾う。
-    """
-
-    import re
-
-    return {
-        match.group("record_id")
-        for match in re.finditer(
-            r"^- `(?P<record_id>ISSUE-[A-Z0-9-]+)`：", document.decode("utf-8"), re.MULTILINE
-        )
-    }
 
 
 def run_two_phase_update(

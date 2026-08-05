@@ -9,7 +9,7 @@
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
 - 現在の工程：過去TODO候補41件のHuman triageは完了し、Issue Intake V4の限定拡張はHuman承認のうえ検証を閉じた。未判断は0件である。
 - 正式Issue：3件、いずれも`registered`かつnonblockingで未着手。active Issueは0件。`ISSUE-HTC-C9F6C917`はPlan提案v2の§3最小縦切り（operation inventory、permission preflight、execution receipt）だけをHuman承認のうえ実装済みで、receipt改竄検出の訂正も完了している（execution receipt schema v2）。Issue全体はcloseしていない。旧v1提案は履歴として保持する。
-- 各Issueの対象：`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。`ISSUE-HTC-66C3E6CA`は`registered`かつnonblockingのままで、Plan提案はHuman承認済みである。TODO最小縦切りを実装中で、受領証の集計、TODO用材料の収集、更新経路の切替の順に進める。
+- 各Issueの対象：`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。`ISSUE-HTC-66C3E6CA`は`registered`かつnonblockingのままで、Plan提案はHuman承認済みである。TODO最小縦切り（受領証の集計、TODO用材料の収集、更新経路の切替）は実装済みで、参照範囲とactive IDの正本に関する境界訂正も完了している。初回のGREEN Evidenceとreceiptは境界不足があった初回根拠としてstaleのまま履歴に残し、有効な完了根拠は境界訂正GREEN Evidenceと訂正最終receiptである。
 - 通常commitの運用：意味単位commitを最小ガード付きで自律化した。push、tag、amend、rebase、reset、force push、履歴書換え、方針変更、段完了、意味的裁定、不可逆操作、外部送信、権限の迂回はHuman明示承認のままである。
 - Task Contract固定sourceの状態解決：歴史状態は受理時点のGit blob、現在有効状態はworking tree、`active_stale`は停止のまま、という三状態をv1／v2共通のresolverで扱う。
 - activeなTask Contract／Work Item：なし。
@@ -33,12 +33,11 @@
 - [機械操作routing Plan提案 v2（§3のみ承認済み）](docs/design/2026-08-05-machine-operation-routing-issue-plan-proposal-v2.md) — SHA-256 `e01c3aaf8039377da2b43dab7f735d28a2f86bf10aa83f5bb22e5dd1eefa8572`
 - [Issue Intake V4 承認Decision](records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md) — SHA-256 `019879235577b39489e4383cd0fa092c562631d3c1b1e1ffa311056c8d1d9f7c`
 - [Issue Intake V4 閉鎖Evidence](records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md) — SHA-256 `b942a9d17ea4c2818c6adb5f3ceabc0063f9b447c7ddb88ccc5baf3d1302d60e`
-- [定型記録生成 Plan承認Decision](records/development/2026-08-05-record-generation-issue-plan-approval-decision-v1.md) — SHA-256 `c4bf61d7f2493f38a48601659efab8300b68b23e40b37fb808ea2f4cf440943b`
+- [定型記録生成 境界訂正GREEN Evidence（有効な完了根拠）](records/development/2026-08-05-record-generation-todo-boundary-repair-green-evidence-v1.md) — SHA-256 `0f4e4031b541a06e431c56de2e1d19c0626aeadb1068a66ee9f392bb9e749634`
+- [境界訂正後の全test receipt](records/development/2026-08-05-record-generation-todo-boundary-repair-green-test-receipt-v1.json) — SHA-256 `ad0f191e0af53a21ab130d9346743d0b214ac56ad6cf958b64ae175535df98df`
 - [定型記録生成 Plan提案（承認済み）](docs/design/2026-08-05-record-generation-issue-plan-proposal.md) — SHA-256 `79ed49831ebd9b69c9713fcd71becfaa1d85f7fd97759e5fff373f99126a2a7c`
 - [Plan提案作成後の全test receipt](records/development/2026-08-05-record-generation-issue-plan-proposal-test-receipt-v1.json) — SHA-256 `d2320449185d783860312a3cc4b5b232a60d861bf5bf123f4794aaefc9927b92`
 - [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
-- [Work 5A 実Review受理 v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-evidence.md) — SHA-256 `2e8335877202c8d5d1be07978b84ef6b3834ac5a207d5afa1184daddc719acdc`
-- [Provenance閉包 無効化record](records/development/2026-08-05-work5a-provenance-closure-invalidation-v1.json) — SHA-256 `f3ba011f5490059d96b8f21429cadc8016a9332415d79c59f546447a9c018a29`
 - [Work 5A 最初の実Review Run](records/development/2026-08-05-work5a-first-real-review-run-evidence-v1.md) — SHA-256 `cdc4c4d8ad08a6f0d8373ea56d46018e070618ba2152ade7ac4dd09d72808b50`
 - [Work 5A GREEN Evidence](records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md) — SHA-256 `57feb4e7fa08924c00307dec997f2b12285641b168925825225e6a596b63fbae`
 - [Work 4 最初のslice設計承認](records/development/2026-08-05-work4-first-review-contract-design-approval-decision-v1.md) — SHA-256 `3048a52ccab59815f92b6fc3d1bd88b0ca8bd5d7a5117ad223d7139dab287675`
@@ -91,7 +90,7 @@
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - 直近の関連Test：Issue Intake V4 `38 passed`
-- 直近の全Test：venv公式runner `881 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の全Test：venv公式runner `892 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

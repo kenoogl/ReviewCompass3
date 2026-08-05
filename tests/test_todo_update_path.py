@@ -251,8 +251,10 @@ def test_broken_receipt_stops_before_writing(update_path, tmp_path):
 
 def test_default_verification_runs_the_repository_validators(update_path):
     source = Path(update_path.__file__).read_text(encoding="utf-8")
-    for expected in ("todo_handoff", "todo_compaction", "validate_todo_reference_digests"):
+    # 参照Digestは、歴史的なglobal validatorではなくEvidence節に限定した検証を使う。
+    for expected in ("todo_handoff", "todo_compaction", "verify_reference_digests"):
         assert expected in source
+    assert "issue_resolution_post_write" not in source
 
 
 def test_atomic_write_replaces_in_one_step(update_path, tmp_path):
@@ -261,3 +263,162 @@ def test_atomic_write_replaces_in_one_step(update_path, tmp_path):
     update_path.atomic_write(target, "after\n".encode("utf-8"))
     assert target.read_text(encoding="utf-8") == "after\n"
     assert sorted(item.name for item in tmp_path.iterdir()) == ["file.md"]
+
+
+# ------------------------------------------- 境界訂正：active IDは正本から得る
+#
+# 指示：records/session-handoffs/
+#       2026-08-05-codex-to-claude-repair-record-generation-todo-boundaries.md
+#
+# 許可するactive IDはTODO本文からではなく、project内の既存Issue正本からだけ得る。
+
+LEGACY_ROOT = ".reviewcompass/workflow/issues"
+V4_ROOT = ".reviewcompass/workflow/issues-v4"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _issue_workspace(tmp_path, *, active_id="ISSUE-PILOT-TODO-GROWTH-001"):
+    root = tmp_path / "project"
+    (root / "records").mkdir(parents=True)
+    (root / LEGACY_ROOT).mkdir(parents=True)
+    (root / V4_ROOT).mkdir(parents=True)
+    (root / LEGACY_ROOT / ".gitkeep").write_text("", encoding="utf-8")
+    (root / V4_ROOT / ".gitkeep").write_text("", encoding="utf-8")
+    (root / LEGACY_ROOT / "issue-pilot-todo-growth-001--v1.json").write_text(
+        json.dumps(
+            {"record_kind": "issue_record", "issue_id": "ISSUE-PILOT-TODO-GROWTH-001"},
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    (root / V4_ROOT / "issue-htc-66c3e6ca--v1.json").write_text(
+        json.dumps(
+            {"record_kind": "issue_record", "issue_id": "ISSUE-HTC-66C3E6CA"},
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    target = root / "records" / "first.md"
+    target.write_text("reference\n", encoding="utf-8")
+    document = f"""# TODO_NEXT_SESSION
+
+## 現在位置
+
+- 全体：人が書いた説明。
+
+## 現在作業に影響する改善候補／Issue
+
+- `{active_id}`：resolved。現行Workへの影響なし。
+
+## 最新のauthority／Evidence
+
+- [記録](records/first.md) — SHA-256 `{_sha256(target)}`
+
+## 次に行う一作業
+
+人が書いた次の一作業。
+
+## Git・Test
+
+- branch：`main`
+- commit境界：本handoffを含むcommit完了時点
+- Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
+- worktree：本handoffを含むcommit完了時点でclean
+- 直近の関連Test：関連 `11 passed`
+- 直近の全Test：venv公式runner `852 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+"""
+    todo = root / "TODO_NEXT_SESSION.md"
+    todo.write_text(document, encoding="utf-8")
+    return root, todo
+
+
+def test_known_active_ids_come_from_both_issue_roots(update_path, tmp_path):
+    root, _todo = _issue_workspace(tmp_path)
+
+    known = update_path.load_known_active_issue_ids(root)
+
+    assert known == {"ISSUE-PILOT-TODO-GROWTH-001", "ISSUE-HTC-66C3E6CA"}
+
+
+def test_known_active_ids_ignore_the_todo_document(update_path, tmp_path):
+    root, todo = _issue_workspace(tmp_path, active_id="ISSUE-UNKNOWN-001")
+
+    known = update_path.load_known_active_issue_ids(root)
+
+    assert "ISSUE-UNKNOWN-001" not in known
+
+
+def test_unknown_active_id_stops_verification(update_path, tmp_path):
+    root, todo = _issue_workspace(tmp_path, active_id="ISSUE-UNKNOWN-001")
+
+    with pytest.raises(Exception) as error:
+        update_path.default_verify(todo, root)
+    assert "unknown active ID" in str(error.value) or "ISSUE-UNKNOWN-001" in str(error.value)
+
+
+def test_unknown_active_id_restores_the_todo_without_a_second_run(
+    update_path, tmp_path
+):
+    root, todo = _issue_workspace(tmp_path, active_id="ISSUE-UNKNOWN-001")
+    before = todo.read_bytes()
+    runner = _phases(_receipt(), _receipt())
+
+    with pytest.raises(update_path.TodoUpdatePathError) as error:
+        update_path.run_two_phase_update(
+            project_root=root, todo_path=todo, run_official_tests=runner
+        )
+
+    assert error.value.code == "todo_verification_failed"
+    assert todo.read_bytes() == before
+    assert runner.calls == ["first"]
+
+
+def test_issue_root_problems_stop(update_path, tmp_path):
+    root, _todo = _issue_workspace(tmp_path)
+
+    def _reject_roots():
+        with pytest.raises(update_path.TodoUpdatePathError) as error:
+            update_path.load_known_active_issue_ids(root)
+        return error.value.code
+
+    broken = root / V4_ROOT / "broken.json"
+    broken.write_text("{not json", encoding="utf-8")
+    assert _reject_roots() == "issue_root_invalid"
+    broken.unlink()
+
+    unknown_kind = root / V4_ROOT / "unknown.json"
+    unknown_kind.write_text(
+        json.dumps({"record_kind": "note", "issue_id": "ISSUE-X-001"}), encoding="utf-8"
+    )
+    assert _reject_roots() == "issue_root_invalid"
+    unknown_kind.unlink()
+
+    missing_id = root / V4_ROOT / "missing.json"
+    missing_id.write_text(json.dumps({"record_kind": "issue_record"}), encoding="utf-8")
+    assert _reject_roots() == "issue_root_invalid"
+    missing_id.unlink()
+
+    duplicated = root / V4_ROOT / "duplicated.json"
+    duplicated.write_text(
+        json.dumps({"record_kind": "issue_record", "issue_id": "ISSUE-HTC-66C3E6CA"}),
+        encoding="utf-8",
+    )
+    assert _reject_roots() == "issue_root_invalid"
+    duplicated.unlink()
+
+    linked = root / V4_ROOT / "linked.json"
+    linked.symlink_to(root / V4_ROOT / "issue-htc-66c3e6ca--v1.json")
+    assert _reject_roots() == "issue_root_invalid"
+    linked.unlink()
+
+    assert update_path.load_known_active_issue_ids(root)
+
+
+def test_repository_todo_resolves_its_active_id_from_the_issue_records(update_path):
+    known = update_path.load_known_active_issue_ids(PROJECT_ROOT)
+
+    assert "ISSUE-PILOT-TODO-GROWTH-001" in known
+    assert {"ISSUE-HTC-66C3E6CA", "ISSUE-HTC-BEB5E0BD", "ISSUE-HTC-C9F6C917"} <= known
+    assert update_path.default_verify(
+        PROJECT_ROOT / "TODO_NEXT_SESSION.md", PROJECT_ROOT
+    ) is True

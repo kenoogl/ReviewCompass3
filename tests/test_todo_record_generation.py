@@ -284,3 +284,86 @@ def test_module_never_parses_counts_out_of_output_text(generation):
         '["stdout"]', '["stderr"]', "passed in",
     ):
         assert forbidden not in text
+
+
+# ------------------------------------------------- 境界訂正：Evidence節への限定
+#
+# 指示：records/session-handoffs/
+#       2026-08-05-codex-to-claude-repair-record-generation-todo-boundaries.md
+#
+# 機械管理はEvidence見出しの次行から、次の`## `見出しの直前までに限る。
+# 節外のlinkは収集・更新・Digest検証のいずれの対象にもしない。
+
+
+def _workspace_with_outside_link(tmp_path):
+    root, todo = _workspace(tmp_path, references=("first.md", "second.md"))
+    outside = root / "records" / "outside.md"
+    outside.write_text("outside\n", encoding="utf-8")
+    document = todo.read_text(encoding="utf-8")
+    document += (
+        "\n## 範囲外の節\n\n"
+        f"- [範囲外参照](records/outside.md) — SHA-256 `{_sha256(outside)}`\n"
+    )
+    todo.write_text(document, encoding="utf-8")
+    return root, todo, outside
+
+
+def test_only_links_inside_the_evidence_section_are_collected(generation, tmp_path):
+    root, todo, _outside = _workspace_with_outside_link(tmp_path)
+
+    collected = generation.collect_reference_digests(
+        todo.read_text(encoding="utf-8"), project_root=root
+    )
+
+    assert [item["path"] for item in collected] == [
+        "records/first.md", "records/second.md",
+    ]
+    assert "records/outside.md" not in {item["path"] for item in collected}
+
+
+def test_candidate_leaves_the_outside_link_byte_identical(generation, tmp_path):
+    root, todo, outside = _workspace_with_outside_link(tmp_path)
+    before = todo.read_text(encoding="utf-8")
+    outside_line = [
+        line for line in before.splitlines() if line.startswith("- [範囲外参照]")
+    ]
+    assert len(outside_line) == 1
+
+    candidate = _candidate(generation, root, todo).decode("utf-8")
+
+    assert outside_line[0] in candidate.splitlines()
+    assert "## 範囲外の節" in candidate
+
+
+def test_tampering_outside_the_evidence_section_does_not_stop(generation, tmp_path):
+    root, todo, outside = _workspace_with_outside_link(tmp_path)
+    outside.write_text(outside.read_text(encoding="utf-8") + "x", encoding="utf-8")
+
+    candidate = _candidate(generation, root, todo).decode("utf-8")
+    assert "- [範囲外参照](records/outside.md) — SHA-256 " in candidate
+    assert generation.verify_reference_digests(
+        candidate, project_root=root
+    ) is True
+
+
+def test_tampering_inside_the_evidence_section_still_stops(generation, tmp_path):
+    root, todo, _outside = _workspace_with_outside_link(tmp_path)
+    target = root / "records" / "first.md"
+    target.write_text(target.read_text(encoding="utf-8") + "x", encoding="utf-8")
+
+    assert _reject(generation, root, todo) == "reference_digest_mismatch"
+
+
+def test_scoped_verification_ignores_links_outside_the_section(generation, tmp_path):
+    root, todo, outside = _workspace_with_outside_link(tmp_path)
+    document = todo.read_text(encoding="utf-8")
+    assert generation.verify_reference_digests(document, project_root=root) is True
+
+    outside.write_text("changed\n", encoding="utf-8")
+    assert generation.verify_reference_digests(document, project_root=root) is True
+
+    inside = root / "records" / "second.md"
+    inside.write_text("changed\n", encoding="utf-8")
+    with pytest.raises(generation.TodoRecordGenerationError) as error:
+        generation.verify_reference_digests(document, project_root=root)
+    assert error.value.code == "reference_digest_mismatch"
