@@ -54,6 +54,8 @@ _ISSUE_ID = re.compile(r"ISSUE-[A-Z0-9]+(?:-[A-Z0-9]+)*")
 RECEIPT_ROOT = "records/development"
 
 STOP_CODES = (
+    "official_test_failed",
+    "todo_update_failed",
     "todo_candidate_failed",
     "todo_write_failed",
     "todo_read_back_mismatch",
@@ -63,6 +65,7 @@ STOP_CODES = (
     "issue_root_invalid",
     "todo_path_invalid",
     "receipt_path_invalid",
+    "config_load_failed",
 )
 
 
@@ -154,17 +157,39 @@ def default_verify(todo_path, project_root):
     return True
 
 
+def _run_official_phase(run_official_tests, phase):
+    """公式Test実行とreceipt取得の失敗を、意味の分かるstop codeへ正規化する。
+
+    `KeyboardInterrupt`と`SystemExit`は`Exception`を継承しないので捕捉しない。
+    """
+
+    try:
+        return run_official_tests(phase)
+    except TodoUpdatePathError:
+        raise
+    except Exception as error:
+        raise TodoUpdatePathError(
+            "official_test_failed", f"{phase}: {error}"
+        ) from error
+
+
 def run_two_phase_update(
     *, project_root, todo_path, run_official_tests, verify=None, write=None
 ):
-    """一時receiptで書き、最終receiptで確定する。失敗したら原状へ戻す。"""
+    """一時receiptで書き、最終receiptで確定する。失敗したら原状へ戻す。
+
+    TODOを書き始めてから確定するまでを一つのtransactionとして扱う。`Exception`を
+    継承する失敗はすべて原状復帰の対象である。1回目の公式Testが失敗した段階では
+    まだ何も書いていないので、復帰のためのwriteもしない。
+    """
 
     verify = verify or default_verify
     write = write or atomic_write
     todo_path = Path(todo_path)
     original = todo_path.read_bytes()
 
-    first_receipt = run_official_tests("first")
+    # ここで失敗してもTODOは一度も書き換わっていない。復元は行わない。
+    first_receipt = _run_official_phase(run_official_tests, "first")
     try:
         try:
             candidate = todo_record_generation.build_todo_candidate(
@@ -190,11 +215,14 @@ def run_two_phase_update(
         except Exception as error:
             raise TodoUpdatePathError("todo_verification_failed", str(error)) from error
 
-        second_receipt = run_official_tests("second")
+        second_receipt = _run_official_phase(run_official_tests, "second")
         compare_receipts(first_receipt, second_receipt)
     except TodoUpdatePathError:
         _restore(todo_path, original)
         raise
+    except Exception as error:
+        _restore(todo_path, original)
+        raise TodoUpdatePathError("todo_update_failed", str(error)) from error
 
     return {
         "todo_bytes": candidate,
@@ -204,11 +232,16 @@ def run_two_phase_update(
 
 
 def _restore(todo_path, original):
+    """元bytesと違っていれば戻す。戻せない場合は`todo_restore_failed`で停止する。"""
+
     try:
+        if Path(todo_path).read_bytes() == original:
+            return
         atomic_write(todo_path, original)
+        restored = Path(todo_path).read_bytes()
     except OSError as error:  # pragma: no cover - 復帰不能は停止条件そのもの
         raise TodoUpdatePathError("todo_restore_failed", str(error)) from error
-    if Path(todo_path).read_bytes() != original:  # pragma: no cover
+    if restored != original:  # pragma: no cover
         raise TodoUpdatePathError("todo_restore_failed", str(todo_path))
 
 
@@ -302,7 +335,14 @@ def main(argv=None, *, execute=None):
         _report({"status": "stopped", "code": error.code, "detail": error.detail})
         return 2
 
-    config = policy_test_runner.load_config(project_root / arguments.config)
+    try:
+        config = policy_test_runner.load_config(project_root / arguments.config)
+    except Exception as error:  # TODOはまだ読んでも書いてもいない。
+        _report(
+            {"status": "stopped", "code": "config_load_failed", "detail": str(error)}
+        )
+        return 2
+
     receipts = {"first": arguments.first_receipt, "second": arguments.final_receipt}
 
     def run_official_tests(phase):
