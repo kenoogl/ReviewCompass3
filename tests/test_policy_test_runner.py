@@ -10,6 +10,19 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config/development-test-runner.json"
+SUMMARY_VARIABLE = "RC3_TEST_SUMMARY_PATH"
+
+
+def _write_summary(environment, *, passed, failed=0):
+    """runnerが読む構造化集計を、pluginの代わりに書き出す。"""
+
+    summary = {
+        "passed": passed, "failed": failed, "skipped": 0,
+        "xfailed": 0, "xpassed": 0, "errors": 0, "total": passed + failed,
+    }
+    Path(environment[SUMMARY_VARIABLE]).write_text(
+        json.dumps(summary, sort_keys=True), encoding="utf-8"
+    )
 
 
 @pytest.fixture
@@ -69,6 +82,7 @@ def test_runner_performs_preflight_test_and_writes_verification_receipt(
             return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
         if command[-1] == "--version":
             return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
+        _write_summary(kwargs["env"], passed=448)
         return SimpleNamespace(
             returncode=0,
             stdout="448 passed in 2.03s\n",
@@ -112,6 +126,7 @@ def test_runner_records_failed_test_without_reclassifying_environment(
             return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
         if command[-1] == "--version":
             return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
+        _write_summary(kwargs["env"], passed=0, failed=1)
         return SimpleNamespace(returncode=1, stdout="1 failed\n", stderr="")
 
     result = runner.execute(

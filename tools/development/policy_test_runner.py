@@ -1,14 +1,22 @@
-"""版付きrepository policyだけから公式Testを実行しreceiptを作る。"""
+"""版付きrepository policyだけから公式Testを実行しreceiptを作る。
+
+receiptの`test_summary`は、pytestのmachine API（report object）から数えた構造化集計である。
+実行結果の出力文字列から件数を取り出すことはしない。集計の各fieldの意味は
+`tools/development/pytest_summary.py`のdocstringを正本とする。
+"""
 
 import argparse
 import dataclasses
 import datetime
 import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
 from pathlib import Path
+
+from tools.development import pytest_summary
 
 
 class TestRunnerPolicyError(Exception):
@@ -227,17 +235,36 @@ def execute(
     if not receipt_output.is_absolute():
         receipt_output = project_root / receipt_output
 
+    # 集計の受け渡しfileはreceiptの隣に置き、読み終えたら消す。source state digestからは除く。
+    summary_output = receipt_output.with_name(receipt_output.name + ".summary.json")
     source_state_digest = _source_state_digest(
         project_root,
-        excluded_paths=(receipt_output,),
+        excluded_paths=(receipt_output, summary_output),
     )
-    test_result = run(
-        list(command),
-        cwd=project_root,
-        capture_output=True,
-        text=True,
-    )
+    try:
+        test_result = run(
+            list(command),
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            env=dict(
+                os.environ,
+                **{pytest_summary.SUMMARY_ENVIRONMENT_VARIABLE: str(summary_output)},
+            ),
+        )
+        try:
+            test_summary = pytest_summary.read_summary(summary_output)
+        except pytest_summary.TestSummaryError as error:
+            raise TestRunnerPolicyError(str(error)) from error
+    finally:
+        if summary_output.exists():
+            summary_output.unlink()
+
     status = "passed" if test_result.returncode == 0 else "failed"
+    if status == "passed" and (test_summary["failed"] or test_summary["errors"]):
+        raise TestRunnerPolicyError(
+            "test_summary_inconsistent: passed status with failed or errored tests"
+        )
     receipt = {
         "receipt_kind": "policy_test_verification_run",
         "runner_id": config["runner_id"],
@@ -256,6 +283,7 @@ def execute(
         "source_state_digest": source_state_digest,
         "status": status,
         "exit_code": test_result.returncode,
+        "test_summary": test_summary,
         "stdout": test_result.stdout,
         "stderr": test_result.stderr,
     }
