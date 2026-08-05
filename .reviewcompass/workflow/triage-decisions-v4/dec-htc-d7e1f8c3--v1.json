@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-D7E1F8C3",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T14:08:59+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-D7E1F8C3",
+    "candidate_content_digest": "8c04d67b868c2ba1a8f19ed9bfd8c6ede9b5464194b41744e6ddcd4b2bb3392e"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": false,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "defer",
+  "blocking": false,
+  "rationale": "この候補は、実施報告照合の自動Claim抽出、Provenance対応、完了stateの結線である。現在は手作業を維持し、将来の製品工程へ先送りすることを選んでいる。この候補が未実施であることは、忘れていたことでも障害でもない。現行のPlanが意図的に先送りしている範囲である。ここでの`defer`は問題を放置するという意味ではなく、計画された時期が来るまで着手しない、という意味である。現時点では現行Workを妨げないため、影響は中、優先順位は低とし、blockingにはしない。新しい正式Issueは作らない。",
+  "next_action": "現行Planで予定された段階になったときに着手する。それまで実装も有効化もしない。個別のIssue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "172bab8fbb41bcb8c180c14ffdaab953beec52d232c7eb12bb75cc442452117b"
+}

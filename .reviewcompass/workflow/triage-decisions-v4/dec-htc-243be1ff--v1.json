@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-243BE1FF",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T14:08:59+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-243BE1FF",
+    "candidate_content_digest": "31fefa1dc66794acdb0640478308d164d4a6e8a73a8d27b5a21231c5fbd46249"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "high",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "dependency",
+  "blocking": false,
+  "rationale": "この候補は、session hook、Desktop監視、Claude hook、scheduler、background serviceの有効化である。これらはいずれも生の会話記録を継続的に集める仕組みであり、保存期間、削除、暗号化、backupの方針が決まる前に動かすべきものではない。よって正式Issue`ISSUE-HTC-BEB5E0BD`の方針決定に依存する。ここでの`dependency`は問題を放置するという意味ではなく、先に決めるべき方針がある、という意味である。未解決であり、記録が増えるたびに同じ判断が必要になるため再発もする。扱う対象が生の会話記録であるため影響は高いが、現行Workを止める性質ではないためblockingにはしない。単独では解けないため、独立した正式Issueへは昇格しない。",
+  "next_action": "正式Issue`ISSUE-HTC-BEB5E0BD`の保存方針が決まるまで、hook、watcher、scheduler、background serviceを有効化しない。方針決定後に有効化の要否を再判定する。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "759c270d6acc3da302cfc5c9da6fdb1c686d2cebface460b5ee5e2f02c0d1737"
+}

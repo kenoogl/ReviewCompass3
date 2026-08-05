@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-1D5B5102",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T14:08:59+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-1D5B5102",
+    "candidate_content_digest": "8dc4b2302ded415b4d5972d9f9404091d2fe0427ed57c1a3462d7e6e31b3df7e"
+  },
+  "human_fields": {
+    "unresolved": false,
+    "recurrence": false,
+    "impact": "not_applicable",
+    "priority": "not_applicable",
+    "promote_to_issue": false
+  },
+  "disposition": "historical_completed",
+  "blocking": false,
+  "rationale": "この候補は、WI-006以降のWI-001の実snapshot／manifest生成、TODO compaction、Resolution Verdictを未実施として並べた記録である。これらはいずれも完了している。ここでの`historical_completed`は、経緯やEvidenceを捨てるという意味ではない。すでに完了しており、現在の独立したIssueとしては追跡しない、という意味である。元のPlan、Decision、Evidence、code、testは変更しない。未解決ではなく再発もしないため、影響と優先順位は該当なしとし、正式Issueへは昇格しない。",
+  "next_action": "候補bundleを変更せず、この判断recordを完了済みの記録として保持する。正式Issue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "8e54752d168ee83f06b186b19c820df568ebcb37a9eaa5b5bf8038a06b2684b0"
+}

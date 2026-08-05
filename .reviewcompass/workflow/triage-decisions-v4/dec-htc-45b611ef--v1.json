@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-45B611EF",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T14:08:59+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-45B611EF",
+    "candidate_content_digest": "3c2c28023c9b0b7f8a2f23576df424d34b416f7acbe3ae67cab1db3b24742889"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": false,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "defer",
+  "blocking": false,
+  "rationale": "この候補は、Project Bindingを恒久的に保存することである。これはWork 7として計画済みの作業であり、その段階で着手する。この候補が未実施であることは、忘れていたことでも障害でもない。現行のPlanが意図的に先送りしている範囲である。ここでの`defer`は問題を放置するという意味ではなく、計画された時期が来るまで着手しない、という意味である。現時点では現行Workを妨げないため、影響は中、優先順位は低とし、blockingにはしない。新しい正式Issueは作らない。",
+  "next_action": "現行Planで予定された段階になったときに着手する。それまで実装も有効化もしない。個別のIssue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "da10f6f9c60fd8ec54c5722aeaeebfeeaa3ec496cf43a3abaddb9953fd430caa"
+}
