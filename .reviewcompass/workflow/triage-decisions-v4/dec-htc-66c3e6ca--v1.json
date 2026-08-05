@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-66C3E6CA",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T14:02:25+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-66C3E6CA",
+    "candidate_content_digest": "b69b41711d9275d0d04d3f59ead32b00057844a4b2c650dd12118753fd9e6ffa"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "high",
+    "priority": "high",
+    "promote_to_issue": true
+  },
+  "disposition": "issue_resolution",
+  "blocking": false,
+  "rationale": "この候補は、固定receiptの全Test時間`2.26s`に対してTODOへ`2.29s`と手入力し、転記の差が出た観測である。単発の文書訂正として個別に直すのではなく、共通の原因を追跡する。共通の原因は、Evidenceやtodoの定型欄を、正しい入力から正しい位置・時点・内訳で生成する処理が機械化されていないことである。固定receiptからの数値の転記、構造見出しからの挿入位置の特定、必須の検証がすべて終わった後の時刻の確定、機械監査結果の区分別の集計は、いずれも定型的に決まる処理であり、機械側が扱うべきものである。同じ原因の観測として`HTC-C2E642ED`、`HTC-D34A113E`、`HTC-D65B4A8E`の3候補があり、これらは個別のIssueにせず、この`ISSUE-HTC-66C3E6CA`で一緒に扱う。未解決であり再発もするため影響と優先順位は高いが、現在進行中のWorkを止める性質ではないためblockingにはしない。このIssue登録は、既存文書の一括書換えや既存receiptの改変を意味しない。LLMが説明文を書くことを禁じるものでもない。定型の値と構造の操作を機械側へ移すための追跡である。",
+  "next_action": "正式Issue`ISSUE-HTC-66C3E6CA`として登録し、Plan化するかどうかをHumanが判断する。既存文書の一括書換えや機械化の実装は開始しない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": true,
+    "issue_id": "ISSUE-HTC-66C3E6CA"
+  },
+  "content_digest": "dd00713c79f27d8bf6bba3e283a65a388ac7df8c27dfe2ae4e2b8304b65ce536"
+}

@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：過去TODO候補41件のうち22件をHuman判断済みrecordとして保存。残り19件はHuman triage待ち。
-- 正式Issue：2件、いずれも`registered`かつnonblockingで未着手。active Issueは0件。`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていることを追跡する。
+- 現在の工程：過去TODO候補41件のうち26件をHuman判断済みrecordとして保存。残り15件はHuman triage待ち。
+- 正式Issue：3件、いずれも`registered`かつnonblockingで未着手。active Issueは0件。`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
@@ -22,7 +22,8 @@
 - [V4 Issue永続化 GREEN](records/development/2026-08-05-v4-issue-persistence-green-evidence-v1.md) — SHA-256 `3ae17b4b5828429ee8c7f1b6dfbc3b80d9439da4bace685542cee3845640b731`
 - [正式Issue record 会話記録方針](.reviewcompass/workflow/issues-v4/issue-htc-beb5e0bd--v1.json) — SHA-256 `a4a1511e609005193a3d127080a3eabf4f56a67529c5bd9b4e0f55b467422d62`
 - [正式Issue record 機械操作の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-c9f6c917--v1.json) — SHA-256 `66cfe50ce79136bca5e92b35b72502cedfb8b6f6f3e20ade1e027bcbf1fec0ed`
-- [判断record作成後の全test receipt](records/development/2026-08-05-triage-existing-machine-closure-test-receipt-v1.json) — SHA-256 `e353c4772f0c1d3b9d79571384713bc9053ffea7e93902e2ac5fc8081866561e`
+- [正式Issue record 記録生成の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-66c3e6ca--v1.json) — SHA-256 `56e0911d6f565915ca0ad7737eae7befbb30d686d344eb5367ecc95598a8c732`
+- [判断record作成後の全test receipt](records/development/2026-08-05-triage-record-generation-root-issue-test-receipt-v1.json) — SHA-256 `fbca74191dd391bc8e962178515ac30f18bdf87abc8f22209f37f7b88fe878ce`
 - [V4 Human triage永続化 GREEN](records/development/2026-08-05-v4-human-triage-persistence-green-evidence-v1.md) — SHA-256 `41fcbbbd6acc278055dd3e43e64fcb0c603627319eae1fb13b853262bda305d7`
 - [過去TODO候補 Human triage資料](records/development/2026-08-05-historical-todo-intake-triage-material-v1.md) — SHA-256 `b2ad5195ffd041a527b8d92f5847606bddcdb5876cacbca05a9a9c304b39efdb`
 - [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
@@ -49,7 +50,7 @@
 
 ## 次に行う一作業
 
-残り19候補に対するHuman triageを受ける。
+残り15候補に対するHuman triageを受ける。
 
 開始条件：
 
@@ -61,15 +62,15 @@
 - 候補一覧：`records/development/2026-08-05-historical-todo-intake-candidates-v1.json`（41件、重複疑い0件）
 - 候補一覧の`human_fields`は生成時の未記入観測として全件`null`のまま保持する。判断正本は
   `.reviewcompass/workflow/triage-decisions-v4/`のV4 human triage decision（schema version 2）である。
-- 判断済み22件。うち正式Issueへ昇格したのは`HTC-BEB5E0BD`と`HTC-C9F6C917`の2件である。
+- 判断済み26件。うち正式Issueへ昇格したのは`HTC-BEB5E0BD`、`HTC-C9F6C917`、`HTC-66C3E6CA`の3件である。
 - 正式Issue正本：`.reviewcompass/workflow/issues-v4/`（V4 issue_record schema version 2）
 
-後続作業：残り19候補のHuman triageと、正式Issue2件のPlan化可否判断。
+後続作業：残り15候補のHuman triageと、正式Issue3件のPlan化可否判断。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：残り19候補のtriageと、正式Issue2件のPlan化可否。昇格、priority、統合、根本原因Issue化はHumanが決める。`ISSUE-HTC-BEB5E0BD`と`ISSUE-HTC-C9F6C917`はともに`registered`かつnonblockingのままで、作業を開始していない。
+- Human判断待ち：残り15候補のtriageと、正式Issue3件のPlan化可否。昇格、priority、統合、根本原因Issue化はHumanが決める。`ISSUE-HTC-BEB5E0BD`、`ISSUE-HTC-C9F6C917`、`ISSUE-HTC-66C3E6CA`はいずれも`registered`かつnonblockingのままで、作業を開始していない。
 - 再開条件：判断recordのcommit後のclean transition。
 
 ## stale・deferred
