@@ -260,7 +260,10 @@ def test_a9_provenance_verdict_and_accepted_artifact(runtime, tmp_path):
     *_rest, human, provenance = _full_chain(runtime, chain)
     assert provenance["record_kind"] == "provenance_verdict"
     assert provenance["status"] == "verified"
-    assert len(provenance["edges"]) >= 9
+    # 新形式：辺数ではなく9 nodeと8 edgeを見る。自己辺は持たない。
+    assert len(provenance["verified_nodes"]) == 9
+    assert len(provenance["verified_edges"]) == 8
+    assert "edges" not in provenance
     accepted = runtime.accept_artifact(
         provenance_verdict=provenance, human_decision=human, context_manifest=chain.context
     )
@@ -285,7 +288,7 @@ def test_a11_self_target_uses_the_same_gates(runtime, tmp_path):
     assert chain.contract["boundary"]["self_application"] is True
     assert chain.contract["boundary"]["gate_bypass_allowed"] is False
     assert provenance["status"] == "verified"
-    gates = [edge["to"] for edge in provenance["edges"]]
+    gates = [edge["to"]["node_role"] for edge in provenance["verified_edges"]]
     for required in ("conformance_verdict", "final_challenge_verdict", "human_decision"):
         assert required in gates
 
@@ -392,7 +395,8 @@ def test_b8_broken_provenance_edge_is_not_verified(runtime, tmp_path):
             permit=permit, finding_set=findings, conformance_verdict=conformance,
             final_challenge_verdict=None, human_decision=human,
         )
-    assert error.value.code == "provenance_edge_missing"
+    # 新形式では、上流recordの欠落はnodeの欠落として停止する。
+    assert error.value.code == "provenance_node_missing"
 
 
 def test_b9_human_decision_digest_mismatch_is_rejected(runtime, tmp_path):
@@ -594,7 +598,8 @@ def test_n1_legacy_terminal_edge_digest_is_rejected(runtime, tmp_path):
     ]
     with pytest.raises(runtime.ContractError) as error:
         runtime.validate_provenance_verdict(legacy)
-    assert error.value.code in ("provenance_edge_unexpected", "provenance_self_reference")
+    # 旧形式はverified_edgesを持たないため、edge欠落として拒否される。
+    assert error.value.code == "provenance_edge_missing"
 
 
 def test_n2_edge_role_swap_is_rejected(runtime, tmp_path):

@@ -7,6 +7,7 @@ reviewerはdeterministic stubであり、LLMを呼ばない。
 from pathlib import Path
 
 from tools.task_contract.identity import (
+    DIGEST_ALGORITHM,
     ContractError,
     file_sha256,
     record_ref,
@@ -345,6 +346,97 @@ def record_human_decision(
     )
 
 
+PROVENANCE_NODE_ROLES = PROVENANCE_EDGE_ORDER
+PROVENANCE_EDGE_PAIRS = tuple(
+    (PROVENANCE_EDGE_ORDER[index], PROVENANCE_EDGE_ORDER[index + 1])
+    for index in range(len(PROVENANCE_EDGE_ORDER) - 1)
+)
+
+
+def _node_ref(node_role, document):
+    return {
+        "node_role": node_role,
+        "record_kind": document["record_kind"],
+        "record_id": document["record_id"],
+        "record_version": document["record_version"],
+        "digest_algorithm": DIGEST_ALGORITHM,
+        "content_digest": document["content_digest"],
+    }
+
+
+def validate_provenance_verdict(verdict, *, upstream_records=None):
+    """V1〜V8を照合する。辺数では判定せず、両端のidentityとDigestを見る。
+
+    `provenance_verdict`自身を端点とするedgeを許さない。自己参照も許さない。
+    """
+
+    if not isinstance(verdict, dict) or verdict.get("record_kind") != "provenance_verdict":
+        raise ContractError("schema_violation", "provenance_verdict required")
+    nodes = verdict.get("verified_nodes")
+    edges = verdict.get("verified_edges")
+    if not isinstance(nodes, list):
+        raise ContractError("provenance_node_missing", "verified_nodes")
+    if not isinstance(edges, list):
+        raise ContractError("provenance_edge_missing", "verified_edges")
+
+    seen = {}
+    for node in nodes:
+        role = node.get("node_role")
+        if role in seen:
+            raise ContractError("provenance_node_duplicated", str(role))
+        seen[role] = node
+    for role in PROVENANCE_NODE_ROLES:
+        if role not in seen:
+            raise ContractError("provenance_node_missing", role)
+    unexpected = sorted(set(seen) - set(PROVENANCE_NODE_ROLES))
+    if unexpected:
+        raise ContractError("provenance_node_duplicated", ",".join(unexpected))
+
+    for role, node in seen.items():
+        if node.get("record_kind") != role:
+            raise ContractError("provenance_node_kind_mismatch", role)
+        for field in ("record_id", "record_version", "content_digest"):
+            if not node.get(field):
+                raise ContractError("provenance_node_identity_mismatch", f"{role}.{field}")
+
+    pairs = []
+    for edge in edges:
+        source = edge.get("from", {}).get("node_role")
+        target = edge.get("to", {}).get("node_role")
+        if source == "provenance_verdict" or target == "provenance_verdict" or source == target:
+            raise ContractError("provenance_self_reference", f"{source}->{target}")
+        if source not in seen or target not in seen:
+            raise ContractError("provenance_edge_endpoint_unresolved", f"{source}->{target}")
+        pairs.append((source, target))
+    for pair in PROVENANCE_EDGE_PAIRS:
+        if pair not in pairs:
+            raise ContractError("provenance_edge_missing", "->".join(pair))
+    if len(pairs) != len(PROVENANCE_EDGE_PAIRS) or pairs != list(PROVENANCE_EDGE_PAIRS):
+        raise ContractError("provenance_edge_unexpected", str(pairs))
+
+    closure = verdict.get("closure", {})
+    if (
+        closure.get("terminal_node_role") != "human_decision"
+        or closure.get("self_edge_present") is not False
+        or closure.get("closed_by") != "accepted_artifact"
+    ):
+        raise ContractError("provenance_self_reference", "closure")
+
+    if upstream_records:
+        for role, document in upstream_records.items():
+            node = seen.get(role)
+            if node is None:
+                raise ContractError("provenance_node_missing", role)
+            if (
+                node["record_id"] != document["record_id"]
+                or node["record_version"] != document["record_version"]
+            ):
+                raise ContractError("provenance_node_identity_mismatch", role)
+            if node["content_digest"] != document["content_digest"]:
+                raise ContractError("provenance_node_digest_mismatch", role)
+    return verdict
+
+
 def verify_provenance(
     *,
     requirement_binding,
@@ -356,8 +448,9 @@ def verify_provenance(
     conformance_verdict,
     final_challenge_verdict,
     human_decision,
+    record_version=1,
 ):
-    """型付き辺とDigestで来歴を検証する。欠落と不一致では`verified`にしない。"""
+    """9 nodeと8 edgeを検証する。verdict自身へ向かうedgeを内容へ含めない。"""
 
     stages = {
         "requirement_binding": requirement_binding,
@@ -370,46 +463,47 @@ def verify_provenance(
         "final_challenge_verdict": final_challenge_verdict,
         "human_decision": human_decision,
     }
-    for name in PROVENANCE_EDGE_ORDER:
-        if not stages.get(name):
-            raise ContractError("provenance_edge_missing", name)
+    for role in PROVENANCE_NODE_ROLES:
+        if not stages.get(role):
+            raise ContractError("provenance_node_missing", role)
     if human_decision["target_digest"] != context_manifest["content_digest"]:
         raise ContractError("decision_digest_mismatch", human_decision["record_id"])
+    for owner_pair in (
+        (conformance_verdict["owner"], final_challenge_verdict["owner"]),
+        (conformance_verdict["owner"], human_decision["owner"]),
+        (final_challenge_verdict["owner"], human_decision["owner"]),
+    ):
+        if owner_pair[0] == owner_pair[1]:
+            raise ContractError("owner_separation_violated", owner_pair[0])
 
-    edges = []
-    previous = None
-    for name in PROVENANCE_EDGE_ORDER:
-        document = stages[name]
-        if previous is not None:
-            edges.append(
-                {
-                    "from": previous,
-                    "to": name,
-                    "to_digest": document["content_digest"],
-                }
-            )
-        previous = name
-    edges.append(
-        {
-            "from": "human_decision",
-            "to": "provenance_verdict",
-            "to_digest": human_decision["content_digest"],
-        }
-    )
-    return seal(
-        {
-            "record_kind": "provenance_verdict",
-            "record_id": f"PV-{contract['record_id']}",
-            "record_version": 1,
-            "status": "verified",
-            "edges": edges,
-            "decision_ref": record_ref(human_decision),
-        }
-    )
+    document = {
+        "record_kind": "provenance_verdict",
+        "record_id": f"PV-{contract['record_id']}",
+        "record_version": record_version,
+        "status": "verified",
+        "verified_nodes": [
+            _node_ref(role, stages[role]) for role in PROVENANCE_NODE_ROLES
+        ],
+        "verified_edges": [
+            {"edge_kind": "precedes",
+             "from": {"node_role": source},
+             "to": {"node_role": target}}
+            for source, target in PROVENANCE_EDGE_PAIRS
+        ],
+        "closure": {
+            "terminal_node_role": "human_decision",
+            "self_edge_present": False,
+            "closed_by": "accepted_artifact",
+        },
+    }
+    validate_provenance_verdict(document, upstream_records=stages)
+    return seal(document)
 
 
-def accept_artifact(*, provenance_verdict, human_decision, context_manifest):
-    """Human承認とProvenance検証が揃った場合だけaccepted artifactを確定する。"""
+def accept_artifact(
+    *, provenance_verdict, human_decision, context_manifest, record_version=1
+):
+    """Human承認と新形式のProvenance検証が揃った場合だけaccepted artifactを確定する。"""
 
     if human_decision is None:
         raise ContractError("human_decision_missing", "human decision required")
@@ -417,13 +511,16 @@ def accept_artifact(*, provenance_verdict, human_decision, context_manifest):
         raise ContractError("human_decision_not_approved", human_decision.get("decision"))
     if provenance_verdict.get("status") != "verified":
         raise ContractError("provenance_edge_missing", "provenance not verified")
+    validate_provenance_verdict(provenance_verdict)
+    if context_manifest is None:
+        raise ContractError("context_incomplete", "context manifest required")
     if human_decision["target_digest"] != context_manifest["content_digest"]:
         raise ContractError("decision_digest_mismatch", human_decision["record_id"])
     return seal(
         {
             "record_kind": "accepted_artifact",
             "record_id": f"AA-{context_manifest['record_id']}",
-            "record_version": 1,
+            "record_version": record_version,
             "target_paths": [
                 item["relative_path"] for item in context_manifest["material_bundle"]
             ],

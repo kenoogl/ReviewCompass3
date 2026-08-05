@@ -31,6 +31,7 @@ from tools.task_contract.execution import (
     record_human_decision,
     release_permit,
     run_stub_reviewer,
+    validate_provenance_verdict,
     verify_provenance,
 )
 from tools.task_contract.identity import (
@@ -69,6 +70,7 @@ __all__ = [
     "record_ref",
     "release_permit",
     "run_stub_reviewer",
+    "validate_provenance_verdict",
     "validate_record",
     "verify_provenance",
 ]
