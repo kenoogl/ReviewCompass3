@@ -9,6 +9,7 @@ from pathlib import Path
 from tools.task_contract.identity import (
     DIGEST_ALGORITHM,
     ContractError,
+    content_digest,
     file_sha256,
     record_ref,
     safe_relative_path,
@@ -42,6 +43,23 @@ PROVENANCE_EDGE_ORDER = (
     "final_challenge_verdict",
     "human_decision",
 )
+
+# Contract version 2は、Definition Challengeとcompileの間へHumanのContract approvalを
+# 置く（Amendment§4）。version 1の9 node、8 edge履歴はそのまま読める。
+CONTRACT_V2_EDGE_ORDER = (
+    "requirement_binding",
+    "review_task_contract",
+    "definition_challenge_verdict",
+    "contract_approval",
+    "compile_verdict",
+    "context_manifest",
+    "workflow_permit",
+    "finding_set",
+    "conformance_verdict",
+    "final_challenge_verdict",
+    "human_decision",
+)
+GATED_CONTRACT_VERSION = 2
 
 
 def read_source_snapshot(*, project_root, target_paths, base_commit, head_commit):
@@ -347,10 +365,43 @@ def record_human_decision(
 
 
 PROVENANCE_NODE_ROLES = PROVENANCE_EDGE_ORDER
-PROVENANCE_EDGE_PAIRS = tuple(
-    (PROVENANCE_EDGE_ORDER[index], PROVENANCE_EDGE_ORDER[index + 1])
-    for index in range(len(PROVENANCE_EDGE_ORDER) - 1)
-)
+
+
+def _edge_pairs(node_roles):
+    return tuple(
+        (node_roles[index], node_roles[index + 1])
+        for index in range(len(node_roles) - 1)
+    )
+
+
+PROVENANCE_EDGE_PAIRS = _edge_pairs(PROVENANCE_EDGE_ORDER)
+CONTRACT_V2_EDGE_PAIRS = _edge_pairs(CONTRACT_V2_EDGE_ORDER)
+
+
+def provenance_node_roles(contract_version):
+    """Contract versionごとの期待node列。辺数だけで判定しない。"""
+
+    if contract_version >= GATED_CONTRACT_VERSION:
+        return CONTRACT_V2_EDGE_ORDER
+    return PROVENANCE_EDGE_ORDER
+
+
+def _assert_contract_gate(*, contract, definition_challenge_verdict, contract_approval):
+    """来歴へ載せる前に、Challengeとapprovalが実際に束縛されているかを見る。
+
+    compile事前gateと同じ判定を、Amendment§3の閉じたreasonで再確認する。
+    """
+
+    from tools.task_contract.contract import compile_gate_reason
+
+    reason = compile_gate_reason(
+        contract=contract,
+        definition_challenge_verdict=definition_challenge_verdict,
+        contract_approval=contract_approval,
+    )
+    if reason is not None:
+        raise ContractError(reason, contract["record_id"])
+    return True
 
 
 def _node_ref(node_role, document):
@@ -385,10 +436,22 @@ def validate_provenance_verdict(verdict, *, upstream_records=None):
         if role in seen:
             raise ContractError("provenance_node_duplicated", str(role))
         seen[role] = node
-    for role in PROVENANCE_NODE_ROLES:
+
+    # 期待するnode列は、来歴が主張するContract versionから決める。
+    # version 2を名乗るnodeがあれば、Definition ChallengeとContract approvalを必ず要求する。
+    contract_node = seen.get("review_task_contract") or {}
+    contract_version = contract_node.get("record_version") or 1
+    if not isinstance(contract_version, int):
+        raise ContractError(
+            "provenance_node_identity_mismatch", "review_task_contract.record_version"
+        )
+    node_roles = provenance_node_roles(contract_version)
+    edge_pairs = _edge_pairs(node_roles)
+
+    for role in node_roles:
         if role not in seen:
             raise ContractError("provenance_node_missing", role)
-    unexpected = sorted(set(seen) - set(PROVENANCE_NODE_ROLES))
+    unexpected = sorted(set(seen) - set(node_roles))
     if unexpected:
         raise ContractError("provenance_node_duplicated", ",".join(unexpected))
 
@@ -408,10 +471,10 @@ def validate_provenance_verdict(verdict, *, upstream_records=None):
         if source not in seen or target not in seen:
             raise ContractError("provenance_edge_endpoint_unresolved", f"{source}->{target}")
         pairs.append((source, target))
-    for pair in PROVENANCE_EDGE_PAIRS:
+    for pair in edge_pairs:
         if pair not in pairs:
             raise ContractError("provenance_edge_missing", "->".join(pair))
-    if len(pairs) != len(PROVENANCE_EDGE_PAIRS) or pairs != list(PROVENANCE_EDGE_PAIRS):
+    if len(pairs) != len(edge_pairs) or pairs != list(edge_pairs):
         raise ContractError("provenance_edge_unexpected", str(pairs))
 
     closure = verdict.get("closure", {})
@@ -434,6 +497,13 @@ def validate_provenance_verdict(verdict, *, upstream_records=None):
                 raise ContractError("provenance_node_identity_mismatch", role)
             if node["content_digest"] != document["content_digest"]:
                 raise ContractError("provenance_node_digest_mismatch", role)
+
+    # 封をしたあとに中身が書き換えられていないかを最後に見る。
+    # node、edge、closureの構造検査を先に通すため、既存の停止codeは変わらない。
+    if "content_digest" in verdict and content_digest(verdict) != verdict[
+        "content_digest"
+    ]:
+        raise ContractError("provenance_node_digest_mismatch", verdict["record_id"])
     return verdict
 
 
@@ -448,13 +518,22 @@ def verify_provenance(
     conformance_verdict,
     final_challenge_verdict,
     human_decision,
+    definition_challenge_verdict=None,
+    contract_approval=None,
     record_version=1,
 ):
-    """9 nodeと8 edgeを検証する。verdict自身へ向かうedgeを内容へ含めない。"""
+    """Contract versionに応じたnodeとedgeを検証する。
 
+    version 1は9 node、8 edge。version 2はDefinition ChallengeとContract approvalを
+    含む11 node、10 edgeである。verdict自身へ向かうedgeを内容へ含めない。
+    """
+
+    node_roles = provenance_node_roles(contract.get("record_version", 1))
     stages = {
         "requirement_binding": requirement_binding,
         "review_task_contract": contract,
+        "definition_challenge_verdict": definition_challenge_verdict,
+        "contract_approval": contract_approval,
         "compile_verdict": compile_verdict,
         "context_manifest": context_manifest,
         "workflow_permit": permit,
@@ -463,32 +542,41 @@ def verify_provenance(
         "final_challenge_verdict": final_challenge_verdict,
         "human_decision": human_decision,
     }
-    for role in PROVENANCE_NODE_ROLES:
+    stages = {role: stages[role] for role in node_roles}
+    for role in node_roles:
         if not stages.get(role):
             raise ContractError("provenance_node_missing", role)
     if human_decision["target_digest"] != context_manifest["content_digest"]:
         raise ContractError("decision_digest_mismatch", human_decision["record_id"])
-    for owner_pair in (
-        (conformance_verdict["owner"], final_challenge_verdict["owner"]),
-        (conformance_verdict["owner"], human_decision["owner"]),
-        (final_challenge_verdict["owner"], human_decision["owner"]),
-    ):
-        if owner_pair[0] == owner_pair[1]:
-            raise ContractError("owner_separation_violated", owner_pair[0])
+
+    owners = [
+        conformance_verdict["owner"],
+        final_challenge_verdict["owner"],
+        human_decision["owner"],
+    ]
+    if definition_challenge_verdict is not None and "definition_challenge_verdict" in stages:
+        _assert_contract_gate(
+            contract=contract,
+            definition_challenge_verdict=definition_challenge_verdict,
+            contract_approval=contract_approval,
+        )
+        owners.append(definition_challenge_verdict["owner"])
+        owners.append(contract_approval["owner"])
+    for index, owner in enumerate(owners):
+        if owner in owners[index + 1:]:
+            raise ContractError("owner_separation_violated", owner)
 
     document = {
         "record_kind": "provenance_verdict",
         "record_id": f"PV-{contract['record_id']}",
         "record_version": record_version,
         "status": "verified",
-        "verified_nodes": [
-            _node_ref(role, stages[role]) for role in PROVENANCE_NODE_ROLES
-        ],
+        "verified_nodes": [_node_ref(role, stages[role]) for role in node_roles],
         "verified_edges": [
             {"edge_kind": "precedes",
              "from": {"node_role": source},
              "to": {"node_role": target}}
-            for source, target in PROVENANCE_EDGE_PAIRS
+            for source, target in _edge_pairs(node_roles)
         ],
         "closure": {
             "terminal_node_role": "human_decision",

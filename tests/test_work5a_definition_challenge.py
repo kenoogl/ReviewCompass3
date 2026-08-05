@@ -25,6 +25,8 @@ import pytest
 
 CONTRACT_V1_ID = "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1"
 CONTRACT_V2_ID = "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2"
+# 「別Contract」の負例では、record identityまで別にしないと同じrecordになる。
+OTHER_CONTRACT_V2_ID = "TC-RC3-REVIEW-OTHER-DOC-CHANGE-2026-08-05-V2"
 BASE_COMMIT = "a" * 40
 HEAD_COMMIT = "b" * 40
 HUMAN_ID = "kenoogl"
@@ -630,7 +632,9 @@ def test_h14_tampered_contract_approval_is_not_compilable(runtime, tmp_path):
 
 def test_h15_approval_for_another_contract_is_not_compilable(runtime, tmp_path):
     draft, verdict, _approval_record = _gated(runtime, tmp_path)
-    other = _v2(runtime, _project(tmp_path / "other"))
+    other = _v2(
+        runtime, _project(tmp_path / "other"), contract_id=OTHER_CONTRACT_V2_ID
+    )
     other_verdict = _challenge(runtime, other)
     other_approval = _approval(runtime, other, other_verdict)
 
@@ -783,7 +787,9 @@ def test_challenge_rejects_a_material_set_bound_to_another_contract(
     runtime, tmp_path
 ):
     draft = _v2(runtime, _project(tmp_path))
-    other = _v2(runtime, _project(tmp_path / "other"))
+    other = _v2(
+        runtime, _project(tmp_path / "other"), contract_id=OTHER_CONTRACT_V2_ID
+    )
 
     verdict = _challenge(runtime, draft, material_set=_materials(runtime, other))
 

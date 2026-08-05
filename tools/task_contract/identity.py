@@ -15,6 +15,9 @@ RECORD_KINDS = (
     "requirement_binding",
     "source_snapshot",
     "review_task_contract",
+    "definition_challenge_material_set",
+    "definition_challenge_verdict",
+    "contract_approval",
     "compile_verdict",
     "plan_bundle",
     "context_manifest",
@@ -50,6 +53,22 @@ STOP_CODES = (
     "decision_digest_mismatch",
     "human_decision_missing",
     "human_decision_not_approved",
+    # Definition Challenge（設計§3のD1〜D8）
+    "definition_requirement_unreceived",
+    "definition_section_missing",
+    "definition_scope_violation",
+    "definition_forbidden_capability",
+    "definition_owner_separation",
+    "definition_deferred_requirement_accepted",
+    "definition_material_missing",
+    "definition_stage_confusion",
+    # compile事前gate（Amendment§3の閉じたreason）
+    "definition_challenge_missing",
+    "definition_challenge_failed",
+    "definition_challenge_invalid",
+    "contract_approval_missing",
+    "contract_approval_rejected",
+    "contract_approval_invalid",
 )
 
 

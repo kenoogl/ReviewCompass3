@@ -9,6 +9,7 @@ from pathlib import Path
 from tools.task_contract.identity import (
     CONTRACT_SECTIONS,
     ContractError,
+    content_digest,
     record_ref,
     safe_relative_path,
     seal,
@@ -48,6 +49,76 @@ REQUIREMENT_OBLIGATIONS = {
     "REQ-WORKFLOW-004": "OBL-SELF-APPLICATION",
     "REQ-WORKFLOW-005": "OBL-ORIGIN-CONTINUATION",
 }
+
+#: Work 5Aが直接束縛する16 Requirement。deferred分をここへ足さない。
+BOUND_REQUIREMENT_IDS = tuple(sorted(REQUIREMENT_OBLIGATIONS))
+
+# 設計§6.1でversion 2が新しく持つ宣言。束縛16 Requirementを、Contractの
+# どの節が受けるかを明示する。値は10節の実在するfield名だけを使う。
+REQUIREMENT_RECEIVERS = {
+    "REQ-CONTRACT-001": "identity",
+    "REQ-CONTRACT-002": "expected_output",
+    "REQ-CONTRACT-003": "acceptance",
+    "REQ-CONTRACT-004": "acceptance",
+    "REQ-CONTRACT-005": "provenance_obligations",
+    "REQ-CONTEXT-001": "context_obligations",
+    "REQ-CONTEXT-002": "context_obligations",
+    "REQ-CONTEXT-003": "boundary",
+    "REQ-CONTEXT-004": "preconditions",
+    "REQ-CONTEXT-005": "context_obligations",
+    "REQ-EXEC-001": "preconditions",
+    "REQ-TRACE-002": "responsibility",
+    "REQ-TRACE-005": "provenance_obligations",
+    "REQ-TRIAGE-003": "escalation",
+    "REQ-WORKFLOW-004": "boundary",
+    "REQ-WORKFLOW-005": "identity",
+}
+
+# 四つのreview判断と、Amendment§2のContract approvalの論理owner。
+# 同じHuman個人が兼ねること自体は禁止しないが、論理ownerは分ける。
+DEFINITION_CHALLENGE_OWNER = "definition_challenge_owner"
+CONTRACT_APPROVAL_OWNER = "contract_approval_owner"
+DEFAULT_REVIEW_OWNERS = {
+    "definition_challenge": DEFINITION_CHALLENGE_OWNER,
+    "contract_approval": CONTRACT_APPROVAL_OWNER,
+    "conformance": "conformance_owner",
+    "final_challenge": "final_challenge_owner",
+    "human_decision": "human_decision_owner",
+}
+SEPARATED_REVIEW_ROLES = (
+    "definition_challenge",
+    "conformance",
+    "final_challenge",
+    "human_decision",
+)
+
+#: Contract version 2がcompile前に通す来歴step。Amendment§4の11 node。
+CONTRACT_V2_REQUIRED_EDGES = (
+    "requirement_binding",
+    "review_task_contract",
+    "definition_challenge_verdict",
+    "contract_approval",
+    "compile_verdict",
+    "context_manifest",
+    "workflow_permit",
+    "finding_set",
+    "conformance_verdict",
+    "final_challenge_verdict",
+    "human_decision",
+)
+
+#: Amendment§3の閉じたreason。compile事前gateはこれ以外を返さない。
+COMPILE_GATE_REASONS = (
+    "definition_challenge_missing",
+    "definition_challenge_failed",
+    "definition_challenge_invalid",
+    "contract_approval_missing",
+    "contract_approval_rejected",
+    "contract_approval_invalid",
+)
+
+#: このversion以上でDefinition ChallengeとContract approvalを必須にする。
+GATED_CONTRACT_VERSION = 2
 
 
 def bind_requirements(
@@ -105,11 +176,22 @@ def build_review_task_contract(
     target_paths,
     origin="new_development",
     continuation="fresh",
+    supersedes=None,
+    requirement_receivers=None,
+    review_owners=None,
 ):
-    """設計§2の10節を持つ最小Review Task Contractを作る。"""
+    """設計§2の10節を持つ最小Review Task Contractを作る。
+
+    version 2では設計§6.1の差分だけをversion 1へ足す。version 1の出力は変えない。
+    """
 
     if origin not in ORIGIN_CLASSES or continuation not in CONTINUATION_CLASSES:
         raise ContractError("schema_violation", "origin/continuation")
+    version_two = contract_version >= GATED_CONTRACT_VERSION
+    if not version_two and any(
+        value is not None for value in (supersedes, requirement_receivers, review_owners)
+    ):
+        raise ContractError("schema_violation", "version 2 only field")
     targets = [safe_relative_path(path) for path in target_paths]
     for path in targets:
         if not path.startswith("docs/"):
@@ -196,7 +278,55 @@ def build_review_task_contract(
         "requirement_ids": sorted(requirement_ids),
         "requirement_binding_ref": record_ref(requirement_binding),
     }
+    if version_two:
+        _apply_version_two_declarations(
+            document,
+            contract_version=contract_version,
+            supersedes=supersedes,
+            requirement_receivers=requirement_receivers,
+            review_owners=review_owners,
+        )
     return seal(document)
+
+
+def _apply_version_two_declarations(
+    document, *, contract_version, supersedes, requirement_receivers, review_owners
+):
+    """設計§6.1が列挙した差分だけをversion 2へ足す。"""
+
+    if not isinstance(supersedes, dict):
+        raise ContractError("schema_violation", "supersedes")
+    if (
+        supersedes.get("record_kind") != "review_task_contract"
+        or not supersedes.get("record_id")
+        or not supersedes.get("content_digest")
+        or not isinstance(supersedes.get("record_version"), int)
+        or supersedes["record_version"] >= contract_version
+    ):
+        raise ContractError("schema_violation", "supersedes")
+
+    document["requirement_receivers"] = dict(
+        REQUIREMENT_RECEIVERS if requirement_receivers is None else requirement_receivers
+    )
+    document["review_owners"] = dict(
+        DEFAULT_REVIEW_OWNERS if review_owners is None else review_owners
+    )
+    document["supersedes"] = dict(supersedes)
+    document["acceptance"] = list(document["acceptance"]) + [
+        "definition_challenge_passed",
+        "contract_approval_recorded",
+    ]
+    document["provenance_obligations"] = dict(
+        document["provenance_obligations"],
+        required_edges=list(CONTRACT_V2_REQUIRED_EDGES),
+    )
+    document["escalation"] = dict(
+        document["escalation"],
+        definition_challenge_failed="stop",
+        contract_approval_missing="not_compilable",
+        contract_approval_rejected="stop",
+    )
+    return document
 
 
 def check_requirement_coverage(*, contract, requirement_binding):
@@ -258,8 +388,71 @@ def _plan_views(contract):
     }
 
 
-def compile_contract(*, contract, requirement_binding):
-    """一Contract typeから一Plan bundleと6 typed viewだけを決定的に作る。"""
+def _sealed_record(document, kind):
+    """recordがその種別として封をされたままかを見る。改竄はDigestで分かる。"""
+
+    if not isinstance(document, dict) or document.get("record_kind") != kind:
+        return False
+    for field in ("record_id", "record_version", "content_digest"):
+        if not document.get(field):
+            return False
+    return content_digest(document) == document["content_digest"]
+
+
+def compile_gate_reason(*, contract, definition_challenge_verdict, contract_approval):
+    """Amendment§3のcompile事前gate。通れば`None`を返す。
+
+    Contract version 1は履歴再読込みのため、この検査を通さない。
+    """
+
+    if contract.get("record_version", 1) < GATED_CONTRACT_VERSION:
+        return None
+
+    if definition_challenge_verdict is None:
+        return "definition_challenge_missing"
+    if not _sealed_record(definition_challenge_verdict, "definition_challenge_verdict"):
+        return "definition_challenge_invalid"
+    if definition_challenge_verdict.get("status") != "passed":
+        return "definition_challenge_failed"
+    if definition_challenge_verdict.get("contract_ref") != record_ref(contract):
+        return "definition_challenge_invalid"
+
+    if contract_approval is None:
+        return "contract_approval_missing"
+    if not _sealed_record(contract_approval, "contract_approval"):
+        return "contract_approval_invalid"
+    if contract_approval.get("decision") != "approved":
+        return "contract_approval_rejected"
+    if contract_approval.get("contract_ref") != record_ref(contract):
+        return "contract_approval_invalid"
+    if contract_approval.get("definition_challenge_ref") != record_ref(
+        definition_challenge_verdict
+    ):
+        return "contract_approval_invalid"
+
+    owners = contract.get("review_owners") or {}
+    separated = {
+        definition_challenge_verdict.get("owner"),
+        contract_approval.get("owner"),
+        owners.get("human_decision"),
+    }
+    if len(separated) != 3 or None in separated:
+        return "contract_approval_invalid"
+    return None
+
+
+def compile_contract(
+    *,
+    contract,
+    requirement_binding,
+    definition_challenge_verdict=None,
+    contract_approval=None,
+):
+    """一Contract typeから一Plan bundleと6 typed viewだけを決定的に作る。
+
+    Contract version 2以降は、Plan bundleを作る前にDefinition Challengeと
+    Human Contract approvalを検証する。一件でも満たさなければPlan bundleを含めない。
+    """
 
     missing = [section for section in CONTRACT_SECTIONS if not contract.get(section)]
     if missing:
@@ -271,6 +464,23 @@ def compile_contract(*, contract, requirement_binding):
                 "status": "not_compilable",
                 "reason": "contract_section_missing",
                 "missing_sections": missing,
+                "unreceived_requirement_ids": [],
+            }
+        )
+    gate_reason = compile_gate_reason(
+        contract=contract,
+        definition_challenge_verdict=definition_challenge_verdict,
+        contract_approval=contract_approval,
+    )
+    if gate_reason is not None:
+        return seal(
+            {
+                "record_kind": "compile_verdict",
+                "record_id": f"CV-{contract['record_id']}",
+                "record_version": 1,
+                "status": "not_compilable",
+                "reason": gate_reason,
+                "missing_sections": [],
                 "unreceived_requirement_ids": [],
             }
         )
@@ -298,16 +508,18 @@ def compile_contract(*, contract, requirement_binding):
             "views": _plan_views(contract),
         }
     )
-    return seal(
-        {
-            "record_kind": "compile_verdict",
-            "record_id": f"CV-{contract['record_id']}",
-            "record_version": 1,
-            "status": "compiled",
-            "reason": None,
-            "missing_sections": [],
-            "unreceived_requirement_ids": [],
-            "contract_ref": record_ref(contract),
-            "plan_bundle": bundle,
-        }
-    )
+    document = {
+        "record_kind": "compile_verdict",
+        "record_id": f"CV-{contract['record_id']}",
+        "record_version": 1,
+        "status": "compiled",
+        "reason": None,
+        "missing_sections": [],
+        "unreceived_requirement_ids": [],
+        "contract_ref": record_ref(contract),
+        "plan_bundle": bundle,
+    }
+    if contract.get("record_version", 1) >= GATED_CONTRACT_VERSION:
+        document["definition_challenge_ref"] = record_ref(definition_challenge_verdict)
+        document["contract_approval_ref"] = record_ref(contract_approval)
+    return seal(document)
