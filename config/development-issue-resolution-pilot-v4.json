@@ -15,6 +15,7 @@
   ],
   "directories": {
     "human_triage_decision": ".reviewcompass/workflow/triage-decisions",
+    "human_triage_decision_v2": ".reviewcompass/workflow/triage-decisions-v4",
     "improvement_candidate": ".reviewcompass/workflow/improvement-candidates",
     "issue_record": ".reviewcompass/workflow/issues",
     "issue_resolution_plan": ".reviewcompass/workflow/resolution-plans",
@@ -69,6 +70,58 @@
     ],
     "source_relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
     "source_sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1"
+  },
+  "human_triage_decision_v2": {
+    "decision_id_prefix": "DEC",
+    "dispositions": [
+      "current_work",
+      "upstream_revision",
+      "dependency",
+      "issue_resolution",
+      "checkpoint",
+      "defer",
+      "reject",
+      "duplicate",
+      "historical_completed"
+    ],
+    "human_field_names": [
+      "unresolved",
+      "recurrence",
+      "impact",
+      "priority",
+      "promote_to_issue"
+    ],
+    "impact_values": [
+      "not_applicable",
+      "low",
+      "medium",
+      "high"
+    ],
+    "priority_values": [
+      "not_applicable",
+      "low",
+      "medium",
+      "high"
+    ],
+    "promotion_disposition": "issue_resolution",
+    "record_fields": [
+      "record_kind",
+      "schema_version",
+      "decision_id",
+      "decision_version",
+      "decided_at",
+      "decision_maker",
+      "candidate_ref",
+      "human_fields",
+      "disposition",
+      "blocking",
+      "rationale",
+      "next_action",
+      "supersedes",
+      "issue_promotion",
+      "content_digest"
+    ],
+    "schema_version": 2
   },
   "issue_schema_version": 2,
   "issue_states": [

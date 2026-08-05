@@ -18,12 +18,35 @@ _TOP_LEVEL_ITEM = re.compile(r"^- \S")
 _COMMIT_SHA = re.compile(r"`[0-9a-f]{7,40}`")
 _EVIDENCE_PATH = re.compile(r"`[^`]+\.(?:py|md|json)`")
 
+_DECISION_ID = re.compile(r"DEC-[A-Z0-9]+(?:-[A-Z0-9]+)+")
+_ISSUE_ID = re.compile(r"ISSUE-[A-Z0-9]+(?:-[A-Z0-9]+)+")
+_SHA256 = re.compile(r"[0-9a-f]{64}")
+_TIMESTAMP = re.compile(
+    r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})"
+)
+
 STOP_CODES = (
     "config_invalid",
     "intake_source_digest_mismatch",
     "intake_rule_excluded",
     "duplicate_suspect_not_flagged",
     "human_ruling_required",
+    "human_triage_decision_required",
+    "human_triage_decision_field_unknown",
+    "human_triage_decision_field_invalid",
+    "human_triage_decision_identity_invalid",
+    "human_triage_decision_schema_version_unsupported",
+    "human_triage_decision_path_invalid",
+    "human_triage_decision_path_mismatch",
+    "human_triage_decision_disposition_invalid",
+    "human_triage_decision_promotion_inconsistent",
+    "human_triage_decision_digest_mismatch",
+    "human_triage_decision_conflict",
+    "candidate_bundle_unavailable",
+    "candidate_bundle_digest_mismatch",
+    "candidate_bundle_schema_version_mismatch",
+    "candidate_not_found",
+    "candidate_digest_mismatch",
     "active_issue_limit_exceeded",
     "active_leaf_limit_exceeded",
     "suspend_requires_blocks_and_ruling",
@@ -55,6 +78,12 @@ def _canonical_digest(document):
     ).hexdigest()
 
 
+def canonical_digest(document):
+    """`content_digest`を除いた正準表現のSHA-256を返す。"""
+
+    return _canonical_digest(document)
+
+
 def _digest_of(value):
     return hashlib.sha256(
         json.dumps(value, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode(
@@ -78,11 +107,31 @@ def load_config(path):
     for required in (
         "maximum_active_issues", "maximum_active_leaves", "issue_states",
         "active_issue_states", "intake", "root_cause_candidate", "todo_projection",
+        "human_triage_decision_v2",
     ):
         if required not in config:
             raise IntakeError("config_invalid", required)
     if config["maximum_active_issues"] != 1 or config["maximum_active_leaves"] != 1:
         raise IntakeError("config_invalid", "active limits must be 1")
+    decision = config["human_triage_decision_v2"]
+    for required in (
+        "schema_version", "decision_id_prefix", "dispositions", "human_field_names",
+        "impact_values", "priority_values", "promotion_disposition", "record_fields",
+    ):
+        if required not in decision:
+            raise IntakeError("config_invalid", f"human_triage_decision_v2.{required}")
+    if decision["schema_version"] != 2:
+        raise IntakeError("config_invalid", "human triage decision schema must be 2")
+    if decision["promotion_disposition"] not in decision["dispositions"]:
+        raise IntakeError("config_invalid", "promotion disposition is not in vocabulary")
+    if "human_triage_decision_v2" not in config["directories"]:
+        raise IntakeError("config_invalid", "directories.human_triage_decision_v2")
+    if (
+        config["directories"]["human_triage_decision_v2"]
+        == config["directories"]["human_triage_decision"]
+    ):
+        # V1 decision directoryはV1規則のまま保つ。V4 schema 2は別directoryへ置く。
+        raise IntakeError("config_invalid", "v4 decisions must not share the v1 directory")
     return config
 
 
@@ -510,6 +559,405 @@ def extract_intake_candidates(*, project_root, config, source_path, expected_sha
             if error.code != "intake_rule_excluded":
                 raise
     return candidates
+
+
+# --------------------------------------------------- V4 Human triage decision v2
+#
+# 候補bundleは機械抽出時のimmutableな観測である。Humanの判断はbundleへ書き戻さず、
+# 一候補につき一件の`human_triage_decision` schema version 2として保存する。
+# V1のdecision directoryと規則は変更しない。V4はV4 configのdirectoryを使う。
+
+
+def _decision_settings(config):
+    return config["human_triage_decision_v2"]
+
+
+def _safe_relative_path(value):
+    if not isinstance(value, str) or not value:
+        raise IntakeError("human_triage_decision_path_invalid", str(value))
+    path = Path(value)
+    if path.is_absolute() or ".." in path.parts or path.as_posix() != value:
+        raise IntakeError("human_triage_decision_path_invalid", value)
+    return path
+
+
+def _require_text(value, label):
+    if not isinstance(value, str) or not value.strip():
+        raise IntakeError("human_triage_decision_field_invalid", label)
+
+
+def _load_candidate_bundle(*, project_root, candidate_ref):
+    """bundleを開き、指紋が一致する候補だけを返す。"""
+
+    relative = _safe_relative_path(candidate_ref["bundle_path"])
+    path = Path(project_root) / relative
+    if not path.is_file():
+        raise IntakeError("candidate_bundle_unavailable", candidate_ref["bundle_path"])
+    actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual != candidate_ref["bundle_sha256"]:
+        raise IntakeError("candidate_bundle_digest_mismatch", actual)
+    try:
+        bundle = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as error:
+        raise IntakeError("candidate_bundle_unavailable", str(error)) from error
+    if bundle.get("schema_version") != candidate_ref["bundle_schema_version"]:
+        raise IntakeError(
+            "candidate_bundle_schema_version_mismatch", str(bundle.get("schema_version"))
+        )
+    for item in bundle.get("candidates", []):
+        if item.get("candidate_id") == candidate_ref["candidate_id"]:
+            if item.get("content_digest") != candidate_ref["candidate_content_digest"]:
+                raise IntakeError(
+                    "candidate_digest_mismatch", candidate_ref["candidate_id"]
+                )
+            return bundle, item
+    raise IntakeError("candidate_not_found", candidate_ref["candidate_id"])
+
+
+def human_triage_decision_path(decision, *, config):
+    """decision IDとversionからV4のrecord pathを決める。"""
+
+    directory = config["directories"]["human_triage_decision_v2"]
+    return f"{directory}/{decision['decision_id'].lower()}--v{decision['decision_version']}.json"
+
+
+def build_human_triage_decision(
+    *, project_root, bundle_path, candidate_id, decided_at, human_fields, disposition,
+    blocking, rationale, next_action, config, decision_version=1, supersedes=None,
+    issue_id=None, decision_suffix=None
+):
+    """bundle内候補を指紋付きで参照するHuman triage decisionを決定的に組み立てる。"""
+
+    settings = _decision_settings(config)
+    relative = _safe_relative_path(bundle_path)
+    path = Path(project_root) / relative
+    if not path.is_file():
+        raise IntakeError("candidate_bundle_unavailable", bundle_path)
+    bundle = json.loads(path.read_text(encoding="utf-8"))
+    candidate_ref = {
+        "bundle_path": bundle_path,
+        "bundle_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "bundle_schema_version": bundle.get("schema_version"),
+        "candidate_id": candidate_id,
+        "candidate_content_digest": None,
+    }
+    for item in bundle.get("candidates", []):
+        if item.get("candidate_id") == candidate_id:
+            candidate_ref["candidate_content_digest"] = item.get("content_digest")
+            break
+    else:
+        raise IntakeError("candidate_not_found", candidate_id)
+
+    decision_id = f"{settings['decision_id_prefix']}-{candidate_id}"
+    if decision_suffix:
+        decision_id = f"{decision_id}-{decision_suffix}"
+    promoted = (
+        human_fields.get("promote_to_issue") is True
+        and disposition == settings["promotion_disposition"]
+    )
+    promotion = {
+        "approved": bool(promoted),
+        "issue_id": (issue_id or f"ISSUE-{candidate_id}") if promoted else None,
+    }
+    if supersedes is not None and "record_kind" in supersedes:
+        supersedes = {
+            "decision_id": supersedes["decision_id"],
+            "decision_version": supersedes["decision_version"],
+            "content_digest": supersedes["content_digest"],
+        }
+    document = {
+        "record_kind": "human_triage_decision",
+        "schema_version": settings["schema_version"],
+        "decision_id": decision_id,
+        "decision_version": decision_version,
+        "decided_at": decided_at,
+        "decision_maker": "human",
+        "candidate_ref": candidate_ref,
+        "human_fields": {
+            name: human_fields[name] for name in settings["human_field_names"]
+        },
+        "disposition": disposition,
+        "blocking": blocking,
+        "rationale": rationale,
+        "next_action": next_action,
+        "supersedes": supersedes,
+        "issue_promotion": promotion,
+    }
+    document["content_digest"] = _canonical_digest(document)
+    return document
+
+
+def validate_human_triage_decision(record, *, path, project_root, config):
+    """未知field、bundle path脱出、指紋不一致、schema不一致をfail-closedで拒否する。"""
+
+    settings = _decision_settings(config)
+    if not isinstance(record, dict):
+        raise IntakeError("human_triage_decision_field_invalid", str(type(record)))
+    if record.get("record_kind") != "human_triage_decision":
+        raise IntakeError(
+            "human_triage_decision_field_invalid", str(record.get("record_kind"))
+        )
+    # 旧schemaのdecisionはV4規則で再判定しない。schema版の不一致として停止する。
+    if record.get("schema_version") != settings["schema_version"]:
+        raise IntakeError(
+            "human_triage_decision_schema_version_unsupported",
+            str(record.get("schema_version")),
+        )
+    expected_fields = set(settings["record_fields"])
+    unknown = sorted(set(record) - expected_fields)
+    if unknown:
+        raise IntakeError("human_triage_decision_field_unknown", ",".join(unknown))
+    missing = sorted(expected_fields - set(record))
+    if missing:
+        raise IntakeError("human_triage_decision_field_invalid", ",".join(missing))
+    if record["decision_maker"] != "human":
+        raise IntakeError(
+            "human_triage_decision_identity_invalid", str(record["decision_maker"])
+        )
+    if (
+        not isinstance(record["decision_id"], str)
+        or not _DECISION_ID.fullmatch(record["decision_id"])
+        or not isinstance(record["decision_version"], int)
+        or isinstance(record["decision_version"], bool)
+        or record["decision_version"] < 1
+        or not isinstance(record["decided_at"], str)
+        or not _TIMESTAMP.fullmatch(record["decided_at"])
+    ):
+        raise IntakeError(
+            "human_triage_decision_identity_invalid", str(record["decision_id"])
+        )
+
+    candidate_ref = record["candidate_ref"]
+    expected_ref_fields = {
+        "bundle_path", "bundle_sha256", "bundle_schema_version", "candidate_id",
+        "candidate_content_digest",
+    }
+    if not isinstance(candidate_ref, dict) or set(candidate_ref) != expected_ref_fields:
+        raise IntakeError("human_triage_decision_field_unknown", "candidate_ref")
+    for field in ("bundle_sha256", "candidate_content_digest"):
+        if not isinstance(candidate_ref[field], str) or not _SHA256.fullmatch(
+            candidate_ref[field]
+        ):
+            raise IntakeError("human_triage_decision_field_invalid", field)
+
+    prefix = f"{settings['decision_id_prefix']}-{candidate_ref['candidate_id']}"
+    if record["decision_id"] != prefix and not record["decision_id"].startswith(
+        f"{prefix}-"
+    ):
+        raise IntakeError(
+            "human_triage_decision_identity_invalid",
+            "decision id is not bound to the candidate",
+        )
+    expected_path = human_triage_decision_path(record, config=config)
+    if path != expected_path:
+        raise IntakeError("human_triage_decision_path_mismatch", str(path))
+
+    _load_candidate_bundle(project_root=project_root, candidate_ref=candidate_ref)
+
+    human_fields = record["human_fields"]
+    if not isinstance(human_fields, dict) or set(human_fields) != set(
+        settings["human_field_names"]
+    ):
+        raise IntakeError("human_triage_decision_field_unknown", "human_fields")
+    for field in ("unresolved", "recurrence", "promote_to_issue"):
+        if not isinstance(human_fields[field], bool):
+            raise IntakeError("human_triage_decision_field_invalid", field)
+    if human_fields["impact"] not in settings["impact_values"]:
+        raise IntakeError("human_triage_decision_field_invalid", "impact")
+    if human_fields["priority"] not in settings["priority_values"]:
+        raise IntakeError("human_triage_decision_field_invalid", "priority")
+
+    if record["disposition"] not in settings["dispositions"]:
+        raise IntakeError(
+            "human_triage_decision_disposition_invalid", str(record["disposition"])
+        )
+    if not isinstance(record["blocking"], bool):
+        raise IntakeError("human_triage_decision_field_invalid", "blocking")
+    _require_text(record["rationale"], "rationale")
+    _require_text(record["next_action"], "next_action")
+
+    supersedes = record["supersedes"]
+    if supersedes is not None:
+        if not isinstance(supersedes, dict) or set(supersedes) != {
+            "decision_id", "decision_version", "content_digest",
+        }:
+            raise IntakeError("human_triage_decision_field_unknown", "supersedes")
+        if (
+            not isinstance(supersedes["decision_id"], str)
+            or not _DECISION_ID.fullmatch(supersedes["decision_id"])
+            or not isinstance(supersedes["decision_version"], int)
+            or isinstance(supersedes["decision_version"], bool)
+            or supersedes["decision_version"] < 1
+            or supersedes["decision_version"] >= record["decision_version"]
+            or not isinstance(supersedes["content_digest"], str)
+            or not _SHA256.fullmatch(supersedes["content_digest"])
+        ):
+            raise IntakeError("human_triage_decision_field_invalid", "supersedes")
+
+    promotion = record["issue_promotion"]
+    if not isinstance(promotion, dict) or set(promotion) != {"approved", "issue_id"}:
+        raise IntakeError("human_triage_decision_field_unknown", "issue_promotion")
+    promotable = (
+        human_fields["promote_to_issue"] is True
+        and record["disposition"] == settings["promotion_disposition"]
+    )
+    if promotable:
+        if promotion["approved"] is not True or not isinstance(
+            promotion["issue_id"], str
+        ) or not _ISSUE_ID.fullmatch(promotion["issue_id"]):
+            raise IntakeError(
+                "human_triage_decision_promotion_inconsistent", record["decision_id"]
+            )
+    elif promotion != {"approved": False, "issue_id": None}:
+        raise IntakeError(
+            "human_triage_decision_promotion_inconsistent", record["decision_id"]
+        )
+
+    if record["content_digest"] != _canonical_digest(record):
+        raise IntakeError(
+            "human_triage_decision_digest_mismatch", str(record["content_digest"])
+        )
+    return True
+
+
+def resolve_effective_triage_decisions(decisions):
+    """candidateごとに有効decisionを一つだけ決める。競合は拒否する。"""
+
+    groups = {}
+    for decision in decisions:
+        candidate_id = decision["candidate_ref"]["candidate_id"]
+        groups.setdefault(candidate_id, []).append(decision)
+
+    effective = {}
+    for candidate_id, group in groups.items():
+        keys = [(item["decision_id"], item["decision_version"]) for item in group]
+        if len(set(keys)) != len(keys):
+            raise IntakeError("human_triage_decision_conflict", candidate_id)
+        by_key = dict(zip(keys, group))
+        roots = [item for item in group if item["supersedes"] is None]
+        if len(roots) != 1:
+            raise IntakeError(
+                "human_triage_decision_conflict",
+                f"{candidate_id}: {len(roots)} decisions without supersedes",
+            )
+        superseded = set()
+        for item in group:
+            reference = item["supersedes"]
+            if reference is None:
+                continue
+            key = (reference["decision_id"], reference["decision_version"])
+            target = by_key.get(key)
+            if target is None:
+                raise IntakeError(
+                    "human_triage_decision_conflict",
+                    f"{candidate_id}: superseded record is absent",
+                )
+            if target["content_digest"] != reference["content_digest"]:
+                raise IntakeError(
+                    "human_triage_decision_conflict",
+                    f"{candidate_id}: supersedes digest is stale",
+                )
+            if item["decision_version"] <= target["decision_version"]:
+                raise IntakeError(
+                    "human_triage_decision_conflict",
+                    f"{candidate_id}: revision version is not increasing",
+                )
+            if key in superseded:
+                raise IntakeError(
+                    "human_triage_decision_conflict",
+                    f"{candidate_id}: one record is superseded twice",
+                )
+            superseded.add(key)
+        latest = [item for item, key in zip(group, keys) if key not in superseded]
+        if len(latest) != 1:
+            raise IntakeError("human_triage_decision_conflict", candidate_id)
+        effective[candidate_id] = latest[0]
+    return effective
+
+
+def load_triage_decisions(*, project_root, config):
+    """V4 decision directoryのrecordだけを読む。V1 directoryは触らない。"""
+
+    directory = Path(project_root) / config["directories"]["human_triage_decision_v2"]
+    if not directory.is_dir():
+        return []
+    decisions = []
+    for path in sorted(directory.glob("*.json")):
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            raise IntakeError("human_triage_decision_field_invalid", str(path)) from error
+        relative = path.relative_to(Path(project_root)).as_posix()
+        validate_human_triage_decision(
+            record, path=relative, project_root=project_root, config=config
+        )
+        decisions.append(record)
+    return decisions
+
+
+def validate_triage_decision_repository(*, project_root, config):
+    """decision単体だけでなく、集合の競合も確認する。"""
+
+    decisions = load_triage_decisions(project_root=project_root, config=config)
+    return resolve_effective_triage_decisions(decisions)
+
+
+def promote_candidate_from_decision(
+    *, candidate, decision, project_root, config, decisions=()
+):
+    """検証済みHuman decisionが昇格を承認した場合だけIssueを作る。
+
+    候補bundleの`human_fields`は読まず、変更もしない。
+    """
+
+    settings = _decision_settings(config)
+    if decision is None:
+        raise IntakeError(
+            "human_triage_decision_required", str(candidate.get("candidate_id"))
+        )
+    path = human_triage_decision_path(decision, config=config)
+    validate_human_triage_decision(
+        decision, path=path, project_root=project_root, config=config
+    )
+    candidate_ref = decision["candidate_ref"]
+    if candidate.get("candidate_id") != candidate_ref["candidate_id"]:
+        raise IntakeError("candidate_not_found", str(candidate.get("candidate_id")))
+    if candidate.get("content_digest") != candidate_ref["candidate_content_digest"]:
+        raise IntakeError("candidate_digest_mismatch", candidate_ref["candidate_id"])
+    if decision["human_fields"]["promote_to_issue"] is not True:
+        raise IntakeError("human_triage_decision_required", candidate_ref["candidate_id"])
+    if decision["disposition"] != settings["promotion_disposition"]:
+        raise IntakeError("human_triage_decision_required", decision["disposition"])
+    promotion = decision["issue_promotion"]
+    if promotion["approved"] is not True:
+        raise IntakeError(
+            "human_triage_decision_promotion_inconsistent", decision["decision_id"]
+        )
+    if decisions:
+        effective = resolve_effective_triage_decisions(decisions)
+        chosen = effective.get(candidate_ref["candidate_id"])
+        if chosen is None or (
+            chosen["decision_id"],
+            chosen["decision_version"],
+        ) != (decision["decision_id"], decision["decision_version"]):
+            raise IntakeError(
+                "human_triage_decision_conflict", candidate_ref["candidate_id"]
+            )
+    return {
+        "record_kind": "issue_record",
+        "schema_version": config["issue_schema_version"],
+        "issue_id": promotion["issue_id"],
+        "issue_version": 1,
+        "state": "registered",
+        "problem": candidate["quotation"],
+        "candidate_ref": dict(candidate_ref),
+        "triage_decision_ref": {
+            "decision_id": decision["decision_id"],
+            "decision_version": decision["decision_version"],
+            "path": path,
+            "content_digest": decision["content_digest"],
+        },
+    }
 
 
 # ------------------------------------------------------------------ TODO projection

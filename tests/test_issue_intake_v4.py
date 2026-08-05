@@ -402,3 +402,405 @@ def test_j16_forbidden_todo_marker_is_rejected(intake, config):
     with pytest.raises(intake.IntakeError) as error:
         intake.validate_todo_projection(section=section, config=config)
     assert error.value.code == "todo_forbidden_marker"
+
+
+# ------------------------------------------- V4 Human triage永続化 K1〜K7
+#
+# 指示：records/session-handoffs/2026-08-05-codex-to-claude-v4-human-triage-persistence.md
+# 候補bundleは機械抽出時のimmutableな観測として保持し、Humanの判断正本は
+# 一候補につき一件のhuman_triage_decision schema version 2とする。
+
+BUNDLE = "records/development/2026-08-05-historical-todo-intake-candidates-v1.json"
+BUNDLE_SHA = "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e"
+APPROVED_CANDIDATE_IDS = (
+    "HTC-14D810C7",
+    "HTC-1AB699F7",
+    "HTC-21C3CE46",
+    "HTC-6ABDDC35",
+)
+HISTORICAL_HUMAN_FIELDS = {
+    "unresolved": False,
+    "recurrence": False,
+    "impact": "not_applicable",
+    "priority": "not_applicable",
+    "promote_to_issue": False,
+}
+DECIDED_AT = "2026-08-05T21:00:00+09:00"
+V1_DECISION = (
+    PROJECT_ROOT
+    / ".reviewcompass/workflow/triage-decisions/dec-pilot-todo-growth-001--v1.json"
+)
+
+
+@pytest.fixture
+def bundle():
+    return json.loads((PROJECT_ROOT / BUNDLE).read_text(encoding="utf-8"))
+
+
+def _bundle_candidate(bundle_document, candidate_id):
+    for item in bundle_document["candidates"]:
+        if item["candidate_id"] == candidate_id:
+            return item
+    raise AssertionError(f"{candidate_id} is absent from the bundle")
+
+
+def _historical_decision(intake, config, candidate_id, **overrides):
+    parameters = {
+        "project_root": PROJECT_ROOT,
+        "bundle_path": BUNDLE,
+        "candidate_id": candidate_id,
+        "decided_at": DECIDED_AT,
+        "human_fields": dict(HISTORICAL_HUMAN_FIELDS),
+        "disposition": "historical_completed",
+        "blocking": False,
+        "rationale": "当時の完了済み手順であり、現在解くIssueではない。",
+        "next_action": "候補bundleを変更せず、この判断recordだけを保持する。",
+        "config": config,
+    }
+    parameters.update(overrides)
+    return intake.build_human_triage_decision(**parameters)
+
+
+def _rehashed(intake, decision, **changes):
+    updated = dict(decision)
+    updated.update(changes)
+    updated["content_digest"] = intake.canonical_digest(updated)
+    return updated
+
+
+def test_k1_decision_references_bundle_candidate_by_fingerprint(intake, config, bundle):
+    decision = _historical_decision(intake, config, "HTC-14D810C7")
+    candidate = _bundle_candidate(bundle, "HTC-14D810C7")
+
+    assert decision["record_kind"] == "human_triage_decision"
+    assert decision["schema_version"] == 2
+    assert decision["decision_maker"] == "human"
+    assert decision["decision_version"] == 1
+    assert decision["supersedes"] is None
+    assert decision["candidate_ref"] == {
+        "bundle_path": BUNDLE,
+        "bundle_sha256": BUNDLE_SHA,
+        "bundle_schema_version": bundle["schema_version"],
+        "candidate_id": "HTC-14D810C7",
+        "candidate_content_digest": candidate["content_digest"],
+    }
+    assert decision["human_fields"] == HISTORICAL_HUMAN_FIELDS
+    assert decision["issue_promotion"] == {"approved": False, "issue_id": None}
+
+    path = intake.human_triage_decision_path(decision, config=config)
+    assert path == (
+        config["directories"]["human_triage_decision_v2"]
+        + "/dec-htc-14d810c7--v1.json"
+    )
+    assert (
+        intake.validate_human_triage_decision(
+            decision, path=path, project_root=PROJECT_ROOT, config=config
+        )
+        is True
+    )
+
+
+def test_k2_broken_candidate_references_are_rejected(intake, config, bundle):
+    decision = _historical_decision(intake, config, "HTC-14D810C7")
+    path = intake.human_triage_decision_path(decision, config=config)
+
+    def _reject(record, record_path=None):
+        with pytest.raises(intake.IntakeError) as error:
+            intake.validate_human_triage_decision(
+                record,
+                path=record_path or path,
+                project_root=PROJECT_ROOT,
+                config=config,
+            )
+        return error.value.code
+
+    stale_bundle = _rehashed(
+        intake,
+        decision,
+        candidate_ref=dict(decision["candidate_ref"], bundle_sha256="0" * 64),
+    )
+    assert _reject(stale_bundle) == "candidate_bundle_digest_mismatch"
+
+    unknown_candidate = _rehashed(
+        intake,
+        decision,
+        decision_id="DEC-HTC-00000000",
+        candidate_ref=dict(decision["candidate_ref"], candidate_id="HTC-00000000"),
+    )
+    assert _reject(
+        unknown_candidate,
+        config["directories"]["human_triage_decision_v2"]
+        + "/dec-htc-00000000--v1.json",
+    ) == "candidate_not_found"
+
+    stale_candidate = _rehashed(
+        intake,
+        decision,
+        candidate_ref=dict(decision["candidate_ref"], candidate_content_digest="0" * 64),
+    )
+    assert _reject(stale_candidate) == "candidate_digest_mismatch"
+
+    wrong_bundle_schema = _rehashed(
+        intake,
+        decision,
+        candidate_ref=dict(decision["candidate_ref"], bundle_schema_version=99),
+    )
+    assert _reject(wrong_bundle_schema) == "candidate_bundle_schema_version_mismatch"
+
+    unknown_field = _rehashed(intake, decision, reviewer="claude")
+    assert _reject(unknown_field) == "human_triage_decision_field_unknown"
+
+    for escape in ("../../etc/passwd", "/etc/passwd", "records/../../outside.json"):
+        traversal = _rehashed(
+            intake,
+            decision,
+            candidate_ref=dict(decision["candidate_ref"], bundle_path=escape),
+        )
+        assert _reject(traversal) == "human_triage_decision_path_invalid"
+
+    wrong_path = _rehashed(intake, decision)
+    assert _reject(
+        wrong_path,
+        config["directories"]["human_triage_decision_v2"] + "/dec-other--v1.json",
+    ) == "human_triage_decision_path_mismatch"
+
+    unknown_disposition = _rehashed(intake, decision, disposition="unknown_route")
+    assert _reject(unknown_disposition) == "human_triage_decision_disposition_invalid"
+
+    broken_digest = dict(decision, content_digest="0" * 64)
+    assert _reject(broken_digest) == "human_triage_decision_digest_mismatch"
+
+    old_schema = json.loads(V1_DECISION.read_text(encoding="utf-8"))
+    with pytest.raises(intake.IntakeError) as error:
+        intake.validate_human_triage_decision(
+            old_schema,
+            path=".reviewcompass/workflow/triage-decisions/"
+            "dec-pilot-todo-growth-001--v1.json",
+            project_root=PROJECT_ROOT,
+            config=config,
+        )
+    assert error.value.code == "human_triage_decision_schema_version_unsupported"
+
+
+def test_k3_conflicting_decisions_are_rejected_and_revisions_are_allowed(
+    intake, config
+):
+    first = _historical_decision(intake, config, "HTC-1AB699F7")
+    rival = _historical_decision(
+        intake,
+        config,
+        "HTC-1AB699F7",
+        decision_suffix="ALT",
+        human_fields=dict(HISTORICAL_HUMAN_FIELDS, unresolved=True),
+        disposition="defer",
+    )
+    assert rival["decision_id"] == "DEC-HTC-1AB699F7-ALT"
+    assert rival["supersedes"] is None
+
+    with pytest.raises(intake.IntakeError) as error:
+        intake.resolve_effective_triage_decisions([first, rival])
+    assert error.value.code == "human_triage_decision_conflict"
+
+    revision = _historical_decision(
+        intake,
+        config,
+        "HTC-1AB699F7",
+        decision_version=2,
+        supersedes=first,
+        human_fields=dict(HISTORICAL_HUMAN_FIELDS, unresolved=True),
+        disposition="defer",
+    )
+    assert revision["supersedes"] == {
+        "decision_id": first["decision_id"],
+        "decision_version": 1,
+        "content_digest": first["content_digest"],
+    }
+    effective = intake.resolve_effective_triage_decisions([first, revision])
+    assert effective["HTC-1AB699F7"]["decision_version"] == 2
+    assert intake.validate_human_triage_decision(
+        revision,
+        path=intake.human_triage_decision_path(revision, config=config),
+        project_root=PROJECT_ROOT,
+        config=config,
+    ) is True
+
+    stale_supersedes = _rehashed(
+        intake,
+        revision,
+        supersedes=dict(revision["supersedes"], content_digest="0" * 64),
+    )
+    with pytest.raises(intake.IntakeError) as error:
+        intake.resolve_effective_triage_decisions([first, stale_supersedes])
+    assert error.value.code == "human_triage_decision_conflict"
+
+
+def test_k4_promotion_requires_a_matching_human_decision(intake, config, bundle):
+    candidate = _bundle_candidate(bundle, "HTC-14D810C7")
+    rejecting = _historical_decision(intake, config, "HTC-14D810C7")
+
+    with pytest.raises(intake.IntakeError) as error:
+        intake.promote_candidate_from_decision(
+            candidate=candidate, decision=None,
+            project_root=PROJECT_ROOT, config=config,
+        )
+    assert error.value.code == "human_triage_decision_required"
+
+    with pytest.raises(intake.IntakeError) as error:
+        intake.promote_candidate_from_decision(
+            candidate=candidate, decision=rejecting,
+            project_root=PROJECT_ROOT, config=config,
+        )
+    assert error.value.code == "human_triage_decision_required"
+
+    wrong_disposition = _historical_decision(
+        intake,
+        config,
+        "HTC-14D810C7",
+        human_fields=dict(HISTORICAL_HUMAN_FIELDS, promote_to_issue=True),
+        disposition="defer",
+    )
+    assert wrong_disposition["issue_promotion"] == {"approved": False, "issue_id": None}
+    with pytest.raises(intake.IntakeError) as error:
+        intake.promote_candidate_from_decision(
+            candidate=candidate, decision=wrong_disposition,
+            project_root=PROJECT_ROOT, config=config,
+        )
+    assert error.value.code == "human_triage_decision_required"
+
+    approving = _historical_decision(
+        intake,
+        config,
+        "HTC-14D810C7",
+        human_fields=dict(HISTORICAL_HUMAN_FIELDS, promote_to_issue=True),
+        disposition="issue_resolution",
+        issue_id="ISSUE-HTC-14D810C7",
+    )
+    assert approving["issue_promotion"] == {
+        "approved": True, "issue_id": "ISSUE-HTC-14D810C7",
+    }
+
+    other_candidate = _bundle_candidate(bundle, "HTC-1AB699F7")
+    with pytest.raises(intake.IntakeError) as error:
+        intake.promote_candidate_from_decision(
+            candidate=other_candidate, decision=approving,
+            project_root=PROJECT_ROOT, config=config,
+        )
+    assert error.value.code == "candidate_not_found"
+
+    detached = dict(candidate, content_digest="0" * 64)
+    with pytest.raises(intake.IntakeError) as error:
+        intake.promote_candidate_from_decision(
+            candidate=detached, decision=approving,
+            project_root=PROJECT_ROOT, config=config,
+        )
+    assert error.value.code == "candidate_digest_mismatch"
+
+    rival = _historical_decision(
+        intake, config, "HTC-14D810C7", decision_suffix="ALT",
+    )
+    with pytest.raises(intake.IntakeError) as error:
+        intake.promote_candidate_from_decision(
+            candidate=candidate, decision=approving, decisions=[approving, rival],
+            project_root=PROJECT_ROOT, config=config,
+        )
+    assert error.value.code == "human_triage_decision_conflict"
+
+    issue = intake.promote_candidate_from_decision(
+        candidate=candidate, decision=approving, decisions=[approving],
+        project_root=PROJECT_ROOT, config=config,
+    )
+    assert issue["issue_id"] == "ISSUE-HTC-14D810C7"
+    assert issue["state"] == "registered"
+    assert issue["triage_decision_ref"]["decision_id"] == approving["decision_id"]
+    assert intake.validate_issue_record(issue, config=config) is True
+    assert candidate["human_fields"] == {
+        "unresolved": None, "recurrence": None, "impact": None,
+        "priority": None, "promote_to_issue": None,
+    }
+
+
+def test_k5_four_approved_decisions_validate_without_touching_the_bundle(
+    intake, config, bundle
+):
+    before = (PROJECT_ROOT / BUNDLE).read_bytes()
+    directory = PROJECT_ROOT / config["directories"]["human_triage_decision_v2"]
+
+    for candidate_id in APPROVED_CANDIDATE_IDS:
+        decision = _historical_decision(intake, config, candidate_id)
+        path = intake.human_triage_decision_path(decision, config=config)
+        assert decision["human_fields"] == HISTORICAL_HUMAN_FIELDS
+        assert decision["disposition"] == "historical_completed"
+        assert decision["blocking"] is False
+        assert decision["issue_promotion"] == {"approved": False, "issue_id": None}
+        assert intake.validate_human_triage_decision(
+            decision, path=path, project_root=PROJECT_ROOT, config=config
+        ) is True
+
+        stored_path = directory / f"dec-{candidate_id.lower()}--v1.json"
+        if stored_path.is_file():
+            stored = json.loads(stored_path.read_text(encoding="utf-8"))
+            assert intake.validate_human_triage_decision(
+                stored,
+                path=intake.human_triage_decision_path(stored, config=config),
+                project_root=PROJECT_ROOT,
+                config=config,
+            ) is True
+            expected = _historical_decision(
+                intake, config, candidate_id,
+                decided_at=stored["decided_at"],
+                rationale=stored["rationale"],
+                next_action=stored["next_action"],
+            )
+            assert stored == expected
+            assert "6b68c25" in stored["rationale"]
+            assert "b10cd09" in stored["rationale"]
+            assert "416e4e1" in stored["rationale"]
+
+    assert (PROJECT_ROOT / BUNDLE).read_bytes() == before
+    assert hashlib.sha256(before).hexdigest() == BUNDLE_SHA
+    for candidate in bundle["candidates"]:
+        assert candidate["human_fields"] == {
+            "unresolved": None, "recurrence": None, "impact": None,
+            "priority": None, "promote_to_issue": None,
+        }
+
+
+def test_k6_legacy_v1_decision_and_pilot_validation_keep_passing(intake, config):
+    pilot = importlib.import_module("tools.development.issue_resolution_pilot")
+    legacy_config = pilot.load_config(CONFIG_V2)
+    result = pilot.validate_record_file(
+        V1_DECISION, project_root=PROJECT_ROOT, config=legacy_config
+    )
+    assert result.record_id == "DEC-PILOT-TODO-GROWTH-001"
+
+    legacy = json.loads(V1_DECISION.read_text(encoding="utf-8"))
+    assert legacy["schema_version"] == 1
+    assert legacy["issue_promotion"]["approved"] is True
+
+    v1_directory = PROJECT_ROOT / config["directories"]["human_triage_decision"]
+    v4_directory = PROJECT_ROOT / config["directories"]["human_triage_decision_v2"]
+    assert v1_directory != v4_directory
+    assert sorted(path.name for path in v1_directory.glob("*.json")) == [
+        "dec-pilot-todo-growth-001--v1.json"
+    ]
+
+
+def test_k7_repository_decision_set_has_no_conflict(intake, config):
+    effective = intake.validate_triage_decision_repository(
+        project_root=PROJECT_ROOT, config=config
+    )
+    assert isinstance(effective, dict)
+    for candidate_id, decision in effective.items():
+        assert decision["candidate_ref"]["candidate_id"] == candidate_id
+        assert decision["candidate_ref"]["bundle_sha256"] == BUNDLE_SHA
+        assert decision["decision_maker"] == "human"
+
+    stored = sorted(
+        (PROJECT_ROOT / config["directories"]["human_triage_decision_v2"]).glob(
+            "*.json"
+        )
+    )
+    assert len(effective) == len({
+        json.loads(path.read_text(encoding="utf-8"))["candidate_ref"]["candidate_id"]
+        for path in stored
+    })
