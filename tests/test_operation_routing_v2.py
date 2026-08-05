@@ -410,7 +410,8 @@ def test_receipt_binds_inventory_and_preflight_identity(routing):
     )
 
     assert receipt["record_kind"] == "operation_execution_receipt"
-    assert receipt["schema_version"] == 1
+    # receiptは完全なpreflight recordを持つ形へ変わったためschema versionは2である。
+    assert receipt["schema_version"] == 2
     assert receipt["inventory_ref"] == {
         "inventory_id": inventory["inventory_id"],
         "inventory_version": inventory["inventory_version"],
@@ -548,3 +549,182 @@ def test_mixed_write_kinds_are_requested_once_without_later_additions(routing):
         "git_metadata_write", "project_artifact_write",
     ]
     assert receipt["preflight_ref"]["missing_permissions"] == []
+
+
+# ---------------------------------------------- receipt整合性の修正（schema v2）
+#
+# 指示：records/session-handoffs/
+#       2026-08-05-codex-to-claude-repair-operation-routing-receipt-integrity.md
+#
+# receiptは抜粋ではなく完全な検証済みpreflight recordを持ち、validatorはそれをinventoryに対して
+# 再計算で検証する。自己Digestを合わせ直した改竄も受理しない。
+
+
+def _granted_both():
+    return {"granted_permissions": ["git_metadata_write", "project_artifact_write"]}
+
+
+def _receipt_for(routing, operations, recorder=None):
+    inventory = _inventory(routing, operations)
+    receipt = routing.execute_with_preflight(
+        inventory=inventory,
+        host_attestation=_granted_both(),
+        execute=recorder or _Recorder(),
+    )
+    return inventory, receipt
+
+
+def _reseal(document):
+    """改竄後に自己Digestを計算し直す。改竄をDigestで隠せないことを示すため。"""
+
+    document["content_digest"] = _digest(document)
+    return document
+
+
+def test_receipt_with_emptied_preflight_requirements_is_rejected(routing):
+    inventory, receipt = _receipt_for(routing, _mixed_operations())
+    assert routing.validate_execution_receipt(receipt, inventory=inventory) is True
+
+    tampered = json.loads(json.dumps(receipt))
+    tampered["preflight_ref"]["required_permissions"] = []
+    tampered["preflight_ref"]["missing_permissions"] = []
+    _reseal(tampered["preflight_ref"])
+    _reseal(tampered)
+
+    with pytest.raises(routing.OperationRoutingError) as error:
+        routing.validate_execution_receipt(tampered, inventory=inventory)
+    assert error.value.code in (
+        "receipt_identity_mismatch", "preflight_requirement_mismatch",
+    )
+
+
+def test_receipt_carries_a_complete_revalidatable_preflight(routing):
+    inventory, receipt = _receipt_for(routing, _mixed_operations())
+    embedded = receipt["preflight_ref"]
+
+    assert embedded["record_kind"] == "operation_permission_preflight"
+    assert embedded["inventory_ref"] == {
+        "inventory_id": inventory["inventory_id"],
+        "inventory_version": inventory["inventory_version"],
+        "content_digest": inventory["content_digest"],
+    }
+    assert routing.validate_permission_preflight(embedded, inventory=inventory) is True
+
+
+def test_standalone_preflight_with_wrong_requirements_is_rejected(routing):
+    inventory = _inventory(routing, _mixed_operations())
+    preflight = routing.run_permission_preflight(
+        inventory=inventory, host_attestation=_granted_both()
+    )
+    assert routing.validate_permission_preflight(preflight, inventory=inventory) is True
+
+    emptied = _reseal(dict(preflight, required_permissions=[]))
+    with pytest.raises(routing.OperationRoutingError) as error:
+        routing.validate_permission_preflight(emptied, inventory=inventory)
+    assert error.value.code == "preflight_requirement_mismatch"
+
+    widened = _reseal(
+        dict(
+            preflight,
+            required_permissions=[
+                "git_metadata_write", "project_artifact_write", "project_artifact_write",
+            ],
+        )
+    )
+    with pytest.raises(routing.OperationRoutingError) as error:
+        routing.validate_permission_preflight(widened, inventory=inventory)
+    assert error.value.code == "preflight_requirement_mismatch"
+
+
+def test_standalone_preflight_with_inconsistent_missing_or_verdict_is_rejected(routing):
+    inventory = _inventory(routing, _mixed_operations())
+    approval = routing.run_permission_preflight(
+        inventory=inventory, host_attestation={"granted_permissions": []}
+    )
+    assert approval["verdict"] == "approval_required"
+    assert routing.validate_permission_preflight(approval, inventory=inventory) is True
+
+    # missingを空にしてverdictだけgrantedへ寄せる。grantedは空のままである。
+    forged = _reseal(dict(approval, missing_permissions=[], verdict="granted"))
+    with pytest.raises(routing.OperationRoutingError) as error:
+        routing.validate_permission_preflight(forged, inventory=inventory)
+    assert error.value.code == "preflight_requirement_mismatch"
+
+    # missingは正しいのにverdictだけgrantedにする。
+    verdict_only = _reseal(dict(approval, verdict="granted"))
+    with pytest.raises(routing.OperationRoutingError) as error:
+        routing.validate_permission_preflight(verdict_only, inventory=inventory)
+    assert error.value.code == "preflight_verdict_mismatch"
+
+    # 語彙外の取得済み権限を申告する。
+    unknown_grant = _reseal(dict(approval, granted_permissions=["superuser"]))
+    with pytest.raises(routing.OperationRoutingError) as error:
+        routing.validate_permission_preflight(unknown_grant, inventory=inventory)
+    assert error.value.code == "host_attestation_invalid"
+
+
+def test_valid_read_only_and_mixed_receipts_stay_green(routing):
+    read_only_inventory = _inventory(routing, _read_only_operations())
+    read_only_receipt = routing.execute_with_preflight(
+        inventory=read_only_inventory,
+        host_attestation={"granted_permissions": []},
+        execute=_Recorder(),
+    )
+    assert routing.validate_execution_receipt(
+        read_only_receipt, inventory=read_only_inventory
+    ) is True
+    assert read_only_receipt["preflight_ref"]["required_permissions"] == []
+
+    mixed_inventory, mixed_receipt = _receipt_for(routing, _mixed_operations())
+    assert routing.validate_execution_receipt(
+        mixed_receipt, inventory=mixed_inventory
+    ) is True
+    assert mixed_receipt["preflight_ref"]["required_permissions"] == [
+        "git_metadata_write", "project_artifact_write",
+    ]
+
+
+def test_receipt_schema_version_two_is_required(routing):
+    inventory, receipt = _receipt_for(routing, _mixed_operations())
+    assert receipt["schema_version"] == 2
+    assert routing.RECEIPT_SCHEMA_VERSION == 2
+    assert routing.SCHEMA_VERSION == 1
+    assert inventory["schema_version"] == 1
+    assert receipt["preflight_ref"]["schema_version"] == 1
+
+    legacy = _reseal(dict(receipt, schema_version=1))
+    with pytest.raises(routing.OperationRoutingError) as error:
+        routing.validate_execution_receipt(legacy, inventory=inventory)
+    assert error.value.code == "receipt_schema_version_unsupported"
+
+
+def test_no_callback_runs_for_any_stop_condition(routing):
+    """unknown、external、権限不足のいずれでもcallbackは一度も呼ばれない。"""
+
+    recorder = _Recorder()
+
+    unknown_inventory = _inventory(
+        routing, [_operation("OP-1", "unknown", ["x"], "判定不能")]
+    )
+    with pytest.raises(routing.OperationRoutingError):
+        routing.execute_with_preflight(
+            inventory=unknown_inventory, host_attestation=_granted_both(), execute=recorder
+        )
+
+    external_inventory = _inventory(
+        routing, [_operation("OP-1", "external", ["send"], "外へ出す")]
+    )
+    with pytest.raises(routing.OperationRoutingError):
+        routing.execute_with_preflight(
+            inventory=external_inventory, host_attestation=_granted_both(), execute=recorder
+        )
+
+    write_inventory = _inventory(routing, _mixed_operations())
+    with pytest.raises(routing.OperationRoutingError):
+        routing.execute_with_preflight(
+            inventory=write_inventory,
+            host_attestation={"granted_permissions": []},
+            execute=recorder,
+        )
+
+    assert recorder.calls == []

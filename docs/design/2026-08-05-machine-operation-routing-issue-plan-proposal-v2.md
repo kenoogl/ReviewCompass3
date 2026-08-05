@@ -16,8 +16,18 @@
   §4に挙げた後続項目（構造化argv executor、shell特殊文字対策の全面移行、cache root固定、
   既存直接shell操作の一括置換、host側tool構文、外部送信、`ISSUE-HTC-66C3E6CA`の定型record生成）は
   承認していない。
-- 実装は`tools/development/operation_routing.py`として完了し、GREEN Evidenceは
-  `records/development/2026-08-05-machine-operation-routing-v2-green-evidence-v1.md`である。
+- 実装は`tools/development/operation_routing.py`として完了した。その後、execution receiptの
+  改竄を拒否できない欠陥が見つかり、receipt validatorを訂正した。現在の実装は、receiptが
+  **完全な検証済みpreflight recordを保存し、validatorがinventoryから必要権限を再計算して
+  照合する**形であり、自己Digestを合わせ直した改竄も拒否する。execution receiptのschema versionは
+  **2**である（operation inventoryとpermission preflightは1のまま）。
+- 有効な完了根拠は、訂正Decision`DEC-MACHINE-OPERATION-ROUTING-RECEIPT-INTEGRITY-001`
+  （`records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-correction-decision-v1.md`）と
+  訂正GREEN Evidence
+  `records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-green-evidence-v1.md`である。
+  初回のGREEN Evidence
+  `records/development/2026-08-05-machine-operation-routing-v2-green-evidence-v1.md`は、
+  validatorの欠陥が判明した時点でstaleであり、履歴として残す。
 - 本書は**正式なIssue Resolution PlanまたはTask Contractへ昇格していない**。
 - `ISSUE-HTC-C9F6C917`のIssue recordの状態は`registered`のまま変更しない。
 

@@ -22,7 +22,13 @@ from pathlib import Path
 
 
 DIGEST_ALGORITHM = "sha256"
+
+#: inventoryとpreflightのschema version。
 SCHEMA_VERSION = 1
+
+#: execution receiptのschema version。完全なpreflight recordを持つ形へ変えたため2である。
+#: version 1のreceiptは抜粋しか持たず改竄を検出できないため、明示的に拒否する。
+RECEIPT_SCHEMA_VERSION = 2
 
 CLASSIFICATIONS = (
     "read_only",
@@ -84,13 +90,6 @@ _RECEIPT_FIELDS = (
     "content_digest",
 )
 _INVENTORY_REF_FIELDS = ("inventory_id", "inventory_version", "content_digest")
-_PREFLIGHT_REF_FIELDS = (
-    "verdict",
-    "attestation_source",
-    "required_permissions",
-    "missing_permissions",
-    "content_digest",
-)
 _RESULT_FIELDS = ("operation_id", "status", "detail")
 _RESULT_STATUSES = ("completed", "failed")
 
@@ -111,6 +110,8 @@ STOP_CODES = (
     "preflight_field_unknown",
     "preflight_digest_mismatch",
     "preflight_identity_mismatch",
+    "preflight_requirement_mismatch",
+    "preflight_verdict_mismatch",
     "preflight_not_passed",
     "receipt_invalid",
     "receipt_field_unknown",
@@ -360,10 +361,18 @@ def run_permission_preflight(*, inventory, host_attestation):
 
 
 def validate_permission_preflight(preflight, *, inventory):
+    """preflightをinventoryから**再計算して**検証する。
+
+    自己Digestを計算し直した改竄でも受理しない。必要権限はinventoryから導き直し、
+    未取得集合とverdictも申告値ではなく再計算した値と一致しなければ拒否する。
+    """
+
     if not isinstance(preflight, dict):
         raise OperationRoutingError("preflight_invalid", str(type(preflight)))
     if preflight.get("record_kind") != "operation_permission_preflight":
         raise OperationRoutingError("preflight_invalid", str(preflight.get("record_kind")))
+    if preflight.get("schema_version") != SCHEMA_VERSION:
+        raise OperationRoutingError("preflight_invalid", str(preflight.get("schema_version")))
     _require_exact(
         preflight,
         _PREFLIGHT_FIELDS,
@@ -377,6 +386,27 @@ def validate_permission_preflight(preflight, *, inventory):
         raise OperationRoutingError("preflight_invalid", str(preflight["verdict"]))
     if preflight["inventory_ref"] != _inventory_reference(inventory):
         raise OperationRoutingError("preflight_identity_mismatch", inventory["inventory_id"])
+
+    granted = _validate_host_attestation(
+        {"granted_permissions": preflight["granted_permissions"]}
+    )
+    if preflight["granted_permissions"] != granted:
+        raise OperationRoutingError("host_attestation_invalid", "granted_permissions")
+
+    needed = required_permissions(inventory)
+    if preflight["required_permissions"] != needed:
+        raise OperationRoutingError(
+            "preflight_requirement_mismatch", ",".join(needed) or "(none)"
+        )
+    missing = sorted(set(needed) - set(granted))
+    if preflight["missing_permissions"] != missing:
+        raise OperationRoutingError(
+            "preflight_requirement_mismatch", ",".join(missing) or "(none)"
+        )
+    expected_verdict = "approval_required" if missing else "granted"
+    if preflight["verdict"] != expected_verdict:
+        raise OperationRoutingError("preflight_verdict_mismatch", preflight["verdict"])
+
     if preflight["content_digest"] != canonical_digest(preflight):
         raise OperationRoutingError(
             "preflight_digest_mismatch", str(preflight["content_digest"])
@@ -385,16 +415,6 @@ def validate_permission_preflight(preflight, *, inventory):
 
 
 # ------------------------------------------------------------------ 3. receipt
-
-
-def _preflight_reference(preflight):
-    return {
-        "verdict": preflight["verdict"],
-        "attestation_source": preflight["attestation_source"],
-        "required_permissions": list(preflight["required_permissions"]),
-        "missing_permissions": list(preflight["missing_permissions"]),
-        "content_digest": preflight["content_digest"],
-    }
 
 
 def _validate_execution_result(result, operation_id):
@@ -448,10 +468,12 @@ def execute_with_preflight(*, inventory, host_attestation, execute):
 
     document = {
         "record_kind": "operation_execution_receipt",
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": RECEIPT_SCHEMA_VERSION,
         "digest_algorithm": DIGEST_ALGORITHM,
         "inventory_ref": _inventory_reference(inventory),
-        "preflight_ref": _preflight_reference(preflight),
+        # 抜粋ではなく、完全な検証済みpreflight recordを保存する。
+        # validatorはこれをinventoryに対して再計算で検証できる。
+        "preflight_ref": preflight,
         "results": results,
     }
     document["content_digest"] = canonical_digest(document)
@@ -466,7 +488,7 @@ def validate_execution_receipt(receipt, *, inventory):
         raise OperationRoutingError("receipt_invalid", str(type(receipt)))
     if receipt.get("record_kind") != "operation_execution_receipt":
         raise OperationRoutingError("receipt_invalid", str(receipt.get("record_kind")))
-    if receipt.get("schema_version") != SCHEMA_VERSION:
+    if receipt.get("schema_version") != RECEIPT_SCHEMA_VERSION:
         raise OperationRoutingError(
             "receipt_schema_version_unsupported", str(receipt.get("schema_version"))
         )
@@ -487,19 +509,14 @@ def validate_execution_receipt(receipt, *, inventory):
     if receipt["inventory_ref"] != _inventory_reference(inventory):
         raise OperationRoutingError("receipt_identity_mismatch", inventory["inventory_id"])
 
-    _require_exact(
-        receipt["preflight_ref"],
-        _PREFLIGHT_REF_FIELDS,
-        unknown_code="receipt_field_unknown",
-        missing_code="receipt_invalid",
-        label="preflight reference",
-    )
-    if receipt["preflight_ref"]["verdict"] != "granted":
-        raise OperationRoutingError(
-            "preflight_not_passed", str(receipt["preflight_ref"]["verdict"])
-        )
-    if receipt["preflight_ref"]["attestation_source"] != "host":
-        raise OperationRoutingError("receipt_invalid", "attestation_source")
+    preflight = receipt["preflight_ref"]
+    if not isinstance(preflight, dict):
+        raise OperationRoutingError("receipt_invalid", "preflight_ref")
+    if preflight.get("verdict") != "granted":
+        raise OperationRoutingError("preflight_not_passed", str(preflight.get("verdict")))
+    # 完全なpreflight recordをinventoryに対して再計算で検証する。
+    # 必要権限を空へ改竄してDigestを合わせ直しても、ここで拒否される。
+    validate_permission_preflight(preflight, inventory=inventory)
 
     results = receipt["results"]
     if not isinstance(results, list) or len(results) != len(inventory["operations"]):

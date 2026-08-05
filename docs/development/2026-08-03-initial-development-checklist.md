@@ -735,6 +735,16 @@ execution receiptの3部だけである。実装moduleは`tools/development/oper
 `ISSUE-HTC-66C3E6CA`の定型欄生成は承認範囲外のままである。`ISSUE-HTC-C9F6C917`のIssue recordは
 `registered`のままであり、**V4 Issueの正式Plan化や実装一般が完了したわけではない**。
 
+その後、execution receiptの改竄を拒否できない欠陥が見つかり、receipt validatorを訂正した。訂正後は、
+receiptが完全な検証済みpreflight recordを保存し、validatorがinventoryから必要権限を再計算して照合する。
+自己Digestを合わせ直した改竄も拒否する。execution receiptのschema versionは2（inventoryとpreflightは1）。
+訂正Decision `DEC-MACHINE-OPERATION-ROUTING-RECEIPT-INTEGRITY-001`は
+`records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-correction-decision-v1.md`、
+SHA-256 `f73f06e12f464a27ded059522e37015acbd2f9487d7d65d55ed96823a6f8033b`。訂正GREEN Evidenceは
+`records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-green-evidence-v1.md`、
+SHA-256 `b6255b0a7de3bcd90b62745ff934a957dba94b3870bc847517f1dbde36a430ea`。対象testは`23 passed`、公式全testは`852 passed`。初回のGREEN Evidenceと
+receiptは削除せず履歴として残すが、validatorの欠陥判明によりstaleであり、有効な完了根拠は訂正側である。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。
