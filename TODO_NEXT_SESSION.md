@@ -1,13 +1,13 @@
 # TODO_NEXT_SESSION
 
-更新日：2026-08-05
+更新日：2026-08-06
 
 > 人向けの現在位置入口。Workflow stateと完了Evidenceの正本ではない。
 
 ## 現在位置
 
-- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AはDefinition Challenge設計とHuman Contract approval gateの採用に続き、実装と初回Runまで到達した。
-- 現在作業：Work 5A Definition Challenge。ClaudeがRED、GREEN、初回Definition Challenge Runを実施した。初回Runは`passed`、blocking Finding 0件である。`contract_approval`は作らず、Contract version 2のHuman承認前で停止している。Codexの独立検証待ちである。
+- 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AはDefinition Challenge実装と初回Runに続き、HumanがContract version 2を承認し、version 2のReview RunをFinal Challengeまで実施した。
+- 現在作業：Work 5A Contract version 2 Review Run完了。`contract_approval`は`approved`、compileは`compiled`、Findingは0件、ConformanceとFinal Challengeはいずれも`passed`である。Human review acceptance待ちで停止しており、`human_decision`、Provenance、accepted artifactは作っていない。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,9 @@
 
 ## 最新のauthority／Evidence
 
+- [Contract v2 Review Run Evidence](records/development/2026-08-06-work5a-contract-v2-review-run-evidence-v1.md) — SHA-256 `49d2df92e02c21491b0bf57c6bf31bd77b3beff1c41757863dcec9fa62af735b`
+- [Contract v2 Review Run records](records/development/2026-08-06-work5a-contract-v2-review-run-records-v1.json) — SHA-256 `51f93bc14e47a3fe2e78eec8daa875930153ecb9d0c1031c12af800eeb723979`
+- [Contract v2 承認Decision](records/development/2026-08-06-work5a-contract-v2-approval-decision-v1.md) — SHA-256 `58063dbb46794a87a4d93f490706e93e366b68ffb029d4ea019f29d20f559c16`
 - [初回Definition Challenge Run Evidence](records/development/2026-08-05-work5a-definition-challenge-first-run-evidence-v1.md) — SHA-256 `ad7b82ae74cec8655c205191feb4bf89801353eb8c7838f239f8b1c7da4c6658`
 - [初回Definition Challenge Run records](records/development/2026-08-05-work5a-definition-challenge-first-run-records-v1.json) — SHA-256 `aace8f35b79cbe4e3113433b55e903e86e0171f04738b180e1728eb83bd93ca6`
 - [Definition Challenge GREEN Evidence](records/development/2026-08-05-work5a-definition-challenge-green-evidence-v1.md) — SHA-256 `3db6b9fe112dc0ab54e2f8edf981a8ba00dd0c94f02be30c38f7c7aa6105a397`
@@ -30,29 +33,29 @@
 
 ## 次に行う一作業
 
-CodexがClaudeのcommitと初回Definition Challenge Runを独立検証し、Contract version 2のHuman承認要否を提示する。
+CodexがContract version 2のReview Runを独立検証し、Review結果をHumanへ提示する。
 
 開始条件：
 
-- Claudeの3 commit（既存Test修正、GREEN実装、初回Run）がcleanであること
+- Review Run recordsとEvidenceを含むcommitがcleanであること
 - HumanがClaudeの作業終了をCodexへ知らせること
 
 完了条件：
 
-- Codexが差分、Digest、RED／GREEN／全Test、初回Runのidentityとverdictを独立検証すること
-- Contract version 2を承認するかどうかの判断材料をHumanへ提示すること
+- Codexが12 recordのcontent digest、上流参照、owner分離、未実行stepを独立検証すること
+- Final Challenge `passed`・Finding 0件という結果をHumanへ提示すること
 
-後続作業：Humanが承認する場合だけ`contract_approval`を作り、その後にversion 2のcompileと新しいReview Runへ進む。承認前はcompile、Plan bundle、accepted artifactを作らない。
+後続作業：Review結果に対するHumanの受理判断。受理する場合だけ`human_decision`を作り、その後にProvenanceとaccepted artifactへ進む。判断前はいずれも作らない。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。実装と初回Runは完了しており、Codexの独立検証を待つ。
-- Human判断待ち：Contract version 2を承認するかどうか。初回Definition Challenge Runは`passed`、blocking Finding 0件である。承認recordが作られるまで、compile、Review Run、accepted artifactへ進まない。
+- blocker：なし。Review RunはFinal Challengeまで完了しており、Codexの独立検証を待つ。
+- Human判断待ち：Review結果を受理するかどうか。Findingは0件、ConformanceとFinal Challengeはいずれも`passed`である。受理判断が出るまで、`human_decision`、Provenance、accepted artifactを作らない。
 
 ## stale・deferred
 
-- stale：旧pause_and_triage表示とupstream_revision判断待ちは、採用Decision `DEC-WORK5A-DEFINITION-CONTRACT-APPROVAL-GATE-001`により置換済み。実装開始判断の根拠に使わない。
-- deferred：Contract version 2承認後のcompileとReview Run、Work 5A Current Work Projection正式record写像、refactor後再確認、Work 6A、Architecture Policy、Challenge Policy、risk catalog、隣接Contract検査、汎用Challenge framework、UI、automation、Work 8正式評価。
+- stale：旧pause_and_triage表示とupstream_revision判断待ちは、採用Decision `DEC-WORK5A-DEFINITION-CONTRACT-APPROVAL-GATE-001`により置換済み。Contract version 2の承認待ち表示も`DEC-WORK5A-CONTRACT-V2-APPROVAL-001`により解消済みで、現在の判断根拠に使わない。
+- deferred：Review結果受理後のProvenanceとaccepted artifact、Work 5A Current Work Projection正式record写像、refactor後再確認、Work 6A、Architecture Policy、Challenge Policy、risk catalog、隣接Contract検査、汎用Challenge framework、UI、automation、Work 8正式評価。
 
 ## Git・Test
 
@@ -60,7 +63,7 @@ CodexがClaudeのcommitと初回Definition Challenge Runを独立検証し、Con
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Definition Challenge `tests/test_work5a_definition_challenge.py` `45 passed`、既存Work 5A `tests/test_first_review_task_contract_e2e.py` `38 passed`
+- 直近の関連Test：Definition Challenge `tests/test_work5a_definition_challenge.py` `45 passed`、既存Work 5A `tests/test_first_review_task_contract_e2e.py` `38 passed`（今回のRun前後で変化なし）
 - 直近の全Test：venv公式runner `1007 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
