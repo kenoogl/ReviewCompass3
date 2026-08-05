@@ -22,20 +22,36 @@ def _module():
     )
 
 
+def _known_active_issue_ids():
+    """許可するactive IDは、正本Issue recordからだけ得る。
+
+    以前はここへ`ISSUE-PILOT-TODO-GROWTH-001`を固定値で書いていたため、TODOの
+    active Issueが正常に移った時点でこのTestが落ちた。TODOもIssueも壊れておらず、
+    Testの側が旧IDを覚えていただけである。判定の正本を`.reviewcompass/workflow/`の
+    Issue recordへ寄せ、固定値を持たない。
+    """
+
+    return importlib.import_module(
+        "tools.development.todo_update_path"
+    ).load_known_active_issue_ids(ROOT)
+
+
 def test_actual_post_write_and_isolated_restore_rehearsal():
     before = (ROOT / "TODO_NEXT_SESSION.md").read_bytes()
+    known_active_ids = _known_active_issue_ids()
 
     result = _module().verify_post_write(
         project_root=ROOT,
         todo_path="TODO_NEXT_SESSION.md",
         snapshot_path="records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
         manifest_path="records/session-handoffs/2026-08-04-todo-before-compaction-001.manifest.json",
-        known_active_ids={"ISSUE-PILOT-TODO-GROWTH-001"},
+        known_active_ids=known_active_ids,
     )
 
     assert result.todo_sha256 == hashlib.sha256(before).hexdigest()
     assert result.todo_bytes <= 12288
-    assert result.active_ids == ("ISSUE-PILOT-TODO-GROWTH-001",)
+    assert len(result.active_ids) == 1
+    assert result.active_ids[0] in known_active_ids
     expected_reference_count = len(
         re.findall(
             " — SHA-256 `[0-9a-f]{64}`".encode("utf-8"),
