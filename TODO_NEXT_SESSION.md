@@ -18,7 +18,7 @@
 
 ## 最新のauthority／Evidence
 
-- [Work 4 最初のReview Task Contract設計提案](docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md) — SHA-256 `6e078fa5608f3fcf2ffafc0ad508da0df38bc8bb3e4e3842686db5c1d03c0ea4`
+- [Work 4 最初のReview Task Contract設計提案](docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md) — SHA-256 `b5ca289307ba053fbdbf4a78facac4ff7112bef16ce83d692a6d46fa50138194`
 - [Work 4A Rebuild Design v3](docs/design/2026-08-04-work-4a-rebuild-design-v3-proposal.md) — SHA-256 `a9e0419dcac556789e82f6f51292dd70399000f988e0720d240286c9a05c2b37`
 - [Work 4A Rebuild v3 Approval](records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md) — SHA-256 `c358f730c84d2cdc3d981c7668d21f1898a12eadd04e9af04800b9c5f26900a1`
 - [Work 4A v3 Actual Observation](records/development/2026-08-04-work-4a-v3-actual-observation-evidence-v1.md) — SHA-256 `75e0eb3d30c4ec559b33e3f9678ff8bbf1752d3a20f6b6a1f5ec4631d9cf25b1`
@@ -42,11 +42,10 @@ Work 4設計提案のHuman承認を得る。
 完了条件：
 
 - 対象scenario、Contract構造、record順序、負例、Work 5A範囲、Requirement対応をHumanが承認または差し戻す。
-- §9の五点（対象文書範囲、束縛Requirement 14件、warningの扱い、bootstrap実装の位置づけ、
-  Final Challenge分離の実現形）を判断する。
+- §9の五点と§11.3の後続評価三点を判断する。
 - 承認された場合にだけDecision Recordを作成する。
 
-後続作業：Work 5AのRED受入固定と最小componentの実装。
+後続作業：Work 5AのRED受入固定と最小componentの実装。E2以降の後続評価は別作業単位とする。
 
 ## blocker・Human判断待ち
 
