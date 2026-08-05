@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：Work 5A／最初のhappy pathがaccepted artifactまで完了。
+- 現在の工程：Work 5A／最初のhappy pathが循環の無いaccepted artifact version 2まで完了。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
@@ -18,8 +18,9 @@
 
 ## 最新のauthority／Evidence
 
-- [Work 5A 実Review受理](records/development/2026-08-05-work5a-first-real-review-acceptance-evidence-v1.md) — SHA-256 `9030225b9ec7138b28234f81dc530b80caf0a6850404df496e3f138b9b946a06`
-- [Work 5A 受理record bundle](records/development/2026-08-05-work5a-first-real-review-acceptance-records-v1.json) — SHA-256 `23bb76d7c7f3a31d6a5459174222280441910478b5a537a8027bdb3c195921ce`
+- [Work 5A 実Review受理 v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-evidence.md) — SHA-256 `2e8335877202c8d5d1be07978b84ef6b3834ac5a207d5afa1184daddc719acdc`
+- [Work 5A 受理record bundle v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-records.json) — SHA-256 `64d75f3568078ef419cf74c3b72632352d07e63449b98fdb1608b17257184e7b`
+- [Provenance閉包 無効化record](records/development/2026-08-05-work5a-provenance-closure-invalidation-v1.json) — SHA-256 `f3ba011f5490059d96b8f21429cadc8016a9332415d79c59f546447a9c018a29`
 - [Work 5A 最初の実Review Run](records/development/2026-08-05-work5a-first-real-review-run-evidence-v1.md) — SHA-256 `cdc4c4d8ad08a6f0d8373ea56d46018e070618ba2152ade7ac4dd09d72808b50`
 - [Work 5A 実Review Run record bundle](records/development/2026-08-05-work5a-first-real-review-run-records-v1.json) — SHA-256 `658e5ba98d6023085709733f91130a8b64acd674b3c9ca497b3f23784d588447`
 - [Work 5A GREEN Evidence](records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md) — SHA-256 `57feb4e7fa08924c00307dec997f2b12285641b168925825225e6a596b63fbae`
@@ -45,14 +46,15 @@
 
 - target：`docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md`
 - Finding 0件、Conformance `passed`、Final Challenge `passed`、Human decision `approved`。
-- Provenance verdict `verified`、accepted artifact作成済み。
+- `provenance_verdict` version 2は`verified_nodes` 9件、`verified_edges` 8件、自己辺なし。
+- `accepted_artifact` version 2を作成。version 1の誤recordは無効化済みで上書きしていない。
 - 受理したのは最小Review経路の実行結果であり、対象文書の品質保証ではない。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
 - Human判断待ち：次作業の選定。後続評価E2、E4、E5の開始承認。
-- 再開条件：受理record commit後のclean transition。
+- 再開条件：受理record version 2 commit後のclean transition。
 
 ## stale・deferred
 
@@ -65,8 +67,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Work 5A first review contract `25 passed`
-- 直近の全Test：venv公式runner `764 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Work 5A first review contract `38 passed`
+- 直近の全Test：venv公式runner `777 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
