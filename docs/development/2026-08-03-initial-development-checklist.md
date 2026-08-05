@@ -9,10 +9,10 @@ authority_order:
   - path: docs/current/reviewcompass3-glossary-current.md
     sha256: f1e7e9a9c57292fe911217d9b4f5d5b8ed99a881d6f113f9b60db1f0d01b19fa
   - path: docs/current/reviewcompass3-plan-current.md
-    sha256: 0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694
+    sha256: 1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f
 operational_policy:
   path: docs/development/2026-08-02-development-policy.md
-  sha256: 9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0
+  sha256: 0d34880353f06f50c7623282c765717348c8776938dc3113e28fdad4e9f8ac18
 policy_decision:
   path: records/development/development-policy-v5.json
   sha256: 88af550d5bc77406cd796e4c78efc20225134473d3d87251942854e6dc57fe98

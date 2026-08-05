@@ -18,7 +18,7 @@
 
 - [Claude開発継続引き継ぎ](records/session-handoffs/2026-08-06-codex-to-claude-development-continuation.md) — SHA-256 `5d488a132777bf012bc433e7929c4db60c8a174077f543936b8d786f918f2563`
 - [Current Work Projection後続route提案](docs/design/2026-08-06-work5a-current-work-projection-routing-proposal.md) — SHA-256 `c061be7d5abd1f428497f59d2b4ccc352b699d657d038d11f1d359a76e587809`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `1232acd3b51527fe04b917538aee7a02d35c991392b35bcaee5b8729f6551b1f`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `54d3b9f4eee5889b3b4d85e94c665eba0c643996ddf74f45f6a514389af00d02`
 - [Contract v2 Review受理records](records/development/2026-08-06-work5a-contract-v2-review-acceptance-records-v1.json) — SHA-256 `151c63c838850a3da319b5f1eaa8cf0d02379aed85b0a592f124e3624c275354`
 - [Contract v2 Review受理Evidence](records/development/2026-08-06-work5a-contract-v2-review-acceptance-evidence-v1.md) — SHA-256 `3edf6f88bd85619c9e75868f066ddc1d0b66c41e842d27cd05abffac64d9bed5`
 - [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f`
