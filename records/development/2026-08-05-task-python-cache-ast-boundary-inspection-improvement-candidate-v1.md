@@ -7,8 +7,8 @@ origin_commit: c9587dbf6135524f4abdee4cd8e02cf16319088d
 candidate_kind: improvement_candidate
 classification: Test／oracle不良
 priority: P1
-status: adopted_for_next_slice
-suggested_route: existing_issue_repair
+status: closed
+suggested_route: existing_issue_repair_completed
 related_issue: ISSUE-HTC-C9F6C917
 confidentiality_class: project-internal
 ---
@@ -71,3 +71,18 @@ Pythonのsourceでは、同じ文字列が識別子の一部にも、docstring�
 - cache初期化、掃除、保持期限の自動化、既存runner／executorへの接続、
   環境変数のglobal（process全体）変更、Windows adapter、既存操作の移行、外部送信。
 - 既存Decision、Issue state、Task Contract、policy、configの変更。
+
+## 7. Outcome
+
+この候補のconsumerは、次の2箇所である。
+
+- `tools/development/python_ast_boundary_check.py`の決定的なAST検査器。
+- `tests/test_task_python_cache.py::test_module_has_no_deletion_or_retention_or_global_environment_change`。
+  この受入Testは、禁止語の部分一致ではなく上記検査器の結果を使う。
+
+Outcomeは`records/development/2026-08-05-task-python-cache-ast-boundary-green-evidence-v1.md`、
+実装commitは`9ebefba1e332f5bb8623cebf36dd96e82ea5ef9d`である。関連65件と公式全962件が通過し、
+`task_python_cache.py`の振る舞いは変更していない。
+
+consumerとOutcomeが接続されたため、本改善候補を`closed`とする。既存Issue
+`ISSUE-HTC-C9F6C917`全体は`registered`のままであり、この候補の閉鎖は同Issue全体の閉鎖を意味しない。
