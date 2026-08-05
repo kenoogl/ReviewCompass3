@@ -179,7 +179,15 @@ def test_repository_contains_only_the_single_valid_pilot_subject():
         ).glob("*.json")
     )
 
-    assert candidate_files == [CANDIDATE_PATH]
+    # V4設計により、検査対象を「候補file数が1件」から
+    # 「Pilot subject（Issue）が1件」と「候補がすべて検証を通る」へ置き換える。
+    # 候補の登録数に上限は無い（docs/design/2026-08-05-historical-todo-issue-intake-proposal.md §1.2）。
+    issue_files = sorted(
+        (PROJECT_ROOT / ".reviewcompass/workflow/issues").glob("*.json")
+    )
+    assert len(issue_files) == 1
+    assert CANDIDATE_PATH in candidate_files
+    # 他の候補はV4 intakeの語彙で作られるため、V2 configで再判定しない。
     assert len(decision_files) <= 1
     result = pilot.validate_record_file(
         CANDIDATE_PATH,

@@ -1,0 +1,127 @@
+{
+  "active_issue_states": [
+    "in_progress"
+  ],
+  "classification_candidates": [
+    "external_blocker",
+    "implementation",
+    "intent",
+    "issue_intake",
+    "process_improvement",
+    "product_idea",
+    "requirement",
+    "task_contract",
+    "test_or_oracle"
+  ],
+  "directories": {
+    "human_triage_decision": ".reviewcompass/workflow/triage-decisions",
+    "improvement_candidate": ".reviewcompass/workflow/improvement-candidates",
+    "issue_record": ".reviewcompass/workflow/issues",
+    "issue_resolution_plan": ".reviewcompass/workflow/resolution-plans",
+    "plan_challenge": ".reviewcompass/workflow/plan-challenges"
+  },
+  "dispositions": [
+    "current_work",
+    "upstream_revision",
+    "dependency",
+    "issue_resolution",
+    "checkpoint",
+    "defer",
+    "reject",
+    "duplicate"
+  ],
+  "intake": {
+    "candidate_id_prefix": "HTC",
+    "excluded_headings": [
+      "verified",
+      "reported_unverified／contradicted",
+      "現在位置",
+      "Git・Test",
+      "更新規則",
+      "次に行う一作業",
+      "stale・deferred"
+    ],
+    "exclusion_rules": {
+      "X1": "見出しが除外側にある",
+      "X2": "第2階層以下の説明行（Evidence、観測した事後状態など）",
+      "X3": "実装済み等の完了語をcommit SHAまたはEvidence pathとともに含む",
+      "X4": "既存の解決済みIssueと同一主題である",
+      "X5": "引用が空、または本文が無い"
+    },
+    "explanation_prefixes": [
+      "Evidence：",
+      "観測した事後状態：",
+      "Evidence:",
+      "根拠："
+    ],
+    "included_headings": [
+      "未実施",
+      "残余risk",
+      "手戻り・機械化候補",
+      "blocker・Human判断待ち"
+    ],
+    "resolution_markers": [
+      "実装済み",
+      "解消した",
+      "訂正した",
+      "完了した",
+      "解決した"
+    ],
+    "source_relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+    "source_sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1"
+  },
+  "issue_schema_version": 2,
+  "issue_states": [
+    "registered",
+    "untriaged",
+    "deferred",
+    "in_progress",
+    "suspended",
+    "resolved",
+    "rejected"
+  ],
+  "maximum_active_issues": 1,
+  "maximum_active_leaves": 1,
+  "pilot_id": "RC3-DEVELOPMENT-ISSUE-RESOLUTION-PILOT",
+  "pilot_mode": "development_only_provisional",
+  "pilot_version": 4,
+  "root_cause_candidate": {
+    "authority_actions": [
+      "create_issue",
+      "create_plan",
+      "start_work",
+      "resume_issue"
+    ],
+    "detection_reason": "blocks_cycle_detected",
+    "grants_authority": false,
+    "required_fields": [
+      "proposed_blocker_issue_id",
+      "proposed_blocked_issue_id",
+      "cycle_path_issue_ids",
+      "cycle_path_relation_ids",
+      "affected_issue_ids",
+      "detection_reason",
+      "input_digest",
+      "content_digest"
+    ]
+  },
+  "terminal_issue_states": [
+    "resolved",
+    "rejected"
+  ],
+  "todo_projection": {
+    "forbidden_document_markers": [
+      "### 手戻り・機械化候補"
+    ],
+    "forbidden_section_markers": [
+      "problem:",
+      "evidence_refs",
+      "期待executor",
+      "実executor"
+    ],
+    "heading": "## 現在作業に影響する改善候補／Issue",
+    "maximum_entries": 5,
+    "maximum_section_bytes": 1024,
+    "registered_count_display_required": false
+  }
+}
