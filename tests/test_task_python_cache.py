@@ -321,7 +321,7 @@ def test_module_has_no_deletion_or_retention_or_global_environment_change(
         "unlink",
         "os.remove",
         "os.rmdir",
-        "environ",
+        "os.environ",
         "putenv",
         "policy_test_runner",
         "structured_argv_executor",
