@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：Work 5A／最初のhappy pathが循環の無いaccepted artifact version 2まで完了。
+- 現在の工程：Issue Intake V4実装GREEN。過去TODOの候補一覧を提示し、Human triage待ち。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
@@ -18,6 +18,8 @@
 
 ## 最新のauthority／Evidence
 
+- [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
+- [Issue Intake V4 GREEN](records/development/2026-08-05-issue-intake-v4-green-evidence-v1.md) — SHA-256 `28809b220e8e5b16f3f643c8994ea9bdeb73ac83d3e506daaea6baceb751e75f`
 - [Work 5A 実Review受理 v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-evidence.md) — SHA-256 `2e8335877202c8d5d1be07978b84ef6b3834ac5a207d5afa1184daddc719acdc`
 - [Work 5A 受理record bundle v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-records.json) — SHA-256 `64d75f3568078ef419cf74c3b72632352d07e63449b98fdb1608b17257184e7b`
 - [Provenance閉包 無効化record](records/development/2026-08-05-work5a-provenance-closure-invalidation-v1.json) — SHA-256 `f3ba011f5490059d96b8f21429cadc8016a9332415d79c59f546447a9c018a29`
@@ -40,21 +42,26 @@
 
 ## 次に行う一作業
 
-未定。次作業はHumanが決める。
+過去TODO候補41件に対するHuman triageを受ける。
+
+開始条件：
+
+- 候補一覧commit後のclean transition。
+- 未解決・再発性・影響・priority・Issue昇格のHuman判断。
 
 完了データ：
 
-- target：`docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md`
-- Finding 0件、Conformance `passed`、Final Challenge `passed`、Human decision `approved`。
-- `provenance_verdict` version 2は`verified_nodes` 9件、`verified_edges` 8件、自己辺なし。
-- `accepted_artifact` version 2を作成。version 1の誤recordは無効化済みで上書きしていない。
-- 受理したのは最小Review経路の実行結果であり、対象文書の品質保証ではない。
+- 候補一覧：`records/development/2026-08-05-historical-todo-intake-candidates-v1.json`
+- 41件（未実施7、残余risk15、手戻り・機械化候補14、blocker・Human判断待ち5）。重複疑い0件。
+- `human_fields`はすべて`null`。正式Issueへ昇格していない。
+
+後続作業：Humanが昇格を選んだ候補だけのIssue化、Plan化。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：次作業の選定。後続評価E2、E4、E5の開始承認。
-- 再開条件：受理record version 2 commit後のclean transition。
+- Human判断待ち：過去TODO候補41件のtriage。昇格、priority、統合、根本原因Issue化はHumanが決める。
+- 再開条件：候補一覧commit後のclean transition。
 
 ## stale・deferred
 
@@ -67,8 +74,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Work 5A first review contract `38 passed`
-- 直近の全Test：venv公式runner `777 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Issue Intake V4 `25 passed`
+- 直近の全Test：venv公式runner `802 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

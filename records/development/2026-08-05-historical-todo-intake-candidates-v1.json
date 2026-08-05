@@ -1,0 +1,1497 @@
+{
+  "by_heading": {
+    "blocker・Human判断待ち": 5,
+    "手戻り・機械化候補": 14,
+    "未実施": 7,
+    "残余risk": 15
+  },
+  "candidate_count": 41,
+  "candidates": [
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-C2E642ED",
+      "content_digest": "14de79f2f20472e93eaefe7e069e507671cfd0d53dba6a57a2e1838e0390ab09",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の候補：checklistへPolicy v5説明を挿入する際、期待executorは構造見出しを解決する`machine`、 実executorはLLMによるexact anchor選択となり、実fileと一致せず`apply_patch verification failed`が1回発生した。 再読込後のpatchは成功した。機械処理候補は見出しidentityからのlocator自動解決、routeは `manual_rework_candidate / checkpoint`とし、同種再発時に共通patch helperのTask Contract候補へ昇格する。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 742,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 739
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-66C3E6CA",
+      "content_digest": "b69b41711d9275d0d04d3f59ead32b00057844a4b2c650dd12118753fd9e6ffa",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の候補：commit後の引き継ぎ照合で、固定receipt v2の全Test時間`2.26s`に対し、TODOへ`2.29s`と 手入力されていた転記差を検出した。期待executorはreceiptからGit／Test欄を生成する`machine`、実executorは 手入力であり、固定Evidenceの値へ訂正した。機械処理候補はreceipt projection、routeは `manual_rework_candidate / checkpoint`とし、同種再発時にTODO更新helperのTask Contract候補へ昇格する。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 746,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 743
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-D65B4A8E",
+      "content_digest": "863753d4aec0d259195de12b1bb2d0f027253727288c697e71869a15d6065120",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の観測：promotion事前監査の初回表示は50件全体の`acceptance_truth_changed=true`を13件と集計し、 旧37件の移行結果との区分が分かりにくかった。実executorと期待executorはともに`machine`で手作業因果はない。 旧37件0、既承認追加13件13へ再集計して解消した。機械処理候補はcohort別監査出力、routeは `machine_report_ambiguity / checkpoint`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 750,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 747
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-D34A113E",
+      "content_digest": "f4411f2913341e88ea23a2363b3f89929d22532c03ef111b622f7aff49b7a161",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の候補：正常系GREEN後にCompletion Evidenceを作成し、その後の高risk負例追加で最終Verification時刻が 後ろへ移ったため、完了記録の`recorded_at`を訂正した。期待executorは全必須Verification終了後に時刻を確定する `machine`、実executorはLLMによる文書作成と途中時刻の採用だった。Evidenceはnegative RED／GREEN receipt、 機械処理候補はcompletion finalizer、routeは`manual_rework_candidate / checkpoint`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 754,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 751
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-3AFBA652",
+      "content_digest": "31ad38ec1cd66ca19604aa2679f4591d20afc9cdbc954a459f8f105d0faf46c2",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の候補：Work 3段完了の最終照合で、一時監査スクリプトがauthority v2のfieldを`requirements`／`status`と 仮定し、`KeyError`で1回停止した。期待executorは承認済みschemaと共通resolverを使う`machine`、実executorは LLMが組み立てた一時スクリプトだった。成果物不良ではなく、実fieldを機械取得後、既存の `resolve_effective_requirement_ids()`へ切り替えて`effective / 50 / legacy binding 0`に合格した。機械処理候補は 段完了監査から共通resolverを直接呼ぶverification commandの定型化、routeは `manual_operation_candidate / resolved_by_existing_machine_reader`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 760,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 755
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-75C717E1",
+      "content_digest": "30882f1fe831120f21b53077573d0018a7c3b4c47ecac419648e19822f869333",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の観測：session transcript実装後の最初の公式全Testで、不正UTF-8を既存どおり `UnicodeDecodeError`にする契約がunknown sourceへ変わる回帰を1件検出した。実executorと期待executorはともに `machine`で、手作業因果はない。decode errorを変換せず伝播させ、関連`30 passed`、全`477 passed`へ復旧した。 既存機械Testが回帰を閉じており、routeは`machine_regression / closed_by_existing_contract`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 764,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 761
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-E7E2F692",
+      "content_digest": "e076ef785c70a53d8a3e8a95f47280f49d52543cd845ee86cd817f493ce049cd",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の文書化では失敗、手戻り、手入力転記訂正は発生しなかった。path存在、見出し、JSON、Digest、Testを 機械処理で照合し、新しい`manual_rework_candidate`／`manual_operation_candidate`はない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 766,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 765
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-A5D1BCCA",
+      "content_digest": "27e0319409fa360dcfc1be6291e29cd3fd5fc5a0d34df206ac299035cdad7532",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の実装調査で、並列`functions.exec`のJavaScript出力区切りをLLMが誤記し、構文エラーが1回発生した。 期待executorはtool-call schemaを検査する`machine`、実executorはLLM直接組立てだった。成果物影響はない。 機械処理候補はcomposition lint、routeは`manual_operation_candidate / checkpoint`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 769,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 767
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-477EA1A4",
+      "content_digest": "331ae2c6bdc46b3d7e50de65c7efa273a5818dbace62006921ab8eb8c058246a",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回のcompile確認はworkspace外cacheへの書込みをsandboxが拒否した。実／期待executorはともに`machine`で 手作業因果はない。task専用`PYTHONPYCACHEPREFIX`で合格した。機械処理候補はcompile runnerのcache固定、 routeは`machine_environment_mismatch / checkpoint`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 772,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 770
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-186E9B83",
+      "content_digest": "2aa672216ac89be2b6fcfded754d837cd04146b8ee0bbe5296e5a37ab69f5de2",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回の限定capture後の補助検索で、検索語中のbacktickをshellが解釈し、一部検索だけが1回失敗した。 成果物、capture、Testへの影響はない。期待executorは構造化argvを渡す`machine`、実executorはLLMによる shell文字列の直接組立てだった。引用を修正して再検索した。機械処理候補はshell非経由のargv実行または composition lint、routeは`manual_operation_candidate / checkpoint`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 776,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 773
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-C9F6C917",
+      "content_digest": "380fb83e6bf42b5e7e6a82ae14d3fb6026342eec3bddf9d71d1da0fed9ea8fe0",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回のcommit作業で、権限定義から`.git`がread-onlyだと事前に分かっていたにもかかわらず、最初の `git add`を通常権限で実行し、`.git/index.lock`を作成できず1回停止した。file内容またはGit状態の問題ではなく、 Git書込み権限で同じstageを再実行して解消した。期待executorはcommand種別とpermission profileから実行経路を 決定する`machine`、実executorはLLMが通常権限を選択した。恒久対策はread-only Git操作を通常権限、Git metadata 書込み操作を初回からGit書込み権限へ機械routingし、試行失敗後の権限切替を廃止する。guarded commitは使用しない。 routeは`manual_operation_candidate / checkpoint`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 782,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 777
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-5C059B48",
+      "content_digest": "e02215a5518726159fd871e408f4dba5c4c64b7e725b80581e7b45dbbe6ad71b",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回のcommit後照合では、TODOへ自己SHA、clean、remote状態を転記するための追加commitが発生した。期待executorは commit前に安定handoffを検査する`machine`、実executorはLLMによるpost-commit転記だった。恒久対策として commit安定TODO validator、policy、template、checklist、AGENTSを実装し、targeted／全Testに合格した。routeは `manual_rework_candidate / resolved_by_commit_stable_todo_validator`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 786,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 783
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-9DCE8503",
+      "content_digest": "11a630f39c3855fd458f35c3b136f2dd518e505c488c34212ce85f03b3e04f09",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回のPlan／checklist最終照合で、LLMがzshの特殊変数`path`をloop変数へ使用し、command検索PATHを上書きして `shasum`が1回だけ`command not found`になった。成果物変更前のread-only照合であり、成果物への影響はない。 期待executorはshell予約・特殊変数を検査した構造化command、実executorはLLMによるshell文字列組立てだった。 `artifact_path`へ変更して同一照合を再実行する。機械処理候補はshell composition lintと予約変数検査、routeは `manual_operation_candidate / checkpoint`とし、Issue Resolution Pilotのdurable Candidate経路が利用可能に なった後の昇格候補とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 792,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 787
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-E183A02B",
+      "content_digest": "f0ab5c4982ae40c71f61b82ad566c1d2d46f5e0262c9a21097de94d00f94a6c0",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "今回のcurrent Issue改定record配置は、期待executorが単一subject制約を参照する機械resolver、実executorが LLMによるworkflow schema配置選択となり、二件目Candidateを置いて公式全Testが一回失敗した。既存の単一subject Testが検出し、`records/development/`の版付きcurrent-Issue改定経路へ修正して全Testを再合格させた。機械処理候補は disposition別record path resolver、routeは`manual_rework_candidate / resolved_by_existing_single_subject_test`とする。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 796,
+        "heading_path": [
+          "実施報告照合",
+          "手戻り・機械化候補"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 793
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-1D5B5102",
+      "content_digest": "8dc4b2302ded415b4d5972d9f9404091d2fe0427ed57c1a3462d7e6e31b3df7e",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "WI-006以降、WI-001の実snapshot／manifest生成、TODO compaction、Resolution Verdict",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 800,
+        "heading_path": [
+          "実施報告照合",
+          "未実施"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 800
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-328144E4",
+      "content_digest": "60c8e3cc989b5dee91c70bd13c46766070ea2828d618be52da42b6a98d415e5f",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "Deployment Manifest、package builder、原子的切替、rollbackのWork 7実装",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 801,
+        "heading_path": [
+          "実施報告照合",
+          "未実施"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 801
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-BE5E1F67",
+      "content_digest": "ae3b53eca1034c528e290b961cd29fd3111f0529560d918edd60dba38d07abef",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "Work 4のDesign差分、代表シナリオ、最初のvertical sliceの選定",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 802,
+        "heading_path": [
+          "実施報告照合",
+          "未実施"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 802
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-45B611EF",
+      "content_digest": "3c2c28023c9b0b7f8a2f23576df424d34b416f7acbe3ae67cab1db3b24742889",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "Project Bindingのdurable保存",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 803,
+        "heading_path": [
+          "実施報告照合",
+          "未実施"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 803
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-D7E1F8C3",
+      "content_digest": "8c04d67b868c2ba1a8f19ed9bfd8c6ede9b5464194b41744e6ddcd4b2bb3392e",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "実施報告照合の自動Claim抽出、Provenance対応、完了state結線",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 804,
+        "heading_path": [
+          "実施報告照合",
+          "未実施"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 804
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-BEB5E0BD",
+      "content_digest": "f47191101eb6471043f641d5b4a4ef268b4ea13c9510dc2951f3281d4ed23f3e",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "private transcriptの長期retention、削除、application-layer暗号化、backupの運用判断",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 805,
+        "heading_path": [
+          "実施報告照合",
+          "未実施"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 805
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-243BE1FF",
+      "content_digest": "31fefa1dc66794acdb0640478308d164d4a6e8a73a8d27b5a21231c5fbd46249",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "session hook／Desktop監視／Claude hook／scheduler／background serviceの有効化",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 806,
+        "heading_path": [
+          "実施報告照合",
+          "未実施"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 806
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-045A8FB5",
+      "content_digest": "bf333dab21d0480796a5fc8c85b55efd12d67367c4a9ba22d1e65d4d7549fc6b",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "operational保存物はproject外の一時development rootにあり、Completion CandidateへidentityとDigestを固定した。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 810,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 810
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-8AEF6A5F",
+      "content_digest": "7f6b6cd3bd7c08b867b520c2d0138f87c45488d9012a4493045a2078c8f7e68c",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "Layout validatorはWork 1A固定規則のbootstrap oracleであり、正式製品Runtimeではない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 811,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 811
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-C05BE65C",
+      "content_digest": "4fc712ce6953a760125195b83da6ceca913f4d62e0dd839071dc0d79af6eff57",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "documentation revision v16は`digest-only`の履歴として残るが、現行固定入力とWork 1A Evidenceは Gitから再構築可能である。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 813,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 812
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-C3193ABF",
+      "content_digest": "e97209cd0bca719f181cd0ecc4d2ba0d313bd5e3e019dd303fecf069920b39f3",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "Intent／用語集候補のfrontmatterはpromotion前snapshotである。現行authorityは外部Approval Decisionと 承認対象Digestであり、候補fileを第二正本にはしない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 815,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 814
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-ECE89CA2",
+      "content_digest": "afb431f62e91a9e5937d38fad4b99828cf7aa41fcfe6ede642f6825efbb151d1",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "session `001`と旧candidate Digestは問題発生Evidenceとして保持し、current判断関門には使用しない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 816,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 816
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-152E0FB3",
+      "content_digest": "8276d99e9dbfccc8e0adea22376bbec978e833705dacfd67bfb7ba1bfd391435",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "現行Planと追加13要件はprovisional／review-candidateであり、baseline確認だけで承認済みにしない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 817,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 817
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-49795CC0",
+      "content_digest": "1e8b9693831ced5713ce1250f61964b157f4246af7e22a66a1d5d774354f9cd5",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "coverage matrixの現行authorityは外部Approval Decisionであり、候補fileを第二正本にしない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 818,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 818
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-094589CA",
+      "content_digest": "182941d49566efefd7a6da9000d9049ee39d3a56a0e10b6c6078ea636bf349a2",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "identity／stale規則とRequirements配置規則の現行authorityは外部Decisionと承認対象Digestであり、候補fileを 第二正本にしない。CI adapter、Build Artifact実装、provider操作は引き続き対象外である。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 820,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 819
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-876989C2",
+      "content_digest": "ddee298356454207291a849f3d762599dc315633ef7c322c4a18740f74d363f7",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "B1に従いdirectory、schema、validator、legacy inventory、50 definition、candidate、Evidence、Human Decision、authority bundle v2を作成した。旧legacy bindingとauthority v1はsuperseded履歴として保持し、 現行authority chainは50 definitionだけで`effective`である。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 823,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 821
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-7DDF463E",
+      "content_digest": "9afd5fb28527e83efd401ca424942aa90947f21be33aaa5ee117f6955ec670dd",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "NFR Profile接続はHuman Decisionで承認済みである。effective Requirementを初期Profileのauthorityとし、Planの Architecture Policy rule 6件は`proposed_policy_rule_not_authoritative`としてWork 4へ分離した。数値閾値、 Architecture Policy、shared／distributed scopeは承認・実装していない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 826,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 824
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-B53A2670",
+      "content_digest": "91acab1e7ac1a94a5845efdceb1286e83d8e27c72d755dbff77bb91ab5544ab2",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "deferred scope候補はHuman承認済みで、13件すべてを初期releaseの`nonblocking`へ固定し、9 consumerの scope leakは0だった。各機能の実装・有効化は別Task ContractとHuman判断まで開始しない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 828,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 827
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-ABE70CFC",
+      "content_digest": "cae3ce4d487384b3d90d354b525e6f98e3d925f33e0460b74787e958872b8dff",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "旧37 Requirementは機械移行済みで、現行effective authority v2は50 definition、legacy binding 0である。 authority v1とlegacy bindingはsuperseded履歴として保持し、削除または上書きしない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 830,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 829
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-7071DD99",
+      "content_digest": "33a8bc6945f4a182e938dd33dea78c65d401f42dfdaecfc751346a92be48de8b",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "公式Testはpolicy runner経由へ変更した。raw `python3 -m pytest -q`はrunner内部commandであり、今後の完了 Evidenceにはrunner receiptを要求する。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 832,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 831
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-62719E1C",
+      "content_digest": "326792a26d25b1992eb1ed12d18bdd5b474d951f8cebf55be444fa28fe09ed82",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "Policy v5により、今後の作業後報告は手戻りと手作業の因果、期待／実executor、Evidence、機械処理候補、 routeを含む。決定的処理をLLMが行った場合は、手戻りがなくても改善候補として報告する。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 834,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 833
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-4ED2C5B1",
+      "content_digest": "81ccb05b5c3a800ea653d5ca071f1b163be43a3c211d99a5aeb342b9b173eed5",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "eventual preservationのmanual collector、durable cursor、reconcile、artifact分離と限定captureは完了した。 capture後に追記された会話は次のmanual reconcile対象である。自動実行は未実装・未有効化であり、 hook／watcherをcorrectness pathにはしない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 837,
+        "heading_path": [
+          "実施報告照合",
+          "残余risk"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 835
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-14D810C7",
+      "content_digest": "77e680bf7a49733c9202e80519f50a41fb14f4343505d6978c2bacfac66806ee",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "blocker：なし。WI-006 GREEN containing commit確認前はWI-007を開始しない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 860,
+        "heading_path": [
+          "blocker・Human判断待ち"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 860
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-1AB699F7",
+      "content_digest": "4bbd8d23986f6e94b046a0cae8b258546d3ae3ec17bfe808e2c22f7dab85543b",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "Human判断待ち：現在のWI-007作業に対する追加判断なし",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 861,
+        "heading_path": [
+          "blocker・Human判断待ち"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 861
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-21C3CE46",
+      "content_digest": "a22e1a440d4fb5ccc771293d35be2f9ce73892455c381789825da2628779914e",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "実行保留：実snapshotはWI-006 GREEN commit後、TODO compactionはWI-007 containing commit後まで開始しない。",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 863,
+        "heading_path": [
+          "blocker・Human判断待ち"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 862
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-CD984CD0",
+      "content_digest": "2a195fec603d34702fa174e1c2d48c4d2dbc6174b41ff11fc8f14160f2fb64d4",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "後続Human判断待ち：2026-09-03のretention review、暗号化、automation activation",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 864,
+        "heading_path": [
+          "blocker・Human判断待ち"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 864
+      }
+    },
+    {
+      "applied_rules": [
+        "X1:pass",
+        "X2:pass",
+        "X3:pass",
+        "X5:pass"
+      ],
+      "candidate_id": "HTC-6ABDDC35",
+      "content_digest": "795bb1c9c359ebb8af4ba39590c41a0d8f8c24b45a088960af67f14b46636e64",
+      "digest_algorithm": "sha256",
+      "duplicate_suspect": {
+        "basis": "quotation正規化の包含一致",
+        "matched_record_ids": [],
+        "suspected": false
+      },
+      "human_fields": {
+        "impact": null,
+        "priority": null,
+        "promote_to_issue": null,
+        "recurrence": null,
+        "unresolved": null
+      },
+      "quotation": "再開条件：WI-006 GREEN containing commit確認、clean worktree、transition合格",
+      "record_kind": "historical_todo_intake_candidate",
+      "schema_version": 1,
+      "source": {
+        "end_line": 865,
+        "heading_path": [
+          "blocker・Human判断待ち"
+        ],
+        "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+        "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1",
+        "start_line": 865
+      }
+    }
+  ],
+  "config": {
+    "pilot_version": 4,
+    "relative_path": "config/development-issue-resolution-pilot-v4.json"
+  },
+  "digest_algorithm": "sha256",
+  "duplicate_suspect_count": 0,
+  "generated_by": "tools/development/issue_intake_v4.py",
+  "note": "機械が抽出した候補一覧である。正式Issueではない。未解決・再発性・影響・priority・Issue昇格はHumanが決める。human_fieldsはすべてnullである。",
+  "promotion_status": "none",
+  "record_kind_bundle": "historical_todo_intake_candidates",
+  "schema_version": 1,
+  "source": {
+    "relative_path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+    "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1"
+  }
+}
