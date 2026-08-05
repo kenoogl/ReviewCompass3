@@ -720,6 +720,21 @@ active Issueは0件である。承認Decision `DEC-HISTORICAL-TODO-ISSUE-INTAKE-
 `pilot_mode: development_only_provisional`を維持する。正式製品schema、UI、automation、3正式Issueの
 Plan化・実装、Work 8評価は引き続き承認範囲外である。上記の早期Pilot完了記録は消さずに残す。
 
+- [x] `ISSUE-HTC-C9F6C917`のPlan提案v2の§3最小縦切りだけをHumanが承認し、実装した。
+
+機械操作routing v2の最小縦切り。承認したのはversioned operation inventory、permission preflight、
+execution receiptの3部だけである。実装moduleは`tools/development/operation_routing.py`で、
+既存policy runnerとは別moduleとし、shellも外部processも起動しない。承認と取得済み権限の確認はhost側に
+置き、project内は必要な権限種別を計算して出すだけである。承認Decision
+`DEC-MACHINE-OPERATION-ROUTING-001`は
+`records/development/2026-08-05-machine-operation-routing-v2-approval-decision-v1.md`、SHA-256
+`c73cdc69b3ca3251b9de9480867c9677e0de4312f7bedff138a407af297cd969`。GREEN Evidenceは
+`records/development/2026-08-05-machine-operation-routing-v2-green-evidence-v1.md`、SHA-256
+`e4f8d9f865e6b6d35e7d00a21eba54c13b1ed331fca3183827b1262d285d88eb`。対象testは`16 passed`、公式全testは
+`845 passed`。構造化argv executor、cache root固定、既存直接操作の移行、host側tool構文、外部送信、
+`ISSUE-HTC-66C3E6CA`の定型欄生成は承認範囲外のままである。`ISSUE-HTC-C9F6C917`のIssue recordは
+`registered`のままであり、**V4 Issueの正式Plan化や実装一般が完了したわけではない**。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

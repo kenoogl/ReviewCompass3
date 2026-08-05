@@ -1,12 +1,30 @@
 # 機械操作routing IssueのPlan提案 v2
 
-状態：`awaiting_human_approval`
+状態：`approved_for_development_implementation`
 対象Issue：`ISSUE-HTC-C9F6C917`
 指示：`records/session-handoffs/2026-08-05-codex-to-claude-revise-machine-operation-routing-plan-v2.md`
 
-**これは正式なIssue Resolution Plan、Decision、Task Contractではない。**Humanが承認するまで、
-operation runner、argv executor、Git preflight、cache routing、config、policy evaluator、Test code、
-Issueのstate、Task Contractを変更しない。Issueは`registered`のままである。
+## 実施状態注記（2026-08-05）
+
+この節だけが提案後に追記した現在の状態である。以降の本文は提案時点のまま残しており、
+全面的な時制の書き換えはしていない。
+
+- Humanは**§3の最小縦切りだけ**を承認した。承認recordは
+  `records/development/2026-08-05-machine-operation-routing-v2-approval-decision-v1.md`
+  （`DEC-MACHINE-OPERATION-ROUTING-001`）である。
+- 承認範囲は、versioned operation inventory、permission preflight、execution receiptの3部だけである。
+  §4に挙げた後続項目（構造化argv executor、shell特殊文字対策の全面移行、cache root固定、
+  既存直接shell操作の一括置換、host側tool構文、外部送信、`ISSUE-HTC-66C3E6CA`の定型record生成）は
+  承認していない。
+- 実装は`tools/development/operation_routing.py`として完了し、GREEN Evidenceは
+  `records/development/2026-08-05-machine-operation-routing-v2-green-evidence-v1.md`である。
+- 本書は**正式なIssue Resolution PlanまたはTask Contractへ昇格していない**。
+- `ISSUE-HTC-C9F6C917`のIssue recordの状態は`registered`のまま変更しない。
+
+以下は提案時点の本文である。
+
+**これは正式なIssue Resolution Plan、Decision、Task Contractではない。**承認していない範囲について、
+argv executor、cache routing、config、policy evaluatorを変更しない。Issueは`registered`のままである。
 
 ## 0. 改訂の理由と、旧提案の扱い
 
