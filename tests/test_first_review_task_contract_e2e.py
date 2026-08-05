@@ -74,7 +74,8 @@ def _project(tmp_path, *, body=CLEAN_DOCUMENT):
     (root / "docs").mkdir(parents=True)
     (root / "records" / "requirements" / "definitions").mkdir(parents=True)
     (root / TARGET).write_text(body, encoding="utf-8")
-    for requirement_id in BOUND_REQUIREMENTS:
+    # B2で「定義は存在するが受け先が無い」Requirementを使うため、定義fileだけ用意する。
+    for requirement_id in BOUND_REQUIREMENTS + ("REQ-EVAL-001",):
         name = requirement_id.lower().replace("req-", "req-") + "--v1.json"
         (root / "records" / "requirements" / "definitions" / name).write_text(
             json.dumps(
