@@ -9,7 +9,7 @@
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
 - 現在の工程：過去TODO候補41件のHuman triageは完了し、Issue Intake V4の限定拡張はHuman承認のうえ検証を閉じた。未判断は0件である。
 - 正式Issue：3件、いずれも`registered`かつnonblockingで未着手。active Issueは0件。`ISSUE-HTC-C9F6C917`はPlan提案v2の§3最小縦切り（operation inventory、permission preflight、execution receipt）だけをHuman承認のうえ実装済みで、receipt改竄検出の訂正も完了している（execution receipt schema v2）。Issue全体はcloseしていない。旧v1提案は履歴として保持する。
-- 各Issueの対象：`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。
+- 各Issueの対象：`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。`ISSUE-HTC-66C3E6CA`は`registered`かつnonblockingのままで、Plan提案がHuman承認待ちである。
 - 通常commitの運用：意味単位commitを最小ガード付きで自律化した。push、tag、amend、rebase、reset、force push、履歴書換え、方針変更、段完了、意味的裁定、不可逆操作、外部送信、権限の迂回はHuman明示承認のままである。
 - Task Contract固定sourceの状態解決：歴史状態は受理時点のGit blob、現在有効状態はworking tree、`active_stale`は停止のまま、という三状態をv1／v2共通のresolverで扱う。
 - activeなTask Contract／Work Item：なし。
@@ -35,7 +35,8 @@
 - [機械操作routing Plan提案 v1（superseded、履歴）](docs/design/2026-08-05-machine-operation-routing-issue-plan-proposal.md) — SHA-256 `722e9448971bcf3e97423ab1b9b137ca202f1f1c0ed7afdd92a619738e608bfa`
 - [Issue Intake V4 承認Decision](records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md) — SHA-256 `019879235577b39489e4383cd0fa092c562631d3c1b1e1ffa311056c8d1d9f7c`
 - [Issue Intake V4 閉鎖Evidence](records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md) — SHA-256 `b942a9d17ea4c2818c6adb5f3ceabc0063f9b447c7ddb88ccc5baf3d1302d60e`
-- [receipt整合性GREEN後の全test receipt](records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-green-test-receipt-v1.json) — SHA-256 `9be48428226a5c7d3e302b0ef68d8941cd21974a211892c66a7d8f3eaf8472bf`
+- [定型記録生成 Plan提案（Human承認待ち）](docs/design/2026-08-05-record-generation-issue-plan-proposal.md) — SHA-256 `746576704f683dba27ce832d64f4a1ad510de211b30f145c9c513ae836d9082d`
+- [Plan提案作成後の全test receipt](records/development/2026-08-05-record-generation-issue-plan-proposal-test-receipt-v1.json) — SHA-256 `d2320449185d783860312a3cc4b5b232a60d861bf5bf123f4794aaefc9927b92`
 - [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
 - [Work 5A 実Review受理 v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-evidence.md) — SHA-256 `2e8335877202c8d5d1be07978b84ef6b3834ac5a207d5afa1184daddc719acdc`
 - [Work 5A 受理record bundle v2](records/development/2026-08-05-work5a-first-real-review-acceptance-v2-records.json) — SHA-256 `64d75f3568078ef419cf74c3b72632352d07e63449b98fdb1608b17257184e7b`
@@ -53,12 +54,12 @@
 
 ## 次に行う一作業
 
-後続範囲（構造化argv executor、cache root固定、既存直接操作の移行順）を扱うかどうかのHuman判断を受ける。
+`ISSUE-HTC-66C3E6CA`のPlan提案に対するHuman判断を受ける。
 
 開始条件：
 
-- 最小縦切りGREENのcommit後のclean transition。
-- 後続範囲に着手するか、別Issueを先にするかのHuman判断。
+- Plan提案のcommit後のclean transition。
+- 最初の対象を案Aに限定する可否、公式Test receiptとして何を受け付けるか、生成済みTODOの更新をどのcommitへ含めるか、案Bへ拡張する条件、実装着手可否のHuman判断。
 
 完了データ：
 
@@ -69,6 +70,7 @@
 - Issue Intake V4は開発用・暫定の限定機能としてHuman承認済みで、実地検証は閉鎖済みである。
 - `ISSUE-HTC-C9F6C917`のPlan提案v2は`approved_for_development_implementation`だが、承認範囲は§3だけである。旧v1提案は状態を変えずに履歴として残す。正式Issue Resolution PlanとTask Contractは作っていない。
 - §3の実装（`tools/development/operation_routing.py`）は完了し、receipt改竄検出の訂正も適用済み。初回のGREEN Evidenceとreceiptはstaleとして履歴に残し、有効な完了根拠は訂正Decisionと訂正GREEN Evidenceである。構造化argv executor、cache root固定、既存直接操作の移行、host側tool構文、外部送信は未実施である。
+- `ISSUE-HTC-66C3E6CA`のPlan提案は`awaiting_human_approval`である。正式Plan、Decision、Task Contractは作っておらず、定型記録生成、TODO renderer、receipt parser、監査集計も実装していない。
 - `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものであり、C9 Plan提案の承認ではない。
 - 正式Issue正本：`.reviewcompass/workflow/issues-v4/`（V4 issue_record schema version 2）
 
@@ -77,7 +79,7 @@
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：`ISSUE-HTC-C9F6C917`の後続範囲に着手するかどうかの判断。§3最小縦切りは承認・実装済みで、Issue全体はcloseしていない。過去TODO候補41件のHuman triageとV4検証閉鎖は完了している。`ISSUE-HTC-BEB5E0BD`、`ISSUE-HTC-C9F6C917`、`ISSUE-HTC-66C3E6CA`はいずれも`registered`かつnonblockingのままで、作業を開始していない。
+- Human判断待ち：`ISSUE-HTC-66C3E6CA`のPlan提案の採否（最初の対象、receiptの受付範囲、更新commitの置き方、拡張条件、実装着手可否）と、`ISSUE-HTC-C9F6C917`の後続範囲に着手するかどうかの判断。§3最小縦切りは承認・実装済みで、Issue全体はcloseしていない。過去TODO候補41件のHuman triageとV4検証閉鎖は完了している。`ISSUE-HTC-BEB5E0BD`、`ISSUE-HTC-C9F6C917`、`ISSUE-HTC-66C3E6CA`はいずれも`registered`かつnonblockingのままで、作業を開始していない。
 - 再開条件：判断recordのcommit後のclean transition。
 
 ## stale・deferred
