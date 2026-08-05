@@ -1,0 +1,61 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-HISTORICAL-TODO-ISSUE-INTAKE-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-05T00:00:00+09:00",
+  "source_work": "inter-work/historical-todo-issue-intake",
+  "source_identity": {
+    "kind": "snapshot",
+    "source_id": "TODO-COMPACTION-SNAPSHOT-2026-08-04-001",
+    "source_version": 1,
+    "path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+    "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1"
+  },
+  "problem": "圧縮前TODOに記載された個別の問題、手戻り候補、未完了の懸念は、TODO肥大化のIssueへ一括要約されたが、個別Issueとして分類・追跡されていない。このままでは、現在の計画に関係する未解決項目が履歴の中に埋もれる。",
+  "impact": [
+    "過去に見つけた未解決の問題が、現行Planや次のWorkへ接続されない",
+    "解決済みの履歴と未解決候補を区別できず、再発や取りこぼしを検査できない",
+    "TODOを短く保っても、個別の改善課題を追跡する入口が無い"
+  ],
+  "scope": [
+    "圧縮前TODO snapshotから、Issue候補となる記述を機械抽出して一覧化する",
+    "候補ごとにsource位置、根拠、現在への影響、既存Evidence、重複候補を保持する",
+    "Humanが未解決・再発性・現在のPlanへの影響を判断した候補だけを個別Issueへ昇格する",
+    "一件だけに固定されたdevelopment Issue Pilotを、複数Issueの受入可否を判断できる設計へ改める"
+  ],
+  "non_scope": [
+    "圧縮前TODOの全記述を機械的に個別Issueへ昇格すること",
+    "解決済みのEvidenceやsession履歴をIssueへ複製すること",
+    "Human判断なしにPlan、Task Contract、Requirementを変更すること",
+    "Definition Challenge、Work 6A、Work 4Bをこの候補の処理中に開始すること"
+  ],
+  "classification_candidates": [
+    "process_improvement",
+    "issue_intake"
+  ],
+  "route_candidates": [
+    "issue_resolution"
+  ],
+  "consumer_candidates": [
+    "reviewcompass3-development",
+    "development-plan",
+    "issue-lane"
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/session-handoffs/2026-08-04-todo-before-compaction-001.md",
+      "sha256": "16010a165c010fa8a25cea5ab0f11990734540f4d5c0f5fdb50fd7c21ee6c0f1"
+    },
+    {
+      "path": ".reviewcompass/workflow/issues/issue-pilot-todo-growth-001--v1.json",
+      "sha256": "2c0ac23012b0b325cd45bafbac3d13c56ec64f45d49919c8b73dd9a210273c1a"
+    },
+    {
+      "path": "config/development-issue-resolution-pilot-v2.json",
+      "sha256": "9af4837d968c4088f1ecbaffbf49fc7002667695cd067ee9d8ad33fceaeeb9ff"
+    }
+  ],
+  "proposed_action": "Humanの『issue化はすぐに対応する』という指示により、まず候補抽出と個別Issue受入の設計を行う。既存Pilotのmaximum_issue_subjectsが1であるため、個別Issueの新規作成は複数Issueを扱う規則を承認してから行う。",
+  "content_digest": "f6a0c19ef6287ea9008d0f3713405645e9c099b8168caf82b20fd1e75405f254"
+}
