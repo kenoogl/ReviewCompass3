@@ -209,18 +209,20 @@ def test_argv_shape_problems_are_rejected(executor, routing, tmp_path):
         document["content_digest"] = routing.canonical_digest(document)
         return document
 
+    # 空listと非文字列要素は、先に走るinventory validatorが拒否する。
     for label, argv in {
         "空list": [],
-        "空文字列の先頭要素": ["", "status", "--porcelain"],
+        "非文字列要素": ["git", 1, "--porcelain"],
     }.items():
         runner = _FakeRunner()
         assert _reject(
             executor, inventory=_tampered(argv), runner=runner, project_root=root
-        ) == "argv_invalid", label
+        ) == "inventory_invalid", label
 
+    # 空文字列の実行fileはinventory validatorを通るため、executorが拒否する。
     runner = _FakeRunner()
     assert _reject(
-        executor, inventory=_tampered(["git", 1, "--porcelain"]), runner=runner,
+        executor, inventory=_tampered(["", "status", "--porcelain"]), runner=runner,
         project_root=root,
     ) == "argv_invalid"
 

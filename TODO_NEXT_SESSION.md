@@ -15,7 +15,7 @@
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
-- Evidence参照：`## 最新のauthority／Evidence`節の参照は機械計測で28件である。件数の訂正記録は`records/development/2026-08-05-todo-evidence-reference-count-correction-v1.md`。
+- Evidence参照：`## 最新のauthority／Evidence`節の参照は機械計測で26件である。件数の訂正記録は`records/development/2026-08-05-todo-evidence-reference-count-correction-v1.md`。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -25,18 +25,16 @@
 
 - [読み取り専用argv executor 承認Decision](records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-decision-v1.md) — SHA-256 `2982646b43a74d856d9b18af527b743b10ac3d8874f03ee39afba825752a8864`
 - [機械操作routing 後続Plan提案（§2.1／§3.2のみ承認済み）](docs/design/2026-08-05-machine-operation-routing-follow-on-plan-proposal.md) — SHA-256 `d5877f9668cc75a00a25b79d0fad9050c7ae3dd243047a4c61ba6e776fceb571`
-- [承認記録時点の全test receipt](records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-test-receipt-v1.json) — SHA-256 `85f411ad3083ee7580e140dce3d0c858bebf4ad1e3ae3a2c032ce9122f5d0d39`
+- [読み取り専用argv executor GREEN Evidence](records/development/2026-08-05-machine-operation-routing-read-only-argv-green-evidence-v1.md) — SHA-256 `4f63620dff80ac3c0408994163885777c0e0d5c1bb6ebf469680857653192db5`
+- [読み取り専用argv executor GREEN receipt](records/development/2026-08-05-machine-operation-routing-read-only-argv-green-test-receipt-v1.json) — SHA-256 `f7eaf735fb0dde4e0d96bc9dcb53b5af522faa7cf784d34d788b8de81cbe59d2`
 - [V4 Issue永続化 GREEN](records/development/2026-08-05-v4-issue-persistence-green-evidence-v1.md) — SHA-256 `3ae17b4b5828429ee8c7f1b6dfbc3b80d9439da4bace685542cee3845640b731`
 - [正式Issue record 会話記録方針](.reviewcompass/workflow/issues-v4/issue-htc-beb5e0bd--v1.json) — SHA-256 `a4a1511e609005193a3d127080a3eabf4f56a67529c5bd9b4e0f55b467422d62`
 - [正式Issue record 機械操作の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-c9f6c917--v1.json) — SHA-256 `66cfe50ce79136bca5e92b35b72502cedfb8b6f6f3e20ade1e027bcbf1fec0ed`
 - [正式Issue record 記録生成の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-66c3e6ca--v1.json) — SHA-256 `56e0911d6f565915ca0ad7737eae7befbb30d686d344eb5367ecc95598a8c732`
 - [意味単位commit最小ガード Decision](records/development/2026-08-05-semantic-commit-minimal-guards-decision-v1.md) — SHA-256 `07eb9cbcd1e4e1b33aff787f597a45db1be6913a0685d76f8db1169adf965d23`
-- [機械操作routing v2 承認Decision](records/development/2026-08-05-machine-operation-routing-v2-approval-decision-v1.md) — SHA-256 `c73cdc69b3ca3251b9de9480867c9677e0de4312f7bedff138a407af297cd969`
 - [receipt整合性 訂正Decision](records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-correction-decision-v1.md) — SHA-256 `f73f06e12f464a27ded059522e37015acbd2f9487d7d65d55ed96823a6f8033b`
 - [receipt整合性 訂正GREEN Evidence（有効な完了根拠）](records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-green-evidence-v1.md) — SHA-256 `b6255b0a7de3bcd90b62745ff934a957dba94b3870bc847517f1dbde36a430ea`
 - [機械操作routing Plan提案 v2（§3のみ承認済み）](docs/design/2026-08-05-machine-operation-routing-issue-plan-proposal-v2.md) — SHA-256 `e01c3aaf8039377da2b43dab7f735d28a2f86bf10aa83f5bb22e5dd1eefa8572`
-- [Issue Intake V4 承認Decision](records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md) — SHA-256 `019879235577b39489e4383cd0fa092c562631d3c1b1e1ffa311056c8d1d9f7c`
-- [Issue Intake V4 閉鎖Evidence](records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md) — SHA-256 `b942a9d17ea4c2818c6adb5f3ceabc0063f9b447c7ddb88ccc5baf3d1302d60e`
 - [定型記録生成 境界訂正GREEN Evidence（有効な完了根拠）](records/development/2026-08-05-record-generation-todo-boundary-repair-green-evidence-v1.md) — SHA-256 `0f4e4031b541a06e431c56de2e1d19c0626aeadb1068a66ee9f392bb9e749634`
 - [境界訂正後の全test receipt](records/development/2026-08-05-record-generation-todo-boundary-repair-green-test-receipt-v1.json) — SHA-256 `ad0f191e0af53a21ab130d9346743d0b214ac56ad6cf958b64ae175535df98df`
 - [定型記録生成 Plan提案（承認済み）](docs/design/2026-08-05-record-generation-issue-plan-proposal.md) — SHA-256 `79ed49831ebd9b69c9713fcd71becfaa1d85f7fd97759e5fff373f99126a2a7c`
@@ -54,24 +52,23 @@
 
 ## 次に行う一作業
 
-`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`で承認された読み取り専用argv executor
-最小sliceを、Test先行で実装する。
+読み取り専用argv executor最小sliceは実装済みである。次に何を行うかのHuman判断を受ける。
 
 開始条件：
 
 - 本handoffを含むcommit後のclean transition。
-- 承認範囲を超えないこと。cache root、移行、書込み、externalは対象外のままとする。
+- 未承認の判断点について、人が次の対象を選ぶこと。
 
 未承認のまま残るHuman判断点：
 
-- cache rootの配置と、削除するか保持するかの方針。
-- 移行対象の優先順。
+- cache rootの配置と、削除するか保持するかの方針（次の別slice）。
+- 移行対象の優先順と、`git status --porcelain`以外の実行templateを増やすかどうか。
 - host側tool構文と外部送信を本Issueで扱わないことの確認。
 
 完了データ：
 
 - 過去TODO候補41件は全件triage済み。正式Issueは3件で、正本は`.reviewcompass/workflow/issues-v4/`である。
-- `ISSUE-HTC-C9F6C917`は§3最小縦切りが承認・実装済みで、`registered`かつnonblockingのままである。後続Plan全体は`awaiting_human_approval`のままだが、読み取り専用argv executor最小sliceだけは`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`で実装承認された。実行templateは`git status --porcelain`だけで、cache root、既存操作の移行、書込み、externalは対象外である。
+- `ISSUE-HTC-C9F6C917`は§3最小縦切りが承認・実装済みで、`registered`かつnonblockingのままである。後続Plan全体は`awaiting_human_approval`のままだが、読み取り専用argv executor最小sliceは`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`で承認され、`tools/development/structured_argv_executor.py`として実装済みである。実行templateは`git status --porcelain`だけで、cache root、既存操作の移行、書込み、externalは対象外である。
 - `ISSUE-HTC-66C3E6CA`はTODO最小縦切りだけ承認・実装済み。案Bは未承認である。
 - `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものである。
 
