@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：Work 5A／最小Review Task Contractの実装GREEN。実review run前。
+- 現在の工程：Work 5A／最初の実Review Run完了。Human decision待ち。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
@@ -18,6 +18,8 @@
 
 ## 最新のauthority／Evidence
 
+- [Work 5A 最初の実Review Run](records/development/2026-08-05-work5a-first-real-review-run-evidence-v1.md) — SHA-256 `cdc4c4d8ad08a6f0d8373ea56d46018e070618ba2152ade7ac4dd09d72808b50`
+- [Work 5A 実Review Run record bundle](records/development/2026-08-05-work5a-first-real-review-run-records-v1.json) — SHA-256 `658e5ba98d6023085709733f91130a8b64acd674b3c9ca497b3f23784d588447`
 - [Work 5A GREEN Evidence](records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md) — SHA-256 `57feb4e7fa08924c00307dec997f2b12285641b168925825225e6a596b63fbae`
 - [Work 4 最初のslice設計承認](records/development/2026-08-05-work4-first-review-contract-design-approval-decision-v1.md) — SHA-256 `3048a52ccab59815f92b6fc3d1bd88b0ca8bd5d7a5117ad223d7139dab287675`
 - [Work 4 最初のReview Task Contract設計提案](docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md) — SHA-256 `14901323a958d686ba0ad0aed62b20b7b7d79908afcced08dc90f72fdb3d2054`
@@ -35,25 +37,26 @@
 
 ## 次に行う一作業
 
-実文書に対する最初のreview runの実施をHumanが承認する。
+最初の実Review Runの結果に対するHuman decisionを得る。
 
 開始条件：
 
-- Work 5A GREEN commit後のclean transition。
-- 対象文書、実施範囲、Human decisionの担当のHuman承認。
+- 実Review Run commit後のclean transition。
+- 提示したFinding、Conformance、Final Challengeの結果をHumanが確認する。
 
 完了データ：
 
-- 受入25件（A1〜A11、B1〜B10、C1〜C4）と全test 764件がGREEN。
-- record kind 13種、6 typed view、owner分離、stale停止を実装済み。
+- target：`docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md`
+- Finding 0件（error 0、warning 0）、Conformance `passed`、Final Challenge `passed`。
+- `human_decision`、`provenance_verdict`、`accepted_artifact`は未作成。
 
-後続作業：実review runの実施、後続評価E2以降の別承認。
+後続作業：Human decision後のProvenance verdictとaccepted artifact、後続評価E2以降の別承認。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：実review runの実施承認。後続評価E2、E4、E5の開始承認。
-- 再開条件：Work 5A GREEN commit後のclean transition。
+- Human判断待ち：最初の実Review Runに対するHuman decision。後続評価E2、E4、E5の開始承認。
+- 再開条件：実Review Run commit後のclean transition。
 
 ## stale・deferred
 
