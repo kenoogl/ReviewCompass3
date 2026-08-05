@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-62719E1C",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T14:25:12+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-62719E1C",
+    "candidate_content_digest": "326792a26d25b1992eb1ed12d18bdd5b474d951f8cebf55be444fa28fe09ed82"
+  },
+  "human_fields": {
+    "unresolved": false,
+    "recurrence": false,
+    "impact": "not_applicable",
+    "priority": "not_applicable",
+    "promote_to_issue": false
+  },
+  "disposition": "reject",
+  "blocking": false,
+  "rationale": "この候補は、作業後の報告に手戻りと手作業の因果、期待した実行者と実際の実行者、Evidence、機械処理の候補、routeを含める、という報告手順の記述である。決定的に決まる処理をLLMが行った場合は、手戻りが無くても改善候補として扱う。現行の報告手順として現在も守られている。ここでの`reject`は、正本の規則、履歴、検証手順を捨てるという意味ではない。これは現在も守られている取り決めの説明であり、この候補を独立したIssueとしては追跡しない、という意味である。元のPlan、Decision、Evidence、code、test、configは変更しない。未解決ではなく再発もしないため、影響と優先順位は該当なしとし、正式Issueへは昇格しない。",
+  "next_action": "候補bundleを変更せず、この判断recordを現行の取り決めの記録として保持する。正式Issue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "bf177ed327cb8d12b89c1b8a92ebd255fa01fd88f02412787c6efc5d63957889"
+}

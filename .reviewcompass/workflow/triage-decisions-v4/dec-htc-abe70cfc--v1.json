@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-ABE70CFC",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T14:25:12+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-ABE70CFC",
+    "candidate_content_digest": "cae3ce4d487384b3d90d354b525e6f98e3d925f33e0460b74787e958872b8dff"
+  },
+  "human_fields": {
+    "unresolved": false,
+    "recurrence": false,
+    "impact": "not_applicable",
+    "priority": "not_applicable",
+    "promote_to_issue": false
+  },
+  "disposition": "reject",
+  "blocking": false,
+  "rationale": "この候補は、旧37件のRequirementが移行済みで、現行の有効な権威は50件の定義・legacy binding 0件であり、旧版は削除も上書きもしない、という記述である。履歴保持の方針として現在も有効である。ここでの`reject`は、正本の規則、履歴、検証手順を捨てるという意味ではない。これは現在も守られている取り決めの説明であり、この候補を独立したIssueとしては追跡しない、という意味である。元のPlan、Decision、Evidence、code、test、configは変更しない。未解決ではなく再発もしないため、影響と優先順位は該当なしとし、正式Issueへは昇格しない。",
+  "next_action": "候補bundleを変更せず、この判断recordを現行の取り決めの記録として保持する。正式Issue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "b45e48bfa40b1abdf6b255aba2e2dc6178c63338427608435be6db887d15bacc"
+}
