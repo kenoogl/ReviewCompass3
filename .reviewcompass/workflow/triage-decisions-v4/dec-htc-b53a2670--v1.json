@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-B53A2670",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:28:26+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-B53A2670",
+    "candidate_content_digest": "91acab1e7ac1a94a5845efdceb1286e83d8e27c72d755dbff77bb91ab5544ab2"
+  },
+  "human_fields": {
+    "unresolved": false,
+    "recurrence": false,
+    "impact": "not_applicable",
+    "priority": "not_applicable",
+    "promote_to_issue": false
+  },
+  "disposition": "reject",
+  "blocking": false,
+  "rationale": "先送りした13機能は初期releaseでは公開を妨げない扱いに固定されている。各機能の実装と有効化は、別のTask ContractとHuman判断があるまで開始しない、という境界の記述である。ここでの`reject`は、この方針やEvidenceを捨てるという意味ではない。承認範囲を誤らないための境界の記述であり、この候補を独立したIssueとしては追跡しない、という意味である。元のPlan、Decision、Evidenceは変更しない。未解決ではなく再発もしないため、影響と優先順位は該当なしとし、正式Issueへは昇格しない。",
+  "next_action": "候補bundleを変更せず、この判断recordを承認範囲の境界の記録として保持する。正式Issue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "21ce4f2b5fb81ceb3818eb1daf45f05f5c91de2d86f10b9c3814f913241c0914"
+}

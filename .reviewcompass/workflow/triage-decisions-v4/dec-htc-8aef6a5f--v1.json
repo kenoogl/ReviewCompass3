@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-8AEF6A5F",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:28:26+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-8AEF6A5F",
+    "candidate_content_digest": "7f6b6cd3bd7c08b867b520c2d0138f87c45488d9012a4493045a2078c8f7e68c"
+  },
+  "human_fields": {
+    "unresolved": false,
+    "recurrence": false,
+    "impact": "not_applicable",
+    "priority": "not_applicable",
+    "promote_to_issue": false
+  },
+  "disposition": "reject",
+  "blocking": false,
+  "rationale": "Layout validatorは、Work 1Aの初期規則が守られているかを測るための定規であり、正式な製品Runtimeではない。この区別は現在も守られている。ここでの`reject`は、この方針やEvidenceを捨てるという意味ではない。承認範囲を誤らないための境界の記述であり、この候補を独立したIssueとしては追跡しない、という意味である。元のPlan、Decision、Evidenceは変更しない。未解決ではなく再発もしないため、影響と優先順位は該当なしとし、正式Issueへは昇格しない。",
+  "next_action": "候補bundleを変更せず、この判断recordを承認範囲の境界の記録として保持する。正式Issue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "07c906915635caa74eb2035722279b116040e2f3f538ad33c8b1b9a7dc6609a4"
+}
