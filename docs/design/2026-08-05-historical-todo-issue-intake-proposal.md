@@ -116,21 +116,64 @@ validatorはversionごとに必須fieldを切り替える。旧versionでは`max
 5. 元のIssueの再開には、阻害Issueが`resolved`であること、または**Humanの明示的な再開裁定**を
    必須にする。機械が自動で再開しない。
 
-### 1.6 阻害関係の循環を禁止し、根本原因へエスカレーションする
+### 1.6 阻害関係の循環を検出し、根本原因へエスカレーションする
 
 `blocks`を有向関係として定義する。`A blocks B`は「Bを進めるにはAの解決が必要」を意味する。
 
-- 関係を追加するたびに、有向循環を機械が検出する。**自己循環（`A blocks A`）も拒否する。**
-- `A → B → A`のような循環を検出した場合、機械は個別Issueを相互に再開して往復させない。
-- 検出時は、循環に含まれるIssueをすべて`suspended`にし、**作業中Issueを0件にする。**
-- 機械は`root_cause_escalation_candidate`を作ってよい。ただし、根本原因Issueへの昇格、
-  優先順位、既存Issueの統合・再開は**Humanだけが決める**。
-- Humanが根本原因Issueを承認した場合だけ、それを唯一の`in_progress`にできる。
-  根本原因Issueの解決またはHumanの裁定なしに、循環に含まれたIssueを再開できない。
+#### 検出と保存の順序
 
-**循環は、個別修正を増やす合図ではない。**「AのためにBが要る、BのためにAが要る」という状態は、
-一件ずつ直しても終わらない。依存関係の切り方、設計、方針のいずれかを根本から見直す必要がある、
-という信号として扱う。だから機械は往復を止め、作業中を0件にして、Humanの判断へ渡す。
+1. 新しい`blocks`関係は、まず**提案関係**として検査する。
+   **循環検出の前に、正本の`blocks`へ保存しない。**
+2. 自己循環（`A blocks A`）、または既存経路と合わせて循環になる場合、
+   正本の`blocks`へは保存せず、`root_cause_escalation_candidate`を作成する。
+3. 循環に含まれるIssueをすべて`suspended`へ移し、**作業中Issueを0件にする。**
+4. 循環にならない提案関係だけが、正本の`blocks`へ保存される。
+
+#### `root_cause_escalation_candidate`の必須証跡
+
+循環する矢印そのものは正本に残らない。代わりに、**何を提案し、どの経路で循環になり、
+どのIssueを止めたか**を残す。次を必須fieldとし、一つでも欠ければ拒否する。
+
+| field | 内容 |
+| --- | --- |
+| `proposed_blocker_issue_id` | 提案した関係の阻害側 |
+| `proposed_blocked_issue_id` | 提案した関係の被阻害側 |
+| `cycle_path_issue_ids` | 循環を構成する既存経路のIssue ID列（順序どおり） |
+| `cycle_path_relation_ids` | 同じ経路を構成する既存`blocks`関係のID列 |
+| `affected_issue_ids` | `suspended`へ移したIssueのID列 |
+| `detection_reason` | `blocks_cycle_detected`固定 |
+| `input_digest` | 検査に使った入力（既存`blocks`集合と提案関係）のcontent digest |
+| `content_digest` | candidate自身のcontent digest |
+
+#### 原子性
+
+candidateの作成と、影響Issueを`suspended`へ移す状態変更は、**同じ検証済み入力から
+一単位で成功するか、どちらも書き込まない。**
+
+- candidateだけが残り、Issueが`in_progress`のままである状態を禁止する。
+- Issueだけが`suspended`になり、理由のcandidateが無い状態を禁止する。
+- 途中失敗を検出したら`cycle_detection_partial_write`で停止し、いずれも書き込まない。
+
+#### candidateの権限
+
+`root_cause_escalation_candidate`は**問題の存在を保存するだけ**である。次のいずれの権限も持たない。
+
+- Issueを作る権限
+- Planを作る権限
+- Workを開始する権限
+- `suspended`のIssueを再開する権限
+
+根本原因Issueへの昇格、優先順位、既存Issueの統合、再開は**Humanの明示的な裁定だけ**が決める。
+Humanが根本原因Issueを承認した場合だけ、それを唯一の`in_progress`にできる。
+
+#### 平易に言うと
+
+**循環する矢印を正本に残さず、循環を発見した事実と根拠だけを残す。**
+これにより、同じ往復を繰り返さず、誰が何を根本から見直すべきかを判断できる。
+
+「AのためにBが要る、BのためにAが要る」という状態は、一件ずつ直しても終わらない。
+依存関係の切り方、設計、方針のいずれかを根本から見直す必要がある、という信号である。
+だから機械は往復を止め、作業中を0件にして、Humanの判断へ渡す。
 
 ## 2. source universeと抽出規則
 
@@ -311,20 +354,27 @@ Issueが増えてもTODOの表示量を増やさない。既存の`todo_projecti
 - J8：`maximum_active_leaves`を超えてWork Itemを開始しようとすると拒否する。
 - J9：**新規Issueの登録だけで現行Issueを`suspended`にしようとすると拒否する。**
   中断は`blocks`関係とHumanの裁定を伴う。
-- J10：**自己循環（`A blocks A`）を拒否する。**
-- J11：**二Issue以上の`blocks`循環（`A → B → A`）を拒否し、作業中Issueを0件にする。**
-  循環に含まれるIssueを機械が相互に再開しない。
-- J12：**Human裁定なしに`root_cause_escalation_candidate`をIssue化しようとすると拒否する。**
-- J13：**根本原因Issueの`resolved`またはHumanの裁定なしに、循環に含まれたIssueを再開しようと
+- J10：**自己循環（`A blocks A`）を拒否する。**提案関係を正本の`blocks`へ保存しない。
+- J11：**二Issue以上の`blocks`循環（`A → B → A`）を拒否する。**循環する関係を正本へ保存せず、
+  循環に含まれるIssueを`suspended`にして作業中Issueを0件にする。機械が相互に再開しない。
+- J12：`root_cause_escalation_candidate`が`proposed_blocker_issue_id`、
+  `proposed_blocked_issue_id`、`cycle_path_issue_ids`、`cycle_path_relation_ids`、
+  `affected_issue_ids`、`detection_reason`、`input_digest`、`content_digest`の
+  **いずれかを欠くと拒否する。**
+- J13：**candidate作成と影響Issueの`suspended`化の一方だけが成功する状態を拒否する。**
+  片方だけの書込みを検出したら`cycle_detection_partial_write`で停止し、いずれも書き込まない。
+- J14：**candidateだけではIssue化、Plan化、Work開始、既存Issueの再開ができない。**
+  Human裁定なしにこれらを行おうとすると拒否する。
+- J15：**根本原因Issueの`resolved`またはHumanの裁定なしに、循環に含まれたIssueを再開しようと
   すると拒否する。**
-- J14：TODOへ禁止markerを書き込もうとすると拒否する。
+- J16：TODOへ禁止markerを書き込もうとすると拒否する。
 
 ## 6. 段階的実施計画
 
 | # | 単位 | 停止条件 | Human承認 |
 | --- | --- | --- | --- |
 | 1 | 本設計の承認、§8の判断 | — | **必要** |
-| 2 | I1〜I6、J1〜J10のRED固定 | 既存testを弱める必要が生じたら停止 | 不要 |
+| 2 | **I1〜I9、J1〜J16の全件**をREDで固定 | 既存testを弱める必要が生じたら停止 | 不要 |
 | 3 | `pilot_version` 4のschema／config／validator実装（state、`blocks`、循環検出を含む） | 旧versionの検証が壊れたら停止 | 不要 |
 | 4 | GREEN。**このとき§0の失敗も解消する** | 一件でも失敗したら停止 | 不要 |
 | 5 | 固定snapshotから候補一覧を機械生成し、Humanへ提示 | 候補0件、またはDigest不一致なら停止 | 不要（提示で停止） |
@@ -332,6 +382,10 @@ Issueが増えてもTODOの表示量を増やさない。既存の`todo_projecti
 | 7 | 昇格を選んだ候補だけをIssue化 | `promote_to_issue`が真でないものを含めたら停止 | **必要** |
 | 8 | Plan化と着手 | `in_progress`が1件を超えたら停止。`blocks`循環を検出したら作業中0件で停止 | 不要 |
 | 9 | 循環検出時の根本原因Issueの承認 | Human裁定が無ければ再開しない | **必要** |
+
+単位2でREDにするのは全件である。中断規則（J9）、二件目の作業開始拒否（J7）、自己循環（J10）、
+複数Issue循環（J11）、循環candidateの証跡欠落（J12）、原子性違反（J13）、Human裁定なしの昇格（J14）、循環中Issueの無断再開（J15）を、
+**実装前のREDから検証する。**これらを後回しにすると、実装後に「動くから正しい」と誤認しやすい。
 
 単位4で§0の失敗が解消する理由は、v4のvalidatorが候補file数ではなく
 「未triage候補の滞留」を見る形へ変わるためである。testを緩めるのではなく、
