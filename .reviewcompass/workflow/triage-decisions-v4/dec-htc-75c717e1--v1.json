@@ -1,0 +1,32 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-HTC-75C717E1",
+  "decision_version": 1,
+  "decided_at": "2026-08-05T13:56:32+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
+    "bundle_sha256": "e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e",
+    "bundle_schema_version": 1,
+    "candidate_id": "HTC-75C717E1",
+    "candidate_content_digest": "30882f1fe831120f21b53077573d0018a7c3b4c47ecac419648e19822f869333"
+  },
+  "human_fields": {
+    "unresolved": false,
+    "recurrence": false,
+    "impact": "not_applicable",
+    "priority": "not_applicable",
+    "promote_to_issue": false
+  },
+  "disposition": "historical_completed",
+  "blocking": false,
+  "rationale": "不正なUTF-8の扱いを変えてしまう回帰の観測である。既存の公式Testがこの回帰を検出し、エラーをそのまま伝播させる既存の契約へ復旧している。既存の機械Testで閉じている。ここでの`historical_completed`は、経緯やEvidenceを捨てるという意味ではない。既存の機械検査または恒久対策ですでに閉じており、現在の独立したIssueとしては追跡しない、という意味である。元のPlan、Decision、Evidence、code、testは変更しない。未解決ではなく再発もしないため、影響と優先順位は該当なしとし、正式Issueへは昇格しない。",
+  "next_action": "候補bundleを変更せず、この判断recordを既存の機械対策で閉じた記録として保持する。正式Issue、Plan、Workは作らない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "443e9159b888a6eca9ed9f8886d3085cd604a01a28092b0138b9efce5c309438"
+}
