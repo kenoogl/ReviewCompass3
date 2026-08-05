@@ -47,6 +47,16 @@ STOP_CODES = (
     "candidate_bundle_schema_version_mismatch",
     "candidate_not_found",
     "candidate_digest_mismatch",
+    "v4_issue_field_unknown",
+    "v4_issue_field_invalid",
+    "v4_issue_schema_version_unsupported",
+    "v4_issue_identity_invalid",
+    "v4_issue_path_invalid",
+    "v4_issue_path_mismatch",
+    "v4_issue_digest_mismatch",
+    "v4_issue_decision_reference_stale",
+    "v4_issue_decision_mismatch",
+    "v4_issue_duplicate_for_candidate",
     "active_issue_limit_exceeded",
     "active_leaf_limit_exceeded",
     "suspend_requires_blocks_and_ruling",
@@ -107,7 +117,7 @@ def load_config(path):
     for required in (
         "maximum_active_issues", "maximum_active_leaves", "issue_states",
         "active_issue_states", "intake", "root_cause_candidate", "todo_projection",
-        "human_triage_decision_v2",
+        "human_triage_decision_v2", "issue_record_v2",
     ):
         if required not in config:
             raise IntakeError("config_invalid", required)
@@ -132,6 +142,24 @@ def load_config(path):
     ):
         # V1 decision directoryはV1規則のまま保つ。V4 schema 2は別directoryへ置く。
         raise IntakeError("config_invalid", "v4 decisions must not share the v1 directory")
+    issue = config["issue_record_v2"]
+    for required in ("schema_version", "issue_id_prefix", "initial_state", "record_fields"):
+        if required not in issue:
+            raise IntakeError("config_invalid", f"issue_record_v2.{required}")
+    if issue["schema_version"] != config["issue_schema_version"]:
+        raise IntakeError("config_invalid", "v4 issue schema version is inconsistent")
+    if issue["initial_state"] not in config["issue_states"]:
+        raise IntakeError("config_invalid", "v4 issue initial state is unknown")
+    if issue["initial_state"] in config["active_issue_states"]:
+        raise IntakeError("config_invalid", "v4 issue must not start as active")
+    if "issue_record_v2" not in config["directories"]:
+        raise IntakeError("config_invalid", "directories.issue_record_v2")
+    if (
+        config["directories"]["issue_record_v2"]
+        == config["directories"]["issue_record"]
+    ):
+        # 旧Issue directoryは「Pilot subjectが1件」の検査を持つ。V4 Issueは別directoryへ置く。
+        raise IntakeError("config_invalid", "v4 issues must not share the legacy directory")
     return config
 
 
@@ -572,18 +600,23 @@ def _decision_settings(config):
     return config["human_triage_decision_v2"]
 
 
-def _safe_relative_path(value):
+def _safe_relative_path(value, code="human_triage_decision_path_invalid"):
     if not isinstance(value, str) or not value:
-        raise IntakeError("human_triage_decision_path_invalid", str(value))
+        raise IntakeError(code, str(value))
     path = Path(value)
     if path.is_absolute() or ".." in path.parts or path.as_posix() != value:
-        raise IntakeError("human_triage_decision_path_invalid", value)
+        raise IntakeError(code, value)
     return path
 
 
 def _require_text(value, label):
     if not isinstance(value, str) or not value.strip():
         raise IntakeError("human_triage_decision_field_invalid", label)
+
+
+def _require_text_field(value, label, code="v4_issue_field_invalid"):
+    if not isinstance(value, str) or not value.strip():
+        raise IntakeError(code, label)
 
 
 def _load_candidate_bundle(*, project_root, candidate_ref):
@@ -958,6 +991,192 @@ def promote_candidate_from_decision(
             "content_digest": decision["content_digest"],
         },
     }
+
+
+# ------------------------------------------------------- V4 Issue永続化（schema 2）
+#
+# 旧Issue directoryは「旧Pilot subjectが1件」の検査を持つため、V4 IssueはV4専用
+# directoryへ永続保存する。旧IssueをV4語彙で再判定しない。
+
+
+def _issue_settings(config):
+    return config["issue_record_v2"]
+
+
+def v4_issue_path(issue, *, config):
+    """issue IDとversionからV4 Issueのrecord pathを決める。"""
+
+    directory = config["directories"]["issue_record_v2"]
+    return f"{directory}/{issue['issue_id'].lower()}--v{issue['issue_version']}.json"
+
+
+def build_v4_issue_record(
+    *, candidate, decision, project_root, config, created_at, problem=None,
+    decisions=(), issue_version=1
+):
+    """検証済みHuman triage decisionから、永続保存できるV4 Issueを決定的に作る。
+
+    候補bundleは読むだけで書き換えない。初期stateは`registered`であり、
+    `in_progress`へは進めない。
+    """
+
+    settings = _issue_settings(config)
+    draft = promote_candidate_from_decision(
+        candidate=candidate, decision=decision, project_root=project_root,
+        config=config, decisions=decisions,
+    )
+    decision_path = human_triage_decision_path(decision, config=config)
+    decision_file = Path(project_root) / _safe_relative_path(
+        decision_path, "v4_issue_path_invalid"
+    )
+    if not decision_file.is_file():
+        raise IntakeError("v4_issue_decision_reference_stale", decision_path)
+    document = {
+        "record_kind": "issue_record",
+        "schema_version": settings["schema_version"],
+        "issue_id": draft["issue_id"],
+        "issue_version": issue_version,
+        "created_at": created_at,
+        "state": settings["initial_state"],
+        "problem": candidate["quotation"] if problem is None else problem,
+        "candidate_ref": dict(decision["candidate_ref"]),
+        "triage_decision_ref": {
+            "decision_id": decision["decision_id"],
+            "decision_version": decision["decision_version"],
+            "path": decision_path,
+            "sha256": hashlib.sha256(decision_file.read_bytes()).hexdigest(),
+            "content_digest": decision["content_digest"],
+        },
+    }
+    document["content_digest"] = _canonical_digest(document)
+    return document
+
+
+def validate_v4_issue_record(record, *, path, project_root, config):
+    """未知field、path脱出、digest不一致、参照decision不一致を拒否する。"""
+
+    settings = _issue_settings(config)
+    decision_settings = _decision_settings(config)
+    if not isinstance(record, dict):
+        raise IntakeError("v4_issue_field_invalid", str(type(record)))
+    if record.get("record_kind") != "issue_record":
+        raise IntakeError("v4_issue_field_invalid", str(record.get("record_kind")))
+    # 旧schemaのIssueはV4語彙で再判定しない。schema版の不一致として停止する。
+    if record.get("schema_version") != settings["schema_version"]:
+        raise IntakeError(
+            "v4_issue_schema_version_unsupported", str(record.get("schema_version"))
+        )
+    expected_fields = set(settings["record_fields"])
+    unknown = sorted(set(record) - expected_fields)
+    if unknown:
+        raise IntakeError("v4_issue_field_unknown", ",".join(unknown))
+    missing = sorted(expected_fields - set(record))
+    if missing:
+        raise IntakeError("v4_issue_field_invalid", ",".join(missing))
+    if (
+        not isinstance(record["issue_id"], str)
+        or not _ISSUE_ID.fullmatch(record["issue_id"])
+        or not record["issue_id"].startswith(f"{settings['issue_id_prefix']}-")
+        or not isinstance(record["issue_version"], int)
+        or isinstance(record["issue_version"], bool)
+        or record["issue_version"] < 1
+        or not isinstance(record["created_at"], str)
+        or not _TIMESTAMP.fullmatch(record["created_at"])
+    ):
+        raise IntakeError("v4_issue_identity_invalid", str(record["issue_id"]))
+    if record["state"] not in config["issue_states"]:
+        raise IntakeError("issue_state_unknown", str(record["state"]))
+    if path != v4_issue_path(record, config=config):
+        raise IntakeError("v4_issue_path_mismatch", str(path))
+    _require_text_field(record["problem"], "problem")
+
+    candidate_ref = record["candidate_ref"]
+    expected_ref_fields = {
+        "bundle_path", "bundle_sha256", "bundle_schema_version", "candidate_id",
+        "candidate_content_digest",
+    }
+    if not isinstance(candidate_ref, dict) or set(candidate_ref) != expected_ref_fields:
+        raise IntakeError("v4_issue_field_unknown", "candidate_ref")
+    _load_candidate_bundle(project_root=project_root, candidate_ref=candidate_ref)
+
+    decision_ref = record["triage_decision_ref"]
+    if not isinstance(decision_ref, dict) or set(decision_ref) != {
+        "decision_id", "decision_version", "path", "sha256", "content_digest",
+    }:
+        raise IntakeError("v4_issue_field_unknown", "triage_decision_ref")
+    relative = _safe_relative_path(decision_ref["path"], "v4_issue_path_invalid")
+    decision_file = Path(project_root) / relative
+    if not decision_file.is_file():
+        raise IntakeError("v4_issue_decision_reference_stale", decision_ref["path"])
+    if hashlib.sha256(decision_file.read_bytes()).hexdigest() != decision_ref["sha256"]:
+        raise IntakeError("v4_issue_decision_reference_stale", decision_ref["path"])
+    try:
+        decision = json.loads(decision_file.read_text(encoding="utf-8"))
+    except ValueError as error:
+        raise IntakeError(
+            "v4_issue_decision_reference_stale", decision_ref["path"]
+        ) from error
+    validate_human_triage_decision(
+        decision, path=decision_ref["path"], project_root=project_root, config=config
+    )
+    if (
+        decision["decision_id"] != decision_ref["decision_id"]
+        or decision["decision_version"] != decision_ref["decision_version"]
+        or decision["content_digest"] != decision_ref["content_digest"]
+        or decision["candidate_ref"] != candidate_ref
+    ):
+        raise IntakeError("v4_issue_decision_mismatch", decision_ref["decision_id"])
+    if (
+        decision["human_fields"]["promote_to_issue"] is not True
+        or decision["disposition"] != decision_settings["promotion_disposition"]
+        or decision["issue_promotion"]["approved"] is not True
+        or decision["issue_promotion"]["issue_id"] != record["issue_id"]
+    ):
+        raise IntakeError("v4_issue_decision_mismatch", record["issue_id"])
+
+    if record["content_digest"] != _canonical_digest(record):
+        raise IntakeError("v4_issue_digest_mismatch", str(record["content_digest"]))
+    return True
+
+
+def load_v4_issues(*, project_root, config):
+    """V4 Issue directoryのrecordだけを読む。旧Issue directoryは触らない。"""
+
+    directory = Path(project_root) / config["directories"]["issue_record_v2"]
+    if not directory.is_dir():
+        return []
+    issues = []
+    for path in sorted(directory.glob("*.json")):
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            raise IntakeError("v4_issue_field_invalid", str(path)) from error
+        relative = path.relative_to(Path(project_root)).as_posix()
+        validate_v4_issue_record(
+            record, path=relative, project_root=project_root, config=config
+        )
+        issues.append(record)
+    return issues
+
+
+def validate_v4_issue_repository(*, project_root, config):
+    """record単体だけでなく、同一candidateへの有効Issue重複も拒否する。"""
+
+    issues = load_v4_issues(project_root=project_root, config=config)
+    seen_ids = set()
+    effective = {}
+    for issue in issues:
+        if issue["issue_id"] in seen_ids:
+            raise IntakeError("v4_issue_identity_invalid", issue["issue_id"])
+        seen_ids.add(issue["issue_id"])
+        if issue["state"] in config["terminal_issue_states"]:
+            continue
+        candidate_id = issue["candidate_ref"]["candidate_id"]
+        if candidate_id in effective:
+            raise IntakeError("v4_issue_duplicate_for_candidate", candidate_id)
+        effective[candidate_id] = issue
+    validate_issue_set(issues=list(effective.values()), config=config)
+    return effective
 
 
 # ------------------------------------------------------------------ TODO projection

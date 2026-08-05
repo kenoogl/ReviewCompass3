@@ -8,6 +8,7 @@
 import hashlib
 import importlib
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -804,3 +805,354 @@ def test_k7_repository_decision_set_has_no_conflict(intake, config):
         json.loads(path.read_text(encoding="utf-8"))["candidate_ref"]["candidate_id"]
         for path in stored
     })
+
+
+# ---------------------------------------------- V4 Issue永続化 L1〜L6
+#
+# 指示：records/session-handoffs/
+#       2026-08-05-codex-to-claude-v4-issue-persistence-and-session-policy-triage.md
+# 旧PilotのIssue directoryは「Pilot subjectが1件」の検査を持つため、V4 Issueは
+# V4専用directoryへ永続保存する。旧IssueをV4語彙で再判定しない。
+
+SESSION_POLICY_CANDIDATE = "HTC-BEB5E0BD"
+SESSION_POLICY_ISSUE_ID = "ISSUE-HTC-BEB5E0BD"
+SESSION_POLICY_PROBLEM = (
+    "生会話記録の保存期間、削除、application-layer暗号化、backupの方針が未決定である。"
+)
+CREATED_AT = "2026-08-05T22:00:00+09:00"
+LEGACY_ISSUE_DIRECTORY = ".reviewcompass/workflow/issues"
+
+
+def _write_json(root, relative, document):
+    path = Path(root) / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return path
+
+
+@pytest.fixture
+def workspace(tmp_path, config):
+    """候補bundleだけを写した作業用project rootを作る。実repositoryは触らない。"""
+
+    root = tmp_path / "project"
+    (root / BUNDLE).parent.mkdir(parents=True)
+    shutil.copy2(PROJECT_ROOT / BUNDLE, root / BUNDLE)
+    for key in ("human_triage_decision_v2", "issue_record_v2"):
+        (root / config["directories"][key]).mkdir(parents=True)
+    return root
+
+
+def _approving_decision(intake, config, root, **overrides):
+    parameters = {
+        "project_root": root,
+        "bundle_path": BUNDLE,
+        "candidate_id": SESSION_POLICY_CANDIDATE,
+        "decided_at": DECIDED_AT,
+        "human_fields": {
+            "unresolved": True,
+            "recurrence": True,
+            "impact": "high",
+            "priority": "high",
+            "promote_to_issue": True,
+        },
+        "disposition": "issue_resolution",
+        "blocking": False,
+        "rationale": "生会話記録の保存方針が未決定であり、正式Issueとして追跡する。",
+        "next_action": "Plan化するかどうかをHumanが判断する。",
+        "issue_id": SESSION_POLICY_ISSUE_ID,
+        "config": config,
+    }
+    parameters.update(overrides)
+    decision = intake.build_human_triage_decision(**parameters)
+    _write_json(
+        root, intake.human_triage_decision_path(decision, config=config), decision
+    )
+    return decision
+
+
+def test_l1_issue_is_persisted_and_reloaded_with_deterministic_path_and_digest(
+    intake, config, workspace
+):
+    before = (workspace / BUNDLE).read_bytes()
+    decision = _approving_decision(intake, config, workspace)
+    candidate = _bundle_candidate(
+        json.loads((workspace / BUNDLE).read_text(encoding="utf-8")),
+        SESSION_POLICY_CANDIDATE,
+    )
+
+    issue = intake.build_v4_issue_record(
+        candidate=candidate, decision=decision, project_root=workspace,
+        config=config, created_at=CREATED_AT, problem=SESSION_POLICY_PROBLEM,
+        decisions=[decision],
+    )
+    assert issue["record_kind"] == "issue_record"
+    assert issue["schema_version"] == 2
+    assert issue["issue_id"] == SESSION_POLICY_ISSUE_ID
+    assert issue["issue_version"] == 1
+    assert issue["state"] == "registered"
+    assert issue["problem"] == SESSION_POLICY_PROBLEM
+    assert issue["candidate_ref"] == decision["candidate_ref"]
+    assert issue["content_digest"] == intake.canonical_digest(issue)
+    assert intake.count_active_issues([issue]) == 0
+
+    path = intake.v4_issue_path(issue, config=config)
+    assert path == (
+        config["directories"]["issue_record_v2"] + "/issue-htc-beb5e0bd--v1.json"
+    )
+    stored = _write_json(workspace, path, issue)
+    reloaded = json.loads(stored.read_text(encoding="utf-8"))
+    assert reloaded == issue
+    assert intake.validate_v4_issue_record(
+        reloaded, path=path, project_root=workspace, config=config
+    ) is True
+
+    decision_reference = issue["triage_decision_ref"]
+    decision_path = intake.human_triage_decision_path(decision, config=config)
+    assert decision_reference == {
+        "decision_id": decision["decision_id"],
+        "decision_version": decision["decision_version"],
+        "path": decision_path,
+        "sha256": hashlib.sha256((workspace / decision_path).read_bytes()).hexdigest(),
+        "content_digest": decision["content_digest"],
+    }
+
+    effective = intake.validate_v4_issue_repository(
+        project_root=workspace, config=config
+    )
+    assert list(effective) == [SESSION_POLICY_CANDIDATE]
+    assert effective[SESSION_POLICY_CANDIDATE]["issue_id"] == SESSION_POLICY_ISSUE_ID
+    assert (workspace / BUNDLE).read_bytes() == before
+
+
+def test_l2_v4_issue_directory_must_differ_from_the_legacy_one(
+    intake, config, tmp_path
+):
+    assert config["directories"]["issue_record"] == LEGACY_ISSUE_DIRECTORY
+    assert config["directories"]["issue_record_v2"] != LEGACY_ISSUE_DIRECTORY
+
+    document = json.loads(CONFIG_V4.read_text(encoding="utf-8"))
+    document["directories"]["issue_record_v2"] = document["directories"]["issue_record"]
+    collided = tmp_path / "collided.json"
+    collided.write_text(json.dumps(document, ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(intake.IntakeError) as error:
+        intake.load_config(collided)
+    assert error.value.code == "config_invalid"
+
+    missing = json.loads(CONFIG_V4.read_text(encoding="utf-8"))
+    del missing["directories"]["issue_record_v2"]
+    absent = tmp_path / "absent.json"
+    absent.write_text(json.dumps(missing, ensure_ascii=False), encoding="utf-8")
+    with pytest.raises(intake.IntakeError) as error:
+        intake.load_config(absent)
+    assert error.value.code == "config_invalid"
+
+
+def test_l3_tampered_references_are_rejected(intake, config, workspace):
+    decision = _approving_decision(intake, config, workspace)
+    candidate = _bundle_candidate(
+        json.loads((workspace / BUNDLE).read_text(encoding="utf-8")),
+        SESSION_POLICY_CANDIDATE,
+    )
+    issue = intake.build_v4_issue_record(
+        candidate=candidate, decision=decision, project_root=workspace,
+        config=config, created_at=CREATED_AT, problem=SESSION_POLICY_PROBLEM,
+    )
+    path = intake.v4_issue_path(issue, config=config)
+
+    def _reject(record, record_path=None):
+        with pytest.raises(intake.IntakeError) as error:
+            intake.validate_v4_issue_record(
+                record,
+                path=record_path or path,
+                project_root=workspace,
+                config=config,
+            )
+        return error.value.code
+
+    assert _reject(
+        _rehashed(
+            intake, issue,
+            candidate_ref=dict(issue["candidate_ref"], bundle_sha256="0" * 64),
+        )
+    ) == "candidate_bundle_digest_mismatch"
+
+    assert _reject(
+        _rehashed(
+            intake, issue,
+            candidate_ref=dict(
+                issue["candidate_ref"], candidate_content_digest="0" * 64
+            ),
+        )
+    ) == "candidate_digest_mismatch"
+
+    assert _reject(
+        _rehashed(
+            intake, issue,
+            triage_decision_ref=dict(issue["triage_decision_ref"], sha256="0" * 64),
+        )
+    ) == "v4_issue_decision_reference_stale"
+
+    assert _reject(
+        _rehashed(
+            intake, issue,
+            triage_decision_ref=dict(
+                issue["triage_decision_ref"], content_digest="0" * 64
+            ),
+        )
+    ) == "v4_issue_decision_mismatch"
+
+    for escape in ("../../etc/passwd", "/etc/passwd"):
+        assert _reject(
+            _rehashed(
+                intake, issue,
+                triage_decision_ref=dict(issue["triage_decision_ref"], path=escape),
+            )
+        ) == "v4_issue_path_invalid"
+
+    assert _reject(
+        _rehashed(
+            intake, issue,
+            triage_decision_ref=dict(
+                issue["triage_decision_ref"],
+                path=config["directories"]["human_triage_decision_v2"]
+                + "/dec-htc-00000000--v1.json",
+            ),
+        )
+    ) == "v4_issue_decision_reference_stale"
+
+    assert _reject(_rehashed(intake, issue, reviewer="claude")) == "v4_issue_field_unknown"
+    assert _reject(dict(issue, content_digest="0" * 64)) == "v4_issue_digest_mismatch"
+    assert _reject(issue, path + ".other") == "v4_issue_path_mismatch"
+
+    # decision fileを後から書き換えると、保存済みIssueの参照は成立しない。
+    tampered = dict(decision, rationale=decision["rationale"] + "追記")
+    tampered["content_digest"] = intake.canonical_digest(tampered)
+    _write_json(
+        workspace, intake.human_triage_decision_path(decision, config=config), tampered
+    )
+    assert _reject(issue) == "v4_issue_decision_reference_stale"
+
+
+def test_l4_issue_creation_requires_an_approving_decision(intake, config, workspace):
+    bundle_document = json.loads((workspace / BUNDLE).read_text(encoding="utf-8"))
+    candidate = _bundle_candidate(bundle_document, SESSION_POLICY_CANDIDATE)
+
+    def _refuse(**overrides):
+        parameters = {
+            "candidate": candidate, "project_root": workspace, "config": config,
+            "created_at": CREATED_AT, "problem": SESSION_POLICY_PROBLEM,
+        }
+        parameters.update(overrides)
+        with pytest.raises(intake.IntakeError) as error:
+            intake.build_v4_issue_record(**parameters)
+        return error.value.code
+
+    assert _refuse(decision=None) == "human_triage_decision_required"
+
+    rejecting = _approving_decision(
+        intake, config, workspace,
+        human_fields={
+            "unresolved": True, "recurrence": True, "impact": "high",
+            "priority": "high", "promote_to_issue": False,
+        },
+        disposition="dependency", issue_id=None, decision_suffix="NO",
+    )
+    assert _refuse(decision=rejecting) == "human_triage_decision_required"
+
+    mismatched = _approving_decision(
+        intake, config, workspace,
+        human_fields={
+            "unresolved": True, "recurrence": True, "impact": "high",
+            "priority": "high", "promote_to_issue": True,
+        },
+        disposition="dependency", issue_id=None, decision_suffix="DEP",
+    )
+    assert _refuse(decision=mismatched) == "human_triage_decision_required"
+
+    approving = _approving_decision(intake, config, workspace)
+    issue = intake.build_v4_issue_record(
+        candidate=candidate, decision=approving, project_root=workspace,
+        config=config, created_at=CREATED_AT, problem=SESSION_POLICY_PROBLEM,
+    )
+    _write_json(workspace, intake.v4_issue_path(issue, config=config), issue)
+
+    renamed = _rehashed(intake, issue, issue_id="ISSUE-HTC-BEB5E0BD-OTHER")
+    with pytest.raises(intake.IntakeError) as error:
+        intake.validate_v4_issue_record(
+            renamed,
+            path=intake.v4_issue_path(renamed, config=config),
+            project_root=workspace,
+            config=config,
+        )
+    assert error.value.code == "v4_issue_decision_mismatch"
+
+    revision = _approving_decision(
+        intake, config, workspace,
+        decision_version=2, supersedes=approving,
+        issue_id="ISSUE-HTC-BEB5E0BD-B",
+    )
+    duplicate = intake.build_v4_issue_record(
+        candidate=candidate, decision=revision, project_root=workspace,
+        config=config, created_at=CREATED_AT, problem=SESSION_POLICY_PROBLEM,
+    )
+    _write_json(workspace, intake.v4_issue_path(duplicate, config=config), duplicate)
+    with pytest.raises(intake.IntakeError) as error:
+        intake.validate_v4_issue_repository(project_root=workspace, config=config)
+    assert error.value.code == "v4_issue_duplicate_for_candidate"
+
+
+def test_l5_legacy_issue_directory_stays_single_and_unjudged_by_v4(intake, config):
+    legacy_files = sorted((PROJECT_ROOT / LEGACY_ISSUE_DIRECTORY).glob("*.json"))
+    assert [path.name for path in legacy_files] == [
+        "issue-pilot-todo-growth-001--v1.json"
+    ]
+    legacy = json.loads(legacy_files[0].read_text(encoding="utf-8"))
+    assert legacy["schema_version"] == 1
+
+    with pytest.raises(intake.IntakeError) as error:
+        intake.validate_v4_issue_record(
+            legacy,
+            path=f"{LEGACY_ISSUE_DIRECTORY}/{legacy_files[0].name}",
+            project_root=PROJECT_ROOT,
+            config=config,
+        )
+    assert error.value.code == "v4_issue_schema_version_unsupported"
+
+    pilot = importlib.import_module("tools.development.issue_resolution_pilot")
+    legacy_config = pilot.load_config(CONFIG_V2)
+    assert pilot.validate_record_file(
+        legacy_files[0], project_root=PROJECT_ROOT, config=legacy_config
+    ).record_id == "ISSUE-PILOT-TODO-GROWTH-001"
+
+
+def test_l6_repository_issue_set_is_consistent(intake, config):
+    effective = intake.validate_v4_issue_repository(
+        project_root=PROJECT_ROOT, config=config
+    )
+    assert isinstance(effective, dict)
+    decisions = intake.validate_triage_decision_repository(
+        project_root=PROJECT_ROOT, config=config
+    )
+
+    for candidate_id, issue in effective.items():
+        assert issue["candidate_ref"]["candidate_id"] == candidate_id
+        assert issue["candidate_ref"]["bundle_sha256"] == BUNDLE_SHA
+        assert issue["state"] == "registered"
+        decision = decisions[candidate_id]
+        assert decision["issue_promotion"] == {
+            "approved": True, "issue_id": issue["issue_id"],
+        }
+        assert decision["blocking"] is False
+    assert intake.count_active_issues(list(effective.values())) == 0
+
+    stored = sorted(
+        (PROJECT_ROOT / config["directories"]["issue_record_v2"]).glob("*.json")
+    )
+    assert len(stored) == len(effective)
+    if stored:
+        assert list(effective) == [SESSION_POLICY_CANDIDATE]
+        issue = effective[SESSION_POLICY_CANDIDATE]
+        assert issue["issue_id"] == SESSION_POLICY_ISSUE_ID
+        assert issue["problem"] == SESSION_POLICY_PROBLEM

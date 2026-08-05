@@ -18,6 +18,7 @@
     "human_triage_decision_v2": ".reviewcompass/workflow/triage-decisions-v4",
     "improvement_candidate": ".reviewcompass/workflow/improvement-candidates",
     "issue_record": ".reviewcompass/workflow/issues",
+    "issue_record_v2": ".reviewcompass/workflow/issues-v4",
     "issue_resolution_plan": ".reviewcompass/workflow/resolution-plans",
     "plan_challenge": ".reviewcompass/workflow/plan-challenges"
   },
@@ -119,6 +120,23 @@
       "next_action",
       "supersedes",
       "issue_promotion",
+      "content_digest"
+    ],
+    "schema_version": 2
+  },
+  "issue_record_v2": {
+    "initial_state": "registered",
+    "issue_id_prefix": "ISSUE",
+    "record_fields": [
+      "record_kind",
+      "schema_version",
+      "issue_id",
+      "issue_version",
+      "created_at",
+      "state",
+      "problem",
+      "candidate_ref",
+      "triage_decision_ref",
       "content_digest"
     ],
     "schema_version": 2
