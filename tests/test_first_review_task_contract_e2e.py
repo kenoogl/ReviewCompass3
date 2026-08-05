@@ -8,8 +8,12 @@
 import importlib
 import json
 import types
+from pathlib import Path
 
 import pytest
+
+
+PROJECT_ROOT_FOR_LEGACY = Path(__file__).resolve().parents[1]
 
 
 CONTRACT_ID = "TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1"
@@ -486,3 +490,262 @@ def test_c4_second_candidate_does_not_start_concurrently(runtime, tmp_path):
     later = runtime.acquire_permit(workflow_state=workflow, context_manifest=second.context)
     assert later["record_kind"] == "workflow_permit"
     assert runtime.active_leaf_count(workflow) == 1
+
+
+# ------------------------------------------------- Provenance閉包 P1〜P2、N1〜N11
+#
+# 正本設計：docs/design/2026-08-05-work5a-provenance-closure-repair-proposal.md（§3〜§5）
+# 承認：DEC-WORK5A-PROVENANCE-CLOSURE-REPAIR-001（§6.3 案A）
+
+LEGACY_ACCEPTANCE_BUNDLE = (
+    "records/development/2026-08-05-work5a-first-real-review-acceptance-records-v1.json"
+)
+NODE_ROLES = (
+    "requirement_binding",
+    "review_task_contract",
+    "compile_verdict",
+    "context_manifest",
+    "workflow_permit",
+    "finding_set",
+    "conformance_verdict",
+    "final_challenge_verdict",
+    "human_decision",
+)
+
+
+def _provenance(runtime, chain):
+    workflow, permit, findings, conformance, challenge = _run_to_challenge(runtime, chain)
+    human = runtime.record_human_decision(
+        contract=chain.contract, context_manifest=chain.context, finding_set=findings,
+        conformance_verdict=conformance, final_challenge_verdict=challenge,
+        decision="approved", human_id=HUMAN_ID, decided_at=DECIDED_AT,
+    )
+    verdict = runtime.verify_provenance(
+        requirement_binding=chain.binding, contract=chain.contract,
+        compile_verdict=chain.compile_verdict, context_manifest=chain.context,
+        permit=permit, finding_set=findings, conformance_verdict=conformance,
+        final_challenge_verdict=challenge, human_decision=human,
+    )
+    return human, verdict
+
+
+def _upstream(runtime, chain):
+    workflow, permit, findings, conformance, challenge = _run_to_challenge(runtime, chain)
+    return {
+        "requirement_binding": chain.binding,
+        "review_task_contract": chain.contract,
+        "compile_verdict": chain.compile_verdict,
+        "context_manifest": chain.context,
+        "workflow_permit": permit,
+        "finding_set": findings,
+        "conformance_verdict": conformance,
+        "final_challenge_verdict": challenge,
+    }
+
+
+def _node(verdict, role):
+    for item in verdict["verified_nodes"]:
+        if item["node_role"] == role:
+            return item
+    raise AssertionError(role)
+
+
+def test_p1_provenance_has_nine_nodes_eight_edges_and_no_self_edge(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+    assert verdict["status"] == "verified"
+    assert [item["node_role"] for item in verdict["verified_nodes"]] == list(NODE_ROLES)
+    assert len(verdict["verified_edges"]) == 8
+    assert "edges" not in verdict
+    for edge in verdict["verified_edges"]:
+        assert edge["from"]["node_role"] != edge["to"]["node_role"]
+        assert edge["from"]["node_role"] in NODE_ROLES
+        assert edge["to"]["node_role"] in NODE_ROLES
+        assert "provenance_verdict" not in (edge["from"]["node_role"], edge["to"]["node_role"])
+    assert verdict["closure"]["terminal_node_role"] == "human_decision"
+    assert verdict["closure"]["self_edge_present"] is False
+    assert verdict["closure"]["closed_by"] == "accepted_artifact"
+    assert verdict["content_digest"] not in json.dumps(
+        {k: v for k, v in verdict.items() if k != "content_digest"}, ensure_ascii=False
+    )
+
+
+def test_p2_accepted_artifact_references_verdict_and_decision(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    human, verdict = _provenance(runtime, chain)
+    accepted = runtime.accept_artifact(
+        provenance_verdict=verdict, human_decision=human, context_manifest=chain.context
+    )
+    assert accepted["provenance_ref"]["content_digest"] == verdict["content_digest"]
+    assert accepted["decision_ref"]["content_digest"] == human["content_digest"]
+    assert accepted["target_paths"] == [TARGET]
+
+
+def test_n1_legacy_terminal_edge_digest_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+    legacy = dict(verdict)
+    legacy.pop("verified_edges")
+    legacy["edges"] = [
+        {"from": "final_challenge_verdict", "to": "human_decision",
+         "to_digest": _node(verdict, "human_decision")["content_digest"]},
+        {"from": "human_decision", "to": "provenance_verdict",
+         "to_digest": _node(verdict, "human_decision")["content_digest"]},
+    ]
+    with pytest.raises(runtime.ContractError) as error:
+        runtime.validate_provenance_verdict(legacy)
+    assert error.value.code in ("provenance_edge_unexpected", "provenance_self_reference")
+
+
+def test_n2_edge_role_swap_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+    broken = json.loads(json.dumps(verdict))
+    broken["verified_edges"][0]["to"]["node_role"] = "finding_set"
+    with pytest.raises(runtime.ContractError) as error:
+        runtime.validate_provenance_verdict(broken)
+    assert error.value.code in ("provenance_edge_unexpected", "provenance_edge_missing")
+
+
+def test_n3_node_kind_swap_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+    broken = json.loads(json.dumps(verdict))
+    _node(broken, "finding_set")["record_kind"] = "conformance_verdict"
+    with pytest.raises(runtime.ContractError) as error:
+        runtime.validate_provenance_verdict(broken)
+    assert error.value.code == "provenance_node_kind_mismatch"
+
+
+def test_n4_node_id_swap_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+    broken = json.loads(json.dumps(verdict))
+    _node(broken, "finding_set")["record_id"] = "FS-OTHER"
+    with pytest.raises(runtime.ContractError) as error:
+        runtime.validate_provenance_verdict(
+            broken, upstream_records=_upstream(runtime, chain)
+        )
+    assert error.value.code == "provenance_node_identity_mismatch"
+
+
+def test_n5_node_digest_swap_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+    broken = json.loads(json.dumps(verdict))
+    _node(broken, "finding_set")["content_digest"] = "0" * 64
+    with pytest.raises(runtime.ContractError) as error:
+        runtime.validate_provenance_verdict(
+            broken, upstream_records=_upstream(runtime, chain)
+        )
+    assert error.value.code == "provenance_node_digest_mismatch"
+
+
+def test_n6_self_reference_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+
+    loop = json.loads(json.dumps(verdict))
+    loop["verified_edges"][0]["to"]["node_role"] = loop["verified_edges"][0]["from"]["node_role"]
+    with pytest.raises(runtime.ContractError) as first:
+        runtime.validate_provenance_verdict(loop)
+    assert first.value.code == "provenance_self_reference"
+
+    to_self = json.loads(json.dumps(verdict))
+    to_self["verified_edges"][-1]["to"]["node_role"] = "provenance_verdict"
+    with pytest.raises(runtime.ContractError) as second:
+        runtime.validate_provenance_verdict(to_self)
+    assert second.value.code == "provenance_self_reference"
+
+
+def test_n7_missing_or_duplicated_node_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+
+    missing = json.loads(json.dumps(verdict))
+    missing["verified_nodes"] = [
+        item for item in missing["verified_nodes"] if item["node_role"] != "workflow_permit"
+    ]
+    with pytest.raises(runtime.ContractError) as first:
+        runtime.validate_provenance_verdict(missing)
+    assert first.value.code == "provenance_node_missing"
+
+    duplicated = json.loads(json.dumps(verdict))
+    duplicated["verified_nodes"].append(dict(_node(verdict, "finding_set")))
+    with pytest.raises(runtime.ContractError) as second:
+        runtime.validate_provenance_verdict(duplicated)
+    assert second.value.code == "provenance_node_duplicated"
+
+
+def test_n8_missing_or_extra_edge_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    _human, verdict = _provenance(runtime, chain)
+
+    missing = json.loads(json.dumps(verdict))
+    del missing["verified_edges"][3]
+    with pytest.raises(runtime.ContractError) as first:
+        runtime.validate_provenance_verdict(missing)
+    assert first.value.code == "provenance_edge_missing"
+
+    extra = json.loads(json.dumps(verdict))
+    extra["verified_edges"].append(
+        {"edge_kind": "precedes",
+         "from": {"node_role": "requirement_binding"},
+         "to": {"node_role": "human_decision"}}
+    )
+    with pytest.raises(runtime.ContractError) as second:
+        runtime.validate_provenance_verdict(extra)
+    assert second.value.code == "provenance_edge_unexpected"
+
+
+def test_n9_decision_target_digest_mismatch_is_rejected(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    workflow, permit, findings, conformance, challenge = _run_to_challenge(runtime, chain)
+    human = runtime.record_human_decision(
+        contract=chain.contract, context_manifest=chain.context, finding_set=findings,
+        conformance_verdict=conformance, final_challenge_verdict=challenge,
+        decision="approved", human_id=HUMAN_ID, decided_at=DECIDED_AT,
+    )
+    tampered = dict(human, target_digest="0" * 64)
+    with pytest.raises(runtime.ContractError) as error:
+        runtime.verify_provenance(
+            requirement_binding=chain.binding, contract=chain.contract,
+            compile_verdict=chain.compile_verdict, context_manifest=chain.context,
+            permit=permit, finding_set=findings, conformance_verdict=conformance,
+            final_challenge_verdict=challenge, human_decision=tampered,
+        )
+    assert error.value.code == "decision_digest_mismatch"
+
+
+def test_n10_invalid_verdict_cannot_produce_accepted_artifact(runtime, tmp_path):
+    chain = _chain(runtime, tmp_path)
+    human, verdict = _provenance(runtime, chain)
+    broken = json.loads(json.dumps(verdict))
+    broken["verified_edges"][-1]["to"]["node_role"] = "provenance_verdict"
+    with pytest.raises(runtime.ContractError) as error:
+        runtime.accept_artifact(
+            provenance_verdict=broken, human_decision=human, context_manifest=chain.context
+        )
+    assert error.value.code == "provenance_self_reference"
+
+
+def test_n11_legacy_record_from_commit_9e8cf00_is_rejected(runtime):
+    """9e8cf00の実recordを固定入力にして、新validatorが拒否することを確認する。"""
+
+    bundle = json.loads(
+        Path(PROJECT_ROOT_FOR_LEGACY, LEGACY_ACCEPTANCE_BUNDLE).read_text(encoding="utf-8")
+    )
+    legacy = bundle["records"]["provenance_verdict"]
+    assert legacy["edges"][-1]["to"] == "provenance_verdict"
+    assert legacy["edges"][-1]["to_digest"] == bundle["records"]["human_decision"]["content_digest"]
+    with pytest.raises(runtime.ContractError) as error:
+        runtime.validate_provenance_verdict(legacy)
+    assert error.value.code in (
+        "provenance_node_missing", "provenance_edge_unexpected", "provenance_self_reference",
+    )
+    with pytest.raises(runtime.ContractError):
+        runtime.accept_artifact(
+            provenance_verdict=legacy,
+            human_decision=bundle["records"]["human_decision"],
+            context_manifest=None,
+        )
