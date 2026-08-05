@@ -1,2 +1,3 @@
 .venv/
 *.egg-info/
+records/session-handoffs/*-claude-to-codex-*.md

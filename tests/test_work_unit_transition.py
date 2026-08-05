@@ -1,7 +1,12 @@
 """完了作業単位から次作業へのcommit関門Test。"""
 
 import importlib
+import subprocess
+from pathlib import Path
 from types import SimpleNamespace
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _module():
@@ -96,3 +101,45 @@ def test_cli_returns_machine_readable_block(capsys, monkeypatch):
     output = capsys.readouterr().out
     assert '"status": "blocked"' in output
     assert '"completed_work_unit_uncommitted"' in output
+
+
+def _git(repository, *arguments):
+    return subprocess.run(
+        ("git", "-C", str(repository), *arguments),
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_preflight_ignores_local_claude_reports_but_blocks_work_artifacts(tmp_path):
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    _git(repository, "init")
+    _git(repository, "config", "user.email", "test@example.invalid")
+    _git(repository, "config", "user.name", "Test User")
+    (repository / ".gitignore").write_text(
+        (ROOT / ".gitignore").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    (repository / "tracked.txt").write_text("tracked\n", encoding="utf-8")
+    _git(repository, "add", ".gitignore", "tracked.txt")
+    _git(repository, "commit", "-m", "initial")
+
+    report = (
+        repository
+        / "records/session-handoffs/2026-08-05-claude-to-codex-completion.md"
+    )
+    report.parent.mkdir(parents=True)
+    report.write_text("local report\n", encoding="utf-8")
+
+    assert _module().preflight_next_work(
+        work_status="completed", project_root=repository
+    ).status == "passed"
+
+    (repository / "uncommitted-artifact.md").write_text(
+        "artifact\n", encoding="utf-8"
+    )
+    assert _module().preflight_next_work(
+        work_status="completed", project_root=repository
+    ).status == "blocked"
