@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：Work 5A／最初の実Review Run完了。Human decision待ち。
+- 現在の工程：Work 5A／最初のhappy pathがaccepted artifactまで完了。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
@@ -18,6 +18,8 @@
 
 ## 最新のauthority／Evidence
 
+- [Work 5A 実Review受理](records/development/2026-08-05-work5a-first-real-review-acceptance-evidence-v1.md) — SHA-256 `9030225b9ec7138b28234f81dc530b80caf0a6850404df496e3f138b9b946a06`
+- [Work 5A 受理record bundle](records/development/2026-08-05-work5a-first-real-review-acceptance-records-v1.json) — SHA-256 `23bb76d7c7f3a31d6a5459174222280441910478b5a537a8027bdb3c195921ce`
 - [Work 5A 最初の実Review Run](records/development/2026-08-05-work5a-first-real-review-run-evidence-v1.md) — SHA-256 `cdc4c4d8ad08a6f0d8373ea56d46018e070618ba2152ade7ac4dd09d72808b50`
 - [Work 5A 実Review Run record bundle](records/development/2026-08-05-work5a-first-real-review-run-records-v1.json) — SHA-256 `658e5ba98d6023085709733f91130a8b64acd674b3c9ca497b3f23784d588447`
 - [Work 5A GREEN Evidence](records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md) — SHA-256 `57feb4e7fa08924c00307dec997f2b12285641b168925825225e6a596b63fbae`
@@ -37,26 +39,20 @@
 
 ## 次に行う一作業
 
-最初の実Review Runの結果に対するHuman decisionを得る。
-
-開始条件：
-
-- 実Review Run commit後のclean transition。
-- 提示したFinding、Conformance、Final Challengeの結果をHumanが確認する。
+未定。次作業はHumanが決める。
 
 完了データ：
 
 - target：`docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md`
-- Finding 0件（error 0、warning 0）、Conformance `passed`、Final Challenge `passed`。
-- `human_decision`、`provenance_verdict`、`accepted_artifact`は未作成。
-
-後続作業：Human decision後のProvenance verdictとaccepted artifact、後続評価E2以降の別承認。
+- Finding 0件、Conformance `passed`、Final Challenge `passed`、Human decision `approved`。
+- Provenance verdict `verified`、accepted artifact作成済み。
+- 受理したのは最小Review経路の実行結果であり、対象文書の品質保証ではない。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：最初の実Review Runに対するHuman decision。後続評価E2、E4、E5の開始承認。
-- 再開条件：実Review Run commit後のclean transition。
+- Human判断待ち：次作業の選定。後続評価E2、E4、E5の開始承認。
+- 再開条件：受理record commit後のclean transition。
 
 ## stale・deferred
 

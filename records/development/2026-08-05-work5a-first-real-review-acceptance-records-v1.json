@@ -1,0 +1,140 @@
+{
+  "acceptance_id": "ACC-WORK5A-FIRST-REAL-REVIEW-2026-08-05-V1",
+  "digest_algorithm": "sha256",
+  "human_decision_basis": "2026-08-05のHumanによる「承認」。最小Review経路の実行結果の受理であり、対象文書の品質保証ではない。",
+  "record_kind_bundle": "work5a_first_real_review_acceptance",
+  "records": {
+    "accepted_artifact": {
+      "content_digest": "6c4c690a39bbf0b1a845432e8dfe6c8f155598927e74e92d51a51eb28c7d9d4c",
+      "decision_ref": {
+        "content_digest": "a240921a70a40837efa2d45ee83def0059c125a2a343b7eb415841ddce65d8af",
+        "digest_algorithm": "sha256",
+        "record_id": "HD-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+        "record_kind": "human_decision",
+        "record_version": 1
+      },
+      "provenance_ref": {
+        "content_digest": "7975c7619dbca8c95fd249303dba47e46e0d8ec681e386866e1dddfbfa38aae0",
+        "digest_algorithm": "sha256",
+        "record_id": "PV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+        "record_kind": "provenance_verdict",
+        "record_version": 1
+      },
+      "record_id": "AA-CM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+      "record_kind": "accepted_artifact",
+      "record_version": 1,
+      "target_paths": [
+        "docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md"
+      ]
+    },
+    "human_decision": {
+      "conformance_ref": {
+        "content_digest": "8b7d44954e336157da1977844e117ca4545218a8667abf8fc731a27d98518868",
+        "digest_algorithm": "sha256",
+        "record_id": "CFV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+        "record_kind": "conformance_verdict",
+        "record_version": 1
+      },
+      "content_digest": "a240921a70a40837efa2d45ee83def0059c125a2a343b7eb415841ddce65d8af",
+      "decided_at": "2026-08-05T09:40:20+09:00",
+      "decision": "approved",
+      "decision_class": "review_acceptance",
+      "final_challenge_ref": {
+        "content_digest": "b059894e80e325c6481f478853a147520855d9b7e2d32598632a8a285918acf0",
+        "digest_algorithm": "sha256",
+        "record_id": "FCV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+        "record_kind": "final_challenge_verdict",
+        "record_version": 1
+      },
+      "finding_set_ref": {
+        "content_digest": "151bc3e4e56f03aeabcb0c9be23e6293cf669aee04db48893744da74ef406a14",
+        "digest_algorithm": "sha256",
+        "record_id": "FS-CM-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+        "record_kind": "finding_set",
+        "record_version": 1
+      },
+      "human_id": "kenoogl",
+      "owner": "human_decision_owner",
+      "record_id": "HD-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+      "record_kind": "human_decision",
+      "record_version": 1,
+      "target_digest": "b955bfc01a82117a385419d475ded408a6fa76bd5b6b19cd0f7ff874babdba5a"
+    },
+    "provenance_verdict": {
+      "content_digest": "7975c7619dbca8c95fd249303dba47e46e0d8ec681e386866e1dddfbfa38aae0",
+      "decision_ref": {
+        "content_digest": "a240921a70a40837efa2d45ee83def0059c125a2a343b7eb415841ddce65d8af",
+        "digest_algorithm": "sha256",
+        "record_id": "HD-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+        "record_kind": "human_decision",
+        "record_version": 1
+      },
+      "edges": [
+        {
+          "from": "requirement_binding",
+          "to": "review_task_contract",
+          "to_digest": "e67dc0d175510d22fbb657556361757f0b147ca7dcaddbe8941c3a9cc939ed98"
+        },
+        {
+          "from": "review_task_contract",
+          "to": "compile_verdict",
+          "to_digest": "ad68259896fe188fb86d47bf3148b3a9b55d629d44ac65a97df1ad55d49e0b57"
+        },
+        {
+          "from": "compile_verdict",
+          "to": "context_manifest",
+          "to_digest": "b955bfc01a82117a385419d475ded408a6fa76bd5b6b19cd0f7ff874babdba5a"
+        },
+        {
+          "from": "context_manifest",
+          "to": "workflow_permit",
+          "to_digest": "9631097c88c6d975d03e46f8dff4b011f3464936e68992a874901ed7929b5101"
+        },
+        {
+          "from": "workflow_permit",
+          "to": "finding_set",
+          "to_digest": "151bc3e4e56f03aeabcb0c9be23e6293cf669aee04db48893744da74ef406a14"
+        },
+        {
+          "from": "finding_set",
+          "to": "conformance_verdict",
+          "to_digest": "8b7d44954e336157da1977844e117ca4545218a8667abf8fc731a27d98518868"
+        },
+        {
+          "from": "conformance_verdict",
+          "to": "final_challenge_verdict",
+          "to_digest": "b059894e80e325c6481f478853a147520855d9b7e2d32598632a8a285918acf0"
+        },
+        {
+          "from": "final_challenge_verdict",
+          "to": "human_decision",
+          "to_digest": "a240921a70a40837efa2d45ee83def0059c125a2a343b7eb415841ddce65d8af"
+        },
+        {
+          "from": "human_decision",
+          "to": "provenance_verdict",
+          "to_digest": "a240921a70a40837efa2d45ee83def0059c125a2a343b7eb415841ddce65d8af"
+        }
+      ],
+      "record_id": "PV-TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V1",
+      "record_kind": "provenance_verdict",
+      "record_version": 1,
+      "status": "verified"
+    }
+  },
+  "schema_version": 1,
+  "target": {
+    "relative_path": "docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md",
+    "sha256": "14901323a958d686ba0ad0aed62b20b7b7d79908afcced08dc90f72fdb3d2054"
+  },
+  "upstream": {
+    "evidence": {
+      "relative_path": "records/development/2026-08-05-work5a-first-real-review-run-evidence-v1.md",
+      "sha256": "cdc4c4d8ad08a6f0d8373ea56d46018e070618ba2152ade7ac4dd09d72808b50"
+    },
+    "record_bundle": {
+      "relative_path": "records/development/2026-08-05-work5a-first-real-review-run-records-v1.json",
+      "sha256": "658e5ba98d6023085709733f91130a8b64acd674b3c9ca497b3f23784d588447"
+    }
+  }
+}
