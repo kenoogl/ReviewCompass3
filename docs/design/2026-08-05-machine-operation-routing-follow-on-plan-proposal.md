@@ -18,8 +18,20 @@
   - inventoryの全操作が`read_only`である場合だけ起動できる。
   - `operation_routing.py`のinventory／preflight／receiptをそのまま利用し、executorは
     権限を判定・付与・再分類しない。
-- **対象外のまま**：cache rootの固定、既存直接操作の移行、Git metadata書込み、project成果物書込み、
-  external操作、host側tool構文、外部送信、環境変数設定、既存call siteの置換。
+- Humanは`DEC-MACHINE-OPERATION-ROUTING-TASK-PYTHON-CACHE-001`
+  （`records/development/2026-08-05-machine-operation-routing-task-python-cache-approval-decision-v1.md`）
+  により、**§2.2に定めたtask専用Python cache root最小sliceだけ**を追加で実装承認した。
+- cache rootの承認された範囲の内訳。
+  - 配置・所有・保持は新しく決めず、Human承認済みのLayout v3をそのまま使う。
+    外部rootは`<runtime_root>/projects/<project_id>/development/cache/`である。
+  - 解決（read-only）と初期化（明示的にdirectoryを作る）を別のAPIに分ける。
+  - `PYTHONPYCACHEPREFIX`だけを持つ環境mappingを返す。`os.environ`は変更しない。
+  - 提案§2.2はA・B・Cの配置候補を比較していたが、配置はLayout v3のcache rootに確定した。
+    提案本文は履歴としてそのまま残す。
+- cache rootで**未承認のまま**：実際のホーム配下（`~/.reviewcompass3`）の初期化、
+  既存processへの自動適用、cleanup／retention automation、Windows adapter、既存操作の移行。
+- **対象外のまま**：既存直接操作の移行、Git metadata書込み、project成果物書込み、
+  external操作、host側tool構文、外部送信、環境変数のglobal設定、既存call siteの置換。
 - `ISSUE-HTC-C9F6C917`のstateは`registered`のままである。正式なIssue Resolution Plan、
   Task Contract、Workflow permitは作らない。
 

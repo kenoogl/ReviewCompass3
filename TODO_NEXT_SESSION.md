@@ -24,7 +24,8 @@
 ## 最新のauthority／Evidence
 
 - [読み取り専用argv executor 承認Decision](records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-decision-v1.md) — SHA-256 `2982646b43a74d856d9b18af527b743b10ac3d8874f03ee39afba825752a8864`
-- [機械操作routing 後続Plan提案（§2.1／§3.2のみ承認済み）](docs/design/2026-08-05-machine-operation-routing-follow-on-plan-proposal.md) — SHA-256 `d5877f9668cc75a00a25b79d0fad9050c7ae3dd243047a4c61ba6e776fceb571`
+- [task専用Python cache root 承認Decision](records/development/2026-08-05-machine-operation-routing-task-python-cache-approval-decision-v1.md) — SHA-256 `b433fd93196e1ee401ad6ff111c6eb15fdacb94993b6ddf5b479f3e25e86f521`
+- [機械操作routing 後続Plan提案（§2.1／§3.2／§2.2のみ承認済み）](docs/design/2026-08-05-machine-operation-routing-follow-on-plan-proposal.md) — SHA-256 `09b1d38c64bbcbe200875fb5b6bbf98461d5c705e5a08ccc2909eaaa1f981cad`
 - [読み取り専用argv executor GREEN Evidence](records/development/2026-08-05-machine-operation-routing-read-only-argv-green-evidence-v1.md) — SHA-256 `4f63620dff80ac3c0408994163885777c0e0d5c1bb6ebf469680857653192db5`
 - [読み取り専用argv executor GREEN receipt](records/development/2026-08-05-machine-operation-routing-read-only-argv-green-test-receipt-v1.json) — SHA-256 `f7eaf735fb0dde4e0d96bc9dcb53b5af522faa7cf784d34d788b8de81cbe59d2`
 - [V4 Issue永続化 GREEN](records/development/2026-08-05-v4-issue-persistence-green-evidence-v1.md) — SHA-256 `3ae17b4b5828429ee8c7f1b6dfbc3b80d9439da4bace685542cee3845640b731`
@@ -38,7 +39,6 @@
 - [定型記録生成 境界訂正GREEN Evidence（有効な完了根拠）](records/development/2026-08-05-record-generation-todo-boundary-repair-green-evidence-v1.md) — SHA-256 `0f4e4031b541a06e431c56de2e1d19c0626aeadb1068a66ee9f392bb9e749634`
 - [境界訂正後の全test receipt](records/development/2026-08-05-record-generation-todo-boundary-repair-green-test-receipt-v1.json) — SHA-256 `ad0f191e0af53a21ab130d9346743d0b214ac56ad6cf958b64ae175535df98df`
 - [定型記録生成 Plan提案（承認済み）](docs/design/2026-08-05-record-generation-issue-plan-proposal.md) — SHA-256 `79ed49831ebd9b69c9713fcd71becfaa1d85f7fd97759e5fff373f99126a2a7c`
-- [Plan提案作成後の全test receipt](records/development/2026-08-05-record-generation-issue-plan-proposal-test-receipt-v1.json) — SHA-256 `d2320449185d783860312a3cc4b5b232a60d861bf5bf123f4794aaefc9927b92`
 - [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
 - [Work 5A 最初の実Review Run](records/development/2026-08-05-work5a-first-real-review-run-evidence-v1.md) — SHA-256 `cdc4c4d8ad08a6f0d8373ea56d46018e070618ba2152ade7ac4dd09d72808b50`
 - [Work 5A GREEN Evidence](records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md) — SHA-256 `57feb4e7fa08924c00307dec997f2b12285641b168925825225e6a596b63fbae`
@@ -52,27 +52,27 @@
 
 ## 次に行う一作業
 
-読み取り専用argv executor最小sliceは実装済みである。次に何を行うかのHuman判断を受ける。
+task専用Python cache root最小sliceを`DEC-MACHINE-OPERATION-ROUTING-TASK-PYTHON-CACHE-001`の範囲でTDD実装する。配置はLayout v3の`<runtime_root>/projects/<project_id>/development/cache/`に確定済みで、新しい配置規則は作らない。
 
 開始条件：
 
 - 本handoffを含むcommit後のclean transition。
-- 未承認の判断点について、人が次の対象を選ぶこと。
+- 解決はread-only、初期化だけがdirectoryを作る、という分離を保つこと。
 
 未承認のまま残るHuman判断点：
 
-- cache rootの配置と、削除するか保持するかの方針（次の別slice）。
+- 実際のホーム配下の初期化、既存processへの自動適用、cleanup／retention automation、Windows adapter。
 - 移行対象の優先順と、`git status --porcelain`以外の実行templateを増やすかどうか。
 - host側tool構文と外部送信を本Issueで扱わないことの確認。
 
 完了データ：
 
 - 過去TODO候補41件は全件triage済み。正式Issueは3件で、正本は`.reviewcompass/workflow/issues-v4/`である。
-- `ISSUE-HTC-C9F6C917`は§3最小縦切りが承認・実装済みで、`registered`かつnonblockingのままである。後続Plan全体は`awaiting_human_approval`のままだが、読み取り専用argv executor最小sliceは`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`で承認され、`tools/development/structured_argv_executor.py`として実装済みである。実行templateは`git status --porcelain`だけで、cache root、既存操作の移行、書込み、externalは対象外である。
+- `ISSUE-HTC-C9F6C917`は§3最小縦切りが承認・実装済みで、`registered`かつnonblockingのままである。後続Plan全体は`awaiting_human_approval`のままだが、読み取り専用argv executor最小sliceは`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`で承認され、`tools/development/structured_argv_executor.py`として実装済みである。実行templateは`git status --porcelain`だけである。cache root最小sliceは`DEC-MACHINE-OPERATION-ROUTING-TASK-PYTHON-CACHE-001`で追加承認され、配置はLayout v3に従う。既存操作の移行、書込み、externalは対象外である。
 - `ISSUE-HTC-66C3E6CA`はTODO最小縦切りだけ承認・実装済み。案Bは未承認である。
 - `DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`は通常commitの運用だけを確定したものである。
 
-後続作業：後続範囲の個別Plan。着手が承認されるまで、argv executor、cache root固定、既存直接操作の置換、host側tool構文、外部送信は行わない。
+後続作業：後続範囲の個別Plan。着手が承認されるまで、既存直接操作の置換、host側tool構文、外部送信は行わない。
 
 ## blocker・Human判断待ち
 
