@@ -13,6 +13,8 @@
   実施・結果・判断にはpath、diff、Digest、command結果、commit SHA、receiptまたはDecisionを対応付ける。
 - Evidenceがない報告は`reported_unverified`として未完了にし、報告と事後状態が違う場合は
   `report_execution_mismatch`として完了判断を停止し、影響を受ける表示と判断をstaleにする。
+- Claude、Codexサブエージェント、人またはscriptへ委譲した作業のレビューは、
+  `docs/development/work-review-protocol.md`を共通入口として実行者に依存しない順序で確認する。
 - 問題がある場合は、起きている事象とその原因を平易に説明する。
 - LLMは文章操作と意味分析に限定し、決定的な変換、抽出、集計、照合、file操作、Test、Git確認、
   command実行は機械処理を使用する。機械処理が未整備なら手作業で常態化させず改善候補へrouteする。
