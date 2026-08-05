@@ -436,6 +436,12 @@ def test_repository_todo_resolves_its_active_id_from_the_issue_records(update_pa
 def _cli_workspace(tmp_path, *, active_id="ISSUE-PILOT-TODO-GROWTH-001"):
     root, todo = _issue_workspace(tmp_path, active_id=active_id)
     (root / "records" / "development").mkdir(parents=True)
+    # CLIはproject rootのrunner configを読む。実configをそのまま写す。
+    config = root / "config" / "development-test-runner.json"
+    config.parent.mkdir(parents=True)
+    config.write_bytes(
+        (PROJECT_ROOT / "config/development-test-runner.json").read_bytes()
+    )
     return root, todo
 
 

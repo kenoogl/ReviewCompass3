@@ -50,6 +50,9 @@ ISSUE_ID_FIELDS = {
 
 _ISSUE_ID = re.compile(r"ISSUE-[A-Z0-9]+(?:-[A-Z0-9]+)*")
 
+#: CLIがreceiptを置いてよい唯一のdirectory。
+RECEIPT_ROOT = "records/development"
+
 STOP_CODES = (
     "todo_candidate_failed",
     "todo_write_failed",
@@ -58,6 +61,8 @@ STOP_CODES = (
     "receipt_summary_mismatch",
     "todo_restore_failed",
     "issue_root_invalid",
+    "todo_path_invalid",
+    "receipt_path_invalid",
 )
 
 
@@ -205,3 +210,132 @@ def _restore(todo_path, original):
         raise TodoUpdatePathError("todo_restore_failed", str(error)) from error
     if Path(todo_path).read_bytes() != original:  # pragma: no cover
         raise TodoUpdatePathError("todo_restore_failed", str(todo_path))
+
+
+# ------------------------------------------------------------------ CLI
+#
+# 指示：records/session-handoffs/
+#       2026-08-05-codex-to-claude-repair-todo-test-projection-cli.md
+#
+# 二段更新経路を機械処理として起動する入口である。TODO本文を直接編集せず、
+# 更新は`run_two_phase_update()`だけを通す。Gitは呼ばない。
+
+
+def _safe_relative(value, *, project_root, code):
+    """project root基準の相対pathだけを受ける。脱出とsymlinkを拒否する。"""
+
+    if not isinstance(value, str) or not value:
+        raise TodoUpdatePathError(code, str(value))
+    candidate = Path(value)
+    if candidate.is_absolute() or ".." in candidate.parts:
+        raise TodoUpdatePathError(code, value)
+    root = Path(project_root).resolve()
+    target = root / candidate
+    if target.is_symlink():
+        raise TodoUpdatePathError(code, value)
+    try:
+        resolved = target.resolve()
+        resolved.relative_to(root)
+    except (OSError, ValueError) as error:
+        raise TodoUpdatePathError(code, value) from error
+    return target
+
+
+def validate_todo_argument(value, *, project_root):
+    target = _safe_relative(value, project_root=project_root, code="todo_path_invalid")
+    if not target.is_file():
+        raise TodoUpdatePathError("todo_path_invalid", value)
+    return target
+
+
+def validate_receipt_argument(value, *, project_root):
+    """receiptは`records/development/`配下の`.json`だけを許す。"""
+
+    target = _safe_relative(
+        value, project_root=project_root, code="receipt_path_invalid"
+    )
+    relative = Path(value)
+    if relative.parent.as_posix() != RECEIPT_ROOT or relative.suffix != ".json":
+        raise TodoUpdatePathError("receipt_path_invalid", value)
+    if target.is_dir():
+        raise TodoUpdatePathError("receipt_path_invalid", value)
+    return target
+
+
+def main(argv=None, *, execute=None):
+    """公式Testを2回起動し、二段確認でroot TODOの機械管理部分を更新する。"""
+
+    import argparse
+
+    from tools.development import policy_test_runner
+
+    parser = argparse.ArgumentParser(
+        description="公式receiptからTODOの機械管理部分を更新する（Git操作はしない）"
+    )
+    parser.add_argument("--project-root", default=".")
+    parser.add_argument("--todo", required=True)
+    parser.add_argument("--first-receipt", required=True)
+    parser.add_argument("--final-receipt", required=True)
+    parser.add_argument("--config", default="config/development-test-runner.json")
+    parser.add_argument("--suite", default="full")
+    arguments = parser.parse_args(argv)
+
+    execute = execute or policy_test_runner.execute
+    project_root = Path(arguments.project_root).resolve()
+
+    def _report(document):
+        print(json.dumps(document, ensure_ascii=False, sort_keys=True))
+
+    try:
+        todo_path = validate_todo_argument(
+            arguments.todo, project_root=project_root
+        )
+        first_receipt = validate_receipt_argument(
+            arguments.first_receipt, project_root=project_root
+        )
+        final_receipt = validate_receipt_argument(
+            arguments.final_receipt, project_root=project_root
+        )
+        if first_receipt == final_receipt:
+            raise TodoUpdatePathError("receipt_path_invalid", "identical receipts")
+    except TodoUpdatePathError as error:
+        _report({"status": "stopped", "code": error.code, "detail": error.detail})
+        return 2
+
+    config = policy_test_runner.load_config(project_root / arguments.config)
+    receipts = {"first": arguments.first_receipt, "second": arguments.final_receipt}
+
+    def run_official_tests(phase):
+        execution = execute(
+            config=config,
+            project_root=project_root,
+            suite=arguments.suite,
+            receipt_path=receipts[phase],
+        )
+        return json.loads(
+            Path(execution.receipt_path).read_text(encoding="utf-8")
+        )
+
+    try:
+        result = run_two_phase_update(
+            project_root=project_root,
+            todo_path=todo_path,
+            run_official_tests=run_official_tests,
+        )
+    except TodoUpdatePathError as error:
+        _report({"status": "stopped", "code": error.code, "detail": error.detail})
+        return 1
+
+    _report(
+        {
+            "status": "updated",
+            "first_receipt": arguments.first_receipt,
+            "final_receipt": arguments.final_receipt,
+            "test_summary": result["second_receipt"]["test_summary"],
+        }
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
