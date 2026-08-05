@@ -1,16 +1,17 @@
 # Work 5A 最小Definition Challenge設計提案
 
-状態：`awaiting_human_approval`
+状態：`approved`
 改訂：第四版（compile後の`plan_bundle`をcompile前のDefinition Challenge入力にする循環を訂正）
 対象：既に受理済みの最初の文書Review Task Contract version 1を後継する
 draft version 2（`TC-RC3-REVIEW-DOC-CHANGE-2026-08-05-V2`）
 基準文書：`docs/design/2026-08-05-work-4-first-review-task-contract-design-proposal.md`（§2、§7、§8）
 Requirement：`records/requirements/definitions/req-contract-004--v1.json`（`REQ-CONTRACT-004`）ほか、
 Work 5Aが直接束縛する16件
-承認記録（予定）：`DEC-WORK5A-DEFINITION-CHALLENGE-001`
+承認記録：`records/development/2026-08-05-work5a-definition-challenge-approval-decision-v1.md`
+（`DEC-WORK5A-DEFINITION-CHALLENGE-001`）
 
-**これはDecision recordではない。**承認までContract version 2、実装、test、実Runを
-作成・実行しない。汎用Challenge frameworkを作らない。対象は後継する一Contract versionだけである。
+**これはDecision recordではない。**承認の正本は上記Decision recordである。
+汎用Challenge frameworkを作らない。対象は後継する一Contract versionだけである。
 
 ## 1. 三つの検査の違い
 
