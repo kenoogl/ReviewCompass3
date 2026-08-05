@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 4Aのv1 patch群は可逆revert済み。
-- 現在の工程：過去TODO候補41件のHuman triageは完了。41件すべてを判断済みrecordとして保存し、未判断は0件である。
+- 現在の工程：過去TODO候補41件のHuman triageは完了し、Issue Intake V4の限定拡張はHuman承認のうえ検証を閉じた。未判断は0件である。
 - 正式Issue：3件、いずれも`registered`かつnonblockingで未着手。active Issueは0件。`ISSUE-HTC-BEB5E0BD`は会話記録の保存方針が未決定であること、`ISSUE-HTC-C9F6C917`はLLMが機械操作の実行手順を都度組み立てていること、`ISSUE-HTC-66C3E6CA`は記録の定型欄の生成が未機械化であることを追跡する。
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
@@ -23,7 +23,9 @@
 - [正式Issue record 会話記録方針](.reviewcompass/workflow/issues-v4/issue-htc-beb5e0bd--v1.json) — SHA-256 `a4a1511e609005193a3d127080a3eabf4f56a67529c5bd9b4e0f55b467422d62`
 - [正式Issue record 機械操作の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-c9f6c917--v1.json) — SHA-256 `66cfe50ce79136bca5e92b35b72502cedfb8b6f6f3e20ade1e027bcbf1fec0ed`
 - [正式Issue record 記録生成の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-66c3e6ca--v1.json) — SHA-256 `56e0911d6f565915ca0ad7737eae7befbb30d686d344eb5367ecc95598a8c732`
-- [判断record作成後の全test receipt](records/development/2026-08-05-triage-authority-history-and-procedure-test-receipt-v1.json) — SHA-256 `b817a25ceab21bfc4987d8aec42d2e18fff014225fbb291e9a12805f4307af34`
+- [Issue Intake V4 承認Decision](records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md) — SHA-256 `019879235577b39489e4383cd0fa092c562631d3c1b1e1ffa311056c8d1d9f7c`
+- [Issue Intake V4 閉鎖Evidence](records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md) — SHA-256 `b942a9d17ea4c2818c6adb5f3ceabc0063f9b447c7ddb88ccc5baf3d1302d60e`
+- [V4閉鎖時の全test receipt](records/development/2026-08-05-historical-todo-issue-intake-v4-closure-test-receipt-v1.json) — SHA-256 `93a8bbf2d271067b3a5dbb5bcdd2c9f7875cc502a80656514fc4442eea93c087`
 - [V4 Human triage永続化 GREEN](records/development/2026-08-05-v4-human-triage-persistence-green-evidence-v1.md) — SHA-256 `41fcbbbd6acc278055dd3e43e64fcb0c603627319eae1fb13b853262bda305d7`
 - [過去TODO候補 Human triage資料](records/development/2026-08-05-historical-todo-intake-triage-material-v1.md) — SHA-256 `b2ad5195ffd041a527b8d92f5847606bddcdb5876cacbca05a9a9c304b39efdb`
 - [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
@@ -44,18 +46,18 @@
 - [Work 4A Rebuild Design v3.2 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-2-proposal.md) — SHA-256 `b157640f940c12d733d237921cad664dbebc4925c592796394f29da1155f5e48`
 - [Work 4A Rebuild Design v3.3 Proposal](docs/design/2026-08-05-work-4a-rebuild-design-v3-3-proposal.md) — SHA-256 `b99edf3b9561da34bd4c0bd8a8e86418c36be18e202eef4f408d9b2e0392e538`
 - [Work 4A Early Exit / Work 4B Decision](records/development/2026-08-05-work-4a-early-completion-and-4b-decision-v1.md) — SHA-256 `68899660b1162b0fb00e5e2b604b3c3c4831c7cc0a32eebfe9541fd0d441a29e`
-- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `df5590903bd0a77cde65450b506843cc19ccb05538c4c59e15cd8ac1463db983`
+- [Current Plan](docs/current/reviewcompass3-plan-current.md) — SHA-256 `57cff08c6624ffb86d94e18b22bb77c635329e9e140dec4f125704b327c33f50`
 - [Development Policy](docs/development/2026-08-02-development-policy.md) — SHA-256 `9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `c95ca09fe43a1c8d39f82426396f4cbac7645e18927e5d21e8d01887b2777fdf`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `65f34c1094c5881cb46128ee1e81eb54f7904202ac0feebfe469adb077624bd1`
 
 ## 次に行う一作業
 
-3正式IssueのPlan化順序、またはIssue Intake V4 Pilotを閉じるかのHuman判断を受ける。
+3正式Issueのどれをやるべきかを、Human判断で一件選ぶ。
 
 開始条件：
 
-- 判断recordのcommit後のclean transition。
-- Plan化順序、またはPilotを閉じるかのHuman判断。
+- 承認record・閉鎖Evidenceのcommit後のclean transition。
+- 3正式IssueのどれをPlan化するかのHuman判断。
 
 完了データ：
 
@@ -63,14 +65,15 @@
 - 候補一覧の`human_fields`は生成時の未記入観測として全件`null`のまま保持する。判断正本は
   `.reviewcompass/workflow/triage-decisions-v4/`のV4 human triage decision（schema version 2）である。
 - 判断済み41件（全件）。うち正式Issueへ昇格したのは`HTC-BEB5E0BD`、`HTC-C9F6C917`、`HTC-66C3E6CA`の3件である。
+- Issue Intake V4は開発用・暫定の限定機能としてHuman承認済みで、実地検証は閉鎖済みである。
 - 正式Issue正本：`.reviewcompass/workflow/issues-v4/`（V4 issue_record schema version 2）
 
-後続作業：正式Issue3件のPlan化順序の判断、またはIssue Intake V4 Pilotを閉じるかの判断。
+後続作業：選ばれた1件のPlan化。まとめてPlan化はしない。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。
-- Human判断待ち：正式Issue3件のPlan化順序、またはIssue Intake V4 Pilotを閉じるかの判断。過去TODO候補41件のHuman triageは完了している。`ISSUE-HTC-BEB5E0BD`、`ISSUE-HTC-C9F6C917`、`ISSUE-HTC-66C3E6CA`はいずれも`registered`かつnonblockingのままで、作業を開始していない。
+- Human判断待ち：3正式Issueのどれをやるべきかの選択。過去TODO候補41件のHuman triageとV4検証閉鎖は完了している。`ISSUE-HTC-BEB5E0BD`、`ISSUE-HTC-C9F6C917`、`ISSUE-HTC-66C3E6CA`はいずれも`registered`かつnonblockingのままで、作業を開始していない。
 - 再開条件：判断recordのcommit後のclean transition。
 
 ## stale・deferred

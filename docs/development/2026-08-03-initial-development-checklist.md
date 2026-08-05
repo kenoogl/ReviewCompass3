@@ -707,6 +707,19 @@ WI-005 containing commit `6da0270`後、Humanは固定候補の推奨、未処�
 残余risk未受容の負例を含むtargeted `9 passed`、公式全`643 passed`、fallback `false`。正式製品schema、UI、
 automation、Work 8評価はdeferredのまま、当初順序のWork 4へ戻る。
 
+- [x] 上記bootstrap閉鎖の後、開発用の限定拡張としてIssue Intake V4を追加し、その実地検証も閉じた。
+
+Issue Intake V4限定拡張の承認・閉鎖。V4は登録済みIssue数に上限を置かず、`in_progress`だけを最大1件に
+制限する。Humanの判断recordを正本とし、候補bundleは機械抽出時の観測として書き換えない。過去TODO候補41件は
+全件Human triage済みで有効decision 41件・競合0件、正式Issueは3件でいずれも`registered`かつnonblocking、
+active Issueは0件である。承認Decision `DEC-HISTORICAL-TODO-ISSUE-INTAKE-001`は
+`records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md`、SHA-256
+`019879235577b39489e4383cd0fa092c562631d3c1b1e1ffa311056c8d1d9f7c`。閉鎖Evidenceは
+`records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md`、SHA-256
+`b942a9d17ea4c2818c6adb5f3ceabc0063f9b447c7ddb88ccc5baf3d1302d60e`。承認は開発用・暫定に限り、
+`pilot_mode: development_only_provisional`を維持する。正式製品schema、UI、automation、3正式Issueの
+Plan化・実装、Work 8評価は引き続き承認範囲外である。上記の早期Pilot完了記録は消さずに残す。
+
 #### Commit／handoff安定化
 
 - [x] TODOをcommit安定形式にし、commit後の自己SHA転記と追加commitを廃止した。

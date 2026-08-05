@@ -1,9 +1,25 @@
 # 過去TODOからのIssue Intake設計提案
 
-状態：`awaiting_human_approval`
+状態：`approved_for_development_use`
 対象：既存の一件限定Issue Pilotを、複数Issueの受付へ拡張する境界
 改善候補：`IC-HISTORICAL-TODO-ISSUE-INTAKE-001`
-承認記録（予定）：`DEC-HISTORICAL-TODO-ISSUE-INTAKE-001`
+承認記録：`DEC-HISTORICAL-TODO-ISSUE-INTAKE-001`
+
+## 実施状態注記（2026-08-05）
+
+この節だけが提案後に追記した現在の状態である。以降の本文は提案時点の事前計画をそのまま残しており、
+過去形・将来形の書き換えはしていない。
+
+- HumanはIssue Intake V4を**development-only provisional**（開発用・暫定）として承認した。
+  `pilot_mode: development_only_provisional`は維持する。
+- 実装、GREEN Evidence、過去TODO候補41件のHuman triageは完了している。有効decisionは41件で競合は無い。
+- 現在のV4 Issueは3件（`ISSUE-HTC-BEB5E0BD`、`ISSUE-HTC-C9F6C917`、`ISSUE-HTC-66C3E6CA`）で、
+  いずれも`registered`かつnonblockingである。active Issueは0件である。
+- 正式製品schema、UI、automation、Work 8評価、および上記3 IssueのPlan化・実装は**承認範囲外**である。
+- 承認record：`records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md`
+- 閉鎖Evidence：`records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md`
+
+以下は提案時点の本文である。
 
 **これはDecision recordではない。**承認までconfig、validator、code、test、既存Issue、Plan、TODOを
 変更しない。圧縮前TODOの記述を自動でIssueへ昇格しない。

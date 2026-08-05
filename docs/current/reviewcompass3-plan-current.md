@@ -1027,11 +1027,20 @@ CI providerの操作機能は初期要件へ入れない。
 | Session transcript eventual preservation | `verified / completed` | Codex exec／rollout／Claudeの3 source kind adapter、manual collector、durable cursor、reconcile、現在のCodex Desktop taskだけの限定実ログcapture | background automation、過去Codex／Claude log capture、長期retention、削除、暗号化、backup |
 | Commit／handoff stability | `verified / completed` | commit安定TODO、post-commit read-only照合、完了済み・未コミット時の次作業停止Pilot | 自動commit、push、hook、履歴書換え |
 | Deployment／Project Artifact boundary | `approved_effective / bootstrap_completed` | Layout Baseline v2、Project Manifest v2、移動させない`.reviewcompass/workflow/` root | Deployment Manifest、package builder、原子的切替、rollback、durable Project Binding |
-| ReviewCompass Issue Resolution early Pilot | `approved / bootstrap_in_progress` | ReviewCompass2 Issue→Plan経路の継承、TODO routing修正案、Project Artifact上位root | Candidate／Triage Decision shape、最初の手作業record、Issue／Plan実record |
+| ReviewCompass Issue Resolution early Pilot | `verified / limited_extension_completed` | ReviewCompass2 Issue→Plan経路の継承、TODO routing修正案、Project Artifact上位root、Issue Intake V4限定拡張（複数`registered` Issueの受付、過去TODO候補41件のHuman triage、active Issue最大1件） | 正式製品schema、UI、automation、3正式IssueのPlan化・実装、Work 8評価 |
 
 Issue Resolution早期Pilotは、Improvement CandidateとHuman Triage Decisionのidentity、field、命名、version、
 Digest、参照規則を固定し、最初の手作業recordで経路を確認するところまでを前倒し範囲とする。製品schema、
 正式state machine、Workflow permit、自動Plan編集、Issue Resolution automation、Work 8の評価は前倒ししない。
+
+早期Pilotのbootstrapを閉じた後、開発用の限定拡張としてIssue Intake V4を追加し、その実地検証も閉じた。
+V4は登録済みIssue数に上限を置かず、`in_progress`だけを最大1件に制限する。Humanの判断recordを正本とし、
+候補bundleは機械抽出時の観測として書き換えない。過去TODO候補41件はすべてHuman triage済みで、
+正式Issueは3件、いずれも`registered`かつnonblocking、active Issueは0件である。
+承認は`records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md`、
+閉鎖Evidenceは`records/development/2026-08-05-historical-todo-issue-intake-v4-closure-evidence-v1.md`。
+承認は開発用・暫定の範囲に限り、`pilot_mode: development_only_provisional`を維持する。
+正式製品schema、UI、automation、3正式IssueのPlan化・実装、Work 8評価は引き続き前倒ししない。
 
 TODOの詳細な手戻り候補を恒久保存する経路はIssue Resolution Pilotへ接続するが、TODO自体はactive IDの
 projectionに限定する。Pilot shape確定前に手作業でIssue fileを置かない。限定Pilotを終えたら、当初順序の
