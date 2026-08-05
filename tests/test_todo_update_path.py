@@ -12,6 +12,7 @@ import hashlib
 import importlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -422,3 +423,204 @@ def test_repository_todo_resolves_its_active_id_from_the_issue_records(update_pa
     assert update_path.default_verify(
         PROJECT_ROOT / "TODO_NEXT_SESSION.md", PROJECT_ROOT
     ) is True
+
+
+# ------------------------------------------------- CLI（機械更新の入口）
+#
+# 指示：records/session-handoffs/
+#       2026-08-05-codex-to-claude-repair-todo-test-projection-cli.md
+#
+# 二段更新経路を機械処理として起動できるCLI。TODO本文を直接編集しない。
+
+
+def _cli_workspace(tmp_path, *, active_id="ISSUE-PILOT-TODO-GROWTH-001"):
+    root, todo = _issue_workspace(tmp_path, active_id=active_id)
+    (root / "records" / "development").mkdir(parents=True)
+    return root, todo
+
+
+def _fake_execute(summaries, *, calls):
+    """policy_test_runner.executeの代わり。receipt fileを書いて結果を返す。"""
+
+    def execute(*, config, project_root, suite, receipt_path):
+        index = len(calls)
+        summary = summaries[index]
+        target = Path(receipt_path)
+        if not target.is_absolute():
+            target = Path(project_root) / target
+        receipt = _receipt()
+        receipt["test_summary"] = summary
+        receipt["suite"] = suite
+        # stdoutの数値はsummaryとわざと食い違わせる。出力文字列を読まないことの確認。
+        receipt["stdout"] = "999 passed in 1.00s\n"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(receipt, ensure_ascii=False, indent=2), encoding="utf-8")
+        calls.append({"suite": suite, "receipt_path": str(receipt_path)})
+        return SimpleNamespace(
+            status="passed", exit_code=0, receipt_path=str(target)
+        )
+
+    return execute
+
+
+def _summary(passed):
+    return {
+        "passed": passed, "failed": 0, "skipped": 0,
+        "xfailed": 0, "xpassed": 0, "errors": 0, "total": passed,
+    }
+
+
+def _cli(update_path, root, *arguments, execute=None):
+    return update_path.main(
+        [
+            "--project-root", str(root),
+            "--todo", "TODO_NEXT_SESSION.md",
+            *arguments,
+        ],
+        execute=execute,
+    )
+
+
+def test_cli_updates_the_full_test_line_from_the_first_receipt(
+    update_path, tmp_path, capsys
+):
+    root, todo = _cli_workspace(tmp_path)
+    before = todo.read_text(encoding="utf-8")
+    calls = []
+
+    exit_code = _cli(
+        update_path, root,
+        "--first-receipt", "records/development/first.json",
+        "--final-receipt", "records/development/final.json",
+        execute=_fake_execute([_summary(7), _summary(7)], calls=calls),
+    )
+
+    assert exit_code == 0
+    assert len(calls) == 2
+    assert calls[0]["receipt_path"] == "records/development/first.json"
+    assert calls[1]["receipt_path"] == "records/development/final.json"
+
+    after = todo.read_text(encoding="utf-8")
+    assert f"{FULL_TEST_PREFIX}venv公式runner `7 passed`" in after
+    assert "999" not in after, "stdoutの数値を読まない"
+    assert "852 passed" not in after
+
+    # 自由文、link label／path、関連Test行は変わらない。
+    for line in before.splitlines():
+        if line.startswith(FULL_TEST_PREFIX):
+            continue
+        assert line in after.splitlines()
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["status"] == "updated"
+    assert output["first_receipt"] == "records/development/first.json"
+    assert output["final_receipt"] == "records/development/final.json"
+    assert output["test_summary"] == _summary(7)
+
+
+def test_cli_requires_every_path_argument(update_path, tmp_path):
+    root, _todo = _cli_workspace(tmp_path)
+
+    for arguments in (
+        ["--first-receipt", "records/development/a.json"],
+        ["--final-receipt", "records/development/b.json"],
+        [],
+    ):
+        with pytest.raises(SystemExit):
+            update_path.main(
+                ["--project-root", str(root), "--todo", "TODO_NEXT_SESSION.md", *arguments],
+                execute=lambda **kwargs: None,
+            )
+
+    with pytest.raises(SystemExit):
+        update_path.main(
+            [
+                "--project-root", str(root),
+                "--first-receipt", "records/development/a.json",
+                "--final-receipt", "records/development/b.json",
+            ],
+            execute=lambda **kwargs: None,
+        )
+
+
+def test_cli_rejects_unsafe_paths_without_touching_anything(
+    update_path, tmp_path, capsys
+):
+    root, todo = _cli_workspace(tmp_path)
+    before = todo.read_bytes()
+    (root / "linked.md").symlink_to(todo)
+
+    cases = {
+        "絶対path receipt": ("records/development/a.json", str(root / "final.json")),
+        "親への脱出": ("records/development/a.json", "records/development/../../final.json"),
+        "development外": ("records/development/a.json", "records/final.json"),
+        "json以外": ("records/development/a.json", "records/development/final.txt"),
+    }
+    for label, (first, final) in cases.items():
+        calls = []
+        exit_code = _cli(
+            update_path, root,
+            "--first-receipt", first, "--final-receipt", final,
+            execute=_fake_execute([_summary(1), _summary(1)], calls=calls),
+        )
+        output = json.loads(capsys.readouterr().out)
+        assert exit_code != 0, label
+        assert output["status"] == "stopped", label
+        assert output["code"] == "receipt_path_invalid", label
+        assert calls == [], label
+        assert todo.read_bytes() == before, label
+        assert not (root / "records" / "development" / "a.json").exists(), label
+
+    # TODO側のpath異常も同様に止まる。
+    for label, todo_argument in {
+        "絶対path": str(todo),
+        "親への脱出": "../TODO_NEXT_SESSION.md",
+        "symlink": "linked.md",
+    }.items():
+        calls = []
+        exit_code = update_path.main(
+            [
+                "--project-root", str(root),
+                "--todo", todo_argument,
+                "--first-receipt", "records/development/a.json",
+                "--final-receipt", "records/development/b.json",
+            ],
+            execute=_fake_execute([_summary(1), _summary(1)], calls=calls),
+        )
+        output = json.loads(capsys.readouterr().out)
+        assert exit_code != 0, label
+        assert output["code"] == "todo_path_invalid", label
+        assert calls == [], label
+        assert todo.read_bytes() == before, label
+
+
+def test_cli_restores_the_todo_when_the_two_runs_disagree(
+    update_path, tmp_path, capsys
+):
+    root, todo = _cli_workspace(tmp_path)
+    before = todo.read_bytes()
+    calls = []
+
+    exit_code = _cli(
+        update_path, root,
+        "--first-receipt", "records/development/first.json",
+        "--final-receipt", "records/development/final.json",
+        execute=_fake_execute([_summary(7), _summary(8)], calls=calls),
+    )
+
+    output = json.loads(capsys.readouterr().out)
+    assert exit_code != 0
+    assert output["status"] == "stopped"
+    assert output["code"] == "receipt_summary_mismatch"
+    assert len(calls) == 2
+    assert todo.read_bytes() == before
+
+
+def test_cli_never_calls_git(update_path):
+    """CLIはGitを呼ばない。散文の語ではなく、実際の呼出し手段が無いことを見る。"""
+
+    source = Path(update_path.__file__).read_text(encoding="utf-8")
+    for forbidden in (
+        "subprocess", '"git"', "'git'", "os.system", "shell=True", "Popen",
+    ):
+        assert forbidden not in source
