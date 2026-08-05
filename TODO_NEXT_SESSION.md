@@ -15,7 +15,7 @@
 - activeなTask Contract／Work Item：なし。
 - 製品実装code：`tools/task_contract/`の最小Runtime packageのみ。
 - 当面の進行入口：Work 5A 最小Review Task Contract。
-- Evidence参照：`## 最新のauthority／Evidence`節の参照は機械計測で26件である。件数の訂正記録は`records/development/2026-08-05-todo-evidence-reference-count-correction-v1.md`。
+- Evidence参照：`## 最新のauthority／Evidence`節の参照は機械計測で25件である。件数の訂正記録は`records/development/2026-08-05-todo-evidence-reference-count-correction-v1.md`。
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -26,9 +26,9 @@
 - [読み取り専用argv executor 承認Decision](records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-decision-v1.md) — SHA-256 `2982646b43a74d856d9b18af527b743b10ac3d8874f03ee39afba825752a8864`
 - [task専用Python cache root 承認Decision](records/development/2026-08-05-machine-operation-routing-task-python-cache-approval-decision-v1.md) — SHA-256 `b433fd93196e1ee401ad6ff111c6eb15fdacb94993b6ddf5b479f3e25e86f521`
 - [task専用Python cache root GREEN Evidence](records/development/2026-08-05-machine-operation-routing-task-python-cache-green-evidence-v1.md) — SHA-256 `75a307615b50e492334fe2f620000ebb3cd1eeee0ae3e5c2ef8a4a4f0b3e6b0b`
+- [AST操作境界検査 GREEN Evidence](records/development/2026-08-05-task-python-cache-ast-boundary-green-evidence-v1.md) — SHA-256 `29ebca316c4bfb368440038a1677a28b2c90137e764130cd22ef2582bdb27c9b`
 - [機械操作routing 後続Plan提案（§2.1／§3.2／§2.2のみ承認済み）](docs/design/2026-08-05-machine-operation-routing-follow-on-plan-proposal.md) — SHA-256 `09b1d38c64bbcbe200875fb5b6bbf98461d5c705e5a08ccc2909eaaa1f981cad`
 - [読み取り専用argv executor GREEN Evidence](records/development/2026-08-05-machine-operation-routing-read-only-argv-green-evidence-v1.md) — SHA-256 `4f63620dff80ac3c0408994163885777c0e0d5c1bb6ebf469680857653192db5`
-- [V4 Issue永続化 GREEN](records/development/2026-08-05-v4-issue-persistence-green-evidence-v1.md) — SHA-256 `3ae17b4b5828429ee8c7f1b6dfbc3b80d9439da4bace685542cee3845640b731`
 - [正式Issue record 会話記録方針](.reviewcompass/workflow/issues-v4/issue-htc-beb5e0bd--v1.json) — SHA-256 `a4a1511e609005193a3d127080a3eabf4f56a67529c5bd9b4e0f55b467422d62`
 - [正式Issue record 機械操作の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-c9f6c917--v1.json) — SHA-256 `66cfe50ce79136bca5e92b35b72502cedfb8b6f6f3e20ade1e027bcbf1fec0ed`
 - [正式Issue record 記録生成の根本原因](.reviewcompass/workflow/issues-v4/issue-htc-66c3e6ca--v1.json) — SHA-256 `56e0911d6f565915ca0ad7737eae7befbb30d686d344eb5367ecc95598a8c732`
@@ -39,7 +39,6 @@
 - [定型記録生成 境界訂正GREEN Evidence（有効な完了根拠）](records/development/2026-08-05-record-generation-todo-boundary-repair-green-evidence-v1.md) — SHA-256 `0f4e4031b541a06e431c56de2e1d19c0626aeadb1068a66ee9f392bb9e749634`
 - [境界訂正後の全test receipt](records/development/2026-08-05-record-generation-todo-boundary-repair-green-test-receipt-v1.json) — SHA-256 `ad0f191e0af53a21ab130d9346743d0b214ac56ad6cf958b64ae175535df98df`
 - [定型記録生成 Plan提案（承認済み）](docs/design/2026-08-05-record-generation-issue-plan-proposal.md) — SHA-256 `79ed49831ebd9b69c9713fcd71becfaa1d85f7fd97759e5fff373f99126a2a7c`
-- [過去TODO候補一覧](records/development/2026-08-05-historical-todo-intake-candidates-v1.json) — SHA-256 `e01c0feb082712f8ef0f77bfa4f031fbdc4530ed51f331f7dafbfd133d479a3e`
 - [Work 5A 最初の実Review Run](records/development/2026-08-05-work5a-first-real-review-run-evidence-v1.md) — SHA-256 `cdc4c4d8ad08a6f0d8373ea56d46018e070618ba2152ade7ac4dd09d72808b50`
 - [Work 5A GREEN Evidence](records/development/2026-08-05-work-5a-first-review-contract-green-evidence-v1.md) — SHA-256 `57feb4e7fa08924c00307dec997f2b12285641b168925825225e6a596b63fbae`
 - [Work 4 最初のslice設計承認](records/development/2026-08-05-work4-first-review-contract-design-approval-decision-v1.md) — SHA-256 `3048a52ccab59815f92b6fc3d1bd88b0ca8bd5d7a5117ad223d7139dab287675`
@@ -52,7 +51,7 @@
 
 ## 次に行う一作業
 
-task専用Python cache root最小sliceは`tools/development/task_python_cache.py`として実装済みである。次に何を行うかのHuman判断を受ける。
+task専用Python cache root最小sliceは実装済みで、その受入検査の誤検知も`tools/development/python_ast_boundary_check.py`によるAST操作検査へ修復済みである。次に何を行うかのHuman判断を受ける。
 
 開始条件：
 
@@ -92,7 +91,7 @@ task専用Python cache root最小sliceは`tools/development/task_python_cache.py
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - 直近の関連Test：Issue Intake V4 `38 passed`
-- 直近の全Test：venv公式runner `942 passed`、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の全Test：venv公式runner `962 passed`、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

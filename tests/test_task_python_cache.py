@@ -10,6 +10,7 @@
 Testは一時directoryだけを使い、実際のホーム配下（`~/.reviewcompass3`）を作らない。
 """
 
+import ast
 import importlib
 import json
 import os
@@ -313,26 +314,36 @@ def test_missing_project_manifest_is_rejected(
 def test_module_has_no_deletion_or_retention_or_global_environment_change(
     cache_module,
 ):
+    """禁止語の文字列検索ではなく、ASTに現れる操作で判定する。
+
+    文字列一致は、正しい公開関数名`bytecode_environment`の中の`environ`まで
+    誤検知した。改善候補：records/development/
+    2026-08-05-task-python-cache-ast-boundary-inspection-improvement-candidate-v1.md
+    """
+
+    boundary_check = importlib.import_module(
+        "tools.development.python_ast_boundary_check"
+    )
     source = Path(cache_module.__file__).read_text(encoding="utf-8")
 
-    for forbidden in (
-        "shutil",
-        "rmtree",
-        "unlink",
-        "os.remove",
-        "os.rmdir",
-        "os.environ",
-        "putenv",
-        "policy_test_runner",
-        "structured_argv_executor",
-        "subprocess",
-        "time.time",
-        "datetime",
-    ):
-        assert forbidden not in source, f"{forbidden} はこのmoduleに存在しない"
+    assert boundary_check.inspect_python_source_boundaries(source) == ()
 
     for absent in ("cleanup", "purge", "evict", "expire"):
         assert not hasattr(cache_module, absent), f"{absent} はこのmoduleに存在しない"
+
+
+def test_module_imports_no_runner_executor_or_external_process(cache_module):
+    """既存runner／executorへの接続と外部process起動の手段を持たない。"""
+
+    tree = ast.parse(Path(cache_module.__file__).read_text(encoding="utf-8"))
+    imported = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            imported.add(node.module or "")
+
+    assert imported == {"dataclasses", "json", "re", "pathlib", "tools.layout"}
 
 
 def test_module_reuses_the_approved_layout_resolver(cache_module):
