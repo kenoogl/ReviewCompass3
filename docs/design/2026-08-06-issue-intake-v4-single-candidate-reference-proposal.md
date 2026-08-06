@@ -1,6 +1,6 @@
 # Issue Intake V4 単体候補参照と候補全件検証 設計提案
 
-状態：`human_decision_candidate`
+状態：`approved`（2026-08-06、下記§8のとおりHuman承認済み）
 
 対象：改善候補の仕分け判断を機械可読に置けない行き止まり（問題一覧#8）と、
 候補が検証されずに腐る経路（#14）の最小修正。あわせて設計と実装の食い違い（#9）の処置を確定する。
@@ -10,12 +10,13 @@
 
 ## 1. 結論（推奨）
 
-全面的な作り直しをせず、次の4変更と、設計文書の食い違い5点の処置だけを行う。
+全面的な作り直しをせず、次の5変更と、設計文書の食い違い5点の処置だけを行う。
 
 1. V4の仕分け判断recordが**単体の候補fileを直接指せる**参照形式を1つ追加する。
 2. 既存Test 2件の条件を「bundleを指すものは、既知のbundleを指す」へ狭める。
 3. 候補置き場の**全件検証**Testを追加し、歴史recordは機械可読なallowlistで明示宣言する。
 4. 2026-08-06のHuman仕分け判断を、新形式でV4レーンへ機械可読に置き直す。
+5. Human承認により、検査器の課題を`registered`（登録のみ・未着手）で登録する。
 
 既存の41 decision、3 Issue、候補bundle、bundle指紋を参照する58 file、V1凍結レーンには一切触れない。
 
@@ -40,7 +41,7 @@
 | `records/development/2026-08-06-authority-reference-digest-check-triage-decision-v1.md` | `be9e7d3a2af88a4452a5055d39be8a6e2f77514a5529a134db2086fb49664fb9` |
 | `.reviewcompass/workflow/improvement-candidates/ic-authority-reference-digest-check-001--v1.json` | `d4e801aa35e4bd1ad2c17917d0cfd57b60e7e1aec93e7d1259bf8321285824c6` |
 
-## 3. 規範宣言（N1〜N11）
+## 3. 規範宣言（N1〜N12）
 
 以下が本提案の規範宣言のすべてである。**この節に無い振る舞い変更は本提案の範囲外**とする。
 
@@ -59,8 +60,7 @@
 
 - **N5**：`test_k7`を「**bundle形式の**decisionはすべて既知bundle（SHA `e01c0feb…`）を指す」へ狭める。
   単体形式は対象外。既存41件の保護は変わらない。
-- **N6**：`test_l6`のIssue側も同じ向きへ狭める。将来、単体候補由来のIssueが同じ壁に当たらないため。
-  （正式Issue登録そのものは本提案では行わない。）
+- **N6**：`test_l6`のIssue側も同じ向きへ狭める。N12の登録が同じ壁に当たらないために必要である。
 
 ### (c) 候補置き場の全件検証
 
@@ -75,14 +75,19 @@
 - **N11**：候補bundle内41件すべてに有効decisionが存在することをTestで固定する
   （閉鎖Evidenceの「未判断0件」を、以後は機械が維持する）。
 
-### (d) 仕分け判断の機械可読化
+### (d) 仕分け判断の機械可読化と課題登録
 
 - **N10**：`DEC-IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001`（version 1）を
   `triage-decisions-v4/`へ単体形式で作成する。値はMarkdown裁定
-  （`DEC-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）の§3の写しとする：
-  `disposition: issue_resolution`、`blocking: false`、`promote_to_issue: false`、
-  `issue_promotion: {approved: false, issue_id: null}`、`unresolved: true`、`recurrence: true`、
-  `impact: medium`、`priority: low`。Markdown裁定は履歴として保持し、上書きしない。
+  （`DEC-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）の§3を基礎とし、昇格だけを
+  2026-08-06のHuman承認（「載せてよい」）により承認側へ更新する：
+  `disposition: issue_resolution`、`blocking: false`、`promote_to_issue: true`、
+  `issue_promotion: {approved: true, issue_id: "ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001"}`、
+  `unresolved: true`、`recurrence: true`、`impact: medium`、`priority: low`。
+  Markdown裁定は履歴として保持し、上書きしない。
+- **N12**：課題record `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`（version 1、
+  `state: registered`）を`issues-v4/`へ作成する。ID規則`_ISSUE_ID`への適合は実測済み。
+  **登録のみで、着手（`in_progress`）はしない。** `in_progress`は0件のままとする。
 
 ## 4. 設計と実装の食い違い（#9）の処置
 
@@ -99,7 +104,7 @@
 
 ## 5. 宣言→RED対応表の義務（実装開始の関門）
 
-- 実装開始前に、N1〜N11それぞれへREDテストを結んだ**対応表record**を作成する。
+- 実装開始前に、N1〜N12それぞれへREDテストを結んだ**対応表record**を作成する。
 - 対応表で「REDの無いN」が**0件**であることを機械で数える。1件でも残れば実装を開始しない。
 - これは、旧設計で§1.3が受入条件一覧（I/J項目）から漏れて未実装のまま「完了」とされた失敗
   （問題一覧#9-b）の再発防止である。
@@ -108,7 +113,7 @@
 
 候補bundle本体、既存41 decision、既存3 Issue、bundle指紋を参照する58 file、V1凍結レーン
 （`triage-decisions`、`issues`）、config v1〜v3、`improvement_candidate`のschema、checklist、
-Current Plan、正式Issue登録（保留のまま）、製品schema、UI、automation。
+Current Plan、製品schema、UI、automation。着手（`in_progress`化）と解決計画の作成は行わない。
 
 ## 7. 危険と緩和
 
@@ -119,7 +124,17 @@ Current Plan、正式Issue登録（保留のまま）、製品schema、UI、auto
 | 新形式の乱用（何でも単体で指せる） | 保存先は`triage-decisions-v4`のみ、ID規則・実在検証・digest束縛は既存のまま適用（N4） |
 | 本作業のPlan上の位置づけが無い | 事実として明示する。Human承認（2026-08-06「推奨案に従おう」）を実施根拠とする |
 
-## 8. Human判断事項
+## 8. Human判断事項（判断結果を追記済み）
+
+2026-08-06のHuman文言による承認状況は次のとおり。
+
+- 「推奨案に従おう」：案1（N1〜N9、N11、§4の処置5点、Test 2件の条件変更を含む推奨）の承認。
+- 「了解」：宣言→RED対応表を実装開始の関門とする2段構えの承認。
+- 「載せてよい」：課題登録（N10の昇格承認への更新とN12）の承認。
+- `impact: medium`・`priority: low`はClaudeの翻訳値のままHumanへ2回提示済み。異議があれば
+  supersedes付きの後継decisionで差し替える。
+
+当初の判断事項は次であった。
 
 1. N1〜N11の承認。
 2. `test_k7`・`test_l6`の条件変更（N5・N6）の承認。既存Testの書き換えにあたる。
@@ -131,5 +146,5 @@ Current Plan、正式Issue登録（保留のまま）、製品schema、UI、auto
 
 ## 9. 非対象
 
-正式Issue登録の実行、V1凍結レーンの解除、bundleの変更・再生成、深さ・派生元fieldの追加
+V1凍結レーンの解除、bundleの変更・再生成、深さ・派生元fieldの追加
 （別途判断）、Work 6A残り10項目、Work 8前倒し、外部送信、push。
