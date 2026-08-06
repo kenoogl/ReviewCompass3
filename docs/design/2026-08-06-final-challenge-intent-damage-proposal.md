@@ -1,6 +1,6 @@
 # Final Challenge 意図毀損検出 設計提案（CL-6A-10）
 
-状態：`human_decision_candidate`
+状態：`approved`（2026-08-06、Human文言「承認」。§7の3点すべてを承認）
 
 対象：Work 6Aチェックリスト項目`CL-6A-10`「Contract適合でも上位Intent／Requirementを損なう成果を
 Final Challengeで検出する」の負例固定と、そのために必要な最小の仕組み。
