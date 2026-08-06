@@ -45,6 +45,7 @@ Work 4B最小試行の範囲提案を作り、Human承認を得る。承認後�
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
 - Human判断待ち：Work 4B最小試行の範囲提案の承認（提案提示後）。旧書庫の削除可否は別途判断。
+- リマインド（Humanの指示による）：Work 4Bで3回目の宣言→RED対応表を作る時点で、対応表の機械照合（AST照合、現状は毎回その場実施）を恒久toolにするかどうかを判断する。既存2件は`records/development/2026-08-06-*-declaration-red-map-v1.json`。
 
 ## stale・deferred
 
