@@ -929,12 +929,40 @@ termination、Human decision、staleの正式record、(4) 次の実行可能作�
 - [ ] Source Snapshot、Change Set、Test Evidenceの不一致を拒否する。
 - [ ] 関数台帳stale、理由なし新規routine、retired routine復活を拒否する。
 - [ ] 部分side effect後のcompensation／reconciliation／Human escalation欠落を検出する。
-- [ ] Current Work Projectionの第二正本化、欠測推測、stale／競合の正常表示を検出する。
+- [x] Current Work Projectionの第二正本化、欠測推測、stale／競合の正常表示を検出する。
 - [ ] 表示器だけのfailureで有効成果を破棄しないことを確認する。
 - [ ] Contract適合でも上位Intent／Requirementを損なう成果をFinal Challengeで検出する。
 - [ ] 全Test、risk別Verification、post-write verificationを通す。
 
-`Evidence`：未記録
+`Evidence`：完了しているのは`Current Work Projectionの第二正本化、欠測推測、stale／競合の
+正常表示を検出する`の1項目だけである。**Work 6Aの段完了ではない。** 他10項目は未完了である。
+
+Human承認は`records/development/2026-08-06-work6a-cl-6a-08-completion-decision-v1.md`
+（`DEC-WORK6A-CL-6A-08-COMPLETION-001`）。実装範囲の承認は
+`records/development/2026-08-06-work6a-projection-green-scope-decision-v1.md`
+（`DEC-WORK6A-PROJECTION-GREEN-SCOPE-001`）と
+`records/development/2026-08-06-work6a-non-authority-input-scope-decision-v1.md`
+（`DEC-WORK6A-PROJECTION-NON-AUTHORITY-SCOPE-001`）である。
+
+RED Evidenceは`records/development/2026-08-06-work6a-projection-negative-red-evidence-v1.md`、
+GREEN Evidenceは`records/development/2026-08-06-work6a-projection-negative-green-evidence-v1.md`と
+`records/development/2026-08-06-work6a-non-authority-input-green-evidence-v1.md`。
+Work 6A項目と既存Testの対応は
+`records/development/2026-08-06-work6a-negative-path-test-inventory-v1.json`にあり、
+checklist 11項目、Plan 28項目を`covered_by_existing_test` 17件、`red_added_now` 2件、
+`out_of_approved_scope` 20件へ分類した。RED Evidence §8-2の事実誤りと、改名により陳腐化した
+GREEN Evidence v1の記述は`records/development/2026-08-06-work6a-evidence-correction-v1.md`で
+訂正し、旧recordは履歴として保持している。
+
+固定したのは`tools/development/session_log_bootstrap.py`の診断判定と表示であり、
+正式入力欠落、第二正本化、欠測推測、stale／競合の誤表示をRED先行でTestへ固定してから
+実装した。公式全Testは`1017 passed`、fallback `false`。同じTestを弱めていない。
+
+残る限界：拒否対象は上位文書が非authorityと宣言する4 identityの完全一致であり、
+名指しのない手編集経路、path表記のゆれ、file名変更後の追随は扱わない。`freshness`の
+`unknown`など他の値、固定入力のDigestと実file内容の突き合わせ、入力側へのauthority宣言方式も
+扱わない。Current Work Projectionの正式record写像は`DEC-WORK5A-PROJECTION-ROUTING-001`の
+再開条件が満たされるまでdeferredである。
 
 ## 10. Work 5B：内部Implementation Task Contract Pilot
 
