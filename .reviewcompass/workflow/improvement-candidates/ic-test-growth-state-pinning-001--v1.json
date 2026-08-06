@@ -1,0 +1,76 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-TEST-GROWTH-STATE-PINNING-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-06T15:15:18+09:00",
+  "source_work": "inter-work/test-suite-structure-review",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-TEST-GROWTH-STATE-PINNING-2026-08-06-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-06-test-growth-state-pinning-observation-v1.json",
+    "sha256": "d2c304aff35f22ae4cb53971194df957f2602d9f57def34fb33c18f1132130e5"
+  },
+  "problem": "公式全Testが2026-08-03の419 passed（`records/development/2026-08-03-work-1a-layout-evidence-v1.md`）から測定commit `85c6a725b36e57b6f2f395d2276c3d18b238576b`時点の1031 passedへ、約3日で612件増えた。実行は約6秒であり実行費用は問題ではない。問題は総数ではなく張り方である。repositoryの状態（record件数、file名、単一bundle指紋）をtestのassertへ釘付けする書き方が、2026-08-05から2026-08-06にかけて承認済みの正当な変更を3回阻んだ（1回目：候補2件目の追加が件数固定`assert len(issue_files) == 1`系に衝突、commit `c7f3712`で修正。2回目：V4 Issue 2件目`ISSUE-HTC-C9F6C917`の登録が`test_l6`の決め打ちに衝突、commit `b6ac2c8`で修正。3回目：仕分け判断2件目が`test_k6`のfile名完全一致と`test_k7`／`test_l6`の同一bundle指紋固定に衝突し、Human承認済みN5／N6によりcommit `d6b043a`で条件を狭めた）。凍結・固定の理由はtestのassertにしか書かれておらず、機械可読な宣言が無い。一方で、1031件あっても設計§1.3（未triage候補の滞留検査）の被覆は0件であり（`records/development/2026-08-06-encountered-problem-inventory-v1.md` #9-a・#9-b）、記録時刻の捏造を捕まえたのはtestではなくレビューだった（同#5）。量は被覆ではない。",
+  "impact": [
+    "正当な2件目のrecord追加のたびに、同一変更内で釘付けtestの修正が必要になり、3回再発した",
+    "凍結の理由がassertからしか復元できず、緩和の可否判断に宣言ではなく考古学を要する",
+    "test総数が被覆の印象を与えるが、設計が宣言した検査（§1.3）の被覆は0件だった",
+    "record整全性の失敗（recorded_atの捏造値）が全Test合格のまま通過し、レビューでのみ検出された",
+    "何も検出していない死重testと、実際に守っているtestを、測定なしには区別できない",
+    "Development Policyは「コミット数、テスト数、記録数の増加だけを品質の代理指標にしない」（217行）と明記しており、現状の増え方はこの方針との整合を機械確認できていない"
+  ],
+  "scope": [
+    "状態の釘付け（件数・file名・指紋の固定）をtestのassertから、機械可読な宣言file＋汎用検査1本へ置き換える方針の検討。凍結・固定の理由を宣言側に持たせる",
+    "Work 8の評価で変異検査（mutation生存数の測定）を行い、何も検出していない死重testを測定することの候補化。測定前に一斉削除はしない",
+    "Development Policy評価指標（validator既知違反検出率、正常例の誤停止、mutation生存数、追加した文書・Schema・関門の維持費）およびCurrent Plan Work 8測定項目との接続"
+  ],
+  "non_scope": [
+    "testの一斉削除・整理の即時実施。測定前の削除は行わない",
+    "Work 8の前倒し。変異検査はWork 8の評価の中で行う",
+    "既存testの変更。本候補はHuman裁定前にtest、実装、config、宣言fileのいずれも作らない",
+    "凍結レーンの解除。旧V1レーンの凍結（1件固定）自体の当否は本候補では判断しない"
+  ],
+  "classification_candidates": [
+    "test_or_oracle",
+    "process_improvement"
+  ],
+  "route_candidates": [
+    "checkpoint",
+    "issue_resolution"
+  ],
+  "consumer_candidates": [
+    "reviewcompass3-development",
+    "work-8-evaluation-pilot",
+    "development-policy"
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/development/2026-08-06-encountered-problem-inventory-v1.md",
+      "sha256": "f6d8da5e6d95767a732e2280ec101df5188d9faac4d55621003c8bb5beb4763b"
+    },
+    {
+      "path": "records/development/2026-08-03-work-1a-layout-evidence-v1.md",
+      "sha256": "5d54c7de759388ae81c1fefebcc50c817c0b38ae2bcdc65444f47aa48cc8e899"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "0d34880353f06f50c7623282c765717348c8776938dc3113e28fdad4e9f8ac18"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f"
+    },
+    {
+      "path": "tests/test_issue_resolution_pilot.py",
+      "sha256": "68dc59f650a7e3b2cf13775f2a56499751199383232a01938f9049f8f8f56c34"
+    },
+    {
+      "path": "tests/test_issue_intake_v4.py",
+      "sha256": "dccc29c0700b4909495bf51bf6e73cbefb28cd33f570318e361f8d21e711d4cd"
+    }
+  ],
+  "proposed_action": "Humanが分類、blocking判定、routeを裁定する。裁定対象は次の2点である。第一に、状態の釘付け（件数・file名・指紋の固定）をtestのassertから機械可読な宣言file＋汎用検査1本へ置き換える方針を検討する。凍結・固定の理由と解除条件を宣言側に持たせ、正当な2件目の追加が「testの書換え」ではなく「宣言の改定」として、理由つきでHuman判断へ届く形にする。第二に、Work 8の評価で変異検査を行い、mutation生存数により何も検出していない死重testを測定する。Development Policyの評価指標（mutation生存数、追加した文書・Schema・関門の維持費）とCurrent Plan Work 8の測定計画（正常fixture誤停止、mutation生存）に既に挙がっており、Work 8での測定が自然な消費先である。測定前の一斉削除は行わない。いずれもHuman裁定前に実装しない。",
+  "content_digest": "b17f27e2fa8ee366846009be3b8d6571c7657a69246d07dd4b4ef99fe2727c36"
+}

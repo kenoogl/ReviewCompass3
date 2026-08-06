@@ -307,7 +307,7 @@ def test_n3_existing_bundle_form_decisions_keep_validating(intake, config):
 # --------------------------------------------- (c) 候補置き場の全件検証 N7〜N9
 
 
-def test_n7_all_candidate_records_validate_or_are_allowlisted(pilot):
+def test_n7_all_candidate_records_validate_or_are_allowlisted(pilot, intake, config):
     """N7（RED）：候補置き場の全JSONは、validator合格またはallowlist宣言を要する。
 
     `.reviewcompass/workflow/improvement-candidates/`の全JSON record
@@ -316,6 +316,9 @@ def test_n7_all_candidate_records_validate_or_are_allowlisted(pilot):
     `historical-allowlist-v1.json`に載っている、のどちらかであることを固定する。
     現状はallowlistが未作成で、`ic-historical-todo-issue-intake-001--v1.json`が
     どちらの条件も満たさないため失敗する。
+
+    第3分岐（N7改定、2026-08-06 Human承認）：有効なV4 triage decisionが存在する
+    仕分け済み候補は歴史扱いとし、decisionによる指紋の固定が生きていることを検証して充足と数える。
     """
 
     configs = (pilot.load_config(CONFIG_V2), pilot.load_config(CONFIG_V3))
@@ -327,6 +330,9 @@ def test_n7_all_candidate_records_validate_or_are_allowlisted(pilot):
         allowed_names = {
             Path(entry["path"]).name for entry in allowlist["entries"]
         }
+    effective = intake.validate_triage_decision_repository(
+        project_root=PROJECT_ROOT, config=config
+    )
     unaccounted = []
     for path in sorted(directory.glob("*.json")):
         if path.name == ALLOWLIST_NAME:
@@ -334,6 +340,20 @@ def test_n7_all_candidate_records_validate_or_are_allowlisted(pilot):
         if _record_files(pilot, configs, path):
             continue
         if path.name in allowed_names:
+            continue
+        record = json.loads(path.read_text(encoding="utf-8"))
+        decision = effective.get(record.get("candidate_id"))
+        if decision is not None:
+            candidate_ref = decision["candidate_ref"]
+            if "record_path" in candidate_ref:
+                assert (
+                    hashlib.sha256(path.read_bytes()).hexdigest()
+                    == candidate_ref["record_sha256"]
+                )
+                assert (
+                    candidate_ref["candidate_content_digest"]
+                    == record["content_digest"]
+                )
             continue
         unaccounted.append(path.name)
     assert unaccounted == []
@@ -364,25 +384,29 @@ def test_n8_historical_allowlist_declares_the_single_seed_entry(intake):
     ).is_file()
 
 
-def test_n9_authority_reference_candidate_passes_the_v3_validator(pilot):
-    """N9（境界、いま成功）：対象候補はv3 configのvalidatorで合格し続ける。
+def test_n9_authority_reference_candidate_binding_stays_pinned(intake, config):
+    """N9改定（2026-08-06 Human承認）：対象候補はdecisionによる指紋の固定を検証する。
 
-    `ic-authority-reference-digest-check-001--v1.json`の実bytesと
-    content_digestが固定値のまま、v3 validatorに合格することを固定する
-    回帰防止testである。
+    旧expectation（v3 validatorに合格し続ける）は、evidence_refsが可変文書を
+    作成時点で固定する性質と両立せず、チェックリスト改定で実際に破綻した。
+    仕分け済み候補は歴史扱いとし、V4 decisionが候補のfile SHA-256と
+    content digestを固定していることの検証へ置き換えた。
     """
 
-    config = pilot.load_config(CONFIG_V3)
+    decision_file = PROJECT_ROOT / DECISION_FILE
+    assert decision_file.is_file()
+    effective = intake.validate_triage_decision_repository(
+        project_root=PROJECT_ROOT, config=config
+    )
+    assert CANDIDATE_ID in effective
+    candidate_ref = effective[CANDIDATE_ID]["candidate_ref"]
     candidate_file = PROJECT_ROOT / CANDIDATE_PATH
     assert (
-        hashlib.sha256(candidate_file.read_bytes()).hexdigest() == CANDIDATE_SHA256
+        hashlib.sha256(candidate_file.read_bytes()).hexdigest()
+        == candidate_ref["record_sha256"]
     )
-    result = pilot.validate_record_file(
-        candidate_file, project_root=PROJECT_ROOT, config=config
-    )
-    assert result.record_kind == "improvement_candidate"
-    assert result.record_id == CANDIDATE_ID
-    assert result.content_digest == CANDIDATE_CONTENT_DIGEST
+    record = json.loads(candidate_file.read_text(encoding="utf-8"))
+    assert candidate_ref["candidate_content_digest"] == record["content_digest"]
 
 
 # ------------------------------- (d) 仕分け判断の機械可読化と課題登録 N10〜N12

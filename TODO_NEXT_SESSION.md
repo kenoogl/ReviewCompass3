@@ -7,47 +7,48 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：Issue Intake V4の最小修正が完了した。単体候補参照、候補全件検証、歴史allowlistを実装し、検査器の課題ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001をregistered（未着手）で登録した。同じTestを弱めていない。問題一覧の#8と#14は解消した。
+- 現在作業：本線Work 6Aを継続中。CL-6A-09を独立検証の上で完了し、被覆過大の3項目は訂正recordで残余を明示した。チェックリスト改定で仕分け済み候補の検証が壊れたため、N7・N9をHuman承認で改定し、テスト増加の改善候補を新規登録した。仕分け済み候補は歴史扱いとする。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`：`registered / nonblocking`、影響：参照Digest driftの恒久検査器が無い。in_progressにはしていない、次：着手はHuman判断。判別規則（対象keyのallowlist宣言）の承認が実装の前提
+- `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`：`registered / nonblocking`、影響：参照Digest driftの恒久検査器が無い。in_progressにはしていない、次：着手はHuman判断。判別規則の承認が実装の前提
 
 ## 最新のauthority／Evidence
 
-- [Intake V4修正 設計提案（承認済み）](docs/design/2026-08-06-issue-intake-v4-single-candidate-reference-proposal.md) — SHA-256 `d5164077b8a53141eb647e57f4746e3347ac4650c03a0d1d553571348fc63358`
-- [Intake V4修正 GREEN Evidence](records/development/2026-08-06-intake-v4-single-candidate-green-evidence-v1.md) — SHA-256 `d63bb9330bbed22f1346618e01ed1710884e55a9e5b3d58686962140b7e7629c`
-- [宣言→RED対応表](records/development/2026-08-06-intake-v4-declaration-red-map-v1.json) — SHA-256 `c24ebaf58eee3ce2d318084697051d41c9669e30aa756086706f9f110117ce40`
-- [Intake V4 Evidence訂正record](records/development/2026-08-06-intake-v4-evidence-correction-v1.md) — SHA-256 `27db1856b650b23458df49c195544fbfb1f9df5112e3bf85ce16ac670e05df9a`
-- [登録した課題record](.reviewcompass/workflow/issues-v4/issue-authority-reference-digest-check-001--v1.json) — SHA-256 `d260ed570598f56ada2cd6b4e54f15543bba0e792db65c14403a038f8100afbe`
+- [N7・N9改定Decision](records/development/2026-08-06-intake-v4-n7-n9-amendment-decision-v1.md) — SHA-256 `e0dd5b4ba6c4a1e797cef59c2ba7727e68786303f5a78bbb1ab74962fddcef78`
+- [CL-6A-09完了Decision](records/development/2026-08-06-work6a-cl-6a-09-completion-decision-v1.md) — SHA-256 `9a8a21dd1829c712e8903e5d0369dd40b147b83972a00267212dab8e5ddd87eb`
+- [対応表の訂正record](records/development/2026-08-06-work6a-inventory-correction-v1.md) — SHA-256 `41b6e8436f437da1eccf911f2e34cff211d5959110ed91e18ce9ea4887bfcdc0`
+- [テスト増加の改善候補](.reviewcompass/workflow/improvement-candidates/ic-test-growth-state-pinning-001--v1.json) — SHA-256 `88256c55a281b7449ab863db4c55bb5055abd6c6c622200a36a83eb77f68efa2`
+- [テスト増加の観測record](records/development/2026-08-06-test-growth-state-pinning-observation-v1.json) — SHA-256 `d2c304aff35f22ae4cb53971194df957f2602d9f57def34fb33c18f1132130e5`
 - [本日の問題一覧（14件）](records/development/2026-08-06-encountered-problem-inventory-v1.md) — SHA-256 `f6d8da5e6d95767a732e2280ec101df5188d9faac4d55621003c8bb5beb4763b`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `53226e7c7c743e145af6fa313e42c2fccdd66f5f41917399b445d8587f022676`
-- [深掘りの停止規則Decision](records/development/2026-08-06-deep-dive-stop-rule-decision-v1.md) — SHA-256 `b28e5b2de79f6ccb6df413f4ecc33c64fc29ab55f7f44f944460bba1e4c82401`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `cf503cd8090dd78f58030378794be87a3156ac6afc4ffa41c16344fad5beb3c6`
+- [登録した課題record](.reviewcompass/workflow/issues-v4/issue-authority-reference-digest-check-001--v1.json) — SHA-256 `d260ed570598f56ada2cd6b4e54f15543bba0e792db65c14403a038f8100afbe`
 
 ## 次に行う一作業
 
-Humanが本線Work 6Aの残り10項目へ戻るか、問題一覧の未解決分のrouteを先に決めるかを判断する。
+HumanがIC-TEST-GROWTH-STATE-PINNING-001（テスト増加と状態釘付け）のtriageを裁定する。あわせてWork 6Aの次のRED対象（CL-6A-10のFinal Challenge専用負例）の提案可否を判断する。
 
 開始条件：
 
-- Intake V4修正と訂正recordを含むcommitがcleanであること
+- 本修復commitがcleanで全Testが緑であること
+- 裁定直前に候補のv3 validatorを再実行すること
 
 完了条件：
 
-- 次の一作業がHuman判断として示されること
+- 分類、blocking判定、route、Issue昇格可否が記録されること
 
-後続作業：本線へ戻る場合、Work 6A残り10項目の次のRED対象を選定して提示する。
+後続作業：CL-6A-10の提案を作る場合、意図毀損を機械的に何で表すかの設計判断を先に固定する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。登録した課題の着手、V1凍結レーンの解除、深さ・派生元field追加、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：次の一作業（本線Work 6Aへ戻るか、未解決問題のroute決めか）。
+- blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
+- Human判断待ち：テスト増加候補のtriage。CL-6A-10提案の作成可否。
 
 ## stale・deferred
 
-- stale：問題一覧の#8（仕分け判断を置けない）と#14（候補が検証されない）は解消した。#9はGREEN Evidence記述の訂正と処置確定により、実装漏れ分（§3.1/§3.2延期など）を残して閉じた。
-- deferred：Work 6Aの残り10項目、登録済み4課題の着手・解決計画、深さ・派生元field、Current Work Projection正式写像、Work 4B、Work 5B、Work 7、Work 8、UI、automation。
+- stale：仕分け済み候補IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001のevidence_refsは作成時点の固定として保持し、現行bytesとの一致は要求しない（N7・N9改定）。対応表のN9行の旧test名は改定Decisionが正本。
+- deferred：Work 6Aの残り9項目、登録済み4課題の着手、テスト整理のWork 8測定、Current Work Projection正式写像、Work 4B、Work 5B、Work 7、Work 8、UI、automation。
 
 ## Git・Test
 
@@ -55,8 +56,8 @@ Humanが本線Work 6Aの残り10項目へ戻るか、問題一覧の未解決分
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：Intake V4単体候補11 passed、Intake関連54 passed
-- 直近の全Test：venv公式runner 1031 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Intake V4単体候補11 passed、Work 6A境界例1 passed
+- 直近の全Test：venv公式runner 1032 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

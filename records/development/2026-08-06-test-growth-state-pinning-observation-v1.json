@@ -1,0 +1,106 @@
+{
+  "observation_id": "OBS-RC3-TEST-GROWTH-STATE-PINNING-2026-08-06-V1",
+  "observed_at": "2026-08-06T15:15:18+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "Test count grew from 419 to 1031 in about three days while state-pinning tests blocked legitimate changes three times and a designed check remained uncovered",
+  "source": {
+    "path": "records/development/2026-08-06-encountered-problem-inventory-v1.md",
+    "sha256": "f6d8da5e6d95767a732e2280ec101df5188d9faac4d55621003c8bb5beb4763b"
+  },
+  "machine_observations": {
+    "measured_at_commit": "85c6a725b36e57b6f2f395d2276c3d18b238576b",
+    "full_suite_at_2026_08_03": {
+      "result": "419 passed in 1.70s",
+      "recorded_in": "records/development/2026-08-03-work-1a-layout-evidence-v1.md",
+      "recorded_in_line": 57
+    },
+    "full_suite_at_measurement": {
+      "result": "1031 passed in 5.83s",
+      "command": ".venv/bin/python3 -m pytest -q --ignore=tests/test_work6a_coverage_boundaries.py",
+      "note": "tests/test_work6a_coverage_boundaries.py is an untracked in-progress file of a parallel worker and was excluded; including it the run is 1032 passed"
+    },
+    "growth": {
+      "from_count": 419,
+      "to_count": 1031,
+      "added": 612,
+      "from_date": "2026-08-03",
+      "to_date": "2026-08-06"
+    },
+    "execution_cost": {
+      "full_suite_seconds_observed": 5.83,
+      "assessment": "execution cost is not the problem"
+    },
+    "state_pinning_tests_observed": [
+      {
+        "test": "tests/test_issue_resolution_pilot.py::test_repository_contains_only_the_single_valid_pilot_subject",
+        "pin": "assert len(issue_files) == 1 (line 188) and assert len(decision_files) <= 1 (line 191)",
+        "kind": "record count pinned in a test assert"
+      },
+      {
+        "test": "tests/test_issue_intake_v4.py::test_k6_legacy_v1_decision_and_pilot_validation_keep_passing",
+        "pin": "sorted(path.name ...) == [\"dec-pilot-todo-growth-001--v1.json\"] (lines 784-786)",
+        "kind": "exact file name list pinned in a test assert"
+      },
+      {
+        "test": "tests/test_issue_intake_v4.py::test_k7_repository_decision_set_has_no_conflict and ::test_l6_repository_issue_set_is_consistent",
+        "pin": "every record was required to reference the single known bundle_sha256; narrowed to bundle-form records only by commit d6b043a under human-approved N5/N6",
+        "kind": "single bundle fingerprint pinned across all records in test asserts"
+      }
+    ],
+    "legitimate_changes_blocked": {
+      "count": 3,
+      "recorded_in": "records/development/2026-08-06-encountered-problem-inventory-v1.md",
+      "recorded_in_line": 175,
+      "occurrences": [
+        "2026-08-05 commit 10fc356 adding a second improvement candidate broke the count pin; repaired by commit c7f3712",
+        "2026-08-05 registering the second V4 issue ISSUE-HTC-C9F6C917 broke the single-issue pin in test_l6; repaired by commit b6ac2c8",
+        "2026-08-06 placing a second triage decision stopped at inventory problem #8; the k7/l6 bundle pin was narrowed by commit d6b043a"
+      ]
+    },
+    "coverage_gap": {
+      "recorded_in": "records/development/2026-08-06-encountered-problem-inventory-v1.md",
+      "items": [
+        {
+          "id": "9-a",
+          "line": 154,
+          "fact": "design section 1.3 (check untriaged candidate backlog instead of candidate totals) has no implementation and no test"
+        },
+        {
+          "id": "9-b",
+          "line": 155,
+          "fact": "the acceptance condition list (25 items I1-I9, J1-J16) contains no item for design section 1.3"
+        }
+      ],
+      "note": "1031 passing tests coexist with zero coverage of a designed check; volume is not coverage"
+    },
+    "review_caught_what_tests_did_not": {
+      "recorded_in": "records/development/2026-08-06-encountered-problem-inventory-v1.md",
+      "item": "2-5 (#5)",
+      "line": 106,
+      "fact": "a non-machine-measured recorded_at value in the Work 6A inventory record was caught by review, not by any test, and corrected before commit 9a39365"
+    },
+    "policy_and_plan_references": {
+      "development_policy_line_217": "コミット数、テスト数、記録数の増加だけを品質の代理指標にしない。",
+      "development_policy_line_215": "- 追加した文書、Schema、関門の維持費",
+      "development_policy_evaluation_metrics_line_209": "- validatorの既知違反検出率、正常例の誤停止、mutation生存数",
+      "current_plan_lines_839_840": "`insufficient_evidence`、`out_of_level`、validator既知違反検出率、正常fixture誤停止率、mutation生存数、post-write再検出を追加する。",
+      "current_plan_work8_line_1220": "材料十分性、必須source消費率、validator既知違反検出、正常fixture誤停止、mutation生存、post-write再検出も測り、Findingゼロだけを成功としない。",
+      "note": "the maintenance-cost metric sits in the Development Policy evaluation metrics; mutation survival metrics appear in both the Policy metrics and the Current Plan Work 8 measurement plan"
+    }
+  },
+  "problem": "The official full test suite grew from 419 passed on 2026-08-03 to 1031 passed at the measurement commit, roughly three days later. Execution takes about six seconds, so run cost is not the issue. The issue is how tests are attached: repository state such as record counts, exact file names and a single bundle fingerprint is pinned inside test asserts, and these pins blocked three legitimate, human-approved changes on 2026-08-05 and 2026-08-06. The reason a state is frozen lives only in the failing assert, with no machine-readable declaration. At the same time 1031 tests provided zero coverage of design section 1.3, and a fabricated record timestamp was caught by review rather than by any test. The Development Policy states that growth in commit, test or record counts alone must not serve as a quality proxy.",
+  "impact": [
+    "each legitimate second record required editing a pinning test in the same change, three times in two days",
+    "the rationale for a freeze is only recoverable from a test assert, so relaxing it requires archaeology instead of reading a declaration",
+    "test volume creates an impression of coverage while a designed check (section 1.3) had no test at all",
+    "a record-integrity failure (fabricated recorded_at) passed the whole suite and was caught only by review",
+    "dead-weight tests that never detect anything cannot be told apart from load-bearing ones without mutation measurement"
+  ],
+  "boundary": [
+    "preserve this observation as immutable source",
+    "do not treat this observation as an Improvement Candidate, Human Triage Decision or Issue Record",
+    "do not delete, rewrite or reorganize any test on the basis of this observation alone",
+    "do not advance Work 8 or start mutation measurement on the basis of this observation alone",
+    "the full-suite count excludes one untracked in-progress test file of a parallel worker, as recorded in machine_observations"
+  ]
+}
