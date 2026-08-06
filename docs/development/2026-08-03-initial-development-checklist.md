@@ -931,12 +931,20 @@ termination、Human decision、staleの正式record、(4) 次の実行可能作�
 - [ ] 部分side effect後のcompensation／reconciliation／Human escalation欠落を検出する。
 - [x] Current Work Projectionの第二正本化、欠測推測、stale／競合の正常表示を検出する。
 - [x] 表示器だけのfailureで有効成果を破棄しないことを確認する。
-- [ ] Contract適合でも上位Intent／Requirementを損なう成果をFinal Challengeで検出する。
+- [x] Contract適合でも上位Intent／Requirementを損なう成果をFinal Challengeで検出する。
 - [ ] 全Test、risk別Verification、post-write verificationを通す。
 
 `Evidence`：完了しているのは`Current Work Projectionの第二正本化、欠測推測、stale／競合の
-正常表示を検出する`と`表示器だけのfailureで有効成果を破棄しないことを確認する`の2項目である。
-**Work 6Aの段完了ではない。** 他9項目は未完了である。
+正常表示を検出する`、`表示器だけのfailureで有効成果を破棄しないことを確認する`、
+`Contract適合でも上位Intent／Requirementを損なう成果をFinal Challengeで検出する`の3項目である。
+**Work 6Aの段完了ではない。** 他8項目は未完了である。
+
+3番目の完了は`DEC-WORK6A-CL-6A-10-COMPLETION-001`
+（`records/development/2026-08-06-work6a-cl-6a-10-completion-decision-v1.md`）による。
+承認済み設計は`docs/design/2026-08-06-final-challenge-intent-damage-proposal.md`、
+GREEN Evidenceは`records/development/2026-08-06-intent-damage-green-evidence-v1.md`。
+Human採否済みの`intent_damage`所見でContract適合成果を拒否し、未裁定所見ではfail-closed停止する。
+所見を生成するLLMレビュー（外部API・サブエージェント経路）は別Task Contractである。
 
 2番目の完了は独立検証（被覆主張を疑う側からの検証）に基づく。承認は
 `records/development/2026-08-06-work6a-cl-6a-09-completion-decision-v1.md`
