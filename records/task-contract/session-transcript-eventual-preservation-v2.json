@@ -1,0 +1,100 @@
+{
+  "task_contract_id": "TC-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-06-V2",
+  "created_at": "2026-08-06T09:13:46+09:00",
+  "status": "active",
+  "owner": "reviewcompass3-development",
+  "goal": "Reconcile the previously authorized current Codex Desktop task into the repository-external private archive under the current Development Policy, then verify raw and verbatim integrity without capturing Claude or historical Codex sessions.",
+  "supersedes": {
+    "task_contract_id": "TC-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-03-V1",
+    "path": "records/task-contract/session-transcript-eventual-preservation-v1.json",
+    "sha256": "981e7cb1e7344f576afe3dbaf9fee94462e353980e4944b7fd2bd33401e595cf",
+    "reason": "The version 1 contract is active_stale because its fixed Development Policy digest no longer matches the current authority. Existing private artifacts remain preserved and are used only as the verified append prefix."
+  },
+  "fixed_sources": [
+    {
+      "path": "docs/design/2026-08-03-session-transcript-eventual-preservation-design.md",
+      "sha256": "b387b9cf913b11a0d39e13cbd5aa6222527fdb4f801e478f1110683c3dd8d1fe"
+    },
+    {
+      "path": "records/development/2026-08-03-session-transcript-eventual-preservation-decision.json",
+      "sha256": "620fde82dc424141f4f5a9e8ce383fd9669506149e764eceebff0ada6addfcba"
+    },
+    {
+      "path": "records/development/2026-08-03-session-transcript-source-formats-completion-evidence-v1.md",
+      "sha256": "bf8aba264810f19bb8ac495ce579412d6df589e286a72484f83efc88ed3f8fd4"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "0d34880353f06f50c7623282c765717348c8776938dc3113e28fdad4e9f8ac18"
+    },
+    {
+      "path": "records/development/2026-08-03-session-transcript-eventual-preservation-implementation-decision.json",
+      "sha256": "1fe3c2a6cf8a3430ffb9a290a437dbc34777d2514beac910a26f52a419732262"
+    }
+  ],
+  "authorized_source": {
+    "provider": "codex",
+    "selector": "the currently preserved Codex Desktop task rollout only",
+    "source_kind": "codex_rollout",
+    "source_identity": "619ff2b0e985199b0006a7166f12ed4b2af26c291ecb1662a9d41d093ac023df",
+    "source_relative_path": "2026/08/03/rollout-2026-08-03T10-33-29-019fc541-2734-79b1-b3d9-3e12665d79f5.jsonl"
+  },
+  "in_scope": [
+    "validate the existing raw archive, private verbatim transcript, durable cursor, private provenance, and integrity ledger",
+    "verify that the existing raw archive is an exact prefix of the current Codex rollout",
+    "append the available bytes for the one authorized current Codex rollout exactly once",
+    "regenerate the private verbatim transcript from the complete preserved raw range",
+    "update the durable cursor, private provenance, and integrity ledger after artifact verification",
+    "perform one immediate idempotent rerun",
+    "verify UTF-8, JSONL parsing, event counts, tool call/result pairing, digests, permissions, and absence of temporary files",
+    "write value-safe repository Evidence without transcript content or private absolute paths"
+  ],
+  "out_of_scope": [
+    "historical Codex session discovery or capture",
+    "Claude session capture",
+    "redacted transcript generation",
+    "hook, watcher, scheduler, service, or background automation activation",
+    "provider source mutation",
+    "external storage or transmission",
+    "retention deletion, backup, or application-layer encryption",
+    "Git storage of private transcript artifacts",
+    "Work 6A implementation changes"
+  ],
+  "acceptance": [
+    "all fixed source digests match the current working tree before capture",
+    "the existing preserved raw is an exact byte prefix of the authorized source",
+    "the manual reconcile reports updated or unchanged without divergence, parse failure, or unsupported source",
+    "the immediate identical rerun reports unchanged and writes no duplicate bytes or events",
+    "the regenerated verbatim transcript matches the stored transcript byte-for-byte",
+    "raw, verbatim, cursor, provenance, and ledger digests agree after reread",
+    "all parsed tool calls that have results in the captured source are paired, and any terminal unpaired call is explicitly reported as a live-boundary limitation",
+    "private output remains outside the repository with directories 0700 and files 0600",
+    "no transcript value or private absolute path is written to repository Evidence",
+    "the existing Claude worktree changes remain untouched"
+  ],
+  "stop_conditions": [
+    "a fixed source digest differs",
+    "the existing archive is not a prefix of the source",
+    "the source identity or relative path differs from the authorized rollout",
+    "a private output may enter the repository or Git boundary",
+    "Claude or historical Codex sources would be captured",
+    "provider source mutation is required",
+    "the collector reports divergence, parse failure, unsupported source, or artifact checkpoint failure",
+    "the repository worktree changes outside this contract scope"
+  ],
+  "recovery": [
+    "preserve the last valid raw and cursor on write failure",
+    "rerun from the durable cursor after interruption",
+    "record divergence without overwriting the archive",
+    "regenerate derived artifacts from preserved raw",
+    "stop and request Human review when the authorized source is unavailable or no longer prefix-compatible"
+  ],
+  "implementation_order": [
+    "verify fixed sources and the existing private checkpoint",
+    "verify source identity and byte-prefix compatibility",
+    "run one manual reconcile from an executor outside the Codex task being captured",
+    "run one immediate idempotent rerun",
+    "reread raw, verbatim, cursor, provenance, and ledger and verify aggregate integrity",
+    "write value-safe Evidence and report"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "decision_id": "RC3-SESSION-TRANSCRIPT-REPAIR-AND-RECAPTURE-2026-08-06-V1",
+  "decided_at": "2026-08-06T09:13:46+09:00",
+  "status": "approved_effective",
+  "decision_maker": "human",
+  "human_instruction": "修復と再承認後、codexのセッションログを記録する",
+  "approved_repair": {
+    "method": "create a new-only version 2 Task Contract bound to the current Development Policy; do not modify or source-pin the active_stale version 1 contract",
+    "task_contract_path": "records/task-contract/session-transcript-eventual-preservation-v2.json",
+    "task_contract_sha256": "d75049cb8f53dc0d7ae7429270c00ca539e90485133d1984edde07f61158355a",
+    "fixed_source_count": 5,
+    "fixed_sources_verified_against_working_tree": true,
+    "superseded_contract_preserved": true
+  },
+  "authorized_storage": {
+    "prior_decision_path": "records/development/2026-08-04-session-transcript-eventual-preservation-storage-decision.json",
+    "prior_decision_sha256": "79c9e7aa781d09cb4afe477919889e12583ae1d8e57b15317046cff5c1e74953",
+    "logical_path": "reviewcompass3_user_data/eventual-preservation",
+    "repository_external_required": true,
+    "directories": "0700",
+    "files": "0600"
+  },
+  "authorized_capture": {
+    "provider": "codex",
+    "selector": "the currently preserved Codex Desktop task rollout only",
+    "source_kind": "codex_rollout",
+    "source_identity": "619ff2b0e985199b0006a7166f12ed4b2af26c291ecb1662a9d41d093ac023df",
+    "source_relative_path": "2026/08/03/rollout-2026-08-03T10-33-29-019fc541-2734-79b1-b3d9-3e12665d79f5.jsonl",
+    "artifacts": [
+      "byte_exact_raw",
+      "private_verbatim_transcript",
+      "durable_cursor",
+      "private_provenance",
+      "integrity_ledger"
+    ],
+    "execution": "one manual reconcile after this Codex turn ends, followed by one immediate idempotent rerun",
+    "executor_boundary": "execute from Claude or another process outside the Codex task being captured so the capture Tool Call does not become a new terminal unpaired event",
+    "redacted_transcript": false
+  },
+  "preflight_observation": {
+    "observed_at": "2026-08-06T09:13:46+09:00",
+    "existing_saved_raw_bytes": 19305386,
+    "current_source_bytes_at_observation": 74070599,
+    "append_bytes_available_at_observation": 54765213,
+    "existing_archive_is_exact_source_prefix": true,
+    "existing_raw_sha256": "4746e67013e96520f76c94b739d4614bb615b6520dfad3b5c4bd2b90e84239ba",
+    "existing_verbatim_sha256": "d87155c5fe8ad42f6546d38523042be84d57c8372a048f45935152317beeb079",
+    "existing_terminal_unpaired_tool_call_count": 1
+  },
+  "required_post_capture_verification": [
+    "manual reconcile action is updated or unchanged and state is reconciled",
+    "immediate rerun action is unchanged",
+    "raw is valid UTF-8 JSONL with zero parse issues",
+    "verbatim regenerated from raw matches the stored verbatim byte-for-byte",
+    "raw, verbatim, cursor, provenance, and ledger digests agree after reread",
+    "tool call and result pairing is checked and any live-boundary terminal call is reported",
+    "private files remain 0600 and directories 0700",
+    "no temporary or lock files remain",
+    "repository Evidence contains no transcript content or private absolute path",
+    "Claude worktree changes remain untouched"
+  ],
+  "not_authorized": [
+    "historical Codex capture",
+    "Claude capture",
+    "redacted transcript generation",
+    "hook, watcher, scheduler, background process, or service activation",
+    "external transmission",
+    "Git storage of private artifacts",
+    "retention deletion, backup, or application-layer encryption",
+    "Work 6A implementation changes as part of this capture"
+  ]
+}
