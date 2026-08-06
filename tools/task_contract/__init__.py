@@ -39,6 +39,8 @@ from tools.task_contract.definition_challenge import (
 )
 from tools.task_contract.execution import (
     CONTRACT_V2_EDGE_ORDER,
+    FINDING_KINDS,
+    FINDING_ORIGIN_ROUTES,
     PROVENANCE_EDGE_ORDER,
     accept_artifact,
     acquire_permit,
@@ -80,6 +82,8 @@ __all__ = [
     "DEFINITION_CHECKS",
     "DEFINITION_SEVERITY_CLASSES",
     "DEFINITION_VERDICT_STATUSES",
+    "FINDING_KINDS",
+    "FINDING_ORIGIN_ROUTES",
     "FORBIDDEN_CAPABILITIES",
     "ORIGIN_CLASSES",
     "PLAN_VIEWS",

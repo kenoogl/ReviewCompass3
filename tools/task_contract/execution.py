@@ -22,6 +22,11 @@ FINAL_CHALLENGE_OWNER = "final_challenge_owner"
 HUMAN_DECISION_OWNER = "human_decision_owner"
 DECISION_CLASSES = ("approved", "rejected")
 
+# finding単位の種別（P1）。省略時は`contract`として扱う（後方互換）。
+FINDING_KINDS = ("contract", "intent_damage")
+# finding単位の発生元route種（P1・P7）。判定上は形式等価に受理する。
+FINDING_ORIGIN_ROUTES = ("deterministic_stub", "subagent", "external_api", "human")
+
 CONTEXT_DECLARATION_FIELDS = (
     "goal",
     "target",
@@ -274,15 +279,24 @@ def run_stub_reviewer(*, contract, context_manifest, permit):
     )
 
 
+def _finding_kind(finding):
+    """finding種別。fieldが無い既存findingは`contract`として扱う（P1後方互換）。"""
+
+    return finding.get("kind", "contract")
+
+
 def _severity_counts(finding_set):
+    """`contract`種別のfindingだけを数える（P2、審査の分離）。"""
+
     counts = {"error": 0, "warning": 0, "info": 0}
     for item in finding_set["findings"]:
-        counts[item["severity"]] += 1
+        if _finding_kind(item) == "contract":
+            counts[item["severity"]] += 1
     return counts
 
 
 def evaluate_conformance(*, contract, plan_bundle, finding_set, owner=CONFORMANCE_OWNER):
-    """errorで停止し、warningでは自動失格にしない。"""
+    """`contract`種別のerrorで停止し、warningでは自動失格にしない（P2）。"""
 
     counts = _severity_counts(finding_set)
     status = "failed" if counts["error"] else "passed"
@@ -304,12 +318,35 @@ def evaluate_conformance(*, contract, plan_bundle, finding_set, owner=CONFORMANC
 def evaluate_final_challenge(
     *, contract, conformance_verdict, finding_set, owner=FINAL_CHALLENGE_OWNER
 ):
-    """Conformanceと別ownerで判定する。ownerが同一なら停止する。"""
+    """Conformanceと別ownerで判定する。ownerが同一なら停止する。
+
+    `intent_damage` findingはHuman採否を前提に扱う（P3〜P6）。採否未了
+    （`human_ruling`省略または`pending`）が1件でもあればverdictを出さず
+    fail-closedで停止する。採否済み（`accepted`）でblocking（severity `error`）の
+    所見が1件でもあれば、Conformanceがpassedでも`failed`とする。
+    `rejected`の所見は判定に影響しない（理由はfinding_setに残る）。
+    複数所見は潰さず、自動統合・多数決はしない（P5）。
+    """
 
     if owner == conformance_verdict["owner"]:
         raise ContractError("owner_separation_violated", owner)
     counts = _severity_counts(finding_set)
+    intent_findings = [
+        item
+        for item in finding_set["findings"]
+        if _finding_kind(item) == "intent_damage"
+    ]
+    for item in intent_findings:
+        if item.get("human_ruling", "pending") == "pending":
+            raise ContractError("human_decision_missing", item["finding_id"])
+    accepted_blocking = [
+        item
+        for item in intent_findings
+        if item["human_ruling"] == "accepted" and item["severity"] == "error"
+    ]
     status = "passed" if conformance_verdict["status"] == "passed" else "failed"
+    if accepted_blocking:
+        status = "failed"
     return seal(
         {
             "record_kind": "final_challenge_verdict",
