@@ -45,9 +45,12 @@
 - AIまたは機械の分類とrouteは提案として扱い、上流改定、Issue昇格、risk受容、再開はHumanが判断する。
   採用候補はconsumerとOutcomeへ接続されるまでclosedにしない。
 - 改善候補の登録は既存経路で行う。まず`OBS-`始まりの観測recordを作り、それを`source_identity`へ
-  束縛した`IC-`始まりの候補を`.reviewcompass/workflow/improvement-candidates/`へ置く。
+  束縛した`IC-`始まりの候補を`.reviewcompass/workflow/improvement-candidates/`へ置き、
   `python3 -m tools.development.issue_resolution_pilot --config config/development-issue-resolution-pilot-v3.json record <path>`
-  で検証してからHumanの仕分け判断を仰ぐ。候補記録の形式そのものの作り直しを先に提案しない。
+  で検証する。候補記録の形式そのものの作り直しを先に提案しない。
+- 改善候補に対するHumanの仕分け判断は`records/development/`のDecision recordへ記録する。旧Pilotの
+  仕分け判断とIssueの置き場所は各1件で凍結されており、新しい記録を追加しない。V4の置き場所は固定
+  bundle参照だけを受け付けるため、単体候補は現時点で載らない。この制約の解消は別のHuman判断とする。
 - 詳細は`docs/development/2026-08-02-development-policy.md`を正本とする。
 
 ## コミット方針
