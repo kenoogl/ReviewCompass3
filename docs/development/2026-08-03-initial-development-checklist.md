@@ -930,12 +930,20 @@ termination、Human decision、staleの正式record、(4) 次の実行可能作�
 - [ ] 関数台帳stale、理由なし新規routine、retired routine復活を拒否する。
 - [ ] 部分side effect後のcompensation／reconciliation／Human escalation欠落を検出する。
 - [x] Current Work Projectionの第二正本化、欠測推測、stale／競合の正常表示を検出する。
-- [ ] 表示器だけのfailureで有効成果を破棄しないことを確認する。
+- [x] 表示器だけのfailureで有効成果を破棄しないことを確認する。
 - [ ] Contract適合でも上位Intent／Requirementを損なう成果をFinal Challengeで検出する。
 - [ ] 全Test、risk別Verification、post-write verificationを通す。
 
 `Evidence`：完了しているのは`Current Work Projectionの第二正本化、欠測推測、stale／競合の
-正常表示を検出する`の1項目だけである。**Work 6Aの段完了ではない。** 他10項目は未完了である。
+正常表示を検出する`と`表示器だけのfailureで有効成果を破棄しないことを確認する`の2項目である。
+**Work 6Aの段完了ではない。** 他9項目は未完了である。
+
+2番目の完了は独立検証（被覆主張を疑う側からの検証）に基づく。承認は
+`records/development/2026-08-06-work6a-cl-6a-09-completion-decision-v1.md`
+（`DEC-WORK6A-CL-6A-09-COMPLETION-001`）。同じ検証で、被覆済みとされていた他4項目は
+部分被覆と判定され、残余の処置（Plan欠落の境界例追加、実在testの引用補充、誤停止側の
+緩い読み採用とWork 8への割当て、Change Set／Test Evidenceの保留訂正）は
+`records/development/2026-08-06-work6a-inventory-correction-v1.md`を正本とする。
 
 Human承認は`records/development/2026-08-06-work6a-cl-6a-08-completion-decision-v1.md`
 （`DEC-WORK6A-CL-6A-08-COMPLETION-001`）。実装範囲の承認は
