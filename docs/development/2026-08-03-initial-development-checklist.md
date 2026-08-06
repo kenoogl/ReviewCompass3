@@ -922,9 +922,9 @@ termination、Human decision、staleの正式record、(4) 次の実行可能作�
 
 ## 9. Work 6A：初期sliceのnegative path
 
-- [ ] Contract／Requirement／Plan／Context／Provenance欠落を検出する。
-- [ ] permission過剰、stale、crash、optional観測欠測を区別する。
-- [ ] validatorの既知違反見逃しと正常例誤停止を検出する。
+- [x] Contract／Requirement／Plan／Context／Provenance欠落を検出する。
+- [x] permission過剰、stale、crash、optional観測欠測を区別する。
+- [x] validatorの既知違反見逃しと正常例誤停止を検出する。
 - [ ] maintenance、reopen、上流改定、dependency、cycle、terminationを検証する。
 - [ ] Source Snapshot、Change Set、Test Evidenceの不一致を拒否する。
 - [ ] 関数台帳stale、理由なし新規routine、retired routine復活を拒否する。
@@ -934,10 +934,19 @@ termination、Human decision、staleの正式record、(4) 次の実行可能作�
 - [x] Contract適合でも上位Intent／Requirementを損なう成果をFinal Challengeで検出する。
 - [ ] 全Test、risk別Verification、post-write verificationを通す。
 
-`Evidence`：完了しているのは`Current Work Projectionの第二正本化、欠測推測、stale／競合の
-正常表示を検出する`、`表示器だけのfailureで有効成果を破棄しないことを確認する`、
-`Contract適合でも上位Intent／Requirementを損なう成果をFinal Challengeで検出する`の3項目である。
-**Work 6Aの段完了ではない。** 他8項目は未完了である。
+`Evidence`：完了しているのは6項目（欠落検出、区別、validator検査、第二正本化等の検出、
+表示器failure分離、意図毀損検出）である。**Work 6Aの段完了ではない。** 残り5項目のうち、
+`CL-6A-04/06/07`は基盤未整備（それぞれ正式Workflow state、Work 4Bの関数台帳、Work 7の外部
+side effect）、`CL-6A-05`はChange Set・Test Evidenceの正式artifact未整備、`CL-6A-11`は段の関門で
+ある。計画のとおり、これらは対象能力のTask ContractがPortfolioへ入った時点で負例として有効化し、
+先行completionをblockしない。
+
+欠落検出・区別・validator検査の3項目の完了は
+`DEC-WORK6A-CL-6A-01-02-03-COMPLETION-001`
+（`records/development/2026-08-06-work6a-cl-6a-01-02-03-completion-decision-v1.md`）による。
+独立検証→残余閉鎖→Human裁定の順を経ており、残余処置の正本は
+`records/development/2026-08-06-work6a-inventory-correction-v1.md`。crash後の実地復旧は
+Work 7Aへ移管し（選択肢ア）、誤停止率・変異検査の系統的測定はWork 8へ割当て済みである。
 
 3番目の完了は`DEC-WORK6A-CL-6A-10-COMPLETION-001`
 （`records/development/2026-08-06-work6a-cl-6a-10-completion-decision-v1.md`）による。
