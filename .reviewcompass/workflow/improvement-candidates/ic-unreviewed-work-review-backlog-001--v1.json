@@ -1,0 +1,66 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-UNREVIEWED-WORK-REVIEW-BACKLOG-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-07T08:21:45+09:00",
+  "source_work": "inter-work/review-history-investigation",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-UNREVIEWED-WORK-REVIEW-BACKLOG-2026-08-07-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-07-unreviewed-work-review-backlog-observation-v1.json",
+    "sha256": "55c78fc61a69eddf2ac3970806e0a5d0a2a0402cafc6911d81182e343e897305"
+  },
+  "problem": "これまでの独立レビュー（独立監査、Plan Challenge、Definition／Final Challenge、被覆主張の独立検証）は、記録上すべて文書・候補・計画・被覆主張を対象としており、実装codeへ適用された記録が一件も無い。repositoryには115個のPython moduleがあり、うち少なくとも13個は他の成果物の合否を決める守り役のcode（validator、Digest照合、承認関門の判定、改竄拒否、伏字化・秘匿検出）である。守り役の欠陥は「誤った合格」として黙って現れるため、テスト合格では検出できない。実例として、機械操作routing v2はTDDの全周期と全テストを通過した後に、改竄されたexecution receiptを拒否できない欠陥が発見され、訂正を要した（DEC-MACHINE-OPERATION-ROUTING-RECEIPT-INTEGRITY-001）。work-review-protocol.mdは2026-08-07の追記（DEC-WORK-REVIEW-PROTOCOL-HIGH-RISK-001）で、守り役codeと不可逆操作を既定highとし、実行者のfixtureに無い反証の新作と上流からの独立oracle導出を高riskレビューへ義務付けたが、この規定は蓄積済みの未レビューmoduleへは適用されていない。全量の書き出しとwork-review-protocol.md基準のトリアージ（文書面・code面の両面）はrecords/development/2026-08-07-unreviewed-work-review-triage-memo-v1.mdに固定した。文書面は既存の監査・Challenge経路がWork 3以降機能しており後追い不要、code面のhigh該当が未処置である。",
+  "impact": [
+    "守り役moduleの欠陥は合格として現れるため、影響を受けた成果物が信号なしに受理される",
+    "receipt改竄受理の先例により、この欠陥類型は本repositoryで現実に発生済みである",
+    "レビュー工程を持たない差し込みTDD開発が続く限り、未レビューのhigh moduleは増え続ける",
+    "tools/session_logs/の伏字化・秘匿検出系は機密保護の要でありながら一度もレビューされていない"
+  ],
+  "scope": [
+    "トリアージメモ§6のhigh判定module群に対する、work-review-protocol §4.4（fixtureに無い反証の新作）と§5（上流からの独立oracle導出）による後追いレビューの計画と実施順の決定",
+    "優先度案：(1)欠陥実績のあるoperation_routing系、(2)Issue・候補・Decision検証器、(3)handoff・移行・公式receipt関門、(4)非authority拒否と意図毀損拒否の判定、(5)session_logsの守り役部分の特定と伏字化系、(6)restore経路とsource pin検証",
+    "tools/session_logs/の守り役部分の特定を最初の作業単位とすること",
+    "1 module（または1系統）＝1作業単位とし、レビュー結果と修正作業を分離すること（protocol §7）"
+  ],
+  "non_scope": [
+    "全codeの一斉再レビュー、過去の完了済み作業単位の完了取り消し",
+    "変異検査の系統的測定の前倒し（Work 8割当てを維持、ISSUE-TEST-GROWTH-STATE-PINNING-001の範囲）",
+    "テストの一斉整理、既存test・validator・moduleのHuman裁定前の変更",
+    "本線（Work 4B最小試行）の中断。本候補の着手はHuman判断まで開始しない",
+    "文書面の後追いレビュー（既存監査・Challenge経路で代替済み）"
+  ],
+  "classification_candidates": [
+    "process_improvement",
+    "test_or_oracle"
+  ],
+  "route_candidates": [
+    "issue_resolution"
+  ],
+  "consumer_candidates": [
+    "reviewcompass3-development",
+    "work-review-protocol"
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/development/2026-08-07-unreviewed-work-review-triage-memo-v1.md",
+      "sha256": "cc85c3ae5dfec9307b320db12b21ffa5acda3f141d8482fede348241f3627ac1"
+    },
+    {
+      "path": "docs/development/work-review-protocol.md",
+      "sha256": "22856c9836de2fd1a5d3a8a79d9437ea82150c8e167fb9ddc40ac6b82bb0a923"
+    },
+    {
+      "path": "records/development/2026-08-07-work-review-protocol-high-risk-additions-decision-v1.md",
+      "sha256": "93c4f82a9c52488dbae69e6a2fa6b6b7226ec44b0c1d2ccfdc3ee6a2e221c36e"
+    },
+    {
+      "path": "records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-correction-decision-v1.md",
+      "sha256": "f73f06e12f464a27ded059522e37015acbd2f9487d7d65d55ed96823a6f8033b"
+    }
+  ],
+  "proposed_action": "Humanが分類、blocking判定、routeを裁定する。裁定文言（2026-08-07）によりIssueへの登録が指示されているため、route候補はissue_resolutionのみとする。着手時はトリアージメモ§6の優先度案に従い、1 module（または1系統）＝1作業単位で、work-review-protocol §4.4の反証新作と§5の上流oracle導出を適用する。レビューで欠陥が見つかった場合は検証結果として分離し、承認なしに実装修正へ移らない（protocol §2-5）。本候補はHuman裁定まで、レビューの実施、module・test・validatorの変更のいずれも開始しない。",
+  "content_digest": "84469621387a879fb86427d9fb9a099b334cf49776b8440d6137066c8519bcb8"
+}

@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-UNREVIEWED-WORK-REVIEW-BACKLOG-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-07T08:21:45+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-unreviewed-work-review-backlog-001--v1.json",
+    "record_sha256": "f8149c7fbd3dfc9f470a2f0cc649131409189312b778f246e41b1616d9611f92",
+    "candidate_id": "IC-UNREVIEWED-WORK-REVIEW-BACKLOG-001",
+    "candidate_content_digest": "84469621387a879fb86427d9fb9a099b334cf49776b8440d6137066c8519bcb8"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": true
+  },
+  "disposition": "issue_resolution",
+  "blocking": false,
+  "rationale": "Humanの裁定文言（2026-08-07）：「先ほど議論したレビュー未対応のリストについては、前述すべてを書き出し、work-review-protocol.mdの方針に沿ってトリアージしたものをメモ化。レビューは文書に対して、およびコードに対して両面から考える。これをイシューにあげる。」この指示に基づき、全量の書き出しと両面トリアージをrecords/development/2026-08-07-unreviewed-work-review-triage-memo-v1.mdへ固定し、本候補をIssueへ昇格する。recurrenceをtrueとする根拠は、レビュー工程を持たない差し込みTDD開発が続く限り未レビューhigh moduleが増え続けること、および同一欠陥類型（receipt改竄受理）の発生実績である。`impact: medium`・`priority: low`はHumanの文言に含まれておらず、登録のみで着手指示が無いことからClaudeが機械可読語彙へ翻訳した値である。異議があればsupersedes付きの後継decisionで差し替える。",
+  "next_action": "課題record `ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`を`registered`で登録のみ行う。着手（`in_progress`化）はHuman判断まで開始しない。着手時はトリアージメモ§6の優先度案に従い、1 module（または1系統）＝1作業単位で、work-review-protocol §4.4の反証新作と§5の上流oracle導出を適用する。本線はWork 4B最小試行の範囲提案のままとする。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": true,
+    "issue_id": "ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001"
+  },
+  "content_digest": "f1bbb308fc39610f3f7d0684d831fdffd041ee4296c5eee1a1a649fbc92a1b75"
+}

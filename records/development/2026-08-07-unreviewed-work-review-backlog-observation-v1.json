@@ -1,0 +1,92 @@
+{
+  "observation_id": "OBS-RC3-UNREVIEWED-WORK-REVIEW-BACKLOG-2026-08-07-V1",
+  "observed_at": "2026-08-07T08:21:45+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "Independent post-work review has never been applied to implementation code, including guard-role modules that decide the pass or fail of other artifacts, while the review lane that exists has covered documents only",
+  "source": {
+    "path": "records/development/2026-08-07-unreviewed-work-review-triage-memo-v1.md",
+    "sha256": "cc85c3ae5dfec9307b320db12b21ffa5acda3f141d8482fede348241f3627ac1"
+  },
+  "machine_observations": {
+    "measured_at_commit": "4b352ac3561ef3461712c454923d1fb882e220b5",
+    "commit_history": {
+      "total_commits": 739,
+      "pre_checklist_commits_2026_07_27_to_28": 416,
+      "note": "counted with git log --format='%ad' --date=short | uniq -c; the pre-checklist phase consists almost entirely of 'Add red tests ...' followed by an implementation commit"
+    },
+    "review_evidence_families_observed": [
+      {
+        "family": "independent audit of candidates",
+        "first_appearance": "Work 3, 2026-08-03",
+        "example": "records/development/2026-08-03-work-3-requirements-coverage-evidence-v1.md"
+      },
+      {
+        "family": "plan challenge",
+        "first_appearance": "issue resolution early pilot, 2026-08-04",
+        "example": "records/development/2026-08-04-issue-resolution-pilot-plan-challenge-v4-completion-evidence-v1.md"
+      },
+      {
+        "family": "definition and final challenge plus independent re-verification",
+        "first_appearance": "Work 5A, 2026-08-05",
+        "example": "records/development/2026-08-05-work5a-definition-challenge-first-run-evidence-v1.md"
+      },
+      {
+        "family": "independent verification of coverage claims",
+        "first_appearance": "Work 6A, 2026-08-06",
+        "example": "records/development/2026-08-06-work6a-cl-6a-09-completion-decision-v1.md"
+      }
+    ],
+    "review_targets_observed": "all observed review families target documents, candidates, plans or coverage claims; no record was found that applies an independent review to an implementation module under tools/",
+    "code_inventory_at_measurement": {
+      "tools_session_logs_modules": 39,
+      "tools_extraction_modules": 23,
+      "tools_development_modules": 21,
+      "tools_bootstrap_modules": 17,
+      "tools_requirements_modules": 7,
+      "tools_task_contract_modules": 5,
+      "tools_design_modules": 2,
+      "tools_layout_modules": 1,
+      "total_modules": 115
+    },
+    "guard_role_modules_identified_in_memo": [
+      "tools/development/operation_routing.py",
+      "tools/development/structured_argv_executor.py",
+      "tools/development/issue_intake_v4.py",
+      "tools/development/issue_resolution_pilot.py",
+      "tools/development/todo_handoff.py",
+      "tools/development/todo_record_generation.py",
+      "tools/development/pytest_summary.py",
+      "tools/development/work_unit_transition.py",
+      "tools/development/policy_test_runner.py",
+      "tools/development/session_log_bootstrap.py",
+      "tools/development/todo_compaction.py",
+      "tools/task_contract/execution.py",
+      "tools/session_logs/ (redaction and secret detection subset, exact modules not yet isolated)"
+    ],
+    "precedent_defect": {
+      "fact": "operation routing v2 passed its full TDD cycle and the whole suite, then a defect that failed to reject tampered execution receipts was found and corrected afterwards",
+      "correction_decision": "records/development/2026-08-05-machine-operation-routing-v2-receipt-integrity-correction-decision-v1.md",
+      "correction_decision_sha256": "f73f06e12f464a27ded059522e37015acbd2f9487d7d65d55ed96823a6f8033b"
+    },
+    "protocol_basis": {
+      "path": "docs/development/work-review-protocol.md",
+      "sha256": "22856c9836de2fd1a5d3a8a79d9437ea82150c8e167fb9ddc40ac6b82bb0a923",
+      "addition_decision": "records/development/2026-08-07-work-review-protocol-high-risk-additions-decision-v1.md",
+      "relevant_rules": "guard-role code and irreversible operations default to high risk; high-risk review requires a reviewer-authored refutation beyond the executor's fixtures and an upstream-derived oracle"
+    }
+  },
+  "problem": "Every independent post-work review recorded in this repository targets documents, candidates, plans or coverage claims. No implementation module has ever received one, although the repository contains 115 Python modules, at least 13 of which are guard-role code whose failure appears as silent false acceptance. The one known defect of this class, the tampered-receipt acceptance in operation routing v2, passed the full TDD cycle and the whole test suite and was found only after the fact. The work review protocol now defines guard-role code and irreversible operations as high risk by default and prescribes reviewer-authored refutations beyond the executor's fixtures, but that prescription has not been applied retroactively to the accumulated unreviewed modules.",
+  "impact": [
+    "a defect in a guard-role module presents itself as a pass, so the affected artifacts are accepted without any signal",
+    "the tampered-receipt precedent shows the defect class is real in this repository, not hypothetical",
+    "the backlog keeps growing while inserted TDD work continues without a review step",
+    "the redaction and secret-detection modules under tools/session_logs/ protect confidentiality and have never been reviewed"
+  ],
+  "boundary": [
+    "preserve this observation as immutable source",
+    "do not treat this observation as an Improvement Candidate, Human Triage Decision or Issue Record",
+    "do not start any retroactive review, change any test, validator or module on the basis of this observation alone",
+    "the work-unit enumeration behind the memo is heuristic name matching and may miss units outside the naming convention",
+    "guard-role membership of the stage-era modules other than tools/session_logs/ has not been assessed yet"
+  ]
+}
