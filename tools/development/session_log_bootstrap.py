@@ -517,12 +517,38 @@ def persist_session_capture(
     )
 
 
+_HEX_DIGITS = frozenset("0123456789abcdefABCDEF")
+
+# 手で編集できる引き継ぎメモの限定列挙。一般規則へ広げない。
+_HAND_EDITABLE_HANDOFF_IDENTITIES = ("TODO_NEXT_SESSION.md",)
+
+
+def _is_fixed_digest(value):
+    """固定入力のDigestが64桁の16進数かどうかを判定する。"""
+
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in _HEX_DIGITS for character in value)
+    )
+
+
+def _fixed_input_identity(item):
+    """固定入力要素のidentity文字列を取り出す。無ければNone。"""
+
+    if not isinstance(item, dict):
+        return None
+    identity = item.get("identity")
+    if not isinstance(identity, str) or not identity:
+        return None
+    return identity
+
+
 def _projection_missing_inputs(fixed_inputs):
     plan_present = any(
         isinstance(item, dict)
         and "plan" in str(item.get("identity", "")).lower()
-        and isinstance(item.get("digest"), str)
-        and len(item["digest"]) == 64
+        and _is_fixed_digest(item.get("digest"))
         for item in fixed_inputs
     )
     event_stream_present = any(
@@ -531,8 +557,7 @@ def _projection_missing_inputs(fixed_inputs):
             str(item.get("identity", "")).endswith(".jsonl")
             or "event" in str(item.get("identity", "")).lower()
         )
-        and isinstance(item.get("digest"), str)
-        and len(item["digest"]) == 64
+        and _is_fixed_digest(item.get("digest"))
         for item in fixed_inputs
     )
     missing = []
@@ -541,6 +566,68 @@ def _projection_missing_inputs(fixed_inputs):
     if not event_stream_present:
         missing.append("workflow event stream identity and Digest")
     return missing
+
+
+def _incomplete_fixed_inputs(fixed_inputs):
+    """identityとDigestが揃わない固定入力を、無視せず欠落として挙げる。"""
+
+    missing = []
+    for item in fixed_inputs:
+        identity = _fixed_input_identity(item)
+        digest = item.get("digest") if isinstance(item, dict) else None
+        if identity is not None and _is_fixed_digest(digest):
+            continue
+        label = "(identity absent)" if identity is None else identity
+        missing.append(
+            f"fixed input lacks identity and Digest: {label}"
+        )
+    return missing
+
+
+def _hand_editable_authority_inputs(fixed_inputs):
+    """手編集できる引き継ぎメモを現在位置のauthorityとして受け付けない。"""
+
+    missing = []
+    for item in fixed_inputs:
+        identity = _fixed_input_identity(item)
+        if identity not in _HAND_EDITABLE_HANDOFF_IDENTITIES:
+            continue
+        missing.append(
+            "hand-editable handoff is not a current work authority: "
+            f"{identity}"
+        )
+    return missing
+
+
+def _freshness_missing(input_record):
+    """freshnessの欠落とstaleを、完全な現在位置として扱わない。"""
+
+    if "freshness" not in input_record:
+        return ["freshness is absent and must not be guessed as current"]
+    if input_record.get("freshness") == "stale":
+        return ["freshness is stale and must be refreshed"]
+    return []
+
+
+def _fixed_input_digest_conflicts(fixed_inputs):
+    """同一identityに異なるDigestがある固定入力を競合として挙げる。"""
+
+    digests = {}
+    for item in fixed_inputs:
+        identity = _fixed_input_identity(item)
+        if identity is None:
+            continue
+        digest = item.get("digest")
+        if not isinstance(digest, str):
+            continue
+        known = digests.setdefault(identity, [])
+        if digest not in known:
+            known.append(digest)
+    return [
+        f"fixed input has conflicting Digests: {identity}"
+        for identity, values in digests.items()
+        if len(values) > 1
+    ]
 
 
 def _work_start_conflict(events):
@@ -653,9 +740,12 @@ def project_current_work(events, *, inputs):
             })
 
     missing = _projection_missing_inputs(fixed_inputs)
+    missing.extend(_incomplete_fixed_inputs(fixed_inputs))
+    missing.extend(_hand_editable_authority_inputs(fixed_inputs))
+    missing.extend(_freshness_missing(input_record))
     if completion_next_missing:
         missing.append("work_completed.payload.next")
-    conflicts = []
+    conflicts = _fixed_input_digest_conflicts(fixed_inputs)
     if _work_start_conflict(event_records):
         conflicts.append(
             "concurrent work_started events have different work_item_id"
