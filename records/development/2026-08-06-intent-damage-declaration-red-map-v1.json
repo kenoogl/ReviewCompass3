@@ -1,0 +1,123 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-INTENT-DAMAGE-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-06T15:56:14+09:00",
+  "proposal": {
+    "path": "docs/design/2026-08-06-final-challenge-intent-damage-proposal.md",
+    "sha256": "7f8cd3bc6da61efbc1fbcef7b93007e1534e8b77d53e329fbcd8026bf143baf6",
+    "declaration_section": "§3（規範宣言P1〜P7）"
+  },
+  "purpose": "提案§4の関門に従い、実装開始前にP1〜P7それぞれへREDまたは境界例を結び、「testの無いP」が0件であることを機械で数える。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、列挙したtestに現在失敗するREDが1件でもあればtrueとする。",
+    "red_nowがfalseの宣言にはboundary_reason（いま成功する境界例である理由）を必ず持たせる。",
+    "tests[].red_nowは各test単位の現在の失敗有無である。",
+    "機械照合はPython astでtests/配下の対象1 fileを解析し、列挙したtest関数名の実在と、testの無い宣言が0件であることを確認した。"
+  ],
+  "test_files": {
+    "tests/test_final_challenge_intent_damage.py": [
+      "test_p1_intent_damage_kind_and_origin_are_constructible",
+      "test_p1_legacy_findings_without_kind_keep_passing",
+      "test_p2_blocking_intent_damage_does_not_fail_conformance",
+      "test_p3_accepted_blocking_intent_damage_fails_final_challenge",
+      "test_p4_pending_intent_damage_stops_final_challenge_fail_closed",
+      "test_p5_multiple_intent_damage_findings_are_kept_without_auto_merge",
+      "test_p6_rejected_intent_damage_does_not_fail_final_challenge",
+      "test_p7_origin_routes_are_formally_equivalent"
+    ]
+  },
+  "declarations": {
+    "P1": {
+      "summary": "findingは種別kind（contract／intent_damage）と発生元origin（route種とidentity）を保持できる。種別が無い既存findingはcontractとして扱う後方互換",
+      "tests": [
+        {
+          "test": "tests/test_final_challenge_intent_damage.py::test_p1_intent_damage_kind_and_origin_are_constructible",
+          "red_now": true
+        },
+        {
+          "test": "tests/test_final_challenge_intent_damage.py::test_p1_legacy_findings_without_kind_keep_passing",
+          "red_now": false
+        }
+      ],
+      "red_now": true
+    },
+    "P2": {
+      "summary": "Conformanceはcontract種別のfindingだけで判定する。intent_damageのblocking findingがあっても落ちない",
+      "tests": [
+        {
+          "test": "tests/test_final_challenge_intent_damage.py::test_p2_blocking_intent_damage_does_not_fail_conformance",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "P3": {
+      "summary": "Human採否済み（accepted）でblockingなintent_damage findingが1件でもあれば、Conformance passedでもFinal Challengeはfailed（CL-6A-10の中核負例）",
+      "tests": [
+        {
+          "test": "tests/test_final_challenge_intent_damage.py::test_p3_accepted_blocking_intent_damage_fails_final_challenge",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "P4": {
+      "summary": "Human採否が未了のintent_damage findingが存在すれば、Final Challengeはverdictを出さずfail-closedで停止する",
+      "tests": [
+        {
+          "test": "tests/test_final_challenge_intent_damage.py::test_p4_pending_intent_damage_stops_final_challenge_fail_closed",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "P5": {
+      "summary": "複数の所見（重複・競合を含む）は潰さず保持し、自動統合・多数決で裁定しない（REQ-TRIAGE-002）",
+      "tests": [
+        {
+          "test": "tests/test_final_challenge_intent_damage.py::test_p5_multiple_intent_damage_findings_are_kept_without_auto_merge",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "P6": {
+      "summary": "Human採否でrejectされたintent_damage findingはFinal Challengeの判定に影響せず、rejectの事実と理由はProvenanceへ残る",
+      "tests": [
+        {
+          "test": "tests/test_final_challenge_intent_damage.py::test_p6_rejected_intent_damage_does_not_fail_final_challenge",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "P7": {
+      "summary": "所見の発生経路（deterministic_stub／subagent／external_api／human）は形式上等価に受理され、経路identityが保持される。LLM呼び出しはしない",
+      "tests": [
+        {
+          "test": "tests/test_final_challenge_intent_damage.py::test_p7_origin_routes_are_formally_equivalent",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": {
+    "method": "Python astによる解析。tests/test_final_challenge_intent_damage.pyのtest_関数名集合と、本表のtests列を突き合わせた。",
+    "checked_at": "2026-08-06T15:56:14+09:00",
+    "missing_tests": [],
+    "unmapped_declarations": [],
+    "red_declaration_count": 7,
+    "boundary_declaration_count": 0,
+    "boundary_test_count": 1,
+    "measured_red_test_failures": {
+      "suite": "full（.venv/bin/python3 -m tools.development.policy_test_runner --suite full）",
+      "recorded_at": "2026-08-06T15:56:14+09:00",
+      "passed": 1033,
+      "failed": 7,
+      "failed_tests_are_all_in": "tests/test_final_challenge_intent_damage.py"
+    }
+  }
+}
