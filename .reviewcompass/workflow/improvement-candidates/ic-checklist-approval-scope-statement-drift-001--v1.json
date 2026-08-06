@@ -1,0 +1,76 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-CHECKLIST-APPROVAL-SCOPE-STATEMENT-DRIFT-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-07T06:36:43+09:00",
+  "source_work": "inter-work/review-history-investigation",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-CHECKLIST-APPROVAL-SCOPE-STATEMENT-DRIFT-2026-08-07-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-07-checklist-approval-scope-statement-drift-observation-v1.json",
+    "sha256": "6454f79bef356a83abb89437698b041d8f7c6a09eed1c331dec92af266f85cd6"
+  },
+  "problem": "開発の開始入口である初期開発チェックリストの本文734〜735行は「構造化argv executor、cache root固定、既存直接操作の移行、host側tool構文、外部送信、`ISSUE-HTC-66C3E6CA`の定型欄生成は承認範囲外のままである」と記載している。この文はcommit `91827a5`（2026-08-05T17:37:28+09:00）で書かれたのが最後である。同日18:19〜21:54に、列挙6項目のうち3項目（定型欄生成、構造化argv executor、cache root固定）へそれぞれ最小sliceのHuman承認Decision（`DEC-RECORD-GENERATION-PLAN-001`、`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`、`DEC-MACHINE-OPERATION-ROUTING-TASK-PYTHON-CACHE-001`）とGREEN実装が積まれたが、以後この文へ触れたcommitは0件であり、承認済み・実装済みの能力が未承認として表示され続けている。チェックリスト自身の運用規則はscope変更を理由とHuman判断を記録して本書を改定するよう求めているが、本文の散文的なscope記述と後続Decision recordを突き合わせるテストもvalidatorも存在せず、手作業の突き合わせで発見されるまで不可視だった。",
+  "impact": [
+    "開始入口を読む者が、承認済み・実装済みの3能力を未承認と誤認し、再提案・再承認・重複実装につながる恐れがある",
+    "checkboxとEvidenceの照合の規律ではこの陳腐化を検出できない。誤った主張がcheckboxの無い散文に置かれているためである",
+    "同型の差し込み（チェックリスト本文へ反映されないTDD作業単位）はheuristicな調査で12群観測されており、再発性がある",
+    "散文のscope記述には後続Decision recordと結ぶ機械的な信号が無い。front matterの参照Digestずれは既存のIC-AUTHORITY-REFERENCE-DIGEST-CHECK-001が扱うが、本文の意味的な陳腐化はどの候補も扱っていない"
+  ],
+  "scope": [
+    "チェックリスト734〜735行の承認範囲文を、3件の承認Decisionと整合する内容（3項目は最小sliceが承認・実装済み、残り3項目の既存直接操作の移行・host側tool構文・外部送信は引き続き承認範囲外）へHuman判断のもとで改定すること",
+    "改定はチェックリストの運用規則（手順変更・scope変更は理由とHuman判断を記録して本書を改定する）に従って記録すること",
+    "差し込みで承認・実装された作業単位をチェックリスト本文へ反映する時点（承認Decision作成時か、handoff時か）の規則をHumanが決めること"
+  ],
+  "non_scope": [
+    "Human裁定前のチェックリスト本文の編集",
+    "3件の承認DecisionとGREEN Evidence自体の変更・再裁定",
+    "本文記述とDecision recordを突き合わせる恒久検査器の実装。参照Digest系の検査はIC-AUTHORITY-REFERENCE-DIGEST-CHECK-001の裁定に属し、本候補で重複させない",
+    "heuristicに観測した差し込み12群全部の一括反映。本候補は機械照合で確定した3項目の食い違いに限定し、全体の扱いは別途Human判断とする"
+  ],
+  "classification_candidates": [
+    "process_improvement"
+  ],
+  "route_candidates": [
+    "checkpoint",
+    "issue_resolution"
+  ],
+  "consumer_candidates": [
+    "reviewcompass3-development",
+    "initial-development-checklist"
+  ],
+  "evidence_refs": [
+    {
+      "path": "docs/development/2026-08-03-initial-development-checklist.md",
+      "sha256": "a089ffdf5e538e28457894fb6a120ef065d2b8a0acb3c392d4dedaeacdecbd9d"
+    },
+    {
+      "path": "records/development/2026-08-05-record-generation-issue-plan-approval-decision-v1.md",
+      "sha256": "c4bf61d7f2493f38a48601659efab8300b68b23e40b37fb808ea2f4cf440943b"
+    },
+    {
+      "path": "records/development/2026-08-05-record-generation-todo-green-evidence-v1.md",
+      "sha256": "61ae616c11f8f9f95acc4c8afde1d7983699bdaaa445ee9d3b3e6ed3ecddb89b"
+    },
+    {
+      "path": "records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-decision-v1.md",
+      "sha256": "2982646b43a74d856d9b18af527b743b10ac3d8874f03ee39afba825752a8864"
+    },
+    {
+      "path": "records/development/2026-08-05-machine-operation-routing-read-only-argv-green-evidence-v1.md",
+      "sha256": "4f63620dff80ac3c0408994163885777c0e0d5c1bb6ebf469680857653192db5"
+    },
+    {
+      "path": "records/development/2026-08-05-machine-operation-routing-task-python-cache-approval-decision-v1.md",
+      "sha256": "b433fd93196e1ee401ad6ff111c6eb15fdacb94993b6ddf5b479f3e25e86f521"
+    },
+    {
+      "path": "records/development/2026-08-05-machine-operation-routing-task-python-cache-green-evidence-v1.md",
+      "sha256": "75a307615b50e492334fe2f620000ebb3cd1eeee0ae3e5c2ef8a4a4f0b3e6b0b"
+    }
+  ],
+  "proposed_action": "Humanが分類、blocking判定、routeを裁定する。修復自体は小さく、該当文を「定型欄生成、構造化argv executor、cache root固定の3項目は最小sliceが承認・実装済み（各Decision ID参照）、既存直接操作の移行、host側tool構文、外部送信は引き続き承認範囲外」へ改定し、改定理由をチェックリストの運用規則に従って記録すればよい。ただし本件は孤立事象ではなく、差し込みで承認された作業がチェックリスト本文へ反映されない再発性の型の一例であるため、反映の時点規則（承認Decision作成と同じ作業単位で反映するか、次のhandoff検査で反映するか）をあわせてHumanが決めることに価値がある。本候補はHuman裁定まで、チェックリスト本文、承認Decision、GREEN Evidence、validator、testのいずれも変更しない。",
+  "content_digest": "02372f08fca4fb2a96fb29051ce6a1b57bbebef0bff91a15c3ca467a5eeb28ee"
+}

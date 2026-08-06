@@ -1,0 +1,102 @@
+{
+  "observation_id": "OBS-RC3-CHECKLIST-APPROVAL-SCOPE-STATEMENT-DRIFT-2026-08-07-V1",
+  "observed_at": "2026-08-07T06:36:43+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "The initial development checklist still declares three capabilities as outside approved scope although each received a human approval decision and a green implementation later on the same day the sentence was last written",
+  "source": {
+    "path": "records/development/2026-08-05-record-generation-issue-plan-approval-decision-v1.md",
+    "sha256": "c4bf61d7f2493f38a48601659efab8300b68b23e40b37fb808ea2f4cf440943b"
+  },
+  "machine_observations": {
+    "measured_at_commit": "57025ab168d87b036e7621f450a1cc30cd003b4c",
+    "checklist_path": "docs/development/2026-08-03-initial-development-checklist.md",
+    "checklist_sha256_at_measurement": "a089ffdf5e538e28457894fb6a120ef065d2b8a0acb3c392d4dedaeacdecbd9d",
+    "stale_statement": {
+      "lines": "734-735",
+      "text": "構造化argv executor、cache root固定、既存直接操作の移行、host側tool構文、外部送信、`ISSUE-HTC-66C3E6CA`の定型欄生成は承認範囲外のままである。",
+      "last_updated_commit": "91827a5",
+      "last_updated_at": "2026-08-05T17:37:28+09:00",
+      "last_updated_commit_subject": "Implement operation routing v2 minimum slice",
+      "measurement_command": "git log --format='%h %ad %s' --date=iso -L 733,736:docs/development/2026-08-03-initial-development-checklist.md",
+      "commits_touching_the_statement_after_91827a5": 0
+    },
+    "superseding_approvals": [
+      {
+        "listed_item": "`ISSUE-HTC-66C3E6CA`の定型欄生成",
+        "decision_id": "DEC-RECORD-GENERATION-PLAN-001",
+        "decision_path": "records/development/2026-08-05-record-generation-issue-plan-approval-decision-v1.md",
+        "decision_sha256": "c4bf61d7f2493f38a48601659efab8300b68b23e40b37fb808ea2f4cf440943b",
+        "decision_added_in_commit": "0a4fdf0",
+        "decision_added_at": "2026-08-05T18:19:37+09:00",
+        "approved_scope": "TODO-limited structured record generation, five points accepted in one decision; generalization to Evidence and Decision records explicitly excluded",
+        "green_evidence_path": "records/development/2026-08-05-record-generation-todo-green-evidence-v1.md",
+        "green_evidence_sha256": "61ae616c11f8f9f95acc4c8afde1d7983699bdaaa445ee9d3b3e6ed3ecddb89b",
+        "green_added_in_commit": "8baac37",
+        "green_added_at": "2026-08-05T18:31:35+09:00"
+      },
+      {
+        "listed_item": "構造化argv executor",
+        "decision_id": "DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001",
+        "decision_path": "records/development/2026-08-05-machine-operation-routing-read-only-argv-approval-decision-v1.md",
+        "decision_sha256": "2982646b43a74d856d9b18af527b743b10ac3d8874f03ee39afba825752a8864",
+        "decision_added_in_commit": "abb066f",
+        "decision_added_at": "2026-08-05T20:47:14+09:00",
+        "approved_scope": "read-only argv executor minimal slice, only the git status --porcelain template, reusing operation_routing inventory, preflight and receipt unchanged",
+        "green_evidence_path": "records/development/2026-08-05-machine-operation-routing-read-only-argv-green-evidence-v1.md",
+        "green_evidence_sha256": "4f63620dff80ac3c0408994163885777c0e0d5c1bb6ebf469680857653192db5",
+        "green_added_in_commit": "fbaa170",
+        "green_added_at": "2026-08-05T20:55:09+09:00"
+      },
+      {
+        "listed_item": "cache root固定",
+        "decision_id": "DEC-MACHINE-OPERATION-ROUTING-TASK-PYTHON-CACHE-001",
+        "decision_path": "records/development/2026-08-05-machine-operation-routing-task-python-cache-approval-decision-v1.md",
+        "decision_sha256": "b433fd93196e1ee401ad6ff111c6eb15fdacb94993b6ddf5b479f3e25e86f521",
+        "decision_added_in_commit": "0b11b7d",
+        "decision_added_at": "2026-08-05T21:46:33+09:00",
+        "approved_scope": "task-scoped Python cache root minimal slice, placement and retention taken from the already approved Layout Baseline v3 without new decisions",
+        "green_evidence_path": "records/development/2026-08-05-machine-operation-routing-task-python-cache-green-evidence-v1.md",
+        "green_evidence_sha256": "75a307615b50e492334fe2f620000ebb3cd1eeee0ae3e5c2ef8a4a4f0b3e6b0b",
+        "green_added_in_commit": "c9587db",
+        "green_added_at": "2026-08-05T21:54:44+09:00"
+      }
+    ],
+    "items_still_unapproved_at_measurement": {
+      "items": ["既存直接操作の移行", "host側tool構文", "外部送信"],
+      "note": "The read-only argv approval decision lists these as out of its own scope, and no approval decision record naming them was found under records/development/ at the measurement commit."
+    },
+    "drift_window": {
+      "statement_written_at": "2026-08-05T17:37:28+09:00",
+      "first_contradicting_approval_at": "2026-08-05T18:19:37+09:00",
+      "minutes_until_first_contradiction": 42,
+      "last_contradicting_green_at": "2026-08-05T21:54:44+09:00"
+    },
+    "recurrence_survey": {
+      "note": "Counts come from a heuristic session analysis that normalized red and green record file names under records/development/ and grepped the checklist body for each normalized work unit name. They bound the recurrence risk and are not a validated inventory.",
+      "checklist_absent_tdd_work_unit_clusters": 12,
+      "examples": [
+        "machine-operation-routing-read-only-argv",
+        "machine-operation-routing-task-python-cache",
+        "record-generation-todo",
+        "task-contract-source-pin",
+        "todo-test-projection-cli",
+        "todo-update-transaction-boundary",
+        "preservation-layout-v3-migration"
+      ]
+    }
+  },
+  "problem": "The initial development checklist is the designated entry point for development work, and its body records at lines 734-735 that six capabilities remain outside approved scope. That sentence was last written at 17:37 on 2026-08-05 by commit 91827a5. Between 18:19 and 21:54 on the same day, three of the six listed items each received a human approval decision for a minimal slice and a green implementation, recorded in immutable decision and evidence records, but no later commit revised the sentence. The checklist therefore keeps presenting already approved and implemented capabilities as unapproved. The checklist's own operating rules require scope changes to be recorded by revising the document with reason and human decision, and no test or validator compares body-text scope statements against decision records, so the drift stayed invisible until a manual cross-reference during a review-history investigation found it.",
+  "impact": [
+    "a reader planning from the checklist entry point treats approved and implemented capabilities as unapproved and may re-propose, re-approve or re-implement them",
+    "the checkbox-to-Evidence discipline does not catch this class of staleness because the stale claim sits in prose without a checkbox",
+    "the heuristic recurrence survey found twelve checklist-absent TDD work-unit clusters, so the insertion pattern that produced this drift is recurring rather than one-off",
+    "prose scope statements have no machine signal tying them to later decision records, unlike digests, which are already covered by OBS-RC3-AUTHORITY-REFERENCE-DIGEST-DRIFT-2026-08-06-V1 for front matter references"
+  ],
+  "boundary": [
+    "preserve this observation as immutable source",
+    "do not treat this observation as an Improvement Candidate, Human Triage Decision or Issue Record",
+    "the source field points at the earliest contradicting approval decision rather than the checklist, because the checklist keeps changing and a mutable source would reproduce the drift this observation reports",
+    "do not edit the checklist, the approval decisions or the green evidence on the basis of this observation alone",
+    "counts under recurrence_survey are heuristic and must be re-measured before any reconciliation relies on them"
+  ]
+}
