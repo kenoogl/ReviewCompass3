@@ -1,0 +1,90 @@
+{
+  "observation_id": "OBS-RC3-AUTHORITY-REFERENCE-DIGEST-DRIFT-2026-08-06-V1",
+  "observed_at": "2026-08-06T10:07:18+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "Checklist front matter authority reference digests drifted from the upstream documents they declare as currently effective",
+  "source": {
+    "path": "records/development/2026-08-06-checklist-authority-reference-digest-repair-evidence-v1.md",
+    "sha256": "b7b280e7c61b193f6ed19f798279fc19a0942e8daa7a99ee7dcaf5549420c373"
+  },
+  "machine_observations": {
+    "measured_at_commit": "21e3d821b398e3b101f296f4f702e620a151e624",
+    "drifted_document_path": "docs/development/2026-08-03-initial-development-checklist.md",
+    "drifted_reference_count": 2,
+    "drifted_references": [
+      {
+        "field": "authority_order[2].sha256",
+        "target_path": "docs/current/reviewcompass3-plan-current.md",
+        "recorded_before_repair": "0ab828f4d940ab8a6a4d285479afbb1fdbc086afbb72fb993b885599f9bf2694",
+        "actual_at_repair": "1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f"
+      },
+      {
+        "field": "operational_policy.sha256",
+        "target_path": "docs/development/2026-08-02-development-policy.md",
+        "recorded_before_repair": "9078276d7ba1f540495a9679a75f12f9dac0c7717fcfd637e883f41b6bf739a0",
+        "actual_at_repair": "0d34880353f06f50c7623282c765717348c8776938dc3113e28fdad4e9f8ac18"
+      }
+    ],
+    "repair_commit": "e732995",
+    "checklist_sha256_before_repair": "1232acd3b51527fe04b917538aee7a02d35c991392b35bcaee5b8729f6551b1f",
+    "checklist_sha256_after_repair": "54d3b9f4eee5889b3b4d85e94c665eba0c643996ddf74f45f6a514389af00d02",
+    "checklist_sha256_at_measurement": "53226e7c7c743e145af6fa313e42c2fccdd66f5f41917399b445d8587f022676",
+    "drift_window": {
+      "reference_field_last_updated_at_commit": "c475bec",
+      "commits_touching_the_reference_field_between_c475bec_and_measurement": 1,
+      "only_commit_touching_the_reference_field": "e732995",
+      "plan_current_revision_commits_in_the_same_range": 7,
+      "development_policy_revision_commits_in_the_same_range": 3,
+      "measurement_command": "git log -L '9,14:docs/development/2026-08-03-initial-development-checklist.md' c475bec..HEAD"
+    },
+    "front_matter_reference_survey": {
+      "total_path_sha256_pairs": 55,
+      "currently_effective_authority_keys": [
+        "authority_order",
+        "operational_policy",
+        "policy_decision",
+        "related_design",
+        "intent_ref",
+        "glossary_ref",
+        "reconciliation_ref"
+      ],
+      "currently_effective_reference_count": 11,
+      "currently_effective_mismatch_count": 0,
+      "generation_time_pin_key": "generated_from",
+      "generation_time_pin_reference_count": 44,
+      "generation_time_pin_mismatch_count": 3,
+      "note": "All three remaining mismatches sit under generated_from, which pins the state at generation time and is correct while stale."
+    },
+    "out_of_scope_reference_survey": {
+      "note": "Counts come from a temporary heuristic scanner that pairs a 64-hex digest with a single backticked path on the same line. They bound the false positive risk and are not a validated inventory.",
+      "markdown_body_paired_references": 500,
+      "markdown_body_mismatched_references": 91,
+      "markdown_body_unpaired_digest_occurrences": 890,
+      "markdown_body_non_repository_paths": 58,
+      "json_record_paired_references": 1432,
+      "json_record_mismatched_references": 537
+    },
+    "existing_mechanisms": {
+      "front_matter_yaml_parser_in_tools": false,
+      "todo_evidence_section_checker": "tools/development/todo_record_generation.py",
+      "todo_evidence_section_reference_count": 8,
+      "todo_evidence_section_mismatch_count": 0,
+      "todo_evidence_section_scope": "the '## 最新のauthority／Evidence' section of TODO_NEXT_SESSION.md only",
+      "permanent_checker_for_front_matter_references": false
+    }
+  },
+  "problem": "The front matter of the initial development checklist declares upstream documents as currently effective by recording their path and SHA-256. On 2026-08-06 two of those digests no longer matched the bytes of the files they name. The field was last updated at commit c475bec, and in the range from c475bec to the measurement commit the Current Plan was revised in 7 commits and the Development Policy in 3, while the reference field itself was touched by only one commit, the repair. No permanent checker compares a recorded front matter digest against the current bytes of the referenced file, so the drift stayed invisible until it was found by hand.",
+  "impact": [
+    "a referring document keeps presenting a superseded revision as the currently effective authority",
+    "a reader following the recorded digest can mistake an older revision for the authoritative source",
+    "the work unit that revises an upstream document has no mechanical signal that a referring document must be updated too",
+    "the same class of drift is checked for TODO_NEXT_SESSION.md but for no other document"
+  ],
+  "boundary": [
+    "preserve this observation as immutable source",
+    "do not treat this observation as an Improvement Candidate, Human Triage Decision or Issue Record",
+    "the source field points at the immutable repair Evidence rather than the checklist, because the checklist keeps changing and a mutable source would reproduce the drift this observation reports",
+    "do not build a checker, change validators, tests, configuration or the checklist on the basis of this observation alone",
+    "counts under out_of_scope_reference_survey are heuristic and must be re-measured before any checker relies on them"
+  ]
+}

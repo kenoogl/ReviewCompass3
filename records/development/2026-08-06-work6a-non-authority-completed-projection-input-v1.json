@@ -1,7 +1,7 @@
 {
   "updated_on": "2026-08-06",
   "overall": "Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。",
-  "current_work": "Work 6A中核negative pathの承認範囲をGREENにし、非authority入力の拒否対象を上位文書が名指しする4件へ広げた。checklistのCL-6A-08はHumanが完了を承認した。Work 6Aの段完了ではなく、他10項目は未完了である。",
+  "current_work": "Work 6A中核negative pathのGREENとchecklist CL-6A-08の完了反映まで終えた。恒久検査器は案1に従い、観測recordと改善候補をnew-onlyで作成した。Issue昇格とtriage判断は未実施である。",
   "task_contract_id": "none",
   "active_issue": {
     "issue_id": "ISSUE-HTC-C9F6C917",
@@ -10,6 +10,16 @@
     "next_action": "現行route判断へ割り込ませず、既存Issueとして保持する"
   },
   "references": [
+    {
+      "label": "検査器の改善候補",
+      "path": ".reviewcompass/workflow/improvement-candidates/ic-authority-reference-digest-check-001--v1.json",
+      "sha256": "d4e801aa35e4bd1ad2c17917d0cfd57b60e7e1aec93e7d1259bf8321285824c6"
+    },
+    {
+      "label": "参照Digest driftの観測record",
+      "path": "records/development/2026-08-06-authority-reference-digest-drift-observation-v1.json",
+      "sha256": "6ccf3d15c28c56a5b74730a9ac056ef3abe13967da0427549e05308cc0ab3841"
+    },
     {
       "label": "CL-6A-08 完了承認Decision",
       "path": "records/development/2026-08-06-work6a-cl-6a-08-completion-decision-v1.md",
@@ -26,19 +36,9 @@
       "sha256": "219eefc14dcda02d4ea72e70682bcaf0fe9ea98d752cb25aacc79dcee64871b7"
     },
     {
-      "label": "非authority入力 採択Decision",
-      "path": "records/development/2026-08-06-work6a-non-authority-input-scope-decision-v1.md",
-      "sha256": "2991aed38dd7e6f294774baa0ff98d664168bd8f2fffdc3337e7228938109af8"
-    },
-    {
       "label": "Work 6A項目と既存Testの対応inventory",
       "path": "records/development/2026-08-06-work6a-negative-path-test-inventory-v1.json",
       "sha256": "51674c143858b37608c7914c5bc2a8973be8221e2d5bde9707d89d082f995a16"
-    },
-    {
-      "label": "案A承認Decision",
-      "path": "records/development/2026-08-06-work5a-current-work-projection-routing-decision-v1.md",
-      "sha256": "f084b471d3fe4ba40a9c6a7a5e3882fa78090da54c7e9b19b04547dde5307eda"
     },
     {
       "label": "Initial Development Checklist",
@@ -52,22 +52,22 @@
     }
   ],
   "next_work": {
-    "action": "Humanが恒久検査器をIssueレーンへ載せる形式を判断する。",
+    "action": "Humanが改善候補IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001のtriageを裁定する。",
     "start_conditions": [
-      "CL-6A-08完了反映を含むcommitがcleanであること",
-      "形式が確定するまで改善候補recordを作成しないこと"
+      "観測recordと改善候補を含むcommitがcleanであること",
+      "裁定直前にv3 validatorを再実行し、evidence_refsが現行bytesと一致することを確認すること"
     ],
     "completion_conditions": [
-      "改善候補recordの形式が確定すること",
-      "候補recordがvalidatorに合格し、Human triage判断へ渡せること"
+      "分類、blocking判定、routeがHuman triage decisionへ記録されること",
+      "Issue昇格の可否が明示されること"
     ],
-    "following": "候補からHuman triage判断を経てIssueへ昇格させる。昇格はHumanが判断する。"
+    "following": "昇格する場合だけIssue recordをissues-v4へ作る。検査器、validator、test、configは裁定まで作らない。"
   },
-  "blocker": "なし。Current Work Projection正式写像、正式Portfolio／Work Item／Workflow state、Work 6Aの残り20項目は開始しない。Codex側の指示書にある作業はHumanの指示により扱わない。",
-  "human_decision": "恒久検査器の改善候補recordの形式。過去TODO由来でない候補は既存2形式のどちらにもそのまま載らない。",
-  "stale": "checklist CL-6A-08は未完了表示から完了へ変わった。RED Evidence§8-2の誤りとGREEN Evidence v1の陳腐化は訂正recordで置換済みである。",
+  "blocker": "なし。検査器の実装、Current Work Projection正式写像、正式Portfolio／Work Item／Workflow state、Work 6Aの残り10項目は開始しない。Codex側の指示書にある作業はHumanの指示により扱わない。",
+  "human_decision": "改善候補IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001の分類、blocking判定、route、Issue昇格の可否。",
+  "stale": "checklist CL-6A-08は完了へ変わった。改善候補のevidence_refsはchecklistを含むため、checklistが再改定されると検証に落ちる。",
   "deferred": "Current Work Projection正式写像、同じTestを変更しないrefactor後再確認、Work 6Aのうち承認範囲外20項目、入力側へのauthority宣言方式、Work 4B、Work 5B、Work 7、Work 8、UI、automation。",
   "branch": "main",
-  "related_test": "Work 6A negative 10 passed、隣接する既存projection関連13 passed",
+  "related_test": "Issue Resolution Pilot関連54 passed、Work 6A negative 10 passed",
   "full_test": "venv公式runner 1017 passed、Python 3.9.6、pytest 8.4.2、fallback false"
 }

@@ -1,0 +1,71 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-06T10:07:18+09:00",
+  "source_work": "inter-work/checklist-authority-reference-digest-repair",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-AUTHORITY-REFERENCE-DIGEST-DRIFT-2026-08-06-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-06-authority-reference-digest-drift-observation-v1.json",
+    "sha256": "6ccf3d15c28c56a5b74730a9ac056ef3abe13967da0427549e05308cc0ab3841"
+  },
+  "problem": "現在有効な上位文書を指す参照Digestが、上位文書の改定に追随せずずれても、機械的に検出されない。2026-08-06に、初期開発チェックリスト`docs/development/2026-08-03-initial-development-checklist.md`のfront matterで実際に2件のずれが見つかり、commit `e732995`で修復した。当該欄は2026-08-04のcommit `c475bec`で更新されたのが最後であり、`c475bec`から測定commit `21e3d821b398e3b101f296f4f702e620a151e624`までの範囲で、Current Planは7 commit、Development Policyは3 commit改定されたが、参照欄に触れたcommitは修復の1件だけであった。front matterのYAMLを解析して記載Digestを参照先の現行bytesと突き合わせる恒久的な検査器は、repository内に存在しない。",
+  "impact": [
+    "参照側の文書が、実際とは異なる版を「現在有効な上位文書」として指し示したまま表示を続ける",
+    "読み手が記載Digestをたどり、古い版を正本と誤認する恐れがある",
+    "上位文書を改定する作業単位に、参照側の更新が必要であるという機械的な信号が無く、stale閉包から参照側が落ちても気付けない",
+    "TODO_NEXT_SESSION.mdについてはEvidence節に限った照合が`tools/development/todo_record_generation.py`にあり、測定commitで参照8件・不一致0件と実際に機能しているが、他の文書のfront matterには同等の仕組みが無い"
+  ],
+  "scope": [
+    "Markdown front matterのうち、現在有効な上位文書を指すkeyに限定した、記載Digestと参照先の現行bytesの照合",
+    "対象keyは`authority_order`、`operational_policy`、`policy_decision`、`related_design`、`intent_ref`、`glossary_ref`、`reconciliation_ref`とする。測定commitで該当参照は11件、不一致0件である",
+    "どのkeyが「現在有効」を意味するかの判別規則を、機械可読な形で宣言すること",
+    "不一致を検出した場合にfail-closedで停止し、参照側のDigestを自動書換えしないこと"
+  ],
+  "non_scope": [
+    "Markdown本文中の参照とJSON記録内の参照。測定commitでの不一致は本文91件、JSON537件だが、そのほとんどは処理時点で固定された正しいpinであり、検査対象に含めると誤検知になる",
+    "過去へ固定した参照。`generated_from`などの生成時点pin、`records/`配下の不変Evidence、Task Contractの固定入力、test内のpinを含む。これらは古い値のままが正しく、key名以外に機械的な判別手がかりが無い",
+    "参照Digestの自動書換え、上位文書の改定、チェックリスト本文・checkbox・Evidence・順序の変更",
+    "検査器の実装、既存validator・test・configの変更。本候補はHuman裁定前に実装しない"
+  ],
+  "classification_candidates": [
+    "process_improvement",
+    "test_or_oracle"
+  ],
+  "route_candidates": [
+    "issue_resolution",
+    "checkpoint"
+  ],
+  "consumer_candidates": [
+    "reviewcompass3-development",
+    "initial-development-checklist",
+    "development-plan"
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/development/2026-08-06-checklist-authority-reference-digest-repair-evidence-v1.md",
+      "sha256": "b7b280e7c61b193f6ed19f798279fc19a0942e8daa7a99ee7dcaf5549420c373"
+    },
+    {
+      "path": "docs/development/2026-08-03-initial-development-checklist.md",
+      "sha256": "53226e7c7c743e145af6fa313e42c2fccdd66f5f41917399b445d8587f022676"
+    },
+    {
+      "path": "docs/current/reviewcompass3-plan-current.md",
+      "sha256": "1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "0d34880353f06f50c7623282c765717348c8776938dc3113e28fdad4e9f8ac18"
+    },
+    {
+      "path": "tools/development/todo_record_generation.py",
+      "sha256": "f5ae4328b211b0d140856a5e29663673f604ba69623b65c13848e432896e37ea"
+    }
+  ],
+  "proposed_action": "Humanが分類、blocking判定、routeを裁定する。実装へ進む前に解くべき前提が一つある。どのfront matter keyが「現在有効な上位文書」を意味するかという判別規則が、どこにも宣言されていない。`schemas/`、`config/`、`tools/`のいずれにも該当する定義は無く、規則は各front matterの中に暗黙的に存在するだけである。同一path `docs/development/2026-08-02-development-policy.md`が2箇所で異なるDigestを持ち、チェックリストの`operational_policy`（現在値）とCurrent Planの`generated_from`（生成時点pin）の両方が正しい、という実例が、判別子がkey名でしかないことを示す。したがって検査器を作る場合は、対象keyのallowlistを機械可読な形で宣言することが先行し、その宣言自体がHuman承認を要する。宣言の無いまま横断検査を作れば、正しい過去pinを不一致として報告する。本候補はIssue昇格の可否を含めてHumanが判断するまで、検査器、validator、test、configを作らない。",
+  "content_digest": "760d9ef9811e6d95c9af406a6664e0e2ef5df9c33e32aa6ebbc33721c931753f"
+}
