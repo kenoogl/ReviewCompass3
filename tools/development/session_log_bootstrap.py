@@ -519,8 +519,19 @@ def persist_session_capture(
 
 _HEX_DIGITS = frozenset("0123456789abcdefABCDEF")
 
-# 手で編集できる引き継ぎメモの限定列挙。一般規則へ広げない。
-_HAND_EDITABLE_HANDOFF_IDENTITIES = ("TODO_NEXT_SESSION.md",)
+# 上位文書が現在位置のauthorityではないと宣言している成果物の限定列挙。
+# 手編集できるから拒否するのではない。Plan authorityも人が編集する文書だが正当な入力である。
+# 完全一致だけで判定し、拡張子や配置場所による一般規則へ広げない。
+# 各identityの非authority宣言の出所は次である。
+# - `TODO_NEXT_SESSION.md`：`docs/development/prompts/todo-handoff-update.md`
+# - `STATUS.md`：Current Plan、初期開発checklist、Current Work Projection検討memo
+# - TODO handoffのtemplateと初期開発checklist：それぞれ当該file自身の宣言
+_NON_AUTHORITY_FIXED_INPUT_IDENTITIES = (
+    "TODO_NEXT_SESSION.md",
+    "STATUS.md",
+    "docs/development/templates/TODO_NEXT_SESSION.template.md",
+    "docs/development/2026-08-03-initial-development-checklist.md",
+)
 
 
 def _is_fixed_digest(value):
@@ -584,16 +595,20 @@ def _incomplete_fixed_inputs(fixed_inputs):
     return missing
 
 
-def _hand_editable_authority_inputs(fixed_inputs):
-    """手編集できる引き継ぎメモを現在位置のauthorityとして受け付けない。"""
+def _non_authority_declared_inputs(fixed_inputs):
+    """上位文書がauthorityではないと宣言した成果物を、現在位置のauthorityにしない。
+
+    判定基準は手編集できるかどうかではなく、当該成果物が現在位置のauthorityとして
+    宣言されているかどうかである。
+    """
 
     missing = []
     for item in fixed_inputs:
         identity = _fixed_input_identity(item)
-        if identity not in _HAND_EDITABLE_HANDOFF_IDENTITIES:
+        if identity not in _NON_AUTHORITY_FIXED_INPUT_IDENTITIES:
             continue
         missing.append(
-            "hand-editable handoff is not a current work authority: "
+            "fixed input is declared not a current work authority: "
             f"{identity}"
         )
     return missing
@@ -741,7 +756,7 @@ def project_current_work(events, *, inputs):
 
     missing = _projection_missing_inputs(fixed_inputs)
     missing.extend(_incomplete_fixed_inputs(fixed_inputs))
-    missing.extend(_hand_editable_authority_inputs(fixed_inputs))
+    missing.extend(_non_authority_declared_inputs(fixed_inputs))
     missing.extend(_freshness_missing(input_record))
     if completion_next_missing:
         missing.append("work_completed.payload.next")
