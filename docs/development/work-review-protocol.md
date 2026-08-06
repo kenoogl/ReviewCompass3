@@ -191,6 +191,7 @@ Claude固有の受け渡し方法は`docs/development/codex-claude-collaboration
 - [ ] commit列と変更pathを実状態から確認した。
 - [ ] 成果物を再読込みし、Digestと参照を再計算した。
 - [ ] 対象Testとriskに応じた全Test／oracleを独立再実行した。
+- [ ] `high`では、実行者のfixtureに無い反証を新作して機械で試した。
 - [ ] Workflow順序、Provenance、Human承認境界を確認した。
 - [ ] 禁止操作とside effectの有無を確認した。
 - [ ] `verified`以外を完了または次段開始の根拠にしていない。
