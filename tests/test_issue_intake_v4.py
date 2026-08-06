@@ -787,13 +787,23 @@ def test_k6_legacy_v1_decision_and_pilot_validation_keep_passing(intake, config)
 
 
 def test_k7_repository_decision_set_has_no_conflict(intake, config):
+    """repository内decision集合の無競合と既知bundle束縛を検査する。
+
+    N5（docs/design/2026-08-06-issue-intake-v4-single-candidate-reference-proposal.md、
+    §8でHuman承認済み）により、「全decisionが既知bundle SHAを指す」から
+    「bundle形式のdecisionは既知bundle SHAを指す」へ狭めた。単体形式
+    （candidate_refに`record_path` keyを持つもの）は対象外とする。
+    既存41 decisionはすべてbundle形式のため、既存41件の保護は変わらない。
+    """
+
     effective = intake.validate_triage_decision_repository(
         project_root=PROJECT_ROOT, config=config
     )
     assert isinstance(effective, dict)
     for candidate_id, decision in effective.items():
         assert decision["candidate_ref"]["candidate_id"] == candidate_id
-        assert decision["candidate_ref"]["bundle_sha256"] == BUNDLE_SHA
+        if "record_path" not in decision["candidate_ref"]:
+            assert decision["candidate_ref"]["bundle_sha256"] == BUNDLE_SHA
         assert decision["decision_maker"] == "human"
 
     stored = sorted(
@@ -1128,6 +1138,15 @@ def test_l5_legacy_issue_directory_stays_single_and_unjudged_by_v4(intake, confi
 
 
 def test_l6_repository_issue_set_is_consistent(intake, config):
+    """repository内Issue集合とdecision集合の整合を検査する。
+
+    N6（docs/design/2026-08-06-issue-intake-v4-single-candidate-reference-proposal.md、
+    §8でHuman承認済み）により、Issue側もN5と同じ向きへ狭めた。bundle形式の
+    Issueだけに既知bundle SHAを要求し、単体形式（candidate_refに`record_path`
+    keyを持つもの）は対象外とする。既存3 IssueはすべてBundle形式のため、
+    既存3件の保護は変わらない。
+    """
+
     effective = intake.validate_v4_issue_repository(
         project_root=PROJECT_ROOT, config=config
     )
@@ -1138,7 +1157,8 @@ def test_l6_repository_issue_set_is_consistent(intake, config):
 
     for candidate_id, issue in effective.items():
         assert issue["candidate_ref"]["candidate_id"] == candidate_id
-        assert issue["candidate_ref"]["bundle_sha256"] == BUNDLE_SHA
+        if "record_path" not in issue["candidate_ref"]:
+            assert issue["candidate_ref"]["bundle_sha256"] == BUNDLE_SHA
         assert issue["state"] == "registered"
         decision = decisions[candidate_id]
         assert decision["issue_promotion"] == {
