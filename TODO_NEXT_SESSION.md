@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：Humanの移行指示により、セッションログ書庫を旧OS標準配置からLayout v3のdevelopment sensitive rootへbyte-exactに移行し、active archiveを切り替えた。12検査全合格、冪等再実行unchanged。旧書庫はrollback copyとして未削除で保持。削除は別のHuman判断である。
+- 現在作業：セッションログ書庫のLayout v3移行が完了した（12検査全合格、冪等unchanged、旧書庫はrollback保持）。HumanがWork 4B最小試行（Current Plan §17実装順12）への前進を選定した。着手前の範囲確定が次である。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -27,27 +27,28 @@
 
 ## 次に行う一作業
 
-Humanが次の一作業を判断する。候補は、旧書庫の削除可否（rollback不要と判断した時点）、Work 4B最小Pilotへの前進、登録済み5課題からの着手選定である。
+Work 4B最小試行の範囲提案を作り、Human承認を得る。承認後にREDへ進む。
 
 開始条件：
 
-- 書庫移行のReceipt・Evidenceを含むcommitがcleanで全Testが緑であること
+- Work 4Bの承認済み境界（Current Plan §12 Work 4B、DEC-WORK4A-EARLY-EXIT-001）を照合すること
+- 対象routineの選定基準と記録方法を提案で固定すること
 
 完了条件：
 
-- 次の一作業がHuman判断として示されること
+- 範囲提案がHuman承認され、宣言→RED対応表の関門を経てREDが固定されること
 
-後続作業：旧書庫の削除は本移行の承認範囲外であり、別のHuman判断まで保持を続ける。
+後続作業：Work 4B最小試行の後、Work 5B（内部Implementation Task Contract Pilot）でgateを実証する。全routineの一括分類は行わない。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：次の一作業の選定。旧書庫の削除可否は別途判断。
+- Human判断待ち：Work 4B最小試行の範囲提案の承認（提案提示後）。旧書庫の削除可否は別途判断。
 
 ## stale・deferred
 
-- stale：セッションログの保存先authorityはDEC-PRESERVATION-LAYOUT-V3-MIGRATION-001が正本となり、旧Storage Decisionと再記録Decisionのlogical_pathは歴史として保持される。
-- deferred：Work 6AのCL-6A-04/05/06/07/11（行き先明記済み）、登録済み5課題の着手、Current Work Projection正式写像、Work 4B、Work 5B、Work 7、Work 8、UI、automation。
+- stale：「次の一作業の選定待ち」はHumanのA選定により解消した。
+- deferred：Work 6AのCL-6A-04/05/06/07/11（行き先明記済み）、登録済み5課題の着手、旧書庫の削除判断、Current Work Projection正式写像、Work 5B、Work 7、Work 8、UI、automation。
 
 ## Git・Test
 
