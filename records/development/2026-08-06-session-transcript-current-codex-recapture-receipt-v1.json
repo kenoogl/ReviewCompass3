@@ -1,0 +1,97 @@
+{
+  "receipt_id": "RC3-SESSION-TRANSCRIPT-CURRENT-CODEX-RECAPTURE-2026-08-06-V1",
+  "recorded_at": "2026-08-06T09:24:03+09:00",
+  "status": "verified",
+  "confidentiality_class": "project-internal-value-safe",
+  "authority_binding": {
+    "task_contract": {
+      "path": "records/task-contract/session-transcript-eventual-preservation-v2.json",
+      "sha256": "d75049cb8f53dc0d7ae7429270c00ca539e90485133d1984edde07f61158355a"
+    },
+    "human_decision": {
+      "path": "records/development/2026-08-06-session-transcript-repair-and-recapture-decision-v1.json",
+      "sha256": "c6ff5904d86049f4e414e93dd3342b0ab793b1a50d0b4f664f507e2faf5c05a5"
+    },
+    "fixed_source_count": 5,
+    "fixed_sources_verified": true
+  },
+  "capture_scope": {
+    "provider": "codex",
+    "selector": "the currently preserved Codex Desktop task rollout only",
+    "source_kind": "codex_rollout",
+    "source_identity": "619ff2b0e985199b0006a7166f12ed4b2af26c291ecb1662a9d41d093ac023df",
+    "historical_codex_capture": false,
+    "claude_capture": false,
+    "redacted_transcript_generation": false
+  },
+  "execution": {
+    "first_run": {
+      "id": "manual-current-codex-first-20260806T092317973549+0900",
+      "observed_at": "2026-08-06T09:23:17.973549+09:00",
+      "action": "updated",
+      "state": "reconciled"
+    },
+    "immediate_rerun": {
+      "id": "manual-current-codex-rerun-20260806T092318443386+0900",
+      "observed_at": "2026-08-06T09:23:18.443386+09:00",
+      "action": "unchanged",
+      "state": "reconciled"
+    },
+    "idempotent": true,
+    "raw_bytes_before": 19305386,
+    "raw_bytes_after": 74070599,
+    "appended_bytes": 54765213,
+    "verbatim_bytes_after": 19806111,
+    "json_record_count": 25196,
+    "event_count": 8458,
+    "issue_count": 0
+  },
+  "artifact_verification": {
+    "artifact_file_count": 5,
+    "raw_sha256": "4e7f0b5db5aa0f562958b7f540c90dafd6702cfeae5236d0a83b396df27c412c",
+    "verbatim_sha256": "7e354804ffa0b9e3ebb709b36a07b219530630dd3feef05a28355b27ceeee312",
+    "cursor_sha256": "834c330f5c0b15336ab8a4ab1db3f18d59d4a9f77d1c1c5dff7256e18bcaf04d",
+    "provenance_sha256": "c4ffdb965767d7ed67870b2af9accce0e12365cff925617fd130c87dfbf096f2",
+    "ledger_sha256": "29cb46710ca0484d2a71cdc516a67a680803cd78e5b7a77cc864f6c330b17811",
+    "source_prefix_matches_before_capture": true,
+    "source_equals_raw_after_capture": true,
+    "raw_utf8": true,
+    "invalid_json_count": 0,
+    "non_object_json_count": 0,
+    "raw_digest_matches_cursor_and_provenance": true,
+    "verbatim_digest_matches_cursor_and_provenance": true,
+    "cursor_provenance_ledger_match": true,
+    "verbatim_regeneration_byte_match": true,
+    "redacted_transcript_absent": true
+  },
+  "tool_pair_verification": {
+    "tool_call_count": 3229,
+    "tool_result_count": 3229,
+    "unmatched_tool_call_count": 0,
+    "unmatched_tool_result_count": 0
+  },
+  "boundary_verification": {
+    "private_root_outside_repository": true,
+    "all_relevant_directory_modes": "0700",
+    "all_artifact_file_modes": "0600",
+    "temporary_or_lock_file_count": 0,
+    "private_paths_or_transcript_content_recorded_here": false,
+    "existing_work6a_changes_unchanged": true
+  },
+  "test_verification": {
+    "related_command": "python3 -m pytest -q tests/test_session_log_eventual_preservation.py tests/test_task_contract_source_resolution.py",
+    "related_result": "25 passed in 0.72s",
+    "full_command": "python3 -m pytest -q",
+    "full_result": "1013 passed in 7.22s",
+    "exit_code": 0
+  },
+  "not_performed": [
+    "historical Codex capture",
+    "Claude capture",
+    "redacted transcript generation",
+    "hook, watcher, scheduler, background process, or service activation",
+    "external transmission",
+    "Git storage of private artifacts",
+    "Work 6A implementation changes"
+  ]
+}
