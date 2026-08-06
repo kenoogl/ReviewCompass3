@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-06T13:33:25+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-authority-reference-digest-check-001--v1.json",
+    "record_sha256": "d4e801aa35e4bd1ad2c17917d0cfd57b60e7e1aec93e7d1259bf8321285824c6",
+    "candidate_id": "IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001",
+    "candidate_content_digest": "760d9ef9811e6d95c9af406a6664e0e2ef5df9c33e32aa6ebbc33721c931753f"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": true
+  },
+  "disposition": "issue_resolution",
+  "blocking": false,
+  "rationale": "参照Digestのずれは実際に発生しcommit `e732995`で修復済みであり、当該欄の最終更新`c475bec`から測定commitまでにCurrent Planは7 commit、Development Policyは3 commit改定されたのに参照側へ触れたcommitは修復の1件だけという再発の経緯も測定済みである。一方、safety、authority、Acceptanceの真偽、必須Provenance、不可逆side effectのいずれも損なっておらず、現行Workを停止する条件に該当しないためblockingはfalseとする。検査器を作る前に、どのfront matter keyが現在有効を意味するかの判別規則の宣言が先行し、その宣言自体がHuman承認を要する。Humanは「対処すべきだが急ぎではない」と述べ、2026-08-06のHuman承認（「載せてよい」）により正式Issueへの昇格だけを承認側へ更新した（Markdown裁定`DEC-AUTHORITY-REFERENCE-DIGEST-CHECK-001` §2・§4の要約）。",
+  "next_action": "課題record `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`を`registered`で登録のみ行う。着手前に、対象front matter keyのallowlist（現在有効な上位文書を意味するkeyの判別規則）をHuman承認つきで宣言する。急いで実装すると正しい過去pinを誤検知するため、着手（`in_progress`化）はHuman判断まで開始しない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": true,
+    "issue_id": "ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001"
+  },
+  "content_digest": "4cad20453e46b6310a47c06f54b302fed3e490b15550799320dfeb30aafea7db"
+}

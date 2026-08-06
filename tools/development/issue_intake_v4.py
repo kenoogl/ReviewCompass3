@@ -45,6 +45,8 @@ STOP_CODES = (
     "candidate_bundle_unavailable",
     "candidate_bundle_digest_mismatch",
     "candidate_bundle_schema_version_mismatch",
+    "candidate_record_unavailable",
+    "candidate_record_digest_mismatch",
     "candidate_not_found",
     "candidate_digest_mismatch",
     "v4_issue_field_unknown",
@@ -619,6 +621,72 @@ def _require_text_field(value, label, code="v4_issue_field_invalid"):
         raise IntakeError(code, label)
 
 
+# candidate_refの2形式（N1）。key集合で形式を判別し、過不足・混在は拒否する。
+_BUNDLE_CANDIDATE_REF_FIELDS = frozenset(
+    (
+        "bundle_path", "bundle_sha256", "bundle_schema_version", "candidate_id",
+        "candidate_content_digest",
+    )
+)
+_SINGLE_CANDIDATE_REF_FIELDS = frozenset(
+    ("record_path", "record_sha256", "candidate_id", "candidate_content_digest")
+)
+
+
+def _candidate_ref_form(candidate_ref, *, code):
+    """candidate_refの形式をkey集合で判別する。過不足・混在は拒否する（N1）。"""
+
+    if isinstance(candidate_ref, dict):
+        fields = frozenset(candidate_ref)
+        if fields == _BUNDLE_CANDIDATE_REF_FIELDS:
+            return "bundle"
+        if fields == _SINGLE_CANDIDATE_REF_FIELDS:
+            return "single"
+    raise IntakeError(code, "candidate_ref")
+
+
+def _load_candidate_record(*, project_root, candidate_ref):
+    """単体候補recordを開き、指紋がすべて一致する場合だけ返す（N2）。
+
+    fileの実在、実bytesのSHA-256一致、record内`candidate_id`一致、
+    record内`content_digest`一致を、fail-closedで検証する。
+    """
+
+    relative = _safe_relative_path(candidate_ref["record_path"])
+    path = Path(project_root) / relative
+    if not path.is_file():
+        raise IntakeError("candidate_record_unavailable", candidate_ref["record_path"])
+    payload = path.read_bytes()
+    actual = hashlib.sha256(payload).hexdigest()
+    if actual != candidate_ref["record_sha256"]:
+        raise IntakeError("candidate_record_digest_mismatch", actual)
+    try:
+        record = json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError) as error:
+        raise IntakeError("candidate_record_unavailable", str(error)) from error
+    if not isinstance(record, dict) or (
+        record.get("candidate_id") != candidate_ref["candidate_id"]
+    ):
+        raise IntakeError("candidate_not_found", candidate_ref["candidate_id"])
+    if record.get("content_digest") != candidate_ref["candidate_content_digest"]:
+        raise IntakeError("candidate_digest_mismatch", candidate_ref["candidate_id"])
+    return record
+
+
+def _load_referenced_candidate(*, project_root, candidate_ref, code):
+    """candidate_refの形式を判別し、対応する検証読み込みへ振り分ける。"""
+
+    form = _candidate_ref_form(candidate_ref, code=code)
+    if form == "bundle":
+        _bundle, candidate = _load_candidate_bundle(
+            project_root=project_root, candidate_ref=candidate_ref
+        )
+        return form, candidate
+    return form, _load_candidate_record(
+        project_root=project_root, candidate_ref=candidate_ref
+    )
+
+
 def _load_candidate_bundle(*, project_root, candidate_ref):
     """bundleを開き、指紋が一致する候補だけを返す。"""
 
@@ -655,31 +723,61 @@ def human_triage_decision_path(decision, *, config):
 
 
 def build_human_triage_decision(
-    *, project_root, bundle_path, candidate_id, decided_at, human_fields, disposition,
-    blocking, rationale, next_action, config, decision_version=1, supersedes=None,
-    issue_id=None, decision_suffix=None
+    *, project_root, bundle_path=None, candidate_id, decided_at, human_fields,
+    disposition, blocking, rationale, next_action, config, decision_version=1,
+    supersedes=None, issue_id=None, decision_suffix=None, candidate_record_path=None
 ):
-    """bundle内候補を指紋付きで参照するHuman triage decisionを決定的に組み立てる。"""
+    """候補を指紋付きで参照するHuman triage decisionを決定的に組み立てる。
+
+    `bundle_path`はbundle形式、`candidate_record_path`は単体形式（N1）の
+    candidate_refを作る。どちらか一方だけを指定する。
+    """
 
     settings = _decision_settings(config)
-    relative = _safe_relative_path(bundle_path)
-    path = Path(project_root) / relative
-    if not path.is_file():
-        raise IntakeError("candidate_bundle_unavailable", bundle_path)
-    bundle = json.loads(path.read_text(encoding="utf-8"))
-    candidate_ref = {
-        "bundle_path": bundle_path,
-        "bundle_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-        "bundle_schema_version": bundle.get("schema_version"),
-        "candidate_id": candidate_id,
-        "candidate_content_digest": None,
-    }
-    for item in bundle.get("candidates", []):
-        if item.get("candidate_id") == candidate_id:
-            candidate_ref["candidate_content_digest"] = item.get("content_digest")
-            break
+    if (bundle_path is None) == (candidate_record_path is None):
+        raise IntakeError(
+            "human_triage_decision_field_invalid",
+            "exactly one of bundle_path and candidate_record_path is required",
+        )
+    if candidate_record_path is not None:
+        relative = _safe_relative_path(candidate_record_path)
+        path = Path(project_root) / relative
+        if not path.is_file():
+            raise IntakeError("candidate_record_unavailable", candidate_record_path)
+        payload = path.read_bytes()
+        try:
+            candidate = json.loads(payload.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError) as error:
+            raise IntakeError("candidate_record_unavailable", str(error)) from error
+        if not isinstance(candidate, dict) or (
+            candidate.get("candidate_id") != candidate_id
+        ):
+            raise IntakeError("candidate_not_found", candidate_id)
+        candidate_ref = {
+            "record_path": candidate_record_path,
+            "record_sha256": hashlib.sha256(payload).hexdigest(),
+            "candidate_id": candidate_id,
+            "candidate_content_digest": candidate.get("content_digest"),
+        }
     else:
-        raise IntakeError("candidate_not_found", candidate_id)
+        relative = _safe_relative_path(bundle_path)
+        path = Path(project_root) / relative
+        if not path.is_file():
+            raise IntakeError("candidate_bundle_unavailable", bundle_path)
+        bundle = json.loads(path.read_text(encoding="utf-8"))
+        candidate_ref = {
+            "bundle_path": bundle_path,
+            "bundle_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "bundle_schema_version": bundle.get("schema_version"),
+            "candidate_id": candidate_id,
+            "candidate_content_digest": None,
+        }
+        for item in bundle.get("candidates", []):
+            if item.get("candidate_id") == candidate_id:
+                candidate_ref["candidate_content_digest"] = item.get("content_digest")
+                break
+        else:
+            raise IntakeError("candidate_not_found", candidate_id)
 
     decision_id = f"{settings['decision_id_prefix']}-{candidate_id}"
     if decision_suffix:
@@ -761,13 +859,15 @@ def validate_human_triage_decision(record, *, path, project_root, config):
         )
 
     candidate_ref = record["candidate_ref"]
-    expected_ref_fields = {
-        "bundle_path", "bundle_sha256", "bundle_schema_version", "candidate_id",
-        "candidate_content_digest",
-    }
-    if not isinstance(candidate_ref, dict) or set(candidate_ref) != expected_ref_fields:
-        raise IntakeError("human_triage_decision_field_unknown", "candidate_ref")
-    for field in ("bundle_sha256", "candidate_content_digest"):
+    form = _candidate_ref_form(
+        candidate_ref, code="human_triage_decision_field_unknown"
+    )
+    digest_fields = (
+        ("bundle_sha256", "candidate_content_digest")
+        if form == "bundle"
+        else ("record_sha256", "candidate_content_digest")
+    )
+    for field in digest_fields:
         if not isinstance(candidate_ref[field], str) or not _SHA256.fullmatch(
             candidate_ref[field]
         ):
@@ -785,7 +885,10 @@ def validate_human_triage_decision(record, *, path, project_root, config):
     if path != expected_path:
         raise IntakeError("human_triage_decision_path_mismatch", str(path))
 
-    _load_candidate_bundle(project_root=project_root, candidate_ref=candidate_ref)
+    _load_referenced_candidate(
+        project_root=project_root, candidate_ref=candidate_ref,
+        code="human_triage_decision_field_unknown",
+    )
 
     human_fields = record["human_fields"]
     if not isinstance(human_fields, dict) or set(human_fields) != set(
@@ -1021,6 +1124,11 @@ def build_v4_issue_record(
     """
 
     settings = _issue_settings(config)
+    if "quotation" not in candidate and "problem" in candidate:
+        # 単体形式（N1）が指すimprovement_candidateは本文を`problem`に持つ。
+        # 昇格整合検査には同じ内容を`quotation`として写した複製を渡し、
+        # 候補record本体は変更しない。
+        candidate = dict(candidate, quotation=candidate["problem"])
     draft = promote_candidate_from_decision(
         candidate=candidate, decision=decision, project_root=project_root,
         config=config, decisions=decisions,
@@ -1091,13 +1199,10 @@ def validate_v4_issue_record(record, *, path, project_root, config):
     _require_text_field(record["problem"], "problem")
 
     candidate_ref = record["candidate_ref"]
-    expected_ref_fields = {
-        "bundle_path", "bundle_sha256", "bundle_schema_version", "candidate_id",
-        "candidate_content_digest",
-    }
-    if not isinstance(candidate_ref, dict) or set(candidate_ref) != expected_ref_fields:
-        raise IntakeError("v4_issue_field_unknown", "candidate_ref")
-    _load_candidate_bundle(project_root=project_root, candidate_ref=candidate_ref)
+    _load_referenced_candidate(
+        project_root=project_root, candidate_ref=candidate_ref,
+        code="v4_issue_field_unknown",
+    )
 
     decision_ref = record["triage_decision_ref"]
     if not isinstance(decision_ref, dict) or set(decision_ref) != {

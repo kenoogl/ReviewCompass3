@@ -1,0 +1,24 @@
+{
+  "record_kind": "historical_candidate_allowlist",
+  "schema_version": 1,
+  "allowlist_id": "RC3-IMPROVEMENT-CANDIDATE-HISTORICAL-ALLOWLIST-001",
+  "allowlist_version": 1,
+  "created_at": "2026-08-06T14:39:40+09:00",
+  "authority": {
+    "proposal_path": "docs/design/2026-08-06-issue-intake-v4-single-candidate-reference-proposal.md",
+    "declarations": ["N7", "N8"]
+  },
+  "purpose": "`.reviewcompass/workflow/improvement-candidates/`の全JSON recordに全件検証（N7）を課すにあたり、現行validatorに合格しない歴史recordを機械可読に明示宣言する。本fileに載るrecordは検証免除であり、entryごとに理由と後継recordへの参照を持つ（N8）。",
+  "entries": [
+    {
+      "path": ".reviewcompass/workflow/improvement-candidates/ic-historical-todo-issue-intake-001--v1.json",
+      "sha256": "ec6e702fec5804e736306d66be084e10f9dffb0f7e4bcf573f75304ee57d0206",
+      "reason": "Issue Intake V4成立の起点となった歴史recordである。現行のどのvalidator（config v2・v3の`validate_record_file`）にも合格しないことが実測済みで、`DEC-HISTORICAL-TODO-ISSUE-INTAKE-001`で閉鎖済みのため、現行形式へは移行せず不変のまま保持する。",
+      "successor_ref": {
+        "decision_id": "DEC-HISTORICAL-TODO-ISSUE-INTAKE-001",
+        "path": "records/development/2026-08-05-historical-todo-issue-intake-v4-approval-decision-v1.md",
+        "sha256": "019879235577b39489e4383cd0fa092c562631d3c1b1e1ffa311056c8d1d9f7c"
+      }
+    }
+  ]
+}
