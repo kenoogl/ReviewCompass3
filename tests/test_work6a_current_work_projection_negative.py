@@ -13,6 +13,11 @@
 既存の被覆（欠測authority、並行work_startedの競合、表示器failureとauthority欠落の分離）は
 `tests/test_session_log_bootstrap.py`と`tests/test_session_bootstrap_e2e.py`が持つ。
 ここでは重複させず、未被覆の負例だけを固定する。
+
+追加：`DEC-WORK6A-PROJECTION-NON-AUTHORITY-SCOPE-001`
+（`records/development/2026-08-06-work6a-non-authority-input-scope-decision-v1.md`）により、
+第二正本化の拒否対象を上位文書が名指しする非authority成果物4件の限定列挙へ広げ、
+併せて過剰な一般化を防ぐ境界例（Plan authority自身は拒否されない）を固定する。
 """
 
 import copy
@@ -81,6 +86,93 @@ def test_hand_editable_handoff_is_not_accepted_as_authority():
     assert diagnostics["status"] != "complete"
     assert any(
         "TODO_NEXT_SESSION.md" in item for item in diagnostics["missing"]
+    ), diagnostics
+
+
+def _project_with_non_authority_identity(identity):
+    """非authority成果物1件を固定入力へ足したprojectionを返す。"""
+
+    inputs = _inputs()
+    inputs["fixed_inputs"].append(
+        {
+            "digest": "0" * 64,
+            "identity": identity,
+        }
+    )
+    return _project(inputs)
+
+
+def test_status_document_is_not_accepted_as_authority():
+    """第二正本化：手編集する`STATUS.md`を現在位置のauthorityにしない。
+
+    上位文書（Current Plan、checklist、Current Work Projection検討memo）が
+    「手編集する`STATUS.md`を作らない」と名指ししている成果物である。
+    """
+
+    projection = _project_with_non_authority_identity("STATUS.md")
+
+    diagnostics = projection["diagnostics"]
+    assert diagnostics["status"] != "complete"
+    assert any(
+        "STATUS.md" in item for item in diagnostics["missing"]
+    ), diagnostics
+
+
+def test_todo_handoff_template_is_not_accepted_as_authority():
+    """第二正本化：TODO handoffのtemplateを現在位置のauthorityにしない。
+
+    当該fileは「本書は人向けの入口であり、Workflow state、完了判断、Evidenceの
+    正本ではない」と自ら宣言している。
+    """
+
+    identity = "docs/development/templates/TODO_NEXT_SESSION.template.md"
+    projection = _project_with_non_authority_identity(identity)
+
+    diagnostics = projection["diagnostics"]
+    assert diagnostics["status"] != "complete"
+    assert any(
+        identity in item for item in diagnostics["missing"]
+    ), diagnostics
+
+
+def test_initial_development_checklist_is_not_accepted_as_authority():
+    """第二正本化：初期開発checklistを現在位置のauthorityにしない。
+
+    当該fileは「checkboxは進行を見失わないための操作viewであり、完了のauthorityは
+    各項目の固定Evidenceである」と自ら宣言している。
+    """
+
+    identity = "docs/development/2026-08-03-initial-development-checklist.md"
+    projection = _project_with_non_authority_identity(identity)
+
+    diagnostics = projection["diagnostics"]
+    assert diagnostics["status"] != "complete"
+    assert any(
+        identity in item for item in diagnostics["missing"]
+    ), diagnostics
+
+
+def test_plan_authority_markdown_is_still_accepted():
+    """境界例：Plan authority自身は拒否されない（追加時点で成功する回帰防止テスト）。
+
+    これは境界例であり、追加時点で成功する回帰防止テストである。非authority成果物の
+    拒否対象を広げるとき、「拡張子が`.md`だから」「`docs/`配下だから」といった
+    一般規則へ過剰に一般化してはならない。`docs/current/reviewcompass3-plan-current.md`は
+    人が編集するMarkdownでありながら正当な固定入力であり、通常の入力では
+    `status`が`complete`のままでなければならない。
+    """
+
+    inputs = _inputs()
+    identities = [item["identity"] for item in inputs["fixed_inputs"]]
+    assert "docs/current/reviewcompass3-plan-current.md" in identities
+
+    projection = _project(inputs)
+
+    diagnostics = projection["diagnostics"]
+    assert diagnostics["status"] == "complete", diagnostics
+    assert not any(
+        "docs/current/reviewcompass3-plan-current.md" in item
+        for item in diagnostics["missing"]
     ), diagnostics
 
 
