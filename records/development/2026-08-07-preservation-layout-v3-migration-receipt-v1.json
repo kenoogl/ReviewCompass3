@@ -1,0 +1,119 @@
+{
+  "record_kind": "preservation_migration_receipt",
+  "record_version": 1,
+  "recorded_at": "2026-08-07T00:53:21+09:00",
+  "authority_decision": {
+    "decision_id": "DEC-PRESERVATION-LAYOUT-V3-MIGRATION-001",
+    "path": "records/development/2026-08-06-preservation-layout-v3-migration-decision-v1.md",
+    "sha256": "b9aa5bc3bc2f6324e42032d3537e3b96f48a63e44c19f530dddafbcf0054843e"
+  },
+  "timeline": {
+    "os_standard_storage_decision_at": "2026-08-04T00:51:19+09:00",
+    "layout_v3_approved_at": "2026-08-04T15:30:44+09:00",
+    "recapture_reused_old_decision_at": "2026-08-06T09:13:46+09:00",
+    "note": "旧Storage DecisionはLayout v3承認より前に決定され、2026-08-06の再記録が旧Decisionを再利用したため旧配置へ追記された。"
+  },
+  "source": {
+    "logical_path": "reviewcompass3_user_data/eventual-preservation (OS標準data root配下)",
+    "status_after_migration": "retained_as_rollback_copy_unmodified",
+    "deleted": false
+  },
+  "target": {
+    "logical_path": "<runtime_root>/projects/reviewcompass3/development/sensitive/eventual-preservation",
+    "resolved_by": "tools.session_logs.preservation_migration.resolve_preservation_private_root (tools.layout.baseline.resolve_project_runtime_layout を再利用)",
+    "layout_baseline_record": "records/development/2026-08-04-layout-baseline-v3-project-first-candidate.json",
+    "project_id": "reviewcompass3",
+    "profile": "development",
+    "sensitive_root_mode": "0700",
+    "active": true
+  },
+  "migrated_identity": {
+    "source_content_id": "b12edc2408fa1263",
+    "file_count": 5,
+    "total_bytes": 93878980,
+    "files": [
+      {
+        "relative_path": "raw/b12edc2408fa1263/2026/08/03/rollout-2026-08-03T10-33-29-019fc541-2734-79b1-b3d9-3e12665d79f5.jsonl",
+        "bytes": 74070599,
+        "sha256": "4e7f0b5db5aa0f562958b7f540c90dafd6702cfeae5236d0a83b396df27c412c"
+      },
+      {
+        "relative_path": "verbatim/b12edc2408fa1263/2026/08/03/rollout-2026-08-03T10-33-29-019fc541-2734-79b1-b3d9-3e12665d79f5.md",
+        "bytes": 19806111,
+        "sha256": "7e354804ffa0b9e3ebb709b36a07b219530630dd3feef05a28355b27ceeee312"
+      },
+      {
+        "relative_path": "cursors/b12edc2408fa1263/2026/08/03/rollout-2026-08-03T10-33-29-019fc541-2734-79b1-b3d9-3e12665d79f5.json",
+        "bytes": 1048,
+        "sha256": "834c330f5c0b15336ab8a4ab1db3f18d59d4a9f77d1c1c5dff7256e18bcaf04d"
+      },
+      {
+        "relative_path": "provenance/b12edc2408fa1263/2026/08/03/rollout-2026-08-03T10-33-29-019fc541-2734-79b1-b3d9-3e12665d79f5.json",
+        "bytes": 950,
+        "sha256": "c4ffdb965767d7ed67870b2af9accce0e12365cff925617fd130c87dfbf096f2"
+      },
+      {
+        "relative_path": "state/ledgers/b12edc2408fa1263.json",
+        "bytes": 272,
+        "sha256": "29cb46710ca0484d2a71cdc516a67a680803cd78e5b7a77cc864f6c330b17811"
+      }
+    ]
+  },
+  "execution": {
+    "pre_check": "旧書庫5 fileのSHA-256が既存receipt（records/development/2026-08-06-session-transcript-current-codex-recapture-receipt-v1.json）の記載と全件一致",
+    "dry_run": {
+      "file_count": 5,
+      "total_bytes": 93878980,
+      "conflicts": [],
+      "rollback_source_preserved": true
+    },
+    "execute_action": "migrated",
+    "verify": {
+      "status": "pass",
+      "file_count": 5,
+      "checks": {
+        "file_count_match": true,
+        "relative_paths_match": true,
+        "size_match": true,
+        "sha256_match": true,
+        "raw_jsonl_valid": true,
+        "raw_parse_issue_count": 0,
+        "verbatim_regenerated_match": true,
+        "metadata_identity_match": true,
+        "directory_mode_0700": true,
+        "file_mode_0600": true,
+        "temporary_residue_count": 0,
+        "lock_residue_count": 0
+      }
+    },
+    "idempotent_rerun_action": "unchanged",
+    "source_unchanged_after_migration": true,
+    "target_digests_equal_source": true,
+    "target_file_permissions": "0600",
+    "target_directory_permissions": "0700"
+  },
+  "active_path_switch": {
+    "statement": "本receiptの記録時点で、active archiveはLayout v3のtarget logical pathである。今後の保存はDEC-PRESERVATION-LAYOUT-V3-MIGRATION-001をauthorityとし、旧OS標準pathをactiveとして扱わない。",
+    "old_path_active": false,
+    "old_path_retained_for_rollback": true
+  },
+  "tests": {
+    "targeted": "tests/test_preservation_migration.py 7 passed",
+    "full_suite": "1047 passed, 0 failed (venv公式runner, Python 3.9.6, pytest 8.4.2, fallback false)"
+  },
+  "implementation": {
+    "module": "tools/session_logs/preservation_migration.py",
+    "sha256": "54d195b42bab7ba25d7e180861ca26afb9922c099437227c9658f16220a934bc",
+    "tests": "tests/test_preservation_migration.py",
+    "tests_sha256": "bcaaf788c24723a7f239affc0733c997838a5189232a994f3a0572993cf15cf2",
+    "red_commit": "edd9514",
+    "green_commit": "d7d2f3f"
+  },
+  "not_performed": [
+    "旧配置の削除（別のHuman判断）",
+    "tools/session_logs/deployment_paths.pyのOS標準path定義の変更",
+    "空のlock directory鎖のcopy（file実体なし。collectorが必要時に0700で再作成する）",
+    "push、PR、外部送信"
+  ],
+  "value_safety": "本receiptは相対path・論理path・件数・Digestのみを記載し、会話本文とhome絶対pathを含まない。"
+}
