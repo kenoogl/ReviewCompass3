@@ -44,6 +44,10 @@
   外部side effectへ影響する候補では現行Workを停止する。それ以外はcheckpointで扱う。
 - AIまたは機械の分類とrouteは提案として扱い、上流改定、Issue昇格、risk受容、再開はHumanが判断する。
   採用候補はconsumerとOutcomeへ接続されるまでclosedにしない。
+- 改善候補の登録は既存経路で行う。まず`OBS-`始まりの観測recordを作り、それを`source_identity`へ
+  束縛した`IC-`始まりの候補を`.reviewcompass/workflow/improvement-candidates/`へ置く。
+  `python3 -m tools.development.issue_resolution_pilot --config config/development-issue-resolution-pilot-v3.json record <path>`
+  で検証してからHumanの仕分け判断を仰ぐ。候補記録の形式そのものの作り直しを先に提案しない。
 - 詳細は`docs/development/2026-08-02-development-policy.md`を正本とする。
 
 ## コミット方針
