@@ -1,0 +1,23 @@
+{
+  "record_kind": "issue_record",
+  "schema_version": 2,
+  "issue_id": "ISSUE-TEST-GROWTH-STATE-PINNING-001",
+  "issue_version": 1,
+  "created_at": "2026-08-06T15:38:38+09:00",
+  "state": "registered",
+  "problem": "公式全Testが2026-08-03の419 passed（`records/development/2026-08-03-work-1a-layout-evidence-v1.md`）から測定commit `85c6a725b36e57b6f2f395d2276c3d18b238576b`時点の1031 passedへ、約3日で612件増えた。実行は約6秒であり実行費用は問題ではない。問題は総数ではなく張り方である。repositoryの状態（record件数、file名、単一bundle指紋）をtestのassertへ釘付けする書き方が、2026-08-05から2026-08-06にかけて承認済みの正当な変更を3回阻んだ（1回目：候補2件目の追加が件数固定`assert len(issue_files) == 1`系に衝突、commit `c7f3712`で修正。2回目：V4 Issue 2件目`ISSUE-HTC-C9F6C917`の登録が`test_l6`の決め打ちに衝突、commit `b6ac2c8`で修正。3回目：仕分け判断2件目が`test_k6`のfile名完全一致と`test_k7`／`test_l6`の同一bundle指紋固定に衝突し、Human承認済みN5／N6によりcommit `d6b043a`で条件を狭めた）。凍結・固定の理由はtestのassertにしか書かれておらず、機械可読な宣言が無い。一方で、1031件あっても設計§1.3（未triage候補の滞留検査）の被覆は0件であり（`records/development/2026-08-06-encountered-problem-inventory-v1.md` #9-a・#9-b）、記録時刻の捏造を捕まえたのはtestではなくレビューだった（同#5）。量は被覆ではない。",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-test-growth-state-pinning-001--v1.json",
+    "record_sha256": "88256c55a281b7449ab863db4c55bb5055abd6c6c622200a36a83eb77f68efa2",
+    "candidate_id": "IC-TEST-GROWTH-STATE-PINNING-001",
+    "candidate_content_digest": "b17f27e2fa8ee366846009be3b8d6571c7657a69246d07dd4b4ef99fe2727c36"
+  },
+  "triage_decision_ref": {
+    "decision_id": "DEC-IC-TEST-GROWTH-STATE-PINNING-001",
+    "decision_version": 1,
+    "path": ".reviewcompass/workflow/triage-decisions-v4/dec-ic-test-growth-state-pinning-001--v1.json",
+    "sha256": "1d06a7310376e10ce32cbb80734d9d4376095d9c5132ab3a7e0987b1288f836f",
+    "content_digest": "1ed05ace66f2f6f2d36e5567cbe92999df73343553b6963eb9cf3f3835007c86"
+  },
+  "content_digest": "3f843ecdbfa3a11680f986ac8d821c0f2eb4294446c1bc7dc0e785f7be810fad"
+}

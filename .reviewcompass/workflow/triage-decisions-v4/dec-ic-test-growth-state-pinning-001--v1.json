@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-TEST-GROWTH-STATE-PINNING-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-06T15:38:38+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-test-growth-state-pinning-001--v1.json",
+    "record_sha256": "88256c55a281b7449ab863db4c55bb5055abd6c6c622200a36a83eb77f68efa2",
+    "candidate_id": "IC-TEST-GROWTH-STATE-PINNING-001",
+    "candidate_content_digest": "b17f27e2fa8ee366846009be3b8d6571c7657a69246d07dd4b4ef99fe2727c36"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": true
+  },
+  "disposition": "issue_resolution",
+  "blocking": false,
+  "rationale": "Humanの裁定文言（2026-08-06）：「対処すべきだが急ぎではない、帳簿に載せる。提案通り、ワーク8で測る。」対処の中身は候補の提案どおり2点である。第一に、状態の釘付け（件数・file名・指紋の固定）をtestのassertから機械可読な宣言file＋汎用検査1本へ置き換える方針の検討。凍結・固定の理由と解除条件を宣言側に持たせる。第二に、Work 8の評価で変異検査（mutation生存数の測定）を行い、何も検出していない死重testを測定する。測定前のtest一斉削除は行わない。recurrenceをtrueとする根拠は、状態釘付けが承認済みの正当な変更を3回阻んだ実績（commit `c7f3712`・`b6ac2c8`・`d6b043a`での修正）である。`impact: medium`・`priority: low`はHumanの「対処すべきだが急ぎではない」という文言からClaudeが機械可読語彙へ翻訳した値であり、Humanがこの2語を直接述べたわけではない。異議があればsupersedes付きの後継decisionで差し替える。",
+  "next_action": "課題record `ISSUE-TEST-GROWTH-STATE-PINNING-001`を`registered`で登録のみ行う。Work 8の評価Pilotで変異検査（mutation生存数）と追加した文書・Schema・関門の維持費の測定を行う。着手（`in_progress`化）はHuman判断まで開始せず、それまで`registered`のまま保持する。測定前のtest一斉削除は行わない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": true,
+    "issue_id": "ISSUE-TEST-GROWTH-STATE-PINNING-001"
+  },
+  "content_digest": "1ed05ace66f2f6f2d36e5567cbe92999df73343553b6963eb9cf3f3835007c86"
+}
