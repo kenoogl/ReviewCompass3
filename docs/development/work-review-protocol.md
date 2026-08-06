@@ -40,6 +40,12 @@ Task Contract、受入条件、Test、validator、Human判断などのoracleを�
 | 停止条件 | 固定source不一致、Test不合格、設計矛盾、承認待ちなど |
 | risk | `low`、`medium`、`high`と必要なoracle |
 
+次は既定で`high`とする。
+
+- 守り役のcode。validator、Digest照合、承認関門の判定、改竄拒否など、他の成果物の合否を決めるcode。
+  失敗が「誤った合格」として黙って現れるためである。
+- 不可逆操作を行うcode。移行、削除、上書き、外部送信を含む。
+
 開始状態を特定できない場合、差分の帰属を推測せず`reported_unverified`として停止する。
 
 ## 4. 標準レビュー順序
@@ -75,6 +81,9 @@ Task Contract、受入条件、Test、validator、Human判断などのoracleを�
 - `medium`以上では全Testを実行する。
 - validator変更では正例、負例、境界例を確認する。
 - `high`ではfault injectionまたはmutation、代表データ、独立oracleを追加する。
+- `high`では、実行者のfixtureに存在しない反証を最低1件、reviewerが新たに作って機械で試す。
+  守り役のcodeでは、誤って合格させる方向（改竄、偽装、迂回、境界値）を優先する。
+  反証が成立した場合は検証結果として分離し、承認なしに実装修正へ移らない。
 - 実行command、exit code、件数、environment、receiptを記録する。
 
 ### 4.5 WorkflowとProvenanceを確認する
@@ -115,6 +124,9 @@ Task Contract、受入条件、Test、validator、Human判断などのoracleを�
 | Review Run | 固定入力、Finding、各verdict、step順序、Provenance、Human境界 |
 | Git操作 | commit SHA、tree、name-status、stage対象、remote事後状態 |
 | 外部操作 | Human承認、payload、送信先、permission、receipt、外部事後状態 |
+
+`high`のcodeでは、期待挙動を実行者のTestからではなく上流（承認Decision、設計、Contract、
+Requirement）から独立に導出して照合する。実行者が書いたTestの再実行だけを独立oracleに数えない。
 
 LLMまたは別エージェントによる再読だけを、決定的Testや実状態照合の代わりにしない。同じモデル系の
 サブエージェントによるレビューも、`high` risk作業の唯一の独立oracleにはしない。
