@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "verification-boundary/layer1-remainder",
+  "external": {
+    "relative_path": "work4b/reuse-searches/0fe58d7b24ef7034f19a2a7639645a63275eb1f86bc428bc242f00aeed389164.json",
+    "content_digest": "0fe58d7b24ef7034f19a2a7639645a63275eb1f86bc428bc242f00aeed389164",
+    "byte_sha256": "045706fd3de036f62fdd248605a585c511a074b27d2fc7152f838c87160acafb"
+  },
+  "source_identity": {
+    "profile_run_id": "3981e7c6af154701d95c934d54fcaaa571d730c9a76027594f647bc8af819976",
+    "discovery_run_id": "768667c099970a14656a6921a392edc1a0428e5a076c818ee1da8f3f42cf054e",
+    "source_content_id": "e738f157a830894b45cf3f3b91573a8e6a91b1fd46be93bc5eb96035c0cdbf6e",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 561,
+  "content_digest": "f772b9f619ae7452e61bc3e1e9843964a9f130c3e1bd3f67233831c137028135"
+}
