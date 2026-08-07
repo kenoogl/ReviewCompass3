@@ -1,0 +1,23 @@
+{
+  "content_digest": "62d6f80931a8eee007136444ba8f2fc619ec6abf71c3c7d05893da6ee7176661",
+  "decision_ref": {
+    "content_digest": "d929fe4d3ab4db4b9c7748ced2e500dc1b68dcee2c8b703830a19afd09da7149",
+    "digest_algorithm": "sha256",
+    "file_sha256": "894dd2047e63fd8aaf20e0d8e6d8da2095d40c89cf7096ff87542c493c4dabec",
+    "record_id": "DEC-RRL-HELPER-ENTRIES-001",
+    "record_kind": "work4a_operational_decision",
+    "relative_path": ".reviewcompass/design-decisions/dec-rrl-helper-entries-001.json",
+    "root_kind": "project",
+    "version": 1
+  },
+  "digest_algorithm": "sha256",
+  "disposition": "as_is",
+  "entry_id": "RRL-RSR-SHA-001",
+  "entry_version": 1,
+  "record_kind": "work4a_ledger_entry",
+  "responsibility": "fileのSHA-256計算。同種計算の複製が他moduleにあり、統合の要否は順位表経由で扱う",
+  "schema_version": 1,
+  "side_effects": "reads a file",
+  "source_content_id": "748e7f6325506014aee5822aed0bb2ab7c68e515c971900a8c9375e5ef19f56a",
+  "symbol_id": "tools/development/reuse_search_record.py:file_sha256"
+}

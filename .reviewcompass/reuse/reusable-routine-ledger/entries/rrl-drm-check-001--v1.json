@@ -1,0 +1,23 @@
+{
+  "content_digest": "79eb645bd8a119642809deb12f6416f61d30ca58b18aa8c3d212315396994103",
+  "decision_ref": {
+    "content_digest": "d929fe4d3ab4db4b9c7748ced2e500dc1b68dcee2c8b703830a19afd09da7149",
+    "digest_algorithm": "sha256",
+    "file_sha256": "894dd2047e63fd8aaf20e0d8e6d8da2095d40c89cf7096ff87542c493c4dabec",
+    "record_id": "DEC-RRL-HELPER-ENTRIES-001",
+    "record_kind": "work4a_operational_decision",
+    "relative_path": ".reviewcompass/design-decisions/dec-rrl-helper-entries-001.json",
+    "root_kind": "project",
+    "version": 1
+  },
+  "digest_algorithm": "sha256",
+  "disposition": "as_is",
+  "entry_id": "RRL-DRM-CHECK-001",
+  "entry_version": 1,
+  "record_kind": "work4a_ledger_entry",
+  "responsibility": "宣言→RED対応表の3判定（実在・全射・単射）をfail-closedで返す",
+  "schema_version": 1,
+  "side_effects": "reads files",
+  "source_content_id": "748e7f6325506014aee5822aed0bb2ab7c68e515c971900a8c9375e5ef19f56a",
+  "symbol_id": "tools/development/declaration_red_map_check.py:check_declaration_red_map"
+}

@@ -1,0 +1,56 @@
+{
+  "approved_candidate_content_digest": "66662e3d7bde0672a8c6c18260719d7aeac4d5c35844477eff6d31a4613f63ec",
+  "approved_candidate_run_id": "4699a776813b4124c17d153f9e0c59d8d1febfe549f67f951964eeb41428e4fe",
+  "approved_source_content_id": "748e7f6325506014aee5822aed0bb2ab7c68e515c971900a8c9375e5ef19f56a",
+  "approved_targets": [
+    {
+      "disposition": "as_is",
+      "symbol_id": "tools/development/reuse_search_record.py:ReuseSearchError"
+    },
+    {
+      "disposition": "as_is",
+      "symbol_id": "tools/development/reuse_search_record.py:search_existing_routines"
+    },
+    {
+      "disposition": "as_is",
+      "symbol_id": "tools/development/reuse_search_record.py:validate_reuse_search_record"
+    },
+    {
+      "disposition": "as_is",
+      "symbol_id": "tools/development/reuse_search_record.py:write_reuse_search_record"
+    },
+    {
+      "disposition": "as_is",
+      "symbol_id": "tools/development/reuse_search_record.py:gate_check"
+    },
+    {
+      "disposition": "as_is",
+      "symbol_id": "tools/development/reuse_search_record.py:file_sha256"
+    },
+    {
+      "disposition": "as_is",
+      "symbol_id": "tools/development/declaration_red_map_check.py:DeclarationRedMapCheckError"
+    },
+    {
+      "disposition": "as_is",
+      "symbol_id": "tools/development/declaration_red_map_check.py:check_declaration_red_map"
+    }
+  ],
+  "attestation_ref": {
+    "content_digest": "e5f58ffb174116a393b6d7dd48b07eece5ee91a8a7b7b743bf52d3971b468503",
+    "digest_algorithm": "sha256",
+    "file_sha256": "51e8293465224c6044a77d33d3ad85f0ab95de1f213a80cc577c90ef529e0e3d",
+    "record_id": "OBSATT-5cea442a82a5662c3a8fa0db49f1c741842489f8965223b7c2ae981bc3c6d4d0",
+    "record_kind": "work4a_observation_attestation",
+    "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/attestations/obsatt-5cea442a82a5662c3a8fa0db49f1c741842489f8965223b7c2ae981bc3c6d4d0--v1.json",
+    "root_kind": "project",
+    "version": 1
+  },
+  "content_digest": "d929fe4d3ab4db4b9c7748ced2e500dc1b68dcee2c8b703830a19afd09da7149",
+  "decided_at": "2026-08-07T14:12:51+09:00",
+  "decision_id": "DEC-RRL-HELPER-ENTRIES-001",
+  "digest_algorithm": "sha256",
+  "human_id": "kenoogl",
+  "record_kind": "work4a_operational_decision",
+  "schema_version": 1
+}

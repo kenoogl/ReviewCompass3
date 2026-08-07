@@ -1,0 +1,136 @@
+{
+  "attestation_ref": {
+    "content_digest": "e5f58ffb174116a393b6d7dd48b07eece5ee91a8a7b7b743bf52d3971b468503",
+    "digest_algorithm": "sha256",
+    "file_sha256": "51e8293465224c6044a77d33d3ad85f0ab95de1f213a80cc577c90ef529e0e3d",
+    "record_id": "OBSATT-5cea442a82a5662c3a8fa0db49f1c741842489f8965223b7c2ae981bc3c6d4d0",
+    "record_kind": "work4a_observation_attestation",
+    "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/attestations/obsatt-5cea442a82a5662c3a8fa0db49f1c741842489f8965223b7c2ae981bc3c6d4d0--v1.json",
+    "root_kind": "project",
+    "version": 1
+  },
+  "baseline_id": "RRL-BASELINE",
+  "baseline_version": 1,
+  "content_digest": "ab325447e06ca8e5e6cb819d27507391adfe1fd745e0b150bba4a309f68d4bb8",
+  "decision_ref": {
+    "content_digest": "d929fe4d3ab4db4b9c7748ced2e500dc1b68dcee2c8b703830a19afd09da7149",
+    "digest_algorithm": "sha256",
+    "file_sha256": "894dd2047e63fd8aaf20e0d8e6d8da2095d40c89cf7096ff87542c493c4dabec",
+    "record_id": "DEC-RRL-HELPER-ENTRIES-001",
+    "record_kind": "work4a_operational_decision",
+    "relative_path": ".reviewcompass/design-decisions/dec-rrl-helper-entries-001.json",
+    "root_kind": "project",
+    "version": 1
+  },
+  "digest_algorithm": "sha256",
+  "entry_refs": [
+    {
+      "content_digest": "bc170333d552404865cfd47a0d4f986bc5b5f3e689d5e1c31b607f8af7dfbf9f",
+      "digest_algorithm": "sha256",
+      "file_sha256": "7099e8b20aefb6f8a11a6fda7ef2634a9cd6aefb15f36c9282008251236b8d1e",
+      "record_id": "RRL-RSR-ERROR-001",
+      "record_kind": "work4a_ledger_entry",
+      "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/entries/rrl-rsr-error-001--v1.json",
+      "root_kind": "project",
+      "version": 1
+    },
+    {
+      "content_digest": "1728ec48c3288dd7001a2fb89127a0f1fd76d98c369f2fbd687a2197e197a98e",
+      "digest_algorithm": "sha256",
+      "file_sha256": "56e099392183f399d9512fcf8bb39ab865fae64e3732625ab310db96a76a1aca",
+      "record_id": "RRL-RSR-SEARCH-001",
+      "record_kind": "work4a_ledger_entry",
+      "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/entries/rrl-rsr-search-001--v1.json",
+      "root_kind": "project",
+      "version": 1
+    },
+    {
+      "content_digest": "e58f026d41842e3adc94c5ae87e345ba8f03099e6e53c330379c2d0cfd0a260b",
+      "digest_algorithm": "sha256",
+      "file_sha256": "6bf36ef7cc0bf5b3440ccd9220b413ad49d8fcfefebecf575c3af1578032a3a1",
+      "record_id": "RRL-RSR-VALIDATE-001",
+      "record_kind": "work4a_ledger_entry",
+      "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/entries/rrl-rsr-validate-001--v1.json",
+      "root_kind": "project",
+      "version": 1
+    },
+    {
+      "content_digest": "ed819c22bf4ff22c4c3c8a69ed56a33973d75d9dfafcfb09f89e24cf9abc6129",
+      "digest_algorithm": "sha256",
+      "file_sha256": "c223af59f868d174869d5057101e2ee2fffafcd90eded6534b18eae6b6098b4a",
+      "record_id": "RRL-RSR-WRITE-001",
+      "record_kind": "work4a_ledger_entry",
+      "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/entries/rrl-rsr-write-001--v1.json",
+      "root_kind": "project",
+      "version": 1
+    },
+    {
+      "content_digest": "227b3589e917762d04d64c9863d765de3a7d53f727133016d38f78055c4717da",
+      "digest_algorithm": "sha256",
+      "file_sha256": "6ea90d0bb45103635b176e7d6bf81275e690e282ce3f81980591fe1e24190612",
+      "record_id": "RRL-RSR-GATE-001",
+      "record_kind": "work4a_ledger_entry",
+      "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/entries/rrl-rsr-gate-001--v1.json",
+      "root_kind": "project",
+      "version": 1
+    },
+    {
+      "content_digest": "62d6f80931a8eee007136444ba8f2fc619ec6abf71c3c7d05893da6ee7176661",
+      "digest_algorithm": "sha256",
+      "file_sha256": "ab8e5eec816c6755ef7f02db6ffb5935ed22495ca5eed3b8069fbc8b2338e44c",
+      "record_id": "RRL-RSR-SHA-001",
+      "record_kind": "work4a_ledger_entry",
+      "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/entries/rrl-rsr-sha-001--v1.json",
+      "root_kind": "project",
+      "version": 1
+    },
+    {
+      "content_digest": "4ac6624c338b6acb760967882fed708e5f7f8b82cfd94a51169636ba70551ea6",
+      "digest_algorithm": "sha256",
+      "file_sha256": "41ac5a929e58ce283267bc0bb46e7b3b56a5ee85c8cbfc806491fe6c1a45584d",
+      "record_id": "RRL-DRM-ERROR-001",
+      "record_kind": "work4a_ledger_entry",
+      "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/entries/rrl-drm-error-001--v1.json",
+      "root_kind": "project",
+      "version": 1
+    },
+    {
+      "content_digest": "79eb645bd8a119642809deb12f6416f61d30ca58b18aa8c3d212315396994103",
+      "digest_algorithm": "sha256",
+      "file_sha256": "81dd015bb5b166dfbe68b719faf19f59681e53e1581cb1d2fe61d64b2d93ab53",
+      "record_id": "RRL-DRM-CHECK-001",
+      "record_kind": "work4a_ledger_entry",
+      "relative_path": ".reviewcompass/reuse/reusable-routine-ledger/entries/rrl-drm-check-001--v1.json",
+      "root_kind": "project",
+      "version": 1
+    }
+  ],
+  "policy_ref": {
+    "content_digest": "675c3b46f883381a742727ac511b832c1a49419a35569960d4ac585bf3fd9005",
+    "digest_algorithm": "sha256",
+    "file_sha256": "34c20640e530ba6e611cff1c804b38c5484d8ff1a63b284e1619a70f72a64d05",
+    "record_id": "POL-WORK4A-FRESHNESS",
+    "record_kind": "work4a_freshness_policy",
+    "relative_path": ".reviewcompass/policies/work4a-freshness-policy-v4.json",
+    "root_kind": "project",
+    "version": 4
+  },
+  "prior_baseline_ref": null,
+  "project_id": "reviewcompass3",
+  "record_kind": "work4a_ledger_baseline",
+  "relation_refs": [],
+  "schema_version": 1,
+  "source_content_id": "748e7f6325506014aee5822aed0bb2ab7c68e515c971900a8c9375e5ef19f56a",
+  "source_universe_id": "SRCU-WORK4A-TOOLS-PY-V1",
+  "source_universe_version": 1,
+  "universe_ref": {
+    "content_digest": "652bf2d8bec5a09c2d765c07644b97508b3a08dc76216ad87ee20320e46c5856",
+    "digest_algorithm": "sha256",
+    "file_sha256": "618f3ef508be432efed2f2ed4ea4e6f11ad6680ee5fed5ba097bf93398acfd06",
+    "record_id": "SRCU-WORK4A-TOOLS-PY-V1",
+    "record_kind": "work4a_source_universe",
+    "relative_path": ".reviewcompass/policies/work4a-source-universe-v1.json",
+    "root_kind": "project",
+    "version": 1
+  }
+}
