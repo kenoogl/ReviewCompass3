@@ -7,50 +7,50 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：セッションログ書庫のLayout v3移行が完了した（12検査全合格、冪等unchanged、旧書庫はrollback保持）。HumanがWork 4B最小試行（Current Plan §17実装順12）への前進を選定した。着手前の範囲確定が次である。
+- 現在作業：Work 4B最小試行の縦一周が完了した（範囲提案のHuman承認→宣言→RED対応表（R1〜R7、testの無い宣言0件）→RED→実装前の自己適用検索record→GREEN 8 passed→gate判定verified）。実装順12の後半（Work 5Bでのgate実証）が残る。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
 
 - `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`：`registered / nonblocking`、影響：参照Digest driftの恒久検査器が無い。in_progressにはしていない、次：着手はHuman判断。判別規則の承認が実装の前提
-- レビューbacklog課題（ID：`ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`、`registered / nonblocking`）：守り役codeへの後追い独立レビュー未実施。in_progressにはしていない、次：着手はHuman判断（Work 4B台帳の後が合理的）。材料：[トリアージメモ](records/development/2026-08-07-unreviewed-work-review-triage-memo-v1.md)、[下流影響の参考情報](records/development/2026-08-07-unreviewed-work-review-downstream-impact-note-v1.md)
+- レビューbacklog課題（ID：`ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`、`registered / nonblocking`）：守り役codeへの後追い独立レビュー未実施。in_progressにはしていない、次：着手はHuman判断（Work 4B台帳の後が合理的）。材料：[トリアージメモ](records/development/2026-08-07-unreviewed-work-review-triage-memo-v1.md)、[下流影響の参考情報](records/development/2026-08-07-unreviewed-work-review-downstream-impact-note-v1.md)。新設の`reuse_search_record.py`も守り役として対象に含める
+- TODO検証の単一入口課題（ID：`ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001`、`registered / nonblocking`）：TODO検証が二tool分離で片方だけ実行しても検出されない。terminal終了コードのpipe隠蔽も対象。次：着手はHuman判断
 
 ## 最新のauthority／Evidence
 
-- [書庫移行 Receipt](records/development/2026-08-07-preservation-layout-v3-migration-receipt-v1.json) — SHA-256 `29a3af432c408e8f479a747706cc8ce406c9c7d123c95d02cbb4f02719235914`
-- [書庫移行 Evidence](records/development/2026-08-07-preservation-layout-v3-migration-evidence-v1.md) — SHA-256 `7e5f8b3701d9df8498d972f42a528552ee96d88eca92845f197ad86df812653f`
-- [書庫移行 承認Decision](records/development/2026-08-06-preservation-layout-v3-migration-decision-v1.md) — SHA-256 `b9aa5bc3bc2f6324e42032d3537e3b96f48a63e44c19f530dddafbcf0054843e`
-- [意図毀損検出 設計提案（承認済み）](docs/design/2026-08-06-final-challenge-intent-damage-proposal.md) — SHA-256 `7f8cd3bc6da61efbc1fbcef7b93007e1534e8b77d53e329fbcd8026bf143baf6`
-- [テスト増加の課題record](.reviewcompass/workflow/issues-v4/issue-test-growth-state-pinning-001--v1.json) — SHA-256 `13f4c9a68d90105e66f3e3b5fb2df36b334f7921ee69430b82e85cf40b6f8194`
-- [本日の問題一覧（14件）](records/development/2026-08-06-encountered-problem-inventory-v1.md) — SHA-256 `f6d8da5e6d95767a732e2280ec101df5188d9faac4d55621003c8bb5beb4763b`
+- [Work 4B最小試行 GREEN Evidence](records/development/2026-08-07-work4b-reuse-search-green-evidence-v1.md) — SHA-256 `3284f77507a2ad09992404cae1ced846a6fe5ccdd564af8c8c0e8772e0588e0c`
+- [Work 4B最小試行 RED Evidence](records/development/2026-08-07-work4b-reuse-search-red-evidence-v1.md) — SHA-256 `2a03d414e34285dcd9fef2a10eea3f46ac63fb23e5e1c5ef3f1f9bf19e167054`
+- [宣言→RED対応表（R1〜R7）](records/development/2026-08-07-work4b-reuse-search-declaration-red-map-v1.json) — SHA-256 `ba313d41f2b517e1923182215420f0b8e0ea13a8b6df30dd1b8372aa183707b7`
+- [範囲提案 承認Decision](records/development/2026-08-07-work-4b-minimal-pilot-scope-approval-decision-v1.md) — SHA-256 `4db98a488c76a7d15c1ddffca5c8f94139c29eadcc985930f30af5636b59adfc`
+- [実装前の自己適用検索record](records/development/2026-08-07-reuse-search-record-helper-reuse-search-v1.json) — SHA-256 `75cb79034e26e65b0aefff4525d4d134f5f3bcae3a34c88cb010edcb5fa6f58d`
+- [作業レビュー手順書（高risk観点追記後）](docs/development/work-review-protocol.md) — SHA-256 `22856c9836de2fd1a5d3a8a79d9437ea82150c8e167fb9ddc40ac6b82bb0a923`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `a089ffdf5e538e28457894fb6a120ef065d2b8a0acb3c392d4dedaeacdecbd9d`
-- [CL-6A-10完了Decision](records/development/2026-08-06-work6a-cl-6a-10-completion-decision-v1.md) — SHA-256 `efd3a577129a1b12c264a300f6743b9d149bd00f002cefac84fe1d433f9ce42a`
+- [書庫移行 Receipt](records/development/2026-08-07-preservation-layout-v3-migration-receipt-v1.json) — SHA-256 `29a3af432c408e8f479a747706cc8ce406c9c7d123c95d02cbb4f02719235914`
 
 ## 次に行う一作業
 
-Work 4B最小試行の範囲提案を作り、Human承認を得る。承認後にREDへ進む。
+Work 5B（内部Implementation Task Contract Pilot）で、ReviewCompass3自身の小さなhelper一件を選定し、reuse search gate（検索record無しでは実装を開始しない関門、`tools/development/reuse_search_record.py`の`gate_check`）を実証する。
 
 開始条件：
 
-- Work 4Bの承認済み境界（Current Plan §12 Work 4B、DEC-WORK4A-EARLY-EXIT-001）を照合すること
-- 対象routineの選定基準と記録方法を提案で固定すること
+- HumanがWork 5Bの開始を承認し、対象helperを選定すること（`DEC-WORK4B-MINIMAL-PILOT-SCOPE-001`はWork 5B開始を承認していない）
+- 宣言→RED対応表照合の恒久tool化の要否をHumanが判断すること（判断期限到来、下記参照）
 
 完了条件：
 
-- 範囲提案がHuman承認され、宣言→RED対応表の関門を経てREDが固定されること
+- checklist §10 Work 5Bの項目（Contract、red、固定source、implementation_ready判断、green、post-write、Provenance、分割commit）に従う
 
-後続作業：Work 4B最小試行の後、Work 5B（内部Implementation Task Contract Pilot）でgateを実証する。全routineの一括分類は行わない。
+後続作業：全routineの一括分類は行わない。Entry・Relation・Baselineの台帳形式はWork 4B本体の後続作業単位。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：Work 4B最小試行の範囲提案の承認（提案提示後）。旧書庫の削除可否は別途判断。
-- リマインド（Humanの指示による）：Work 4Bで3回目の宣言→RED対応表を作る時点で、対応表の機械照合（AST照合、現状は毎回その場実施）を恒久toolにするかどうかを判断する。既存2件は`records/development/2026-08-06-*-declaration-red-map-v1.json`。
+- Human判断待ち：(1) Work 5B開始の承認と対象helperの選定。(2) 宣言→RED対応表照合の恒久tool化の要否——リマインドの判断時点が到来した。3回目の対応表（Work 4B、R1〜R7）は確立済みのその場AST照合で作成済みであり、4回目以降をtool化するかの判断。(3) 旧書庫の削除可否は別途判断。
 
 ## stale・deferred
 
-- stale：「次の一作業の選定待ち」はHumanのA選定により解消した。
-- deferred：Work 6AのCL-6A-04/05/06/07/11（行き先明記済み）、登録済み5課題の着手、旧書庫の削除判断、Current Work Projection正式写像、Work 5B、Work 7、Work 8、UI、automation。
+- stale：なし。
+- deferred：Work 6AのCL-6A-04/05/06/07/11（行き先明記済み）、登録済み7課題の着手、旧書庫の削除判断、Current Work Projection正式写像、Entry・Relation・Baseline台帳、Work 7、Work 8、UI、automation。
 
 ## Git・Test
 
@@ -58,8 +58,8 @@ Work 4B最小試行の範囲提案を作り、Human承認を得る。承認後�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：書庫移行 7 passed、Intake V4単体候補11 passed
-- 直近の全Test：venv公式runner 1047 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：Work 4B reuse search 8 passed（宣言R1〜R7対応）
+- 直近の全Test：venv pytest 1055 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
