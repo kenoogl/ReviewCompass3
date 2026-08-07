@@ -1,0 +1,68 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-ADVERSARIAL-REMEDY-I4-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T16:34:07+09:00",
+  "proposal": {
+    "path": "records/development/2026-08-07-adversarial-remedy-i4-decision-v1.md",
+    "sha256": "ed7963e58e5ab741740d307bc7b296a77b0506d13ff240b0a8149aebd9bdb6b3",
+    "declaration_section": "処置Decision§1（I-4即時修正）から展開した規範宣言N1〜N3",
+    "approval_decision": "DEC-ADVERSARIAL-REMEDY-I4-001"
+  },
+  "purpose": "反証I-4を拒否テストとして固定し、実装前に「testの無いN」が0件であることを恒久検査器で数える。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値である。N1は本文一致検査の追加後も既存recordが通ることを固定する境界例であり、現時点で成功する（red_now: false、boundary_reasonを持つ）。N2・N3は拒否機構が未実装のため失敗する。",
+    "機械照合はtools/development/declaration_red_map_check.pyのcheck_declaration_red_mapで実施した。"
+  ],
+  "test_files": {
+    "tests/test_adversarial_remedy_i4.py": [
+      "test_i4_issue_body_must_match_the_cited_candidate",
+      "test_i4_rewritten_issue_body_is_rejected",
+      "test_i4_truncated_issue_body_is_rejected"
+    ]
+  },
+  "declarations": {
+    "N1": {
+      "summary": "健全なV4 Issue recordは、本文一致の検査を加えても検証を通り続ける",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_i4.py::test_i4_issue_body_must_match_the_cited_candidate",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "本文一致検査の追加が既存の健全なrecordを壊さないことを固定する境界例であり、実装前から成功する。"
+    },
+    "N2": {
+      "summary": "Issueのproblem本文を引用元候補と無関係な内容へ差し替えたrecordは、自己digestを合わせ直しても拒否される（反証I-4）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_i4.py::test_i4_rewritten_issue_body_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "N3": {
+      "summary": "本文の一部だけを削ったrecordも拒否される（部分的な書き換えを見逃さない）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_i4.py::test_i4_truncated_issue_body_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": {
+    "checker": "tools/development/declaration_red_map_check.py",
+    "status": "passed",
+    "machine_count": {
+      "declarations": 3,
+      "declarations_without_tests": 0,
+      "listed_tests_missing_in_file": 0,
+      "tests_unmapped_to_declarations": 0
+    }
+  }
+}
