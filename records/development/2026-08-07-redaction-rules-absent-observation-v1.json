@@ -1,0 +1,54 @@
+{
+  "observation_id": "OBS-RC3-REDACTION-RULES-ABSENT-2026-08-07-V1",
+  "observed_at": "2026-08-07T18:05:00+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "No sensitive-information rules are registered anywhere, so the first redaction stage redacts nothing and the only preserved session data was stored verbatim without any redaction pass",
+  "source": {
+    "path": "records/development/2026-08-07-adversarial-review-batch2-redaction-v1.md",
+    "sha256": "c6fbd4db69c443afd5f5ffbc5de7f4596e50b1b20a72cbb2b1b1afab1d272088"
+  },
+  "machine_observations": {
+    "measured_at_commit": "d9cb56a",
+    "design": {
+      "stage_one": "tools/session_logs/redaction.py:redact_text applies configured Rule patterns",
+      "stage_two": "tools/session_logs/redaction.py:redact_text_strict rejects leftover high entropy tokens",
+      "configuration_key": "redaction_rules in the session log config, read by tools/session_logs/config.py"
+    },
+    "findings": [
+      {
+        "fact": "the configuration default for redaction_rules is an empty tuple",
+        "evidence": "tools/session_logs/config.py reads data.get('redaction_rules', ()) with no fallback ruleset"
+      },
+      {
+        "fact": "every test fixture registers an empty rule list except one CLI test",
+        "evidence": "grep over tests/ shows redaction_rules set to [] in test_session_log_e2e_fixtures.py, test_session_log_config_boundaries.py and test_session_log_cli.py"
+      },
+      {
+        "fact": "the only real preserved session records a null redaction rules digest and a null redacted artifact digest",
+        "evidence": "provenance record under the sensitive root for source content id b12edc2408fa1263 has redaction_rules_sha256 null and artifacts.redacted_sha256 null, while verbatim_sha256 is present",
+        "implication": "the preserved data was stored verbatim and no redaction pass ran over it"
+      },
+      {
+        "fact": "an empty ruleset would still produce a stable digest if the pass had run",
+        "evidence": "redaction_rules_digest([], allow_patterns=[]) returns 11706fa413661e2cbbf23a42023e876098f1479544a96c4212a5d98f2c777b43, which differs from the recorded null"
+      }
+    ],
+    "correction_of_prior_record": {
+      "prior": "records/development/2026-08-07-adversarial-review-batch2-redaction-v1.md section 4 stated that the entropy net is a secondary safeguard behind a primary ruleset",
+      "correction": "the primary ruleset does not exist in practice, so the premise of that sentence was wrong; the prior record is kept unchanged as history"
+    }
+  },
+  "problem": "The session log pipeline is built to redact sensitive information in two stages, but what counts as sensitive information has never been defined. No rule is registered in configuration, the default is an empty ruleset, and the single real preservation run stored the transcript verbatim with a null redaction digest, meaning no redaction pass ran at all. The adversarial review of the entropy net therefore examined a secondary safeguard whose primary stage is absent. Deciding the definition is a prerequisite for the net's threshold design, for its layer placement, and for any judgement about sending derived artifacts outside the project.",
+  "impact": [
+    "derived artifacts carry whatever the transcript contained, because nothing is redacted",
+    "the entropy net cannot compensate, since the review found it passes short, low variety, separator split and allow-pattern-exempted values",
+    "any future decision to send derived data to an external service would rest on a redaction guarantee that does not exist",
+    "the earlier review record stated a primary ruleset as a premise, which this observation corrects"
+  ],
+  "boundary": [
+    "preserve this observation as immutable source",
+    "do not treat this observation as an Improvement Candidate, Human Triage Decision or Issue Record",
+    "do not define rules, change configuration, or run any redaction pass on the basis of this observation alone",
+    "no inspection of the preserved transcript contents was performed; whether real secrets are present remains unmeasured and any such inspection is a human decision"
+  ]
+}
