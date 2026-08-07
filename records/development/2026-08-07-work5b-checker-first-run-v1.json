@@ -1,0 +1,70 @@
+{
+  "record_kind": "declaration_red_map_check_run",
+  "run_id": "RC3-WORK5B-CHECKER-FIRST-RUN-001",
+  "run_version": 1,
+  "created_at": "2026-08-07T10:35:26+09:00",
+  "checker": {
+    "path": "tools/development/declaration_red_map_check.py",
+    "sha256": "dcff2cf16a532c8f4b11471093132fc0c5ef9d83d6ed7bcab847b0027c06c2da"
+  },
+  "purpose": "WI-5B-2：検査器の第一実運用。既存4枚の宣言→RED対応表をread-onlyで検査し、結果を固定する。対応表本体は書き換えない。",
+  "results": [
+    {
+      "map_path": "records/development/2026-08-06-intake-v4-declaration-red-map-v1.json",
+      "map_sha256": "c24ebaf58eee3ce2d318084697051d41c9669e30aa756086706f9f110117ce40",
+      "status": "failed",
+      "machine_count": {
+        "declarations": 12,
+        "declarations_without_tests": 0,
+        "listed_tests_missing_in_file": 1,
+        "tests_unmapped_to_declarations": 0
+      },
+      "findings": [
+        "listed_test_missing: tests/test_issue_intake_v4_single_candidate.py::test_n9_authority_reference_candidate_passes_the_v3_validator",
+        "test_file_listing_invalid: tests/test_issue_intake_v4.py"
+      ]
+    },
+    {
+      "map_path": "records/development/2026-08-06-intent-damage-declaration-red-map-v1.json",
+      "map_sha256": "80decdaa37ac8a0f977128d7a7866c6e00c6defd58faacf32eceeeb2a90ae3d0",
+      "status": "passed",
+      "machine_count": {
+        "declarations": 7,
+        "declarations_without_tests": 0,
+        "listed_tests_missing_in_file": 0,
+        "tests_unmapped_to_declarations": 0
+      },
+      "findings": []
+    },
+    {
+      "map_path": "records/development/2026-08-07-work4b-reuse-search-declaration-red-map-v1.json",
+      "map_sha256": "ba313d41f2b517e1923182215420f0b8e0ea13a8b6df30dd1b8372aa183707b7",
+      "status": "passed",
+      "machine_count": {
+        "declarations": 7,
+        "declarations_without_tests": 0,
+        "listed_tests_missing_in_file": 0,
+        "tests_unmapped_to_declarations": 0
+      },
+      "findings": []
+    },
+    {
+      "map_path": "records/development/2026-08-07-work5b-red-map-checker-declaration-red-map-v1.json",
+      "map_sha256": "dd8c1fa92da5b80de7c116a9bf21fb0e2cd0f914144bfbe45ca3097b8e821d26",
+      "status": "passed",
+      "machine_count": {
+        "declarations": 4,
+        "declarations_without_tests": 0,
+        "listed_tests_missing_in_file": 0,
+        "tests_unmapped_to_declarations": 0
+      },
+      "findings": []
+    }
+  ],
+  "summary": {
+    "checked": 4,
+    "passed": 3,
+    "failed": 1
+  },
+  "content_digest": "43127cc28b9ae0e38751be0292a1939fcec90cd7f61e96f047ea2af9609fd1df"
+}
