@@ -1199,10 +1199,17 @@ def validate_v4_issue_record(record, *, path, project_root, config):
     _require_text_field(record["problem"], "problem")
 
     candidate_ref = record["candidate_ref"]
-    _load_referenced_candidate(
+    form, candidate = _load_referenced_candidate(
         project_root=project_root, candidate_ref=candidate_ref,
         code="v4_issue_field_unknown",
     )
+    # 単体形式（N1）のIssue本文は候補の本文の写しである。指紋照合は候補側の
+    # 改竄を拒否するが、Issue側だけを別内容へ差し替える経路は塞がない（反証I-4）。
+    # bundle形式は`quotation`が抽出時の原文引用、Issueの`problem`がHuman仕分け時の
+    # 記述であり、一致しないのが設計である。bundle側の差し替えは塞げない限界として
+    # 記録する。
+    if form == "single" and record["problem"] != candidate.get("problem"):
+        raise IntakeError("v4_issue_body_mismatch", record["issue_id"])
 
     decision_ref = record["triage_decision_ref"]
     if not isinstance(decision_ref, dict) or set(decision_ref) != {
