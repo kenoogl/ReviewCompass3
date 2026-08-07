@@ -20,6 +20,16 @@
   command実行は機械処理を使用する。機械処理が未整備なら手作業で常態化させず改善候補へrouteする。
 - 手戻りが発生した場合は、手作業箇所との因果を確認する。手作業が原因または原因候補なら、作業後報告に
   対象操作、期待executor、実executor、手作業理由、手戻り事象とEvidence、機械処理候補、routeを含める。
+- test・validatorの合否は、**単独で実行したcommandの終了コード**で確認する。pipeや`;`連結の後段で
+  合否を判定しない。連結すると失敗の終了コードが隠蔽される（実害：2026-08-08、不合格のままの
+  コミットが2件通過した）。
+- `.reviewcompass/workflow/`配下の台帳recordは、**対応する正規tool（検証器を含む）だけで作成・変更する**。
+  既存recordの雛形複製による手書きを禁止する（実害：2026-08-08、手書きrecordが台帳整合テスト9件に
+  不合格となりrevertした）。
+- 本文書の制度記述が実装またはDecisionと食い違う場合は、**実測を優先**し、食い違いを観測として
+  記録したうえで本文書を更新する。制度記述には根拠となるDecisionまたはrecordを併記する
+  （実害：2026-08-08、単体候補N1改定〔2026-08-06〕に本文書が追随せず、誤った「登録不可」判断の
+  根拠になった）。
 
 ## 報告の信頼性規則
 
@@ -87,8 +97,11 @@
   `python3 -m tools.development.issue_resolution_pilot --config config/development-issue-resolution-pilot-v3.json record <path>`
   で検証する。候補記録の形式そのものの作り直しを先に提案しない。
 - 改善候補に対するHumanの仕分け判断は`records/development/`のDecision recordへ記録する。旧Pilotの
-  仕分け判断とIssueの置き場所は各1件で凍結されており、新しい記録を追加しない。V4の置き場所は固定
-  bundle参照だけを受け付けるため、単体候補は現時点で載らない。この制約の解消は別のHuman判断とする。
+  仕分け判断とIssueの置き場所は各1件で凍結されており、新しい記録を追加しない。V4の置き場所は、
+  固定bundle参照に加えて**単体候補の決定（単体形式N1）を受け付ける**（2026-08-06のN7改定、
+  Human承認。実例：`ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）。単体候補のトリアージ決定は
+  `tools/development/issue_intake_v4.py`の`build_human_triage_decision`で組み立て、台帳整合検証に
+  合格させる。
 - 詳細は`docs/development/2026-08-02-development-policy.md`を正本とする。
 
 ## コミット方針
