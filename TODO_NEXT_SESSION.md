@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：段階2「dry-run」が完了した。実データ（上位20 group）で分類は実験と完全一致（同187／別1,169／曖昧59）。曖昧59組のpayload実物・manifest・報告書を`records/development/2026-08-07-egress-dry-run-v1/`に固定（一覧digest `baa6491f…`）。**Human目視待ち**：この59組の実物を見て「外部判定が要る／直接見る」を判断する段。全suite 1205 passed。
+- 現在作業：Human方針「Aをやって Bで答え合わせ」に従い、**A1（サブエージェント判定）が完了した**。曖昧59組をdry-run payloadそのままで4体（claude-fable-5、独立文脈）に判定させ、same 49／partial 8／different 2（確信度high 54）。記録に固定済み。**B（Human答え合わせ）待ち**。A2（外部API比較）は段階3・4の承認・実装が前提の別段。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,7 @@
 
 ## 最新のauthority／Evidence
 
+- [A1判定record（59組）](records/development/2026-08-08-egress-a1-subagent-judgment-v1.md) — SHA-256 `2f8dda0d443666a2512bca5207bd0573f5667b190507224413420e8032ba8ef3`
 - [反証レビュー結果（出口関門）](records/development/2026-08-07-egress-adversarial-review-v1.md) — SHA-256 `b0a3ad899bd2f3ef6d010a572e5cad7f3d48a9ea5a82638ba40f109efa87d09a`
 - [段階1 GREEN Evidence](records/development/2026-08-07-egress-stage1-green-evidence-v1.md) — SHA-256 `ba75438bb22815783b6f5a52cae9f842b1672a5816fa8d52feb678664fb5f081`
 - [出口の設計提案v4（確認済み）](docs/design/2026-08-07-external-egress-gate-proposal-v4.md) — SHA-256 `3a82b3973f8abc947782c4bbf8e2d54713043e8e8591a543089a5824c57bcacd`
@@ -53,7 +54,7 @@
 
 ## 次に行う一作業
 
-Humanによるdry-run出力の目視（`records/development/2026-08-07-egress-dry-run-v1/report.md`から）。判断は「外部判定へ進む（送信物一覧承認）／この規模ならHumanが直接見る」の二択。前者なら段階3（承認record正式schema化、反証I-6の真正性担保を含む）へ。
+B：HumanによるA1判定の答え合わせ。`records/development/2026-08-08-egress-a1-subagent-judgment-v1.md` §2の表に○×を付ける（§3の効率案：same 6系統は代表精査、partial 8・different 2・medium 5を個別精査）。結果を記録し、A1の正答率とA2（外部API比較）の要否を判断する。
 
 開始条件：
 
@@ -61,14 +62,14 @@ Humanによるdry-run出力の目視（`records/development/2026-08-07-egress-dr
 
 完了条件：
 
-- Humanの目視判断が記録されること
+- Bの結果（○×と正答率）が記録されること
 
 後続作業：段階3（承認record形式の正式schema化。反証I-6の真正性担保を含む）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：dry-run出力59組の目視判断（外部判定へ進むか）。
+- Human判断待ち：B（A1判定59組の答え合わせ）。
 - 継続する留意点：背景調査の不足が累計5件、さらに本調査で6件目の未遂があった（配備先コピーを最新と誤認し、開発元の存在をHuman指摘で知った）。規律を三段で持つ：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認の範囲は「記録が指す先」まで (3)**指された物が写しなら原本（開発元）まで遡り、鮮度（最終commit日）を確認してから状態を断定する**。
 
 ## stale・deferred
