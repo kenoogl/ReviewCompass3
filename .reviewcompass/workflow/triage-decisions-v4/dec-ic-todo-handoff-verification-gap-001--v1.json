@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-TODO-HANDOFF-VERIFICATION-GAP-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-07T09:12:27+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-todo-handoff-verification-gap-001--v1.json",
+    "record_sha256": "2d3dadaace97b0e95fd10d9209938dfc4106e06e258cbb171fe66491d0a1f51a",
+    "candidate_id": "IC-TODO-HANDOFF-VERIFICATION-GAP-001",
+    "candidate_content_digest": "6535ef09320f93fcca9fe6dba3733fdd455581ce9706d998292b492aaaf73925"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": true
+  },
+  "disposition": "issue_resolution",
+  "blocking": false,
+  "rationale": "Humanの裁定文言（2026-08-07）：「承認。イシュー登録」。「イシュー登録」は、直前の手戻り報告で提示した機械処理候補（TODO検証の二段分離と、コミット時テストの終了コード判定）をIssueへ登録する指示である。recurrenceをtrueとする根拠は、同じ教訓（宣言しただけで検査が無い規則は守られない）の再現であり、単一入口が無い限り実行者の記憶依存が続くことである。`impact: medium`・`priority: low`はHumanの文言に含まれておらず、登録のみで着手指示が無いことからClaudeが機械可読語彙へ翻訳した値である。異議があればsupersedes付きの後継decisionで差し替える。",
+  "next_action": "課題record `ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001`を`registered`で登録のみ行う。着手（`in_progress`化）はHuman判断まで開始しない。対処時はhookを使わず、実行者が明示実行するcommandとして単一入口と終了コード直接判定を設計する。本線はWork 4B最小試行のままとする。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": true,
+    "issue_id": "ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001"
+  },
+  "content_digest": "f4813ac0654ca1d4545b657edf06b451d0a60647474490a1cf3d93d59be10529"
+}

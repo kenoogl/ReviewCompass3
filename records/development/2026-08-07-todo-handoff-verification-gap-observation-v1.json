@@ -1,0 +1,64 @@
+{
+  "observation_id": "OBS-RC3-TODO-HANDOFF-VERIFICATION-GAP-2026-08-07-V1",
+  "observed_at": "2026-08-07T09:12:27+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "The TODO handoff procedure requires two separate machine verifications but no single machine step enforces both, so a TODO edit that passed one verifier and violated the other was committed and stayed unnoticed across three commits",
+  "source": {
+    "path": "docs/development/prompts/todo-handoff-update.md",
+    "sha256": "eff64878479ce82a48f8e5b4160dd7913364268c9e94d1a6f0a63087e7fb0f4d"
+  },
+  "machine_observations": {
+    "measured_at_commit": "8037ff3",
+    "procedure_step_5": "run tools/development/todo_compaction.py verification (12288 bytes, single active ID, forbidden history, reference resolution) and, before the final stage, python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md",
+    "verifiers": [
+      {
+        "path": "tools/development/todo_handoff.py",
+        "sha256": "17077dde9953a93b316e600fe8762a2e4a42ef3f95b13f824a34b22a55a8d43d",
+        "note": "passed on the offending TODO revision"
+      },
+      {
+        "path": "tools/development/todo_compaction.py",
+        "sha256": "0e446f9aa100d8128c32a3ddbcaca601e66aead9548db349b11a9f5adde89a1f",
+        "note": "its single-active-ID rule was violated by the offending TODO revision; rule regex requires exactly one line starting with '- `ISSUE-...`：'"
+      }
+    ],
+    "incident": {
+      "introduced_in_commit": "2766a10",
+      "introduced_at": "2026-08-07",
+      "change": "a second issue line formatted as an active-ID line was added to TODO_NEXT_SESSION.md to link the review backlog issue",
+      "verification_run_at_introduction": "todo_handoff.py only, result passed",
+      "undetected_through_commits": [
+        "2766a10",
+        "c298b8e",
+        "d669003"
+      ],
+      "detected_by": "full pytest run during the d669003 work unit: tests/test_todo_update_path.py and tests/test_issue_resolution_pilot_wi_005.py failed with 'active ID count is invalid'",
+      "repaired_in_commit": "eaf83c9",
+      "repair": "reworded the added line so only one line keeps the active-ID format; the link itself was preserved; full suite returned to 1047 passed"
+    },
+    "aggravating_factor": {
+      "fact": "the executor's commit chains piped pytest output into tail, so the pipeline exit code came from tail and a failing suite did not stop the commit",
+      "affected_commits": [
+        "2766a10",
+        "c298b8e",
+        "d669003"
+      ]
+    },
+    "constraint_on_remedy": {
+      "fact": "DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001 and AGENTS.md forbid guarded commits and hooks",
+      "implication": "any remedy must stay an explicit executor-run command, not a hook"
+    }
+  },
+  "problem": "The TODO handoff procedure names two machine verifications, todo_compaction.py and todo_handoff.py, but there is no single machine command that runs both, and nothing detects that only one was run. On 2026-08-07 a TODO edit passed todo_handoff.py while violating todo_compaction.py's single-active-ID rule, was committed, and survived two further commits until an unrelated full test run exposed it. A second manual weakness amplified the miss: the executor's commit chain piped the test run into tail, so the failing exit code was masked and the commit condition 'tests pass' was judged by eye instead of by the machine. Both weaknesses are instances of the recorded lesson that a declared rule without a machine check does not hold.",
+  "impact": [
+    "a TODO revision violating a machine rule was treated as verified and committed three times",
+    "the commit condition requiring passing tests was bypassed unnoticed because the exit code was masked by a pipe",
+    "the two-step verification depends on the executor remembering both steps, which is exactly the manual-rework class the development policy routes to machine candidates"
+  ],
+  "boundary": [
+    "preserve this observation as immutable source",
+    "do not treat this observation as an Improvement Candidate, Human Triage Decision or Issue Record",
+    "do not modify todo_handoff.py, todo_compaction.py, the procedure document or any test on the basis of this observation alone",
+    "the remedy must not introduce hooks or guarded commits"
+  ]
+}

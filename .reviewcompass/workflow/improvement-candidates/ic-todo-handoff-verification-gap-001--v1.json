@@ -1,0 +1,59 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-TODO-HANDOFF-VERIFICATION-GAP-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-07T09:12:27+09:00",
+  "source_work": "work-4b/scope-proposal-work-unit",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-TODO-HANDOFF-VERIFICATION-GAP-2026-08-07-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-07-todo-handoff-verification-gap-observation-v1.json",
+    "sha256": "01f57093a875059d738f7045cfc9ca124dde3d838f6bed4f1a9c533382a43dcc"
+  },
+  "problem": "TODO handoffの共通手順は`todo_compaction.py`と`todo_handoff.py`の二つの機械検証を要求するが、両方を一度に実行する単一の機械commandが無く、片方しか実行しなかったことを検出する仕組みも無い。2026-08-07に、TODOへのIssue link追加が`todo_handoff.py`に合格しながら`todo_compaction.py`のactive ID 1件規則に違反したままcommitされ（`2766a10`）、後続2 commitを経て、無関係な全テスト実行で初めて検出された（修復は`eaf83c9`）。さらに、実行者のcommit連鎖がテスト実行の出力をpipeで繋いだため失敗の終了コードが隠され、「テスト合格」というcommit条件が機械でなく目視で判定されていた。いずれも「宣言しただけで検査が無い規則は守られない」という記録済みの教訓の再現である。",
+  "impact": [
+    "機械規則に違反したTODOが検証済みとして扱われ、3 commitにわたり残存した",
+    "テスト合格というcommit条件が、終了コードのpipe隠蔽により気付かれずに迂回された",
+    "二段検証は実行者が両方を覚えていることに依存しており、開発方針が機械化候補へrouteすべきとする手作業起因の手戻り類型そのものである"
+  ],
+  "scope": [
+    "TODO検証の単一入口化：`todo_handoff.py`がcompaction検査（12,288 bytes上限、active ID 1件、禁止履歴、参照解決）を内包するか、両方を実行する単一のwrapper commandを設ける",
+    "commit前検査でテスト・validatorの終了コードを機械で直接判定する実行手順（pipeによる隠蔽の排除）",
+    "いずれも実行者が明示的に実行するcommandとして設計すること（hook・guarded commitは導入しない）"
+  ],
+  "non_scope": [
+    "hook、guarded commit、コミットごとの恒久的な承認fileの導入（DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001の維持）",
+    "active ID 1件規則そのものの変更（規則は正しく働いた。壊れていたのは検証の実行経路である）",
+    "Human裁定前のtodo_handoff.py・todo_compaction.py・手順書・testの変更",
+    "本線（Work 4B最小試行）の中断"
+  ],
+  "classification_candidates": [
+    "process_improvement",
+    "implementation"
+  ],
+  "route_candidates": [
+    "issue_resolution"
+  ],
+  "consumer_candidates": [
+    "reviewcompass3-development",
+    "todo-handoff-procedure"
+  ],
+  "evidence_refs": [
+    {
+      "path": "docs/development/prompts/todo-handoff-update.md",
+      "sha256": "eff64878479ce82a48f8e5b4160dd7913364268c9e94d1a6f0a63087e7fb0f4d"
+    },
+    {
+      "path": "tools/development/todo_handoff.py",
+      "sha256": "17077dde9953a93b316e600fe8762a2e4a42ef3f95b13f824a34b22a55a8d43d"
+    },
+    {
+      "path": "tools/development/todo_compaction.py",
+      "sha256": "0e446f9aa100d8128c32a3ddbcaca601e66aead9548db349b11a9f5adde89a1f"
+    }
+  ],
+  "proposed_action": "Humanが分類、blocking判定、routeを裁定する。裁定文言（2026-08-07「イシュー登録」）によりIssueへの登録が指示されているため、route候補はissue_resolutionのみとする。対処案は2点：(1) TODO検証の単一入口化（todo_handoff.pyへのcompaction検査統合、または両検証を実行する単一command）、(2) commit前検査の終了コード直接判定の手順化。いずれもhookを使わず、実行者が明示的に実行するcommandとして設計する。着手はHuman判断まで開始しない。",
+  "content_digest": "6535ef09320f93fcca9fe6dba3733fdd455581ce9706d998292b492aaaf73925"
+}
