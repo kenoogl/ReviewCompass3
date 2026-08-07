@@ -1,0 +1,127 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-VERIFICATION-BOUNDARY-LAYER1-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T17:15:22+09:00",
+  "scope": {
+    "kind": "complete"
+  },
+  "proposal": {
+    "path": "records/development/2026-08-07-verification-boundary-approval-decision-v1.md",
+    "sha256": "2aa6157a503b7aef1cc03f21a98abb476f46a8b2b27955d8a2b2c9782f5adb8d",
+    "declaration_section": "層1の残り3件（C-1 scope欄、R-3 gate再検索、C-2空文字・I-2単調性）",
+    "approval_decision": "DEC-VERIFICATION-BOUNDARY-001"
+  },
+  "purpose": "層1の残りを拒否テストとして固定する。本対応表はDEC-RED-VERIFICATION-ADOPTION-001の手順を初適用し、RED固定commit前に実行照合する。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（scope欄・再検索・単調性検査がいずれも未実装のため）。",
+    "静的検査と実行照合の両方をtools/development/declaration_red_map_check.pyで実施した。"
+  ],
+  "test_files": {
+    "tests/test_verification_boundary_layer1.py": [
+      "test_l1_complete_scope_detects_a_test_missing_from_both_sides",
+      "test_l2_partial_scope_limits_the_check_to_the_listing",
+      "test_l3_partial_scope_without_a_reason_is_rejected",
+      "test_l4_missing_scope_defaults_to_complete",
+      "test_l5_empty_declaration_summary_is_rejected",
+      "test_l6_emptied_hits_are_rejected_by_re_running_the_search",
+      "test_l7_intact_record_passes_the_re_run",
+      "test_l8_successor_decision_may_not_move_backwards_in_time",
+      "test_l9_forward_moving_successor_is_accepted"
+    ]
+  },
+  "declarations": {
+    "L1": {
+      "summary": "scope: completeの対応表は、欄からも宣言からも漏れた実在testを検出する（反証C-1の完全解消）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l1_complete_scope_detects_a_test_missing_from_both_sides",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "L2": {
+      "summary": "scope: partialの対応表は、理由を添えれば範囲外のtestを判定対象にしない",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l2_partial_scope_limits_the_check_to_the_listing",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "現行の検査器はscope欄を読まず、欄と宣言の一致だけを見るため、この形は実装前から成功する。scope欄の実装後も成功し続けることを固定する境界例である。"
+    },
+    "L3": {
+      "summary": "範囲を狭めるpartialは理由の記載を要し、無い場合は拒否される",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l3_partial_scope_without_a_reason_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "L4": {
+      "summary": "scope欄の無い対応表はcompleteとして扱う（黙って緩めない）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l4_missing_scope_defaults_to_complete",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "L5": {
+      "summary": "宣言のsummaryが空白のみの対応表は拒否される（反証C-2の形式面）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l5_empty_declaration_summary_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "L6": {
+      "summary": "gateは検索を再実行し、hitsを空にしたrecordをsearch_result_mismatchで拒否する（反証R-3）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l6_emptied_hits_are_rejected_by_re_running_the_search",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "L7": {
+      "summary": "無改変のrecordは再検索照合を通過する",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l7_intact_record_passes_the_re_run",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "L8": {
+      "summary": "後継decisionの決定時刻は前版より過去へ戻れない（反証I-2の機械化可能部分）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l8_successor_decision_may_not_move_backwards_in_time",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "L9": {
+      "summary": "時刻が前進する後継decisionは受理される",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer1.py::test_l9_forward_moving_successor_is_accepted",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  }
+}
