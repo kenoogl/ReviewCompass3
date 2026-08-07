@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "adversarial-remedy-i4",
+  "external": {
+    "relative_path": "work4b/reuse-searches/1da248131bedeb7f0e7970cc7b28b911aa6e4492c2e618dd51033e06ef501bcb.json",
+    "content_digest": "1da248131bedeb7f0e7970cc7b28b911aa6e4492c2e618dd51033e06ef501bcb",
+    "byte_sha256": "c478011e078170934531fb35589cd4b2842278f1ac3e336c41ebbd30bf80ed51"
+  },
+  "source_identity": {
+    "profile_run_id": "bc64b7a9b33ce8b2120345982eaedeb492442d538adde782b8e45daa94f4abec",
+    "discovery_run_id": "0cdf407cda40c65585513b8723c58b7cec8b9dfafc4c2ecd61e3dcbc26b42a6f",
+    "source_content_id": "3a14c0a65aed6d56de95379201fe81f8eba64aad83a65e9b0d52f8366394b4b2",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 297,
+  "content_digest": "215b806a8c7661ec1b41d04049e3ba1ed4199f92d75de01328e42255b283271d"
+}
