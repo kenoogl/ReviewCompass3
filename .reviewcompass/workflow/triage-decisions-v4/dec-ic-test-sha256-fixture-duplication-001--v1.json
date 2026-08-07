@@ -1,0 +1,31 @@
+{
+ "record_kind": "human_triage_decision",
+ "schema_version": 2,
+ "decision_id": "DEC-IC-TEST-SHA256-FIXTURE-DUPLICATION-001",
+ "decision_version": 1,
+ "decided_at": "2026-08-08T08:06:16+09:00",
+ "decision_maker": "human",
+ "candidate_ref": {
+  "record_path": ".reviewcompass/workflow/improvement-candidates/ic-test-sha256-fixture-duplication-001--v1.json",
+  "record_sha256": "f9884941465c9a6c439aa348eb1857f216f6b890aaeb6e042b11721c9f74a68a",
+  "candidate_id": "IC-TEST-SHA256-FIXTURE-DUPLICATION-001",
+  "candidate_content_digest": "1661532218a8520f92d4c53238ed75fc9806b0939a2ceaad043ad0d2338f7bf6"
+ },
+ "human_fields": {
+  "unresolved": true,
+  "recurrence": true,
+  "impact": "low",
+  "priority": "low",
+  "promote_to_issue": true
+ },
+ "disposition": "issue_resolution",
+ "blocking": false,
+ "rationale": "Human判断2026-08-08「イ。登録のみでよい」および記入欄5項目の承認「保留中は承認」。テストの一斉整理は行わないblockerと整合させ、登録のみとする。",
+ "next_action": "課題record `ISSUE-TEST-SHA256-FIXTURE-DUPLICATION-001`を`registered`で登録のみ行う。着手（`in_progress`化）はHuman判断まで開始しない。",
+ "supersedes": null,
+ "issue_promotion": {
+  "approved": true,
+  "issue_id": "ISSUE-TEST-SHA256-FIXTURE-DUPLICATION-001"
+ },
+ "content_digest": "73c4b6a9da93d0edc431723d902bdb5265db99777c43c027cac740f0180a7e27"
+}

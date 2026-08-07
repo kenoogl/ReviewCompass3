@@ -1,0 +1,35 @@
+{
+ "observation_id": "OBS-RC3-TEST-SHA256-FIXTURE-DUPLICATION-2026-08-08-V1",
+ "observed_at": "2026-08-08T08:05:38+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "テストfileが同型のSHA-256補助関数を自前定義しており、tool側の7重複より多い14fileに重複している",
+ "machine_observations": {
+  "measured_by": "grep -rln 'def _sha256' tests/",
+  "duplicated_test_files": [
+   "tests/test_issue_resolution_pilot.py",
+   "tests/test_issue_resolution_pilot_implementation_task_contract.py",
+   "tests/test_issue_resolution_pilot_implementation_task_contract_v2.py",
+   "tests/test_issue_resolution_pilot_issue_plan.py",
+   "tests/test_issue_resolution_pilot_plan_challenge.py",
+   "tests/test_session_log_bootstrap.py",
+   "tests/test_task_contract_source_pin.py",
+   "tests/test_task_contract_source_resolution.py",
+   "tests/test_todo_compaction.py",
+   "tests/test_todo_handoff_projection.py",
+   "tests/test_todo_record_generation.py",
+   "tests/test_todo_snapshot.py",
+   "tests/test_todo_update_path.py",
+   "tests/test_work5b_contract.py"
+  ],
+  "count": 14
+ },
+ "problem": "テスト側にSHA-256補助関数の自前定義が14file存在し、同じ処理の複製が繰り返されている。tool側の統合を行ってもテスト側の重複は残る。",
+ "impact": [
+  "補助関数の仕様変更時に14か所の追随が必要",
+  "新しいテストがさらに複製を増やす"
+ ],
+ "boundary": [
+  "本観測はテストの整理を開始しない",
+  "改善候補への昇格とトリアージはHuman判断による"
+ ]
+}

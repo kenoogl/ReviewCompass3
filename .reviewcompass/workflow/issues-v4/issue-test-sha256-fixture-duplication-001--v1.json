@@ -1,0 +1,23 @@
+{
+ "record_kind": "issue_record",
+ "schema_version": 2,
+ "issue_id": "ISSUE-TEST-SHA256-FIXTURE-DUPLICATION-001",
+ "issue_version": 1,
+ "created_at": "2026-08-08T08:06:16+09:00",
+ "state": "registered",
+ "problem": "テスト側にSHA-256補助関数の自前定義が14file存在し、同じ処理の複製が繰り返されている。tool側の統合を行ってもテスト側の重複は残る。",
+ "candidate_ref": {
+  "record_path": ".reviewcompass/workflow/improvement-candidates/ic-test-sha256-fixture-duplication-001--v1.json",
+  "record_sha256": "f9884941465c9a6c439aa348eb1857f216f6b890aaeb6e042b11721c9f74a68a",
+  "candidate_id": "IC-TEST-SHA256-FIXTURE-DUPLICATION-001",
+  "candidate_content_digest": "1661532218a8520f92d4c53238ed75fc9806b0939a2ceaad043ad0d2338f7bf6"
+ },
+ "triage_decision_ref": {
+  "decision_id": "DEC-IC-TEST-SHA256-FIXTURE-DUPLICATION-001",
+  "decision_version": 1,
+  "path": ".reviewcompass/workflow/triage-decisions-v4/dec-ic-test-sha256-fixture-duplication-001--v1.json",
+  "sha256": "d95090a7ad5420f7010f3198424ca3754df5ab5c0dba26c8a2d98cd71c93c3dc",
+  "content_digest": "73c4b6a9da93d0edc431723d902bdb5265db99777c43c027cac740f0180a7e27"
+ },
+ "content_digest": "774cff88bf2eaaf7659160bdf3a27167612a0251011f16690e5011f4779d7101"
+}

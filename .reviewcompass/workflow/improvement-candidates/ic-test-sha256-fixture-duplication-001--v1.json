@@ -1,0 +1,48 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-TEST-SHA256-FIXTURE-DUPLICATION-001",
+ "candidate_version": 1,
+ "created_at": "2026-08-08T08:05:38+09:00",
+ "source_work": "consolidation/family-a-materials",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-TEST-SHA256-FIXTURE-DUPLICATION-2026-08-08-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-08-test-sha256-fixture-duplication-observation-v1.json",
+  "sha256": "30e17ecbac1d91cdbfdf1224e0d97f8776b72cc1d057628c37e7acd5c3cd66be"
+ },
+ "problem": "テスト側にSHA-256補助関数の自前定義が14file存在し、同じ処理の複製が繰り返されている。tool側の統合を行ってもテスト側の重複は残る。",
+ "impact": [
+  "補助関数の仕様変更時に14か所の追随が必要",
+  "新しいテストがさらに複製を増やす"
+ ],
+ "scope": [
+  "tests/配下の_sha256系自前定義14fileの共通fixture化による整理"
+ ],
+ "non_scope": [
+  "tool側の統合（評価②）",
+  "テスト全体の一斉整理"
+ ],
+ "classification_candidates": [
+  "process_improvement",
+  "test_or_oracle"
+ ],
+ "route_candidates": [
+  "issue_resolution",
+  "checkpoint"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development",
+  "initial-development-checklist",
+  "development-plan"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-08-consolidation-family-a-materials-v1.md",
+   "sha256": "502f8f643989664afb734752e18432e93dd8b91da7705dd4cc480480ec86df3a"
+  }
+ ],
+ "proposed_action": "テスト共通fixtureへの整理を将来の作業単位として登録する。着手はHuman判断。",
+ "content_digest": "1661532218a8520f92d4c53238ed75fc9806b0939a2ceaad043ad0d2338f7bf6"
+}

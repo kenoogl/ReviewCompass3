@@ -15,6 +15,7 @@
 - `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`：`registered / nonblocking`、影響：参照Digest driftの恒久検査器が無い。in_progressにはしていない、次：着手はHuman判断。判別規則の承認が実装の前提
 - レビューbacklog課題（ID：`ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`、`registered / nonblocking`）：守り役codeへの後追い独立レビュー未実施。in_progressにはしていない、次：着手はHuman判断（Work 4B台帳の後が合理的）。材料：[トリアージメモ](records/development/2026-08-07-unreviewed-work-review-triage-memo-v1.md)、[下流影響の参考情報](records/development/2026-08-07-unreviewed-work-review-downstream-impact-note-v1.md)。新設の`reuse_search_record.py`も守り役として対象に含める
 - TODO検証の単一入口課題（ID：`ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001`、`registered / nonblocking`）：TODO検証が二tool分離で片方だけ実行しても検出されない。terminal終了コードのpipe隠蔽も対象。次：着手はHuman判断
+- テストfixture重複課題（ID：`ISSUE-TEST-SHA256-FIXTURE-DUPLICATION-001`、`registered / nonblocking`）：テスト14fileが同型の_sha256補助関数を自前定義。正規経路（OBS→IC→pilot v3検証→tool組立decision→issue）で登録済み。着手はHuman判断
 
 ## 最新のauthority／Evidence
 
@@ -51,7 +52,7 @@
 
 ## 次に行う一作業
 
-Human決定済み（2026-08-08「イ。登録のみでよい」）を実行する。(1) テスト重複14件のissue登録を**intake toolの正規経路で**やり直す（手作りrecordは台帳整合テスト9件に不合格でrevert済み。`tools/development/issue_intake_v4.py`の正規手順を調べて使う）。(2) 系統A+C合流の「digest系」材料（C系統4関数の実測を加えた統合案）を作り直し、手順4の再判断に付す。
+系統A+C合流の「digest系」材料を作る：C系統4関数（canonical digest計算。4file全て守り役）の実測（本体・呼び出し・テスト参照）を加え、共通module一括の統合案・削減行数・alias要否を提示して手順4の再判断に付す。issue登録のやり直しは正規経路で完了済み。AGENTS.mdの整理はHuman方針判断待ち（肥大への対処）。
 
 開始条件：
 
@@ -59,7 +60,7 @@ Human決定済み（2026-08-08「イ。登録のみでよい」）を実行す�
 
 完了条件：
 
-- issueが正規経路で登録され台帳整合テスト合格、digest系材料が手順4に付されること
+- digest系材料が手順4のHuman判断に付されること
 
 後続作業：段階3（承認record形式の正式schema化。反証I-6の真正性担保を含む）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
 
