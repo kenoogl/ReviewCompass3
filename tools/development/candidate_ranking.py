@@ -12,7 +12,11 @@ import hashlib
 import json
 from pathlib import Path
 
-from tools.development.integration_exclusions import excluded_entry_ids
+from tools.development.integration_exclusions import (
+    IntegrationExclusionError,
+    excluded_entry_ids,
+    validate_integration_exclusions,
+)
 from tools.development.reuse_search_record import _assess_freshness
 
 
@@ -67,6 +71,17 @@ def build_candidate_ranking(
         "source_content_id"
     ):
         raise CandidateRankingError("profile and discovery source content ids differ")
+
+    # 除外宣言は候補の脱落を決める。検証せずに受け取ると、壊れた宣言のまま
+    # groupを落とせてしまう。
+    try:
+        validate_integration_exclusions(
+            exclusions_record, project_root=project_root
+        )
+    except IntegrationExclusionError as error:
+        raise CandidateRankingError(
+            f"exclusions record is invalid: {error}"
+        ) from error
 
     freshness = _assess_freshness(
         observation_document=observation_document,

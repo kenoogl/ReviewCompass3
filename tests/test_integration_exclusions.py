@@ -39,7 +39,10 @@ def _fixture_record(tmp_path):
                 ],
                 "rationale": "旧Pilot記録は旧規則のまま保持し、新規則で再判定しない",
                 "authority_refs": [
-                    {"decision_id": "DEC-FROZEN-LANE-GUIDANCE-CORRECTION-001"}
+                    {
+                        "decision_id": "DEC-FROZEN-LANE-GUIDANCE-CORRECTION-001",
+                        "path": "records/approval-decision.md",
+                    }
                 ],
             },
             {
@@ -53,7 +56,10 @@ def _fixture_record(tmp_path):
                 ],
                 "rationale": "一回性の移行器を歴史として保持する",
                 "authority_refs": [
-                    {"decision_id": "DEC-INTEGRATION-EXCLUSION-ENTRIES-001"}
+                    {
+                        "decision_id": "DEC-INTEGRATION-EXCLUSION-ENTRIES-001",
+                        "path": "records/approval-decision.md",
+                    }
                 ],
             },
         ],

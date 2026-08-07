@@ -130,11 +130,18 @@ def _map_env(tmp_path):
     )
 
 
-def test_c1_omitting_a_test_from_the_listing_is_rejected(tmp_path):
+def test_c1_listing_and_declarations_must_agree_in_both_directions(tmp_path):
+    """C-1の部分修正：欄と宣言の双方向一致を要求する。
+
+    欄からも宣言からも漏れた実在testの検出（反証C-1の完全な解消）は、
+    部分列挙の対応表と衝突するため設計判断へ送った。限界は
+    `records/development/2026-08-07-adversarial-remedy-batch1-green-evidence-v1.md`
+    に記録する。
+    """
     _map_env(tmp_path)
     document = {
         "record_kind": "declaration_red_map", "map_id": "M", "map_version": 1,
-        "test_files": {"tests/test_sample.py": ["test_a"]},
+        "test_files": {"tests/test_sample.py": ["test_a", "test_orphan"]},
         "declarations": {"P1": {"summary": "s", "tests": [
             {"test": "tests/test_sample.py::test_a", "red_now": True}],
             "red_now": True}},
@@ -145,6 +152,27 @@ def test_c1_omitting_a_test_from_the_listing_is_rejected(tmp_path):
     assert result["status"] == "failed"
     assert result["machine_count"]["tests_unmapped_to_declarations"] == 1
     assert any("test_orphan" in finding for finding in result["findings"])
+
+    reversed_document = {
+        "record_kind": "declaration_red_map", "map_id": "M", "map_version": 1,
+        "test_files": {"tests/test_sample.py": ["test_a"]},
+        "declarations": {"P1": {"summary": "s", "tests": [
+            {"test": "tests/test_sample.py::test_a", "red_now": True},
+            {"test": "tests/test_sample.py::test_orphan", "red_now": True}],
+            "red_now": True}},
+    }
+    reversed_path = tmp_path / "map_reversed.json"
+    reversed_path.write_text(
+        json.dumps(reversed_document, ensure_ascii=False), encoding="utf-8"
+    )
+    reversed_result = drmc.check_declaration_red_map(
+        map_path=reversed_path, project_root=tmp_path
+    )
+    assert reversed_result["status"] == "failed"
+    assert any(
+        "test_missing_from_listing" in finding
+        for finding in reversed_result["findings"]
+    )
 
 
 def test_c3_sharing_one_test_across_declarations_is_rejected(tmp_path):

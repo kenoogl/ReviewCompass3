@@ -111,6 +111,18 @@ def validate_integration_exclusions(record, *, project_root="."):
             raise IntegrationExclusionError(
                 f"entry authority refs are missing: {entry['entry_id']}"
             )
+        # 根拠は解決できなければ根拠ではない。ID文字列だけでは、実在しない
+        # Decisionを名乗って除外を通せてしまう。
+        for reference in entry["authority_refs"]:
+            if not isinstance(reference, dict) or not reference.get("path"):
+                raise IntegrationExclusionError(
+                    f"authority reference has no path: {entry['entry_id']}"
+                )
+            target = Path(project_root) / reference["path"]
+            if not target.is_file():
+                raise IntegrationExclusionError(
+                    f"authority reference is unresolvable: {reference['path']}"
+                )
 
     if record["content_digest"] != content_digest(record):
         raise IntegrationExclusionError("content digest mismatch")

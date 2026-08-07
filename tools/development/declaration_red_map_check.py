@@ -71,6 +71,7 @@ def check_declaration_red_map(*, map_path, project_root="."):
     machine_count["declarations"] = len(declarations)
 
     bound = {}
+    owner = {}
     for key in sorted(declarations):
         entry = declarations[key]
         tests = entry.get("tests") if isinstance(entry, dict) else None
@@ -86,6 +87,15 @@ def check_declaration_red_map(*, map_path, project_root="."):
                 continue
             file_part, name = reference.split("::", 1)
             bound.setdefault(file_part, set()).add(name)
+            # 一つのtestを複数の宣言で使い回すと、宣言の数だけ被覆があるように
+            # 見えて実際には一つしか検査していない。
+            if reference in owner:
+                findings.append(
+                    f"shared_test_across_declarations: {reference}: "
+                    f"{owner[reference]},{key}"
+                )
+            else:
+                owner[reference] = key
 
     universe_files = sorted(set(test_files) | set(bound))
     actual = {}
@@ -109,16 +119,25 @@ def check_declaration_red_map(*, map_path, project_root="."):
 
     for relative in universe_files:
         functions = actual.get(relative)
-        referenced = bound.get(relative, set()) | listed_by_file.get(relative, set())
+        listed = listed_by_file.get(relative, set())
+        declared = bound.get(relative, set())
         if functions is not None:
-            for name in sorted(referenced):
+            for name in sorted(listed | declared):
                 if name not in functions:
                     machine_count["listed_tests_missing_in_file"] += 1
                     findings.append(f"listed_test_missing: {relative}::{name}")
-        for name in sorted(listed_by_file.get(relative, set())):
-            if name not in bound.get(relative, set()):
-                machine_count["tests_unmapped_to_declarations"] += 1
-                findings.append(f"test_unmapped_to_declarations: {relative}::{name}")
+        # test_files欄と宣言側のtest集合は双方向で一致しなければならない。
+        # 欄に載っているのに宣言へ結ばれていないtest、および宣言が参照するのに
+        # 欄へ載っていないtestを検出する。
+        # 限界：欄からも宣言からも漏れた実在testは検出できない（反証C-1）。
+        # 実在test全体を判定対象にすると部分列挙の対応表と衝突するため、
+        # 対象範囲の宣言方法はHuman判断へ送る。
+        for name in sorted(listed - declared):
+            machine_count["tests_unmapped_to_declarations"] += 1
+            findings.append(f"test_unmapped_to_declarations: {relative}::{name}")
+        for name in sorted(declared - listed):
+            machine_count["tests_unmapped_to_declarations"] += 1
+            findings.append(f"test_missing_from_listing: {relative}::{name}")
 
     status = "passed" if not findings else "failed"
     return _result(status, findings, machine_count)

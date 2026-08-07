@@ -107,7 +107,9 @@ def _exclusions(tmp_path):
                     {"kind": "module_path", "value": "tools/pkg/frozen.py"}
                 ],
                 "rationale": "凍結対象",
-                "authority_refs": [{"decision_id": "DEC-FIXTURE-001"}],
+                "authority_refs": [
+                    {"decision_id": "DEC-FIXTURE-001", "path": "records/approval.md"}
+                ],
             }
         ],
     }

@@ -276,6 +276,14 @@ def validate_reuse_search_record(record, *, expected_identity):
     elif schema_version == 2:
         _require_exact_fields(record, _RECORD_FIELDS_V2, "reuse search record")
         _require_exact_fields(record["freshness"], _FRESHNESS_FIELDS, "freshness")
+        # 反証R-2・R-4：宣言とfreshnessの対象範囲は一致しなければならない。
+        # 片方だけ狭めると、gateが範囲外の変更・新規fileを見なくなる。
+        if list(record["freshness"]["target_paths"]) != list(
+            record["declaration"]["target_paths"]
+        ):
+            raise ReuseSearchError(
+                "freshness scope disagrees with the declared scope"
+            )
     else:
         raise ReuseSearchError("schema version is invalid")
     _require_exact_fields(record["declaration"], _DECLARATION_FIELDS, "declaration")
@@ -482,6 +490,13 @@ def gate_check_attested(*, attestation_path, data_root, expected_identity, proje
         return {"start_allowed": False, "reason": "record_unavailable"}
     if record.get("content_digest") != external_ref.get("content_digest"):
         return {"start_allowed": False, "reason": "record_unavailable"}
+    # 反証R-5・R-6：証明書は外部本体の要約を載せる。要約が本体と食い違うなら、
+    # 読み手が本体を開かずに誤った件数・由来を信じることになる。
+    expected_attestation = _build_attestation(
+        record, byte_sha256=external_ref.get("byte_sha256")
+    )
+    if attestation != expected_attestation:
+        return {"start_allowed": False, "reason": "attestation_mismatch"}
     return _gate_verdict(
         record, expected_identity=expected_identity, project_root=project_root
     )

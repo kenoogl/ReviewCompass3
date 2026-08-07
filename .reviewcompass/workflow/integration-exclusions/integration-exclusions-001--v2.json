@@ -1,0 +1,78 @@
+{
+  "record_kind": "integration_exclusions",
+  "schema_version": 1,
+  "exclusion_id": "RC3-INTEGRATION-EXCLUSIONS-001",
+  "exclusion_version": 2,
+  "created_at": "2026-08-07T16:13:49+09:00",
+  "approval": {
+    "decision_id": "DEC-INTEGRATION-EXCLUSION-ENTRIES-001",
+    "path": "records/development/2026-08-07-integration-exclusion-entries-decision-v1.md",
+    "sha256": "f2b415e4cc59a9e1481d727f158a83eb2016f921262451f30eb29e4c02ffd043"
+  },
+  "entries": [
+    {
+      "entry_id": "E1",
+      "reason_kind": "frozen_lane",
+      "targets": [
+        {
+          "kind": "symbol_prefix",
+          "value": "tools/development/issue_resolution_pilot.py:validate_implementation_task_contract_v2"
+        },
+        {
+          "kind": "symbol_prefix",
+          "value": "tools/development/issue_resolution_pilot.py:validate_fixed_sources_for_contract"
+        },
+        {
+          "kind": "symbol_prefix",
+          "value": "tools/development/issue_resolution_pilot.py:validate_task_contract_sources"
+        }
+      ],
+      "rationale": "旧Pilot subject（ISSUE-PILOT-TODO-GROWTH-001）固定の検証器群。旧Pilotの記録は旧規則のまま保持し、新規則で再判定しない（凍結）。現行世代の検証器と統合すると、旧記録が旧検証器で検証され続けるという凍結の意味が壊れる。",
+      "authority_refs": [
+        {
+          "decision_id": "DEC-FROZEN-LANE-GUIDANCE-CORRECTION-001",
+          "path": "records/development/2026-08-06-frozen-lane-guidance-correction-decision-v1.md"
+        },
+        {
+          "proposal_section": "docs/design/2026-08-05-historical-todo-issue-intake-proposal.md §1.1",
+          "path": "docs/design/2026-08-05-historical-todo-issue-intake-proposal.md"
+        }
+      ]
+    },
+    {
+      "entry_id": "E2",
+      "reason_kind": "version_pinned",
+      "targets": [
+        {
+          "kind": "config_lane",
+          "value": "config/development-issue-resolution-pilot-v2.json"
+        }
+      ],
+      "rationale": "schema_version 2のrecordはv2の規則で検証され続ける必要がある。v3系configとの統合や最新版への一本化は、既存recordの検証可能性を失わせる。共有validator関数内の版分岐も同様に維持する。",
+      "authority_refs": [
+        {
+          "proposal_section": "docs/design/2026-08-05-historical-todo-issue-intake-proposal.md §1.1",
+          "path": "docs/design/2026-08-05-historical-todo-issue-intake-proposal.md"
+        }
+      ]
+    },
+    {
+      "entry_id": "E3",
+      "reason_kind": "historical_retained",
+      "targets": [
+        {
+          "kind": "module_path",
+          "value": "tools/requirements/unified_migration.py"
+        }
+      ],
+      "rationale": "旧37 Requirement定義を統一50候補へ移行した一回性の移行器。移行の再現可能性を保持する歴史的codeであり、現行の検証器・生成器との統合対象にしない。",
+      "authority_refs": [
+        {
+          "decision_id": "DEC-INTEGRATION-EXCLUSION-ENTRIES-001",
+          "path": "records/development/2026-08-07-integration-exclusion-entries-decision-v1.md"
+        }
+      ]
+    }
+  ],
+  "content_digest": "41bdd46907c878f63cf7b08c85a1f773e6989d6a7619d3f9dacd2456b0e2e0f1"
+}
