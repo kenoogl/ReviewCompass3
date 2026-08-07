@@ -203,19 +203,29 @@ def test_r5_validator_rejects_disposition_labels():
 
 
 def test_r6_group_references_keep_all_members():
+    # 設計変更（2026-08-07）：memberの全列は各hitへ複製せず、recordの`groups`欄へ
+    # group一件につき一度だけ保持する。実データ測定でhitごとの複製がmember項目を
+    # 62,113件（正規化後3,493件の約18倍）へ膨張させたため。R6の趣旨（memberを
+    # 上限で切り捨てない）は`groups`欄の全member保持で満たす。
     record = _search()
     group_hits = [
         hit for hit in record["hits"] if hit.get("group_id") == "group-0001"
     ]
     assert group_hits, "target routines belong to group-0001"
+    groups_by_id = {group["group_id"]: group for group in record["groups"]}
     for hit in group_hits:
-        assert sorted(hit["group_member_symbol_ids"]) == sorted(
-            [
-                "tools/development/example_a.py:build_record",
-                "tools/development/example_b.py:canonical_digest",
-                "tools/session_logs/unrelated.py:far_away",
-            ]
-        )
+        assert hit["group_id"] in groups_by_id
+    assert sorted(groups_by_id["group-0001"]["member_symbol_ids"]) == sorted(
+        [
+            "tools/development/example_a.py:build_record",
+            "tools/development/example_b.py:canonical_digest",
+            "tools/session_logs/unrelated.py:far_away",
+        ]
+    )
+    referenced = {
+        hit["group_id"] for hit in record["hits"] if hit["group_id"] is not None
+    }
+    assert referenced <= set(groups_by_id), "every referenced group is present once"
 
 
 def test_r7_gate_fails_closed_on_missing_record_and_stale_identity(tmp_path):
