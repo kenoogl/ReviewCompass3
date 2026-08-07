@@ -17,9 +17,14 @@ class ReuseSearchError(Exception):
     """検索recordの生成・検証・保存・gate判定の失敗。"""
 
 
-_RECORD_FIELDS = (
+_RECORD_FIELDS_V1 = (
     "record_kind", "schema_version", "subject", "declaration",
     "source_identity", "query", "hits", "groups", "content_digest",
+)
+_RECORD_FIELDS_V2 = _RECORD_FIELDS_V1 + ("freshness",)
+_FRESHNESS_FIELDS = (
+    "assessed", "observation_snapshot_id", "target_paths",
+    "files_at_observation", "changed_files", "new_files", "missing_files", "stale",
 )
 _DECLARATION_FIELDS = ("subject", "target_paths", "target_symbols")
 _IDENTITY_FIELDS = (
@@ -40,6 +45,69 @@ _QUERY_RULES = (
     "direct_neighbor",
     "group_membership_full_members",
 )
+
+
+def file_sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def _range_matches(relative, target_paths):
+    return any(
+        relative == prefix or relative.startswith(prefix) for prefix in target_paths
+    )
+
+
+def _current_range_files(project_root, target_paths):
+    """対象範囲に現存する.py fileをproject root相対で決定的に列挙する。"""
+
+    root = Path(project_root)
+    found = set()
+    for prefix in target_paths:
+        candidate = root / prefix
+        if candidate.is_file():
+            found.add(Path(prefix).as_posix())
+        elif candidate.is_dir():
+            for item in candidate.rglob("*.py"):
+                found.add(item.relative_to(root).as_posix())
+    return sorted(found)
+
+
+def _assess_freshness(*, observation_document, target_paths, project_root):
+    """観測時点のfile digestと現状を突き合わせ、乖離を機械計測する。"""
+
+    files_at_observation = sorted(
+        (
+            {"path": item["path"], "sha256": item["file_sha256"]}
+            for item in observation_document.get("files", [])
+            if _range_matches(item["path"], target_paths)
+        ),
+        key=lambda item: item["path"],
+    )
+    observed_paths = {item["path"] for item in files_at_observation}
+    changed = []
+    missing = []
+    root = Path(project_root)
+    for item in files_at_observation:
+        target = root / item["path"]
+        if not target.is_file():
+            missing.append(item["path"])
+        elif file_sha256(target) != item["sha256"]:
+            changed.append(item["path"])
+    new_files = [
+        relative
+        for relative in _current_range_files(project_root, target_paths)
+        if relative not in observed_paths
+    ]
+    return {
+        "assessed": True,
+        "observation_snapshot_id": observation_document.get("snapshot_id"),
+        "target_paths": list(target_paths),
+        "files_at_observation": files_at_observation,
+        "changed_files": changed,
+        "new_files": new_files,
+        "missing_files": missing,
+        "stale": bool(changed or new_files or missing),
+    }
 
 
 def _content_digest(document):
@@ -65,8 +133,19 @@ def _discovery_run_id(discovery_document):
     return value
 
 
-def search_existing_routines(*, profile_document, discovery_document, declaration):
-    """宣言された対象範囲から既存routineを決定的に検索し、recordを返す。"""
+def search_existing_routines(
+    *,
+    profile_document,
+    discovery_document,
+    declaration,
+    observation_document=None,
+    project_root=".",
+):
+    """宣言された対象範囲から既存routineを決定的に検索し、recordを返す。
+
+    observation_documentを渡すとschema 2となり、観測時点のfile digestとの乖離を
+    機械計測したfreshness欄を持つ。渡さない場合はschema 1（既存recordと同形式）。
+    """
 
     for field in _DECLARATION_FIELDS:
         if field not in declaration:
@@ -143,7 +222,7 @@ def search_existing_routines(*, profile_document, discovery_document, declaratio
 
     record = {
         "record_kind": "reuse_search_record",
-        "schema_version": 1,
+        "schema_version": 1 if observation_document is None else 2,
         "subject": declaration["subject"],
         "declaration": {
             "subject": declaration["subject"],
@@ -163,6 +242,12 @@ def search_existing_routines(*, profile_document, discovery_document, declaratio
         "hits": hits,
         "groups": groups_section,
     }
+    if observation_document is not None:
+        record["freshness"] = _assess_freshness(
+            observation_document=observation_document,
+            target_paths=target_paths,
+            project_root=project_root,
+        )
     record["content_digest"] = _content_digest(record)
     return record
 
@@ -181,10 +266,17 @@ def _require_exact_fields(document, fields, label):
 def validate_reuse_search_record(record, *, expected_identity):
     """結線・new-only形式・label禁止・digestをfail-closedで検証する。"""
 
-    _require_exact_fields(record, _RECORD_FIELDS, "reuse search record")
-    if record["record_kind"] != "reuse_search_record":
+    if not isinstance(record, dict):
+        raise ReuseSearchError("reuse search record is not a mapping")
+    if record.get("record_kind") != "reuse_search_record":
         raise ReuseSearchError("record kind is invalid")
-    if record["schema_version"] != 1:
+    schema_version = record.get("schema_version")
+    if schema_version == 1:
+        _require_exact_fields(record, _RECORD_FIELDS_V1, "reuse search record")
+    elif schema_version == 2:
+        _require_exact_fields(record, _RECORD_FIELDS_V2, "reuse search record")
+        _require_exact_fields(record["freshness"], _FRESHNESS_FIELDS, "freshness")
+    else:
         raise ReuseSearchError("schema version is invalid")
     _require_exact_fields(record["declaration"], _DECLARATION_FIELDS, "declaration")
     if record["subject"] != record["declaration"]["subject"]:
@@ -225,8 +317,8 @@ def write_reuse_search_record(*, path, record):
     )
 
 
-def gate_check(*, record_path, expected_identity):
-    """実装開始のgate判定。record不存在・結線不一致はfail-closedで開始不可。"""
+def gate_check(*, record_path, expected_identity, project_root="."):
+    """実装開始のgate判定。record不存在・結線不一致・鮮度乖離はfail-closedで開始不可。"""
 
     target = Path(record_path)
     if not target.is_file():
@@ -248,4 +340,34 @@ def gate_check(*, record_path, expected_identity):
             "start_allowed": False,
             "reason": f"reuse_search_record_invalid: {error}",
         }
-    return {"start_allowed": True, "reason": "reuse_search_record_verified"}
+    if record["schema_version"] == 1:
+        return {
+            "start_allowed": True,
+            "reason": "reuse_search_record_verified",
+            "freshness": "not_assessed",
+        }
+
+    freshness = record["freshness"]
+    observed = {
+        item["path"]: item["sha256"] for item in freshness["files_at_observation"]
+    }
+    stale_files = []
+    root = Path(project_root)
+    for relative, recorded_sha in sorted(observed.items()):
+        current = root / relative
+        if not current.is_file() or file_sha256(current) != recorded_sha:
+            stale_files.append(relative)
+    for relative in _current_range_files(project_root, freshness["target_paths"]):
+        if relative not in observed:
+            stale_files.append(relative)
+    if stale_files:
+        return {
+            "start_allowed": False,
+            "reason": "profile_stale",
+            "stale_files": sorted(stale_files),
+        }
+    return {
+        "start_allowed": True,
+        "reason": "reuse_search_record_verified",
+        "freshness": "assessed_fresh",
+    }
