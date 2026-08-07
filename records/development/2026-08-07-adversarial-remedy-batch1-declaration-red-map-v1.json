@@ -1,0 +1,127 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-ADVERSARIAL-REMEDY-BATCH1-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T16:13:49+09:00",
+  "proposal": {
+    "path": "records/development/2026-08-07-adversarial-remedy-batch1-decision-v1.md",
+    "sha256": "cec7ff95147f6c3934d8c87361b6993a20a124b4b5c23292a1a0126ce0feb706",
+    "declaration_section": "処置Decision§1（型1・型2の8件）から展開した規範宣言M1〜M8",
+    "approval_decision": "DEC-ADVERSARIAL-REMEDY-BATCH1-001"
+  },
+  "purpose": "反証で成立した攻撃を拒否テストとして固定し、実装前に「testの無いM」が0件であることを恒久検査器で数える。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（拒否機構が未実装のため9 testすべてが失敗する）。",
+    "機械照合はtools/development/declaration_red_map_check.pyのcheck_declaration_red_mapで実施した。"
+  ],
+  "test_files": {
+    "tests/test_adversarial_remedy_batch1.py": [
+      "test_c1_omitting_a_test_from_the_listing_is_rejected",
+      "test_c3_sharing_one_test_across_declarations_is_rejected",
+      "test_g1_ranking_rejects_an_invalid_exclusions_record",
+      "test_r2_narrowed_freshness_scope_is_rejected",
+      "test_r4_scope_disagreement_between_declaration_and_freshness_is_rejected",
+      "test_r5_tampered_attestation_field_is_rejected",
+      "test_r6_attestation_identity_swap_is_rejected",
+      "test_x1_authority_reference_without_a_path_is_rejected",
+      "test_x1_unresolvable_authority_reference_is_rejected"
+    ]
+  },
+  "declarations": {
+    "M1": {
+      "summary": "検索recordのfreshness対象範囲を宣言より狭めたrecordは、gateがscope不一致として拒否する（反証R-2）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_r2_narrowed_freshness_scope_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "M2": {
+      "summary": "declarationとfreshnessの対象範囲が食い違うrecordは、gateが拒否する（反証R-4）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_r4_scope_disagreement_between_declaration_and_freshness_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "M3": {
+      "summary": "証明書の記述（hit件数）が外部record本体と食い違う場合、証明書gateはattestation_mismatchで拒否する（反証R-5）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_r5_tampered_attestation_field_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "M4": {
+      "summary": "証明書のsource identityが外部record本体と食い違う場合、証明書gateは拒否する（反証R-6）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_r6_attestation_identity_swap_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "M5": {
+      "summary": "対応表のtest_files欄が実在testを列挙し漏らしている場合、検査器は結ばれないtestとして検出する（反証C-1）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_c1_omitting_a_test_from_the_listing_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "M6": {
+      "summary": "複数の宣言が同一testを共有する対応表を、検査器は拒否する（反証C-3）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_c3_sharing_one_test_across_declarations_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "M7": {
+      "summary": "除外宣言のauthority_refsは解決可能でなければならず、path欠落や実在しない参照は検証器が拒否する（反証X-1）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_x1_unresolvable_authority_reference_is_rejected",
+          "red_now": true
+        },
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_x1_authority_reference_without_a_path_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "M8": {
+      "summary": "順位表の生成は、受け取った除外宣言recordを検証してからでなければ行わない（反証G-1）",
+      "tests": [
+        {
+          "test": "tests/test_adversarial_remedy_batch1.py::test_g1_ranking_rejects_an_invalid_exclusions_record",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": {
+    "checker": "tools/development/declaration_red_map_check.py",
+    "status": "passed",
+    "machine_count": {
+      "declarations": 8,
+      "declarations_without_tests": 0,
+      "listed_tests_missing_in_file": 0,
+      "tests_unmapped_to_declarations": 0
+    }
+  }
+}
