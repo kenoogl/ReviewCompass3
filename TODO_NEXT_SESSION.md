@@ -33,7 +33,7 @@
 
 開始条件：
 
-- Intake V4対応表の所見2件（改名未追随のtest名、dict形式のtest_files欄）の処置をHumanが判断すること（対応表v2でのsupersedeか、検査器の別形対応か）
+- なし（Intake V4対応表の所見はA案でv2作成済み、Work 5B残項目はア案でdefer済み。DEC-INTAKE-V4-RED-MAP-SUPERSEDE-001、DEC-WORK5B-LEDGER-ITEM-DEFER-001）
 
 完了条件：
 
@@ -44,7 +44,7 @@
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：(1) Intake V4対応表の所見2件の処置（第一実運用recordに固定済み）。(2) Work 5Bの段完了の承認（台帳更新の項目は台帳整備後に完了へ戻す前提で）。(3) 旧書庫の削除可否は別途判断。
+- Human判断待ち：旧書庫の削除可否（別途判断）。所見処置と段完了扱いは2026-08-07に裁定済み（A案・ア案）。
 
 ## stale・deferred
 

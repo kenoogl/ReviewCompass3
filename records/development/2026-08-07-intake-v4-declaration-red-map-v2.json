@@ -1,0 +1,181 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-INTAKE-V4-DECLARATION-RED-MAP-001",
+  "map_version": 2,
+  "created_at": "2026-08-07T11:30:00+09:00",
+  "proposal": {
+    "path": "docs/design/2026-08-06-issue-intake-v4-single-candidate-reference-proposal.md",
+    "sha256": "d5164077b8a53141eb647e57f4746e3347ac4650c03a0d1d553571348fc63358",
+    "declaration_section": "§3（規範宣言N1〜N12）"
+  },
+  "purpose": "提案§5の義務に従い、実装開始前にN1〜N12それぞれへREDテストを結び、「REDの無いN」が0件であることを機械で数える。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、列挙したtestに現在失敗するREDが1件でもあればtrueとする。",
+    "red_nowがfalseの宣言にはboundary_reason（いま成功する境界例である理由）を必ず持たせる。",
+    "tests[].red_nowは各test単位の現在の失敗有無である。",
+    "機械照合はPython astでtests/配下の対象2 fileを解析し、列挙したtest関数名の実在と、testの無い宣言が0件であることを確認した。"
+  ],
+  "test_files": {
+    "tests/test_issue_intake_v4_single_candidate.py": [
+      "test_n10_machine_readable_decision_record_is_persisted",
+      "test_n11_every_bundle_candidate_has_an_effective_decision",
+      "test_n12_issue_is_registered_and_nothing_is_in_progress",
+      "test_n1_candidate_ref_key_set_deviations_are_rejected",
+      "test_n1_single_form_candidate_ref_decision_validates",
+      "test_n2_single_form_fingerprint_mismatches_are_rejected",
+      "test_n3_existing_bundle_form_decisions_keep_validating",
+      "test_n4_single_form_decision_id_must_be_bound_to_the_candidate",
+      "test_n7_all_candidate_records_validate_or_are_allowlisted",
+      "test_n8_historical_allowlist_declares_the_single_seed_entry",
+      "test_n9_authority_reference_candidate_binding_stays_pinned"
+    ],
+    "tests/test_issue_intake_v4.py": [
+      "test_k7_repository_decision_set_has_no_conflict",
+      "test_l6_repository_issue_set_is_consistent"
+    ]
+  },
+  "declarations": {
+    "N1": {
+      "summary": "candidate_refの2形式化。単体形式4 key厳密一致、過不足・混在は拒否",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n1_single_form_candidate_ref_decision_validates",
+          "red_now": true
+        },
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n1_candidate_ref_key_set_deviations_are_rejected",
+          "red_now": false
+        }
+      ],
+      "red_now": true
+    },
+    "N2": {
+      "summary": "単体形式のfile実在・SHA-256・candidate_id・content_digestのfail-closed検証",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n2_single_form_fingerprint_mismatches_are_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "N3": {
+      "summary": "既存41 decisionのbundle形式は変更なしで合格し続ける",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n3_existing_bundle_form_decisions_keep_validating",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "既存41 decisionは現repositoryですでに合格しており、回帰防止のための境界固定である。単体形式追加後も壊れないようbundle形式だけを数える。"
+    },
+    "N4": {
+      "summary": "decision ID規則DEC-<candidate_id>を単体形式にも適用する",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n4_single_form_decision_id_must_be_bound_to_the_candidate",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "N5": {
+      "summary": "test_k7を「bundle形式のdecisionは既知bundle SHAを指す」へ狭める",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4.py::test_k7_repository_decision_set_has_no_conflict",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "承認済み条件変更（提案§8）を既存testへ適用した。単体形式recordはまだ存在しないため、変更後も現repositoryで成功し続ける。"
+    },
+    "N6": {
+      "summary": "test_l6のIssue側も同じ向きへ狭める",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4.py::test_l6_repository_issue_set_is_consistent",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "承認済み条件変更（提案§8）を既存testへ適用した。単体形式recordはまだ存在しないため、変更後も現repositoryで成功し続ける。"
+    },
+    "N7": {
+      "summary": "候補置き場の全JSONはvalidator合格またはallowlist宣言のどちらかを要する",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n7_all_candidate_records_validate_or_are_allowlisted",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "N8": {
+      "summary": "歴史allowlistは機械可読fileで、初期entryは歴史候補1件",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n8_historical_allowlist_declares_the_single_seed_entry",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "N9": {
+      "summary": "ic-authority-reference-digest-check-001はv3 validatorで合格し続ける",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n9_authority_reference_candidate_binding_stays_pinned",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "対象候補は現時点でv3 validatorに合格しており（実測exit 0）、回帰防止のための境界固定である。"
+    },
+    "N10": {
+      "summary": "DEC-IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001を単体形式でV4レーンへ作成する",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n10_machine_readable_decision_record_is_persisted",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "N11": {
+      "summary": "候補bundle内41件すべてに有効decisionが存在することを機械維持する",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n11_every_bundle_candidate_has_an_effective_decision",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "実測で有効decision 41件と候補41件が一致し未判断0件のため現在成功する。閉鎖Evidenceの「未判断0件」を以後は機械が維持する境界固定である。"
+    },
+    "N12": {
+      "summary": "ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001をregisteredで登録し、着手0件を保つ",
+      "tests": [
+        {
+          "test": "tests/test_issue_intake_v4_single_candidate.py::test_n12_issue_is_registered_and_nothing_is_in_progress",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": "tools/development/declaration_red_map_check.py（恒久検査器）による。結果は本file書き込み後に検査した receipt を参照。",
+  "supersedes": {
+    "map_id": "RC3-INTAKE-V4-DECLARATION-RED-MAP-001",
+    "map_version": 1,
+    "path": "records/development/2026-08-06-intake-v4-declaration-red-map-v1.json",
+    "sha256": "c24ebaf58eee3ce2d318084697051d41c9669e30aa756086706f9f110117ce40"
+  },
+  "corrections": [
+    "N9のtest名をN7-N9修正（DEC記録：records/development/2026-08-06-intake-v4-n7-n9-amendment-decision-v1.md）後の実名へ追随させた（test_n9_authority_reference_candidate_passes_the_v3_validator -> test_n9_authority_reference_candidate_binding_stays_pinned）。",
+    "tests/test_issue_intake_v4.pyのtest_files欄をdict形式（changed_tests_only）からlist形式へ正規化した。列挙は変更対象testのみという意味を保つ。",
+    "承認：DEC-INTAKE-V4-RED-MAP-SUPERSEDE-001（Human、2026-08-07）。v1は歴史recordとして不変のまま保持し、以後の検査はv2に対して行う。"
+  ]
+}
