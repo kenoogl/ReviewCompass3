@@ -1,0 +1,116 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-REDACTION-ENVIRONMENT-RULES-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T18:18:31+09:00",
+  "scope": {
+    "kind": "complete"
+  },
+  "proposal": {
+    "path": "records/development/2026-08-07-redaction-rules-design-approval-decision-v1.md",
+    "sha256": "02778387419f34ec64cee5015070f641fded9f1551f89ebff20f0854317bff2e",
+    "declaration_section": "設計提案§2〜§4（二種類の規則、実値が漏れない仕組み、適用順序）",
+    "approval_decision": "DEC-REDACTION-RULES-DESIGN-001"
+  },
+  "purpose": "機微情報の規則を導入する。核心は環境依存値が伏字化の副産物として漏れないことであり、置換先・digest・診断のいずれにも実値が出ないことをE3・E4・E5で固定する。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（規則と解決経路が未実装のため）。",
+    "静的検査と実行照合の両方をtools/development/declaration_red_map_check.pyで実施した（DEC-RED-VERIFICATION-ADOPTION-001）。",
+    "testで使う値はすべて合成した架空の文字列であり、実在の秘密は使わない。"
+  ],
+  "test_files": {
+    "tests/test_redaction_environment_rules.py": [
+      "test_e1_environment_rules_declare_roles_without_values",
+      "test_e2_resolution_happens_at_run_time",
+      "test_e3_replacement_carries_the_role_not_the_value",
+      "test_e4_digest_excludes_resolved_values",
+      "test_e5_diagnostics_do_not_leak_values",
+      "test_e6_pattern_rules_cover_the_approved_initial_set",
+      "test_e7_pattern_rules_redact_their_targets",
+      "test_e8_application_order_is_deterministic"
+    ]
+  },
+  "declarations": {
+    "E1": {
+      "summary": "environment_reference規則は役割名だけを持ち、実値を持たない",
+      "tests": [
+        {
+          "test": "tests/test_redaction_environment_rules.py::test_e1_environment_rules_declare_roles_without_values",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "E2": {
+      "summary": "実値は実行時に環境から解決される（規則には残らない）",
+      "tests": [
+        {
+          "test": "tests/test_redaction_environment_rules.py::test_e2_resolution_happens_at_run_time",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "E3": {
+      "summary": "置換先には役割名だけが出る。実値が置換先へ漏れない",
+      "tests": [
+        {
+          "test": "tests/test_redaction_environment_rules.py::test_e3_replacement_carries_the_role_not_the_value",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "E4": {
+      "summary": "規則digestの入力は役割名であり、解決後の実値を含まない（digestが環境情報の写しにならない）",
+      "tests": [
+        {
+          "test": "tests/test_redaction_environment_rules.py::test_e4_digest_excludes_resolved_values",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "E5": {
+      "summary": "診断・報告に実値が出ない性質を壊さない",
+      "tests": [
+        {
+          "test": "tests/test_redaction_environment_rules.py::test_e5_diagnostics_do_not_leak_values",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "E6": {
+      "summary": "承認された初版pattern規則5件が登録されている",
+      "tests": [
+        {
+          "test": "tests/test_redaction_environment_rules.py::test_e6_pattern_rules_cover_the_approved_initial_set",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "E7": {
+      "summary": "初版規則が対象を伏字にする（合成した架空の値のみで確認）",
+      "tests": [
+        {
+          "test": "tests/test_redaction_environment_rules.py::test_e7_pattern_rules_redact_their_targets",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "E8": {
+      "summary": "適用順序が決定的であり、同じ入力から同じ結果が出る",
+      "tests": [
+        {
+          "test": "tests/test_redaction_environment_rules.py::test_e8_application_order_is_deterministic",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  }
+}
