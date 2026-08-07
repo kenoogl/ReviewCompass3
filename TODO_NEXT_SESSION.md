@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：出口の設計提案v3を起草し固定した。骨格は開発元ReviewCompassの新世代実装（送信直前検査の単一実装・trusted入口・content-addressed manifest・承認消費の排他claim）、接続先はRC3の`tools/bootstrap/`既存機構（`runner`注入点）。さらにHuman発案の**ローカル事前分類**を実測し（上位20 groupの1,415組→外部送信は曖昧59組・4%まで削減、逐語重複17件を送信ゼロで発見）、「比べ方の規則」としてv3 §3.1に組み込んだ。v3はHumanの内容承認待ち（§11判断点8件）。
+- 現在作業：出口設計の判断点8件を**Humanが全て判断した**（`DEC-EGRESS-GATE-V3-JUDGMENTS-001`に逐語固定）。主な確定：(1)codeはコピーせず構造を参考にRC3で書き直す (2)外部判定は評価①（実装の同一性）に限定し、評価②（文脈依存の統合可否）は別評価に切り出す (3)承認は範囲＋回数でなく**送信物一覧の実物承認**（回数の発明不要、小分け実行・全送義務なし）。全判断を反映したv4を作成した。残る確認はv4が判断を正確に反映しているかの1点のみ。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,7 +18,8 @@
 
 ## 最新のauthority／Evidence
 
-- [出口の設計提案v3（Human判断待ち）](docs/design/2026-08-07-external-egress-gate-proposal-v3.md) — SHA-256 `ef2ae12a4a4e37ee469448deef042917b9e56f57083dfc22335d53eb45236eca`
+- [出口の設計提案v4（反映確認待ち）](docs/design/2026-08-07-external-egress-gate-proposal-v4.md) — SHA-256 `3a82b3973f8abc947782c4bbf8e2d54713043e8e8591a543089a5824c57bcacd`
+- [判断点8件のHuman判断Decision](records/development/2026-08-07-egress-gate-v3-judgments-decision-v1.md) — SHA-256 `7f7741eeb840307af115a23d525abafd1ac3e509ff7d3191ab2c798f40abc08a`
 - [ローカル事前分類 実験Evidence](records/development/2026-08-07-local-prefilter-experiment-evidence-v1.md) — SHA-256 `8376d0c53b32beb17bac39f98fabbafc51f629eeaf658f84d76115583942846b`
 - [LLMGP外部レビュー資産の調査結果record](records/development/2026-08-07-llmgp-external-review-assets-investigation-v1.md) — SHA-256 `4acf974e09f6818241b17347aca1271a4bd54cf9d4436125178c44ce39d6e3a8`
 - [LLMGP外部レビュー資産の観測](records/development/2026-08-07-llmgp-external-review-assets-observation-v1.json) — SHA-256 `872c4736b33f4c314e1fc3bd22ffb52ce8be5de6b0dcfaca3b9841921ae6bc07`
@@ -50,22 +51,22 @@
 
 ## 次に行う一作業
 
-v3のHuman承認後、段階1「出口関門つき送信係」の実装（TDD）。関門9条件（v3 §5）とローカル事前分類（同§3.1）を対象に、まずテストを書き失敗を確認してから実装する。守り役codeのため`work-review-protocol` §3の既定`high`を適用し、実装後にv3 §10の反証観点で反証レビューを行う。
+段階1「出口関門つき送信係」の実装（TDD）。関門9条件（v4 §5）とローカル事前分類（同§3.1）を対象に、まずテストを書き失敗を確認してから実装する。codeはコピーせず構造を参考にRC3で新規実装（v4 §1）。守り役codeのため`work-review-protocol` §3の既定`high`を適用し、実装後にv4 §10の反証観点で反証レビューを行う。
 
 開始条件：
 
-- Humanによるv3の内容承認（§11判断点8件。閾値・割り切りの承認を含む）
+- Humanによるv4の反映確認（判断8件が正確に反映されているか）と着手指示
 
 完了条件：
 
 - 段階1のGREEN Evidence固定（送信機能なし）。段階2（dry-run）へ進める状態
 
-後続作業：段階2（dry-run、Human目視）→段階3（承認record形式の確定）→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
+後続作業：段階2（dry-run、Human目視。外部判定の要否をここで実物を根拠に再判断）→段階3（承認record形式の確定）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：**v3の内容承認**（§11判断点8件：発明しない原則、3種構成と1送信1判断、比べ方の規則と閾値・割り切り、承認8項目、関門9条件、伏字化の扱い、証跡、段階1〜3の範囲）。
+- Human判断待ち：**v4の反映確認**（判断8件は判断済み。文書が正確に反映しているかの確認のみ）。
 - 継続する留意点：背景調査の不足が累計5件、さらに本調査で6件目の未遂があった（配備先コピーを最新と誤認し、開発元の存在をHuman指摘で知った）。規律を三段で持つ：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認の範囲は「記録が指す先」まで (3)**指された物が写しなら原本（開発元）まで遡り、鮮度（最終commit日）を確認してから状態を断定する**。
 
 ## stale・deferred
