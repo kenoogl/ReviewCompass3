@@ -29,22 +29,22 @@
 
 ## 次に行う一作業
 
-合意順序（DEC-WORK5B-DISCUSSION-OUTCOMES-001）の②：Work 4B本体の設計束を一枚の提案にまとめ、Human承認を得る。内容は、Profile再観測の検索への組み込み、検索recordの外部化（DATA_ROOT＋証明書方式）、絞り込み順位表と除外宣言（「すぐ対処」指定。除外宣言の承認が先行）、Entry・Relation・Baseline台帳。
+Work 4B本体設計束（DEC-WORK4B-MAIN-DESIGN-BUNDLE-001で承認済み）の構成A-1：統合除外宣言の初版entry（候補3件提示済み）のHuman裁定を得て、裁定済みentryで除外宣言recordをtest-firstで実装する。
 
 開始条件：
 
-- なし（Intake V4対応表の所見はA案でv2作成済み、Work 5B残項目はア案でdefer済み。DEC-INTAKE-V4-RED-MAP-SUPERSEDE-001、DEC-WORK5B-LEDGER-ITEM-DEFER-001）
+- 初版entry候補3件（[候補一覧](records/development/2026-08-07-integration-exclusion-entries-candidate-v1.md)）のHuman裁定
 
 完了条件：
 
-- 設計束提案がHuman承認されること。実装はその後の作業単位
+- 裁定済みentryの除外宣言record・schema・検証器がGREENで、宣言→RED対応表（恒久検査器で照合）を経ること
 
 後続作業：合意順序の③レビューbacklog上位2系統の先行反証レビュー、④残りのbacklogとRC2取り込み・外部APIレビュー（台帳整備後）。全routineの一括分類は行わない。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：旧書庫の削除可否（別途判断）。所見処置と段完了扱いは2026-08-07に裁定済み（A案・ア案）。
+- Human判断待ち：(1) 統合除外宣言の初版entry候補3件の裁定。(2) 旧書庫の削除可否（別途判断）。
 
 ## stale・deferred
 
