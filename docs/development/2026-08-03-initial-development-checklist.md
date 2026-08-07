@@ -994,7 +994,7 @@ GREEN Evidence v1の記述は`records/development/2026-08-06-work6a-evidence-cor
 - [x] ReviewCompass3自身の小さなhelper一件を選定した。
 - [x] Contract、red、固定source、Index／Ledger照合を通した。
 - [x] Humanの`implementation_ready`判断を記録した。
-- [ ] Testを弱めずgreen実装、refactor、台帳更新を行った。
+- [x] Testを弱めずgreen実装、refactor、台帳更新を行った。
 - [x] post-write verification、Provenance、分割commitを確認した。
 - [x] provisionalな自己適用能力を正式Runtime既定にしていない。
 
@@ -1013,9 +1013,12 @@ testの無い宣言0件）、GREENと第一実運用は
 `records/development/2026-08-07-work5b-checker-green-evidence-v1.md`と
 `records/development/2026-08-07-work5b-checker-first-run-v1.json`（4枚中3枚passed、自己検査passed、
 Intake V4対応表に実在所見2件——処置はHuman判断待ち）。公式全Testは`1066 passed`、fallback `false`。
-4番目の項目はgreen実装とrefactorを完了したが、**台帳更新は台帳未整備のため実施できず**、
-検索recordのnew-only追加で代替した。台帳の行き先はWork 4B本体の設計束であり、本項目は台帳整備後に
-完了へ戻す。**Work 5Bの段完了ではない。** 段完了はHuman判断とする。
+4番目の項目は当初、台帳未整備のため未完了とした（defer：`DEC-WORK5B-LEDGER-ITEM-DEFER-001`）。
+2026-08-07に既存台帳経路の再利用（`DEC-WORK4B-D-LEDGER-REUSE-001`）でBaseline v1が整備され、
+helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`as_is`）つきで記録して
+完了へ戻した。Evidenceは
+`records/development/2026-08-07-work4b-d-ledger-first-operation-evidence-v1.md`。
+**Work 5Bの段完了ではない。** 段完了はHuman判断とする。
 
 ## 11. Work 7A：`local_integrated` deployment E2E
 
