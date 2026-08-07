@@ -69,7 +69,7 @@ Work 5Bのdefer項目（helper 2件の台帳Entry）の再開条件でもある�
 
 - 置き場：`.reviewcompass/workflow/routine-ledger/`（new-only、path単独では正本にしない）。
 - **Entry**：一routine（または一部品）の台帳項目。symbol_id、code_reference、処置label
-  （`reuse | extend | merge | split | as_is`）、労定Decision参照、由来（新設／継承／統合）。
+  （`reuse | extend | merge | split | as_is`）、裁定Decision参照、由来（新設／継承／統合）。
   **labelはHuman裁定Decisionへの参照なしには書けない**（検証器で拒否）。
 - **Relation**：部品間の型付き関係（`duplicate_of | extracted_to | replaces | depends_on`）。
   Work 5Bで可視化された実例（正規化digest計算3箇所など）が初期候補。
