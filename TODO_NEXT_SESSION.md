@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：Human裁定「案イ」（〈名前が契約〉の外部はコードベース外に限る）で基準v3が確定し、明確化後の再判定で**全59組が正解Bと一致（100%）**した。精度推移は85%→92%→100%で、誤読は通算0件。**精度を決めるのは基準の精密さでありモデル系列ではない**ことが実証され、サブエージェント方式による外部API代替の仮説が強く支持された。判定報告はdigest鍵＋manifest機械照合を設計要件とする（記帳ずれの実例と判定者の誤申告を検出した教訓）。
+- 現在作業：判定方式の検証が**結論に達した**（`DEC-EGRESS-METHOD-CONCLUSION-001`）。Human決定：「外部API比較はしない。統合へ進む」。サブエージェント方式は本用途で外部APIを代替できる（85%→92%→100%、誤読0件）。`tools/egress/`と提案v4は完成資産として保持し、段階3・4は着手しない。機密実施順序の残項目は不変（着手はHuman判断）。次は統合：評価②（統合可否）の定義と進め方の提案起草。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,7 @@
 
 ## 最新のauthority／Evidence
 
+- [経緯と結論Decision（A2中止・統合へ）](records/development/2026-08-08-egress-method-conclusion-decision-v1.md) — SHA-256 `d9228be3ec17db82fbed694e7a6bf05b8a5d6fae52ff2353aad39aeac27dc6fc`
 - [「名前が契約」裁定・100%一致record](records/development/2026-08-08-egress-name-contract-adjudication-v1.md) — SHA-256 `bba8c1ac8840940d4e834242e8ebb7f1dc1292a77c70ebbc1d1f5fcfd262df70`
 - [A1'再判定・方式比較record](records/development/2026-08-08-egress-a1prime-comparison-v1.md) — SHA-256 `18aff58ee76c1c299185d729cb3a022647e575edeca767ad2dd90f860da0f666`
 - [B結果・基準Decision](records/development/2026-08-08-egress-b-check-decision-v1.md) — SHA-256 `40530e41f407a231d3e1cc96bf7c9fdeac49208e30fc25cde78846b1a61ba917`
@@ -57,7 +58,7 @@
 
 ## 次に行う一作業
 
-Human判断を受けて分岐：(1) **A2（外部API比較）の要否**——59組で100%一致となった今、系列独立の判定に残る価値（独立性の儀式）を見るか。実施なら段階3から。(2) **統合の着手**——same 48組の逐語重複系統（fail-closed例外×7file、SHA-256×7file等）を評価②の定義起草から進めるか。順序もHuman判断。
+評価②（統合可否）の定義と進め方の提案を起草する。対象はsame 48組が束なる逐語重複6系統（fail-closed例外×7file、SHA-256×7file、canonical digest×4file、_withinパス判定×4file、JSON印字×3file、dataclass系）。判断材料はDEC-EGRESS-B-CHECK-001の基準（効果・使われ方・保証・名前契約）を土台にし、統合除外宣言（integration-exclusions）との照合を手順に含める。1系統1単位、TDD、Human承認を経て実施する形で設計する。
 
 開始条件：
 
@@ -65,14 +66,14 @@ Human判断を受けて分岐：(1) **A2（外部API比較）の要否**——59
 
 完了条件：
 
-- Human判断（A2要否・統合順序）が記録されること
+- 評価②提案が固定され、Human判断に付されること
 
 後続作業：段階3（承認record形式の正式schema化。反証I-6の真正性担保を含む）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：A2要否、統合の着手順序。
+- Human判断待ち：なし。次作業（評価②提案の起草）の着手指示を待つ。
 - 継続する留意点：背景調査の不足が累計5件、さらに本調査で6件目の未遂があった（配備先コピーを最新と誤認し、開発元の存在をHuman指摘で知った）。規律を三段で持つ：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認の範囲は「記録が指す先」まで (3)**指された物が写しなら原本（開発元）まで遡り、鮮度（最終commit日）を確認してから状態を断定する**。
 
 ## stale・deferred
