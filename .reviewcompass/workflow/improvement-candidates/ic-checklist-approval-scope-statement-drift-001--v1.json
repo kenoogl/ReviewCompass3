@@ -44,7 +44,7 @@
   "evidence_refs": [
     {
       "path": "docs/development/2026-08-03-initial-development-checklist.md",
-      "sha256": "a089ffdf5e538e28457894fb6a120ef065d2b8a0acb3c392d4dedaeacdecbd9d"
+      "sha256": "387907b9e4abc513b1c367daa57d8f6e48227b0c43b5c2f16b747523c37111e1"
     },
     {
       "path": "records/development/2026-08-05-record-generation-issue-plan-approval-decision-v1.md",
@@ -72,5 +72,5 @@
     }
   ],
   "proposed_action": "Humanが分類、blocking判定、routeを裁定する。修復自体は小さく、該当文を「定型欄生成、構造化argv executor、cache root固定の3項目は最小sliceが承認・実装済み（各Decision ID参照）、既存直接操作の移行、host側tool構文、外部送信は引き続き承認範囲外」へ改定し、改定理由をチェックリストの運用規則に従って記録すればよい。ただし本件は孤立事象ではなく、差し込みで承認された作業がチェックリスト本文へ反映されない再発性の型の一例であるため、反映の時点規則（承認Decision作成と同じ作業単位で反映するか、次のhandoff検査で反映するか）をあわせてHumanが決めることに価値がある。本候補はHuman裁定まで、チェックリスト本文、承認Decision、GREEN Evidence、validator、testのいずれも変更しない。",
-  "content_digest": "02372f08fca4fb2a96fb29051ce6a1b57bbebef0bff91a15c3ca467a5eeb28ee"
+  "content_digest": "ebccbf6716cc0843bf379b418b5375b1c35b0223a95b852d93af4e0c52b00c8d"
 }
