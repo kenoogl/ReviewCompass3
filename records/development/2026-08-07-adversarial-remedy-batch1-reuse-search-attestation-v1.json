@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "adversarial-remedy-batch1",
+  "external": {
+    "relative_path": "work4b/reuse-searches/6b0939633cf23501b79a39ff3f8b08b89417494b87b26bdbcf776df9a8b77224.json",
+    "content_digest": "6b0939633cf23501b79a39ff3f8b08b89417494b87b26bdbcf776df9a8b77224",
+    "byte_sha256": "f37c0db36d1f91247328aae99fff9af1132ec869e73784c5ded25e0f10cbf250"
+  },
+  "source_identity": {
+    "profile_run_id": "7e46a5cfd1da124e3ce182198405b60ff637b43a9bd2019e4484a92f9f401261",
+    "discovery_run_id": "d0cd84d164317c84b3edc592d9eb3d446919c8bf08cd8bbfbbe8591f818b51db",
+    "source_content_id": "85341b4bc4c319be6ed10bd4579c75ed873f09e5b25100621b3259e3144bd3be",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 1923,
+  "content_digest": "ac51b422a4320694eef59605a18a6e8d9604074a9764f8a2020f0a1e9a30f321"
+}
