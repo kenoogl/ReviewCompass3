@@ -158,6 +158,28 @@ def excluded_entry_ids(symbol_id, *, record):
     return sorted(matched)
 
 
+def exclusion_impact(*, record, symbol_ids):
+    """除外指定が落とすsymbolの件数をentry別に報告する（層2）。
+
+    拒否はしない。広範囲の指定が何を落とすかをHumanが承認時に見えるようにする。
+    """
+
+    by_entry = {entry["entry_id"]: 0 for entry in record["entries"]}
+    excluded = 0
+    for symbol_id in symbol_ids:
+        matched = excluded_entry_ids(symbol_id, record=record)
+        if matched:
+            excluded += 1
+        for entry_id in matched:
+            by_entry[entry_id] += 1
+    return {
+        "enforcement": "reported_for_human_review",
+        "total_symbols": len(tuple(symbol_ids)),
+        "excluded_symbols": excluded,
+        "by_entry": by_entry,
+    }
+
+
 def load_integration_exclusions(*, path, project_root="."):
     """読み込みと検証。欠落・解析不能はfail-closedでerrorにする。"""
 

@@ -1,0 +1,60 @@
+{
+  "record_kind": "classification_minimum_rules",
+  "schema_version": 1,
+  "guarantee": "typo_detection_not_safety",
+  "coverage": "known_cases_only",
+  "note": "既知の危険な操作が軽い分類を名乗ることだけを拒否する。網羅は不可能であり、この規則の合格を安全の根拠にしてはならない。規則の追加・変更はHuman判断とする。",
+  "authority": {
+    "decision_id": "DEC-VERIFICATION-BOUNDARY-001",
+    "path": "records/development/2026-08-07-verification-boundary-approval-decision-v1.md"
+  },
+  "classification_rank": {
+    "read_only": 0,
+    "unknown": 0,
+    "git_metadata_write": 1,
+    "project_artifact_write": 1,
+    "external": 2
+  },
+  "rules": [
+    {
+      "argv_head": ["rm"],
+      "minimum": "project_artifact_write",
+      "note": "file削除は読み取りではない"
+    },
+    {
+      "argv_head": ["rmdir"],
+      "minimum": "project_artifact_write",
+      "note": "directory削除は読み取りではない"
+    },
+    {
+      "argv_head": ["mv"],
+      "minimum": "project_artifact_write",
+      "note": "移動は書込みである"
+    },
+    {
+      "argv_head": ["git", "push"],
+      "minimum": "external",
+      "note": "pushは外部への送信である"
+    },
+    {
+      "argv_head": ["git", "commit"],
+      "minimum": "git_metadata_write",
+      "note": "commitはmetadataの書込みである"
+    },
+    {
+      "argv_head": ["git", "reset"],
+      "minimum": "git_metadata_write",
+      "note": "resetはmetadataの書換えである"
+    },
+    {
+      "argv_head": ["curl"],
+      "minimum": "external",
+      "note": "外部通信である"
+    },
+    {
+      "argv_head": ["wget"],
+      "minimum": "external",
+      "note": "外部通信である"
+    }
+  ]
+}

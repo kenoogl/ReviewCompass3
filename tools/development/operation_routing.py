@@ -51,6 +51,10 @@ _REQUIRED_PERMISSION = {
     "unknown": None,
 }
 
+# 分類の下限規則（層2）は外部configで宣言する。moduleは特定toolの知識を持たず、
+# 規則を読んで適用するだけである（既存の境界設計を保つため）。
+_MINIMUM_RULES_PATH = "config/development-classification-minimums.json"
+
 _OPERATION_FIELDS = (
     "operation_id",
     "operation_version",
@@ -163,9 +167,49 @@ def _require_exact(document, fields, *, unknown_code, missing_code, label):
 # ------------------------------------------------------------------ 1. inventory
 
 
-def build_operation_inventory(*, inventory_id, inventory_version=1, operations):
+def classification_minimum_rules(*, project_root="."):
+    """分類の下限規則を宣言として読む（層2の位置づけを含む）。
+
+    規則の実体は外部configにあり、moduleは特定toolの知識を持たない。
+    """
+
+    path = Path(project_root) / _MINIMUM_RULES_PATH
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise OperationRoutingError(
+            "classification_minimum_rules_unavailable", str(error)
+        ) from error
+    return document
+
+
+def _check_classification_minimum(operation, *, rules_document):
+    """argvの先頭が宣言済みの危険操作なら、軽すぎる分類を拒否する（層2）。"""
+
+    argv = [item for item in operation.get("argv", []) if isinstance(item, str)]
+    rank = rules_document["classification_rank"]
+    actual = rank.get(operation["classification"], 0)
+    for rule in rules_document["rules"]:
+        head = tuple(rule["argv_head"])
+        if tuple(argv[: len(head)]) != head:
+            continue
+        if actual < rank[rule["minimum"]]:
+            raise OperationRoutingError(
+                "classification_below_minimum",
+                "%s: declared as %s, minimum %s (%s)" % (
+                    operation.get("operation_id"), operation["classification"],
+                    rule["minimum"], rule["note"],
+                ),
+            )
+    return True
+
+
+def build_operation_inventory(
+    *, inventory_id, inventory_version=1, operations, project_root="."
+):
     """分類と必要権限を確定した版付きinventoryを決定的に組み立てる。"""
 
+    rules_document = classification_minimum_rules(project_root=project_root)
     if not _require_text(inventory_id):
         raise OperationRoutingError("inventory_invalid", "inventory_id")
     if not isinstance(inventory_version, int) or isinstance(inventory_version, bool):
@@ -182,16 +226,16 @@ def build_operation_inventory(*, inventory_id, inventory_version=1, operations):
             raise OperationRoutingError(
                 "operation_classification_unknown", str(classification)
             )
-        built.append(
-            {
-                "operation_id": operation.get("operation_id"),
-                "operation_version": operation.get("operation_version", 1),
-                "classification": classification,
-                "required_permission": _REQUIRED_PERMISSION[classification],
-                "argv": list(operation.get("argv", [])),
-                "summary": operation.get("summary"),
-            }
-        )
+        entry = {
+            "operation_id": operation.get("operation_id"),
+            "operation_version": operation.get("operation_version", 1),
+            "classification": classification,
+            "required_permission": _REQUIRED_PERMISSION[classification],
+            "argv": list(operation.get("argv", [])),
+            "summary": operation.get("summary"),
+        }
+        _check_classification_minimum(entry, rules_document=rules_document)
+        built.append(entry)
 
     document = {
         "record_kind": "operation_inventory",

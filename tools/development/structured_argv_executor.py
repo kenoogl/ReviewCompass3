@@ -33,7 +33,7 @@ runnerは呼出し側が渡す。既定のrunnerは持たない。実processを�
 processの実行結果が失敗であることは入力の失敗と区別し、例外にせずreceiptへ記録する。
 """
 
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from tools.development import operation_routing
 
@@ -91,6 +91,15 @@ def _validate_template(argv):
         raise StructuredArgvExecutorError("template_mismatch", rest[0])
     if PATHSPEC_SEPARATOR in rest[1:]:
         raise StructuredArgvExecutorError("template_mismatch", "duplicated separator")
+    # 区切りの後ろはpathspecでなければならない。option形・絶対path・親escapeは
+    # 素通りさせない（層2。誤記検出であり、pathspec文法の完全な検証ではない）。
+    for item in rest[1:]:
+        if item.startswith("-"):
+            raise StructuredArgvExecutorError("pathspec_invalid", "option shaped")
+        if item.startswith("/"):
+            raise StructuredArgvExecutorError("pathspec_invalid", "absolute path")
+        if ".." in PurePosixPath(item).parts:
+            raise StructuredArgvExecutorError("pathspec_invalid", "parent escape")
     return argv
 
 
