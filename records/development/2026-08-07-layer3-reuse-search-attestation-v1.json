@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "verification-boundary/layer3-declaration",
+  "external": {
+    "relative_path": "work4b/reuse-searches/ba036df8d93f3e46d69043aa1303b3e33144a23d27cd9e7e1822f78d835005ed.json",
+    "content_digest": "ba036df8d93f3e46d69043aa1303b3e33144a23d27cd9e7e1822f78d835005ed",
+    "byte_sha256": "0f7cc5758f4e32d35dff5842e3e6e43582eca8118089fa9a2f4b1f03033d675b"
+  },
+  "source_identity": {
+    "profile_run_id": "7108e1f02eaeffd417d4af6edc115572593272c4a8960fccbf9293e7d10473ac",
+    "discovery_run_id": "c188824006faad9caefc6fda8329b3675d2844802c7ff00e905073f887620e91",
+    "source_content_id": "c5926238bcb970cca9311da3610141f64795839a93a53c5c29eb63ffe8f09412",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 225,
+  "content_digest": "d13344fa526baa2aff6f15d90a7bceec9785e135682633f605da4634f5b04f7b"
+}
