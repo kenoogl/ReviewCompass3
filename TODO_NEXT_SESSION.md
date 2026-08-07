@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：Work 4B本体設計束の構成A-1（統合除外宣言）と構成B（検索の鮮度判定）が完了した。検索recordはschema 2でfreshness欄を持ち、gateがgate時点で乖離を再計測してprofile_staleで停止する（閾値：対象範囲の変更1件）。schema 1の既存record 4件は版固定で有効のまま。次は実装順どおり構成A-2（絞り込み順位表。除外宣言を機械参照し、落とした件数を表示する）。
+- 現在作業：設計束の構成A-1・B・A-2が完了した。再観測を2回実施（現行Profileはroutine 1245件・group 809件、head `3fae166`時点）し、最初の実順位表を生成：741 groupを承認済み辞書式順で順位付け、68 groupを除外宣言で脱落（全件表示）。鮮度gateは初回実運用で正しく発火した（順位表module自身がprofile_staleを引き起こし、再観測後に生成）。残りは構成D（台帳）とC（外部化）。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,8 @@
 
 ## 最新のauthority／Evidence
 
+- [構成A-2 GREEN Evidence](records/development/2026-08-07-work4b-a2-candidate-ranking-green-evidence-v1.md) — SHA-256 `7ce86a44e5ef270875135ce8d9c82017152db82302d76e29db750a5cb2bd96eb`
+- [実順位表v1](records/development/2026-08-07-candidate-ranking-v1.json) — SHA-256 `7b02535390547f169b1643f2314979ca9bc5dfb7df8e59a9a99a942f3c09cfee`
 - [構成B GREEN Evidence](records/development/2026-08-07-work4b-b-reuse-search-freshness-green-evidence-v1.md) — SHA-256 `cbf5a22317c8aa622a3bdd462ee521f93ba0ab5e662df57135c0287114de9877`
 - [構成A-1 GREEN Evidence](records/development/2026-08-07-work4b-a1-integration-exclusions-green-evidence-v1.md) — SHA-256 `91910e837710140a43e0b060832b3726a1b11a5348a7ee4b59cc95b19467a153`
 - [統合除外宣言record](.reviewcompass/workflow/integration-exclusions/integration-exclusions-001--v1.json) — SHA-256 `f482bf3d6200e1c2a4fc17233d4e87ed098f04d053dc1fa56e69e481a4b090fd`
@@ -30,7 +32,7 @@
 
 ## 次に行う一作業
 
-設計束の実装順どおり構成A-2：絞り込み順位表。ProfileとDiscoveryから決定的に順位recordを生成する。順位は承認済みの辞書式順（構造一致の強さ→守り役の含有→実害の大きさ→変更範囲との交差）、統合除外宣言（integration-exclusions-001）を機械参照して該当groupを落とし、落とした件数を表示する。順位表の入力はschema 2（freshness付き）の検索経路とそろえる。
+設計束の実装順どおり構成D：台帳（Entry・Relation・Baseline）の最小形。`.reviewcompass/workflow/routine-ledger/`にEntry（処置labelはHuman裁定Decision参照なしには書けない——検証器で拒否）とRelation（`duplicate_of`等）のschema・検証器・手作業記入経路を実装する。完了後、Work 5B defer項目（helper 2件の台帳Entry）の完了戻しへ進む（DEC-WORK5B-LEDGER-ITEM-DEFER-001の再開条件）。
 
 開始条件：
 
@@ -38,7 +40,7 @@
 
 完了条件：
 
-- 順位表生成がGREENで、除外の件数表示（silent capの禁止）と決定的再生成が固定されていること
+- Entry・Relation検証器がGREENで、labelのHuman裁定参照必須とnew-onlyが固定されていること
 
 後続作業：合意順序の③レビューbacklog上位2系統の先行反証レビュー、④残りのbacklogとRC2取り込み・外部APIレビュー（台帳整備後）。全routineの一括分類は行わない。
 
@@ -58,8 +60,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：鮮度判定 4 passed（宣言F1〜F4対応）＋既存R系 8 passed
-- 直近の全Test：venv pytest 1075 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：順位表 5 passed（宣言G1〜G5対応）
+- 直近の全Test：venv pytest 1080 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
