@@ -1,0 +1,89 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-C4-RED-VERIFICATION-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T16:53:57+09:00",
+  "proposal": {
+    "path": "records/development/2026-08-07-verification-boundary-approval-decision-v1.md",
+    "sha256": "2aa6157a503b7aef1cc03f21a98abb476f46a8b2b27955d8a2b2c9782f5adb8d",
+    "declaration_section": "層1・C-4（red_nowの実行照合）から展開した規範宣言V1〜V5",
+    "approval_decision": "DEC-VERIFICATION-BOUNDARY-001"
+  },
+  "purpose": "反証C-4（REDでないものをREDと称して通せる）を塞ぐ。この対応表自身は静的検査で作成し、GREEN後に実行照合経路で自己検査する。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（実行照合経路が未実装のため5 testすべてが失敗する）。",
+    "機械照合はtools/development/declaration_red_map_check.pyのcheck_declaration_red_mapで実施した（静的検査）。"
+  ],
+  "test_files": {
+    "tests/test_declaration_red_verification.py": [
+      "test_v1_static_check_stays_the_default",
+      "test_v2_red_claim_is_confirmed_when_the_test_actually_fails",
+      "test_v3_red_claim_is_rejected_when_the_test_actually_passes",
+      "test_v4_boundary_example_must_actually_pass",
+      "test_v5_unknown_outcome_fails_closed"
+    ]
+  },
+  "declarations": {
+    "V1": {
+      "summary": "既定は静的検査のままであり、実行照合はしない（実行は明示指定時のみ）",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_verification.py::test_v1_static_check_stays_the_default",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "V2": {
+      "summary": "red_now: trueの宣言は、対象testが実際に失敗していれば確認済みとなる",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_verification.py::test_v2_red_claim_is_confirmed_when_the_test_actually_fails",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "V3": {
+      "summary": "red_now: trueなのに対象testが成功する場合、検査器は不合格を返す（反証C-4）",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_verification.py::test_v3_red_claim_is_rejected_when_the_test_actually_passes",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "V4": {
+      "summary": "red_now: falseの境界例は、対象testが実際に成功していなければ不合格になる",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_verification.py::test_v4_boundary_example_must_actually_pass",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "V5": {
+      "summary": "結果を得られないtestは合格でも不合格でもなく、不明としてfail-closedで拒否する",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_verification.py::test_v5_unknown_outcome_fails_closed",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": {
+    "checker": "tools/development/declaration_red_map_check.py",
+    "status": "passed",
+    "machine_count": {
+      "declarations": 5,
+      "declarations_without_tests": 0,
+      "listed_tests_missing_in_file": 0,
+      "tests_unmapped_to_declarations": 0
+    }
+  }
+}
