@@ -1,0 +1,114 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-WORK4B-REUSE-SEARCH-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T09:12:27+09:00",
+  "proposal": {
+    "path": "docs/design/2026-08-07-work-4b-minimal-pilot-scope-proposal.md",
+    "sha256": "51eec963e5b7469110658a2a0b95f9d4effbe9279f078175076fe0e1dda2169a",
+    "declaration_section": "§4（規範宣言R1〜R7）",
+    "approval_decision": "DEC-WORK4B-MINIMAL-PILOT-SCOPE-001"
+  },
+  "purpose": "提案§5-1の関門に従い、実装開始前にR1〜R7それぞれへREDを結び、「testの無いR」が0件であることを機械で数える。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、列挙したtestに現在失敗するREDが1件でもあればtrueとする。",
+    "本mapでは全宣言がred_now: trueである（対象module tools/development/reuse_search_record.py が未実装のため、全testが期待どおり失敗する）。",
+    "機械照合はPython astでtests/配下の対象1 fileを解析し、列挙したtest関数名の実在、testの無い宣言が0件、宣言へ結ばれないtestが0件であることを確認した。"
+  ],
+  "test_files": {
+    "tests/test_work4b_reuse_search_record.py": [
+      "test_r1_record_binds_work4a_identity",
+      "test_r1_validator_rejects_missing_or_mismatched_identity",
+      "test_r2_write_is_new_only_and_refuses_overwrite",
+      "test_r3_same_inputs_yield_identical_content_digest",
+      "test_r4_zero_hit_record_is_valid_and_distinct_from_absence",
+      "test_r5_validator_rejects_disposition_labels",
+      "test_r6_group_references_keep_all_members",
+      "test_r7_gate_fails_closed_on_missing_record_and_stale_identity"
+    ]
+  },
+  "declarations": {
+    "R1": {
+      "summary": "検索recordはWork 4A identityへdigestで結線され、結線が欠けるか一致しないrecordをvalidatorが拒否する",
+      "tests": [
+        {
+          "test": "tests/test_work4b_reuse_search_record.py::test_r1_record_binds_work4a_identity",
+          "red_now": true
+        },
+        {
+          "test": "tests/test_work4b_reuse_search_record.py::test_r1_validator_rejects_missing_or_mismatched_identity",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "R2": {
+      "summary": "検索recordはnew-onlyであり、既存fileへの上書き書き込みを拒否する",
+      "tests": [
+        {
+          "test": "tests/test_work4b_reuse_search_record.py::test_r2_write_is_new_only_and_refuses_overwrite",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "R3": {
+      "summary": "同一の宣言と同一のProfile／Discoveryから同一の検索結果（content digest一致）が決定的に再生成される",
+      "tests": [
+        {
+          "test": "tests/test_work4b_reuse_search_record.py::test_r3_same_inputs_yield_identical_content_digest",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "R4": {
+      "summary": "hit 0件は正常なrecordとして保存でき、record不存在（検索未実施）と機械的に区別される",
+      "tests": [
+        {
+          "test": "tests/test_work4b_reuse_search_record.py::test_r4_zero_hit_record_is_valid_and_distinct_from_absence",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "R5": {
+      "summary": "処置labelを含むrecordはvalidatorが拒否する（Human判断の先取り禁止）",
+      "tests": [
+        {
+          "test": "tests/test_work4b_reuse_search_record.py::test_r5_validator_rejects_disposition_labels",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "R6": {
+      "summary": "Discovery groupの参照はmemberを上限で切り捨てない",
+      "tests": [
+        {
+          "test": "tests/test_work4b_reuse_search_record.py::test_r6_group_references_keep_all_members",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "R7": {
+      "summary": "gate判定は検索recordの不存在、identity結線の不一致のいずれでもfail-closedで開始不可を返す",
+      "tests": [
+        {
+          "test": "tests/test_work4b_reuse_search_record.py::test_r7_gate_fails_closed_on_missing_record_and_stale_identity",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_count": {
+    "declarations": 7,
+    "declarations_without_tests": 0,
+    "listed_tests_missing_in_file": 0,
+    "tests_unmapped_to_declarations": 0
+  },
+  "content_digest": "eb3ea8a331a38c4d1e03fcbc09c978470c0bdbc23892aa8816bfb93e76ad0f10"
+}
