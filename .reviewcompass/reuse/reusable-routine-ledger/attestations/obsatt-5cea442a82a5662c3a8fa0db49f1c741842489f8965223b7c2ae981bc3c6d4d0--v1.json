@@ -1,0 +1,95 @@
+{
+  "attestation_id": "OBSATT-5cea442a82a5662c3a8fa0db49f1c741842489f8965223b7c2ae981bc3c6d4d0",
+  "attestation_version": 1,
+  "candidate_run": {
+    "advisory_locator": {
+      "digest_algorithm": "sha256",
+      "evidentiary_role": "advisory_locator",
+      "file_sha256": "d83aa474c35d35d2cb3b8b9e675eff83cff5dd8248a0ebc857d324efa6bea3e9",
+      "profile": "development",
+      "project_id": "reviewcompass3",
+      "relative_path": "work4a/candidates/4699a776813b4124c17d153f9e0c59d8d1febfe549f67f951964eeb41428e4fe.json",
+      "root_kind": "data",
+      "root_selector": "data"
+    },
+    "candidate_run_id": "4699a776813b4124c17d153f9e0c59d8d1febfe549f67f951964eeb41428e4fe",
+    "content_digest": "66662e3d7bde0672a8c6c18260719d7aeac4d5c35844477eff6d31a4613f63ec",
+    "extraction_rule_version": 4,
+    "observation_snapshot_id": "5cea442a82a5662c3a8fa0db49f1c741842489f8965223b7c2ae981bc3c6d4d0",
+    "record_kind": "work4a_candidate_run",
+    "source_content_id": "748e7f6325506014aee5822aed0bb2ab7c68e515c971900a8c9375e5ef19f56a"
+  },
+  "candidate_summary": {
+    "candidate_count": 1245,
+    "classification_counts": {
+      "unknown": 1245
+    },
+    "sensitive_content_included": false,
+    "symbol_id_list_digest": "8ff03bcd26729d98b936ed34464591b2dd5e21d0dcd0c6927a1983be29082d41"
+  },
+  "content_digest": "e5f58ffb174116a393b6d7dd48b07eece5ee91a8a7b7b743bf52d3971b468503",
+  "digest_algorithm": "sha256",
+  "observation": {
+    "advisory_locator": {
+      "digest_algorithm": "sha256",
+      "evidentiary_role": "advisory_locator",
+      "file_sha256": "9570763498f13ab1804cd383f8191decfb2193a8eacd1d5d4f0bd5ae0cf3ab7c",
+      "profile": "development",
+      "project_id": "reviewcompass3",
+      "relative_path": "work4a/observations/5cea442a82a5662c3a8fa0db49f1c741842489f8965223b7c2ae981bc3c6d4d0.json",
+      "root_kind": "data",
+      "root_selector": "data"
+    },
+    "captured_at": "2026-08-07T13:38:57+0900",
+    "content_digest": "b7580d71ea73e6351feaa625c5b02baec5ef4f8b954b003a7e5f712dafa84386",
+    "head": "3fae166f6510680a3a6e80bf19ee33b058b392e1",
+    "record_kind": "work4a_source_observation",
+    "snapshot_id": "5cea442a82a5662c3a8fa0db49f1c741842489f8965223b7c2ae981bc3c6d4d0",
+    "source_file_count": 119,
+    "tool_version": "v3.3"
+  },
+  "policy_ref": {
+    "content_digest": "675c3b46f883381a742727ac511b832c1a49419a35569960d4ac585bf3fd9005",
+    "digest_algorithm": "sha256",
+    "file_sha256": "34c20640e530ba6e611cff1c804b38c5484d8ff1a63b284e1619a70f72a64d05",
+    "record_id": "POL-WORK4A-FRESHNESS",
+    "record_kind": "work4a_freshness_policy",
+    "relative_path": ".reviewcompass/policies/work4a-freshness-policy-v4.json",
+    "root_kind": "project",
+    "version": 4
+  },
+  "profile": "development",
+  "project_id": "reviewcompass3",
+  "record_kind": "work4a_observation_attestation",
+  "routine_profile": {
+    "advisory_locator": {
+      "digest_algorithm": "sha256",
+      "evidentiary_role": "advisory_locator",
+      "file_sha256": "9c010d70b7c4b02c813348fa3645dc11ebf307d8e4a9f6a167f0569bea903a77",
+      "profile": "development",
+      "project_id": "reviewcompass3",
+      "relative_path": "work4a/profiles/b4ba016eaac8bc07326ef24e8c730d235dcf97b01ed7c4312107bc96fff1b66d.json",
+      "root_kind": "data",
+      "root_selector": "data"
+    },
+    "content_digest": "cfb78ddb05537795624ec90116202e137906027578d4d5372b59d953c5f67d44",
+    "extraction_rule_version": 4,
+    "profile_run_id": "b4ba016eaac8bc07326ef24e8c730d235dcf97b01ed7c4312107bc96fff1b66d",
+    "record_kind": "work4a_routine_profile"
+  },
+  "schema_version": 2,
+  "source_content_id": "748e7f6325506014aee5822aed0bb2ab7c68e515c971900a8c9375e5ef19f56a",
+  "source_universe_id": "SRCU-WORK4A-TOOLS-PY-V1",
+  "source_universe_ref": {
+    "content_digest": "652bf2d8bec5a09c2d765c07644b97508b3a08dc76216ad87ee20320e46c5856",
+    "digest_algorithm": "sha256",
+    "file_sha256": "618f3ef508be432efed2f2ed4ea4e6f11ad6680ee5fed5ba097bf93398acfd06",
+    "record_id": "SRCU-WORK4A-TOOLS-PY-V1",
+    "record_kind": "work4a_source_universe",
+    "relative_path": ".reviewcompass/policies/work4a-source-universe-v1.json",
+    "root_kind": "project",
+    "version": 1
+  },
+  "source_universe_version": 1,
+  "supersedes_attestation": null
+}
