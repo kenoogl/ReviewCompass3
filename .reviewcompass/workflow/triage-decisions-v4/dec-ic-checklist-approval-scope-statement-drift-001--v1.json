@@ -1,0 +1,31 @@
+{
+ "record_kind": "human_triage_decision",
+ "schema_version": 2,
+ "decision_id": "DEC-IC-CHECKLIST-APPROVAL-SCOPE-STATEMENT-DRIFT-001",
+ "decision_version": 1,
+ "decided_at": "2026-08-08T08:42:36+09:00",
+ "decision_maker": "human",
+ "candidate_ref": {
+  "record_path": ".reviewcompass/workflow/improvement-candidates/ic-checklist-approval-scope-statement-drift-001--v1.json",
+  "record_sha256": "acb2e8e58eb52f6e8e873ce60a12df58cc28845bbc3e4c3a2aa1e0d1784070eb",
+  "candidate_id": "IC-CHECKLIST-APPROVAL-SCOPE-STATEMENT-DRIFT-001",
+  "candidate_content_digest": "429334f1f738ba608b93256f1fbbed0fb36580eac78c7f3262f0e2255ca51bbb"
+ },
+ "human_fields": {
+  "unresolved": true,
+  "recurrence": true,
+  "impact": "medium",
+  "priority": "medium",
+  "promote_to_issue": false
+ },
+ "disposition": "current_work",
+ "blocking": false,
+ "rationale": "Human判断2026-08-08「選択肢1で」。checklist改定r1に修復を含めて決着させる（748行付近の承認範囲外の列挙を、承認・実装済み3項目と残る範囲外3項目へ改定）。候補が提起した反映の時点規則（差し込み承認を本文へ反映するタイミングの規則化）は別件のHuman判断として保留する。",
+ "next_action": "checklist改定r1で本文を修復済み。issueは作らない。反映の時点規則はHuman判断待ちとして保留。",
+ "supersedes": null,
+ "issue_promotion": {
+  "approved": false,
+  "issue_id": null
+ },
+ "content_digest": "bc9ad4fb4318eb4c24517d909490c7d4d4e2c61537a92ae541534c2e9ac495ad"
+}

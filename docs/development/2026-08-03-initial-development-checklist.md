@@ -100,7 +100,7 @@ Session EvidenceとGitへ委ねる。
       追加コミットを作成していない。
 - [ ] TODOへ過去sessionを累積せず、現行handoffを短時間で読める量に保った。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）
 
 ## 3. Work 1：固定入力と開発入口
 
@@ -254,6 +254,19 @@ Work 1B Completion Candidateは
 段完了を承認した。Decision正本は`records/development/2026-08-03-work-1b-completion-decision.json`、
 SHA-256 `69b4f792e3ccf529af338bce08e46ec2dace77ba86b5e4df624ff4b399e63ac8`。
 Work 1Bの結果は`verified / completed`であり、次の未完了工程はWork 2とする。
+
+### Work 1B後続：機密の扱い（2026-08-08改定r1で追加）
+
+Work 1Bが敷いた機密分離（rawは`SENSITIVE_ROOT`、外に出すのは伏字化派生物のみ）の運用を
+完成させる残項目。順序と根拠は`DEC-CONFIDENTIALITY-WORK-ORDER-001`
+（`records/development/2026-08-07-confidentiality-work-order-decision-v1.md`）。
+①出口の設計は完結した：関門・dry-runを段階2まで実装し（`tools/egress/`、反証レビュー済み）、
+外部API比較の中止により送信実装（段階4）は不要となった（`DEC-EGRESS-METHOD-CONCLUSION-001`）。
+資産は保持し、必要が再発したときの再判断材料は固定済みである。
+
+- [ ] 伏字化規則を設定へ登録し、保全経路から呼ぶ（実施順序2番目。実装済み規則の登録）。
+- [ ] C（内部の未公開情報）とD（会話に混入した外部データ）の扱いを定義する（同3番目）。
+- [ ] 既存の保全済みデータへの遡及適用を判断する（同4番目。着手はHuman判断）。
 
 ## 6. Work 2〜4：上流文書、Requirements、最初のslice設計
 
@@ -731,8 +744,11 @@ execution receiptの3部だけである。実装moduleは`tools/development/oper
 `c73cdc69b3ca3251b9de9480867c9677e0de4312f7bedff138a407af297cd969`。GREEN Evidenceは
 `records/development/2026-08-05-machine-operation-routing-v2-green-evidence-v1.md`、SHA-256
 `e4f8d9f865e6b6d35e7d00a21eba54c13b1ed331fca3183827b1262d285d88eb`。対象testは`16 passed`、公式全testは
-`845 passed`。構造化argv executor、cache root固定、既存直接操作の移行、host側tool構文、外部送信、
-`ISSUE-HTC-66C3E6CA`の定型欄生成は承認範囲外のままである。`ISSUE-HTC-C9F6C917`のIssue recordは
+`845 passed`。定型欄生成、構造化argv executor、cache root固定の3項目は、その後の最小sliceがそれぞれ承認・実装済み
+である（`DEC-RECORD-GENERATION-PLAN-001`、`DEC-MACHINE-OPERATION-ROUTING-READ-ONLY-ARGV-001`、
+`DEC-MACHINE-OPERATION-ROUTING-TASK-PYTHON-CACHE-001`。2026-08-08改定r1で反映、
+指摘元は`IC-CHECKLIST-APPROVAL-SCOPE-STATEMENT-DRIFT-001`）。既存直接操作の移行、host側tool構文、
+外部送信は引き続き承認範囲外である。`ISSUE-HTC-C9F6C917`のIssue recordは
 `registered`のままであり、**V4 Issueの正式Plan化や実装一般が完了したわけではない**。
 
 その後、execution receiptの改竄を拒否できない欠陥が見つかり、receipt validatorを訂正した。訂正後は、
@@ -816,7 +832,7 @@ guarded commit、hook、コミットごとの承認file、巨大なcommit manife
 - [ ] 最初のReview Task Contractに必要なDesignとAcceptance Testが実装可能な粒度である。
 - [ ] 新しい第5段相当の完了条件を満たし、Human判断を得ている。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）
 
 ## 7. Work 4A：再利用探索baseline（早期完了）
 
@@ -844,10 +860,16 @@ E2E Test：`tests/test_work4a_rebuild_v3_e2e.py`、`tests/test_work4a_rebuild_v3
 
 ### Work 4B：再利用・統合の運用Pilot
 
-- [ ] 新規・変更routineの対象範囲で、既存routine検索を実装前に実施し、結果を記録する。
+- [x] 新規・変更routineの対象範囲で、既存routine検索を実装前に実施し、結果を記録する。
+  （構成B GREEN Evidence 2026-08-07、以後の各作業単位でreuse-search attestationを実運用）
 - [ ] 必要なcandidateだけについて、Humanが処置labelを確定し、Entry・Relation・Baselineをnew-onlyで記録する。
+  （評価①の実装同一性判定は59組完了・基準確立：`DEC-EGRESS-B-CHECK-001`。処置label＝統合可否は
+  評価②の手順4で系統ごとにHumanが確定する）
 - [ ] 共通候補ごとに振る舞いTestを固定し、共通部品への段階移行と旧実装の削除判断を独立Work Itemで行う。
-- [ ] Work 5Bの内部Implementation Task Contract Pilotで、再利用検索と台帳更新のgateを実証する。
+  （**実行形が承認済み**：評価②提案v2＝`DEC-CONSOLIDATION-EVAL2-APPROVAL-001`。1系統1単位・TDD・
+  挙動不変・守り役への反証レビュー。系統A材料済み、次はA+C合流のdigest系材料）
+- [x] Work 5Bの内部Implementation Task Contract Pilotで、再利用検索と台帳更新のgateを実証する。
+  （Work 5B検査器 GREEN・構成D台帳初回実運用 2026-08-07、attestation群で継続実証）
 
 Work 4Bは全routineの一括分類を前提にしない。LLMの説明・Disposition Proposalは別承認後のみ使用する。
 
@@ -1031,7 +1053,7 @@ helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`a
 - [ ] Project Artifacts更新がRuntime Core再installを要求しない。
 - [ ] Current Work Projectionが別rootと再開後も同じauthorityから再生成できる。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）
 
 ## 12. Work 8：Evaluation Pilot
 
@@ -1045,7 +1067,7 @@ helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`a
 - [ ] text／machine-readable projectionの実測から、画面UI着手の必要性をHuman判断へ渡した。
 - [ ] 速度や入力削減だけを成功とせず、安全性と再生成一致を確認した。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）
 
 ## 13. Work 8A：`bounded_parallel` Pilot（条件付き）
 
@@ -1056,7 +1078,7 @@ helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`a
 - [ ] merge後のstale、Test、Integration Verdict、Current Work Projectionを確認した。
 - [ ] 成功しても初期既定policyへ自動昇格していない。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）
 
 ## 14. Work 7B：lifecycle deployment E2E
 
@@ -1066,7 +1088,7 @@ helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`a
 - [ ] Build ArtifactをSource Snapshot、build Run、Verification、Digestへ束縛した。
 - [ ] lifecycle操作の前後でCurrent Work Projectionを再生成できる。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）
 
 ## 15. Stage G：Release Evaluation
 
@@ -1077,7 +1099,7 @@ helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`a
 - [ ] stable candidateをdevelopment candidate自身だけで判定していない。
 - [ ] release、defer、accept-with-known-riskまたは中止をHumanが判断した。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）
 
 ## 16. 初期範囲へ前倒ししないもの
 
@@ -1121,7 +1143,7 @@ helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`a
 - [ ] 影響を受けるTest、Verdict、projection、checklist項目をstaleにした。
 - [ ] 改定後のContract、Plan、Context、checkpointを再確認してから再開した。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）
 
 ## 18. チェックリスト自身の改定
 
@@ -1131,4 +1153,4 @@ helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`a
 - [ ] 削除項目が持っていた停止、復旧、Evidence、後継Testを失っていない。
 - [ ] Humanが新しい順序と適用開始を判断した。
 
-`Evidence`：未記録
+`Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）

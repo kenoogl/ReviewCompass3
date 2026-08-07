@@ -48,11 +48,11 @@
 - [設計議論の証跡Decision](records/development/2026-08-07-work5b-discussion-outcomes-decision-v1.md) — SHA-256 `8cfc4a1581ed53513d97f70fa78323f6dc574eb2555bbd35ed78c7a4e1214a9d`
 - [Work 5B検査器 GREEN Evidence](records/development/2026-08-07-work5b-checker-green-evidence-v1.md) — SHA-256 `020db589b586e6db741e0d5d347d31c30c89a077c390ebd2232c42dfccbb7d2c`
 - [作業レビュー手順書（高risk観点追記後）](docs/development/work-review-protocol.md) — SHA-256 `37c0391a322a6841421742125fff646600aff7d3acd905990c605f614d2e2967`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `a325a20814ad63131486570a94118b4d665dda88b952cd6fb8af476aec073942`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `99a84b333b8842c59c37230e58fd9f495e87dfdf1f19e22e5a5b4df1e329871d`
 
 ## 次に行う一作業
 
-系統A+C合流の「digest系」材料を作る：C系統4関数（canonical digest計算。4file全て守り役）の実測（本体・呼び出し・テスト参照）を加え、共通module一括の統合案・削減行数・alias要否を提示して手順4の再判断に付す。issue登録のやり直しとAGENTS.md整理（139行→78行、規則の増減ゼロ、Human承認済み）は完了。
+系統A+C合流の「digest系」材料を作る：C系統4関数（canonical digest計算。4file全て守り役）の実測（本体・呼び出し・テスト参照）を加え、共通module一括の統合案・削減行数・alias要否を提示して手順4の再判断に付す。issue登録のやり直し・AGENTS.md整理（139→78行）・checklist改定r1（Work 4B追随[x]2件、評価②の対応明記、Work 1B後続に機密レーン残3項を新設、Digest8件一致確認。Human承認済み）は完了。
 
 開始条件：
 
