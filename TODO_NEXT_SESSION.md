@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：系統Aの材料一式（手順1〜3）を固定し、**手順4のHuman判断待ち**。実測の要点：7関数は2行の逐語同一・呼び出し31か所はmodule内のみ・**テストからの直接参照0件**（既存テスト無修正で通る）・守り役4/7・凍結symbolとの同居1file（差分不可侵を実施条件に）。**効果は正直に中立**（−14+7+約10行）で、単独実施は効果基準を満たさない所見。選択肢はア（A単独）／イ（C系統と合流しdigest系として一括）／ウ（見送り）。テスト側の`_sha256`自前定義**14件**を発見し、改善候補としてトリアージ待ち。
+- 現在作業：**digest系（A+C合流）の材料一式を固定し、手順4のHuman判断待ち**。11関数（9file）とも除外・凍結非該当、守り役8/11。A本体2行×7・C本体7行×4とも逐語同一。呼び出し47か所、テスト直接参照はCの公開2名のみ→**alias維持で既存テスト無修正**。効果：約−17行・digest定義11→2・canonical仕様の単一化（守り役中核仕様の保証改善）。**実施を推す所見**。追加観測：テスト側canonical自前定義12file（_sha256系14fileと同型。issue拡張はトリアージ判断）。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -19,6 +19,7 @@
 
 ## 最新のauthority／Evidence
 
+- [digest系（A+C）統合判断の材料](records/development/2026-08-08-consolidation-digest-family-materials-v1.md) — SHA-256 `ea1ec1ab55a8c8073932497338cbfa6588c52a430d3d278f07905d887279592d`
 - [系統A 統合判断の材料](records/development/2026-08-08-consolidation-family-a-materials-v1.md) — SHA-256 `502f8f643989664afb734752e18432e93dd8b91da7705dd4cc480480ec86df3a`
 - [評価②提案v2 承認Decision](records/development/2026-08-08-consolidation-eval2-approval-decision-v1.md) — SHA-256 `2726c4f435f3fb31e22b7f5468a627a2b615ee4da7bb02c28bf9ce4b0854f173`
 - [評価②提案v2（承認済み）](docs/design/2026-08-08-consolidation-evaluation2-proposal-v2.md) — SHA-256 `967dd4cae74a0229a90a61df29ceff9c3f91aa6bd2a2be434da9f401196cbfe8`
@@ -67,7 +68,7 @@
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：なし（イ・登録のみ、は決定済み。文言はDEC-CONSOLIDATION-EVAL2-APPROVAL-001後の2026-08-08「イ。登録のみでよい」）。次作業の着手指示を待つ。
+- Human判断待ち：digest系の手順4判断（実施可否・moduleの置き場と命名）。
 - 継続する留意点：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認は「記録が指す先」まで、写しなら原本まで (3)**登録済み課題2件が実害として発現した**：pipe隠蔽で不合格コミットが2回通過（`;`連結が原因。コミット前の全test確認は独立コマンドで行う）、TODO byte上限超過をCLI検証が見逃しテストだけが検出（二tool分離）。workflow台帳へのrecord追加は必ず正規toolを通す（手作りJSONは台帳整合テストに落ちる）。
 
 ## stale・deferred
