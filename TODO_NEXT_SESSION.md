@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：**Work 4B本体設計束の4構成すべてが完了した**（A-1除外宣言、B鮮度gate、A-2順位表、D台帳=既存経路再利用、C外部化）。Cでは検索record 7件を全件byte一致で外部化し証明書をproject内へ作成（旧位置は保持）。universe v2も作成したが、`validate_current`の停止原因は**freshness policy v4自身の開発方針参照**と再特定され（診断訂正Evidence参照）、policy v5の作成がHuman判断待ち。参照Digest drift類型は4例目となった。
+- 現在作業：4件の裁定（DEC-FOUR-RULINGS-2026-08-07-001）を実施した。(1) policy v5作成で`validate_current`が全通過（baseline v1、注記なし）。(2) レビュー第1束の開始承認（新module 4件＋従来上位2系統）。Issueのin_progress化は「1 file per issue」規則とactive 0件の固定testに衝突（状態釘付けIssueの4例目実例）したため、開始正本は裁定Decisionとし、V4状態はregisteredのまま。(3) Work 5B段完了をchecklistへ反映。(4) 旧書庫（両側SHA検証後）と検索record旧位置6件を削除、1件はContract束縛のため保留（削除Receipt参照）。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -35,28 +35,27 @@
 
 ## 次に行う一作業
 
-合意順序（DEC-WORK5B-DISCUSSION-OUTCOMES-001 §2）の③：レビューbacklog上位2系統（operation_routing系、Issue・候補の合否を決める検証器群）への先行反証レビュー。着手には`ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`の`in_progress`化が必要で、これはHuman判断である（同Decision §3）。
+反証レビュー第1束の実施（DEC-FOUR-RULINGS-2026-08-07-001裁定2で承認済み）。対象は新module 4件（`reuse_search_record.py`外部化含む、`declaration_red_map_check.py`、`integration_exclusions.py`、`candidate_ranking.py`）と従来上位2系統（`operation_routing.py`＋`structured_argv_executor.py`、`issue_intake_v4.py`＋`issue_resolution_pilot.py`）。方法はwork-review-protocol §4.4（実装者のfixtureに無い反証——改竄・偽装・迂回・境界——の新作）・§5（上流からの独立oracle導出）。
 
 開始条件：
 
-- Humanがbacklog Issueの`in_progress`化と上位2系統の着手を承認すること
-- 反証レビューはwork-review-protocol §4.4（fixtureに無い反証の新作）・§5（上流からの独立oracle導出）に従う
+- なし（裁定2で承認済み）
 
 完了条件：
 
-- 上位2系統それぞれについて、反証レビューの結果record（見つかった欠陥または反証不成立の記録）が固定されること。欠陥の修正はレビューと分離する
+- 対象ごとに反証レビューの結果record（欠陥または反証不成立の記録）が固定されること。**欠陥の修正はレビューと分離し、都度Human判断**（protocol §2-5）
 
-後続作業：合意順序の③レビューbacklog上位2系統の先行反証レビュー、④残りのbacklogとRC2取り込み・外部APIレビュー（台帳整備後）。全routineの一括分類は行わない。
+後続作業：合意順序④（残りのbacklog、RC2取り込み、外部APIレビュー）。全routineの一括分類は行わない。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：(1) freshness policy v5の作成可否（validate_current停止の残余処置。参照現行化のみ、語彙・閾値変更なし）。(2) レビューbacklog Issueの`in_progress`化と上位2系統着手（次の一作業の開始条件）。(3) Work 5Bの段完了（全6項目がEvidence接続済み）。(4) 外部化済み旧record 7件と旧書庫の削除可否（削除でrepositoryが約2.3MB軽くなる）。
+- Human判断待ち：なし（4件の裁定はすべて実施済み。保留1件=検査器の検索record旧位置はContract v2化の際に削除判断へ戻す）。
 
 ## stale・deferred
 
 - stale：なし。
-- deferred：Work 6AのCL-6A-04/05/06/07/11（行き先明記済み）、登録済み7課題の着手、旧書庫の削除判断、Current Work Projection正式写像、Entry・Relation・Baseline台帳、Work 7、Work 8、UI、automation。
+- deferred：Work 6AのCL-6A-04/05/06/07/11（行き先明記済み）、backlog以外の登録済み課題の着手、Current Work Projection正式写像、Work 7、Work 8、UI、automation。
 
 ## Git・Test
 
