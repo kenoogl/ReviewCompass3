@@ -12,6 +12,7 @@ promotion_required: true
 """
 
 import dataclasses
+import hashlib
 import json
 
 from tools.egress.approval import (
@@ -21,8 +22,10 @@ from tools.egress.approval import (
   validate_approval_record,
 )
 from tools.egress.payload import (
+  MACHINE_FEATURE_ALLOWLIST,
   EgressPayload,
   PayloadError,
+  resolve_question,
   verify_fragment_provenance,
 )
 
@@ -73,6 +76,14 @@ def run_egress_gate(
     )
     return GateResult(False, tuple(reasons), tuple(recovery))
 
+  if hashlib.sha256(
+    payload.content.encode("utf-8")
+  ).hexdigest() != payload.digest:
+    block(
+      "payloadのdigestが内容の指紋と一致しない（偽造の兆候）",
+      "build_pair_payloadで組み立て直し、一覧承認を取り直す",
+    )
+
   try:
     document = json.loads(payload.content)
   except ValueError:
@@ -84,6 +95,28 @@ def run_egress_gate(
       "payload内容が3種の構成要素と一致しない",
       "build_pair_payloadで組み立て直す",
     )
+  else:
+    try:
+      expected_question = resolve_question(document.get("question_id"))
+    except PayloadError:
+      expected_question = None
+    if (
+      expected_question is None
+      or document.get("question_text") != expected_question
+    ):
+      block(
+        "問いが承認済みtemplateの定型文と一致しない",
+        "resolve_questionの定型文だけを用いて組み立て直す",
+      )
+    for side in ("machine_features_a", "machine_features_b"):
+      features = document.get(side)
+      if not isinstance(features, dict) or not (
+        set(features) <= set(MACHINE_FEATURE_ALLOWLIST)
+      ):
+        block(
+          f"{side}にallowlist外のfieldが含まれる",
+          "build_machine_featuresだけを用いて組み立て直す",
+        )
 
   for fragment in (payload.fragment_a, payload.fragment_b):
     try:
