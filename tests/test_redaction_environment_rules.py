@@ -111,6 +111,21 @@ def test_e7_pattern_rules_redact_their_targets():
         assert "[REDACTED:%s]" % label in result.text, label
 
 
+def test_e9_digesting_resolved_rules_does_not_leak_the_value():
+    """反証レビューで成立した漏れ（解決済み規則をdigestへ渡す誤用）を塞ぐ。
+
+    解決済み規則はpatternに実値を含むため、誤って渡された場合でもdigestの入力は
+    役割名だけになる。
+    """
+
+    resolved = redaction.resolve_environment_rules(_environment_rules())
+    payload = redaction.redaction_rules_digest_payload(resolved, allow_patterns=())
+    home = str(Path.home())
+    assert home not in payload
+    assert Path.home().name not in payload
+    assert "home_directory" in payload
+
+
 def test_e8_application_order_is_deterministic():
     """同じ入力から同じ結果が出る（適用順序が決定的である）。"""
 

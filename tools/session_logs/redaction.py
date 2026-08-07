@@ -10,6 +10,7 @@ import hashlib
 import json
 import math
 import re
+import socket
 from pathlib import Path
 
 
@@ -36,6 +37,32 @@ class Rule:
 
 
 @dataclasses.dataclass(frozen=True)
+class EnvironmentRule:
+  """環境依存値の規則。実値を持たず、役割の名前だけを持つ。
+
+  実値を規則へ書くと、規則file自体が環境情報の記録になり、配置換えで当たらなくなった
+  うえ古い環境情報だけが残る。値は実行のたびに解決する。
+  """
+
+  label: str
+  environment_role: str
+  pattern: str = None
+
+
+@dataclasses.dataclass(frozen=True)
+class ResolvedEnvironmentRule:
+  """解決済みの環境規則。patternに実値を含むため、記録経路へ渡してはならない。
+
+  digest計算では役割名だけを使う（`redaction_rules_digest_payload`が種別で判別する）。
+  誤って解決済み規則を渡しても実値がdigestへ入らないようにするための型である。
+  """
+
+  label: str
+  pattern: str
+  environment_role: str
+
+
+@dataclasses.dataclass(frozen=True)
 class Finding:
   label: str
   count: int
@@ -55,22 +82,113 @@ class HighEntropyFinding:
   entropy: float
 
 
-def redaction_rules_digest(rules, *, allow_patterns=()) -> str:
-  payload = {
-    "rules": [
-      {
+DEFAULT_PATTERN_RULES = (
+  Rule(
+    label="email",
+    pattern=r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
+  ),
+  Rule(
+    label="bearer_token",
+    pattern=r"(?i)\bBearer\s+[A-Za-z0-9._~+/-]{16,}=*",
+  ),
+  Rule(
+    label="api_key_assignment",
+    pattern=(
+      r"(?i)\b(?:api[_-]?key|secret|token|password)\b\s*[=:]\s*"
+      r"[\"']?[A-Za-z0-9._~+/-]{12,}[\"']?"
+    ),
+  ),
+  Rule(
+    label="private_key_block",
+    pattern=r"-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----",
+  ),
+  Rule(
+    label="aws_access_key_id",
+    pattern=r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b",
+  ),
+)
+
+ENVIRONMENT_RULES = (
+  EnvironmentRule(label="home_directory", environment_role="home_directory"),
+  EnvironmentRule(label="user_name", environment_role="user_name"),
+  EnvironmentRule(label="host_name", environment_role="host_name"),
+)
+
+
+def default_pattern_rules() -> tuple:
+  """承認済みの初版pattern規則。網羅ではなく出発点である。"""
+
+  return DEFAULT_PATTERN_RULES
+
+
+def environment_reference_rules() -> tuple:
+  """環境依存参照の規則。役割名だけを持ち、実値は持たない。"""
+
+  return ENVIRONMENT_RULES
+
+
+def _resolve_environment_role(role) -> str:
+  if role == "home_directory":
+    return str(Path.home())
+  if role == "user_name":
+    return Path.home().name
+  if role == "host_name":
+    return socket.gethostname()
+  raise ValueError("unknown environment role")
+
+
+def resolve_environment_rules(rules) -> tuple:
+  """実行時に環境から値を解決し、patternを持つRuleへ変換する。
+
+  解決した値は戻り値の中にしか現れず、規則fileへは書き戻さない。
+  """
+
+  resolved = []
+  for rule in rules:
+    value = _resolve_environment_role(rule.environment_role)
+    if not value:
+      continue
+    resolved.append(ResolvedEnvironmentRule(
+      label=rule.label,
+      pattern=re.escape(value),
+      environment_role=rule.environment_role,
+    ))
+  # 長い値から先に消す。短い値（ユーザー名）が長い値（home path）の一部を
+  # 先に置換すると、結果が入力順に依存してしまう。
+  resolved.sort(key=lambda rule: len(rule.pattern), reverse=True)
+  return tuple(resolved)
+
+
+def redaction_rules_digest_payload(rules, *, allow_patterns=()) -> str:
+  """digestの入力を返す。環境依存規則は役割名だけを入れ、解決値を入れない。"""
+
+  entries = []
+  for rule in rules:
+    # 宣言済み規則も解決済み規則も、digestへ入れるのは役割名だけとする。
+    # 解決済みを誤って渡しても実値がdigestの入力にならない。
+    if isinstance(rule, (EnvironmentRule, ResolvedEnvironmentRule)):
+      entries.append({
         "label": rule.label,
-        "pattern": rule.pattern,
-      }
-      for rule in rules
-    ],
+        "environment_role": rule.environment_role,
+      })
+    else:
+      entries.append({"label": rule.label, "pattern": rule.pattern})
+  payload = {
+    "rules": entries,
     "allow_patterns": list(allow_patterns),
   }
-  encoded = json.dumps(
+  return json.dumps(
     payload,
     ensure_ascii=False,
     sort_keys=True,
     separators=(",", ":"),
+  )
+
+
+def redaction_rules_digest(rules, *, allow_patterns=()) -> str:
+  encoded = redaction_rules_digest_payload(
+    rules,
+    allow_patterns=allow_patterns,
   ).encode("utf-8")
   return hashlib.sha256(encoded).hexdigest()
 
@@ -128,6 +246,32 @@ def redact_text_strict(text, rules, *, allow_patterns=()) -> RedactionResult:
   if remaining:
     raise SensitiveDataRemaining(remaining)
   return result
+
+
+def redact_with_environment(
+  text,
+  *,
+  pattern_rules=None,
+  environment_rules=None,
+  allow_patterns=(),
+  strict=False,
+) -> RedactionResult:
+  """環境依存参照とpattern規則を決定的な順序で適用する。
+
+  順序は(1)環境依存参照（長い値から先に）、(2)pattern規則、(3)strictなら高entropy網。
+  置換先には役割名・labelだけが出るため、実値は結果テキストへ残らない。
+  """
+
+  resolved = resolve_environment_rules(
+    environment_rules if environment_rules is not None else ENVIRONMENT_RULES
+  )
+  patterns = (
+    pattern_rules if pattern_rules is not None else DEFAULT_PATTERN_RULES
+  )
+  ordered = tuple(resolved) + tuple(patterns)
+  if strict:
+    return redact_text_strict(text, ordered, allow_patterns=allow_patterns)
+  return redact_text(text, ordered)
 
 
 def write_sensitive_report(path, error, *, source_path):
