@@ -1,0 +1,78 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-WORK4B-B-REUSE-SEARCH-FRESHNESS-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T13:20:00+09:00",
+  "proposal": {
+    "path": "records/development/2026-08-07-work4b-main-design-bundle-approval-decision-v1.md",
+    "sha256": "6bbaea795f7280f006dce2834b0286bb7df0b1cdb05b12918d2ce7574c27bf5e",
+    "declaration_section": "設計束§3（構成B）から展開した規範宣言F1〜F4",
+    "approval_decision": "DEC-WORK4B-MAIN-DESIGN-BUNDLE-001"
+  },
+  "purpose": "実装開始前にF1〜F4それぞれへREDを結び、「testの無いF」が0件であることを恒久検査器で数える。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（freshness機能が未実装のため、対象testは失敗する）。",
+    "機械照合はtools/development/declaration_red_map_check.pyのcheck_declaration_red_mapで実施した。"
+  ],
+  "test_files": {
+    "tests/test_reuse_search_freshness.py": [
+      "test_f1_record_carries_machine_assessed_freshness",
+      "test_f2_gate_stops_when_an_observed_file_changed",
+      "test_f3_gate_stops_when_a_new_file_appears_in_range",
+      "test_f4_gate_allows_when_range_is_unchanged_and_v1_records_keep_validating"
+    ]
+  },
+  "declarations": {
+    "F1": {
+      "summary": "検索record（schema 2）は生成時に機械計測したfreshness欄（観測snapshot、変更・新規fileの有無、stale判定）を持つ",
+      "tests": [
+        {
+          "test": "tests/test_reuse_search_freshness.py::test_f1_record_carries_machine_assessed_freshness",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "F2": {
+      "summary": "対象範囲のfileが観測後に変更されている場合、gateはprofile_staleで開始不可を返す（閾値：変更1件で停止）",
+      "tests": [
+        {
+          "test": "tests/test_reuse_search_freshness.py::test_f2_gate_stops_when_an_observed_file_changed",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "F3": {
+      "summary": "対象範囲に観測に無い新規fileが現れた場合も、gateはprofile_staleで開始不可を返す",
+      "tests": [
+        {
+          "test": "tests/test_reuse_search_freshness.py::test_f3_gate_stops_when_a_new_file_appears_in_range",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "F4": {
+      "summary": "乖離が無ければgateは開始可を返し、schema 1の既存recordは版固定のまま検証・gate通過できる（freshnessはnot_assessedと明示）",
+      "tests": [
+        {
+          "test": "tests/test_reuse_search_freshness.py::test_f4_gate_allows_when_range_is_unchanged_and_v1_records_keep_validating",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": {
+    "checker": "tools/development/declaration_red_map_check.py",
+    "status": "passed",
+    "machine_count": {
+      "declarations": 4,
+      "declarations_without_tests": 0,
+      "listed_tests_missing_in_file": 0,
+      "tests_unmapped_to_declarations": 0
+    }
+  }
+}
