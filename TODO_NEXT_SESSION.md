@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：**B（Human答え合わせ）が完了した**。最終判定はsame 48／partial 0／different 11。A1との一致は50/59（約85%）で、不一致9組は全て判定基準の未定義が原因（コード誤読は0件）。判定基準が確定：そのままの置き換え可能性で決める統一定義（partialは片方向包含に限定）、使われ方調査＋所見提示の手順、統合の効果基準、役割・契約の観点。統合の本命はsame 48組の逐語重複系統（SHA-256×7file、fail-closed例外×7file等）。
+- 現在作業：**A1'（基準v2明示の再判定）が完了した**。正解Bとの一致は54/59（92%。初回A1は85%）。基準明示だけで不一致9組中8組が解消し、誤読は今回も0件。残る5組は単一論点「例外クラス名を〈名前が契約〉に含めるか」に集中し、判定者間でも解釈が割れた（Human自身の#54〜56裁定と#10裁定の適用範囲の問題）。方式の限界でなく基準の精密さが精度を決める構図。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,7 @@
 
 ## 最新のauthority／Evidence
 
+- [A1'再判定・方式比較record](records/development/2026-08-08-egress-a1prime-comparison-v1.md) — SHA-256 `18aff58ee76c1c299185d729cb3a022647e575edeca767ad2dd90f860da0f666`
 - [B結果・基準Decision](records/development/2026-08-08-egress-b-check-decision-v1.md) — SHA-256 `40530e41f407a231d3e1cc96bf7c9fdeac49208e30fc25cde78846b1a61ba917`
 - [A1判定record（59組）](records/development/2026-08-08-egress-a1-subagent-judgment-v1.md) — SHA-256 `2f8dda0d443666a2512bca5207bd0573f5667b190507224413420e8032ba8ef3`
 - [反証レビュー結果（出口関門）](records/development/2026-08-07-egress-adversarial-review-v1.md) — SHA-256 `b0a3ad899bd2f3ef6d010a572e5cad7f3d48a9ea5a82638ba40f109efa87d09a`
@@ -55,7 +56,7 @@
 
 ## 次に行う一作業
 
-Human判断を受けて分岐する：(a) A2（外部API比較）を行うなら段階3（承認record正式schema化。確定済みの判定基準を審査基準へ明記）から着手。(b) 統合を進めるなら評価②（文脈依存の統合可否）の定義を起草し、same 48組の逐語重複系統を候補として扱う。(a)(b)の順序もHuman判断。
+Human裁定2件を受けて分岐：(1) **例外クラス名は「名前が契約」に含めるか**（A1'比較record §3。基準v2最後の未定義点）。(2) **A2（外部API比較）の要否**——A1'92%・誤読0件を踏まえ、系列独立の判定に残る価値を見るか。実施なら段階3から。統合（評価②定義）の着手順序も合わせて判断。
 
 開始条件：
 
@@ -63,14 +64,14 @@ Human判断を受けて分岐する：(a) A2（外部API比較）を行うなら
 
 完了条件：
 
-- Human判断（A2要否・統合候補の扱い・順序）が記録されること
+- Human裁定（例外名の契約性・A2要否・順序）が記録されること
 
 後続作業：段階3（承認record形式の正式schema化。反証I-6の真正性担保を含む）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：A2（外部API比較）の要否と、統合候補（same 48組の系統）の扱い・着手順序。
+- Human判断待ち：例外クラス名の契約性の裁定、A2要否、統合の着手順序。
 - 継続する留意点：背景調査の不足が累計5件、さらに本調査で6件目の未遂があった（配備先コピーを最新と誤認し、開発元の存在をHuman指摘で知った）。規律を三段で持つ：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認の範囲は「記録が指す先」まで (3)**指された物が写しなら原本（開発元）まで遡り、鮮度（最終commit日）を確認してから状態を断定する**。
 
 ## stale・deferred
