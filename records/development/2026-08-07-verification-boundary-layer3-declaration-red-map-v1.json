@@ -1,0 +1,93 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-VERIFICATION-BOUNDARY-LAYER3-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T17:30:16+09:00",
+  "scope": {
+    "kind": "complete"
+  },
+  "proposal": {
+    "path": "records/development/2026-08-07-verification-boundary-approval-decision-v1.md",
+    "sha256": "2aa6157a503b7aef1cc03f21a98abb476f46a8b2b27955d8a2b2c9782f5adb8d",
+    "declaration_section": "層3（機械は保証しない。明示してHumanが担う）",
+    "approval_decision": "DEC-VERIFICATION-BOUNDARY-001"
+  },
+  "purpose": "検証していない箇所を機械可読な宣言として固定し、宣言と実装の対応が崩れたら検出できるようにする。黙って通すのではなく、検証していないと表示する。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（宣言moduleが未実装のため）。",
+    "静的検査と実行照合の両方をtools/development/declaration_red_map_check.pyで実施した（DEC-RED-VERIFICATION-ADOPTION-001）。"
+  ],
+  "test_files": {
+    "tests/test_verification_boundary_layer3.py": [
+      "test_z1_declaration_lists_every_unverified_field",
+      "test_z2_each_entry_states_who_carries_it",
+      "test_z3_declared_targets_exist_in_the_repository",
+      "test_z4_host_boundary_is_declared_as_design_not_defect",
+      "test_z5_free_text_entries_are_marked_as_unverifiable_prose",
+      "test_z6_declaration_is_reachable_from_the_review_protocol"
+    ]
+  },
+  "declarations": {
+    "Z1": {
+      "summary": "層3の全7項目（O-2、O-3、O-4、I-1、I-2-text、P-1、C-2-meaning）が宣言に載る",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer3.py::test_z1_declaration_lists_every_unverified_field",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Z2": {
+      "summary": "各項目は、対象record種別・field・機械が保証しない理由・担い手を持つ",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer3.py::test_z2_each_entry_states_who_carries_it",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Z3": {
+      "summary": "宣言が指すrecord種別とfieldは実在の形式と対応し、解決できない参照は0件である",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer3.py::test_z3_declared_targets_exist_in_the_repository",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Z4": {
+      "summary": "host権限の自己申告は欠陥ではなく設計どおりの境界であると明示し、根拠Decisionを持つ（反証O-2・O-3）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer3.py::test_z4_host_boundary_is_declared_as_design_not_defect",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Z5": {
+      "summary": "自由文の項目は機械では真偽を判定できないと明示し、担い手をHumanとする（反証O-4・I-1・I-2・P-1・C-2）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer3.py::test_z5_free_text_entries_are_marked_as_unverifiable_prose",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Z6": {
+      "summary": "レビュー手順書から宣言へ辿れる（人が確認すべき対象として見える）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer3.py::test_z6_declaration_is_reachable_from_the_review_protocol",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  }
+}

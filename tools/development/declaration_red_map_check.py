@@ -48,6 +48,33 @@ def _result(status, findings, machine_count, red_verification=None):
 _OUTCOME_LINE = re.compile(
     r"^(?P<outcome>PASSED|FAILED|ERROR|SKIPPED)\s+(?P<node>\S+::\S+)"
 )
+_COLLECTION_ERROR_LINE = re.compile(r"^ERROR\s+(?P<file>\S+\.py)\s*$")
+
+
+def parse_pytest_outcomes(output, *, node_ids):
+    """pytestの報告からnode idごとの結果を読む。
+
+    収集エラー（ImportErrorなど）ではtest単位の行が出ないため、そのfileに属する
+    node idをすべてerrorとして扱う。実装未着手のREDを`unknown`と取り違えない。
+    """
+
+    outcomes = {}
+    failed_files = set()
+    for line in output.splitlines():
+        stripped = line.strip()
+        matched = _OUTCOME_LINE.match(stripped)
+        if matched:
+            outcomes[matched.group("node")] = matched.group("outcome").lower()
+            continue
+        collection = _COLLECTION_ERROR_LINE.match(stripped)
+        if collection:
+            failed_files.add(collection.group("file"))
+    for node_id in node_ids:
+        if node_id in outcomes:
+            continue
+        if node_id.split("::", 1)[0] in failed_files:
+            outcomes[node_id] = "error"
+    return outcomes
 
 
 def pytest_runner(node_ids, *, project_root):
@@ -61,12 +88,7 @@ def pytest_runner(node_ids, *, project_root):
         capture_output=True,
         text=True,
     )
-    outcomes = {}
-    for line in completed.stdout.splitlines():
-        matched = _OUTCOME_LINE.match(line.strip())
-        if matched:
-            outcomes[matched.group("node")] = matched.group("outcome").lower()
-    return outcomes
+    return parse_pytest_outcomes(completed.stdout, node_ids=sorted(node_ids))
 
 
 def _verify_red_claims(*, declarations, project_root, runner):
