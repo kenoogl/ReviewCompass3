@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "redaction-rules/environment-reference",
+  "external": {
+    "relative_path": "work4b/reuse-searches/3ec17ed9ff9edbaaa4930fefea6f5f0335e88ce95ef61410fc21c5e79020faa7.json",
+    "content_digest": "3ec17ed9ff9edbaaa4930fefea6f5f0335e88ce95ef61410fc21c5e79020faa7",
+    "byte_sha256": "a3ab273a451dd3f3f6251e0eb845e8380a6e507a7da270ee15c50db22ec37265"
+  },
+  "source_identity": {
+    "profile_run_id": "330e0cf73366f5625b3e042b136eee66384cb4787a64caddaa78672cfafcd5a1",
+    "discovery_run_id": "bfa30a6ec50330bfb82750e43c7d4bf950a6b07df53271358513b8af8545d9ff",
+    "source_content_id": "57ebd77690a3150796eeb6442e5efca1a5e528eb1d89e68a43a08bb948a6fc59",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 951,
+  "content_digest": "40d2ed97a4e4c02ba90adf8d43f0af26e6823994b0e04b79d2ca3d36e59fc2f8"
+}
