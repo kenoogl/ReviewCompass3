@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：**評価②提案v2がHuman承認された**（`DEC-CONSOLIDATION-EVAL2-APPROVAL-001`。判断点4件＝定義・手順8段・挙動不変の原則・着手順A→B→C）。統合の実施は系統ごとに手順4でHumanが判断する。次は系統A（SHA-256計算、7file逐語重複）の手順1〜3：照合・使われ方とテスト参照の実測・統合案と効果見積りの提示。
+- 現在作業：系統Aの材料一式（手順1〜3）を固定し、**手順4のHuman判断待ち**。実測の要点：7関数は2行の逐語同一・呼び出し31か所はmodule内のみ・**テストからの直接参照0件**（既存テスト無修正で通る）・守り役4/7・凍結symbolとの同居1file（差分不可侵を実施条件に）。**効果は正直に中立**（−14+7+約10行）で、単独実施は効果基準を満たさない所見。選択肢はア（A単独）／イ（C系統と合流しdigest系として一括）／ウ（見送り）。テスト側の`_sha256`自前定義**14件**を発見し、改善候補としてトリアージ待ち。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,7 @@
 
 ## 最新のauthority／Evidence
 
+- [系統A 統合判断の材料](records/development/2026-08-08-consolidation-family-a-materials-v1.md) — SHA-256 `502f8f643989664afb734752e18432e93dd8b91da7705dd4cc480480ec86df3a`
 - [評価②提案v2 承認Decision](records/development/2026-08-08-consolidation-eval2-approval-decision-v1.md) — SHA-256 `2726c4f435f3fb31e22b7f5468a627a2b615ee4da7bb02c28bf9ce4b0854f173`
 - [評価②提案v2（承認済み）](docs/design/2026-08-08-consolidation-evaluation2-proposal-v2.md) — SHA-256 `967dd4cae74a0229a90a61df29ceff9c3f91aa6bd2a2be434da9f401196cbfe8`
 - [経緯と結論Decision（A2中止・統合へ）](records/development/2026-08-08-egress-method-conclusion-decision-v1.md) — SHA-256 `d9228be3ec17db82fbed694e7a6bf05b8a5d6fae52ff2353aad39aeac27dc6fc`
@@ -60,22 +61,22 @@
 
 ## 次に行う一作業
 
-系統A（SHA-256計算、7file）の手順1〜3を実施する：①統合除外・凍結レーン・守り役とのprefix照合 ②呼び出し箇所・テスト直接参照・テスト重複の機械集計 ③統合案（共通module案・alias要否・削減行数の機械集計・保証への所見）の提示。手順4のHuman承認に足る材料一式を出す。
+Humanの手順4判断（系統A：ア＝単独実施／イ＝C系統と合流してdigest系一括の再提示／ウ＝見送り）と、テスト重複14件の改善候補トリアージを受けて、決定どおりに進める。イならA+C合流の材料を作り直して再提示、アなら共通module名の決定を受けてTDD実施へ。
 
 開始条件：
 
-- Humanの着手指示
+- Humanの手順4判断（ア／イ／ウ）
 
 完了条件：
 
-- 系統Aの材料一式（照合・実測・統合案）が提示され、手順4のHuman判断に付されること
+- 判断がrecordに固定され、次の実作業（実施またはB系統へ移行）が確定すること
 
 後続作業：段階3（承認record形式の正式schema化。反証I-6の真正性担保を含む）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：なし。次作業（系統Aの材料づくり）の着手指示を待つ。
+- Human判断待ち：系統Aの手順4判断（ア／イ／ウ）とテスト重複14件のトリアージ。
 - 継続する留意点：背景調査の不足が累計5件、さらに本調査で6件目の未遂があった（配備先コピーを最新と誤認し、開発元の存在をHuman指摘で知った）。規律を三段で持つ：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認の範囲は「記録が指す先」まで (3)**指された物が写しなら原本（開発元）まで遡り、鮮度（最終commit日）を確認してから状態を断定する**。
 
 ## stale・deferred
