@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：v4確認済み（Human「次へ」）を受け、**段階1「出口関門つき送信係」のTDD実装が完了した**。`tools/egress/`に事前分類・3種payload・承認record検証・関門（条件1〜6・8、fail-closed）・段階1送信係（関門合格でも送信は型として不可能）を新規実装。RED→GREENの2巡、全suite 1196 passed。条件7・9は送信を持つ段階4の対象。伏字化hookは規則未登録のため未結線（gateは未結線を拒否する状態が現在の正）。
+- 現在作業：段階1実装の**反証レビューが完了した**。的中1件（I-1：digestと内容の結線が無く、承認済みdigestを名乗る改ざん内容が通過）を発見し処置済み。多層化2件（allowlist再検査・定型文一致検査）を追加。I-6（承認recordの真正性＝Humanが本当に書いたかの担保）は段階3の設計事項として持ち越し。全suite 1201 passed。伏字化hookは規則未登録のため未結線（gateは未結線を拒否する状態が現在の正）。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,7 @@
 
 ## 最新のauthority／Evidence
 
+- [反証レビュー結果（出口関門）](records/development/2026-08-07-egress-adversarial-review-v1.md) — SHA-256 `b0a3ad899bd2f3ef6d010a572e5cad7f3d48a9ea5a82638ba40f109efa87d09a`
 - [段階1 GREEN Evidence](records/development/2026-08-07-egress-stage1-green-evidence-v1.md) — SHA-256 `ba75438bb22815783b6f5a52cae9f842b1672a5816fa8d52feb678664fb5f081`
 - [出口の設計提案v4（確認済み）](docs/design/2026-08-07-external-egress-gate-proposal-v4.md) — SHA-256 `3a82b3973f8abc947782c4bbf8e2d54713043e8e8591a543089a5824c57bcacd`
 - [判断点8件のHuman判断Decision](records/development/2026-08-07-egress-gate-v3-judgments-decision-v1.md) — SHA-256 `7f7741eeb840307af115a23d525abafd1ac3e509ff7d3191ab2c798f40abc08a`
@@ -52,7 +53,7 @@
 
 ## 次に行う一作業
 
-段階1実装の**反証レビュー**。`tools/egress/`は不可逆な外部送信を制御する守り役codeであり`work-review-protocol` §3の既定`high`。v4 §10の6観点（構成規則の迂回、allowlist外の自由文、一覧外payload、目録偽造、排他claim回避、`runner`迂回の直接送信）で反証を新作し、発見があれば処置してEvidence固定する。
+段階2「dry-run」の実装（TDD）。上位20 groupへ事前分類を実データで適用し、曖昧な組のpayload一式（各payloadと一覧のSHA-256付き）をHumanが目視できる形で組み立てて出力する。送信機能は含まない。出力を見て「外部判定が要る／この規模ならHumanが直接見る」を実物を根拠に再判断する（v4 §8）。
 
 開始条件：
 
@@ -60,14 +61,14 @@
 
 完了条件：
 
-- 反証レビュー結果のrecord固定（発見と処置を含む）。段階2（dry-run）へ進める状態
+- dry-run出力（曖昧組のpayload一式）が生成され、Human目視に付されること
 
-後続作業：段階2（dry-run、曖昧59組のpayload一式組み立てとHuman目視。外部判定の要否をここで実物を根拠に再判断）→段階3（承認record形式の正式schema化）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
+後続作業：段階3（承認record形式の正式schema化。反証I-6の真正性担保を含む）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：なし。次作業（反証レビュー）の着手指示を待つ。
+- Human判断待ち：なし。次作業（段階2 dry-run）の着手指示を待つ。
 - 継続する留意点：背景調査の不足が累計5件、さらに本調査で6件目の未遂があった（配備先コピーを最新と誤認し、開発元の存在をHuman指摘で知った）。規律を三段で持つ：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認の範囲は「記録が指す先」まで (3)**指された物が写しなら原本（開発元）まで遡り、鮮度（最終commit日）を確認してから状態を断定する**。
 
 ## stale・deferred
@@ -81,8 +82,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：egress新規56 passed（RED→GREEN 2巡）
-- 直近の全Test：venv pytest 1196 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：egress計61 passed（反証5件を含む。的中1件は処置済み）
+- 直近の全Test：venv pytest 1201 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
