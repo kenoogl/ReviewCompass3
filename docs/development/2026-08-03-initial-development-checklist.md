@@ -1018,7 +1018,8 @@ Intake V4対応表に実在所見2件——処置はHuman判断待ち）。公�
 helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`as_is`）つきで記録して
 完了へ戻した。Evidenceは
 `records/development/2026-08-07-work4b-d-ledger-first-operation-evidence-v1.md`。
-**Work 5Bの段完了ではない。** 段完了はHuman判断とする。
+2026-08-07、全6項目のEvidence接続を前提にHumanがWork 5Bの**段完了を承認した**
+（`DEC-FOUR-RULINGS-2026-08-07-001`裁定3）。Work 5Bは`verified / completed`である。
 
 ## 11. Work 7A：`local_integrated` deployment E2E
 
