@@ -1,0 +1,83 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-WORK4B-A1-INTEGRATION-EXCLUSIONS-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T12:57:15+09:00",
+  "proposal": {
+    "path": "records/development/2026-08-07-integration-exclusion-entries-decision-v1.md",
+    "sha256": "f2b415e4cc59a9e1481d727f158a83eb2016f921262451f30eb29e4c02ffd043",
+    "declaration_section": "承認entry 3件と設計束§2から展開した規範宣言X1〜X4",
+    "approval_decision": "DEC-INTEGRATION-EXCLUSION-ENTRIES-001"
+  },
+  "purpose": "実装開始前にX1〜X4それぞれへREDを結び、「testの無いX」が0件であることを機械で数える。照合は恒久検査器declaration_red_map_check.pyによる（その場AST照合の置き換え後、最初の新規map）。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（対象module tools/development/integration_exclusions.py が未実装のため）。",
+    "機械照合はtools/development/declaration_red_map_check.pyのcheck_declaration_red_mapで実施した。"
+  ],
+  "test_files": {
+    "tests/test_integration_exclusions.py": [
+      "test_x1_rejects_unknown_reason_kind",
+      "test_x1_valid_record_validates",
+      "test_x2_rejects_missing_approval_and_refuses_overwrite",
+      "test_x3_symbol_matching_is_deterministic",
+      "test_x4_load_fails_closed_on_missing_or_invalid_file"
+    ]
+  },
+  "declarations": {
+    "X1": {
+      "summary": "除外宣言recordは必須field（entry、理由種別、根拠参照）を持ち、語彙外の理由種別を拒否する",
+      "tests": [
+        {
+          "test": "tests/test_integration_exclusions.py::test_x1_valid_record_validates",
+          "red_now": true
+        },
+        {
+          "test": "tests/test_integration_exclusions.py::test_x1_rejects_unknown_reason_kind",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "X2": {
+      "summary": "recordは承認Decision参照なしを拒否し、new-onlyで既存fileへの上書きを拒否する",
+      "tests": [
+        {
+          "test": "tests/test_integration_exclusions.py::test_x2_rejects_missing_approval_and_refuses_overwrite",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "X3": {
+      "summary": "除外判定はsymbol接頭・module pathの一致で決定的に該当entryを返し、非該当は空を返す",
+      "tests": [
+        {
+          "test": "tests/test_integration_exclusions.py::test_x3_symbol_matching_is_deterministic",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "X4": {
+      "summary": "宣言recordの欠落・解析不能のとき、読み込みはfail-closedでerrorを返す（黙って「宣言なし」にしない）",
+      "tests": [
+        {
+          "test": "tests/test_integration_exclusions.py::test_x4_load_fails_closed_on_missing_or_invalid_file",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": {
+    "checker": "tools/development/declaration_red_map_check.py",
+    "status": "passed",
+    "machine_count": {
+      "declarations": 4,
+      "declarations_without_tests": 0,
+      "listed_tests_missing_in_file": 0,
+      "tests_unmapped_to_declarations": 0
+    }
+  }
+}
