@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：反証レビュー第1束が完了した。25件試して21件成立（新module 12/14、routing・Intake 9/11）。うち9件を機械修正済み（範囲一致、証明書の記述照合、根拠参照の解決、除外宣言の事前検証、test使い回し拒否、双方向一致、Issue本文の候補束縛）。残り11件は性質上の分類を経て[検証境界の設計提案](docs/design/2026-08-07-verification-boundary-proposal.md)へまとめ、Human承認待ちである。修正のたびにstale再検査を実施し、対応表・除外宣言・順位表・Issue全件の再検証を通した。
+- 現在作業：**検証境界の三層すべてが完了した**。反証レビュー第1束の21件は、9件を第1次修正、8件を層1（機械が保証する）・層2（機械が支援する）で機械化、7項目を層3（機械は保証しない）で明示、という形ですべて処置済み。層1にはC-4（関門が名のとおりREDを確認するようになった）を含む。層2は「安全保証ではなく誤記検出」を機械可読に宣言。層3は`tools/development/verification_boundary.py`で「合格＝検証対象外」を明示し、レビュー手順書から導線を張った。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,7 +18,10 @@
 
 ## 最新のauthority／Evidence
 
-- [検証境界の設計提案（承認待ち）](docs/design/2026-08-07-verification-boundary-proposal.md) — SHA-256 `f904e995003f30d9b7bf92555ac390649b4b084f232d9bc50fac341af6a4f4cb`
+- [層3 GREEN Evidence](records/development/2026-08-07-verification-boundary-layer3-green-evidence-v1.md) — SHA-256 `4ed47b951ee9ccb8b28389a53ba91414cdf0d38f2eb9d4f3fb383118fc833722`
+- [層2 GREEN Evidence](records/development/2026-08-07-verification-boundary-layer2-green-evidence-v1.md) — SHA-256 `dc8a83595c67077460793eb435e8aa65b38623a237ea2d905310a7ed364f18cf`
+- [層1 GREEN Evidence](records/development/2026-08-07-verification-boundary-layer1-green-evidence-v1.md) — SHA-256 `baff96b87dd17f52da622f9d984b8836a3cb22922044c987a15ac9c56af71c65`
+- [検証境界の設計提案（承認済み）](docs/design/2026-08-07-verification-boundary-proposal.md) — SHA-256 `f904e995003f30d9b7bf92555ac390649b4b084f232d9bc50fac341af6a4f4cb`
 - [反証レビュー結果（新module 4件）](records/development/2026-08-07-adversarial-review-batch1-new-modules-v1.md) — SHA-256 `2558dd841712d24596ba79513b4e16da6edc0c236ca18d1537d660b72d6df94c`
 - [反証レビュー結果（routing・Intake）](records/development/2026-08-07-adversarial-review-batch1-legacy-systems-v1.md) — SHA-256 `b6221cfbf2c1d8b220e0a0fe7087218551bbfed96303b777f3b461a9bcf0900d`
 - [I-4処置 GREEN Evidence](records/development/2026-08-07-adversarial-remedy-i4-green-evidence-v1.md) — SHA-256 `fad332129fc7c2cbc84f7cacc1788ff1178ab9a3913e01fc3a461a4297fb7ec1`
@@ -39,22 +42,22 @@
 
 ## 次に行う一作業
 
-検証境界の設計提案（三層の枠組みと11件の割り当て）のHuman承認を得る。承認後、実装順どおり層1のC-4（`red_now`の実行照合。関門の名がREDでありながらREDを一度も確認していない問題）から着手する。
+反証レビュー第2束：stage期module群（`tools/session_logs/`の伏字化・秘匿検出系ほか）への反証レビュー。トリアージメモ§6の優先度案では、守り役でありながら一度もレビューされていない最後の大きな塊である。まず対象moduleの絞り込み（伏字化・秘匿検出に該当する部分の特定）から始める。
 
 開始条件：
 
-- 提案§7の4判断点（枠組み、層への割り当て、実装順、層2の位置づけ）のHuman裁定
+- Humanの着手承認（`ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`の範囲内だが、第2束の着手は未承認）
 
 完了条件：
 
-- 承認された割り当てに従い、層1の各件が確立済み関門（再観測→検索gate→宣言→RED対応表→RED→GREEN→stale再検査）を通ること
+- 対象ごとに反証レビューの結果record（欠陥または反証不成立）が固定されること。修正はレビューと分離する
 
-後続作業：層2・層3、反証レビュー第2束（stage期module群）、合意順序④（RC2取り込み、外部APIレビュー）。
+後続作業：合意順序④（RC2資産の取り込み、外部APIによる独立レビュー）。層3で「Humanが担う」と宣言した項目の確認設計はWork 8の評価対象。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：検証境界の設計提案（§7の4判断点）。保留1件=検査器の検索record旧位置はContract v2化の際に削除判断へ戻す。
+- Human判断待ち：反証レビュー第2束（stage期module群）の着手承認。
 
 ## stale・deferred
 
@@ -67,8 +70,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：反証処置 9 passed（宣言M1〜M8）＋I-4処置 3 passed（宣言N1〜N3）
-- 直近の全Test：venv pytest 1096 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：層1 9 passed＋層2 11 passed＋層3 6 passed＋収集エラー補修 3 passed
+- 直近の全Test：venv pytest 1131 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
