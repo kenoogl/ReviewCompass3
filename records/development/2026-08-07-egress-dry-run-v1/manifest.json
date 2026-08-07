@@ -1,0 +1,365 @@
+{
+ "band_counts": {
+  "ambiguous": 59,
+  "clearly_diff": 1169,
+  "clearly_same": 187
+ },
+ "entries": [
+  {
+   "digest": "1ba3403c67ae174ef1eb7cfcff21d8580ba7b6c96dda0b75b9338fc4dcd08f66",
+   "similarity": 0.5,
+   "symbol_a": "tools/development/work4a_rebuild_v3.py:Continuity",
+   "symbol_b": "tools/development/work4a_rebuild_v3.py:CurrentState"
+  },
+  {
+   "digest": "a76ea62afbbd28e714e9089952872d3798effdc5b4e3166aa2b5de717eed44e0",
+   "similarity": 0.629,
+   "symbol_a": "tools/development/work4a_rebuild_v3.py:Policy",
+   "symbol_b": "tools/development/work4a_rebuild_v3.py:Universe"
+  },
+  {
+   "digest": "8f0870ef50181943281eb157af12c7f932c8c48b3f2cb0ab42f6b2a85abb3124",
+   "similarity": 0.848,
+   "symbol_a": "tools/extraction/batch_reassessment.py:BatchReassessmentResult",
+   "symbol_b": "tools/extraction/reassessment.py:ReassessmentResult"
+  },
+  {
+   "digest": "eb8fbe58713e8be007dfbb9a60e810ff7ca7ad39d207a4f73f727bfd1bde502b",
+   "similarity": 0.729,
+   "symbol_a": "tools/requirements/source_trace.py:ObligationSourceTrace",
+   "symbol_b": "tools/requirements/source_trace.py:RequirementSourceTrace"
+  },
+  {
+   "digest": "f902a31d157e990c3bcece310c0a89661fb4e6445ebe83d0e4a4c788a1136660",
+   "similarity": 0.767,
+   "symbol_a": "tools/session_logs/deployment_lifecycle.py:DeploymentLifecycleResult",
+   "symbol_b": "tools/session_logs/limited_deployment.py:LimitedDeploymentResult"
+  },
+  {
+   "digest": "a04b5394806a4504934b154ab6f4c99c1ff46ffc0bbb32f6ac88cd65f2457f25",
+   "similarity": 0.481,
+   "symbol_a": "tools/bootstrap/review_execution.py:ReviewExecution",
+   "symbol_b": "tools/bootstrap/review_triage.py:ReviewTriage"
+  },
+  {
+   "digest": "1dbcf6796fbbe0dad49db1c9c05bd747e27e04643f960fd3c5cc68980f59b0ce",
+   "similarity": 0.487,
+   "symbol_a": "tools/bootstrap/stage_one_gate.py:StageOneAudit",
+   "symbol_b": "tools/extraction/stage_two_audit.py:StageTwoAudit"
+  },
+  {
+   "digest": "6d5cd98eada86f9e5e0bb3dc8077fcc66e04e92280628d3b3c332a5297de0ac2",
+   "similarity": 0.563,
+   "symbol_a": "tools/bootstrap/stage_one_gate.py:StageOneAudit",
+   "symbol_b": "tools/session_logs/stage_gate.py:StageGateResult"
+  },
+  {
+   "digest": "9fff8caf5e8cc5e6e8e6794b2eaf92c3250284ef6e5719962bcb4a66d7b64b5a",
+   "similarity": 0.791,
+   "symbol_a": "tools/requirements/source_trace.py:ObligationSourceRecord",
+   "symbol_b": "tools/requirements/source_trace.py:RequirementSourceRecord"
+  },
+  {
+   "digest": "65119c189785fb2a27db0e937da5c07225d47ea1f788661e9e006f1feb142e9f",
+   "similarity": 0.457,
+   "symbol_a": "tools/session_logs/deployment_paths.py:DeploymentPaths",
+   "symbol_b": "tools/session_logs/deployment_paths.py:_BuiltinPlatformDirs"
+  },
+  {
+   "digest": "982111e80d5d85445b7d80df831dc9c96c0122ff1a3a878d994a93009c05d4fc",
+   "similarity": 0.636,
+   "symbol_a": "tools/session_logs/parse_claude.py:ToolCall",
+   "symbol_b": "tools/session_logs/parse_claude.py:ToolResult"
+  },
+  {
+   "digest": "495c8b94fb831891e86ffe87e1effa7991f7e732c07ac16915fb1479f840bbe2",
+   "similarity": 0.532,
+   "symbol_a": "tools/bootstrap/raw_review_store.py:RawReviewRecord",
+   "symbol_b": "tools/bootstrap/review_response_parser.py:ParsedReview"
+  },
+  {
+   "digest": "cfe3538ce3b845c2ee56e8b32139e198c265f79f1458375e5e8992c67c233815",
+   "similarity": 0.6,
+   "symbol_a": "tools/development/bootstrap_environment.py:_sha256",
+   "symbol_b": "tools/development/issue_resolution_pilot.py:_sha256_bytes"
+  },
+  {
+   "digest": "46aae22ff9b858dd4d4b55f1592d4038f9708e3a3f316e6e87b744d250550a4b",
+   "similarity": 0.76,
+   "symbol_a": "tools/development/bootstrap_environment.py:_sha256",
+   "symbol_b": "tools/development/session_log_bootstrap.py:_sha256"
+  },
+  {
+   "digest": "6378f50d2d511d4626789b90adcd446810ca3f14856aea9937d425c5818b0f78",
+   "similarity": 0.76,
+   "symbol_a": "tools/development/bootstrap_environment.py:_sha256",
+   "symbol_b": "tools/session_logs/eventual_preservation.py:_sha256"
+  },
+  {
+   "digest": "51b1d057d1b733a3221270d1e6ca6b2b6e3cc90a085a4b4db3616ff80c9d8791",
+   "similarity": 0.6,
+   "symbol_a": "tools/development/issue_resolution_pilot.py:_sha256_bytes",
+   "symbol_b": "tools/development/issue_resolution_post_write.py:_sha256"
+  },
+  {
+   "digest": "9944fde085831f523110ffd64f804f223961efeb2f6c6e3f6597024ea4c75a2f",
+   "similarity": 0.6,
+   "symbol_a": "tools/development/issue_resolution_pilot.py:_sha256_bytes",
+   "symbol_b": "tools/development/session_log_bootstrap.py:_sha256"
+  },
+  {
+   "digest": "fa1d9c3210db3cd08914ae48d74dea006eb64e5fb33f5cebeeb2879e2de341ae",
+   "similarity": 0.6,
+   "symbol_a": "tools/development/issue_resolution_pilot.py:_sha256_bytes",
+   "symbol_b": "tools/development/todo_compaction.py:_sha256"
+  },
+  {
+   "digest": "07b6f5562a91955fe94d35211ab648a20c9fa6a656379e116433f6b7fbfde7f5",
+   "similarity": 0.6,
+   "symbol_a": "tools/development/issue_resolution_pilot.py:_sha256_bytes",
+   "symbol_b": "tools/development/todo_snapshot.py:_sha256"
+  },
+  {
+   "digest": "35269b32ced8f180121d1debb512a9a118bd1ddcea219a080300d3cc9064a450",
+   "similarity": 0.6,
+   "symbol_a": "tools/development/issue_resolution_pilot.py:_sha256_bytes",
+   "symbol_b": "tools/session_logs/eventual_preservation.py:_sha256"
+  },
+  {
+   "digest": "8b55ec30b5a8548d306e266bf390cf82c19260dd3416ee5d4d4c70e86cda2bfb",
+   "similarity": 0.76,
+   "symbol_a": "tools/development/issue_resolution_post_write.py:_sha256",
+   "symbol_b": "tools/development/session_log_bootstrap.py:_sha256"
+  },
+  {
+   "digest": "7e9b28c42d34b787c0d37a670d9bf7a6b8d60c50b6f1f2f4c416201b2926e5cf",
+   "similarity": 0.76,
+   "symbol_a": "tools/development/issue_resolution_post_write.py:_sha256",
+   "symbol_b": "tools/session_logs/eventual_preservation.py:_sha256"
+  },
+  {
+   "digest": "7b9419a10b50996b34863cd134477241ccc725f49673925660e1671b86eb7aba",
+   "similarity": 0.76,
+   "symbol_a": "tools/development/session_log_bootstrap.py:_sha256",
+   "symbol_b": "tools/development/todo_compaction.py:_sha256"
+  },
+  {
+   "digest": "771a40d8f831d856afa672790c0c0c2da93388a431b137fa17bdcf4607193d33",
+   "similarity": 0.76,
+   "symbol_a": "tools/development/session_log_bootstrap.py:_sha256",
+   "symbol_b": "tools/development/todo_snapshot.py:_sha256"
+  },
+  {
+   "digest": "611bfa62b31cd8dbe60cd0dac57e80f4c4c8d95a90f167839cd300bdf0425e53",
+   "similarity": 0.76,
+   "symbol_a": "tools/development/todo_compaction.py:_sha256",
+   "symbol_b": "tools/session_logs/eventual_preservation.py:_sha256"
+  },
+  {
+   "digest": "df890b82794ba54f0394756135afcb74b47a1c75d2a6db3138599fd92dce8fe0",
+   "similarity": 0.76,
+   "symbol_a": "tools/development/todo_snapshot.py:_sha256",
+   "symbol_b": "tools/session_logs/eventual_preservation.py:_sha256"
+  },
+  {
+   "digest": "f8ade1b5d2cdb5f8bb914397ab2535d2605cda32e54e3eb549e548c75201aa40",
+   "similarity": 0.48,
+   "symbol_a": "tools/development/issue_intake_v4.py:IntakeError",
+   "symbol_b": "tools/development/python_ast_boundary_check.py:PythonAstBoundaryError"
+  },
+  {
+   "digest": "922150c02b6a16fe27c5d3f01ecf14bcc737fff7607cddb566b3ac63e5ab7301",
+   "similarity": 0.583,
+   "symbol_a": "tools/development/issue_intake_v4.py:IntakeError",
+   "symbol_b": "tools/development/structured_argv_executor.py:StructuredArgvExecutorError"
+  },
+  {
+   "digest": "51d30a22f683c1122ff32ce45bbe9cbc89c1ab259097c0837b5d528c9550ce03",
+   "similarity": 0.497,
+   "symbol_a": "tools/development/issue_intake_v4.py:IntakeError",
+   "symbol_b": "tools/development/task_python_cache.py:TaskPythonCacheError"
+  },
+  {
+   "digest": "2bbf36d87072ecd4bba4339ee4f2e75e19bda1e2e9f3abdc96a9aaa56d6e3297",
+   "similarity": 0.497,
+   "symbol_a": "tools/development/issue_intake_v4.py:IntakeError",
+   "symbol_b": "tools/development/todo_record_generation.py:TodoRecordGenerationError"
+  },
+  {
+   "digest": "fd4f6ce2560ec66bfcd82bcaa67c20e181bd4420e9229b6eaca0dbb8554e3c01",
+   "similarity": 0.48,
+   "symbol_a": "tools/development/issue_intake_v4.py:IntakeError",
+   "symbol_b": "tools/development/todo_update_path.py:TodoUpdatePathError"
+  },
+  {
+   "digest": "88ad670484f20f910224d0b44230c1999c6479e3868e71b84511aafc4a3ee53d",
+   "similarity": 0.61,
+   "symbol_a": "tools/development/issue_intake_v4.py:IntakeError",
+   "symbol_b": "tools/task_contract/identity.py:ContractError"
+  },
+  {
+   "digest": "64d176292d6ff5e4cc1d9719f2a9f8ae738cae928bb806177858a0c0c381262b",
+   "similarity": 0.469,
+   "symbol_a": "tools/development/python_ast_boundary_check.py:PythonAstBoundaryError",
+   "symbol_b": "tools/development/structured_argv_executor.py:StructuredArgvExecutorError"
+  },
+  {
+   "digest": "162ebd725f70fc0129d38fa03d71413e98148b5f8d32ad35571052d9464f2113",
+   "similarity": 0.617,
+   "symbol_a": "tools/development/python_ast_boundary_check.py:PythonAstBoundaryError",
+   "symbol_b": "tools/development/task_python_cache.py:TaskPythonCacheError"
+  },
+  {
+   "digest": "4a3dffc10cbcd123906c4bf18207c352b2969e447b9c0cab82b971bfa244d31f",
+   "similarity": 0.505,
+   "symbol_a": "tools/development/python_ast_boundary_check.py:PythonAstBoundaryError",
+   "symbol_b": "tools/development/todo_record_generation.py:TodoRecordGenerationError"
+  },
+  {
+   "digest": "31e1b6beb2b8524a55567709553f17724ad089d384a50f16e5f9275c0b4ad193",
+   "similarity": 0.486,
+   "symbol_a": "tools/development/python_ast_boundary_check.py:PythonAstBoundaryError",
+   "symbol_b": "tools/development/todo_update_path.py:TodoUpdatePathError"
+  },
+  {
+   "digest": "9db55236c00b110d282ac92b8f0e23ac1ccde690f715176cfc2ecaeab499a48a",
+   "similarity": 0.48,
+   "symbol_a": "tools/development/python_ast_boundary_check.py:PythonAstBoundaryError",
+   "symbol_b": "tools/task_contract/identity.py:ContractError"
+  },
+  {
+   "digest": "bf8fa84b4700e598a3a51552a7dc58e4780cdd7fddb177b23f7a85646951b96c",
+   "similarity": 0.486,
+   "symbol_a": "tools/development/structured_argv_executor.py:StructuredArgvExecutorError",
+   "symbol_b": "tools/development/task_python_cache.py:TaskPythonCacheError"
+  },
+  {
+   "digest": "a24736556becd6d3f751b157162f37c5b4a2a487437b7e7e5acaed60f307b3ac",
+   "similarity": 0.486,
+   "symbol_a": "tools/development/structured_argv_executor.py:StructuredArgvExecutorError",
+   "symbol_b": "tools/development/todo_record_generation.py:TodoRecordGenerationError"
+  },
+  {
+   "digest": "64c2d08192e20ab1bae63315dba124dd9924f1b61e540b7293b588c8781e0ddd",
+   "similarity": 0.469,
+   "symbol_a": "tools/development/structured_argv_executor.py:StructuredArgvExecutorError",
+   "symbol_b": "tools/development/todo_update_path.py:TodoUpdatePathError"
+  },
+  {
+   "digest": "0e0421e57524dd527c9f6ac35c7c13e7955f432809c695bd6a8cc685ea6eb8eb",
+   "similarity": 0.583,
+   "symbol_a": "tools/development/structured_argv_executor.py:StructuredArgvExecutorError",
+   "symbol_b": "tools/task_contract/identity.py:ContractError"
+  },
+  {
+   "digest": "1a9a6d1f57989754ac51bada3b92421b028fc7117145e0edff368997396c54a3",
+   "similarity": 0.529,
+   "symbol_a": "tools/development/task_python_cache.py:TaskPythonCacheError",
+   "symbol_b": "tools/development/todo_record_generation.py:TodoRecordGenerationError"
+  },
+  {
+   "digest": "0b67bf7d7664a3a406eb25deb29941710f786537adcaaf46f85e6d56047a9adf",
+   "similarity": 0.505,
+   "symbol_a": "tools/development/task_python_cache.py:TaskPythonCacheError",
+   "symbol_b": "tools/development/todo_update_path.py:TodoUpdatePathError"
+  },
+  {
+   "digest": "1b35f685d6b3a9ab8857bd8e57550f3a0aadd6afa765cb4d896e575b3502deb0",
+   "similarity": 0.563,
+   "symbol_a": "tools/development/task_python_cache.py:TaskPythonCacheError",
+   "symbol_b": "tools/task_contract/identity.py:ContractError"
+  },
+  {
+   "digest": "75a047d39853cc8258a965d5f5a8751a206edcab755614ee5e7e30e8fee06dd0",
+   "similarity": 0.617,
+   "symbol_a": "tools/development/todo_record_generation.py:TodoRecordGenerationError",
+   "symbol_b": "tools/development/todo_update_path.py:TodoUpdatePathError"
+  },
+  {
+   "digest": "41067e0be1aaf7a6f0e0250c58f2b0ff42ac57180d29e8ec50a0c08dea20dadf",
+   "similarity": 0.497,
+   "symbol_a": "tools/development/todo_record_generation.py:TodoRecordGenerationError",
+   "symbol_b": "tools/task_contract/identity.py:ContractError"
+  },
+  {
+   "digest": "c05877206098c4dcc752d4374b1b165322ac278ddb570c1ba529022e745d5a9f",
+   "similarity": 0.48,
+   "symbol_a": "tools/development/todo_update_path.py:TodoUpdatePathError",
+   "symbol_b": "tools/task_contract/identity.py:ContractError"
+  },
+  {
+   "digest": "aadd85e461f33be1564b3bbcff41255dfae0ac63d57e2f96391c9809bb4f07e9",
+   "similarity": 0.837,
+   "symbol_a": "tools/development/candidate_ranking.py:_content_digest",
+   "symbol_b": "tools/development/issue_intake_v4.py:_canonical_digest"
+  },
+  {
+   "digest": "f2531b890552700a3b1254545efb1666e26cbb6ff7dcd4d857a7e0ddeb09d65e",
+   "similarity": 0.781,
+   "symbol_a": "tools/development/integration_exclusions.py:content_digest",
+   "symbol_b": "tools/development/issue_intake_v4.py:_canonical_digest"
+  },
+  {
+   "digest": "e409774d3698880cb12578ec1ec8adaa67f29dec0831f620f350a51ac388a3ad",
+   "similarity": 0.837,
+   "symbol_a": "tools/development/issue_intake_v4.py:_canonical_digest",
+   "symbol_b": "tools/development/reuse_search_record.py:_content_digest"
+  },
+  {
+   "digest": "252fa2e80a10c199ec013668c7ba4f6ce930b33b69ea70561bc7877cb9232307",
+   "similarity": 0.742,
+   "symbol_a": "tools/session_logs/distribution_validation.py:_within",
+   "symbol_b": "tools/session_logs/private_validation.py:_within"
+  },
+  {
+   "digest": "c383869aa6b37fce0129ce7b9ab91a52d16b0297b1572d8c7b5d4b26db89ba2d",
+   "similarity": 0.742,
+   "symbol_a": "tools/session_logs/eventual_preservation.py:_within",
+   "symbol_b": "tools/session_logs/private_validation.py:_within"
+  },
+  {
+   "digest": "352a4a8729f1da140b9f36b3fef4ed202fc446b6eff7c58fcbb2ee0be140643e",
+   "similarity": 0.742,
+   "symbol_a": "tools/session_logs/native_validation.py:_within",
+   "symbol_b": "tools/session_logs/private_validation.py:_within"
+  },
+  {
+   "digest": "11f8ae2eb9be2538ee699484c4f4939afa474f46eac23aceaaec13ecdb4f22eb",
+   "similarity": 0.833,
+   "symbol_a": "tools/session_logs/scheduler.py:_absolute_path",
+   "symbol_b": "tools/session_logs/systemd_scheduler.py:_absolute_path"
+  },
+  {
+   "digest": "c1f980897eef129efed5e6298fa316f7cf1babcd12e1d4ec08d5b68c48c3016b",
+   "similarity": 0.833,
+   "symbol_a": "tools/session_logs/scheduler.py:_absolute_path",
+   "symbol_b": "tools/session_logs/windows_scheduler.py:_absolute_path"
+  },
+  {
+   "digest": "a21df923cfd753b28d806de9e6722b7250e78a675f1227240b2b8abbaf03d944",
+   "similarity": 0.833,
+   "symbol_a": "tools/session_logs/systemd_scheduler.py:_absolute_path",
+   "symbol_b": "tools/session_logs/windows_scheduler.py:_absolute_path"
+  },
+  {
+   "digest": "33074bae8791c364c2454d0bfcc0b516631f71578f4828ad61a7c84d988625ad",
+   "similarity": 0.587,
+   "symbol_a": "tools/development/todo_update_path.py:main.<locals>._report",
+   "symbol_b": "tools/session_logs/cli.py:_print_json"
+  },
+  {
+   "digest": "9021b95b6cd711b84232a9b2a98d3350382fdfa02e770fa7ae6d2ef15bd47d93",
+   "similarity": 0.548,
+   "symbol_a": "tools/development/todo_update_path.py:main.<locals>._report",
+   "symbol_b": "tools/session_logs/private_validation.py:_print_result"
+  },
+  {
+   "digest": "ec5273614ac4c36a12911a977ff175ac840031db7636870103b28cae80fd1957",
+   "similarity": 0.8,
+   "symbol_a": "tools/session_logs/cli.py:_print_json",
+   "symbol_b": "tools/session_logs/private_validation.py:_print_result"
+  }
+ ],
+ "payload_list_digest": "baa6491f55554898430c88ab48f85bc12c241164e7da8bc2e6550ed5288f1241",
+ "schema_version": 1
+}

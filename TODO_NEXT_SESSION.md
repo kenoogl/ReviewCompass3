@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：段階1実装の**反証レビューが完了した**。的中1件（I-1：digestと内容の結線が無く、承認済みdigestを名乗る改ざん内容が通過）を発見し処置済み。多層化2件（allowlist再検査・定型文一致検査）を追加。I-6（承認recordの真正性＝Humanが本当に書いたかの担保）は段階3の設計事項として持ち越し。全suite 1201 passed。伏字化hookは規則未登録のため未結線（gateは未結線を拒否する状態が現在の正）。
+- 現在作業：段階2「dry-run」が完了した。実データ（上位20 group）で分類は実験と完全一致（同187／別1,169／曖昧59）。曖昧59組のpayload実物・manifest・報告書を`records/development/2026-08-07-egress-dry-run-v1/`に固定（一覧digest `baa6491f…`）。**Human目視待ち**：この59組の実物を見て「外部判定が要る／直接見る」を判断する段。全suite 1205 passed。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -53,7 +53,7 @@
 
 ## 次に行う一作業
 
-段階2「dry-run」の実装（TDD）。上位20 groupへ事前分類を実データで適用し、曖昧な組のpayload一式（各payloadと一覧のSHA-256付き）をHumanが目視できる形で組み立てて出力する。送信機能は含まない。出力を見て「外部判定が要る／この規模ならHumanが直接見る」を実物を根拠に再判断する（v4 §8）。
+Humanによるdry-run出力の目視（`records/development/2026-08-07-egress-dry-run-v1/report.md`から）。判断は「外部判定へ進む（送信物一覧承認）／この規模ならHumanが直接見る」の二択。前者なら段階3（承認record正式schema化、反証I-6の真正性担保を含む）へ。
 
 開始条件：
 
@@ -61,14 +61,14 @@
 
 完了条件：
 
-- dry-run出力（曖昧組のpayload一式）が生成され、Human目視に付されること
+- Humanの目視判断が記録されること
 
 後続作業：段階3（承認record形式の正式schema化。反証I-6の真正性担保を含む）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：なし。次作業（段階2 dry-run）の着手指示を待つ。
+- Human判断待ち：dry-run出力59組の目視判断（外部判定へ進むか）。
 - 継続する留意点：背景調査の不足が累計5件、さらに本調査で6件目の未遂があった（配備先コピーを最新と誤認し、開発元の存在をHuman指摘で知った）。規律を三段で持つ：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認の範囲は「記録が指す先」まで (3)**指された物が写しなら原本（開発元）まで遡り、鮮度（最終commit日）を確認してから状態を断定する**。
 
 ## stale・deferred
@@ -82,8 +82,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：egress計61 passed（反証5件を含む。的中1件は処置済み）
-- 直近の全Test：venv pytest 1201 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：egress計65 passed（dry-run 4件を含む）
+- 直近の全Test：venv pytest 1205 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
