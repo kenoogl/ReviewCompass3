@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：Work 4B本体設計束（DEC-WORK4B-MAIN-DESIGN-BUNDLE-001）の構成A-1が完了した。統合除外宣言record（承認済みE1凍結レーン・E2版固定・E3歴史保持）とhelperがGREENで、凍結の機械可読化（DEC-FROZEN-LANE-GUIDANCE-CORRECTION-001の原因1）が解消。宣言→RED対応表の照合は恒久検査器へ移行済み。次は設計束の実装順どおり構成B（Profile再観測の検索への組み込み）。
+- 現在作業：Work 4B本体設計束の構成A-1（統合除外宣言）と構成B（検索の鮮度判定）が完了した。検索recordはschema 2でfreshness欄を持ち、gateがgate時点で乖離を再計測してprofile_staleで停止する（閾値：対象範囲の変更1件）。schema 1の既存record 4件は版固定で有効のまま。次は実装順どおり構成A-2（絞り込み順位表。除外宣言を機械参照し、落とした件数を表示する）。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,7 @@
 
 ## 最新のauthority／Evidence
 
+- [構成B GREEN Evidence](records/development/2026-08-07-work4b-b-reuse-search-freshness-green-evidence-v1.md) — SHA-256 `cbf5a22317c8aa622a3bdd462ee521f93ba0ab5e662df57135c0287114de9877`
 - [構成A-1 GREEN Evidence](records/development/2026-08-07-work4b-a1-integration-exclusions-green-evidence-v1.md) — SHA-256 `91910e837710140a43e0b060832b3726a1b11a5348a7ee4b59cc95b19467a153`
 - [統合除外宣言record](.reviewcompass/workflow/integration-exclusions/integration-exclusions-001--v1.json) — SHA-256 `f482bf3d6200e1c2a4fc17233d4e87ed098f04d053dc1fa56e69e481a4b090fd`
 - [設計束 承認Decision](records/development/2026-08-07-work4b-main-design-bundle-approval-decision-v1.md) — SHA-256 `6bbaea795f7280f006dce2834b0286bb7df0b1cdb05b12918d2ce7574c27bf5e`
@@ -29,15 +30,15 @@
 
 ## 次に行う一作業
 
-設計束の実装順どおり構成B：Profile再観測の検索への組み込み。`reuse_search_record`へ`freshness`欄（観測後の対象範囲の変更有無）を追加し、乖離があればgateが`profile_stale`で開始不可を返す。承認済み閾値は「対象範囲のfileに観測後の変更が1件でもあれば停止」。
+設計束の実装順どおり構成A-2：絞り込み順位表。ProfileとDiscoveryから決定的に順位recordを生成する。順位は承認済みの辞書式順（構造一致の強さ→守り役の含有→実害の大きさ→変更範囲との交差）、統合除外宣言（integration-exclusions-001）を機械参照して該当groupを落とし、落とした件数を表示する。順位表の入力はschema 2（freshness付き）の検索経路とそろえる。
 
 開始条件：
 
-- なし（DEC-WORK4B-MAIN-DESIGN-BUNDLE-001で承認済み。確立済み関門——実装前検索gate、宣言→RED対応表、RED固定——を通す）
+- なし（DEC-WORK4B-MAIN-DESIGN-BUNDLE-001で承認済み。確立済み関門を通す）
 
 完了条件：
 
-- freshness判定がGREENで、既存の検索record・testを弱めていないこと
+- 順位表生成がGREENで、除外の件数表示（silent capの禁止）と決定的再生成が固定されていること
 
 後続作業：合意順序の③レビューbacklog上位2系統の先行反証レビュー、④残りのbacklogとRC2取り込み・外部APIレビュー（台帳整備後）。全routineの一括分類は行わない。
 
@@ -57,8 +58,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：統合除外宣言 5 passed（宣言X1〜X4対応）
-- 直近の全Test：venv pytest 1071 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：鮮度判定 4 passed（宣言F1〜F4対応）＋既存R系 8 passed
+- 直近の全Test：venv pytest 1075 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
