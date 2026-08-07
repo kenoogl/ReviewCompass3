@@ -1,0 +1,69 @@
+{
+  "observation_id": "OBS-RC3-LLMGP-EXTERNAL-REVIEW-ASSETS-2026-08-07-V1",
+  "observed_at": "2026-08-07T19:00:00+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "An operated external API review implementation exists in the LLMGP project, whose location was already fixed in an existing source record, and it was not consulted while a replacement was being designed from scratch",
+  "source": {
+    "path": "records/sources/2026-08-02-llmgp-hybrid-experiment.md",
+    "sha256": "dc26f666371008534910e0619c1b0f00203ff83fa01a86a020548e7bee0f8ae5"
+  },
+  "machine_observations": {
+    "measured_at_commit": "d6b9acb",
+    "asset_location": "/Users/Daily/Development/WindTurbineWake/LLMGP/.reviewcompass/specs/_cross_feature/reviews/",
+    "observed_runs": [
+      "2026-07-25-requirements-review-wave-run",
+      "2026-07-26-requirements-reflection-triad-review",
+      "2026-07-27-requirements-redraft-triad-review",
+      "2026-07-27-d-independence-review-wave-run",
+      "2026-07-27-requirements-review-wave-run",
+      "2026-07-28-exp-nesting-and-checkpoint-review-run"
+    ],
+    "artefact_kinds": [
+      {
+        "pattern": "target-*-masked.md",
+        "note": "review target prepared in a masked form, i.e. an existing answer to the question of what may leave the project"
+      },
+      {
+        "pattern": "api-review-criteria*.md",
+        "note": "the criteria handed to the external API, matching what the draft proposal called an approved question template"
+      },
+      {
+        "pattern": "main-preanalysis.md and preanalysis-audit*",
+        "note": "pre-send analysis and an audit of that analysis"
+      },
+      {
+        "pattern": "triad-review-summary.md",
+        "note": "synthesis across reviewers"
+      },
+      {
+        "pattern": "tools/write_triad_records.py",
+        "note": "records two providers in distinct roles: anthropic-api as chair and openai-api as adversary"
+      }
+    ],
+    "how_it_was_missed": {
+      "fact": "records/sources/2026-08-02-llmgp-hybrid-experiment.md already fixes the LLMGP location with observed paths and SHA-256 values",
+      "fact_2": "that record was read during this session, but only its adoption list (task structure, review intensity) was taken in; the presence of operated external review assets was not noticed",
+      "searches_that_failed": "a grep for anthropic, openai, httpx, requests and urllib was run over ReviewCompass3 and ReviewCompass2 only, never over the path the source record names"
+    },
+    "prior_background_gaps_this_session": [
+      "component D: an equivalent ledger mechanism already existed",
+      "layer 2: the first attempt violated a module boundary an existing test defended",
+      "redaction review: the premise that a primary ruleset exists was wrong",
+      "egress proposal v1: approval granularity and a second use case were absent",
+      "egress proposal v2: stated that no prior art exists, while RC2 principles and LLMGP assets both do"
+    ]
+  },
+  "problem": "An external API review was designed from scratch across two proposal versions while an operated implementation existed in the LLMGP project. Its location was not hidden: the source record fixed at 2026-08-02 names the absolute paths and digests, and that record was read during this session. What was taken from it was only the adoption list, so the review assets went unnoticed. The proposal therefore invented a payload shape, an approval granularity and a ceiling of twenty groups, none of which were checked against a mechanism that had already been run six times over four days.",
+  "impact": [
+    "the egress proposal rests on invented parameters rather than on operated experience",
+    "the masked target form and the criteria documents answer, in practice, the question the proposal was trying to design",
+    "this is the fifth background gap in one session, and the first where the location was recorded in advance and still not consulted",
+    "the pre-proposal check section added earlier today did not catch it, because the check surveyed the current repository rather than the sources the records point to"
+  ],
+  "boundary": [
+    "preserve this observation as immutable source",
+    "do not treat this observation as an Improvement Candidate, Human Triage Decision or Issue Record",
+    "no LLMGP artefact was copied into this repository; only directory and file names were read",
+    "the contents of the review runs have not been analysed, so what should be inherited is not yet determined"
+  ]
+}
