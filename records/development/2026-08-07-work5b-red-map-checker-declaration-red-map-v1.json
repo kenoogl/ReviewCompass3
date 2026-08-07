@@ -1,0 +1,86 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-WORK5B-RED-MAP-CHECKER-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T09:36:07+09:00",
+  "proposal": {
+    "path": "records/development/2026-08-07-work5b-start-decision-v1.md",
+    "sha256": "b99da9e4f3eb2913731ebf2701eb6abcf7787548feb5c152118c7aa98d916bfe",
+    "declaration_section": "§2（検査器の承認範囲。規範宣言C1〜C4として本mapで固定）",
+    "approval_decision": "DEC-WORK5B-START-001"
+  },
+  "purpose": "実装開始前にC1〜C4それぞれへREDを結び、「testの無いC」が0件であることを機械で数える。本mapの照合はその場AST照合の最終回であり、GREEN後は本checker自身が後続mapの照合器になる。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（対象module tools/development/declaration_red_map_check.py が未実装のため）。",
+    "契約束縛test（tests/test_work5b_contract.py）はContract実体の結線検査であり、宣言→RED対応の対象外として本mapへ含めない。",
+    "機械照合はPython astで対象test fileを解析し、列挙test関数の実在、testの無い宣言0件、宣言へ結ばれないtest 0件を確認した。"
+  ],
+  "test_files": {
+    "tests/test_declaration_red_map_check.py": [
+      "test_c1_fails_when_a_listed_test_is_missing",
+      "test_c1_passes_when_all_listed_tests_exist",
+      "test_c2_fails_when_a_declaration_has_no_tests",
+      "test_c3_fails_when_a_test_is_unmapped",
+      "test_c4_fails_closed_on_missing_map_or_test_file",
+      "test_c4_result_is_deterministic"
+    ]
+  },
+  "declarations": {
+    "C1": {
+      "summary": "列挙されたtest関数の実在をAST解析で判定し、実在しない列挙を検出する",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_map_check.py::test_c1_passes_when_all_listed_tests_exist",
+          "red_now": true
+        },
+        {
+          "test": "tests/test_declaration_red_map_check.py::test_c1_fails_when_a_listed_test_is_missing",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "C2": {
+      "summary": "testの無い宣言を数え、0件でない場合は不合格を返す",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_map_check.py::test_c2_fails_when_a_declaration_has_no_tests",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "C3": {
+      "summary": "宣言に結ばれないtestを数え、0件でない場合は不合格を返す",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_map_check.py::test_c3_fails_when_a_test_is_unmapped",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "C4": {
+      "summary": "判定はfail-closed（map・test fileの欠落や解析不能は不合格）で、machine_countを含む決定的な結果を返す",
+      "tests": [
+        {
+          "test": "tests/test_declaration_red_map_check.py::test_c4_fails_closed_on_missing_map_or_test_file",
+          "red_now": true
+        },
+        {
+          "test": "tests/test_declaration_red_map_check.py::test_c4_result_is_deterministic",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_count": {
+    "declarations": 4,
+    "declarations_without_tests": 0,
+    "listed_tests_missing_in_file": 0,
+    "tests_unmapped_to_declarations": 0
+  },
+  "content_digest": "1a81d23b60245da8772163251cff2f677a4a43c2fc58e4e490c9e4074c8a2b69"
+}
