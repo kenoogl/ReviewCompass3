@@ -84,6 +84,10 @@ Task Contract、受入条件、Test、validator、Human判断などのoracleを�
 - `high`では、実行者のfixtureに存在しない反証を最低1件、reviewerが新たに作って機械で試す。
   守り役のcodeでは、誤って合格させる方向（改竄、偽装、迂回、境界値）を優先する。
   反証が成立した場合は検証結果として分離し、承認なしに実装修正へ移らない。
+- 宣言→RED対応表を作る作業では、RED固定commitの前に`verify_red=True`で実行照合し、
+  結果をRED Evidenceへ記録する。`mismatched`または`unknown`が残る間はcommitしない
+  （`DEC-RED-VERIFICATION-ADOPTION-001`）。`red_now`はRED時点の主張であり、
+  実装完了後には照合が成立しない。
 - 実行command、exit code、件数、environment、receiptを記録する。
 
 ### 4.5 WorkflowとProvenanceを確認する
@@ -192,6 +196,7 @@ Claude固有の受け渡し方法は`docs/development/codex-claude-collaboration
 - [ ] 成果物を再読込みし、Digestと参照を再計算した。
 - [ ] 対象Testとriskに応じた全Test／oracleを独立再実行した。
 - [ ] `high`では、実行者のfixtureに無い反証を新作して機械で試した。
+- [ ] 宣言→RED対応表を作った場合、RED固定commit前に実行照合し、結果をEvidenceへ記録した。
 - [ ] Workflow順序、Provenance、Human承認境界を確認した。
 - [ ] 禁止操作とside effectの有無を確認した。
 - [ ] `verified`以外を完了または次段開始の根拠にしていない。

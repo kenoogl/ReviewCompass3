@@ -1,0 +1,144 @@
+{
+  "record_kind": "work5b_implementation_task_contract",
+  "schema_version": 1,
+  "task_contract_id": "TC-WORK5B-DECLARATION-RED-MAP-CHECK-001",
+  "task_contract_version": 2,
+  "created_at": "2026-08-07T09:36:07+09:00",
+  "state_at_creation": "task_contract_commit_pending",
+  "goal": "宣言→RED対応表検査器 tools/development/declaration_red_map_check.py を新設し、固定済みの宣言C1〜C4のtestを変更せずGREENにする。検査器は対応表JSONとtest fileを読み、列挙testの実在、testの無い宣言0件、宣言に結ばれないtest 0件を機械判定し、fail-closedで決定的な結果を返す。hook・自動実行は付けない。",
+  "approval": {
+    "decision_id": "DEC-WORK5B-START-001",
+    "path": "records/development/2026-08-07-work5b-start-decision-v1.md",
+    "sha256": "b99da9e4f3eb2913731ebf2701eb6abcf7787548feb5c152118c7aa98d916bfe"
+  },
+  "fixed_sources": [
+    {
+      "role": "start_approval",
+      "path": "records/development/2026-08-07-work5b-start-decision-v1.md",
+      "sha256": "b99da9e4f3eb2913731ebf2701eb6abcf7787548feb5c152118c7aa98d916bfe",
+      "reference_kind": "immutable_record"
+    },
+    {
+      "role": "reuse_search_record",
+      "path": "records/development/2026-08-07-declaration-red-map-checker-reuse-search-attestation-v1.json",
+      "sha256": "763131b442201b7f235a691c0db460475d170294b553284ff37ba5bd28943590",
+      "note": "構成Cで外部化済み。project内には証明書のみを置き、record本体は外部DATA_ROOTにある。",
+      "reference_kind": "immutable_record"
+    },
+    {
+      "role": "declaration_red_map",
+      "path": "records/development/2026-08-07-work5b-red-map-checker-declaration-red-map-v1.json",
+      "sha256": "dd8c1fa92da5b80de7c116a9bf21fb0e2cd0f914144bfbe45ca3097b8e821d26",
+      "reference_kind": "immutable_record"
+    },
+    {
+      "role": "red_evidence",
+      "path": "records/development/2026-08-07-work5b-red-map-checker-red-evidence-v1.md",
+      "sha256": "202a01ebce78b5f8e4967fcec672175595763267926b3c61d07b046b272b77d8",
+      "reference_kind": "immutable_record"
+    },
+    {
+      "role": "review_protocol",
+      "path": "docs/development/work-review-protocol.md",
+      "sha256": "22856c9836de2fd1a5d3a8a79d9437ea82150c8e167fb9ddc40ac6b82bb0a923",
+      "note": "作業開始時点の姿を記録する。以後の改定で現行と一致しなくなるのは正常である。",
+      "reference_kind": "pinned_at_start"
+    },
+    {
+      "role": "fixed_tests_checker",
+      "path": "tests/test_declaration_red_map_check.py",
+      "sha256": "901a4ea19a9945a615f3328122f9a759820eea1bd126cf4a29e410e94a23fe42",
+      "reference_kind": "immutable_record"
+    },
+    {
+      "role": "fixed_tests_contract_binding",
+      "path": "tests/test_work5b_contract.py",
+      "sha256": "9630b087d400dd13eb36c519a5d916755626ebcb15ffb6942ad6ce87cb05d9d0",
+      "reference_kind": "immutable_record"
+    }
+  ],
+  "reuse_search_gate": {
+    "attestation_path": "records/development/2026-08-07-declaration-red-map-checker-reuse-search-attestation-v1.json",
+    "record_content_digest": "93343aaba1d318aa79d706e6cb4b6a38468d17816b1cfbbc96761be8e6efc0d1",
+    "external_relative_path": "work4b/reuse-searches/93343aaba1d318aa79d706e6cb4b6a38468d17816b1cfbbc96761be8e6efc0d1.json",
+    "gate_result_at_creation": "start_allowed"
+  },
+  "work_items": [
+    {
+      "work_item_id": "WI-5B-1",
+      "sequence": 1,
+      "objective": "固定testを変更せずtools/development/declaration_red_map_check.pyを実装し、検査器test 6件と既存全testをGREENにする",
+      "depends_on": [],
+      "status_at_creation": "not_started"
+    },
+    {
+      "work_item_id": "WI-5B-2",
+      "sequence": 2,
+      "objective": "検査器の第一実運用として、既存4枚の宣言→RED対応表をread-onlyで検査し、結果をrecordへ固定する（対応表は書き換えない）",
+      "depends_on": [
+        "WI-5B-1"
+      ],
+      "status_at_creation": "not_started"
+    },
+    {
+      "work_item_id": "WI-5B-3",
+      "sequence": 3,
+      "objective": "post-write verification（成果物再読込・Digest照合）、Provenance（承認→検索→Contract→RED→GREEN→実運用の結線）、分割commitを確認する",
+      "depends_on": [
+        "WI-5B-2"
+      ],
+      "status_at_creation": "not_started"
+    },
+    {
+      "work_item_id": "WI-5B-4",
+      "sequence": 4,
+      "objective": "handoffとchecklist §10のWork 5B項目をEvidenceへ接続して更新する（段完了はHuman判断）",
+      "depends_on": [
+        "WI-5B-3"
+      ],
+      "status_at_creation": "not_started"
+    }
+  ],
+  "acceptance": [
+    "検査器test 6件（C1〜C4）がtestを変更せずGREENである",
+    "公式全testがGREENで、既存testを弱めていない",
+    "検査器が自身の対応表（C1〜C4）を検査してpassedを返す",
+    "既存3枚の対応表への検査結果が記録され、対応表本体は不変である",
+    "検査器はhitの無い異常系（map欠落・test file欠落）で不合格を返す"
+  ],
+  "prohibitions": [
+    "Humanのimplementation_ready判断のrecordが無い間はWI-5B-1を開始しない",
+    "hook、自動実行、commit連動、guarded commitを導入しない",
+    "固定testを弱めない・書き換えない（設計変更は理由記録とHuman判断を経る）",
+    "既存の宣言→RED対応表record 4枚を書き換えない",
+    "新設module 1件以外の既存moduleを変更しない",
+    "provisionalな自己適用能力を正式Runtime既定にしない"
+  ],
+  "human_gates": [
+    {
+      "gate": "implementation_ready",
+      "required_before": "WI-5B-1",
+      "status_at_creation": "pending"
+    },
+    {
+      "gate": "work5b_completion",
+      "required_before": "checklist §10の段完了",
+      "status_at_creation": "pending"
+    }
+  ],
+  "risk": "high",
+  "risk_basis": "検査器は「testの無い宣言0件」の合否を決める守り役codeであり、work-review-protocol §3の既定highに該当する。GREEN後の後追いレビューはISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001の枠で§4.4（fixtureに無い反証の新作）を適用する。",
+  "rollback": "新設fileの削除（tools/development/declaration_red_map_check.py、関連GREEN Evidence）で復元する。record類はnew-onlyの履歴として保持し、削除しない。",
+  "content_digest": "3f865f8603a99f2698628c60c2a7ea6a9e7dd47e50b2d1134fd7babd542cbe59",
+  "supersedes": {
+    "task_contract_id": "TC-WORK5B-DECLARATION-RED-MAP-CHECK-001",
+    "task_contract_version": 1,
+    "path": "records/development/2026-08-07-work5b-implementation-task-contract-v1.json",
+    "sha256": "89c92ae260bfb1efd201d414e0235b66ebb270b457942c59ef5fccfc9cfa5387"
+  },
+  "corrections": [
+    "固定sourceへreference_kindを追加した（immutable_record／pinned_at_start）。上流の可変文書は開始時点のpinであり、改定後に指紋が一致しないのは正常である。",
+    "reuse_search_recordの参照を、外部化済みの証明書へ置き換えた。",
+    "承認：DEC-FIXED-SOURCE-KIND-001。意味内容（結線先、Work Item、禁止事項、risk）は不変。"
+  ]
+}
