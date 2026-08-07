@@ -1,0 +1,89 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-WORK4B-A2-CANDIDATE-RANKING-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T13:34:52+09:00",
+  "proposal": {
+    "path": "records/development/2026-08-07-work4b-main-design-bundle-approval-decision-v1.md",
+    "sha256": "6bbaea795f7280f006dce2834b0286bb7df0b1cdb05b12918d2ce7574c27bf5e",
+    "declaration_section": "設計束§2 A-2から展開した規範宣言G1〜G5",
+    "approval_decision": "DEC-WORK4B-MAIN-DESIGN-BUNDLE-001"
+  },
+  "purpose": "実装開始前にG1〜G5それぞれへREDを結び、「testの無いG」が0件であることを恒久検査器で数える。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（対象module tools/development/candidate_ranking.py が未実装のため）。",
+    "機械照合はtools/development/declaration_red_map_check.pyのcheck_declaration_red_mapで実施した。"
+  ],
+  "test_files": {
+    "tests/test_candidate_ranking.py": [
+      "test_g1_ranking_is_deterministic",
+      "test_g2_order_follows_the_approved_lexicographic_rule",
+      "test_g3_excluded_groups_are_dropped_with_visible_counts",
+      "test_g4_stale_profile_is_rejected_fail_closed",
+      "test_g5_write_is_new_only"
+    ]
+  },
+  "declarations": {
+    "G1": {
+      "summary": "順位表はProfile・Discovery・除外宣言・観測から決定的に生成され、同一入力で同一content digestになる",
+      "tests": [
+        {
+          "test": "tests/test_candidate_ranking.py::test_g1_ranking_is_deterministic",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "G2": {
+      "summary": "順位は承認済み辞書式順（basis_kind強度→守り役含有→member数→変更範囲交差→group_id）に従う",
+      "tests": [
+        {
+          "test": "tests/test_candidate_ranking.py::test_g2_order_follows_the_approved_lexicographic_rule",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "G3": {
+      "summary": "除外宣言に該当するgroupは順位表から落ち、落とした件数・group・該当entry IDを順位表自身が表示する（silent cap禁止）",
+      "tests": [
+        {
+          "test": "tests/test_candidate_ranking.py::test_g3_excluded_groups_are_dropped_with_visible_counts",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "G4": {
+      "summary": "入力Profileが観測に対してstaleな場合、順位表の生成はfail-closedで拒否される（構成B残余の締め）",
+      "tests": [
+        {
+          "test": "tests/test_candidate_ranking.py::test_g4_stale_profile_is_rejected_fail_closed",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "G5": {
+      "summary": "順位表recordはnew-onlyで保存され、上書きを拒否する",
+      "tests": [
+        {
+          "test": "tests/test_candidate_ranking.py::test_g5_write_is_new_only",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": {
+    "checker": "tools/development/declaration_red_map_check.py",
+    "status": "passed",
+    "machine_count": {
+      "declarations": 5,
+      "declarations_without_tests": 0,
+      "listed_tests_missing_in_file": 0,
+      "tests_unmapped_to_declarations": 0
+    }
+  }
+}
