@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：検証境界の三層と反証レビュー第2束（伏字化）が完了し、機密の扱いへ進んだ。**重要な発見が2件**ある。(1) 機微情報の規則は一件も登録されておらず、唯一の実データは伏字化を経ず逐語保存されていた。(2) 外部APIレビューの実運用資産がLLMGPに存在し、所在は2026-08-02の記録に固定済みだったが参照していなかった。出口の設計提案v2は、この先行資産を踏まえた書き直しが必要である。
+- 現在作業：LLMGP外部レビュー資産の調査が完了し、調査結果recordを固定した。**発見が2件**ある。(1) 開発元ReviewCompass（`/Users/Daily/Development/ReviewCompass/`、最終commit 2026-07-31）に、LLMGP運用より新しい出口実装がある（送信直前に必ず通る機械検査の単一実装、trusted送信入口、content-addressed manifest、承認消費の排他claim）。(2) RC3自身の`tools/bootstrap/`に閉鎖payload・証拠閉包・契約・実行境界が実装済みで、欠けているのは外へ出る経路と関門だけである。提案v3は開発元の新世代を骨格に、RC3既存機構への接続として書く。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,7 @@
 
 ## 最新のauthority／Evidence
 
+- [LLMGP外部レビュー資産の調査結果record](records/development/2026-08-07-llmgp-external-review-assets-investigation-v1.md) — SHA-256 `4acf974e09f6818241b17347aca1271a4bd54cf9d4436125178c44ce39d6e3a8`
 - [LLMGP外部レビュー資産の観測](records/development/2026-08-07-llmgp-external-review-assets-observation-v1.json) — SHA-256 `872c4736b33f4c314e1fc3bd22ffb52ce8be5de6b0dcfaca3b9841921ae6bc07`
 - [伏字化規則の不在 観測](records/development/2026-08-07-redaction-rules-absent-observation-v1.json) — SHA-256 `c77d4c385a7ac8b4cb52128acfd19e51da8655df2e8e9f70033aa36c27f88673`
 - [機密関連の実施順序 Decision](records/development/2026-08-07-confidentiality-work-order-decision-v1.md) — SHA-256 `ca5c4a89adb6ab2807887bb7834c4778f4e8658a697deb9f64617893dd67de09`
@@ -47,23 +48,23 @@
 
 ## 次に行う一作業
 
-LLMGPの外部APIレビュー実運用資産を調査し、何を継承すべきかを整理する。所在は`/Users/Daily/Development/WindTurbineWake/LLMGP/.reviewcompass/specs/_cross_feature/reviews/`（観測recordに固定済み）。まず最新の1回分（`2026-07-27-requirements-redraft-triad-review`）を精読し、マスク済み対象の作り方・レビュー基準の構成・事前分析の役割を把握してから調査範囲を判断する（Humanと合意した案1）。
+出口の設計提案v3を書く。調査結果record（`INV-LLMGP-EXTERNAL-REVIEW-ASSETS-001`）の継承点§3を土台にする。骨格は開発元ReviewCompassの新世代（送信直前検査の単一実装・trusted入口・content-addressed manifest・承認消費の排他claim）、接続先はRC3の`tools/bootstrap/`既存機構（`runner`注入点から外への経路と関門を設計。並行機構は新設しない）。v2の考案値（上限20件等）は件数上限でなく「1プロンプト1判断」への分割で再設計する。開発元の未精読分（`review_input_guard.py`等）は出口の関門に関わる範囲だけ精読する。
 
 開始条件：
 
-- なし（本sessionでHumanが案1を選定）
+- Humanの着手指示（実施順序Decision `DEC-CONFIDENTIALITY-WORK-ORDER-001` 1番の継続）
 
 完了条件：
 
-- 調査結果recordが固定され、出口の設計提案v3で継承すべき点が特定されること
+- 提案v3が固定され、Human判断に付されること
 
-後続作業：出口の設計提案v3（LLMGP資産を踏まえた書き直し。上限20件など私が考案した値は仮説として再検証する）→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。
+後続作業：実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：なし。次作業（LLMGP資産の調査）は本sessionで案1として選定済み。
-- 継続する留意点：本sessionで背景調査の不足が5件あった（既存台帳の見落とし、module境界の侵犯、伏字化の前提誤り、提案v1の粒度・用途欠落、LLMGP資産の見落とし）。提案を書く前に(1)既存機構の確認 (2)前提の実測 (3)用途の列挙を行う規律を提案v2から導入したが、LLMGPの件は**記録が指す外部sourceまで見ていなかった**ため防げなかった。確認の範囲を「現repository」から「記録が指す先」まで広げる。
+- Human判断待ち：なし。次作業（提案v3起草）の着手指示を待つ。
+- 継続する留意点：背景調査の不足が累計5件、さらに本調査で6件目の未遂があった（配備先コピーを最新と誤認し、開発元の存在をHuman指摘で知った）。規律を三段で持つ：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認の範囲は「記録が指す先」まで (3)**指された物が写しなら原本（開発元）まで遡り、鮮度（最終commit日）を確認してから状態を断定する**。
 
 ## stale・deferred
 
@@ -76,7 +77,7 @@ LLMGPの外部APIレビュー実運用資産を調査し、何を継承すべき
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：伏字化規則 9 passed（宣言E1〜E9。E9はGREEN後の反証レビューで発見した実値漏れの処置）
+- 直近の関連Test：なし（本作業は読み取り調査とrecord作成のみ。code変更なし）
 - 直近の全Test：venv pytest 1140 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
