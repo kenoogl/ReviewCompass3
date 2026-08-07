@@ -1,139 +1,78 @@
 # AGENTS.md
 
-## 作業進行
+本文書は入口と判断規則の最小集である。詳細は§4末尾の正本へ委譲する。規則の追加は実害または
+根拠recordを要し、追加の前に既存規則への統合を検討する。記述が実装またはDecisionと食い違う
+場合は実測を優先し、食い違いを観測として記録して本文書を更新する（根拠：2026-08-08の実害、
+`records/development/2026-08-08-egress-name-contract-adjudication-v1.md`と同日の手戻り）。
 
-- 利用者から指示を受けたら、作業開始前に指示を自分の理解で復唱する。
-- 作業開始前に、具体的な作業項目を適切な粒度で示す。
-- 当面の開発作業は`docs/development/2026-08-03-initial-development-checklist.md`を開始入口とし、
-  authority文書との一致を確認して、未完了の先頭工程から進める。
-- checklistのcheckboxだけを完了根拠にせず、各節の固定Evidenceを確認する。
-- `TODO_NEXT_SESSION.md`の読取、作成、更新、検証は、唯一の共通手順`docs/development/prompts/todo-handoff-update.md`に従う。
-- 作業後に、実施内容と確認結果を報告する。
-- 「実施した」という報告だけを完了根拠にしない。実施、結果、判断、提案、未実施を分け、
-  実施・結果・判断にはpath、diff、Digest、command結果、commit SHA、receiptまたはDecisionを対応付ける。
-- Evidenceがない報告は`reported_unverified`として未完了にし、報告と事後状態が違う場合は
-  `report_execution_mismatch`として完了判断を停止し、影響を受ける表示と判断をstaleにする。
-- Claude、Codexサブエージェント、人またはscriptへ委譲した作業のレビューは、
-  `docs/development/work-review-protocol.md`を共通入口として実行者に依存しない順序で確認する。
-- 問題がある場合は、起きている事象とその原因を平易に説明する。
-- LLMは文章操作と意味分析に限定し、決定的な変換、抽出、集計、照合、file操作、Test、Git確認、
-  command実行は機械処理を使用する。機械処理が未整備なら手作業で常態化させず改善候補へrouteする。
-- 手戻りが発生した場合は、手作業箇所との因果を確認する。手作業が原因または原因候補なら、作業後報告に
-  対象操作、期待executor、実executor、手作業理由、手戻り事象とEvidence、機械処理候補、routeを含める。
-- test・validatorの合否は、**単独で実行したcommandの終了コード**で確認する。pipeや`;`連結の後段で
-  合否を判定しない。連結すると失敗の終了コードが隠蔽される（実害：2026-08-08、不合格のままの
-  コミットが2件通過した）。
-- `.reviewcompass/workflow/`配下の台帳recordは、**対応する正規tool（検証器を含む）だけで作成・変更する**。
-  既存recordの雛形複製による手書きを禁止する（実害：2026-08-08、手書きrecordが台帳整合テスト9件に
-  不合格となりrevertした）。
-- 本文書の制度記述が実装またはDecisionと食い違う場合は、**実測を優先**し、食い違いを観測として
-  記録したうえで本文書を更新する。制度記述には根拠となるDecisionまたはrecordを併記する
-  （実害：2026-08-08、単体候補N1改定〔2026-08-06〕に本文書が追随せず、誤った「登録不可」判断の
-  根拠になった）。
+## 1. 入口
 
-## 報告の信頼性規則
+- 指示を受けたら自分の理解で復唱し、作業開始前に作業項目を適切な粒度で示す。
+- 開発は`docs/development/2026-08-03-initial-development-checklist.md`を入口とし、authority文書との
+  一致と各節の固定Evidenceを確認する。checkboxだけを完了根拠にしない。
+- `TODO_NEXT_SESSION.md`の読取・作成・更新・検証は`docs/development/prompts/todo-handoff-update.md`
+  の共通手順だけを使う。
+- 委譲した作業のレビューは`docs/development/work-review-protocol.md`を共通入口とする。
 
-検証済みの答えが記録に既にあるのに、その場の浅い検索で代用して誤った主張を判断材料として
-出す事象が実際に発生した。次を厳守する。
+## 2. 報告と判断の規則
 
-- 事実の主張には出どころのラベルを付ける。**【実測】**＝その場でcommandを実行して確かめた
-  （commandと結果を示す）。**【記録】**＝検証済みrecordから引いた（pathを示す）。
-  **【推測】**＝読んだだけで未確認。
-- **人の判断に影響する主張は【実測】か【記録】だけで出す。** 【推測】を出す場合は推測と明記し、
-  判断材料にしないよう添える。
-- 主張を出す前に、その問いの答えを持つ既存recordを先に探す。検索よりrecordが先。
-- 重要な主張は、出す前に**反証を1つ機械で試す**（主張が偽になる条件を1つ確かめる）。
-- ラベルの無い主張は、確認を省いた印である。利用者は「それは実測か、記録か、推測か」と
-  問い返してよい。
+- 報告は実施・結果・判断・提案・未実施を分け、実施・結果・判断にはpath、diff、Digest、
+  command結果、commit SHA、receiptまたはDecisionを対応付ける。Evidenceの無い報告は
+  `reported_unverified`、報告と事後状態の相違は`report_execution_mismatch`として完了判断を停止し、影響を受ける表示と判断をstaleにする。
+- 事実の主張には【実測】【記録】【推測】のラベルを付け、人の判断に影響する主張は実測か記録だけで
+  出す。主張の前に既存recordを先に探し、重要な主張は反証を1つ機械で試す。ラベルの無い主張には
+  利用者が出どころを問い返してよい。
+- 深掘りの停止：本線中の発見は記録し、その場で直さない。対処が必要なら3択（いま対処／候補として
+  後回し／本線へ戻る）と現行Plan上の位置づけを併記して人へ渡す。連鎖の深さ2以上の対処は開始前に
+  停止して人の判断を得る。本線外の対処は1作業単位に原則1本。未承認の設計変更・schema変更・
+  既存Testの書換えが必要と判明した時点で止める。有用な発見ほど候補として記録し本線の区切りで扱う。
+- 手戻りが発生したら、対象操作・期待executor・実executor・手作業理由・事象とEvidence・
+  機械処理候補・routeを作業後報告に含める。
+- 問題がある場合は、事象と原因を平易に説明する。
 
-本規則は判断の規則であり、機械では守らせられない。
+## 3. 機械規律
 
-## 深掘りの停止規則
+- LLMは文章操作と意味分析に限定し、決定的な変換・抽出・集計・照合・file操作・Test・Git確認・
+  command実行は機械処理を使う。未整備なら手作業を常態化させず改善候補へrouteする。
+- test・validatorの合否は**単独で実行したcommandの終了コード**で確認する。pipeや`;`連結の後段で
+  合否を判定しない（根拠：2026-08-08、不合格コミット2件通過の実害）。
+- `.reviewcompass/workflow/`配下の台帳recordは**対応する正規tool（検証器を含む）だけで作成・変更**
+  する。雛形複製の手書きを禁止する（根拠：2026-08-08、台帳整合テスト不合格とrevertの実害）。
 
-本線の作業中に見つけた問題を追ううちに、未承認の設計変更が必要な地点へ到達して動けなくなる事象が
-実際に発生した。発見は価値があるが、対処は本線を止める。次を厳守する。
+## 4. 開発と改善の要点
 
-- 本線の作業中に見つけた問題は、**見つけることを止めない。直すことを止める。** 発見は改善候補として
-  記録し、その場で対処しない。
-- 対処が必要と考えたときは、必ず次の3つを併記して人へ渡す。(1) いま対処する (2) 候補として記録し
-  後回しにする (3) 本線へ戻る。あわせて、その作業が現行Planの初期実装順のどこに位置づくかを示す。
-  位置づけが無い場合は「位置づけ無し」と明示する。
-- **連鎖の深さを数える。** 本線の副産物を深さ1、その対処が掘り当てた問題を深さ2とする。
-  **深さ2以上の対処は、開始前に必ず停止して人の判断を得る。**
-- 一つの作業単位で、本線以外の対処は原則1本までとする。
-- 対処の途中で、未承認の設計変更、schema変更、既存Testの書換えが必要と判明した時点で、
-  **その場で止めて人へ渡す**。到達した地点と、そこまでに分かった事実を記録する。
-- 深掘りで有用な発見が得られたことは、深掘りを続けてよい理由にならない。**有用な発見ほど候補として
-  記録し、本線の区切りで扱う。**
-
-本規則は判断の規則であり、機械では守らせられない。宣言しただけで検査が無い規則は守られないという
-教訓は本規則自身にも当てはまる。
-
-## 開発方針
-
-- SDDと小さなE2E縦切りを基本単位とする。
-- 振る舞いを変更する場合、実装前または同一変更内で関連テストを用意し、
-  変更がなければ失敗することを確認する。
-- 赤テストだけのコミットは必須にしない。統合対象のコミットは原則として緑にする。
-- 要求の誤解または設計変更が判明した場合は、理由を記録してテストを修正できる。
-- 変異検査、実データ検証、独立レビューは高リスク境界に適用する。
-- validatorまたは入力前提を変更した場合は旧合格をstaleとし、risk別の正例・負例・境界例と
-  必要な独立oracleを再実行する。
-- 成果物を書き換えた場合は、再読込、関連validator、参照整合、stale閉包を確認する。
-- 文書、試作、調査には形式的な赤緑サイクルを強制しない。
-- Pythonは4スペースとし、その他の言語は標準フォーマッターに従う。
-  既存ファイルは機能変更と無関係な一括整形をせず、変更時に段階的に合わせる。
-- Human承認は、方針変更、外部送信、不可逆操作、意味的裁定、段完了に要求する。
-- 自己適用にはstableと判定された機能だけを使用する。
-- 自己適用中に問題、改善案、新機能案を見つけた場合、現行Plan、Task Contract、Testまたは
-  受入基準を先に書き換えず、発生元Work、固定source、Evidenceを持つ改善候補
-  （`improvement_candidate`）として記録し、分類、停止判定、routeを行う。
-- safety、authority、Acceptanceの真偽、必須Provenance、source／Test／Verdict identity、不可逆または
-  外部side effectへ影響する候補では現行Workを停止する。それ以外はcheckpointで扱う。
-- AIまたは機械の分類とrouteは提案として扱い、上流改定、Issue昇格、risk受容、再開はHumanが判断する。
-  採用候補はconsumerとOutcomeへ接続されるまでclosedにしない。
-- 改善候補の登録は既存経路で行う。まず`OBS-`始まりの観測recordを作り、それを`source_identity`へ
-  束縛した`IC-`始まりの候補を`.reviewcompass/workflow/improvement-candidates/`へ置き、
+- SDDと小さなE2E縦切りを基本単位とする。振る舞いの変更は関連テストを実装前または同一変更内で
+  用意し、変更が無ければ失敗することを確認する。赤テストだけのコミットは必須にしない。統合対象のコミットは原則緑。要求の誤解や設計変更が
+  判明したら理由を記録してテストを修正できる。文書・試作・調査に赤緑サイクルを強制しない。
+- 変異検査・実データ検証・独立レビューは高リスク境界に適用する。validatorまたは入力前提を変更したら
+  旧合格をstaleとし、risk別の例と独立oracleを再実行する。成果物を書き換えたら再読込・関連validator・
+  参照整合・stale閉包を確認する。
+- Pythonは4スペース、他言語は標準フォーマッター。機能変更と無関係な一括整形をせず、変更時に段階的に合わせる。
+- Human承認は方針変更・外部送信・不可逆操作・意味的裁定・段完了に要求する。
+- 自己適用にはstable機能だけを使う。自己適用中の発見は改善候補（`improvement_candidate`）として
+  記録し、safety・authority・Acceptance真偽・必須Provenance・identity・不可逆や外部side effectに
+  影響する候補は現行Workを停止、それ以外はcheckpointで扱う。AIの分類とrouteは提案であり、
+  上流改定・Issue昇格・risk受容・再開はHumanが判断する。採用候補はconsumerとOutcomeへ接続されるまでclosedにしない。
+- 改善候補の登録は既存経路で行う：`OBS-`観測record→`source_identity`で束縛した`IC-`候補を
+  `.reviewcompass/workflow/improvement-candidates/`へ置き、
   `python3 -m tools.development.issue_resolution_pilot --config config/development-issue-resolution-pilot-v3.json record <path>`
-  で検証する。候補記録の形式そのものの作り直しを先に提案しない。
-- 改善候補に対するHumanの仕分け判断は`records/development/`のDecision recordへ記録する。旧Pilotの
-  仕分け判断とIssueの置き場所は各1件で凍結されており、新しい記録を追加しない。V4の置き場所は、
-  固定bundle参照に加えて**単体候補の決定（単体形式N1）を受け付ける**（2026-08-06のN7改定、
-  Human承認。実例：`ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）。単体候補のトリアージ決定は
+  で検証する。仕分け判断は`records/development/`のDecision recordへ記録する。V4の置き場所は
+  固定bundle参照に加えて単体形式N1を受け付ける（2026-08-06のN7改定。実例：
+  `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）。トリアージ決定は
   `tools/development/issue_intake_v4.py`の`build_human_triage_decision`で組み立て、台帳整合検証に
-  合格させる。
-- 詳細は`docs/development/2026-08-02-development-policy.md`を正本とする。
+  合格させる。旧Pilotの置き場所は凍結のまま。候補記録の形式の作り直しを先に提案しない。
+- 正本：開発方針の詳細＝`docs/development/2026-08-02-development-policy.md`。
 
-## コミット方針
+## 5. コミット
 
-通常の開発作業のコミットは、次の最小条件をすべて満たす場合、コミットごとの利用者の明示指示なしに
-行ってよい。正本は`records/development/2026-08-05-semantic-commit-minimal-guards-decision-v1.md`
-（`DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`）とする。
-
-- 一つの目的と確認結果を独立して説明できる、意味的に完結した作業単位である。
-  ファイル数だけを基準に分割せず、途中状態が不整合またはテスト失敗になる分割はしない。
-- stage対象は、明示したrepository-relative pathの列挙だけである。`git add -A`、`git add .`、
-  範囲外ファイルの一括追加を使わない。
-- `git diff --check`と、変更に応じたtest／validatorを実行して合格している。引き継ぎ文書を含める場合は、
-  上記の共通手順が定める検査にも合格している。
-- コミット後はread-onlyで状態を照合し、完了済み作業単位を未コミットのまま次の作業へ渡さない。
-  自己SHAまたはremote状態の転記だけを目的とする追加コミットを作らない。
-
-次は引き続き利用者の明示承認を必要とし、通常コミットの自律化に含めない。
-
-- 方針変更、段完了、意味的裁定、不可逆操作、外部送信
-- push、tag、amend、rebase、reset、force push、履歴書換え
-- sandboxまたはhostの権限の迂回
-
-その他の運用は従来どおりとする。
-
-- 完了した作業単位を未コミットのまま次の作業単位へ進めない。作業単位の完了時と、利用者から
-  「次へ」相当の指示を受けた時は、
-  `python3 tools/development/work_unit_transition.py --work-status completed`を実行する。
-- preflightが`completed_work_unit_uncommitted`を返した場合は、上の最小条件を満たす意味単位コミットを
-  行い、transitionを再実行する。条件を満たせないときだけ停止して利用者へ報告する。
-  作業中のdirty差分だけではこの状態に分類しない。
-- 利用者が一括コミットまたは分割方法を指定した場合は、その指定を優先する。
-- 最終コミット前のhandoff更新と検査も、上記の共通手順に従う。
-- guarded commit、hook、コミットごとの恒久的な承認ファイル、巨大なcommit manifestは導入しない。
-- `stage_completion`など、既存のHuman承認境界は緩めない。これらは通常のGit commitを意味しない。
+- 正本は`DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`
+  （`records/development/2026-08-05-semantic-commit-minimal-guards-decision-v1.md`）。最小条件——
+  意味的に完結した単位（ファイル数だけで分割せず、途中状態が不整合やテスト失敗になる分割をしない）・明示pathだけのstage・`git diff --check`と該当test／validator合格・
+  コミット後のread-only照合——を満たす通常コミットは、コミットごとの明示指示なしに行ってよい。
+- 次は引き続き明示承認を要する：方針変更・段完了・意味的裁定・不可逆操作・外部送信、
+  push・tag・amend・rebase・reset・force push・履歴書換え、sandboxやhost権限の迂回。
+- 完了した作業単位を未コミットのまま次へ進めない。完了時と「次へ」相当の指示時に
+  `python3 tools/development/work_unit_transition.py --work-status completed`を実行し、
+  `completed_work_unit_uncommitted`なら最小条件を満たす意味単位コミットの後に再実行する。
+  満たせないときだけ停止して報告する。作業中のdirty差分だけではこの状態に分類しない。自己SHAやremote状態の転記だけを目的とする追加コミットを作らない。利用者がコミット方法を指定したらそれを優先する。
+  guarded commitやhook等は導入せず、`stage_completion`など既存のHuman承認境界は緩めない。
