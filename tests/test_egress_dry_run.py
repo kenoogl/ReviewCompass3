@@ -37,11 +37,8 @@ def _routine(path, start, end, name):
 
 @pytest.fixture
 def dataset(tmp_path):
-  source = tmp_path / "mod.py"
-  source.write_text(
+  (tmp_path / "mod.py").write_text(
     "def make_widget():\n"
-    "  shared_core = 1\n"
-    "def make_widget_copy():\n"
     "  shared_core = 1\n"
     "def alpha_beta():\n"
     "  ccc_value = 1\n"
@@ -49,11 +46,16 @@ def dataset(tmp_path):
     "  ddd_value = 1\n",
     encoding="utf-8",
   )
+  (tmp_path / "mod2.py").write_text(
+    "def make_widget():\n"
+    "  shared_core = 1\n",
+    encoding="utf-8",
+  )
   routines = [
     _routine("mod.py", 1, 2, "make_widget"),
-    _routine("mod.py", 3, 4, "make_widget_copy"),
-    _routine("mod.py", 5, 6, "alpha_beta"),
-    _routine("mod.py", 7, 8, "alpha_beta_two"),
+    _routine("mod2.py", 1, 2, "make_widget"),
+    _routine("mod.py", 3, 4, "alpha_beta"),
+    _routine("mod.py", 5, 6, "alpha_beta_two"),
   ]
   routines_by_id = {r["symbol_id"]: r for r in routines}
   groups_by_id = {
