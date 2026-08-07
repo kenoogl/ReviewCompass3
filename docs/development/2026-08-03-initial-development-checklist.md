@@ -991,14 +991,31 @@ GREEN Evidence v1の記述は`records/development/2026-08-06-work6a-evidence-cor
 
 ## 10. Work 5B：内部Implementation Task Contract Pilot
 
-- [ ] ReviewCompass3自身の小さなhelper一件を選定した。
-- [ ] Contract、red、固定source、Index／Ledger照合を通した。
-- [ ] Humanの`implementation_ready`判断を記録した。
+- [x] ReviewCompass3自身の小さなhelper一件を選定した。
+- [x] Contract、red、固定source、Index／Ledger照合を通した。
+- [x] Humanの`implementation_ready`判断を記録した。
 - [ ] Testを弱めずgreen実装、refactor、台帳更新を行った。
-- [ ] post-write verification、Provenance、分割commitを確認した。
-- [ ] provisionalな自己適用能力を正式Runtime既定にしていない。
+- [x] post-write verification、Provenance、分割commitを確認した。
+- [x] provisionalな自己適用能力を正式Runtime既定にしていない。
 
-`Evidence`：未記録
+`Evidence`：対象helperは宣言→RED対応表検査器（`tools/development/declaration_red_map_check.py`）。
+選定・恒久tool化承認は`DEC-WORK5B-START-001`
+（`records/development/2026-08-07-work5b-start-decision-v1.md`）。Contractは
+`TC-WORK5B-DECLARATION-RED-MAP-CHECK-001`
+（`records/development/2026-08-07-work5b-implementation-task-contract-v1.json`）。台帳（Index／Ledger）は
+未整備のため、照合はWork 4B最小試行の再利用検索record＋gate判定
+（`records/development/2026-08-07-declaration-red-map-checker-reuse-search-v1.json`、
+`start_allowed: true`）で代替した（`DEC-WORK4A-EARLY-EXIT-001`の境界どおり）。
+`implementation_ready`は設計議論の終了を条件とするHuman承認により成立
+（`DEC-WORK5B-IMPLEMENTATION-READY-001`、議論証跡は`DEC-WORK5B-DISCUSSION-OUTCOMES-001`）。
+REDは`records/development/2026-08-07-work5b-red-map-checker-red-evidence-v1.md`（宣言C1〜C4、
+testの無い宣言0件）、GREENと第一実運用は
+`records/development/2026-08-07-work5b-checker-green-evidence-v1.md`と
+`records/development/2026-08-07-work5b-checker-first-run-v1.json`（4枚中3枚passed、自己検査passed、
+Intake V4対応表に実在所見2件——処置はHuman判断待ち）。公式全Testは`1066 passed`、fallback `false`。
+4番目の項目はgreen実装とrefactorを完了したが、**台帳更新は台帳未整備のため実施できず**、
+検索recordのnew-only追加で代替した。台帳の行き先はWork 4B本体の設計束であり、本項目は台帳整備後に
+完了へ戻す。**Work 5Bの段完了ではない。** 段完了はHuman判断とする。
 
 ## 11. Work 7A：`local_integrated` deployment E2E
 
