@@ -132,6 +132,11 @@ Task Contract、受入条件、Test、validator、Human判断などのoracleを�
 `high`のcodeでは、期待挙動を実行者のTestからではなく上流（承認Decision、設計、Contract、
 Requirement）から独立に導出して照合する。実行者が書いたTestの再実行だけを独立oracleに数えない。
 
+**機械が検証していない箇所**は`tools/development/verification_boundary.py`の宣言
+（`unverified_fields`）に列挙してある。Human裁定文、実行結果の説明、候補の提案文、host申告の
+権限などがこれにあたる。これらの欄の合格表示は「検証した」ではなく「検証対象外」を意味する。
+reviewerはこの一覧を、Humanが確認すべき対象として扱う。
+
 LLMまたは別エージェントによる再読だけを、決定的Testや実状態照合の代わりにしない。同じモデル系の
 サブエージェントによるレビューも、`high` risk作業の唯一の独立oracleにはしない。
 
