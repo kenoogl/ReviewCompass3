@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "work5b/declaration-red-map-checker",
+  "external": {
+    "relative_path": "work4b/reuse-searches/93343aaba1d318aa79d706e6cb4b6a38468d17816b1cfbbc96761be8e6efc0d1.json",
+    "content_digest": "93343aaba1d318aa79d706e6cb4b6a38468d17816b1cfbbc96761be8e6efc0d1",
+    "byte_sha256": "a0f2f14836ca260496db2d90cbcc8845d19c1610c864450ab54f0b868eca0306"
+  },
+  "source_identity": {
+    "profile_run_id": "55fdacd5aec93a857b7c4900eb895488f77b5f57419c25af5309fdafe10ad8c1",
+    "discovery_run_id": "4dabb03b820bfbbac01c5d6e38e7e208f19703b617d7cd7376f38a82bea0293d",
+    "source_content_id": "978da3d1bcc6a2f49cf22e90fa32799daf6f6a1da493397c91f3e0eaa16265a2",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 1,
+  "hit_count": 958,
+  "content_digest": "f330f92bf984ab2028091ff76e96868d110c6b5a648be4d0c6dfd15e7a6a0432"
+}

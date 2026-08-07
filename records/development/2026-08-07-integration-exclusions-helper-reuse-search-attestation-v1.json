@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "work4b-a1/integration-exclusions-helper",
+  "external": {
+    "relative_path": "work4b/reuse-searches/eec45eaa2033394e8e87c8301cd12c26426ec6a5b9fad7fdc1f24b03e57199b2.json",
+    "content_digest": "eec45eaa2033394e8e87c8301cd12c26426ec6a5b9fad7fdc1f24b03e57199b2",
+    "byte_sha256": "cb224184565d6cc9185c57dcb6e8b188fb6d68957deb47dffe1a0dbc606ca58d"
+  },
+  "source_identity": {
+    "profile_run_id": "55fdacd5aec93a857b7c4900eb895488f77b5f57419c25af5309fdafe10ad8c1",
+    "discovery_run_id": "4dabb03b820bfbbac01c5d6e38e7e208f19703b617d7cd7376f38a82bea0293d",
+    "source_content_id": "978da3d1bcc6a2f49cf22e90fa32799daf6f6a1da493397c91f3e0eaa16265a2",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 1,
+  "hit_count": 310,
+  "content_digest": "19777990ac4c7d8b536f648e7bc8c11822720ec9f364de372e4b311ffedca99c"
+}

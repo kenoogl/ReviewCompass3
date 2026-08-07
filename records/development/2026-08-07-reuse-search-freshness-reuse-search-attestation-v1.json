@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "work4b-b/reuse-search-freshness",
+  "external": {
+    "relative_path": "work4b/reuse-searches/9b117d50c51aef672e0181a7d0c3c6e4055d128b3788c2e20d164caf84723acb.json",
+    "content_digest": "9b117d50c51aef672e0181a7d0c3c6e4055d128b3788c2e20d164caf84723acb",
+    "byte_sha256": "6c6919bff4c1f909a2fa5b19633d992963541f737ed9d1e466ad50c21b20c94f"
+  },
+  "source_identity": {
+    "profile_run_id": "55fdacd5aec93a857b7c4900eb895488f77b5f57419c25af5309fdafe10ad8c1",
+    "discovery_run_id": "4dabb03b820bfbbac01c5d6e38e7e208f19703b617d7cd7376f38a82bea0293d",
+    "source_content_id": "978da3d1bcc6a2f49cf22e90fa32799daf6f6a1da493397c91f3e0eaa16265a2",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 1,
+  "hit_count": 194,
+  "content_digest": "7ba07b257c9d009e66a48e472b8620c19435d97a645d30f1472b10c39ccf8046"
+}

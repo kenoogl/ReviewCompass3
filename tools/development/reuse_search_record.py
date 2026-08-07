@@ -317,22 +317,9 @@ def write_reuse_search_record(*, path, record):
     )
 
 
-def gate_check(*, record_path, expected_identity, project_root="."):
-    """実装開始のgate判定。record不存在・結線不一致・鮮度乖離はfail-closedで開始不可。"""
+def _gate_verdict(record, *, expected_identity, project_root):
+    """読み込み済みrecordに対する共通のgate判定（検証と鮮度再計測）。"""
 
-    target = Path(record_path)
-    if not target.is_file():
-        return {
-            "start_allowed": False,
-            "reason": "reuse_search_record_missing",
-        }
-    try:
-        record = json.loads(target.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {
-            "start_allowed": False,
-            "reason": "reuse_search_record_unreadable",
-        }
     try:
         validate_reuse_search_record(record, expected_identity=expected_identity)
     except ReuseSearchError as error:
@@ -371,3 +358,130 @@ def gate_check(*, record_path, expected_identity, project_root="."):
         "reason": "reuse_search_record_verified",
         "freshness": "assessed_fresh",
     }
+
+
+def gate_check(*, record_path, expected_identity, project_root="."):
+    """実装開始のgate判定。record不存在・結線不一致・鮮度乖離はfail-closedで開始不可。"""
+
+    target = Path(record_path)
+    if not target.is_file():
+        return {
+            "start_allowed": False,
+            "reason": "reuse_search_record_missing",
+        }
+    try:
+        record = json.loads(target.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {
+            "start_allowed": False,
+            "reason": "reuse_search_record_unreadable",
+        }
+    return _gate_verdict(
+        record, expected_identity=expected_identity, project_root=project_root
+    )
+
+
+_EXTERNAL_DIRECTORY = "work4b/reuse-searches"
+
+
+def _external_relative_path(record):
+    return f"{_EXTERNAL_DIRECTORY}/{record['content_digest']}.json"
+
+
+def _build_attestation(record, *, byte_sha256):
+    document = {
+        "record_kind": "reuse_search_attestation",
+        "schema_version": 1,
+        "subject": record["subject"],
+        "external": {
+            "relative_path": _external_relative_path(record),
+            "content_digest": record["content_digest"],
+            "byte_sha256": byte_sha256,
+        },
+        "source_identity": dict(record["source_identity"]),
+        "record_schema_version": record["schema_version"],
+        "hit_count": len(record["hits"]),
+    }
+    document["content_digest"] = _content_digest(document)
+    return document
+
+
+def _write_new_text(path, text):
+    target = Path(path)
+    if target.exists():
+        raise ReuseSearchError(f"target already exists: {target}")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text, encoding="utf-8")
+    return target
+
+
+def externalize_reuse_search_record(*, record, data_root, attestation_path):
+    """record本体を外部rootへ、証明書をproject内へ、いずれもnew-onlyで書く。"""
+
+    external = Path(data_root) / _external_relative_path(record)
+    _write_new_text(
+        external, json.dumps(record, ensure_ascii=False, indent=2) + "\n"
+    )
+    attestation = _build_attestation(record, byte_sha256=file_sha256(external))
+    _write_new_text(
+        attestation_path,
+        json.dumps(attestation, ensure_ascii=False, indent=2) + "\n",
+    )
+    return attestation
+
+
+def migrate_reuse_search_record(*, record_path, data_root, attestation_path):
+    """既存recordをbyte一致で外部化する。旧位置recordは削除せず保持する。"""
+
+    source = Path(record_path)
+    payload = source.read_bytes()
+    record = json.loads(payload.decode("utf-8"))
+    external = Path(data_root) / _external_relative_path(record)
+    if external.exists():
+        raise ReuseSearchError(f"target already exists: {external}")
+    external.parent.mkdir(parents=True, exist_ok=True)
+    external.write_bytes(payload)
+    if external.read_bytes() != payload or not source.is_file():
+        raise ReuseSearchError("migration is not byte identical")
+    attestation = _build_attestation(record, byte_sha256=file_sha256(external))
+    _write_new_text(
+        attestation_path,
+        json.dumps(attestation, ensure_ascii=False, indent=2) + "\n",
+    )
+    return {
+        "byte_identical": True,
+        "external_path": str(external),
+        "attestation_path": str(attestation_path),
+        "content_digest": record["content_digest"],
+    }
+
+
+def gate_check_attested(*, attestation_path, data_root, expected_identity, project_root="."):
+    """証明書経由のgate判定。外部recordの欠落・改竄はfail-closedで開始不可。"""
+
+    try:
+        attestation = json.loads(Path(attestation_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {"start_allowed": False, "reason": "attestation_unavailable"}
+    external_ref = attestation.get("external", {})
+    relative = external_ref.get("relative_path")
+    if (
+        not isinstance(relative, str)
+        or Path(relative).is_absolute()
+        or ".." in Path(relative).parts
+    ):
+        return {"start_allowed": False, "reason": "attestation_unavailable"}
+    external = Path(data_root) / relative
+    if not external.is_file():
+        return {"start_allowed": False, "reason": "record_unavailable"}
+    if file_sha256(external) != external_ref.get("byte_sha256"):
+        return {"start_allowed": False, "reason": "record_unavailable"}
+    try:
+        record = json.loads(external.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {"start_allowed": False, "reason": "record_unavailable"}
+    if record.get("content_digest") != external_ref.get("content_digest"):
+        return {"start_allowed": False, "reason": "record_unavailable"}
+    return _gate_verdict(
+        record, expected_identity=expected_identity, project_root=project_root
+    )

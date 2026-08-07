@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "work4b-minimal-pilot/reuse-search-record-helper",
+  "external": {
+    "relative_path": "work4b/reuse-searches/dc3f6a2a7450eaeed60f7254fb8e61a7e1d3ca7ed1554b62993ac3cd9ddb46c6.json",
+    "content_digest": "dc3f6a2a7450eaeed60f7254fb8e61a7e1d3ca7ed1554b62993ac3cd9ddb46c6",
+    "byte_sha256": "75cb79034e26e65b0aefff4525d4d134f5f3bcae3a34c88cb010edcb5fa6f58d"
+  },
+  "source_identity": {
+    "profile_run_id": "55fdacd5aec93a857b7c4900eb895488f77b5f57419c25af5309fdafe10ad8c1",
+    "discovery_run_id": "4dabb03b820bfbbac01c5d6e38e7e208f19703b617d7cd7376f38a82bea0293d",
+    "source_content_id": "978da3d1bcc6a2f49cf22e90fa32799daf6f6a1da493397c91f3e0eaa16265a2",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 1,
+  "hit_count": 1654,
+  "content_digest": "00b3e0f2fd201a3dfcd8fd11974291ee1e1d1b503fedfcc641eed9298720350c"
+}

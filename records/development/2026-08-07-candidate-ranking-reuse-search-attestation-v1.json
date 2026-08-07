@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "work4b-a2/candidate-ranking",
+  "external": {
+    "relative_path": "work4b/reuse-searches/0a4793e47d301a70280c2b59ef13e6deeeea82920cf34f538fce4818e6d97be3.json",
+    "content_digest": "0a4793e47d301a70280c2b59ef13e6deeeea82920cf34f538fce4818e6d97be3",
+    "byte_sha256": "127ddefd45680a9abea6274b4dc2254ffb884c02e7d582d027d44baa6bda2e26"
+  },
+  "source_identity": {
+    "profile_run_id": "079162d49b41c7e4703b4848dd3d3ee8ef892499ff34b0dce042320ada59448c",
+    "discovery_run_id": "e7eb2eee5459ebace2d4e2c1116225dc0e5f0af0449718b80d248042296c048f",
+    "source_content_id": "82634be2f6437338c2542554dcafd8028a3ae68da676d722d6e4fa6df7a2d6bd",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 101,
+  "content_digest": "2776192912d75258c9dff0a1d9e1efc153e7b2aa50066a5e6c7f1e7432a749bb"
+}

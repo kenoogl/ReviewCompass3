@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "work4b-d/routine-ledger",
+  "external": {
+    "relative_path": "work4b/reuse-searches/c4135cbde1f2c172eb3d8eb9ffffe52447c3806847e95d2255f93dc4a2fe9811.json",
+    "content_digest": "c4135cbde1f2c172eb3d8eb9ffffe52447c3806847e95d2255f93dc4a2fe9811",
+    "byte_sha256": "901d5a6f319ff811d6207e017165adb4c11ffcd862e0edbb74ce60c7b6e172cd"
+  },
+  "source_identity": {
+    "profile_run_id": "b4ba016eaac8bc07326ef24e8c730d235dcf97b01ed7c4312107bc96fff1b66d",
+    "discovery_run_id": "a66a4f5b28468fedcc6e9b94df75786bc6336a969fb56178fdeb1e049b7080b3",
+    "source_content_id": "748e7f6325506014aee5822aed0bb2ab7c68e515c971900a8c9375e5ef19f56a",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 303,
+  "content_digest": "69e46a4dcc40ab8c1ebf4897afd2e23e96c3a8d3b020931b31e9d432345a5999"
+}
