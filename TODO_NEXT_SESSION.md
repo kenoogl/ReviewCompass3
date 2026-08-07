@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：Work 5Bの対象helper（宣言→RED対応表検査器）がGREENと第一実運用まで完了した。検査gateの実証（実装前検索record→gate→Contract→red→implementation_ready→green）を一周し、恒久tool化が成立。第一実運用は4枚中3枚passed（自己検査passed）、Intake V4対応表に実在所見2件——処置はHuman判断待ち。設計議論の合意はDEC-WORK5B-DISCUSSION-OUTCOMES-001へ証跡化済み。台帳更新の項目だけ台帳未整備のため残る。
+- 現在作業：Work 4B本体設計束（DEC-WORK4B-MAIN-DESIGN-BUNDLE-001）の構成A-1が完了した。統合除外宣言record（承認済みE1凍結レーン・E2版固定・E3歴史保持）とhelperがGREENで、凍結の機械可読化（DEC-FROZEN-LANE-GUIDANCE-CORRECTION-001の原因1）が解消。宣言→RED対応表の照合は恒久検査器へ移行済み。次は設計束の実装順どおり構成B（Profile再観測の検索への組み込み）。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,33 +18,33 @@
 
 ## 最新のauthority／Evidence
 
-- [Work 5B検査器 GREEN Evidence](records/development/2026-08-07-work5b-checker-green-evidence-v1.md) — SHA-256 `020db589b586e6db741e0d5d347d31c30c89a077c390ebd2232c42dfccbb7d2c`
-- [検査器 第一実運用record](records/development/2026-08-07-work5b-checker-first-run-v1.json) — SHA-256 `e2c4fb658c289340f2d0ac3c27a7cb3bce8168b3dcccd6926de30c5e21aca20c`
+- [構成A-1 GREEN Evidence](records/development/2026-08-07-work4b-a1-integration-exclusions-green-evidence-v1.md) — SHA-256 `91910e837710140a43e0b060832b3726a1b11a5348a7ee4b59cc95b19467a153`
+- [統合除外宣言record](.reviewcompass/workflow/integration-exclusions/integration-exclusions-001--v1.json) — SHA-256 `f482bf3d6200e1c2a4fc17233d4e87ed098f04d053dc1fa56e69e481a4b090fd`
+- [設計束 承認Decision](records/development/2026-08-07-work4b-main-design-bundle-approval-decision-v1.md) — SHA-256 `6bbaea795f7280f006dce2834b0286bb7df0b1cdb05b12918d2ce7574c27bf5e`
+- [設計束提案（承認済み）](docs/design/2026-08-07-work-4b-main-design-bundle-proposal.md) — SHA-256 `14c629d2f45a1dd36cbb3ed60b311ead2898c1e07fe71ffc8e5d2c6365234b5b`
 - [設計議論の証跡Decision](records/development/2026-08-07-work5b-discussion-outcomes-decision-v1.md) — SHA-256 `8cfc4a1581ed53513d97f70fa78323f6dc574eb2555bbd35ed78c7a4e1214a9d`
-- [implementation_ready Decision](records/development/2026-08-07-work5b-implementation-ready-decision-v1.md) — SHA-256 `ad81728241f849b605954c6aa597215fed2811f5dbc1e6a21aafc5b508552554`
-- [Work 5B Contract](records/development/2026-08-07-work5b-implementation-task-contract-v1.json) — SHA-256 `89c92ae260bfb1efd201d414e0235b66ebb270b457942c59ef5fccfc9cfa5387`
-- [Work 4B最小試行 GREEN Evidence](records/development/2026-08-07-work4b-reuse-search-green-evidence-v1.md) — SHA-256 `3284f77507a2ad09992404cae1ced846a6fe5ccdd564af8c8c0e8772e0588e0c`
+- [Work 5B検査器 GREEN Evidence](records/development/2026-08-07-work5b-checker-green-evidence-v1.md) — SHA-256 `020db589b586e6db741e0d5d347d31c30c89a077c390ebd2232c42dfccbb7d2c`
 - [作業レビュー手順書（高risk観点追記後）](docs/development/work-review-protocol.md) — SHA-256 `22856c9836de2fd1a5d3a8a79d9437ea82150c8e167fb9ddc40ac6b82bb0a923`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `387907b9e4abc513b1c367daa57d8f6e48227b0c43b5c2f16b747523c37111e1`
 
 ## 次に行う一作業
 
-Work 4B本体設計束（DEC-WORK4B-MAIN-DESIGN-BUNDLE-001で承認済み）の構成A-1：統合除外宣言の初版entry（候補3件提示済み）のHuman裁定を得て、裁定済みentryで除外宣言recordをtest-firstで実装する。
+設計束の実装順どおり構成B：Profile再観測の検索への組み込み。`reuse_search_record`へ`freshness`欄（観測後の対象範囲の変更有無）を追加し、乖離があればgateが`profile_stale`で開始不可を返す。承認済み閾値は「対象範囲のfileに観測後の変更が1件でもあれば停止」。
 
 開始条件：
 
-- 初版entry候補3件（[候補一覧](records/development/2026-08-07-integration-exclusion-entries-candidate-v1.md)）のHuman裁定
+- なし（DEC-WORK4B-MAIN-DESIGN-BUNDLE-001で承認済み。確立済み関門——実装前検索gate、宣言→RED対応表、RED固定——を通す）
 
 完了条件：
 
-- 裁定済みentryの除外宣言record・schema・検証器がGREENで、宣言→RED対応表（恒久検査器で照合）を経ること
+- freshness判定がGREENで、既存の検索record・testを弱めていないこと
 
 後続作業：合意順序の③レビューbacklog上位2系統の先行反証レビュー、④残りのbacklogとRC2取り込み・外部APIレビュー（台帳整備後）。全routineの一括分類は行わない。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：(1) 統合除外宣言の初版entry候補3件の裁定。(2) 旧書庫の削除可否（別途判断）。
+- Human判断待ち：旧書庫の削除可否（別途判断）。
 
 ## stale・deferred
 
@@ -57,8 +57,8 @@ Work 4B本体設計束（DEC-WORK4B-MAIN-DESIGN-BUNDLE-001で承認済み）の�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：検査器 6 passed（宣言C1〜C4対応）、Contract結線 5 passed
-- 直近の全Test：venv pytest 1066 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：統合除外宣言 5 passed（宣言X1〜X4対応）
+- 直近の全Test：venv pytest 1071 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
