@@ -956,6 +956,27 @@ def validate_human_triage_decision(record, *, path, project_root, config):
     return True
 
 
+def check_decision_time_monotonicity(*, successor, previous):
+    """後継decisionの決定時刻が前版より過去へ戻ることを拒否する（反証I-2）。
+
+    文面の真偽は検証できないが、版の前後と時刻の前後が矛盾することは検出できる。
+    """
+
+    if successor["decision_id"] != previous["decision_id"]:
+        raise IntakeError(
+            "human_triage_decision_identity_invalid", successor["decision_id"]
+        )
+    if successor["decision_version"] <= previous["decision_version"]:
+        raise IntakeError(
+            "human_triage_decision_field_invalid", "decision_version"
+        )
+    if successor["decided_at"] < previous["decided_at"]:
+        raise IntakeError(
+            "human_triage_decision_time_not_monotonic", successor["decided_at"]
+        )
+    return True
+
+
 def resolve_effective_triage_decisions(decisions):
     """candidateごとに有効decisionを一つだけ決める。競合は拒否する。"""
 

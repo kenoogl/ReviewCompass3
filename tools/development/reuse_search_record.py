@@ -368,8 +368,47 @@ def _gate_verdict(record, *, expected_identity, project_root):
     }
 
 
-def gate_check(*, record_path, expected_identity, project_root="."):
-    """実装開始のgate判定。record不存在・結線不一致・鮮度乖離はfail-closedで開始不可。"""
+def _search_matches(record, *, profile_document, discovery_document, project_root):
+    """記録された検索結果を再現し、同一かどうかを返す（反証R-3）。
+
+    記録済みの宣言と観測から検索をやり直し、content digestを突き合わせる。
+    観測欄を持たないschema 1のrecordは再現の材料が無いため、照合しない。
+    """
+
+    if record["schema_version"] != 2:
+        return True
+    freshness = record["freshness"]
+    observation = {
+        "snapshot_id": freshness["observation_snapshot_id"],
+        "source_content_id": record["source_identity"]["source_content_id"],
+        "files": [
+            {"path": item["path"], "file_sha256": item["sha256"]}
+            for item in freshness["files_at_observation"]
+        ],
+    }
+    rebuilt = search_existing_routines(
+        profile_document=profile_document,
+        discovery_document=discovery_document,
+        declaration=record["declaration"],
+        observation_document=observation,
+        project_root=project_root,
+    )
+    return rebuilt["content_digest"] == record["content_digest"]
+
+
+def gate_check(
+    *,
+    record_path,
+    expected_identity,
+    project_root=".",
+    profile_document=None,
+    discovery_document=None,
+):
+    """実装開始のgate判定。record不存在・結線不一致・鮮度乖離はfail-closedで開始不可。
+
+    ProfileとDiscoveryを渡した場合、検索を再実行して結果の一致まで確認する
+    （反証R-3。渡さない場合は再検索を行わない）。
+    """
 
     target = Path(record_path)
     if not target.is_file():
@@ -384,6 +423,21 @@ def gate_check(*, record_path, expected_identity, project_root="."):
             "start_allowed": False,
             "reason": "reuse_search_record_unreadable",
         }
+    if profile_document is not None and discovery_document is not None:
+        try:
+            reproduced = _search_matches(
+                record,
+                profile_document=profile_document,
+                discovery_document=discovery_document,
+                project_root=project_root,
+            )
+        except ReuseSearchError as error:
+            return {
+                "start_allowed": False,
+                "reason": f"search_result_unreproducible: {error}",
+            }
+        if not reproduced:
+            return {"start_allowed": False, "reason": "search_result_mismatch"}
     return _gate_verdict(
         record, expected_identity=expected_identity, project_root=project_root
     )

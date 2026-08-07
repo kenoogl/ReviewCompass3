@@ -144,6 +144,16 @@ def check_declaration_red_map(
         )
         return _result("failed", findings, machine_count)
 
+    # scope欄は判定対象の広さを宣言する。欄が無い対応表はcompleteとして扱い、
+    # 黙って範囲を狭められないようにする（反証C-1）。
+    scope = document.get("scope") or {}
+    scope_kind = scope.get("kind", "complete")
+    if scope_kind not in ("complete", "partial"):
+        findings.append(f"scope_kind_invalid: {scope_kind}")
+        scope_kind = "complete"
+    if scope_kind == "partial" and not str(scope.get("reason", "")).strip():
+        findings.append("scope_reason_missing: partial scope requires a reason")
+
     machine_count["declarations"] = len(declarations)
 
     bound = {}
@@ -151,6 +161,8 @@ def check_declaration_red_map(
     for key in sorted(declarations):
         entry = declarations[key]
         tests = entry.get("tests") if isinstance(entry, dict) else None
+        if isinstance(entry, dict) and not str(entry.get("summary", "")).strip():
+            findings.append(f"declaration_summary_empty: {key}")
         if not isinstance(tests, list) or not tests:
             machine_count["declarations_without_tests"] += 1
             findings.append(f"declaration_without_tests: {key}")
@@ -202,12 +214,13 @@ def check_declaration_red_map(
                 if name not in functions:
                     machine_count["listed_tests_missing_in_file"] += 1
                     findings.append(f"listed_test_missing: {relative}::{name}")
+        # completeを宣言した対応表は、fileに実在するtest全体を判定対象にする。
+        # partialは列挙分だけを対象にし、範囲を狭めた理由をrecordへ残す。
+        if scope_kind == "complete" and functions is not None:
+            for name in sorted(set(functions) - declared - listed):
+                machine_count["tests_unmapped_to_declarations"] += 1
+                findings.append(f"test_unmapped_to_declarations: {relative}::{name}")
         # test_files欄と宣言側のtest集合は双方向で一致しなければならない。
-        # 欄に載っているのに宣言へ結ばれていないtest、および宣言が参照するのに
-        # 欄へ載っていないtestを検出する。
-        # 限界：欄からも宣言からも漏れた実在testは検出できない（反証C-1）。
-        # 実在test全体を判定対象にすると部分列挙の対応表と衝突するため、
-        # 対象範囲の宣言方法はHuman判断へ送る。
         for name in sorted(listed - declared):
             machine_count["tests_unmapped_to_declarations"] += 1
             findings.append(f"test_unmapped_to_declarations: {relative}::{name}")

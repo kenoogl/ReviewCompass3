@@ -28,6 +28,8 @@ def _map(tmp_path, *, entries):
     document = {
         "record_kind": "declaration_red_map",
         "map_id": "M", "map_version": 1,
+        # red_nowの照合だけを目的とするfixtureであり、file内の全testは扱わない。
+        "scope": {"kind": "partial", "reason": "red_now照合の検証に必要なtestだけを扱う"},
         "test_files": {test_file: sorted(name for name, _ in entries)},
         "declarations": {
             "P%d" % index: {
