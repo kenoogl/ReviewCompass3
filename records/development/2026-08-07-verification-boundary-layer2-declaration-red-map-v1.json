@@ -1,0 +1,150 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-VERIFICATION-BOUNDARY-LAYER2-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T17:23:01+09:00",
+  "scope": {
+    "kind": "complete"
+  },
+  "proposal": {
+    "path": "records/development/2026-08-07-verification-boundary-approval-decision-v1.md",
+    "sha256": "2aa6157a503b7aef1cc03f21a98abb476f46a8b2b27955d8a2b2c9782f5adb8d",
+    "declaration_section": "層2（O-1分類の下限規則、A-1 pathspec形式検査、X-2影響件数表示）",
+    "approval_decision": "DEC-VERIFICATION-BOUNDARY-001"
+  },
+  "purpose": "層2の3件を拒否テストとして固定する。層2は安全保証ではなく誤記検出であり、その位置づけ自体を機械可読な宣言としてY4・Y11で固定する。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値である。Y3・Y8は正常な操作が止められないことを固定する境界例であり、実装前から成功する。",
+    "静的検査と実行照合の両方をtools/development/declaration_red_map_check.pyで実施した（DEC-RED-VERIFICATION-ADOPTION-001）。"
+  ],
+  "test_files": {
+    "tests/test_verification_boundary_layer2.py": [
+      "test_a1_absolute_pathspec_is_rejected",
+      "test_a1_option_shaped_pathspec_is_rejected",
+      "test_a1_ordinary_pathspec_is_accepted",
+      "test_a1_parent_escape_pathspec_is_rejected",
+      "test_o1_destructive_argv_cannot_claim_read_only",
+      "test_o1_minimum_rule_declares_it_is_not_a_safety_guarantee",
+      "test_o1_push_cannot_claim_read_only",
+      "test_o1_read_only_command_is_accepted",
+      "test_x2_broad_prefix_reports_its_impact",
+      "test_x2_impact_is_reported_not_enforced",
+      "test_x2_narrow_target_reports_a_small_impact"
+    ]
+  },
+  "declarations": {
+    "Y1": {
+      "summary": "既知の破壊的argv（rm -rf など）をread_onlyと申告するinventoryは拒否される（反証O-1）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_o1_destructive_argv_cannot_claim_read_only",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Y2": {
+      "summary": "git pushもread_onlyを名乗れない",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_o1_push_cannot_claim_read_only",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Y3": {
+      "summary": "実際に読み取り専用の操作は従来どおり通る",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_o1_read_only_command_is_accepted",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "実装前から成立する正例であり、層2の規則が正常な操作を誤って止めないことを固定する境界例である。"
+    },
+    "Y4": {
+      "summary": "分類の下限規則は、安全保証ではなく誤記検出であることを機械可読に宣言する（層2の要件）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_o1_minimum_rule_declares_it_is_not_a_safety_guarantee",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Y5": {
+      "summary": "pathspec位置のoption形の引数は拒否され、何も実行されない（反証A-1）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_a1_option_shaped_pathspec_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Y6": {
+      "summary": "絶対pathのpathspecは拒否される",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_a1_absolute_pathspec_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Y7": {
+      "summary": "親directoryへ抜けるpathspecは拒否される",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_a1_parent_escape_pathspec_is_rejected",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Y8": {
+      "summary": "通常のpathspecは従来どおり実行される",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_a1_ordinary_pathspec_is_accepted",
+          "red_now": false
+        }
+      ],
+      "red_now": false,
+      "boundary_reason": "実装前から成立する正例であり、層2の規則が正常な操作を誤って止めないことを固定する境界例である。"
+    },
+    "Y9": {
+      "summary": "広範囲の除外指定は、落とす件数をentry別に報告する（反証X-2）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_x2_broad_prefix_reports_its_impact",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Y10": {
+      "summary": "限定的な除外指定は小さい影響件数を報告する",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_x2_narrow_target_reports_a_small_impact",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "Y11": {
+      "summary": "影響件数は拒否ではなく表示であることを宣言する（層2の要件）",
+      "tests": [
+        {
+          "test": "tests/test_verification_boundary_layer2.py::test_x2_impact_is_reported_not_enforced",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  }
+}
