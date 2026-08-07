@@ -1,0 +1,78 @@
+{
+  "record_kind": "declaration_red_map",
+  "map_id": "RC3-WORK4B-C-EXTERNALIZATION-DECLARATION-RED-MAP-001",
+  "map_version": 1,
+  "created_at": "2026-08-07T14:30:00+09:00",
+  "proposal": {
+    "path": "records/development/2026-08-07-work4b-main-design-bundle-approval-decision-v1.md",
+    "sha256": "6bbaea795f7280f006dce2834b0286bb7df0b1cdb05b12918d2ce7574c27bf5e",
+    "declaration_section": "設計束§4（構成C）から展開した規範宣言H1〜H4",
+    "approval_decision": "DEC-WORK4B-MAIN-DESIGN-BUNDLE-001"
+  },
+  "purpose": "実装開始前にH1〜H4それぞれへREDを結び、「testの無いH」が0件であることを恒久検査器で数える。",
+  "generation_rules": [
+    "tests列は「testファイルの相対path::test関数名」で列挙する。",
+    "red_nowは宣言単位の値であり、全宣言がred_now: trueである（外部化・移行・証明書gateの各関数が未実装のため）。",
+    "機械照合はtools/development/declaration_red_map_check.pyのcheck_declaration_red_mapで実施した。"
+  ],
+  "test_files": {
+    "tests/test_reuse_search_externalization.py": [
+      "test_h1_externalize_writes_body_and_attestation_new_only",
+      "test_h2_attested_gate_allows_valid_external_record",
+      "test_h3_attested_gate_fails_closed_on_missing_or_tampered_body",
+      "test_h4_migration_is_byte_identical_and_keeps_the_original"
+    ]
+  },
+  "declarations": {
+    "H1": {
+      "summary": "外部化はrecord本体を外部rootへ、証明書（外部相対path・content digest・byte SHA-256・source identity）をproject内へ、いずれもnew-onlyで書く",
+      "tests": [
+        {
+          "test": "tests/test_reuse_search_externalization.py::test_h1_externalize_writes_body_and_attestation_new_only",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "H2": {
+      "summary": "gateは証明書経由で外部recordを解決し、byte一致・結線・鮮度まで確認して判定する",
+      "tests": [
+        {
+          "test": "tests/test_reuse_search_externalization.py::test_h2_attested_gate_allows_valid_external_record",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "H3": {
+      "summary": "外部recordの欠落・改竄はfail-closedでrecord_unavailableを返す",
+      "tests": [
+        {
+          "test": "tests/test_reuse_search_externalization.py::test_h3_attested_gate_fails_closed_on_missing_or_tampered_body",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    },
+    "H4": {
+      "summary": "移行はbyte一致で検証され、旧位置recordは削除せず保持される",
+      "tests": [
+        {
+          "test": "tests/test_reuse_search_externalization.py::test_h4_migration_is_byte_identical_and_keeps_the_original",
+          "red_now": true
+        }
+      ],
+      "red_now": true
+    }
+  },
+  "machine_check": {
+    "checker": "tools/development/declaration_red_map_check.py",
+    "status": "passed",
+    "machine_count": {
+      "declarations": 4,
+      "declarations_without_tests": 0,
+      "listed_tests_missing_in_file": 0,
+      "tests_unmapped_to_declarations": 0
+    }
+  }
+}
