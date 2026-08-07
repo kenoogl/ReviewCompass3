@@ -15,6 +15,9 @@ hook、自動実行、commit連動は持たない。対応表を書き換えな�
 
 import ast
 import json
+import re
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -31,16 +34,89 @@ def _collect_test_functions(path):
     }
 
 
-def _result(status, findings, machine_count):
-    return {
+def _result(status, findings, machine_count, red_verification=None):
+    document = {
         "status": status,
         "findings": sorted(findings),
         "machine_count": machine_count,
     }
+    if red_verification is not None:
+        document["red_verification"] = red_verification
+    return document
 
 
-def check_declaration_red_map(*, map_path, project_root="."):
-    """対応表を検査し、status、findings、machine_countを返す。fail-closed。"""
+_OUTCOME_LINE = re.compile(
+    r"^(?P<outcome>PASSED|FAILED|ERROR|SKIPPED)\s+(?P<node>\S+::\S+)"
+)
+
+
+def pytest_runner(node_ids, *, project_root):
+    """node idごとの結果を返す既定runner。判定はpytestの報告に従う。"""
+
+    if not node_ids:
+        return {}
+    completed = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "--no-header", "-rA", *sorted(node_ids)],
+        cwd=str(project_root),
+        capture_output=True,
+        text=True,
+    )
+    outcomes = {}
+    for line in completed.stdout.splitlines():
+        matched = _OUTCOME_LINE.match(line.strip())
+        if matched:
+            outcomes[matched.group("node")] = matched.group("outcome").lower()
+    return outcomes
+
+
+def _verify_red_claims(*, declarations, project_root, runner):
+    """宣言のred_now主張を実行結果と突き合わせる。不明はfail-closedで扱う。
+
+    red_now: trueは対象testが実際に失敗していること、falseは実際に成功して
+    いることを要求する。結果を得られないtestは合格と見なさない。
+    """
+
+    claims = {}
+    for key in sorted(declarations):
+        entry = declarations[key]
+        for item in entry.get("tests") or []:
+            if isinstance(item, dict) and isinstance(item.get("test"), str):
+                claims[item["test"]] = (key, bool(item.get("red_now")))
+
+    outcomes = runner(sorted(claims), project_root=project_root)
+    findings = []
+    verified = mismatched = unknown = 0
+    for node_id in sorted(claims):
+        declaration_key, expects_red = claims[node_id]
+        outcome = outcomes.get(node_id)
+        if outcome is None:
+            unknown += 1
+            findings.append(f"red_outcome_unknown: {declaration_key}: {node_id}")
+            continue
+        actually_red = outcome in ("failed", "error")
+        if actually_red == expects_red:
+            verified += 1
+        else:
+            mismatched += 1
+            code = "red_claim_unmet" if expects_red else "boundary_claim_unmet"
+            findings.append(f"{code}: {declaration_key}: {node_id}: {outcome}")
+    summary = {
+        "checked": len(claims),
+        "verified": verified,
+        "mismatched": mismatched,
+        "unknown": unknown,
+    }
+    return summary, findings
+
+
+def check_declaration_red_map(
+    *, map_path, project_root=".", verify_red=False, runner=None
+):
+    """対応表を検査し、status、findings、machine_countを返す。fail-closed。
+
+    `verify_red=True`のとき、宣言のred_now主張を実際のtest実行と突き合わせる
+    （反証C-4の処置）。既定は静的検査のみで、testを実行しない。
+    """
 
     findings = []
     machine_count = {
@@ -139,5 +215,14 @@ def check_declaration_red_map(*, map_path, project_root="."):
             machine_count["tests_unmapped_to_declarations"] += 1
             findings.append(f"test_missing_from_listing: {relative}::{name}")
 
+    red_verification = None
+    if verify_red:
+        red_verification, red_findings = _verify_red_claims(
+            declarations=declarations,
+            project_root=project_root,
+            runner=runner or pytest_runner,
+        )
+        findings.extend(red_findings)
+
     status = "passed" if not findings else "failed"
-    return _result(status, findings, machine_count)
+    return _result(status, findings, machine_count, red_verification)
