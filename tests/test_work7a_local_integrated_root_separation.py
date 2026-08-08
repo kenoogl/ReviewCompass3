@@ -14,6 +14,7 @@ import importlib
 import json
 import os
 import stat
+import traceback
 from pathlib import Path
 
 import pytest
@@ -544,3 +545,95 @@ def test_initialization_rejects_post_resolution_symlink_swaps(
     while chained is not None:
         assert marker not in str(chained)
         chained = getattr(chained, "__cause__", None)
+
+
+def _rendered_exception(error):
+    return "".join(traceback.format_exception(
+        type(error),
+        error,
+        error.__traceback__,
+    ))
+
+
+def _install_initializer_spy(monkeypatch):
+    layout = importlib.import_module("tools.layout.baseline")
+    calls = []
+    original = layout.initialize_project_runtime_layout
+
+    def recording_initializer(*args, **kwargs):
+        calls.append(True)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(
+        layout,
+        "initialize_project_runtime_layout",
+        recording_initializer,
+    )
+    return calls
+
+
+def test_initialization_symlink_loop_stops_without_leaking_cause(
+    tmp_path,
+    monkeypatch,
+):
+    """負例：自己参照symlink loopでも、例外連鎖・tracebackへpathを漏らさず停止する。"""
+
+    module = _module()
+    install, project, runtime = _fixture(tmp_path)
+    roots = _resolve(module, install, project, runtime)
+    runtime.parent.mkdir(parents=True)
+    runtime.symlink_to(runtime)
+    calls = _install_initializer_spy(monkeypatch)
+    install_before = _state_snapshot(install)
+    project_before = _state_snapshot(project)
+
+    with pytest.raises(module.RootSeparationError) as error:
+        module.initialize_local_integrated_roots(roots)
+
+    assert error.value.stop_code == "runtime_initialization_target_invalid"
+    assert error.value.__cause__ is None
+    assert error.value.__context__ is None
+    rendered = _rendered_exception(error.value)
+    assert str(tmp_path) not in rendered
+    assert "Symlink loop" not in rendered
+    assert calls == []
+    assert _state_snapshot(install) == install_before
+    assert _state_snapshot(project) == project_before
+    assert runtime.is_symlink()
+    assert sorted(runtime.parent.iterdir()) == [runtime]
+
+
+def test_initialization_forced_runtime_error_stops_without_leaking_cause(
+    tmp_path,
+    monkeypatch,
+):
+    """負例：再検査中の合成marker入りRuntimeErrorも、連鎖・tracebackへ漏らさない。"""
+
+    module = _module()
+    install, project, runtime = _fixture(tmp_path)
+    roots = _resolve(module, install, project, runtime)
+    marker = "SYNTHETIC-EXCEPTION-PATH-MARKER"
+
+    def failing_resolve(self, strict=False):
+        raise RuntimeError("synthetic failure at %s" % marker)
+
+    calls = _install_initializer_spy(monkeypatch)
+    install_before = _state_snapshot(install)
+    project_before = _state_snapshot(project)
+    monkeypatch.setattr(Path, "resolve", failing_resolve)
+
+    with pytest.raises(module.RootSeparationError) as error:
+        module.initialize_local_integrated_roots(roots)
+
+    monkeypatch.undo()
+    assert error.value.stop_code == "runtime_initialization_target_invalid"
+    assert error.value.__cause__ is None
+    assert error.value.__context__ is None
+    rendered = _rendered_exception(error.value)
+    assert marker not in rendered
+    assert str(tmp_path) not in rendered
+    assert calls == []
+    assert _state_snapshot(install) == install_before
+    assert _state_snapshot(project) == project_before
+    assert not runtime.exists()
+    assert not runtime.parent.exists()
