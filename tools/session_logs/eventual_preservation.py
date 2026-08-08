@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 
+from tools.session_logs.config import load_config
 from tools.session_logs.discovery import discover_raw_logs
 from tools.session_logs.locking import LockError, LockHeld, exclusive_lock
 from tools.session_logs.preservation import preserve_raw_log
@@ -837,11 +838,22 @@ def run(argv=None):
   parser.add_argument("--tool-version", required=True)
   parser.add_argument("--run-id")
   parser.add_argument("--observed-at")
+  parser.add_argument("--config")
   args = parser.parse_args(argv)
   now = datetime.datetime.now(datetime.timezone.utc).astimezone()
   run_id = args.run_id or now.strftime("manual-%Y%m%dT%H%M%S%z")
   observed_at = args.observed_at or now.isoformat(timespec="seconds")
   try:
+    # 設定はsource発見やraw保全より前に1回だけ読み、失敗時は何も開始しない。
+    # configから使うのは伏字化規則とallow patternsだけである。
+    redaction_rules = None
+    environment_redaction_rules = None
+    allow_patterns = ()
+    if args.config is not None:
+      loaded = load_config(args.config)
+      redaction_rules = loaded.redaction_rules
+      environment_redaction_rules = loaded.environment_redaction_rules
+      allow_patterns = loaded.allow_patterns
     source_root = Path(args.source_root)
     if args.source_relative_path is None:
       result = reconcile_source_root(
@@ -851,6 +863,9 @@ def run(argv=None):
         tool_version=args.tool_version,
         run_id=run_id,
         observed_at=observed_at,
+        redaction_rules=redaction_rules,
+        allow_patterns=allow_patterns,
+        environment_redaction_rules=environment_redaction_rules,
       )
     else:
       relative_path = Path(args.source_relative_path)
@@ -864,6 +879,9 @@ def run(argv=None):
         tool_version=args.tool_version,
         run_id=run_id,
         observed_at=observed_at,
+        redaction_rules=redaction_rules,
+        allow_patterns=allow_patterns,
+        environment_redaction_rules=environment_redaction_rules,
       )
       result = _summarize_items((_item_from_result(collected),))
   except Exception as error:
