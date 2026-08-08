@@ -1,0 +1,56 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-V4-ISSUE-RESOLUTION-PERSISTENCE-GAP-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-08T21:58:21+09:00",
+  "source_work": "todo-handoff-verification-gap/resolution-closure",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-V4-ISSUE-RESOLUTION-PERSISTENCE-GAP-2026-08-08-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-08-v4-issue-resolution-persistence-gap-observation-v1.json",
+    "sha256": "535fefa8af613f816eb3db31f68162a1c57557639e269c10890405caf79f58c2"
+  },
+  "problem": "V4 IssueのHuman resolutionを承認しても、workflow台帳を手編集せずresolvedへ反映する正規toolがない。承認結果とIssue record stateを一致させられない。",
+  "impact": [
+    "実装とHuman承認が完了したIssueがregisteredのまま残る",
+    "TODOや報告だけをresolvedにするとworkflow正本とのreport_execution_mismatchになる",
+    "旧Pilot Verdictを流用すると未承認のPlanとTask Contractを捏造することになる"
+  ],
+  "scope": [
+    "Human裁定に基づくV4 Issueのresolved／rejected遷移",
+    "既存Issue recordのstateとcontent_digestを正規永続化する明示CLI",
+    "二重解決、非Human裁定、stale入力、同時active Issueとの整合を拒否するTest"
+  ],
+  "non_scope": [
+    "V4 Issue schemaの変更",
+    "旧Pilot Resolution Verdict chainの移植",
+    "本候補登録時点でのresolve tool実装または既存Issue record変更"
+  ],
+  "classification_candidates": [
+    "process_improvement",
+    "test_or_oracle"
+  ],
+  "route_candidates": [
+    "checkpoint",
+    "defer"
+  ],
+  "consumer_candidates": [
+    "reviewcompass3-development",
+    "issue-intake-v4",
+    "workflow-ledger"
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/development/2026-08-08-todo-handoff-unified-verification-green-evidence-v1.md",
+      "sha256": "71442848c2b95a4b7f0212705ee24a99d8e008c8e459f219040b5308102730a9"
+    },
+    {
+      "path": ".reviewcompass/workflow/issues-v4/issue-todo-handoff-verification-gap-001--v1.json",
+      "sha256": "475b0ea27b331b1d44e3883a30c575d21ebd14ab14b894725e8aa9121e51bba5"
+    }
+  ],
+  "proposed_action": "V4 Issue state遷移の正規永続化toolを将来の作業候補として保持する。今回のHuman判断どおり着手せずdeferする。",
+  "content_digest": "50d879b201c8e033152e04a458325bf2ae1991db3c60050af66a9a387ed44e6b"
+}

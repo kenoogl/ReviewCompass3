@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-V4-ISSUE-RESOLUTION-PERSISTENCE-GAP-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-08T21:59:22+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-v4-issue-resolution-persistence-gap-001--v1.json",
+    "record_sha256": "90fad5def3a731f27c4c320a3074808bb170323b8661fdea46140cbbdbf2c231",
+    "candidate_id": "IC-V4-ISSUE-RESOLUTION-PERSISTENCE-GAP-001",
+    "candidate_content_digest": "50d879b201c8e033152e04a458325bf2ae1991db3c60050af66a9a387ed44e6b"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": false,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "defer",
+  "blocking": false,
+  "rationale": "Humanは2026-08-08、本sessionで提示された三択のうち選択肢2（正規tool不足を改善候補として登録し、元Issueはregisteredのまま後回し）を選択した。V4 resolve toolの設計・実装と既存Issue record変更は開始しない。",
+  "next_action": "改善候補をdeferで保持する。着手は別のHuman判断まで開始せず、本線の次作業へ戻る。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "5dc960dede70f0cecfb136d012ca55fb445f823657bd8d8de3435717964d8721"
+}

@@ -1,0 +1,35 @@
+{
+  "observation_id": "OBS-RC3-V4-ISSUE-RESOLUTION-PERSISTENCE-GAP-2026-08-08-V1",
+  "observed_at": "2026-08-08T21:58:21+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "V4 Issueはresolved stateを語彙に持つが、Human Resolution Verdictを既存Issueへ正規永続化するtool経路が無い",
+  "machine_observations": {
+    "issue_path": ".reviewcompass/workflow/issues-v4/issue-todo-handoff-verification-gap-001--v1.json",
+    "issue_state": "registered",
+    "human_resolution_decision": "2026-08-08の本sessionでHumanがresolved提案へ『承認』",
+    "v4_implementation": {
+      "path": "tools/development/issue_intake_v4.py",
+      "available": [
+        "build_v4_issue_recordは初期state registeredを生成する",
+        "start_issueはメモリ上でin_progressへ遷移する",
+        "validate_v4_issue_recordはresolvedを許可語彙として検証する"
+      ],
+      "missing": [
+        "Human裁定を入力にresolvedへ遷移する関数",
+        "既存V4 Issue recordへstateとcontent_digestを永続化する正規CLI"
+      ]
+    },
+    "legacy_verdict_boundary": "issue_resolution_post_write.validate_resolution_verdictは旧PilotのPlan、Task Contract、完全state chainを要求し、本V4 Issueには適用できない"
+  },
+  "problem": "V4 IssueのHuman resolutionを承認しても、workflow台帳を手編集せずresolvedへ反映する正規toolがない。承認結果とIssue record stateを一致させられない。",
+  "impact": [
+    "実装とHuman承認が完了したIssueがregisteredのまま残る",
+    "TODOや報告だけをresolvedにするとworkflow正本とのreport_execution_mismatchになる",
+    "旧Pilot Verdictを流用すると未承認のPlanとTask Contractを捏造することになる"
+  ],
+  "boundary": [
+    "本観測ではV4 Issue recordを変更しない",
+    "resolve tool、schema、Plan、Task Contractを実装または新設しない",
+    "改善候補としてdeferし、着手は別のHuman判断とする"
+  ]
+}

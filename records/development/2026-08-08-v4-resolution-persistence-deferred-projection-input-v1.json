@@ -1,0 +1,62 @@
+{
+  "updated_on": "2026-08-08",
+  "overall": "Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討が完了。TODO検証単一入口の実装も完了した。",
+  "current_work": "TODO検証単一入口はRED commit ebadd12、実装commit 0bfcc4c、公式全1269 passedで完了。Humanはresolvedを承認したが、V4 Issueへ正規永続化するtoolが無いためstate変更を停止した。Human選択2によりtool不足をIC-V4-ISSUE-RESOLUTION-PERSISTENCE-GAP-001へ登録し、deferした。",
+  "task_contract_id": "none",
+  "active_issue": {
+    "issue_id": "ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001",
+    "state": "registered / nonblocking（実装完了、formal resolution永続化はdefer）",
+    "impact": "正規resolve toolが無いためIssue record stateはregisteredのまま",
+    "next_action": "将来のHuman判断までtool不足候補とともにdefer"
+  },
+  "references": [
+    {
+      "label": "V4 resolution永続化gap Human defer Decision",
+      "path": ".reviewcompass/workflow/triage-decisions-v4/dec-ic-v4-issue-resolution-persistence-gap-001--v1.json",
+      "sha256": "01c3e15ab98cca964dc3776127f2205219e915a2c26bdb61ea8327a4e91db355"
+    },
+    {
+      "label": "V4 resolution永続化gap 改善候補",
+      "path": ".reviewcompass/workflow/improvement-candidates/ic-v4-issue-resolution-persistence-gap-001--v1.json",
+      "sha256": "90fad5def3a731f27c4c320a3074808bb170323b8661fdea46140cbbdbf2c231"
+    },
+    {
+      "label": "TODO検証単一入口 GREEN Evidence",
+      "path": "records/development/2026-08-08-todo-handoff-unified-verification-green-evidence-v1.md",
+      "sha256": "71442848c2b95a4b7f0212705ee24a99d8e008c8e459f219040b5308102730a9"
+    },
+    {
+      "label": "機密関連の実施順序 Decision",
+      "path": "records/development/2026-08-07-confidentiality-work-order-decision-v1.md",
+      "sha256": "ca5c4a89adb6ab2807887bb7834c4778f4e8658a697deb9f64617893dd67de09"
+    },
+    {
+      "label": "伏字化規則 GREEN Evidence",
+      "path": "records/development/2026-08-07-redaction-environment-rules-green-evidence-v1.md",
+      "sha256": "9dae5c2df9d39be08a63e22f47936fb27336d42c9032d8b5442bca8d7df68f85"
+    },
+    {
+      "label": "Initial Development Checklist",
+      "path": "docs/development/2026-08-03-initial-development-checklist.md",
+      "sha256": "08927e713a47517fd3bd0d5b7520a1eec0a9b1300c677e7590da3db847c65e74"
+    }
+  ],
+  "next_work": {
+    "action": "伏字化規則の設定登録と保全経路への接続。実装済み規則を設定へ登録し、保全経路で実際にマスクが適用されることをTDDで固定する。",
+    "start_conditions": [
+      "Humanの着手指示",
+      "DEC-CONFIDENTIALITY-WORK-ORDER-001の実施順序2番目と既存redaction実装を固定入力にすること"
+    ],
+    "completion_conditions": [
+      "設定登録GREENと、保全経路で伏字化が実際に適用されるEvidenceを固定すること"
+    ],
+    "following": "幹線復帰としてWork 7A local_integrated deployment E2Eを推奨する。"
+  },
+  "blocker": "なし。V4 resolve tool不足はdefer済みで、本線を阻害しない。",
+  "human_decision": "次の一作業（伏字化規則の設定登録）の着手指示。行き先変更も可。",
+  "stale": "TODO検証単一入口Issueのresolution_verdict_pending projectionはHuman選択2によりstale。",
+  "deferred": "IC-V4-ISSUE-RESOLUTION-PERSISTENCE-GAP-001、参照Digest恒久検査器、守り役後追いレビュー、テストfixture重複、Work 7A以降。",
+  "branch": "main",
+  "related_test": "Candidate V3 validator passed、Human Decision V4 repository validation passed、TODO単一入口48 passed",
+  "full_test": "venv公式runner 1269 passed、Python 3.9.6、pytest 8.4.2、fallback false"
+}
