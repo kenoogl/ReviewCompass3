@@ -106,15 +106,18 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("path")
     args = parser.parse_args(argv)
+
+    from tools.development import todo_update_path
+
     try:
-        document = Path(args.path).read_text(encoding="utf-8")
-    except OSError:
+        todo_update_path.default_verify(Path(args.path), Path.cwd())
+    except Exception as error:
         result = HandoffValidation(
             status="failed",
-            findings=("todo_read_failed",),
+            findings=(str(error),),
         )
     else:
-        result = validate_commit_stable_git_section(document)
+        result = HandoffValidation(status="passed", findings=())
     print(json.dumps(result.report(), ensure_ascii=False, sort_keys=True))
     return 0 if result.status == "passed" else 1
 
