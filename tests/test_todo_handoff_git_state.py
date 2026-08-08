@@ -1,6 +1,7 @@
 """Commitと循環しないTODO Git欄の検査Test。"""
 
 import importlib
+import json
 from pathlib import Path
 
 
@@ -115,3 +116,38 @@ def test_cli_returns_machine_readable_failure(capsys, tmp_path):
 
     assert exit_code == 1
     assert '"status": "failed"' in capsys.readouterr().out
+
+
+def test_cli_returns_failure_when_compaction_rejects_git_stable_todo(
+    capsys, monkeypatch, tmp_path
+):
+    issue_root = tmp_path / ".reviewcompass/workflow/issues-v4"
+    issue_root.mkdir(parents=True)
+    (issue_root / "issue-todo-handoff-verification-gap-001--v1.json").write_text(
+        json.dumps(
+            {
+                "record_kind": "issue_record",
+                "issue_id": "ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001",
+            }
+        ),
+        encoding="utf-8",
+    )
+    document = _stable_document().replace(
+        "## Git・Test",
+        """## 現在作業に影響する改善候補／Issue
+
+- `ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001`：in_progress
+
+## Git・Test""",
+    ).encode("utf-8")
+    assert len(document) < 12289
+    path = tmp_path / "TODO_NEXT_SESSION.md"
+    path.write_bytes(document + b" " * (12289 - len(document)))
+    monkeypatch.chdir(tmp_path)
+
+    exit_code = _module().main(("TODO_NEXT_SESSION.md",))
+
+    assert exit_code == 1
+    output = capsys.readouterr().out
+    assert '"status": "failed"' in output
+    assert "TODO exceeds 12288 bytes" in output

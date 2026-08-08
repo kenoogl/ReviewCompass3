@@ -46,13 +46,16 @@ def test_repository_has_one_common_prompt_and_two_link_only_entrypoints():
 
 def test_common_prompt_routes_meaning_and_machine_operations():
     prompt = PROMPT.read_text(encoding="utf-8")
+    unified_command = (
+        "python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md"
+    )
 
     for required in (
         "docs/development/templates/TODO_NEXT_SESSION.template.md",
         "tools/development/todo_handoff_projection.py",
         "tools/development/todo_compaction.py",
         # module起動へ統一（DEC-SHARED-FUNCTION-POLICY-001）に伴い期待文字列を更新
-        "python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md",
+        unified_command,
         "python3 -m tools.development.work_unit_transition --work-status completed",
         "active Issue",
         "Candidate／Issue／Evidence",
@@ -60,6 +63,8 @@ def test_common_prompt_routes_meaning_and_machine_operations():
         "機械",
     ):
         assert required in prompt
+    assert "単一入口" in prompt
+    assert prompt.count(unified_command) == 1
 
 
 def test_rejects_independent_todo_rule_in_claude_entrypoint():
