@@ -42,20 +42,7 @@ class TodoRestoreResult:
 from tools.common.digests import sha256_hex as _sha256
 
 
-def _canonical_digest(record):
-    payload = {
-        key: value
-        for key, value in record.items()
-        if key != "content_digest"
-    }
-    return _sha256(
-        json.dumps(
-            payload,
-            ensure_ascii=False,
-            separators=(",", ":"),
-            sort_keys=True,
-        ).encode("utf-8")
-    )
+from tools.common.digests import canonical_content_digest as _canonical_digest
 
 
 def _resolve_project_path(project_root, relative_path, *, label):

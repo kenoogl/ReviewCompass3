@@ -47,8 +47,7 @@ _QUERY_RULES = (
 )
 
 
-def file_sha256(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+from tools.common.digests import file_sha256 as file_sha256
 
 
 def _range_matches(relative, target_paths):

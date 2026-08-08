@@ -47,13 +47,7 @@ def _resolved(path):
   return Path(path).resolve()
 
 
-def _within(path, root):
-  resolved_path = _resolved(path)
-  resolved_root = _resolved(root)
-  return (
-    resolved_path == resolved_root
-    or resolved_root in resolved_path.parents
-  )
+from tools.common.paths import within as _within
 
 
 def _validate_storage_boundaries(config):

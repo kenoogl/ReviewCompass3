@@ -83,13 +83,10 @@ def canonical_bytes(value):
     ).encode("utf-8")
 
 
-def content_digest(document):
-    payload = {key: value for key, value in document.items() if key != "content_digest"}
-    return hashlib.sha256(canonical_bytes(payload)).hexdigest()
+from tools.common.digests import canonical_content_digest as content_digest
 
 
-def file_sha256(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+from tools.common.digests import file_sha256 as file_sha256
 
 
 def seal(document):

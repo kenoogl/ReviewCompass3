@@ -12,6 +12,7 @@ promotion_required: true
 
 import hashlib
 import json
+from pathlib import Path
 
 
 def sha256_hex(data):
@@ -29,3 +30,8 @@ def canonical_content_digest(document):
             payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True
         ).encode("utf-8")
     )
+
+
+def file_sha256(path):
+    """fileの現在bytesのSHA-256 hexdigestを返す。"""
+    return sha256_hex(Path(path).read_bytes())

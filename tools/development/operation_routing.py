@@ -137,15 +137,7 @@ class OperationRoutingError(Exception):
         self.missing_permissions = tuple(missing_permissions)
 
 
-def canonical_digest(document):
-    """`content_digest`を除いた正準表現のSHA-256を返す。"""
-
-    payload = {key: value for key, value in document.items() if key != "content_digest"}
-    return hashlib.sha256(
-        json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode(
-            "utf-8"
-        )
-    ).hexdigest()
+from tools.common.digests import canonical_content_digest as canonical_digest
 
 
 def _require_text(value):

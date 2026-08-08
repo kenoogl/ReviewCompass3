@@ -29,8 +29,7 @@ _REASON_KINDS = (
 _TARGET_KINDS = ("symbol_prefix", "module_path", "config_lane")
 
 
-def file_sha256(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+from tools.common.digests import file_sha256 as file_sha256
 
 
 from tools.common.digests import canonical_content_digest as content_digest

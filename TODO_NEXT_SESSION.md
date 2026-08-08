@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：共通化一式の**反証レビューで的中4件**（`6c5fc7ba…`に固定、裁定待ち）。I-1：canonical写しが**7file残存**（対象列挙が順位表上位20由来でrepo全体を見ていなかった）。I-2：`_within`写し1file残存（config.py）。I-3：file指紋計算が5か所同型（正本への`file_sha256`追加＝Human承認事項）。I-4：根本原因は複製禁止検査がrepo全体pattern走査になっていないこと。未実施の攻撃観点（pin・兄弟隔離・起動到達等）は処置と同単位で実施予定。
+- 現在作業：**反証レビューが完結した**（処置1〜5全実施、`66707bc6…`）。的中4件を処置：canonical写し6file・`_within`1file・file指紋計算6か所（pilotの合成写し1件を実装中に追加発見）を結線し、正本は5関数（`file_sha256`追加はHuman承認済み）。恒久guard：再発明のrepo全体走査・正本指紋pin・兄弟隔離・`-m`到達。**計37定義を正本へ一元化**、残置は凍結fileの2種のみ（監視テスト付き、凍結解除時に一括追随）。凍結元Decision確認済み（解除はHuman裁定のみ）。全1268 passed。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -19,7 +19,8 @@
 
 ## 最新のauthority／Evidence
 
-- [共通化 反証レビュー所見（裁定待ち）](records/development/2026-08-08-shared-function-adversarial-review-v1.md) — SHA-256 `6c5fc7baa3e6ab6b3d09ba635f58b15f085e50008eb78793daf076e387d2843f`
+- [掃討処置GREEN・反証完結Evidence](records/development/2026-08-08-shared-function-sweep-green-evidence-v1.md) — SHA-256 `66707bc6ec726b9fec4c2afadd6016ac2574293db899bef0f4e1a0423c7b21c9`
+- [共通化 反証レビュー所見（処置済み）](records/development/2026-08-08-shared-function-adversarial-review-v1.md) — SHA-256 `6c5fc7baa3e6ab6b3d09ba635f58b15f085e50008eb78793daf076e387d2843f`
 - [共通関数化 B/D/E GREEN Evidence・レーン結論](records/development/2026-08-08-shared-function-bde-green-evidence-v1.md) — SHA-256 `7a8437a7f0dc32051f4540b3db185a75f3e54d8519c2293bfbc0b0682df584b7`
 - [共通関数化 digest系 GREEN Evidence](records/development/2026-08-08-shared-function-digest-green-evidence-v1.md) — SHA-256 `56858f105bcd690560fdce818ae4168d973a47a2686da7b4af2fd8c46256ca9a`
 - [共通関数化方針Decision](records/development/2026-08-08-shared-function-policy-decision-v1.md) — SHA-256 `62f1e298ceacab9a6afabb9fedc40f35312d02bbd3e1e58dd51d58ba95065ff0`
@@ -59,7 +60,7 @@
 
 ## 次に行う一作業
 
-Human裁定（処置案5点：I-1結線6file／I-2結線1file／I-3正本へ`file_sha256`追加と5結線／I-4恒久guardテスト一式／残置は凍結解除時に一括追随）を受けて処置をTDDで実施し、反証レビューを完結させる。
+分岐判断：**幹線復帰（Work 7A：`local_integrated` deployment E2E）**か、足場課題（伏字化規則登録／参照Digest恒久検査器／TODO検証単一入口）か。統合レーンと反証レビューは完結しており、開いた作業はない。
 
 開始条件：
 
@@ -67,14 +68,14 @@ Human裁定（処置案5点：I-1結線6file／I-2結線1file／I-3正本へ`fil
 
 完了条件：
 
-- 処置GREENと恒久guardテストの固定、反証レビュー完結のEvidence固定
+- Humanが次の行き先を指定すること
 
-後続作業：幹線復帰（Work 7A）か足場課題（伏字化規則登録・Digest検査器・TODO検証単一入口）かの分岐判断。
+後続作業：指定された行き先による。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：反証レビュー処置案5点の裁定（とくにI-3の正本拡張）。
+- Human判断待ち：次の行き先の指定（幹線Work 7Aか足場課題か）。
 - 継続する留意点：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認は「記録が指す先」まで、写しなら原本まで (3)**登録済み課題2件が実害として発現した**：pipe隠蔽で不合格コミットが2回通過（`;`連結が原因。コミット前の全test確認は独立コマンドで行う）、TODO byte上限超過をCLI検証が見逃しテストだけが検出（二tool分離）。workflow台帳へのrecord追加は必ず正規toolを通す（手作りJSONは台帳整合テストに落ちる）。
 
 ## stale・deferred
@@ -88,8 +89,8 @@ Human裁定（処置案5点：I-1結線6file／I-2結線1file／I-3正本へ`fil
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：共通部品テスト33件（digest15＋B/D/E18。RED→GREEN各1巡）
-- 直近の全Test：venv pytest 1238 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：共通部品・掃討・guardテスト計63件（RED→GREEN 3巡）
+- 直近の全Test：venv pytest 1268 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

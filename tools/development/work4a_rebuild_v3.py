@@ -473,12 +473,10 @@ def _digest(value):
     return hashlib.sha256(_canonical_bytes(value)).hexdigest()
 
 
-def _content_digest(document):
-    return _digest({key: value for key, value in document.items() if key != "content_digest"})
+from tools.common.digests import canonical_content_digest as _content_digest
 
 
-def _file_sha256(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+from tools.common.digests import file_sha256 as _file_sha256
 
 
 def _serialize(document):

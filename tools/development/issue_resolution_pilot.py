@@ -52,24 +52,10 @@ _ACTIVE_ENTRY = re.compile(
 from tools.common.digests import sha256_hex as _sha256_bytes
 
 
-def _sha256_file(path):
-    return _sha256_bytes(Path(path).read_bytes())
+from tools.common.digests import file_sha256 as _sha256_file
 
 
-def _canonical_digest(record):
-    payload = {
-        key: value
-        for key, value in record.items()
-        if key != "content_digest"
-    }
-    return _sha256_bytes(
-        json.dumps(
-            payload,
-            ensure_ascii=False,
-            separators=(",", ":"),
-            sort_keys=True,
-        ).encode("utf-8")
-    )
+from tools.common.digests import canonical_content_digest as _canonical_digest
 
 
 def _load_json(path, label):
