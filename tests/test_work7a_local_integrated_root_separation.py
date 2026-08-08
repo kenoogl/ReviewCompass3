@@ -451,3 +451,96 @@ def test_rejects_install_package_containing_prohibited_paths(
         _resolve(module, install, project, runtime)
 
     assert error.value.stop_code == "install_package_invalid"
+
+
+def _state_snapshot(root):
+    """root自身を含むmode・mtime・種別・内容Digestの読み取り専用snapshot。"""
+
+    base = Path(root)
+    entries = {}
+    for path in [base, *sorted(base.rglob("*"))]:
+        info = path.lstat()
+        relative = "." if path == base else path.relative_to(base).as_posix()
+        if path.is_symlink():
+            kind = "symlink"
+        elif path.is_file():
+            kind = (
+                "file",
+                hashlib.sha256(path.read_bytes()).hexdigest(),
+            )
+        else:
+            kind = "dir"
+        entries[relative] = (
+            stat.S_IMODE(info.st_mode),
+            info.st_mtime_ns,
+            kind,
+        )
+    return entries
+
+
+@pytest.mark.parametrize("swap_case", (
+    "runtime_root_symlink",
+    "component_symlink",
+    "ancestor_symlink",
+))
+def test_initialization_rejects_post_resolution_symlink_swaps(
+    tmp_path,
+    monkeypatch,
+    swap_case,
+):
+    """負例：解決後のsymlink差替えを初期化の副作用より前にfail-closedで停止する。
+
+    runtime root本体、下位component（projects）、解決時未作成だった祖先の3態様。
+    Layout初期化APIが呼ばれず、install・projectのinventory・Digest・mode・mtimeが
+    不変で、symlink先にsensitiveやその祖先が作られないことを機械確認する。
+    """
+
+    module = _module()
+    layout = importlib.import_module("tools.layout.baseline")
+    install, project, runtime = _fixture(tmp_path)
+    roots = _resolve(module, install, project, runtime)
+
+    if swap_case == "runtime_root_symlink":
+        runtime.parent.mkdir(parents=True)
+        runtime.symlink_to(install, target_is_directory=True)
+        forbidden = install / "projects"
+    elif swap_case == "component_symlink":
+        runtime.mkdir(parents=True)
+        (runtime / "projects").symlink_to(
+            install,
+            target_is_directory=True,
+        )
+        forbidden = install / "project-alpha"
+    else:
+        runtime.parent.symlink_to(install, target_is_directory=True)
+        forbidden = install / ".reviewcompass3"
+
+    calls = []
+    original = layout.initialize_project_runtime_layout
+
+    def recording_initializer(*args, **kwargs):
+        calls.append(True)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(
+        layout,
+        "initialize_project_runtime_layout",
+        recording_initializer,
+    )
+    install_before = _state_snapshot(install)
+    project_before = _state_snapshot(project)
+
+    with pytest.raises(module.RootSeparationError) as error:
+        module.initialize_local_integrated_roots(roots)
+
+    assert error.value.stop_code == "runtime_initialization_target_invalid"
+    assert calls == []
+    assert _state_snapshot(install) == install_before
+    assert _state_snapshot(project) == project_before
+    assert not forbidden.exists()
+    assert not roots.sensitive_root.exists()
+    marker = str(tmp_path)
+    chained = error.value
+    while chained is not None:
+        assert marker not in str(chained)
+        chained = getattr(chained, "__cause__", None)
