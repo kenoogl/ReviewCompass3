@@ -1,0 +1,67 @@
+{
+  "updated_on": "2026-08-08",
+  "overall": "Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口が完了。伏字化規則の設定登録とactual CLI保全経路への接続も独立レビュー済みで完了した。",
+  "current_work": "伏字化規則の設定登録はRED 89affb7／GREEN dc13ed1、actual CLI未接続の修正はRED 698a5aa／GREEN f9f92cf。Codex独立レビューでtargeted 13、関連34、公式全1282 passed、新作したactual CLIのhigh-entropy反証もfail-closedとなり、verified / completed。",
+  "task_contract_id": "none",
+  "active_issue": {
+    "issue_id": "ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001",
+    "state": "registered / nonblocking（実装完了、formal resolution永続化はdefer）",
+    "impact": "正規resolve toolが無いためIssue record stateはregisteredのまま",
+    "next_action": "将来のHuman判断までtool不足候補とともにdefer"
+  },
+  "references": [
+    {
+      "label": "伏字化・実保全入口 独立レビューEvidence",
+      "path": "records/development/2026-08-08-redaction-production-entry-independent-review-evidence-v1.md",
+      "sha256": "8b543e61ba9cb98b0d2ff65360ba5885c47cfa8f8cb5e60b74c3bdcff61af98b"
+    },
+    {
+      "label": "伏字化・実保全入口 独立レビュー公式receipt",
+      "path": "records/development/2026-08-08-redaction-production-entry-independent-review-test-receipt-v1.json",
+      "sha256": "ce26543e61df279103dfa57150f939fe4935fd08c989524dad2d56f29e4d1627"
+    },
+    {
+      "label": "actual CLI接続修正 GREEN Evidence",
+      "path": "records/development/2026-08-08-redaction-production-entry-correction-green-evidence-v1.md",
+      "sha256": "d9ec9d812c3cd8a3eb2efdc293eb934fe02dafe157aae9c3b24c996f2cb08f21"
+    },
+    {
+      "label": "機密関連の実施順序 Decision",
+      "path": "records/development/2026-08-07-confidentiality-work-order-decision-v1.md",
+      "sha256": "ca5c4a89adb6ab2807887bb7834c4778f4e8658a697deb9f64617893dd67de09"
+    },
+    {
+      "label": "Initial Development Checklist",
+      "path": "docs/development/2026-08-03-initial-development-checklist.md",
+      "sha256": "32c5fe8e6707a2f139a7486a5a6da9e484629f57b1cf6200dd5a96fca0611496"
+    },
+    {
+      "label": "V4 resolution永続化gap Human defer Decision",
+      "path": ".reviewcompass/workflow/triage-decisions-v4/dec-ic-v4-issue-resolution-persistence-gap-001--v1.json",
+      "sha256": "01c3e15ab98cca964dc3776127f2205219e915a2c26bdb61ea8327a4e91db355"
+    },
+    {
+      "label": "V4 resolution永続化gap 改善候補",
+      "path": ".reviewcompass/workflow/improvement-candidates/ic-v4-issue-resolution-persistence-gap-001--v1.json",
+      "sha256": "90fad5def3a731f27c4c320a3074808bb170323b8661fdea46140cbbdbf2c231"
+    }
+  ],
+  "next_work": {
+    "action": "Work 7A local_integrated deployment E2Eの最初の縦切り。install、project、runtime、sensitiveの各rootを分離し、既存Layout v3とdeployment境界をTDDで固定する。",
+    "start_conditions": [
+      "Humanの着手指示",
+      "Layout Baseline v3とWork 7A checklistを固定入力にし、最初のroot分離だけへscopeを限定すること"
+    ],
+    "completion_conditions": [
+      "4種rootのidentity、物理分離、禁止cross-writeを正例・負例・境界TestとGREEN Evidenceへ固定すること"
+    ],
+    "following": "Work 7Aの次項目として、別checkoutとproject移動後のBinding、Snapshot、Change Set復元へ進む。"
+  },
+  "blocker": "なし。V4 resolve tool不足はdefer済みで、本線を阻害しない。",
+  "human_decision": "Work 7A最初の縦切りへの着手指示。行き先変更も可。",
+  "stale": "伏字化規則の着手待ちprojectionと、actual CLI未接続を完了扱いした先行completed_claim。いずれも修復Evidenceにより置換済み。",
+  "deferred": "IC-V4-ISSUE-RESOLUTION-PERSISTENCE-GAP-001、C／Dの扱い、既存保全データへの遡及適用、参照Digest恒久検査器、守り役後追いレビュー、テストfixture重複。",
+  "branch": "main",
+  "related_test": "伏字化設定・actual CLI targeted 13 passed、関連34 passed、独立actual CLI正例とhigh-entropy反証 passed",
+  "full_test": "venv公式runner 1282 passed、Python 3.9.6、pytest 8.4.2、fallback false"
+}

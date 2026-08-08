@@ -264,9 +264,17 @@ Work 1Bが敷いた機密分離（rawは`SENSITIVE_ROOT`、外に出すのは伏
 外部API比較の中止により送信実装（段階4）は不要となった（`DEC-EGRESS-METHOD-CONCLUSION-001`）。
 資産は保持し、必要が再発したときの再判断材料は固定済みである。
 
-- [ ] 伏字化規則を設定へ登録し、保全経路から呼ぶ（実施順序2番目。実装済み規則の登録）。
+- [x] 伏字化規則を設定へ登録し、保全経路から呼ぶ（実施順序2番目。実装済み規則の登録）。
 - [ ] C（内部の未公開情報）とD（会話に混入した外部データ）の扱いを定義する（同3番目）。
 - [ ] 既存の保全済みデータへの遡及適用を判断する（同4番目。着手はHuman判断）。
+
+`Evidence`：設定登録とcollector APIはRED `89affb7`、GREEN `dc13ed1`で実装した。actual CLIの
+未接続をCodexの反証で検出して`report_execution_mismatch`とし、修正RED `698a5aa`、GREEN
+`f9f92cf`で`collect-eventual --config`の2分岐へ接続した。独立レビューは
+`records/development/2026-08-08-redaction-production-entry-independent-review-evidence-v1.md`。
+targeted `13 passed`、関連`34 passed`、公式全`1282 passed`に加え、実装者fixtureに無い
+high-entropy残存のactual CLI反証でraw先行保全1件、派生物・Provenance・cursor 0件、診断漏れ0件を
+確認した。結果は`verified / completed`。C／Dと既存データへの遡及適用は未実施のままである。
 
 ## 6. Work 2〜4：上流文書、Requirements、最初のslice設計
 
