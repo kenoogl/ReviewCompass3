@@ -240,10 +240,14 @@ def initialize_local_integrated_roots(roots):
         _revalidate_initialization_targets(roots)
     except RootSeparationError:
         raise
-    except (OSError, RuntimeError) as error:
-        raise RootSeparationError(
-            "runtime_initialization_target_invalid"
-        ) from error
+    except (OSError, RuntimeError):
+        # 原因例外はhost pathや未検査内容を文言に含み得るため、__cause__にも
+        # __context__にも残さない。handler内で連結せず、handler外でraiseする。
+        revalidation_failed = True
+    else:
+        revalidation_failed = False
+    if revalidation_failed:
+        raise RootSeparationError("runtime_initialization_target_invalid")
     try:
         created = layout_baseline.initialize_project_runtime_layout(
             roots.runtime_layout,
