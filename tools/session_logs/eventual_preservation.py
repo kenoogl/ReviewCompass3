@@ -235,8 +235,7 @@ def _layout(source_root, relative_path, private_root):
   )
 
 
-def _sha256(data):
-  return hashlib.sha256(data).hexdigest()
+from tools.common.digests import sha256_hex as _sha256
 
 
 def _json_bytes(payload):

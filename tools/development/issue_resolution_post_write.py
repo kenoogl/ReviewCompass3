@@ -94,8 +94,7 @@ class ResolutionVerdictValidation:
     derived_state: str
 
 
-def _sha256(content):
-    return hashlib.sha256(content).hexdigest()
+from tools.common.digests import sha256_hex as _sha256
 
 
 def canonical_digest(record):

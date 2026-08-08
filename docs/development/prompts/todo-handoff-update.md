@@ -15,11 +15,11 @@
 5. `tools/development/todo_compaction.py`で12,288 bytes以下、active ID 1件、禁止履歴0、参照解決を
    機械検証する。最終stage前に次を実行する。
 
-   `python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`
+   `python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`
 
 6. 完了した作業単位から次へ移る前に次を実行する。
 
-   `python3 tools/development/work_unit_transition.py --work-status completed`
+   `python3 -m tools.development.work_unit_transition --work-status completed`
 
    `completed_work_unit_uncommitted`なら、`DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`の最小条件
    （意味的に完結した単位、明示pathだけのstage、`git diff --check`と該当test／validatorの合格、

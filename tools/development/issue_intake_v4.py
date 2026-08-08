@@ -81,13 +81,7 @@ class IntakeError(Exception):
         self.detail = detail
 
 
-def _canonical_digest(document):
-    payload = {key: value for key, value in document.items() if key != "content_digest"}
-    return hashlib.sha256(
-        json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode(
-            "utf-8"
-        )
-    ).hexdigest()
+from tools.common.digests import canonical_content_digest as _canonical_digest
 
 
 def canonical_digest(document):

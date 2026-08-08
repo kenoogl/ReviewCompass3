@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：残4系統の予備評価が完了し、**統合レーン総括をHuman判断に付した**。実測：Bはlibrary6/script1・D/Eは全て自己完結script・live指紋固定はどの系統にも検出なし。提案：B/D/Eは**分岐検出テスト**（挙動一致を独立oracleで固定、source変更ゼロ）、Fは**何もしない**（処理を持たない入れ物で分岐riskなし）。レーン全体の結論案：「重複は自己完結設計の代償であり、統合でなく分岐検出テストで守る」。承認されればcheck­list Work 4B 3項目目へ反映して完結。
+- 現在作業：Human方針転換（`DEC-SHARED-FUNCTION-POLICY-001`「複製禁止・共通関数化・module起動統一」）を受け、**digest系10定義を`tools/common/digests.py`の正本へ共通化した**。起動はrepository根元からの`python3 -m`へ統一（生きている5文書9か所を書換え、期待文字列のテスト1件を理由記録つき更新）。AGENTS.md機械規律へ複製禁止とmodule起動の2規則を明文化。凍結の`todo_snapshot.py`のみ写し1件残置（出力一致テストで守る）。全1220 passed。統合レーン総括（分岐検出テスト案）は本方針で**上書き**された。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -19,7 +19,9 @@
 
 ## 最新のauthority／Evidence
 
-- [統合レーン総括（裁定待ち）](records/development/2026-08-08-consolidation-lane-summary-v1.md) — SHA-256 `45438e4c53e7493bdd19c8b824de868325741c28f68b97da4d7e8e93ced7922a`
+- [共通関数化 digest系 GREEN Evidence](records/development/2026-08-08-shared-function-digest-green-evidence-v1.md) — SHA-256 `56858f105bcd690560fdce818ae4168d973a47a2686da7b4af2fd8c46256ca9a`
+- [共通関数化方針Decision](records/development/2026-08-08-shared-function-policy-decision-v1.md) — SHA-256 `62f1e298ceacab9a6afabb9fedc40f35312d02bbd3e1e58dd51d58ba95065ff0`
+- [統合レーン総括（方針転換で上書き）](records/development/2026-08-08-consolidation-lane-summary-v1.md) — SHA-256 `45438e4c53e7493bdd19c8b824de868325741c28f68b97da4d7e8e93ced7922a`
 - [digest系統合の結果Evidence（統合せず・分岐検出）](records/development/2026-08-08-digest-family-consolidation-outcome-evidence-v1.md) — SHA-256 `6bcd784dbf0d60e8f24221db80873bd2473d586b31b6cf317dc54bedd0fad92d`
 - [digest系（A+C）統合判断の材料](records/development/2026-08-08-consolidation-digest-family-materials-v1.md) — SHA-256 `ea1ec1ab55a8c8073932497338cbfa6588c52a430d3d278f07905d887279592d`
 - [系統A 統合判断の材料](records/development/2026-08-08-consolidation-family-a-materials-v1.md) — SHA-256 `502f8f643989664afb734752e18432e93dd8b91da7705dd4cc480480ec86df3a`
@@ -51,11 +53,11 @@
 - [設計議論の証跡Decision](records/development/2026-08-07-work5b-discussion-outcomes-decision-v1.md) — SHA-256 `8cfc4a1581ed53513d97f70fa78323f6dc574eb2555bbd35ed78c7a4e1214a9d`
 - [Work 5B検査器 GREEN Evidence](records/development/2026-08-07-work5b-checker-green-evidence-v1.md) — SHA-256 `020db589b586e6db741e0d5d347d31c30c89a077c390ebd2232c42dfccbb7d2c`
 - [作業レビュー手順書（高risk観点追記後）](docs/development/work-review-protocol.md) — SHA-256 `37c0391a322a6841421742125fff646600aff7d3acd905990c605f614d2e2967`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `99a84b333b8842c59c37230e58fd9f495e87dfdf1f19e22e5a5b4df1e329871d`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `5fa39a7631e421831eb714b1f942ed0f22124ce81ced5c2c48dd39a27f90e3b2`
 
 ## 次に行う一作業
 
-系統A+C合流の「digest系」材料を作る：C系統4関数（canonical digest計算。4file全て守り役）の実測（本体・呼び出し・テスト参照）を加え、共通module一括の統合案・削減行数・alias要否を提示して手順4の再判断に付す。issue登録のやり直し・AGENTS.md整理（139→78行）・checklist改定r1（Work 4B追随[x]2件、評価②の対応明記、Work 1B後続に機密レーン残3項を新設、Digest8件一致確認。Human承認済み）は完了。
+B（fail-closed例外7class）・D（`_within`4file）・E（JSON印字3file）を共通関数化方針で共通化する（TDD・1系統1単位可。例外は共通基底クラス、名前は各module維持）。完了後、統合レーン総括を方針転換後の形で書き直し、checklist Work 4B 3項目目へ反映して統合レーンを完結させる。
 
 開始条件：
 
@@ -63,14 +65,14 @@
 
 完了条件：
 
-- digest系材料が手順4のHuman判断に付されること
+- B/D/E共通化のGREEN Evidence固定と総括改稿・checklist反映が完了すること
 
-後続作業：段階3（承認record形式の正式schema化。反証I-6の真正性担保を含む）→評価②（文脈依存の統合可否）の定義→実施順序の2番目以降（規則の登録、C・Dの定義、既存データの扱い）。送信の実装（段階4）と場面2は別提案。
+後続作業：幹線復帰（Work 7A）か足場課題（伏字化規則登録・Digest検査器・TODO検証単一入口）かの分岐判断。
 
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：統合レーン総括の裁定（B/D/E＝分岐検出テスト、F＝何もしない、レーン結論の承認）。
+- Human判断待ち：なし（方針は`DEC-SHARED-FUNCTION-POLICY-001`で決定済み）。次作業の着手指示を待つ。
 - 継続する留意点：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認は「記録が指す先」まで、写しなら原本まで (3)**登録済み課題2件が実害として発現した**：pipe隠蔽で不合格コミットが2回通過（`;`連結が原因。コミット前の全test確認は独立コマンドで行う）、TODO byte上限超過をCLI検証が見逃しテストだけが検出（二tool分離）。workflow台帳へのrecord追加は必ず正規toolを通す（手作りJSONは台帳整合テストに落ちる）。
 
 ## stale・deferred
@@ -84,8 +86,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：egress計65 passed（dry-run 4件を含む）
-- 直近の全Test：venv pytest 1205 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：共通digest・module起動テスト15件（RED→GREEN。-m起動2経路の実測を含む）
+- 直近の全Test：venv pytest 1220 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

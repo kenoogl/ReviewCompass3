@@ -110,13 +110,7 @@ def _assess_freshness(*, observation_document, target_paths, project_root):
     }
 
 
-def _content_digest(document):
-    payload = {key: value for key, value in document.items() if key != "content_digest"}
-    return hashlib.sha256(
-        json.dumps(
-            payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True
-        ).encode("utf-8")
-    ).hexdigest()
+from tools.common.digests import canonical_content_digest as _content_digest
 
 
 def _profile_run_id(profile_document):

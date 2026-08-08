@@ -12,7 +12,7 @@ authority_order:
     sha256: 1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f
 operational_policy:
   path: docs/development/2026-08-02-development-policy.md
-  sha256: 0d34880353f06f50c7623282c765717348c8776938dc3113e28fdad4e9f8ac18
+  sha256: 08bea1f9d5937ba5c212512ad041a0d03583d743dcc27742ad77c8741a22ad1c
 policy_decision:
   path: records/development/development-policy-v5.json
   sha256: 88af550d5bc77406cd796e4c78efc20225134473d3d87251942854e6dc57fe98
@@ -93,7 +93,7 @@ Session EvidenceとGitへ委ねる。
 - [ ] `TODO_NEXT_SESSION.md`の先頭へ、現在地、実施内容、次作業、blocker、Human判断待ち、
       stale、Git／Test結果、Evidence linkを更新した。
 - [ ] 最終stage前にTODOのGit欄をcommit安定形式へ更新し、
-      `python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`が合格した。
+      `python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`が合格した。
 - [ ] 完了した作業単位から次作業へ移る前にwork unit transition preflightを実行し、
       `completed_work_unit_uncommitted`ならコミットまで移行を停止した。
 - [ ] コミット後のGit確認はread-onlyで行い、自己SHA、固定ahead／behind、push済否の転記だけを目的とする

@@ -54,8 +54,7 @@ class SessionBootstrapResult:
     display_error: str
 
 
-def _sha256(data):
-    return hashlib.sha256(data).hexdigest()
+from tools.common.digests import sha256_hex as _sha256
 
 
 def _mapping(value, *, field):

@@ -51,8 +51,9 @@ def test_common_prompt_routes_meaning_and_machine_operations():
         "docs/development/templates/TODO_NEXT_SESSION.template.md",
         "tools/development/todo_handoff_projection.py",
         "tools/development/todo_compaction.py",
-        "python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md",
-        "python3 tools/development/work_unit_transition.py --work-status completed",
+        # module起動へ統一（DEC-SHARED-FUNCTION-POLICY-001）に伴い期待文字列を更新
+        "python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md",
+        "python3 -m tools.development.work_unit_transition --work-status completed",
         "active Issue",
         "Candidate／Issue／Evidence",
         "LLM",

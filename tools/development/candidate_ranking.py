@@ -39,13 +39,7 @@ def file_sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def _content_digest(document):
-    payload = {key: value for key, value in document.items() if key != "content_digest"}
-    return hashlib.sha256(
-        json.dumps(
-            payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True
-        ).encode("utf-8")
-    ).hexdigest()
+from tools.common.digests import canonical_content_digest as _content_digest
 
 
 def _matches_any(relative, prefixes):

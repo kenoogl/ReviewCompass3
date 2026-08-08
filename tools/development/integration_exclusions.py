@@ -33,13 +33,7 @@ def file_sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def content_digest(record):
-    payload = {key: value for key, value in record.items() if key != "content_digest"}
-    return hashlib.sha256(
-        json.dumps(
-            payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True
-        ).encode("utf-8")
-    ).hexdigest()
+from tools.common.digests import canonical_content_digest as content_digest
 
 
 def _require_exact_fields(document, fields, label):

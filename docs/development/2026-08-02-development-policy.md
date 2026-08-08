@@ -158,7 +158,7 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 2. stage対象は明示したrepository-relative pathの列挙だけである。`git add -A`、`git add .`、
    範囲外fileの一括追加を使わない。
 3. `git diff --check`と、変更に応じたtest／validatorを実行して合格している。
-   `TODO_NEXT_SESSION.md`を含める場合は`python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`も
+   `TODO_NEXT_SESSION.md`を含める場合は`python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`も
    合格している。
 4. commit後はread-onlyで状態を照合し、完了済み作業単位を未コミットのまま次の作業へ渡さない。
 
@@ -172,7 +172,7 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 旧方針は、上の最小ガードへ置換した。push、guarded commit、hook、amend、rebase、reset、履歴書換えを
 対象外とする点は変更していない。guarded commit、hook、コミットごとの恒久的な承認file、巨大な
 commit manifestは導入しない。遷移前の機械検査には
-`python3 tools/development/work_unit_transition.py --work-status completed`を使用する。
+`python3 -m tools.development.work_unit_transition --work-status completed`を使用する。
 
 最終コミットに`TODO_NEXT_SESSION.md`の引き継ぎ更新を含める場合、TODOのGit欄は、そのコミット完了と
 同時に真になるcommit安定形式へコミット前に更新する。コミット後はGitの事後状態をread-onlyで照合し、
@@ -187,7 +187,7 @@ TODOのGit欄へ次のmutable snapshotを固定しない。
 
 HEAD、upstream、ahead／behind、push状態の正本はGitとし、必要時に機械取得する。TODOには
 `本handoffを含むcommit完了時点`というcommit境界と、Gitから機械取得する旨を記録する。最終stage前に
-`python3 tools/development/todo_handoff.py TODO_NEXT_SESSION.md`を実行して検査する。commit SHAが必要な
+`python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`を実行して検査する。commit SHAが必要な
 Evidenceは、当該コミットと循環しない後続EvidenceまたはGit自体へ接続する。この運用にguarded commit、
 post-commit amend、hookは要求しない。
 

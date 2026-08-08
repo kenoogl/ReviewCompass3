@@ -49,8 +49,7 @@ _ACTIVE_ENTRY = re.compile(
 )
 
 
-def _sha256_bytes(value):
-    return hashlib.sha256(value).hexdigest()
+from tools.common.digests import sha256_hex as _sha256_bytes
 
 
 def _sha256_file(path):

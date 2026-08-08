@@ -72,7 +72,7 @@
 - 次は引き続き明示承認を要する：方針変更・段完了・意味的裁定・不可逆操作・外部送信、
   push・tag・amend・rebase・reset・force push・履歴書換え、sandboxやhost権限の迂回。
 - 完了した作業単位を未コミットのまま次へ進めない。完了時と「次へ」相当の指示時に
-  `python3 tools/development/work_unit_transition.py --work-status completed`を実行し、
+  `python3 -m tools.development.work_unit_transition --work-status completed`を実行し、
   `completed_work_unit_uncommitted`なら最小条件を満たす意味単位コミットの後に再実行する。
   満たせないときだけ停止して報告する。作業中のdirty差分だけではこの状態に分類しない。自己SHAやremote状態の転記だけを目的とする追加コミットを作らない。利用者がコミット方法を指定したらそれを優先する。
   guarded commitやhook等は導入せず、`stage_completion`など既存のHuman承認境界は緩めない。
