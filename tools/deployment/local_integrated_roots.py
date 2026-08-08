@@ -173,14 +173,77 @@ def validate_root_write_target(roots, *, root_kind, target):
     return canonical
 
 
+def _sensitive_component_chain(runtime_root, sensitive_root):
+    chain = [runtime_root]
+    current = runtime_root
+    for part in sensitive_root.relative_to(runtime_root).parts:
+        current = current / part
+        chain.append(current)
+    return chain
+
+
+def _revalidate_initialization_targets(roots):
+    """初期化の最初の副作用より前に、root identityをread-onlyで再検査する。
+
+    解決後から初期化呼出し前に完了したsymlink差替え・identity差替え・
+    root escapeを検出してfail-closedに停止する。初期化syscallと同時の
+    別processとの競合を防ぐ原子的protocolは後続であり、ここでは扱わない。
+    """
+
+    layout = roots.runtime_layout
+    if (
+        not isinstance(layout, layout_baseline.ProjectRuntimeLayoutResolution)
+        or roots.runtime_root != layout.runtime_root
+        or roots.sensitive_root != layout.roots.get("sensitive")
+        or roots.project_id != layout.project_id
+        or roots.profile != layout.profile
+        or roots.profile != _PROFILE
+    ):
+        raise RootSeparationError("runtime_initialization_target_invalid")
+    for stored in (roots.install_root, roots.project_root):
+        if (
+            not stored.is_absolute()
+            or stored.is_symlink()
+            or not stored.is_dir()
+            or stored.resolve() != stored
+        ):
+            raise RootSeparationError("runtime_initialization_target_invalid")
+    runtime = roots.runtime_root
+    sensitive = roots.sensitive_root
+    if (
+        not runtime.is_absolute()
+        or not _inside(sensitive, runtime)
+        or runtime.resolve() != runtime
+        or sensitive.resolve() != sensitive
+        or _overlaps(runtime, roots.install_root)
+        or _overlaps(runtime, roots.project_root)
+    ):
+        raise RootSeparationError("runtime_initialization_target_invalid")
+    for component in _sensitive_component_chain(runtime, sensitive):
+        if component.is_symlink():
+            raise RootSeparationError("runtime_initialization_target_invalid")
+        if component.exists() and not component.is_dir():
+            raise RootSeparationError("runtime_initialization_target_invalid")
+
+
 def initialize_local_integrated_roots(roots):
     """runtime rootの必要な祖先とsensitive rootだけを明示作成する。
 
     installとproject、同じruntime profileの他kind、configは作成・変更しない。
+    filesystemへの最初の副作用より前にroot identityを再検査し、不合格なら
+    Layout初期化を呼ばずに停止する。
     """
 
     if not isinstance(roots, LocalIntegratedRoots):
         raise RootSeparationError("root_resolution_required")
+    try:
+        _revalidate_initialization_targets(roots)
+    except RootSeparationError:
+        raise
+    except (OSError, RuntimeError) as error:
+        raise RootSeparationError(
+            "runtime_initialization_target_invalid"
+        ) from error
     try:
         created = layout_baseline.initialize_project_runtime_layout(
             roots.runtime_layout,
