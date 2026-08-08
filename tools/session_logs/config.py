@@ -9,7 +9,11 @@ import dataclasses
 import json
 from pathlib import Path
 
-from tools.session_logs.redaction import Rule
+from tools.session_logs.redaction import (
+  EnvironmentRule,
+  Rule,
+  environment_reference_rules,
+)
 
 
 class ConfigError(Exception):
@@ -32,6 +36,7 @@ class Config:
   tool_version: str
   redaction_rules: tuple
   allow_patterns: tuple
+  environment_redaction_rules: tuple = ()
 
 
 def _resolve(base, value):
@@ -75,6 +80,39 @@ def _validate_storage_boundaries(config):
       raise ConfigError("Unsafe Git storage boundary: %s" % name)
 
 
+def _parse_redaction_rules(items):
+  """pattern宣言とenvironment reference宣言を区別して読み込む。
+
+  両方を持つ項目、どちらも持たない項目、未知roleはfail-closedとし、
+  例外文に入力値を含めない。
+  """
+
+  known_roles = frozenset(
+    rule.environment_role
+    for rule in environment_reference_rules()
+  )
+  pattern_rules = []
+  environment_rules = []
+  for item in items:
+    has_pattern = "pattern" in item
+    has_role = "environment_role" in item
+    if has_pattern == has_role:
+      raise ConfigError("Invalid redaction rule declaration")
+    if has_role:
+      if item["environment_role"] not in known_roles:
+        raise ConfigError("Unknown environment reference role")
+      environment_rules.append(EnvironmentRule(
+        label=item["label"],
+        environment_role=item["environment_role"],
+      ))
+    else:
+      pattern_rules.append(Rule(
+        label=item["label"],
+        pattern=item["pattern"],
+      ))
+  return tuple(pattern_rules), tuple(environment_rules)
+
+
 def load_config(path) -> Config:
   config_path = Path(path)
   data = json.loads(config_path.read_text(encoding="utf-8"))
@@ -84,6 +122,9 @@ def load_config(path) -> Config:
   backup_root = data.get("backup_root")
   ledger_path = data.get("preservation_ledger_path")
   hook_event_log_path = data.get("hook_event_log_path")
+  pattern_rules, environment_rules = _parse_redaction_rules(
+    data.get("redaction_rules", ())
+  )
   config = Config(
     repository_root=(
       _resolve(base, repository_root).resolve()
@@ -119,11 +160,9 @@ def load_config(path) -> Config:
       data.get("preservation_enabled", False)
     ),
     tool_version=data["tool_version"],
-    redaction_rules=tuple(
-      Rule(label=item["label"], pattern=item["pattern"])
-      for item in data.get("redaction_rules", ())
-    ),
+    redaction_rules=pattern_rules,
     allow_patterns=tuple(data.get("allow_patterns", ())),
+    environment_redaction_rules=environment_rules,
   )
   _validate_storage_boundaries(config)
   return config

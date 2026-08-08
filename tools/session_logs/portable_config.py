@@ -11,6 +11,11 @@ import json
 import os
 from pathlib import Path
 
+from tools.session_logs.redaction import (
+  default_pattern_rules,
+  environment_reference_rules,
+)
+
 
 class PortableConfigError(Exception):
   """安全なポータブル設定を生成できない。"""
@@ -41,6 +46,25 @@ _ROOT_ENVIRONMENT = {
   "state_root": "REVIEWCOMPASS3_STATE_ROOT",
   "log_root": "REVIEWCOMPASS3_LOG_ROOT",
 }
+
+
+def default_redaction_rule_declarations() -> tuple:
+  """承認済み規則を宣言値のままJSON表現へ写す。
+
+  宣言sourceは`tools.session_logs.redaction`だけであり、patternをここへ
+  重複記載しない。environment reference宣言は役割名だけを持ち、
+  解決した実値を含まない。
+  """
+
+  pattern_declarations = tuple(
+    {"label": rule.label, "pattern": rule.pattern}
+    for rule in default_pattern_rules()
+  )
+  environment_declarations = tuple(
+    {"label": rule.label, "environment_role": rule.environment_role}
+    for rule in environment_reference_rules()
+  )
+  return pattern_declarations + environment_declarations
 
 
 def _select_path(name, default, *, environment, overrides):
@@ -204,6 +228,7 @@ def run(argv=None) -> int:
       deployment_paths=paths,
       tool_version=args.tool_version,
       overrides=overrides,
+      redaction_rules=default_redaction_rule_declarations(),
     )
     if args.dry_run:
       _print_result("planned", "ok")

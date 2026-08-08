@@ -17,7 +17,7 @@ from tools.session_logs.discovery import discover_raw_logs
 from tools.session_logs.locking import LockError, LockHeld, exclusive_lock
 from tools.session_logs.preservation import preserve_raw_log
 from tools.session_logs.redaction import (
-  redact_text_strict,
+  redact_with_environment,
   redaction_rules_digest,
 )
 from tools.session_logs.source_adapter import (
@@ -403,6 +403,7 @@ def _collect_locked(
   *,
   redaction_rules,
   allow_patterns,
+  environment_redaction_rules,
   tool_version,
   run_id,
   observed_at,
@@ -495,17 +496,26 @@ def _collect_locked(
     redacted_bytes = None
     rules_digest = None
   else:
+    # 環境依存参照（長い値から）→pattern（登録順）→高entropy網の順で適用する。
+    # digestは宣言（役割名とpattern）から算出し、解決値を入れない。
+    environment_rules = (
+      tuple(environment_redaction_rules)
+      if environment_redaction_rules is not None
+      else ()
+    )
     try:
-      redacted = redact_text_strict(
+      redacted = redact_with_environment(
         verbatim_bytes.decode("utf-8"),
-        redaction_rules,
+        pattern_rules=redaction_rules,
+        environment_rules=environment_rules,
         allow_patterns=allow_patterns,
+        strict=True,
       )
     except Exception as error:
       raise CollectionError("Transcript redaction failed") from error
     redacted_bytes = redacted.text.encode("utf-8")
     rules_digest = redaction_rules_digest(
-      redaction_rules,
+      environment_rules + tuple(redaction_rules),
       allow_patterns=allow_patterns,
     )
 
@@ -639,6 +649,7 @@ def collect_source(
   observed_at,
   redaction_rules=None,
   allow_patterns=(),
+  environment_redaction_rules=None,
   lock_timeout_seconds=300,
 ) -> CollectionResult:
   (
@@ -671,6 +682,7 @@ def collect_source(
         layout,
         redaction_rules=redaction_rules,
         allow_patterns=allow_patterns,
+        environment_redaction_rules=environment_redaction_rules,
         tool_version=tool_version,
         run_id=run_id,
         observed_at=observed_at,
@@ -754,6 +766,7 @@ def reconcile_source_root(
   observed_at,
   redaction_rules=None,
   allow_patterns=(),
+  environment_redaction_rules=None,
 ) -> ReconcileResult:
   native_root = Path(source_root)
   private = Path(private_root)
@@ -780,6 +793,7 @@ def reconcile_source_root(
         observed_at=observed_at,
         redaction_rules=redaction_rules,
         allow_patterns=allow_patterns,
+        environment_redaction_rules=environment_redaction_rules,
       )
     except Exception as error:
       source_id = _source_id(
