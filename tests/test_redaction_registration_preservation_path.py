@@ -394,3 +394,163 @@ def test_unmatched_high_entropy_value_fails_closed_without_leaking(
   assert tuple((private_root / "redacted").rglob("*.md")) == ()
   assert tuple((private_root / "provenance").rglob("*.json")) == ()
   assert tuple((private_root / "cursors").rglob("*.json")) == ()
+
+
+def _install_generated_config(tmp_path, monkeypatch):
+  """init-configの実CLIで8宣言入りconfigを生成し、そのpathを返す。"""
+
+  deployment_paths = importlib.import_module(
+    "tools.session_logs.deployment_paths"
+  )
+
+  class FakePlatformDirs:
+    user_config_path = tmp_path / "standard" / "config"
+    user_data_path = tmp_path / "standard" / "data"
+    user_state_path = tmp_path / "standard" / "state"
+    user_log_path = tmp_path / "standard" / "log"
+    user_cache_path = tmp_path / "standard" / "cache"
+
+  monkeypatch.setattr(
+    deployment_paths,
+    "_default_platform_dirs_factory",
+    lambda **_arguments: FakePlatformDirs(),
+  )
+  raw_root = tmp_path / "portable-raw"
+  raw_root.mkdir(exist_ok=True)
+  entry = importlib.import_module("tools.session_logs.entry")
+  assert entry.run((
+    "init-config",
+    "--raw-root",
+    str(raw_root),
+    "--tool-version",
+    "test-v1",
+  )) == 0
+  return tmp_path / "standard" / "config" / "session-logs.json"
+
+
+def _entry_collect(tmp_path, config_file, *, relative_path=None):
+  """actual CLI（entry collect-eventual）を公開入口から実行する。"""
+
+  entry = importlib.import_module("tools.session_logs.entry")
+  arguments = [
+    "collect-eventual",
+    "--source-root",
+    str(tmp_path / "native"),
+    "--private-root",
+    str(tmp_path / "private-collect"),
+    "--repository-root",
+    str(_repository(tmp_path)),
+    "--tool-version",
+    "test-v1",
+    "--run-id",
+    "run-1",
+    "--observed-at",
+    "2026-08-08T10:00:00+09:00",
+  ]
+  if relative_path is not None:
+    arguments.extend(["--source-relative-path", relative_path])
+  if config_file is not None:
+    arguments.extend(["--config", str(config_file)])
+  return entry.run(tuple(arguments))
+
+
+@pytest.mark.parametrize("relative_path", (None, "session.jsonl"))
+def test_actual_cli_applies_configured_rules_in_both_branches(
+  tmp_path,
+  monkeypatch,
+  capsys,
+  relative_path,
+):
+  """actual CLIの2分岐（source-root全体・単一source）が--configの8宣言で伏字化する。"""
+
+  home = _synthetic_environment(tmp_path, monkeypatch)
+  config_file = _install_generated_config(tmp_path, monkeypatch)
+  text = (
+    "設定は %s/.reviewcompass3/config.json にある。"
+    "利用者 %s が %s から接続し、連絡先は %s、"
+    "認可は %s である。"
+  ) % (home, SYNTHETIC_USER, SYNTHETIC_HOST, SYNTHETIC_EMAIL, SYNTHETIC_BEARER)
+  _write_session(tmp_path / "native", text)
+  capsys.readouterr()
+
+  exit_code = _entry_collect(
+    tmp_path,
+    config_file,
+    relative_path=relative_path,
+  )
+  output = capsys.readouterr().out
+  payload = json.loads(output)
+
+  assert exit_code == 0
+  assert payload["status"] == "ok"
+  assert payload["counts"]["succeeded"] == 1
+  private_root = tmp_path / "private-collect"
+  redacted_files = tuple((private_root / "redacted").rglob("*.md"))
+  assert len(redacted_files) == 1
+  redacted_text = redacted_files[0].read_text(encoding="utf-8")
+  for value in (
+    str(home),
+    SYNTHETIC_USER,
+    SYNTHETIC_HOST,
+    SYNTHETIC_EMAIL,
+    "abcdefghijklmnopqrstuvwx",
+  ):
+    assert value not in redacted_text
+    assert value not in output
+  for label in (
+    "home_directory",
+    "user_name",
+    "host_name",
+    "email",
+    "bearer_token",
+  ):
+    assert "[REDACTED:%s]" % label in redacted_text
+
+  provenance_files = tuple((private_root / "provenance").rglob("*.json"))
+  assert len(provenance_files) == 1
+  provenance_text = provenance_files[0].read_text(encoding="utf-8")
+  provenance = json.loads(provenance_text)
+  assert provenance["artifacts"]["redacted_sha256"] == hashlib.sha256(
+    redacted_files[0].read_bytes()
+  ).hexdigest()
+  loaded = load_config(config_file)
+  expected_digest = redaction.redaction_rules_digest(
+    tuple(loaded.environment_redaction_rules)
+    + tuple(loaded.redaction_rules),
+    allow_patterns=loaded.allow_patterns,
+  )
+  assert provenance["redaction_rules_sha256"] == expected_digest
+  for value in (str(home), SYNTHETIC_USER, SYNTHETIC_HOST):
+    assert value not in provenance_text
+
+
+@pytest.mark.parametrize("kind", ("missing", "invalid"))
+def test_actual_cli_fails_closed_before_reading_sources_on_bad_config(
+  tmp_path,
+  monkeypatch,
+  capsys,
+  kind,
+):
+  """存在しない・不正なconfigはexit 5とし、source読取りもprivate artifact作成もしない。"""
+
+  _synthetic_environment(tmp_path, monkeypatch)
+  _write_session(tmp_path / "native", "合成の本文。")
+  if kind == "missing":
+    config_file = tmp_path / "config" / "does-not-exist.json"
+  else:
+    config_file = _write_config(tmp_path, [{
+      "label": "broken",
+      "pattern": "BROKEN-VALUE-[0-9]+",
+      "environment_role": "home_directory",
+    }])
+  capsys.readouterr()
+
+  exit_code = _entry_collect(tmp_path, config_file)
+  output = capsys.readouterr().out
+  payload = json.loads(output)
+
+  assert exit_code == 5
+  assert payload["status"] == "error"
+  assert not (tmp_path / "private-collect").exists()
+  assert str(config_file) not in output
+  assert "BROKEN-VALUE" not in output
