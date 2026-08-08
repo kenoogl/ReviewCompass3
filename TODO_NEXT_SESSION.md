@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：digest系はHuman判断「ｂ」で**統合せず・分岐検出テストで守る**と確定した。実施中に2段の発見：(1)凍結レーンは`todo_snapshot.py`の**file指紋**を固定（symbol照合だけでは不可視）、(2)対象10fileは**自己完結script**で、統合がscript起動を破壊——重複は設計の代償だった。取り消し後、全11実装の出力一致を固定する分岐検出テスト8件を追加し全1213 passed。**見落とし2件は判定基準へ恒久フィードバック済み**（照合に契約file固定、実測に起動方式）。反証レビューは不要になった（構造変更なし）。
+- 現在作業：残4系統の予備評価が完了し、**統合レーン総括をHuman判断に付した**。実測：Bはlibrary6/script1・D/Eは全て自己完結script・live指紋固定はどの系統にも検出なし。提案：B/D/Eは**分岐検出テスト**（挙動一致を独立oracleで固定、source変更ゼロ）、Fは**何もしない**（処理を持たない入れ物で分岐riskなし）。レーン全体の結論案：「重複は自己完結設計の代償であり、統合でなく分岐検出テストで守る」。承認されればcheck­list Work 4B 3項目目へ反映して完結。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -19,6 +19,7 @@
 
 ## 最新のauthority／Evidence
 
+- [統合レーン総括（裁定待ち）](records/development/2026-08-08-consolidation-lane-summary-v1.md) — SHA-256 `45438e4c53e7493bdd19c8b824de868325741c28f68b97da4d7e8e93ced7922a`
 - [digest系統合の結果Evidence（統合せず・分岐検出）](records/development/2026-08-08-digest-family-consolidation-outcome-evidence-v1.md) — SHA-256 `6bcd784dbf0d60e8f24221db80873bd2473d586b31b6cf317dc54bedd0fad92d`
 - [digest系（A+C）統合判断の材料](records/development/2026-08-08-consolidation-digest-family-materials-v1.md) — SHA-256 `ea1ec1ab55a8c8073932497338cbfa6588c52a430d3d278f07905d887279592d`
 - [系統A 統合判断の材料](records/development/2026-08-08-consolidation-family-a-materials-v1.md) — SHA-256 `502f8f643989664afb734752e18432e93dd8b91da7705dd4cc480480ec86df3a`
@@ -69,7 +70,7 @@
 ## blocker・Human判断待ち
 
 - blocker：なし。登録済み課題の着手、V1凍結レーンの解除、テストの一斉整理、Work 8前倒しは行わない。Codex側の指示書にある作業はHumanの指示により扱わない。
-- Human判断待ち：なし。次作業（反証レビュー）の着手指示を待つ。
+- Human判断待ち：統合レーン総括の裁定（B/D/E＝分岐検出テスト、F＝何もしない、レーン結論の承認）。
 - 継続する留意点：(1)提案前に既存機構の確認・前提の実測・用途の列挙 (2)確認は「記録が指す先」まで、写しなら原本まで (3)**登録済み課題2件が実害として発現した**：pipe隠蔽で不合格コミットが2回通過（`;`連結が原因。コミット前の全test確認は独立コマンドで行う）、TODO byte上限超過をCLI検証が見逃しテストだけが検出（二tool分離）。workflow台帳へのrecord追加は必ず正規toolを通す（手作りJSONは台帳整合テストに落ちる）。
 
 ## stale・deferred
