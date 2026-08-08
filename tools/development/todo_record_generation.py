@@ -34,6 +34,7 @@
 import hashlib
 import re
 from pathlib import Path
+from tools.common.errors import FailClosedError
 
 from tools.development import pytest_summary
 
@@ -90,13 +91,8 @@ STOP_CODES = (
 )
 
 
-class TodoRecordGenerationError(Exception):
+class TodoRecordGenerationError(FailClosedError):
     """TODOの機械管理部分を安全に作れない。"""
-
-    def __init__(self, code, detail=None):
-        super().__init__(f"{code}: {detail}" if detail else code)
-        self.code = code
-        self.detail = detail
 
 
 def _require_text(value, label):

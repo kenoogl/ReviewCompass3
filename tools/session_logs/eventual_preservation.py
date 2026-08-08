@@ -121,10 +121,7 @@ class _Layout:
   lock_path: Path
 
 
-def _within(path, root):
-  target = Path(path).resolve()
-  boundary = Path(root).resolve()
-  return target == boundary or boundary in target.parents
+from tools.common.paths import within as _within
 
 
 def _validate_boundaries(

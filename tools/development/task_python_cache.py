@@ -23,6 +23,7 @@ import dataclasses
 import json
 import re
 from pathlib import Path
+from tools.common.errors import FailClosedError
 
 from tools.layout import baseline as layout_baseline
 
@@ -62,13 +63,8 @@ STOP_CODES = (
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
 
-class TaskPythonCacheError(Exception):
+class TaskPythonCacheError(FailClosedError):
     """task専用cacheを安全に扱えない。判断できない入力はここで止める。"""
-
-    def __init__(self, code, detail=None):
-        super().__init__(f"{code}: {detail}" if detail else code)
-        self.code = code
-        self.detail = detail
 
 
 @dataclasses.dataclass(frozen=True)

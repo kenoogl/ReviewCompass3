@@ -7,6 +7,7 @@
 import hashlib
 import json
 from pathlib import Path
+from tools.common.errors import FailClosedError
 
 
 DIGEST_ALGORITHM = "sha256"
@@ -72,13 +73,8 @@ STOP_CODES = (
 )
 
 
-class ContractError(Exception):
+class ContractError(FailClosedError):
     """最小Review Task Contractのfail-closed条件に触れた。"""
-
-    def __init__(self, code, detail=None):
-        super().__init__(f"{code}: {detail}" if detail else code)
-        self.code = code
-        self.detail = detail
 
 
 def canonical_bytes(value):

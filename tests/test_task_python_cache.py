@@ -343,7 +343,10 @@ def test_module_imports_no_runner_executor_or_external_process(cache_module):
         elif isinstance(node, ast.ImportFrom):
             imported.add(node.module or "")
 
-    assert imported == {"dataclasses", "json", "re", "pathlib", "tools.layout"}
+    # 複製禁止方針（DEC-SHARED-FUNCTION-POLICY-001）により共通例外基底のみ追加許可
+    assert imported == {
+        "dataclasses", "json", "re", "pathlib", "tools.layout", "tools.common.errors"
+    }
 
 
 def test_module_reuses_the_approved_layout_resolver(cache_module):

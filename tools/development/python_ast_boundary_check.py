@@ -24,6 +24,7 @@
 """
 
 import ast
+from tools.common.errors import FailClosedError
 
 
 #: 参照そのものを違反とする操作。呼び出さずに受け渡すだけでも同じ能力を持つ。
@@ -47,13 +48,8 @@ PATH_REMOVAL_METHODS = {"unlink": "pathlib.Path.unlink"}
 STOP_CODES = ("source_invalid", "source_unparsable")
 
 
-class PythonAstBoundaryError(Exception):
+class PythonAstBoundaryError(FailClosedError):
     """sourceを構文として解析できない。判断できないので続行しない。"""
-
-    def __init__(self, code, detail=None):
-        super().__init__(f"{code}: {detail}" if detail else code)
-        self.code = code
-        self.detail = detail
 
 
 def inspect_python_source_boundaries(source):

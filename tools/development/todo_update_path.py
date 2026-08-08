@@ -20,6 +20,8 @@ import json
 import os
 import re
 from pathlib import Path
+from tools.common.errors import FailClosedError
+from tools.common.output import print_json as _report
 
 from tools.development import todo_compaction
 from tools.development import todo_handoff
@@ -69,13 +71,8 @@ STOP_CODES = (
 )
 
 
-class TodoUpdatePathError(Exception):
+class TodoUpdatePathError(FailClosedError):
     """root TODOの更新経路を安全に完了できない。"""
-
-    def __init__(self, code, detail=None):
-        super().__init__(f"{code}: {detail}" if detail else code)
-        self.code = code
-        self.detail = detail
 
 
 def atomic_write(path, data):
@@ -315,9 +312,6 @@ def main(argv=None, *, execute=None):
 
     execute = execute or policy_test_runner.execute
     project_root = Path(arguments.project_root).resolve()
-
-    def _report(document):
-        print(json.dumps(document, ensure_ascii=False, sort_keys=True))
 
     try:
         todo_path = validate_todo_argument(

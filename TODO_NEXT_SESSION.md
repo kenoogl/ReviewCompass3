@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B、Work 2、Work 3、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baselineが完了。Work 5AのContract version 2 Review経路はaccepted artifactまで完了した。以降の開発はHumanの指示によりClaudeが継続する。
-- 現在作業：Human方針転換（`DEC-SHARED-FUNCTION-POLICY-001`「複製禁止・共通関数化・module起動統一」）を受け、**digest系10定義を`tools/common/digests.py`の正本へ共通化した**。起動はrepository根元からの`python3 -m`へ統一（生きている5文書9か所を書換え、期待文字列のテスト1件を理由記録つき更新）。AGENTS.md機械規律へ複製禁止とmodule起動の2規則を明文化。凍結の`todo_snapshot.py`のみ写し1件残置（出力一致テストで守る）。全1220 passed。統合レーン総括（分岐検出テスト案）は本方針で**上書き**された。
+- 現在作業：**B/D/E系統の共通化が完了し、統合レーンの実施が完結した**。`tools/common/`正本4module（digests・errors・paths・output）へ計24定義を一元化（F対象外・todo_snapshot残置）。既存の「import最小限」不変条件テスト2件は複製禁止方針を優先して許可集合へ`tools.common.errors`のみ追加する形で更新。checklist Work 4B 3項目目へ[x]反映済み。全1238 passed。**残債：共通化一式（守り役含む19file＋正本4module）の反証レビューhighが未実施**（評価②手順7）。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -19,6 +19,7 @@
 
 ## 最新のauthority／Evidence
 
+- [共通関数化 B/D/E GREEN Evidence・レーン結論](records/development/2026-08-08-shared-function-bde-green-evidence-v1.md) — SHA-256 `7a8437a7f0dc32051f4540b3db185a75f3e54d8519c2293bfbc0b0682df584b7`
 - [共通関数化 digest系 GREEN Evidence](records/development/2026-08-08-shared-function-digest-green-evidence-v1.md) — SHA-256 `56858f105bcd690560fdce818ae4168d973a47a2686da7b4af2fd8c46256ca9a`
 - [共通関数化方針Decision](records/development/2026-08-08-shared-function-policy-decision-v1.md) — SHA-256 `62f1e298ceacab9a6afabb9fedc40f35312d02bbd3e1e58dd51d58ba95065ff0`
 - [統合レーン総括（方針転換で上書き）](records/development/2026-08-08-consolidation-lane-summary-v1.md) — SHA-256 `45438e4c53e7493bdd19c8b824de868325741c28f68b97da4d7e8e93ced7922a`
@@ -53,11 +54,11 @@
 - [設計議論の証跡Decision](records/development/2026-08-07-work5b-discussion-outcomes-decision-v1.md) — SHA-256 `8cfc4a1581ed53513d97f70fa78323f6dc574eb2555bbd35ed78c7a4e1214a9d`
 - [Work 5B検査器 GREEN Evidence](records/development/2026-08-07-work5b-checker-green-evidence-v1.md) — SHA-256 `020db589b586e6db741e0d5d347d31c30c89a077c390ebd2232c42dfccbb7d2c`
 - [作業レビュー手順書（高risk観点追記後）](docs/development/work-review-protocol.md) — SHA-256 `37c0391a322a6841421742125fff646600aff7d3acd905990c605f614d2e2967`
-- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `5fa39a7631e421831eb714b1f942ed0f22124ce81ced5c2c48dd39a27f90e3b2`
+- [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `08927e713a47517fd3bd0d5b7520a1eec0a9b1300c677e7590da3db847c65e74`
 
 ## 次に行う一作業
 
-B（fail-closed例外7class）・D（`_within`4file）・E（JSON印字3file）を共通関数化方針で共通化する（TDD・1系統1単位可。例外は共通基底クラス、名前は各module維持）。完了後、統合レーン総括を方針転換後の形で書き直し、checklist Work 4B 3項目目へ反映して統合レーンを完結させる。
+共通化一式の**反証レビュー**（`work-review-protocol` §3の`high`。digest＋B/D/E、守り役含む）。観点：結線の迂回（各moduleでlocal再定義が通るか）、基底`FailClosedError`変更の波及範囲、正本4moduleの変更がHuman承認なしで通る経路がないか、alias越しの挙動差、`-m`起動の全経路。発見があれば処置しEvidence固定。
 
 開始条件：
 
@@ -65,7 +66,7 @@ B（fail-closed例外7class）・D（`_within`4file）・E（JSON印字3file）�
 
 完了条件：
 
-- B/D/E共通化のGREEN Evidence固定と総括改稿・checklist反映が完了すること
+- 反証レビュー結果record固定（発見と処置を含む）
 
 後続作業：幹線復帰（Work 7A）か足場課題（伏字化規則登録・Digest検査器・TODO検証単一入口）かの分岐判断。
 
@@ -86,8 +87,8 @@ B（fail-closed例外7class）・D（`_within`4file）・E（JSON印字3file）�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：共通digest・module起動テスト15件（RED→GREEN。-m起動2経路の実測を含む）
-- 直近の全Test：venv pytest 1220 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：共通部品テスト33件（digest15＋B/D/E18。RED→GREEN各1巡）
+- 直近の全Test：venv pytest 1238 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

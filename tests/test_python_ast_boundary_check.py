@@ -289,7 +289,8 @@ def test_checker_uses_only_the_standard_ast_module(checker):
         elif isinstance(node, ast.ImportFrom):
             imported.add((node.module or "").split(".")[0])
 
-    assert imported == {"ast"}
+    # 複製禁止方針（DEC-SHARED-FUNCTION-POLICY-001）により共通例外基底のみ追加許可
+    assert imported == {"ast", "tools"}
 
 
 # -------------------------------------------------- 実際の対象module

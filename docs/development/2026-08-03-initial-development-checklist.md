@@ -865,9 +865,12 @@ E2E Test：`tests/test_work4a_rebuild_v3_e2e.py`、`tests/test_work4a_rebuild_v3
 - [ ] 必要なcandidateだけについて、Humanが処置labelを確定し、Entry・Relation・Baselineをnew-onlyで記録する。
   （評価①の実装同一性判定は59組完了・基準確立：`DEC-EGRESS-B-CHECK-001`。処置label＝統合可否は
   評価②の手順4で系統ごとにHumanが確定する）
-- [ ] 共通候補ごとに振る舞いTestを固定し、共通部品への段階移行と旧実装の削除判断を独立Work Itemで行う。
-  （**実行形が承認済み**：評価②提案v2＝`DEC-CONSOLIDATION-EVAL2-APPROVAL-001`。1系統1単位・TDD・
-  挙動不変・守り役への反証レビュー。系統A材料済み、次はA+C合流のdigest系材料）
+- [x] 共通候補ごとに振る舞いTestを固定し、共通部品への段階移行と旧実装の削除判断を独立Work Itemで行う。
+  （複製禁止方針`DEC-SHARED-FUNCTION-POLICY-001`の下でdigest系＋B/D/E系統の計24定義を
+  `tools/common/`正本4moduleへ一元化。F系統は対象外、todo_snapshotは凍結解除まで残置。
+  Evidence：`records/development/2026-08-08-shared-function-digest-green-evidence-v1.md`、
+  `records/development/2026-08-08-shared-function-bde-green-evidence-v1.md`。
+  反証レビューhighは次の作業単位で実施）
 - [x] Work 5Bの内部Implementation Task Contract Pilotで、再利用検索と台帳更新のgateを実証する。
   （Work 5B検査器 GREEN・構成D台帳初回実運用 2026-08-07、attestation群で継続実証）
 

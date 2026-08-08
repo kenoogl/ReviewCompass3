@@ -48,12 +48,7 @@ EXIT_RESTORE_PRESERVED = 9
 EXIT_RESTORE_INTEGRITY_FAILED = 10
 
 
-def _print_json(payload):
-  print(json.dumps(
-    payload,
-    ensure_ascii=False,
-    sort_keys=True,
-  ))
+from tools.common.output import print_json as _print_json
 
 
 class _JsonLinesReporter:

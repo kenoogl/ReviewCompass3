@@ -33,13 +33,7 @@ class PrivateValidationResult:
   evidence_path: Path
 
 
-def _within(path, root):
-  resolved_path = Path(path).resolve()
-  resolved_root = Path(root).resolve()
-  return (
-    resolved_path == resolved_root
-    or resolved_root in resolved_path.parents
-  )
+from tools.common.paths import within as _within
 
 
 def _validate_boundaries(raw_root, repository_root, evidence_path):
@@ -188,12 +182,7 @@ def validate_private_logs(
   )
 
 
-def _print_result(payload):
-  print(json.dumps(
-    payload,
-    ensure_ascii=False,
-    sort_keys=True,
-  ))
+from tools.common.output import print_json as _print_result
 
 
 def run(argv=None) -> int:

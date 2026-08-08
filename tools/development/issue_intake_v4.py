@@ -10,6 +10,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from tools.common.errors import FailClosedError
 
 
 DIGEST_ALGORITHM = "sha256"
@@ -72,13 +73,8 @@ STOP_CODES = (
 )
 
 
-class IntakeError(Exception):
+class IntakeError(FailClosedError):
     """Issue Intake V4のfail-closed条件に触れた。"""
-
-    def __init__(self, code, detail=None):
-        super().__init__(f"{code}: {detail}" if detail else code)
-        self.code = code
-        self.detail = detail
 
 
 from tools.common.digests import canonical_content_digest as _canonical_digest

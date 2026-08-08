@@ -28,10 +28,7 @@ class DistributionValidationError(Exception):
   """隔離された配布検証を完了できない。"""
 
 
-def _within(path, root):
-  target = Path(path).resolve()
-  boundary = Path(root).resolve()
-  return target == boundary or boundary in target.parents
+from tools.common.paths import within as _within
 
 
 def _copy_source(project_root, source_root):

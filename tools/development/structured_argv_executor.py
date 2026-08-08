@@ -34,6 +34,7 @@ processの実行結果が失敗であることは入力の失敗と区別し、�
 """
 
 from pathlib import Path, PurePosixPath
+from tools.common.errors import FailClosedError
 
 from tools.development import operation_routing
 
@@ -53,13 +54,8 @@ STOP_CODES = (
 )
 
 
-class StructuredArgvExecutorError(Exception):
+class StructuredArgvExecutorError(FailClosedError):
     """読み取り専用argv executorのfail-closed条件に触れた。"""
-
-    def __init__(self, code, detail=None):
-        super().__init__(f"{code}: {detail}" if detail else code)
-        self.code = code
-        self.detail = detail
 
 
 def _validate_argv(argv):
