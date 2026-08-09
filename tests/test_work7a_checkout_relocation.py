@@ -644,6 +644,68 @@ def test_environment_config_injection_cannot_hide_dirty_state(
     assert ("a.txt", "worktree") in tracked
 
 
+def test_change_set_captures_tracked_symlink_payload_change(tmp_path):
+    """修正RED（RR-P1-004）：tracked symlinkのpayload差を空Change Setにしない。
+
+    Gitはsymlinkのlink payload（指し先文字列）をtracked contentとして追跡する。
+    同一HEADで、base捕捉時とcandidate捕捉時のpayloadだけが異なる場合も、
+    実file deltaとして識別する。参照先fileの内容は読まない。
+    """
+
+    module = _module()
+    checkout = _make_checkout(tmp_path)
+    (checkout / "target-a.txt").write_text("target a\n", encoding="utf-8")
+    (checkout / "target-b.txt").write_text("target b\n", encoding="utf-8")
+    (checkout / "target-c.txt").write_text("target c\n", encoding="utf-8")
+    (checkout / "link.txt").symlink_to("target-a.txt")
+    _git(checkout, "add", ".")
+    _git(checkout, "commit", "-m", "commit-2")
+    head = _head(checkout)
+    binding = module.capture_repository_binding(checkout)
+    (checkout / "link.txt").unlink()
+    (checkout / "link.txt").symlink_to("target-b.txt")
+    base_snapshot = module.capture_source_snapshot(
+        checkout,
+        binding=binding,
+        base_commit=head,
+        head_commit=head,
+    )
+    (checkout / "link.txt").unlink()
+    (checkout / "link.txt").symlink_to("target-c.txt")
+    candidate_snapshot = module.capture_source_snapshot(
+        checkout,
+        binding=binding,
+        base_commit=head,
+        head_commit=head,
+    )
+
+    change_set = module.derive_change_set(
+        checkout,
+        base_snapshot=base_snapshot,
+        candidate_snapshot=candidate_snapshot,
+        work_item_id="WORK-7A-2-PRECURSOR",
+        task_contract_id="none",
+        change_semantics="precursor-fixture",
+    )
+
+    items = change_set["added_modified_deleted_renamed_items"]
+    assert items != []
+    kinds = {
+        (item["change_kind"], item["relative_path"])
+        for item in items
+    }
+    assert ("modify", "link.txt") in kinds
+    assert base_snapshot["content_manifest_digest"] != (
+        candidate_snapshot["content_manifest_digest"]
+    )
+    assert module.verify_change_set(
+        checkout,
+        change_set=change_set,
+        base_snapshot=base_snapshot,
+        candidate_snapshot=candidate_snapshot,
+    ) is True
+
+
 @pytest.mark.parametrize("record_kind", ("binding", "snapshot", "change_set"))
 def test_rejects_tampered_capture_records(tmp_path, record_kind):
     """境界13：捕捉recordのcontent digest改竄を照合で拒否する。"""
