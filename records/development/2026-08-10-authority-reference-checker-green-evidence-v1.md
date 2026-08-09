@@ -75,7 +75,28 @@
 | `tests/test_authority_reference_checker.py` | `b6edd8ce4f9c598a8240eb7562fccdeb267404ba961fcd341f8813c6241e398c` |
 | 公式receipt | `5de14a42510d26721327db1b610b2b0c9c66cff4ea2ed5c67a09cbb497a0f518` |
 
-## 7. 禁止境界と未実施範囲
+## 7. AR-P1-001修正（完了レビューv1反映）
+
+完了レビューv1（`records/session-handoffs/2026-08-10-codex-review-result-authority-reference-checker-v1.md`、
+判定`report_execution_mismatch`）のAR-P1-001（許可key行のコロン後の不正値を無視して
+合格させる）について、Humanの修正承認（2026-08-10「AR-P1-001の修正を承認する」）を受けて
+次を修正した。**本節が§3のfail-closed Claimと§6のDigestを再置換する。**
+
+- 修正RED commit：`2914e39`（Test 4件追加のみ。反証4変種——mapping：`unexpected`・`[]`、
+  mapping_list：`unexpected`・`{}`——が実装前は合格してしまうことを固定。先行15件合格、exit `1`）
+- 実装修正：`_extract_references`で許可key行のコロン後に空白以外の値がある場合、
+  下位の参照対を解析せずinvalid（fail-closed・exit `5`）とする。1箇所のみの変更。
+- Test結果（全て単独command）：targeted 19 passed（exit `0`）、関連回帰21 passed
+  （exit `0`）、公式全Test 1357 passed・status `passed`（receipt更新・再読込みで
+  failed 0確認）、`git diff --check`指摘なし。
+
+| file | SHA-256（本節で有効） |
+| --- | --- |
+| `tools/development/authority_reference_checker.py` | `584c9669c5b0230f2fa460ce9d0b975d7c416371529cf6f6f2a9d2221ca8ffcf` |
+| `tests/test_authority_reference_checker.py` | `ef97b9af746f5a60023476c900c1dffae2cca116885e8fbe1567fadd7158f350` |
+| 公式receipt（更新済み） | `065f6260a0e810cdca27231833ece3fe60d4f18f5f2eb570105907df1e183fb5` |
+
+## 8. 禁止境界と未実施範囲
 
 - `todo_handoff.py`・`todo_record_generation.py`・`digests.py`・docs実文書・既存record・
   TODO・checklist：未変更。参照Digestの自動書換えなし。

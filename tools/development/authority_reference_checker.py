@@ -99,6 +99,7 @@ def _extract_references(matter_lines, allowlist):
         if match is None:
             continue
         key = match.group(1)
+        inline_value = match.group(2).strip()
         block = []
         while index < len(matter_lines):
             _sub_number, sub_line = matter_lines[index]
@@ -107,6 +108,11 @@ def _extract_references(matter_lines, allowlist):
             block.append(matter_lines[index])
             index += 1
         if key not in allowlist:
+            continue
+        if inline_value:
+            # 許可key行のコロン後の値は宣言形（mapping／mapping_list）に無い形であり、
+            # 下位の参照対が正しくても黙って捨てずfail-closedにする（AR-P1-001）。
+            invalid.append({"key": key, "path": "", "line": number})
             continue
         shape = allowlist[key]
         entries = []
