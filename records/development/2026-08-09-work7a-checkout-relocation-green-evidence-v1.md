@@ -98,7 +98,45 @@ RED commit後、Testは未変更。
 | `tests/test_work7a_checkout_relocation.py` | `db68cc42b4020ff7e5ad6ee485aa7ad401df5ccd18fd6f57dae93ef5378586e1` |
 | 公式receipt（同上JSON） | `b1084387a999b9dc3349e503bf0bb4748eb8dc33ca1bb3f28ada61b15495446d` |
 
-## 7. 禁止境界と未実施範囲
+## 7. 修正版（独立レビューv1のFindings反映）
+
+独立レビューv1（`records/session-handoffs/2026-08-09-codex-review-result-work7a-checkout-relocation-v1.md`、
+判定`report_execution_mismatch`）の3 Findingについて、Humanの修正承認を受けて次を修正した。
+**§1〜§6の初版Claim・Digestのうち、実装・Test・receiptに関するものは本節で置換される
+（stale）。** 修正RED commitは`2b27b4d4a00a7ee6989d29fc6a35e92ef01d8b56`
+（Test 3件追加のみ。実装前は3件とも反証どおり失敗、先行19件合格、exit `1`）。
+
+- **RR-P1-001**：Change Set導出・照合を、commit間delta（A/M/D/R）に加えて、両Snapshotが
+  記録したindex・worktree・対象untrackedの状態差を合成する`_combined_change_items`へ変更。
+  同一pathはcommit側kindを優先。これに伴い`tracked_changes`の各entryへ
+  `content_identity`（index=blob oid、worktree=現内容SHA-256）を追加した。これは
+  in-memory値schema内の表現追加であり、承認済みidentity fields（top-level）は不変。
+  同一HEADのdirty・staged・対象untrackedが空Change Setにならないことを新Testで固定。
+- **RR-P1-002**：捕捉時に実HEADを機械取得し、caller指定`head_commit`を期待値として
+  一致必須にした。不一致は新stop code `head_commit_mismatch`で拒否（新Testで固定）。
+- **RR-P2-003**：`_git_environment`で`GIT_CONFIG*`全て（COUNT／KEY_*／VALUE_*含む）を
+  除去してからfile configをdevnullへ固定し、`GIT_DIR`等のrepository位置差替え変数も
+  除去した。`core.fileMode=false`注入でdirtyを隠せないことを新Testで固定。
+
+修正後のTest実行（全て単独command）：
+
+| 区分 | 結果 | exit code |
+| --- | --- | --- |
+| 修正RED（実装前・単独） | 3 failed（新規のみ・反証どおり）／19 passed | `1` |
+| targeted GREEN | 22 passed | `0` |
+| 関連回帰（同§4のcommand） | 83 passed | `0` |
+| 公式全Test（同§4のcommand・receipt更新） | 1337 passed、status `passed`（再読込みでfailed 0確認） | `0` |
+| `git diff --check` | 指摘なし | `0` |
+
+修正後のSHA-256（§6を置換）：
+
+| file | SHA-256 |
+| --- | --- |
+| `tools/deployment/checkout_relocation.py` | `5c353c6f2815dbe434d5fab5374ac3af2d6996eddc417b9fa30930402778f589` |
+| `tests/test_work7a_checkout_relocation.py` | `2a5c32ae22104217219e26a5c82b0de26b56de9dd3226a06e07765de0e273eda` |
+| 公式receipt（更新済み） | `e653387a9f35eb04fe7951c670b9c21a6bdefbe699f70871e0a0d2e94e27684e` |
+
+## 8. 禁止境界と未実施範囲
 
 - `tools/layout/baseline.py`・`tools/task_contract/`配下・
   `tools/deployment/local_integrated_roots.py`・TODO・checklist・Plan・Decision・

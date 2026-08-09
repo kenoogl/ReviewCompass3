@@ -73,9 +73,28 @@ class RelocationError(Exception):
         super().__init__(stop_code)
 
 
+_ENVIRONMENT_INJECTION_KEYS = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_NAMESPACE",
+    "GIT_CEILING_DIRECTORIES",
+    "GIT_COMMON_DIR",
+)
+
+
 def _git_environment():
-    # identity導出が利用者Git configへ依存しないよう、configを隔離する。
-    environment = dict(os.environ)
+    # identity導出が呼出し環境のGit設定に依存しないよう、file config
+    # （GIT_CONFIG_GLOBAL／SYSTEM）だけでなくcommand-scope注入
+    # （GIT_CONFIG_COUNT／KEY_*／VALUE_*）とrepository位置の差替え変数も除去する。
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.startswith("GIT_CONFIG")
+        and name not in _ENVIRONMENT_INJECTION_KEYS
+    }
     environment.update({
         "GIT_CONFIG_GLOBAL": os.devnull,
         "GIT_CONFIG_SYSTEM": os.devnull,
@@ -219,22 +238,30 @@ def _status_entries(checkout_root):
     return staged, worktree, untracked
 
 
-def _tracked_changes(staged, worktree):
-    changes = [
-        {
+def _tracked_changes(checkout_root, staged, worktree):
+    """staged／worktree変更を、内容identity付きの決定的な列挙にする。"""
+
+    index_oids = _index_entries(checkout_root)
+    changes = []
+    for item in staged:
+        changes.append({
             "relative_path": item["relative_path"],
             "location": "index",
             "status": item["status"],
-        }
-        for item in staged
-    ] + [
-        {
+            "content_identity": index_oids.get(item["relative_path"]),
+        })
+    for item in worktree:
+        path = checkout_root / item["relative_path"]
+        if path.is_file() and not path.is_symlink():
+            identity = file_sha256(path)
+        else:
+            identity = None
+        changes.append({
             "relative_path": item["relative_path"],
             "location": "worktree",
             "status": item["status"],
-        }
-        for item in worktree
-    ]
+            "content_identity": identity,
+        })
     changes.sort(key=lambda item: (item["relative_path"], item["location"]))
     return changes
 
@@ -291,18 +318,10 @@ def _content_manifest_digest(
     tracked_changes,
     included_untracked,
 ):
-    worktree_content = {}
-    for item in tracked_changes:
-        path = checkout_root / item["relative_path"]
-        if path.is_file() and not path.is_symlink():
-            worktree_content[item["relative_path"]] = file_sha256(path)
-        else:
-            worktree_content[item["relative_path"]] = None
     manifest = {
         "head_tree": _head_tree(checkout_root),
         "index_entries": _index_entries(checkout_root),
         "tracked_changes": tracked_changes,
-        "worktree_content": worktree_content,
         "included_untracked_files": included_untracked,
     }
     return canonical_content_digest(manifest)
@@ -349,13 +368,16 @@ def _capture_source_snapshot(
         raise RelocationError("repository_identity_mismatch")
     base = _resolve_commit(root, base_commit)
     head = _resolve_commit(root, head_commit)
+    # head_commitはcaller期待値であり、実HEADと一致しない捕捉を作らない。
+    if head != _resolve_commit(root, "HEAD"):
+        raise RelocationError("head_commit_mismatch")
     staged, worktree, untracked_now = _status_entries(root)
     included = [
         _safe_included_untracked(root, relative, untracked_now)
         for relative in included_untracked_files
     ]
     included.sort(key=lambda item: item["relative_path"])
-    tracked_changes = _tracked_changes(staged, worktree)
+    tracked_changes = _tracked_changes(root, staged, worktree)
     snapshot = {
         "repository_binding_id": binding["binding_id"],
         "base_commit": base,
@@ -454,6 +476,94 @@ def _changed_files(items):
     return sorted(files)
 
 
+_STATE_KIND_BY_STATUS = {"A": "add", "M": "modify", "D": "delete", "T": "modify"}
+_STATE_KIND_BY_LOST_STATUS = {
+    "A": "delete",
+    "M": "modify",
+    "D": "add",
+    "T": "modify",
+}
+
+
+def _snapshot_state(snapshot):
+    state = {}
+    for entry in snapshot["tracked_changes"]:
+        state[("tracked", entry["relative_path"], entry["location"])] = (
+            entry["status"],
+            entry.get("content_identity"),
+        )
+    for item in snapshot["included_untracked_files"]:
+        state[("untracked", item["relative_path"], "untracked")] = (
+            item["sha256"],
+        )
+    return state
+
+
+def _merge_state_kind(previous, kind):
+    if previous is None or previous == kind:
+        return kind
+    if "add" in (previous, kind):
+        return "add"
+    if "delete" in (previous, kind):
+        return "delete"
+    return "modify"
+
+
+def _state_delta_kinds(base_snapshot, candidate_snapshot):
+    """commitに現れないindex・worktree・対象untrackedの実内容差をpath別kindへ写す。"""
+
+    base_state = _snapshot_state(base_snapshot)
+    candidate_state = _snapshot_state(candidate_snapshot)
+    kinds_by_path = {}
+    for key in set(base_state) | set(candidate_state):
+        if base_state.get(key) == candidate_state.get(key):
+            continue
+        category, relative = key[0], key[1]
+        if key in candidate_state:
+            if category == "untracked":
+                kind = "add" if key not in base_state else "modify"
+            else:
+                kind = _STATE_KIND_BY_STATUS.get(candidate_state[key][0])
+        elif category == "untracked":
+            kind = "delete"
+        else:
+            kind = _STATE_KIND_BY_LOST_STATUS.get(base_state[key][0])
+        if kind is None:
+            raise RelocationError("unsupported_change_kind")
+        kinds_by_path[relative] = _merge_state_kind(
+            kinds_by_path.get(relative),
+            kind,
+        )
+    return kinds_by_path
+
+
+def _combined_change_items(checkout_root, base_snapshot, candidate_snapshot):
+    """base／candidate Snapshotの実内容差からChange Set項目を導出する。
+
+    commit間のfile delta（A/M/D/R）に、両Snapshotが記録したindex・worktree・
+    対象untrackedの状態差を合成する。同一pathはcommit側のkindを優先する。
+    """
+
+    base = _resolve_commit(checkout_root, base_snapshot["head_commit"])
+    candidate = _resolve_commit(checkout_root, candidate_snapshot["head_commit"])
+    combined = {}
+    for item in _diff_items(checkout_root, base, candidate):
+        combined[item["relative_path"]] = item
+    for relative, kind in sorted(
+        _state_delta_kinds(base_snapshot, candidate_snapshot).items()
+    ):
+        if relative not in combined:
+            combined[relative] = {
+                "change_kind": kind,
+                "relative_path": relative,
+            }
+    items = sorted(
+        combined.values(),
+        key=lambda item: (item["relative_path"], item["change_kind"]),
+    )
+    return items
+
+
 def _derive_change_set(
     checkout_root,
     base_snapshot,
@@ -470,9 +580,7 @@ def _derive_change_set(
         != candidate_snapshot["repository_binding_id"]
     ):
         raise RelocationError("change_set_binding_mismatch")
-    base = _resolve_commit(root, base_snapshot["head_commit"])
-    candidate = _resolve_commit(root, candidate_snapshot["head_commit"])
-    items = _diff_items(root, base, candidate)
+    items = _combined_change_items(root, base_snapshot, candidate_snapshot)
     change_set = {
         "base_snapshot_id": base_snapshot["content_digest"],
         "candidate_snapshot_id": candidate_snapshot["content_digest"],
@@ -549,7 +657,7 @@ def _verify_source_snapshot(checkout_root, binding, snapshot):
         raise RelocationError("checkout_state_mismatch")
     staged, worktree, untracked_now = _status_entries(root)
     if (
-        _tracked_changes(staged, worktree) != snapshot["tracked_changes"]
+        _tracked_changes(root, staged, worktree) != snapshot["tracked_changes"]
         or {
             "clean": not staged and not worktree,
             "staged_paths": [item["relative_path"] for item in staged],
@@ -603,9 +711,7 @@ def _verify_change_set(
         != candidate_snapshot["content_digest"]
     ):
         raise RelocationError("change_set_binding_mismatch")
-    base = _resolve_commit(root, base_snapshot["head_commit"])
-    candidate = _resolve_commit(root, candidate_snapshot["head_commit"])
-    if _diff_items(root, base, candidate) != (
+    if _combined_change_items(root, base_snapshot, candidate_snapshot) != (
         change_set["added_modified_deleted_renamed_items"]
     ):
         raise RelocationError("change_set_state_mismatch")
