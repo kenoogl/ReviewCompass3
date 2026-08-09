@@ -48,9 +48,13 @@ codex exec --sandbox workspace-write "あなたはReviewerです。
 docs/development/work-review-protocol.mdのレビュー手順に従い、次のレビューを実施してください。
 対象：<commit SHAまたはrecord path>
 先行レビュー：<record path（あれば）>
+判定recordの冒頭に、Reviewerのmodel名とreasoning effort（起動時に表示された値）を記載してください。
 判定recordを <record path> へ作成し、そのrecordだけを単独commitして停止してください。
 record以外のファイルは変更しないでください。"
 ```
+
+model名の記載は判定の由来（provenance）の固定である。どのモデルによる判定かをrecordから
+機械的に辿れるようにし、モデル更新時に過去verdictのstale判断へ使う。
 
 読み取り確認（変更なし）：
 
