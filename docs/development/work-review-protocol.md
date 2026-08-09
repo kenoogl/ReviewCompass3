@@ -233,11 +233,12 @@ completion）を必ず付ける。blockingにできる根拠は次の4類型だ�
 
 列挙外の指摘は自動的にnon-blockingとし、確認段階を指定して記録する。
 
-停止系の判定には根拠の列挙を必須とする。`report_execution_mismatch`は、報告と事後状態の
-競合を示すblocking Finding（類型1〜4のいずれか）を1件以上列挙できる場合に限る。
-`reported_unverified`は、blocking Findingの列挙、または§6が定める不足した必須Evidence・
-再現条件の列挙を伴う場合に限る（Evidence不足による`reported_unverified`は§4.7・§6の
-従来定義のまま変えない）。どちらの列挙もない停止判定はしない。
+停止系の判定には根拠の列挙を必須とする。`report_execution_mismatch`は、§4.7・§6が定める
+「報告と事後状態の競合」を示すEvidenceを1件以上列挙できる場合に成立し、競合Evidenceの
+列挙自体を根拠とする。類型1〜4への該当は要件ではない（該当する場合はblocking Finding
+として併記する）。`reported_unverified`は、blocking Findingの列挙、または§6が定める
+不足した必須Evidence・再現条件の列挙を伴う場合に限る。いずれの判定でも、Evidence不足と
+報告不一致の従来定義（§4.7・§6）は変えない。根拠の列挙がない停止判定はしない。
 
 ### 11.2 段階対応（altitude規則）
 
