@@ -77,3 +77,36 @@ Humanのchat message 1通を1 eventとし、承認と受け渡しを兼ねるmes
 
 §10のとおり、一件の結果だけで恒久方式へ昇格しない。`low`／`medium`の適用結果を
 分けて集め、継続・改定・廃止はHumanが判断する。
+
+## 4. 追記：low risk適用とCLI橋渡しの実測（2026-08-10）
+
+### 4.1 low risk作業の初適用（deferred #7 テストfixture重複共通化）
+
+| 項目 | 実測 |
+| --- | --- |
+| Human承認・裁定 | 2 event（仕分け裁定「1，5，6，7を実施」／「#7 risk lowを確定、実装開始を承認する」） |
+| Humanのchat運搬 | 0回（受け渡しはPilot起動・record正本方式へ移行後） |
+| 範囲レビュー | なし（`low`規定どおり。過小分類でないことは完了レビューで確認済み） |
+| 完了レビュー周回 | 1周（`verified`、Finding 0） |
+| 停止系判定 | 0回 |
+| Pilot commit数 | 4（裁定record・SCOPE・REFACTOR・review request）＋Reviewer判定record 1＋Closer projection 1 |
+| Test | 対象129件・公式全1338件とも数・結果不変。fixture同一性probe 9／9一致 |
+| 経過 | 同日内 |
+
+`high`（前駆slice）比で、承認event 6→2、レビュー周回3→1、停止系判定3→0。
+
+### 4.2 Pilot起動・record正本方式（codex CLI橋渡し）の実測
+
+| 起動 | sandbox | token（CLI報告値） | 結果 |
+| --- | --- | --- | --- |
+| 疎通確認（HEAD SHA正答） | read-only | 9,277 | 正答 |
+| 比例原則 再々レビュー | workspace-write | 72,450 | `verified` |
+| 受け渡し条項改定 レビュー | workspace-write | 未取得 | `verified` |
+| fixture共通化 レビュー | workspace-write | 145,622 | `verified` |
+| #7完了projection（Closer） | workspace-write | 未取得 | validator合格・transition passed |
+
+- 全5起動でHumanのchat運搬は0回。承認・裁定の文言だけがHumanに残った。
+- 鮮度検査（判定recordが対象commitより後にあること・変更pathがrecord 1件のみ）は
+  全件Pilotが機械照合し、不一致0件。
+- Reviewer model記載（`gpt-5.6-sol`／reasoning `high`）はfixture共通化レビューから適用。
+- token消費の取得はCLI出力のtail依存で2件欠測。恒常的な記録方法は未決事項のまま。
