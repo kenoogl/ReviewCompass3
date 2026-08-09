@@ -528,6 +528,122 @@ def test_clean_clones_share_content_manifest_digest(tmp_path):
     )
 
 
+def test_change_set_captures_dirty_candidate_on_same_head(tmp_path):
+    """修正RED（RR-P1-001）：同一HEADでもdirty・staged・対象untrackedの実内容差を固定する。
+
+    commit SHAだけではdirty worktreeを表せない（Work 3承認の中心規則）。base捕捉後の
+    dirty変更・staged追加・対象untracked追加は、同じHEADでも空Change Setにならない。
+    """
+
+    module = _module()
+    checkout = _make_checkout(tmp_path)
+    commit_1 = _head(checkout)
+    binding = module.capture_repository_binding(checkout)
+    base_snapshot = module.capture_source_snapshot(
+        checkout,
+        binding=binding,
+        base_commit=commit_1,
+        head_commit=commit_1,
+    )
+    (checkout / "a.txt").write_text("alpha dirty change\n", encoding="utf-8")
+    (checkout / "staged-new.txt").write_text("staged new\n", encoding="utf-8")
+    _git(checkout, "add", "staged-new.txt")
+    (checkout / "extra.txt").write_text("extra untracked\n", encoding="utf-8")
+    candidate_snapshot = module.capture_source_snapshot(
+        checkout,
+        binding=binding,
+        base_commit=commit_1,
+        head_commit=commit_1,
+        included_untracked_files=("extra.txt",),
+    )
+
+    change_set = module.derive_change_set(
+        checkout,
+        base_snapshot=base_snapshot,
+        candidate_snapshot=candidate_snapshot,
+        work_item_id="WORK-7A-2-PRECURSOR",
+        task_contract_id="none",
+        change_semantics="precursor-fixture",
+    )
+
+    items = change_set["added_modified_deleted_renamed_items"]
+    assert items != []
+    kinds = {
+        (item["change_kind"], item["relative_path"])
+        for item in items
+    }
+    assert ("modify", "a.txt") in kinds
+    assert ("add", "staged-new.txt") in kinds
+    assert ("add", "extra.txt") in kinds
+    assert module.verify_change_set(
+        checkout,
+        change_set=change_set,
+        base_snapshot=base_snapshot,
+        candidate_snapshot=candidate_snapshot,
+    ) is True
+
+
+def test_rejects_head_commit_that_differs_from_actual_head(tmp_path):
+    """修正RED（RR-P1-002）：実HEADと異なるcaller指定commitでの捕捉を拒否する。
+
+    存在する旧commitをhead_commitへ渡しても、実HEADとの不一致は安定stop codeで
+    拒否され、HEADとmanifestが競合するSnapshotを作らない。
+    """
+
+    module = _module()
+    checkout = _make_checkout(tmp_path)
+    commit_1 = _head(checkout)
+    binding = module.capture_repository_binding(checkout)
+    (checkout / "later.txt").write_text("later\n", encoding="utf-8")
+    _git(checkout, "add", "later.txt")
+    _git(checkout, "commit", "-m", "commit-2")
+    assert _head(checkout) != commit_1
+
+    with pytest.raises(module.RelocationError) as error:
+        module.capture_source_snapshot(
+            checkout,
+            binding=binding,
+            base_commit=commit_1,
+            head_commit=commit_1,
+        )
+
+    assert error.value.stop_code == "head_commit_mismatch"
+
+
+def test_environment_config_injection_cannot_hide_dirty_state(
+    tmp_path,
+    monkeypatch,
+):
+    """修正RED（RR-P2-003）：command-scope Git config注入でdirty状態を隠せない。
+
+    GIT_CONFIG_COUNT／KEY／VALUEでcore.fileMode=falseを注入しても、実file mode差は
+    Snapshotのindex_state・tracked_changesへ現れる。
+    """
+
+    module = _module()
+    checkout = _make_checkout(tmp_path)
+    head = _head(checkout)
+    binding = module.capture_repository_binding(checkout)
+    (checkout / "a.txt").chmod(0o755)
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "core.fileMode")
+    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "false")
+
+    snapshot = module.capture_source_snapshot(
+        checkout,
+        binding=binding,
+        base_commit=head,
+        head_commit=head,
+    )
+
+    assert snapshot["index_state"]["clean"] is False
+    tracked = {
+        (item["relative_path"], item["location"])
+        for item in snapshot["tracked_changes"]
+    }
+    assert ("a.txt", "worktree") in tracked
+
+
 @pytest.mark.parametrize("record_kind", ("binding", "snapshot", "change_set"))
 def test_rejects_tampered_capture_records(tmp_path, record_kind):
     """境界13：捕捉recordのcontent digest改竄を照合で拒否する。"""
