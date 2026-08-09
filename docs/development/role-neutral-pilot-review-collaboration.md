@@ -57,6 +57,9 @@ Pilotは範囲固定文書へ`low`、`medium`、`high`の提案と根拠を書�
 | `medium` | Reviewerが範囲とriskを簡易レビューし、Humanが再開を確認するまで停止 | 全Testを含む独立レビュー |
 | `high` | Reviewerが上流から範囲を独立レビューし、Humanがriskと再開を明示承認するまで停止 | 全Test、独立oracle、Pilotのfixtureにない反証を最低1件実行 |
 
+`medium`の簡易レビューでは、少なくとも上流authorityとの整合、受入条件・変更可能path・
+禁止事項・停止条件の妥当性、risk分類の妥当性を確認する。
+
 守り役のcodeと不可逆操作を行うcodeは`work-review-protocol.md`どおり既定で`high`とする。
 safety、authority、Acceptance、必須Provenance、identity、外部side effectへ影響する自己適用作業では、
 AIの分類とrouteは提案であり、Humanがrisk受容と再開を判断する。
@@ -91,6 +94,9 @@ authorityから受入条件と反証候補を独立に導出する。結果は�
 records/session-handoffs/YYYY-MM-DD-<reviewer>-scope-review-<work>-v<N>.md
 ```
 
+Reviewerは範囲レビュー結果を単独commitして停止する。未コミットhandoffを残さない原則は、
+完了レビューだけでなく範囲レビューにも適用する。
+
 範囲変更が必要なら元文書や履歴を書き換えず、Pilotが次versionを新規commitする。`high`では、合格した
 範囲レビューとHumanの再開承認を受け取るまでREDを開始しない。
 
@@ -116,13 +122,19 @@ amend、rebase、resetして見えなくしない。
 Pilotは実装後、次のレビュー依頼書を作り、単独commitして停止する。
 
 ```text
-records/session-handoffs/YYYY-MM-DD-<pilot>-to-<reviewer>-<work>-review-request-v<N>.md
+records/session-handoffs/YYYY-MM-DD-<pilot>-pilot-<work>-review-request-v<N>.md
 ```
+
+handoff fileの命名には`<pilot>-to-<reviewer>`形式を使わない。`.gitignore`の
+`records/session-handoffs/*-claude-to-codex-*.md`は非公開のchat型報告を管理外にする
+既存規則であり、本modeのcommit対象handoffはこの規則に掛からない名前とし、ignore規則
+自体は変更しない。
 
 レビュー依頼書には次を書く。
 
 - 範囲固定文書と、該当する範囲レビュー結果
-- baseからレビュー依頼commitまでのcommit列と各役割
+- baseから最新の実装commit（GREEN等）までのcommit列と各役割。レビュー依頼commit自体の
+  SHAは依頼書へ書かず、Reviewerがgitから特定する
 - 実施、結果、判断、未実施、提案へ分けたClaim
 - 成果物、Test、Evidence、receiptのpathとSHA-256
 - Human承認と対象identity
@@ -158,7 +170,7 @@ Reviewer自身が過去に範囲レビューを行っていても、PilotのTest
 レビュー結果は次へ固定し、単独commitして停止する。実装修正と混在させない。
 
 ```text
-records/session-handoffs/YYYY-MM-DD-<reviewer>-to-<pilot>-<work>-review-result-v<N>.md
+records/session-handoffs/YYYY-MM-DD-<reviewer>-review-result-<work>-v<N>.md
 ```
 
 判定は`verified`、`reported_unverified`、`report_execution_mismatch`、`blocked`、`not_executed`から選ぶ。
