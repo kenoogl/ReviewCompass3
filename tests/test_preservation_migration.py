@@ -15,6 +15,8 @@ from pathlib import Path
 
 import pytest
 
+from shared_fixtures import claude_conversation_records, write_jsonl
+
 
 PROJECT_ROOT = Path(__file__).parents[1]
 BASELINE_V3_CANDIDATE = (
@@ -33,35 +35,13 @@ def _module():
 
 
 def _write_jsonl(path, records):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    encoded = b"".join(
-        (json.dumps(record, ensure_ascii=False) + "\n").encode("utf-8")
-        for record in records
-    )
-    path.write_bytes(encoded)
-    return encoded
+    return write_jsonl(path, records)
 
 
 def _claude_records():
-    return (
-        {
-            "uuid": "user-1",
-            "type": "user",
-            "sessionId": "session-1",
-            "message": {
-                "role": "user",
-                "content": "移行対象の会話 %s" % _MARKER,
-            },
-        },
-        {
-            "uuid": "assistant-1",
-            "type": "assistant",
-            "sessionId": "session-1",
-            "message": {
-                "role": "assistant",
-                "content": [{"type": "text", "text": "移行fixtureを保存しました。"}],
-            },
-        },
+    return claude_conversation_records(
+        "移行対象の会話 %s" % _MARKER,
+        "移行fixtureを保存しました。",
     )
 
 

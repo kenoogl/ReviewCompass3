@@ -12,6 +12,8 @@ from pathlib import Path
 
 import pytest
 
+from shared_fixtures import work4a_manifest
+
 
 UNIVERSE_ID = "SRCU-WORK4A-TOOLS-PY-V1"
 POLICY_ID = "POL-WORK4A-FRESHNESS"
@@ -31,17 +33,7 @@ def rebuild():
 
 
 def _manifest(project_id):
-    return {
-        "artifact_roots": {
-            "contracts": ".reviewcompass/contracts",
-            "design_decisions": ".reviewcompass/design-decisions",
-            "policies": ".reviewcompass/policies",
-            "reuse": ".reviewcompass/reuse",
-        },
-        "document_links": [],
-        "project_id": project_id,
-        "schema_version": 2,
-    }
+    return work4a_manifest(project_id)
 
 
 def _project(tmp_path, project_id=PROJECT_ID):

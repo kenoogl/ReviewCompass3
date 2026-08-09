@@ -22,13 +22,14 @@
 
 import hashlib
 import importlib
-import json
 import os
 import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
+
+from shared_fixtures import write_project_manifest_v2
 
 
 PROJECT_ID = "project-alpha"
@@ -73,26 +74,7 @@ def _git(cwd, *arguments):
 
 
 def _write_manifest(checkout, project_id=PROJECT_ID):
-    manifest_dir = checkout / ".reviewcompass"
-    manifest_dir.mkdir(parents=True, exist_ok=True)
-    manifest = {
-        "schema_version": 2,
-        "project_id": project_id,
-        "artifact_roots": {
-            "contracts": "artifacts/contracts",
-            "design_decisions": "artifacts/design-decisions",
-            "policies": "artifacts/policies",
-            "requirement_maps": "artifacts/requirement-maps",
-            "reuse": "artifacts/reuse",
-            "verified_artifacts": "artifacts/verified",
-            "workflow": "artifacts/workflow",
-        },
-        "document_links": [],
-    }
-    (manifest_dir / "project-manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True),
-        encoding="utf-8",
-    )
+    write_project_manifest_v2(checkout, project_id)
 
 
 def _make_checkout(base, name="checkout-a", project_id=PROJECT_ID):

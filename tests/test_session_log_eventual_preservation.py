@@ -7,6 +7,8 @@ import stat
 
 import pytest
 
+from shared_fixtures import claude_conversation_records, write_jsonl
+
 
 def _repository(tmp_path):
   repository = tmp_path / "repository"
@@ -15,35 +17,13 @@ def _repository(tmp_path):
 
 
 def _write_jsonl(path, records):
-  path.parent.mkdir(parents=True, exist_ok=True)
-  encoded = b"".join(
-    (json.dumps(record, ensure_ascii=False) + "\n").encode("utf-8")
-    for record in records
-  )
-  path.write_bytes(encoded)
-  return encoded
+  return write_jsonl(path, records)
 
 
 def _claude_records(secret="SECRET-123"):
-  return (
-    {
-      "uuid": "user-1",
-      "type": "user",
-      "sessionId": "session-1",
-      "message": {
-        "role": "user",
-        "content": "保存対象 %s" % secret,
-      },
-    },
-    {
-      "uuid": "assistant-1",
-      "type": "assistant",
-      "sessionId": "session-1",
-      "message": {
-        "role": "assistant",
-        "content": [{"type": "text", "text": "保存しました。"}],
-      },
-    },
+  return claude_conversation_records(
+    "保存対象 %s" % secret,
+    "保存しました。",
   )
 
 

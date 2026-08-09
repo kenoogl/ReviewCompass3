@@ -19,6 +19,8 @@ from pathlib import Path
 
 import pytest
 
+from shared_fixtures import write_project_manifest_v2
+
 
 PROJECT_ROOT = Path(__file__).parents[1]
 BASELINE_V3_RECORD = (
@@ -49,26 +51,8 @@ def _write_install_package(base, name="install"):
 
 def _write_project(base, name="project", project_id="project-alpha"):
     project = base / name
-    manifest_dir = project / ".reviewcompass"
-    manifest_dir.mkdir(parents=True)
-    manifest = {
-        "schema_version": 2,
-        "project_id": project_id,
-        "artifact_roots": {
-            "contracts": "artifacts/contracts",
-            "design_decisions": "artifacts/design-decisions",
-            "policies": "artifacts/policies",
-            "requirement_maps": "artifacts/requirement-maps",
-            "reuse": "artifacts/reuse",
-            "verified_artifacts": "artifacts/verified",
-            "workflow": "artifacts/workflow",
-        },
-        "document_links": [],
-    }
-    (manifest_dir / "project-manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True),
-        encoding="utf-8",
-    )
+    project.mkdir(parents=True)
+    write_project_manifest_v2(project, project_id)
     (project / "README.md").write_text(
         "synthetic target project\n",
         encoding="utf-8",
