@@ -193,6 +193,11 @@ Human境界：<維持／違反>
 
 Claude固有の受け渡し方法は`docs/development/codex-claude-collaboration.md`を参照する。
 
+Humanが`role_neutral_pilot_review` modeを明示した場合は、受け渡しと役割割当だけ
+`docs/development/role-neutral-pilot-review-collaboration.md`の規則を使う。modeの明示が
+ない場合は上表の従来方式を使う。いずれの場合も、レビュー順序と判定基準は本プロトコルの
+まま変えない。
+
 ## 10. レビュー完了チェック
 
 - [ ] 作業指示、base commit、許可範囲、停止条件を特定した。

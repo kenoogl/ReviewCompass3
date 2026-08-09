@@ -75,6 +75,9 @@ Pilotは実装前に範囲固定文書を作り、単独commitする。pathは�
 records/session-handoffs/YYYY-MM-DD-<pilot>-pilot-<work>-scope-v<N>.md
 ```
 
+`<work>`の命名規則とcommit前のignore検査（§6のhandoff path規則）は、本pathを含む
+§4・§6・§7の全handoff確定pathへ適用する。
+
 範囲固定文書には少なくとも次を書く。
 
 - mode、Pilot、Reviewer、Closer、work item、risk提案と根拠
@@ -129,6 +132,11 @@ handoff fileの命名には`<pilot>-to-<reviewer>`形式を使わない。`.giti
 `records/session-handoffs/*-claude-to-codex-*.md`は非公開のchat型報告を管理外にする
 既存規則であり、本modeのcommit対象handoffはこの規則に掛からない名前とし、ignore規則
 自体は変更しない。
+
+`<work>`には予約substring`claude-to-codex`を含めない。作業名が本来この語を含む場合は
+`claude2codex`へ正規化して使う。§4・§6・§7の全handoff確定pathは、file作成・commitの
+前に単独commandで`git check-ignore --no-index <path>`を実行し、exit codeで判定する。
+`0`はignoredとして停止、`1`だけを続行可能、`2`以上は検査エラーとして停止する。
 
 レビュー依頼書には次を書く。
 
