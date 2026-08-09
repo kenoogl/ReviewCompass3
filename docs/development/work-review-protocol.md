@@ -231,9 +231,13 @@ completion）を必ず付ける。blockingにできる根拠は次の4類型だ�
    機械実行できる反証を付ける
 4. 禁止事項違反、またはscope・schema境界の破り
 
-列挙外の指摘は自動的にnon-blockingとし、確認段階を指定して記録する。停止系の判定
-（`reported_unverified`、`report_execution_mismatch`）は、blocking Findingを1件以上
-列挙できる場合に限る。
+列挙外の指摘は自動的にnon-blockingとし、確認段階を指定して記録する。
+
+停止系の判定には根拠の列挙を必須とする。`report_execution_mismatch`は、報告と事後状態の
+競合を示すblocking Finding（類型1〜4のいずれか）を1件以上列挙できる場合に限る。
+`reported_unverified`は、blocking Findingの列挙、または§6が定める不足した必須Evidence・
+再現条件の列挙を伴う場合に限る（Evidence不足による`reported_unverified`は§4.7・§6の
+従来定義のまま変えない）。どちらの列挙もない停止判定はしない。
 
 ### 11.2 段階対応（altitude規則）
 
