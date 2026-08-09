@@ -160,12 +160,12 @@ def test_all_allowlisted_references_match(tmp_path, capsys):
 
     assert exit_code == 0
     assert payload["status"] == "ok"
-    assert payload["totals"]["checked"] == 10
-    assert payload["totals"]["matched"] == 10
+    assert payload["totals"]["checked"] == 11
+    assert payload["totals"]["matched"] == 11
     assert payload["totals"]["mismatched"] == 0
     assert payload["totals"]["missing"] == 0
     assert payload["totals"]["invalid"] == 0
-    assert payload["files"][str(checklist)]["checked"] == 9
+    assert payload["files"][str(checklist)]["checked"] == 10
     assert payload["files"][str(plan)]["checked"] == 1
 
 
