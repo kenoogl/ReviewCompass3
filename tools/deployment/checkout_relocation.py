@@ -252,8 +252,15 @@ def _tracked_changes(checkout_root, staged, worktree):
         })
     for item in worktree:
         path = checkout_root / item["relative_path"]
-        if path.is_file() and not path.is_symlink():
-            identity = file_sha256(path)
+        if path.is_symlink():
+            # Gitはsymlinkのlink payloadをtracked contentとして追跡する。
+            # 参照先fileは読まず、payload自体を種別接頭辞付きで識別する。
+            payload = os.readlink(path)
+            identity = "symlink:" + hashlib.sha256(
+                os.fsencode(payload)
+            ).hexdigest()
+        elif path.is_file():
+            identity = "file:" + file_sha256(path)
         else:
             identity = None
         changes.append({

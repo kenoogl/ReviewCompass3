@@ -136,6 +136,29 @@ RED commit後、Testは未変更。
 | `tests/test_work7a_checkout_relocation.py` | `2a5c32ae22104217219e26a5c82b0de26b56de9dd3226a06e07765de0e273eda` |
 | 公式receipt（更新済み） | `e653387a9f35eb04fe7951c670b9c21a6bdefbe699f70871e0a0d2e94e27684e` |
 
+### RR-P1-004修正（再レビューv2反映）
+
+再レビューv2（`records/session-handoffs/2026-08-09-codex-review-result-work7a-checkout-relocation-v2.md`、
+判定`report_execution_mismatch`）のRR-P1-004（tracked symlinkのlink payload差が
+`content_identity=None`へ正規化され空Change Setになる）について、Humanの修正承認を受けて
+次を修正した。**本節が§7の実装・Test・receipt Digestを再置換する。**
+
+- 修正RED commit：`0e1952195d0c40c5b3285fc151a55ac0ebf085cf`（Test 1件追加のみ。実装前は
+  反証どおり空Change Setで失敗、先行22件合格、exit `1`）
+- 実装修正：worktree上のtracked symlinkは参照先を読まず、`readlink`で得たlink payload
+  自体のSHA-256を種別接頭辞付き（`symlink:`／`file:`）で`content_identity`へ記録する。
+  index側は既にsymlink blob oidがpayloadを反映しているため変更なし。untracked symlinkの
+  拒否（`snapshot_path_escape`）は不変。
+- Test結果（全て単独command）：targeted 23 passed（exit `0`）、関連回帰83 passed
+  （exit `0`）、公式全Test 1338 passed・status `passed`（exit `0`、receipt再読込みで
+  failed 0確認）、`git diff --check`指摘なし。
+
+| file | SHA-256（本節で有効） |
+| --- | --- |
+| `tools/deployment/checkout_relocation.py` | `2a81b11d1355f5bcde1381ff40dd9cd9337781e2719cbb696befc5d60d44eed1` |
+| `tests/test_work7a_checkout_relocation.py` | `ab8f311dd6099085acec942c8e956523209756e4bcdc585be5e5b89e84b19258` |
+| 公式receipt（更新済み） | `b4384813ff82ca0e7aa9a133996dc618710658a7f5a7ca1c405c63805f9d9a9e` |
+
 ## 8. 禁止境界と未実施範囲
 
 - `tools/layout/baseline.py`・`tools/task_contract/`配下・
