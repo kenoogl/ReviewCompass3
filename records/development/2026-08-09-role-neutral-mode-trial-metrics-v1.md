@@ -91,9 +91,15 @@ Humanのchat message 1通を1 eventとし、承認と受け渡しを兼ねるmes
 | 停止系判定 | 0回 |
 | Pilot commit数 | 4（裁定record・SCOPE・REFACTOR・review request）＋Reviewer判定record 1＋Closer projection 1 |
 | Test | 対象129件・公式全1338件とも数・結果不変。fixture同一性probe 9／9一致 |
-| 経過 | 同日内 |
+| 経過 | scope固定〜Reviewer判定（`verified`）までは2026-08-09。Closer projection（`86a1cd0`）は2026-08-10で、§1の定義（scope固定〜完了projection）では2暦日にまたがる |
 
-`high`（前駆slice）比で、承認event 6→2、レビュー周回3→1、停止系判定3→0。
+`high`（前駆slice）比で、承認event 6→2、完了レビュー周回3→1、停止系判定の発生回数4→0
+（計数規則は§1と同じ「発生回数」。前駆sliceの4回には、後の再評価で`verified`へ訂正された
+範囲レビューv2の1回を含む）。
+
+（本表の「経過」と比較値は、範囲レビュー
+`records/session-handoffs/2026-08-10-codex-scope-review-reference-digest-checker-v1.md` §6の
+不一致指摘を受けた2026-08-10の訂正版である。訂正前の値「同日内」「3→0」は無効とする）
 
 ### 4.2 Pilot起動・record正本方式（codex CLI橋渡し）の実測
 
@@ -109,4 +115,6 @@ Humanのchat message 1通を1 eventとし、承認と受け渡しを兼ねるmes
 - 鮮度検査（判定recordが対象commitより後にあること・変更pathがrecord 1件のみ）は
   全件Pilotが機械照合し、不一致0件。
 - Reviewer model記載（`gpt-5.6-sol`／reasoning `high`）はfixture共通化レビューから適用。
-- token消費の取得はCLI出力のtail依存で2件欠測。恒常的な記録方法は未決事項のまま。
+- token消費の取得はCLI出力のtail依存で2件欠測。取得済み3値もCLI表示の転記であり、
+  repository内に独立再計算できるreceiptが無いため`reported_unverified`として扱う
+  （比較・裁定の根拠に使わない）。恒常的な記録方法は未決事項のまま。
