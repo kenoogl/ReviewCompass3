@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "record_role": "authority_reference_key_allowlist",
+  "approved_by": "human",
+  "approved_at": "2026-08-10",
+  "approval_source": "records/session-handoffs/2026-08-10-claude-pilot-reference-digest-checker-scope-v2.md",
+  "keys": {
+    "authority_order": "mapping_list",
+    "glossary_ref": "mapping",
+    "intent_ref": "mapping",
+    "operational_policy": "mapping",
+    "policy_decision": "mapping",
+    "reconciliation_ref": "mapping",
+    "related_design": "mapping_list"
+  }
+}
