@@ -1066,6 +1066,11 @@ helper 2件のEntry 8件をHuman裁定（`DEC-RRL-HELPER-ENTRIES-001`、全件`a
 
 `Evidence`：[改定r1 record](../../records/development/2026-08-08-checklist-revision-r1-record-v1.md)（2026-08-08。Work 4B追随・Work 1B後続追加・Digest8件一致確認）。
 第1項は[4種root分離 独立レビューEvidence](../../records/development/2026-08-09-work7a-four-root-separation-independent-review-evidence-v1.md)により完了した。元RED `b006e60`／GREEN `663ec50`、symlink差替え修正RED `2239a02`／GREEN `6f1c417`、例外連鎖修正RED `b77e044`／GREEN `58e2533`。targeted `33 passed`、関連`46 passed`、公式全`1315 passed`、独立`OSError`反証も合格し、`verified / completed`。原子的filesystem競合防止と第2項以降は未実施のままである。
+第2項はHuman裁定「分割案1」により3 sliceへ分割した。最初のread-only Git捕捉・checkout移動後照合は
+[前駆slice Completion Evidence](../../records/development/2026-08-09-work7a-checkout-relocation-precursor-completion-evidence-v1.md)と
+[独立review result v3](../../records/session-handoffs/2026-08-09-codex-review-result-work7a-checkout-relocation-v3.md)により
+`verified / completed`。targeted `23 passed`、関連`83 passed`、公式全`1338 passed`、独立symlink反証も
+合格した。Project Bindingの耐久保存・復元とVerification Run復元は未実施なので、第2項checkboxは未完了のまま維持する。
 
 ## 12. Work 8：Evaluation Pilot
 
