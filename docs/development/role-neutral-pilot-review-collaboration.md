@@ -100,6 +100,10 @@ records/session-handoffs/YYYY-MM-DD-<reviewer>-scope-review-<work>-v<N>.md
 Reviewerは範囲レビュー結果を単独commitして停止する。未コミットhandoffを残さない原則は、
 完了レビューだけでなく範囲レビューにも適用する。
 
+範囲レビューのblocking判定は`work-review-protocol.md`「レビューの比例原則」に従う。
+blocking対象は境界の妥当性だけとし、実装手段の詳細は「実装時確認事項」として
+non-blockingで記録し、完了レビューで検証する。
+
 範囲変更が必要なら元文書や履歴を書き換えず、Pilotが次versionを新規commitする。`high`では、合格した
 範囲レビューとHumanの再開承認を受け取るまでREDを開始しない。
 
@@ -174,6 +178,11 @@ Reviewerは`work-review-protocol.md`の順序と判定を使う。特に次を�
 
 `high`では、Pilotのfixtureにない反証を最低1件新作し、上流authorityから導出した独立oracleで確認する。
 Reviewer自身が過去に範囲レビューを行っていても、PilotのTest再実行だけを独立oracleに数えない。
+
+Findingの分類とblocking判定は`work-review-protocol.md`「レビューの比例原則」に従う。
+偽陰性・偽陽性の欠陥類型をblockingで見つけた場合は、同じ類型の変種を同じ周回で掃き出す。
+scope宣言のfixture・対象にないものへの指摘は、blockingにせず後続slice候補として
+defer記録する。
 
 レビュー結果は次へ固定し、単独commitして停止する。実装修正と混在させない。
 
