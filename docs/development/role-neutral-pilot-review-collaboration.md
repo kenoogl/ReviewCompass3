@@ -28,8 +28,18 @@ closer: reviewer | humanが指定した担当
 work_item: <一つの作業項目>
 ```
 
-`pilot`と`reviewer`は同じ担当にしない。ClaudeとCodexは直接通信せず、Humanがpathと再開指示を
-受け渡す。
+`pilot`と`reviewer`は同じ担当にしない。
+
+受け渡しは`docs/development/pilot-driven-record-handoff.md`（Pilot起動・record正本方式）に
+従う。内容の正本はcommitted recordだけとし、`pilot: claude`の作業ではPilotがcodex CLIの
+固定promptでReviewerを起動する。Humanはagent間の運搬を行わず、作業項目の指定、risk確定、
+再開・段完了の承認、意味的裁定の文言だけを担う。
+
+本方式が現時点で覆うのは`pilot: claude`の割り当てだけである。`pilot: codex`の作業では
+従来のHuman中継（`codex-claude-collaboration.md`）をfallbackとして使う。逆方向起動
+（CodexによるClaude起動）は、Humanが`pilot: codex`の作業を指定した時点を開始条件とする
+後続作業とし、起動権をPilotだけに置く規則、権限profile、課金の承認を含めてHuman判断と
+する。CLI不通・認証切れ・異常応答時もHuman中継fallbackへ戻る。
 
 本modeでは、独立Reviewerを確保するため、Pilotが操縦と実装を一体で担当する。操縦と実装を別担当に
 する従来方式は`codex-claude-collaboration.md`のmodeとして分離し、本modeへ暗黙に混在させない。

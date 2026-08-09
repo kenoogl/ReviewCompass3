@@ -33,6 +33,8 @@ Codexによる独立確認が終わるまで、次の作業へ進まないでく
 
 ## 注意
 
+- 本手順は、Pilot起動・record正本方式（`docs/development/pilot-driven-record-handoff.md`）が
+  使えない場合（CLI不通・認証切れ・未対応の役割割り当て）のfallback経路を兼ねる。
 - HumanがClaudeとCodexの受け渡しを行う。
 - Claudeの実装中にCodexは同じfileを変更しない。
 - Claudeの報告だけで完了とせず、Codexがrepositoryの事後状態を確認する。
