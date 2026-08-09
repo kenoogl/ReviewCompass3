@@ -421,6 +421,59 @@ def test_same_target_in_multiple_keys_checked_independently(tmp_path, capsys):
     assert [item["key"] for item in report["mismatched"]] == ["glossary_ref"]
 
 
+@pytest.mark.parametrize(("key", "shape", "inline_value"), (
+    ("intent_ref", "mapping", "unexpected"),
+    ("intent_ref", "mapping", "[]"),
+    ("authority_order", "mapping_list", "unexpected"),
+    ("authority_order", "mapping_list", "{}"),
+))
+def test_inline_values_on_allowlisted_key_lines_fail_closed(
+    tmp_path,
+    capsys,
+    key,
+    shape,
+    inline_value,
+):
+    """修正RED（AR-P1-001）：許可key行のコロン後の値は宣言形と異なる不正形として拒否する。
+
+    下位の参照対が正しくても、key行に値が同居した時点でfail-closed（exit 5）とし、
+    黙って値を捨てて合格させない。
+    """
+
+    module = _module()
+    root = tmp_path / "root"
+    root.mkdir()
+    digest = _write_target(root, "docs/intent.md", "intent\n")
+    if shape == "mapping":
+        block = "%s: %s\n  path: docs/intent.md\n  sha256: %s\n" % (
+            key,
+            inline_value,
+            digest,
+        )
+    else:
+        block = "%s: %s\n  - path: docs/intent.md\n    sha256: %s\n" % (
+            key,
+            inline_value,
+            digest,
+        )
+    document = root / "doc.md"
+    document.write_text(_document([block]), encoding="utf-8")
+    allowlist = _write_allowlist(tmp_path)
+
+    exit_code, payload = _run(
+        module,
+        capsys,
+        (document,),
+        allowlist=allowlist,
+        root=root,
+    )
+
+    assert exit_code == 5
+    assert payload["status"] == "failed"
+    report = payload["files"][str(document)]
+    assert any(item["key"] == key for item in report["invalid"])
+
+
 def test_body_references_are_not_extracted(tmp_path, capsys):
     """境界10：front matter終端後の本文にあるpath＋hexは抽出しない（non_scope）。"""
 
