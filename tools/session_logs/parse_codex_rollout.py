@@ -21,17 +21,24 @@ from tools.session_logs.parse_claude import (
 _IGNORED_RECORD_TYPES = {
   "compacted",
   "event_msg",
+  "inter_agent_communication_metadata",
   "session_meta",
   "turn_context",
   "world_state",
 }
 _IGNORED_ITEM_TYPES = {"reasoning"}
+_IGNORED_MESSAGE_BLOCK_TYPES = {"encrypted_content"}
 _MESSAGE_ROLES = {"assistant", "developer", "system", "user"}
 _TEXT_BLOCK_TYPES = {"input_text", "output_text", "text"}
-_TOOL_CALL_TYPES = {"custom_tool_call", "function_call"}
+_TOOL_CALL_TYPES = {
+  "custom_tool_call",
+  "function_call",
+  "tool_search_call",
+}
 _TOOL_RESULT_TYPES = {
   "custom_tool_call_output",
   "function_call_output",
+  "tool_search_output",
 }
 
 
@@ -88,6 +95,8 @@ def _message_text(content, line_no, issues) -> str:
       ))
       continue
     block_type = block.get("type")
+    if block_type in _IGNORED_MESSAGE_BLOCK_TYPES:
+      continue
     if block_type not in _TEXT_BLOCK_TYPES:
       issues.append(ParseIssue(
         kind="unsupported_message_block",
@@ -138,9 +147,42 @@ def _parse_message(item, item_id, line_no, issues):
   ),)
 
 
+def _parse_agent_message(item, item_id, line_no, issues):
+  author = item.get("author")
+  recipient = item.get("recipient")
+  if not isinstance(author, str) or not author:
+    issues.append(ParseIssue(
+      kind="incomplete_event",
+      line_no=line_no,
+      detail="missing_agent_author",
+    ))
+    return ()
+  if not isinstance(recipient, str) or not recipient:
+    issues.append(ParseIssue(
+      kind="incomplete_event",
+      line_no=line_no,
+      detail="missing_agent_recipient",
+    ))
+    return ()
+  message = _message_text(item.get("content"), line_no, issues)
+  return (Event(
+    event_id=item_id,
+    role="agent",
+    text=(
+      "author: %s\nrecipient: %s\n\n%s"
+      % (author, recipient, message)
+    ),
+    line_no=line_no,
+  ),)
+
+
 def _parse_tool_call(item, item_id, line_no, issues):
   call_id = item.get("call_id")
-  name = item.get("name")
+  name = (
+    "tool_search"
+    if item.get("type") == "tool_search_call"
+    else item.get("name")
+  )
   if not isinstance(call_id, str) or not call_id:
     issues.append(ParseIssue(
       kind="incomplete_tool_event",
@@ -180,10 +222,15 @@ def _parse_tool_result(item, item_id, line_no, issues):
     ))
     return ()
   status = item.get("status")
+  output = (
+    item.get("tools")
+    if item.get("type") == "tool_search_output"
+    else item.get("output")
+  )
   return (ToolResult(
     event_id=item_id,
     call_id=call_id,
-    text=_json_text(item.get("output")),
+    text=_json_text(output),
     is_error=(
       status not in (None, "completed")
       or item.get("error") is not None
@@ -207,6 +254,8 @@ def _parse_item(item, line_no, issues):
   item_type = item.get("type")
   if item_type == "message":
     return _parse_message(item, item_id, line_no, issues)
+  if item_type == "agent_message":
+    return _parse_agent_message(item, item_id, line_no, issues)
   if item_type in _TOOL_CALL_TYPES:
     return _parse_tool_call(item, item_id, line_no, issues)
   if item_type in _TOOL_RESULT_TYPES:
