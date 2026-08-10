@@ -160,3 +160,112 @@ def test_source_digest_excludes_local_environment_and_install_metadata(
     egg_info.write_text("changed metadata\n")
 
     assert runner._source_state_digest(tmp_path) == before
+
+
+def _preflight(command):
+    """preflight 2回分の応答。testの本体実行以外を共通化する。"""
+
+    if command[-1] == "--version" and "pytest" not in command:
+        return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
+    if command[-1] == "--version":
+        return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
+    return None
+
+
+class TestSummaryIsBoundToTheCurrentRun:
+    """F-B1反証：実行前から在る集計や、実合格0件を公式合格にしない。"""
+
+    def test_pre_existing_summary_is_rejected(self, runner, tmp_path):
+        config = runner.load_config(CONFIG_PATH)
+        receipt_path = tmp_path / "receipt.json"
+        stale = receipt_path.with_name(receipt_path.name + ".summary.json")
+        stale.write_text(
+            json.dumps(
+                {
+                    "passed": 999, "failed": 0, "skipped": 0, "xfailed": 0,
+                    "xpassed": 0, "errors": 0, "total": 999,
+                },
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+
+        def fake_run(command, **kwargs):
+            prepared = _preflight(command)
+            if prepared is not None:
+                return prepared
+            # 現在runは集計を書かない（古いfileがそのまま残る）。
+            return SimpleNamespace(returncode=0, stdout="1 passed\n", stderr="")
+
+        with pytest.raises(Exception) as caught:
+            runner.execute(
+                config=config,
+                project_root=PROJECT_ROOT,
+                suite="full",
+                receipt_path=receipt_path,
+                locate=lambda command: "/usr/bin/python3",
+                run=fake_run,
+            )
+        assert not isinstance(caught.value, AssertionError)
+        assert not receipt_path.exists()
+
+    @pytest.mark.parametrize("field", ["skipped", "xfailed"])
+    def test_zero_passed_suite_is_not_official_pass(self, runner, tmp_path, field):
+        config = runner.load_config(CONFIG_PATH)
+
+        def fake_run(command, **kwargs):
+            prepared = _preflight(command)
+            if prepared is not None:
+                return prepared
+            summary = {
+                "passed": 0, "failed": 0, "skipped": 0, "xfailed": 0,
+                "xpassed": 0, "errors": 0, "total": 2,
+            }
+            summary[field] = 2
+            Path(kwargs["env"][SUMMARY_VARIABLE]).write_text(
+                json.dumps(summary, sort_keys=True), encoding="utf-8"
+            )
+            return SimpleNamespace(returncode=0, stdout="2 %s\n" % field, stderr="")
+
+        with pytest.raises(runner.TestRunnerPolicyError):
+            runner.execute(
+                config=config,
+                project_root=PROJECT_ROOT,
+                suite="full",
+                receipt_path=tmp_path / "receipt.json",
+                locate=lambda command: "/usr/bin/python3",
+                run=fake_run,
+            )
+
+
+class TestReceiptPathIsOutsideTheSource:
+    """F-B2反証：receiptで実行対象sourceを上書きできない。"""
+
+    def test_receipt_path_inside_source_tree_is_rejected(self, runner, tmp_path):
+        """実repositoryは触らない。使い捨てのproject rootで反証する。"""
+
+        config = runner.load_config(CONFIG_PATH)
+        fake_root = tmp_path / "project"
+        (fake_root / "tools").mkdir(parents=True)
+        target = fake_root / "tools" / "module.py"
+        original = b"def value():\n    return 1\n"
+        target.write_bytes(original)
+
+        def fake_run(command, **kwargs):
+            prepared = _preflight(command)
+            if prepared is not None:
+                return prepared
+            _write_summary(kwargs["env"], passed=1)
+            return SimpleNamespace(returncode=0, stdout="1 passed\n", stderr="")
+
+        with pytest.raises(Exception) as caught:
+            runner.execute(
+                config=config,
+                project_root=fake_root,
+                suite="full",
+                receipt_path=target,
+                locate=lambda command: "/usr/bin/python3",
+                run=fake_run,
+            )
+        assert not isinstance(caught.value, AssertionError)
+        assert target.read_bytes() == original

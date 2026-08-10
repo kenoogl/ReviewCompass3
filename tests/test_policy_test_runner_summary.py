@@ -239,3 +239,56 @@ def test_repository_conftest_registers_the_summary_hooks():
     assert "pytest_runtest_logreport" in text
     assert "pytest_sessionfinish" in text
     assert "pytest_summary" in text
+
+
+class TestSummaryCountsAreDeduplicatedAndComplete:
+    """F-B3反証：同一testの重複計上と、収集errorの欠落を許さない。"""
+
+    def _summary(self):
+        import importlib
+
+        return importlib.import_module("tools.development.pytest_summary")
+
+    def test_duplicate_call_reports_for_one_test_count_once(self):
+        summary = self._summary()
+        counts = summary.new_counts()
+        report = SimpleNamespace(
+            nodeid="tests/test_x.py::test_one", when="call", outcome="passed"
+        )
+        summary.record_report(counts, report)
+        summary.record_report(counts, report)
+        assert counts["passed"] == 1
+
+    def test_distinct_tests_are_counted_separately(self):
+        summary = self._summary()
+        counts = summary.new_counts()
+        for name in ("test_one", "test_two"):
+            summary.record_report(
+                counts,
+                SimpleNamespace(
+                    nodeid="tests/test_x.py::%s" % name,
+                    when="call",
+                    outcome="passed",
+                ),
+            )
+        assert counts["passed"] == 2
+
+    def test_collection_error_is_counted(self):
+        summary = self._summary()
+        counts = summary.new_counts()
+        summary.record_collect_report(
+            counts,
+            SimpleNamespace(nodeid="tests/test_broken.py", outcome="failed"),
+        )
+        finalized = summary.finalize(counts)
+        assert finalized["errors"] == 1
+        assert finalized["total"] == 1
+
+    def test_successful_collection_is_not_counted(self):
+        summary = self._summary()
+        counts = summary.new_counts()
+        summary.record_collect_report(
+            counts,
+            SimpleNamespace(nodeid="tests/test_ok.py", outcome="passed"),
+        )
+        assert summary.finalize(counts)["total"] == 0

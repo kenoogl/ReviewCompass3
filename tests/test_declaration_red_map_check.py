@@ -138,3 +138,88 @@ def test_c4_result_is_deterministic(tmp_path):
     first = drmc.check_declaration_red_map(map_path=map_path, project_root=tmp_path)
     second = drmc.check_declaration_red_map(map_path=map_path, project_root=tmp_path)
     assert first == second
+
+
+class TestCompleteScopeCannotBeEmptied:
+    """F-B4反証：宣言逃れ・型偽装・root脱出を対応表で合格させない。"""
+
+    def test_complete_scope_with_no_declarations_is_rejected(self, tmp_path):
+        _write_test_file(
+            tmp_path, "def test_a():\n    pass\n"
+        )
+        map_path = tmp_path / "empty-map.json"
+        map_path.write_text(
+            json.dumps(
+                {"scope": {"kind": "complete"}, "test_files": {}, "declarations": {}},
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        result = drmc.check_declaration_red_map(
+            map_path=map_path, project_root=tmp_path
+        )
+        assert result["status"] == "failed"
+
+    def test_non_boolean_red_now_is_rejected(self, tmp_path):
+        _write_test_file(tmp_path, "def test_a():\n    pass\n")
+        map_path = tmp_path / "typed-map.json"
+        map_path.write_text(
+            json.dumps(
+                {
+                    "scope": {"kind": "complete"},
+                    "test_files": {"tests/test_sample.py": ["test_a"]},
+                    "declarations": {
+                        "D1": {
+                            "summary": "s",
+                            "tests": [
+                                {
+                                    "test": "tests/test_sample.py::test_a",
+                                    "red_now": "false",
+                                }
+                            ],
+                        }
+                    },
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        result = drmc.check_declaration_red_map(
+            map_path=map_path, project_root=tmp_path
+        )
+        assert result["status"] == "failed"
+        assert any("red_now" in finding for finding in result["findings"])
+
+    def test_test_file_outside_project_root_is_rejected(self, tmp_path):
+        outside = tmp_path.parent / "outside_sample.py"
+        outside.write_text("def test_a():\n    pass\n", encoding="utf-8")
+        map_path = tmp_path / "escape-map.json"
+        map_path.write_text(
+            json.dumps(
+                {
+                    "scope": {"kind": "complete"},
+                    "test_files": {"../outside_sample.py": ["test_a"]},
+                    "declarations": {
+                        "D1": {
+                            "summary": "s",
+                            "tests": [
+                                {
+                                    "test": "../outside_sample.py::test_a",
+                                    "red_now": True,
+                                }
+                            ],
+                        }
+                    },
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        result = drmc.check_declaration_red_map(
+            map_path=map_path, project_root=tmp_path
+        )
+        assert result["status"] == "failed"
+        assert any(
+            "outside" in finding or "scope" in finding
+            for finding in result["findings"]
+        )

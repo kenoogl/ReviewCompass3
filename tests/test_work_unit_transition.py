@@ -5,6 +5,8 @@ import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -143,3 +145,53 @@ def test_preflight_ignores_local_claude_reports_but_blocks_work_artifacts(tmp_pa
     assert _module().preflight_next_work(
         work_status="completed", project_root=repository
     ).status == "blocked"
+
+
+class TestTransitionCannotBeBypassed:
+    """F-B5反証：indexの隠蔽や別Git rootで完了関門を迂回できない。"""
+
+    def _transition(self):
+        import importlib
+
+        return importlib.import_module("tools.development.work_unit_transition")
+
+    def test_head_difference_blocks_even_with_empty_porcelain(self):
+        transition = self._transition()
+        result = transition.evaluate_transition(
+            work_status="completed",
+            porcelain="",
+            head_difference="tools/development/policy.py\n",
+        )
+        assert result.status == "blocked"
+        assert result.next_work_allowed is False
+
+    def test_clean_state_still_passes(self):
+        transition = self._transition()
+        result = transition.evaluate_transition(
+            work_status="completed",
+            porcelain="",
+            head_difference="",
+        )
+        assert result.status == "passed"
+        assert result.next_work_allowed is True
+
+    def test_preflight_binds_the_requested_repository_identity(self, tmp_path):
+        transition = self._transition()
+        calls = []
+
+        def fake_run(command, **kwargs):
+            calls.append((tuple(command), kwargs.get("cwd")))
+            if "rev-parse" in command:
+                return SimpleNamespace(
+                    returncode=0, stdout="%s\n" % tmp_path, stderr=""
+                )
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        other_root = tmp_path / "other"
+        other_root.mkdir()
+        with pytest.raises(transition.WorkUnitTransitionError):
+            transition.preflight_next_work(
+                work_status="completed",
+                project_root=other_root,
+                run=fake_run,
+            )
