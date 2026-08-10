@@ -21,7 +21,7 @@ def _approval():
   return importlib.import_module("tools.egress.approval")
 
 
-NOW = "2026-08-07T12:00:00+09:00"
+FUTURE = "2099-01-01T00:00:00+09:00"
 
 
 def _build_payload(tmp_path):
@@ -61,33 +61,52 @@ def _build_payload(tmp_path):
   )
 
 
+def _approval_file(directory, list_digest):
+  """Human作成の承認record fileを模す。pathとSHA-256の組で渡す。"""
+  import hashlib
+
+  path = directory / "approval-record.json"
+  path.write_text(
+    json.dumps(
+      {
+        "schema_version": "egress-approval-v1",
+        "approved_by": "user",
+        "payload_list_digest": list_digest,
+        "provider": "anthropic-api",
+        "model": "claude-sonnet-5",
+        "expires_at": FUTURE,
+        "purpose": "implementation_sameness_judgment",
+        "material_policy": {
+          "require_secret_scan": True,
+          "forbid_credentials": True,
+          "forbid_personal_identifiers": True,
+        },
+        "consumed": False,
+      },
+      ensure_ascii=False,
+      sort_keys=True,
+    ),
+    encoding="utf-8",
+  )
+  return path, hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def _run(tmp_path, built, forged=None):
   gate = _gate()
   approval = _approval()
   target = forged if forged is not None else built
+  record_path, record_digest = _approval_file(
+    tmp_path, approval.payload_list_digest([built.digest])
+  )
   return gate.run_egress_gate(
     payload=target,
     repository_root=tmp_path,
     approved_payload_digests=[built.digest],
-    approval_record={
-      "schema_version": "egress-approval-v1",
-      "approved_by": "user",
-      "payload_list_digest": approval.payload_list_digest([built.digest]),
-      "provider": "anthropic-api",
-      "model": "claude-sonnet-5",
-      "expires_at": "2026-08-08T00:00:00+09:00",
-      "purpose": "implementation_sameness_judgment",
-      "material_policy": {
-        "require_secret_scan": True,
-        "forbid_credentials": True,
-        "forbid_personal_identifiers": True,
-      },
-      "consumed": False,
-    },
+    approval_record_path=record_path,
+    approval_record_sha256=record_digest,
     provider="anthropic-api",
     model="claude-sonnet-5",
-    redaction_hook=lambda text: text,
-    now=NOW,
+    redaction_hook=gate.APPROVED_REDACTION_HOOK,
   )
 
 
@@ -175,3 +194,74 @@ class TestClaimRobustness:
         raise RuntimeError("boom")
     with approval.approval_claim(record_path):
       pass
+
+
+class TestApprovalForgeryIsRejected:
+  """反証6〜8（F-E1）：Human作成recordへ束縛されない承認は通らない。"""
+
+  def test_self_written_approval_dictionary_cannot_reach_the_gate(
+    self, tmp_path
+  ):
+    gate = _gate()
+    built = _build_payload(tmp_path)
+    with pytest.raises(TypeError):
+      gate.run_egress_gate(
+        payload=built,
+        repository_root=tmp_path,
+        approved_payload_digests=[built.digest],
+        approval_record={"approved_by": "user"},
+        provider="anthropic-api",
+        model="claude-sonnet-5",
+        redaction_hook=gate.APPROVED_REDACTION_HOOK,
+        now="2026-08-07T12:00:00+09:00",
+      )
+
+  def test_consumed_field_removed_is_not_treated_as_unconsumed(self, tmp_path):
+    import hashlib
+
+    gate = _gate()
+    approval = _approval()
+    built = _build_payload(tmp_path)
+    record = json.loads(
+      _approval_file(
+        tmp_path, approval.payload_list_digest([built.digest])
+      )[0].read_text(encoding="utf-8")
+    )
+    del record["consumed"]
+    path = tmp_path / "approval-record.json"
+    path.write_text(
+      json.dumps(record, ensure_ascii=False, sort_keys=True), encoding="utf-8"
+    )
+    result = gate.run_egress_gate(
+      payload=built,
+      repository_root=tmp_path,
+      approved_payload_digests=[built.digest],
+      approval_record_path=path,
+      approval_record_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+      provider="anthropic-api",
+      model="claude-sonnet-5",
+      redaction_hook=gate.APPROVED_REDACTION_HOOK,
+    )
+    assert result.allowed is False
+
+
+class TestCredentialScanCoversApprovedFormats:
+  """反証9〜10（F-E3）：資格情報3形式の見逃しと、Digest由来の誤検出。"""
+
+  @pytest.mark.parametrize(
+    "secret",
+    [
+      "AKIAIOSFODNN7EXAMPLE",
+      "ghp_0123456789abcdefghijklmnopqrstuvwxyz",
+      "-----BEGIN RSA PRIVATE KEY-----",
+    ],
+  )
+  def test_credentials_in_outbound_text_are_detected(self, secret):
+    approval = _approval()
+    assert approval.scan_outbound_text("value = %s" % secret) != []
+
+  def test_digest_hex_does_not_trigger_personal_identifier(self):
+    approval = _approval()
+    assert approval.scan_outbound_text(
+      '{"content_sha256":"%s"}' % ("0123456789abcdef" * 4)
+    ) == []

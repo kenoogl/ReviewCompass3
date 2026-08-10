@@ -183,3 +183,35 @@ class TestFragmentProvenance:
     target.write_text("changed\nlines\n", encoding="utf-8")
     with pytest.raises(payload.PayloadError):
       payload.verify_fragment_provenance(tmp_path, fragment)
+
+
+class TestFragmentContentIsBoundToSource:
+  """F-E2反証：断片本文がsource外へ差し替えられたものは通らない。"""
+
+  def test_content_replaced_with_outside_text_is_detected(self, tmp_path):
+    import dataclasses
+
+    payload = _payload()
+    _write_source(tmp_path, "pkg/mod.py", ["line1", "line2"])
+    fragment = payload.cut_code_fragment(
+      tmp_path,
+      {"relative_path": "pkg/mod.py", "start_line": 1, "end_line": 2},
+    )
+    forged = dataclasses.replace(
+      fragment, content="source外の自由文がここから漏れる。"
+    )
+    with pytest.raises(payload.PayloadError):
+      payload.verify_fragment_provenance(tmp_path, forged)
+
+  def test_declared_line_range_must_match_content(self, tmp_path):
+    import dataclasses
+
+    payload = _payload()
+    _write_source(tmp_path, "pkg/mod.py", ["line1", "line2", "line3"])
+    fragment = payload.cut_code_fragment(
+      tmp_path,
+      {"relative_path": "pkg/mod.py", "start_line": 1, "end_line": 2},
+    )
+    forged = dataclasses.replace(fragment, start_line=2, end_line=3)
+    with pytest.raises(payload.PayloadError):
+      payload.verify_fragment_provenance(tmp_path, forged)

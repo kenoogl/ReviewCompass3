@@ -167,3 +167,65 @@ class TestClassifyPair:
         routine_a={"line_count": 1},
         routine_b=_routine(),
       )
+
+
+class TestThresholdsAreValidated:
+  """F-E4反証：非有限値・範囲外の閾値でHuman承認済み分類を迂回できない。"""
+
+  def _classify(self, thresholds):
+    prefilter = _prefilter()
+    return prefilter.classify_pair(
+      code_a="aaa_bbb ccc",
+      code_b="aaa_bbb ccc",
+      name_a="make_widget",
+      name_b="make_widget",
+      routine_a=_routine(),
+      routine_b=_routine(),
+      thresholds=thresholds,
+    )
+
+  def _thresholds(self, **overrides):
+    prefilter = _prefilter()
+    values = {
+      "same_min": 0.85,
+      "diff_max": 0.45,
+      "body_weight": 0.6,
+      "name_weight": 0.2,
+      "feature_weight": 0.2,
+    }
+    values.update(overrides)
+    return prefilter.Thresholds(**values)
+
+  def test_default_thresholds_still_classify(self):
+    prefilter = _prefilter()
+    assert self._classify(prefilter.DEFAULT_THRESHOLDS).band == "clearly_same"
+
+  def test_non_finite_weight_is_rejected(self):
+    prefilter = _prefilter()
+    with pytest.raises(prefilter.PrefilterError):
+      self._classify(self._thresholds(body_weight=float("nan")))
+
+  def test_infinite_threshold_is_rejected(self):
+    prefilter = _prefilter()
+    with pytest.raises(prefilter.PrefilterError):
+      self._classify(self._thresholds(same_min=float("inf")))
+
+  def test_out_of_range_threshold_is_rejected(self):
+    prefilter = _prefilter()
+    with pytest.raises(prefilter.PrefilterError):
+      self._classify(self._thresholds(same_min=1.5))
+
+  def test_negative_weight_is_rejected(self):
+    prefilter = _prefilter()
+    with pytest.raises(prefilter.PrefilterError):
+      self._classify(self._thresholds(name_weight=-0.2, body_weight=0.8))
+
+  def test_same_min_not_above_diff_max_is_rejected(self):
+    prefilter = _prefilter()
+    with pytest.raises(prefilter.PrefilterError):
+      self._classify(self._thresholds(same_min=0.4, diff_max=0.45))
+
+  def test_weights_not_summing_to_one_are_rejected(self):
+    prefilter = _prefilter()
+    with pytest.raises(prefilter.PrefilterError):
+      self._classify(self._thresholds(body_weight=0.9))
