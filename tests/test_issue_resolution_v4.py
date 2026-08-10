@@ -104,11 +104,37 @@ def _force_state(intake, workspace, issue_path, state):
     return document
 
 
-def _ruling(workspace, text="解決を承認する。"):
-    relative = "records/development/2026-08-10-resolution-ruling-fixture.md"
+def _ruling(
+    workspace,
+    *,
+    issue_id=ISSUE_A,
+    target_state="resolved",
+    human_id="kenoogl",
+    decided_at="2026-08-10T12:00:00+09:00",
+    wording="解決を承認する。",
+    drop_fields=(),
+    **overrides,
+):
+    """scope v3 §2の厳密形の裁定record（合成）。負例はoverridesで崩す。"""
+
+    document = {
+        "decision_maker": "human",
+        "human_id": human_id,
+        "decided_at": decided_at,
+        "issue_id": issue_id,
+        "target_state": target_state,
+        "wording": wording,
+    }
+    document.update(overrides)
+    for name in drop_fields:
+        document.pop(name, None)
+    relative = "records/development/2026-08-10-resolution-ruling-fixture.json"
     file = workspace / relative
     file.parent.mkdir(parents=True, exist_ok=True)
-    file.write_text(text, encoding="utf-8")
+    file.write_text(
+        json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
     return relative, hashlib.sha256(file.read_bytes()).hexdigest()
 
 
@@ -216,7 +242,11 @@ def test_registered_issue_can_be_rejected(intake, config, workspace, capsys):
 
     module = _module()
     issue_path, _before = _registered_issue(intake, config, workspace)
-    ruling, ruling_sha = _ruling(workspace, "却下を裁定する。")
+    ruling, ruling_sha = _ruling(
+        workspace,
+        target_state="rejected",
+        wording="却下を裁定する。",
+    )
     evidence = _evidence(workspace)
 
     exit_code, payload = _run(
@@ -454,6 +484,138 @@ def test_rejects_bad_resolution_record_paths(
         assert (workspace / RECORD_PATH).read_bytes() == existing_bytes
     else:
         assert not (workspace / record_path).exists()
+
+
+@pytest.mark.parametrize("binding_case", (
+    "non_human_maker",
+    "issue_id_mismatch",
+    "target_state_mismatch",
+    "human_id_mismatch",
+    "bad_timestamp",
+    "missing_field",
+))
+def test_rejects_unbound_or_non_human_rulings(
+    intake, config, workspace, capsys, binding_case
+):
+    """修正RED（IR-COMP-001）：裁定recordの構造化束縛違反6態様の拒否と無変更。"""
+
+    module = _module()
+    issue_path, _before = _registered_issue(intake, config, workspace)
+    frozen = (workspace / issue_path).read_bytes()
+    decided_at = "2026-08-10T12:00:00+09:00"
+    if binding_case == "non_human_maker":
+        ruling, ruling_sha = _ruling(workspace, decision_maker="automation")
+    elif binding_case == "issue_id_mismatch":
+        ruling, ruling_sha = _ruling(workspace, issue_id="ISSUE-HTC-OTHER")
+    elif binding_case == "target_state_mismatch":
+        ruling, ruling_sha = _ruling(workspace, target_state="rejected")
+    elif binding_case == "human_id_mismatch":
+        ruling, ruling_sha = _ruling(workspace, human_id="someone-else")
+    elif binding_case == "bad_timestamp":
+        decided_at = "2026-08-10 12:00"
+        ruling, ruling_sha = _ruling(workspace, decided_at=decided_at)
+    else:
+        ruling, ruling_sha = _ruling(workspace, drop_fields=("wording",))
+    evidence = _evidence(workspace)
+
+    exit_code, payload = _run(
+        module,
+        capsys,
+        workspace,
+        issue_path,
+        ruling=ruling,
+        ruling_sha=ruling_sha,
+        evidence=[evidence],
+        decided_at=decided_at,
+    )
+
+    assert exit_code == 5
+    assert payload["reason"] == "human_ruling_invalid"
+    assert (workspace / issue_path).read_bytes() == frozen
+    assert not (workspace / RECORD_PATH).exists()
+
+
+def _inject_partial_write(monkeypatch, target_directory, *, partial_bytes=19):
+    """指定directory配下への書込みを部分書込み後に失敗させる（scope v3 §3の注入）。"""
+
+    resolved_directory = target_directory.resolve()
+    original = Path.write_bytes
+
+    def failing(self, data):
+        if self.parent.resolve() == resolved_directory:
+            original(self, data[:partial_bytes])
+            raise OSError("injected partial write failure")
+        return original(self, data)
+
+    monkeypatch.setattr(Path, "write_bytes", failing)
+
+
+def _no_leftovers(directory):
+    return sorted(
+        path.name for path in directory.glob("*") if path.name.endswith(".tmp")
+    ) == []
+
+
+def test_issue_write_failure_leaves_ledger_intact(
+    intake, config, workspace, capsys, monkeypatch
+):
+    """修正RED（IR-COMP-002）：issue書込みの部分失敗でも台帳が無傷で残骸も無い。"""
+
+    module = _module()
+    issue_path, _before = _registered_issue(intake, config, workspace)
+    frozen = (workspace / issue_path).read_bytes()
+    ruling, ruling_sha = _ruling(workspace)
+    evidence = _evidence(workspace)
+    ledger = workspace / config["directories"]["issue_record_v2"]
+    _inject_partial_write(monkeypatch, ledger)
+
+    exit_code, payload = _run(
+        module,
+        capsys,
+        workspace,
+        issue_path,
+        ruling=ruling,
+        ruling_sha=ruling_sha,
+        evidence=[evidence],
+    )
+    monkeypatch.undo()
+
+    assert exit_code == 5
+    assert payload["status"] == "error"
+    assert (workspace / issue_path).read_bytes() == frozen
+    assert not (workspace / RECORD_PATH).exists()
+    assert _no_leftovers(ledger)
+
+
+def test_record_write_failure_restores_issue_without_partial_record(
+    intake, config, workspace, capsys, monkeypatch
+):
+    """修正RED（IR-COMP-002）：解決record書込みの部分失敗でissue復元・部分record非残留。"""
+
+    module = _module()
+    issue_path, _before = _registered_issue(intake, config, workspace)
+    frozen = (workspace / issue_path).read_bytes()
+    ruling, ruling_sha = _ruling(workspace)
+    evidence = _evidence(workspace)
+    records_directory = workspace / "records" / "development"
+    _inject_partial_write(monkeypatch, records_directory)
+
+    exit_code, payload = _run(
+        module,
+        capsys,
+        workspace,
+        issue_path,
+        ruling=ruling,
+        ruling_sha=ruling_sha,
+        evidence=[evidence],
+    )
+    monkeypatch.undo()
+
+    assert exit_code == 5
+    assert payload["status"] == "error"
+    assert (workspace / issue_path).read_bytes() == frozen
+    assert not (workspace / RECORD_PATH).exists()
+    assert _no_leftovers(records_directory)
 
 
 def test_post_validation_failure_restores_everything(
