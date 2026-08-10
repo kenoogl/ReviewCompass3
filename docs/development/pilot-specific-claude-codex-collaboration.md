@@ -19,7 +19,7 @@
 | `docs/development/work-review-protocol.md` | 共通のレビュー基準 | Claudeが実装した結果をCodexが確認するとき | 担当者や起動方向の決定 |
 | `docs/development/pilot-driven-record-handoff.md` | ClaudeからCodexを起動する方法の詳細 | `pilot: claude`でCodexをレビュー担当として起動するとき | `pilot: codex`からClaudeへ実装を依頼するとき |
 | `docs/development/codex-claude-collaboration.md` | CodexからClaudeへ実装を依頼する方法と、人による中継方法の詳細 | `pilot: codex`でClaudeへ実装を依頼するとき | `pilot: claude`からCodexをレビュー担当として起動するとき |
-| `docs/development/role-neutral-pilot-review-collaboration.md` | 先行試行の役割方式 | その文書を参照して開始済みの既存作業 | 本書を参照して開始する新しい作業 |
+| `docs/development/legacy-pilot-review-collaboration.md` | 先行試行の役割方式 | その文書を参照して開始済みの既存作業 | 本書を参照して開始する新しい作業 |
 
 担当者を決める規則は本書を正とする。既存三文書は、本書で決めた担当を変更せず、該当する方向の
 受け渡し方法または過去作業の解釈にだけ使う。

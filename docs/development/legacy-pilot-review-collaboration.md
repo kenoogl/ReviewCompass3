@@ -1,6 +1,10 @@
-# 操縦者を差し替え可能にするPilot／Review連携方法
+# 先行試行のPilot／Review連携方法
 
-状態：運用メモ（試行）
+状態：過去方式として保存する運用メモ
+
+旧名称：`docs/development/role-neutral-pilot-review-collaboration.md`
+
+新しい作業の入口：`docs/development/pilot-specific-claude-codex-collaboration.md`
 
 共通レビュー基準：`docs/development/work-review-protocol.md`
 

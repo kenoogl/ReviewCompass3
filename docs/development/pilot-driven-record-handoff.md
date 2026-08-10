@@ -2,7 +2,7 @@
 
 状態：運用メモ（試行）
 
-関連：`docs/development/role-neutral-pilot-review-collaboration.md`（役割中立mode）、
+関連：`docs/development/legacy-pilot-review-collaboration.md`（先行試行の役割方式）、
 `docs/development/work-review-protocol.md`（共通レビュー基準）
 
 ## 1. 背景とHuman決定
@@ -73,7 +73,7 @@ codex exec --sandbox read-only "<読み取りだけで答えられる確認内�
 
 ## 5. 未決事項
 
-- `role-neutral-pilot-review-collaboration.md` §1の「ClaudeとCodexは直接通信せず、
+- `legacy-pilot-review-collaboration.md` §1の「ClaudeとCodexは直接通信せず、
   Humanがpathと再開指示を受け渡す」の条項改定（本方式を正、Human中継をfallbackとする）。
   この改定は独立の文書変更作業とし、本方式で起動するCodexレビューを受ける。
 - `codex-claude-collaboration.md`（従来方式）へのfallback位置づけの追記。
