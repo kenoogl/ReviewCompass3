@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計とHuman段完了承認を終え、最初の機械処理縦切りへ着手した。
-- 現在作業：操縦者別連携の最小実装依頼は、指示文監査6所見と判定担当の全件accept推奨を受け、所見ごとのHuman裁定待ち。実装担当は未起動で、group C・Dの保留も継続している。
+- 現在作業：Humanが指示文監査6所見を全件採用し、完全な開始設定、コマンド、結果、起動記録、段階記録を持つ最小実装依頼v2を作成した。新しいSHA-256に対する再監査・再判定待ちで、実装担当は未起動。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,21 +16,21 @@
 
 ## 最新のauthority／Evidence
 
-- [操縦者別連携 最小実装依頼 v1](records/session-handoffs/2026-08-11-pilot-collaboration-entry-implementation-request-v1.md) — SHA-256 `2bc4f1b7953dfe4f615e97c41f10e869558a4868b8cd017b740c6148c105cdb4`
-- [操縦者別連携 指示文品質確認 v1](records/session-handoffs/2026-08-11-pilot-collaboration-entry-prompt-quality-review-v1.md) — SHA-256 `456d6551515e1c09f493bd7fcbd4cd6c3b29a95df233558acb39e62deff1607a`
+- [操縦者別連携 最小実装依頼 v2](records/session-handoffs/2026-08-11-pilot-collaboration-entry-implementation-request-v2.md) — SHA-256 `7310fa0c88e3becd4bf36e43c1363247d325d2ad013f809c8ffdbb78c96d6363`
+- [操縦者別連携 指示文所見 Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-entry-prompt-findings-human-decision-v1.md) — SHA-256 `de176de8ee6798de493010ef81e18e37c6ffb73bfeb95c54f23a865e1e5bbc57`
 - [操縦者別のClaude／Codex連携方法](docs/development/pilot-specific-claude-codex-collaboration.md) — SHA-256 `aee8c8b72487e26395615c8442710b0695b035ec0aa129b4a777c6142864489d`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
 - [ReviewCompass3 開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `08bea1f9d5937ba5c212512ad041a0d03583d743dcc27742ad77c8741a22ad1c`
 
 ## 次に行う一作業
 
-HumanがPA-PC-001〜006を所見ごとに採用、不採用、保留のいずれかで裁定する。採用所見があれば指示書へ反映し、新しい監査・判定周回を行う。
+最小実装依頼v2を新しい会話状態の指示文監査・判定担当へ渡し、全27要求の被覆と実装可能性を再確認する。
 
 開始条件：
 
-- 指示文品質確認recordと対象指示書のSHA-256が一致していること
-- HumanがPA-PC-001〜006を全件裁定すること
-- 保留所見がある場合は実装担当を起動しないこと
+- 最小実装依頼v2とHuman裁定recordのSHA-256が固定されていること
+- 監査担当と判定担当を別の新しい会話状態で起動すること
+- 所見が残る場合はHuman裁定前に実装担当を起動しないこと
 
 完了条件：
 
@@ -38,12 +38,12 @@ HumanがPA-PC-001〜006を所見ごとに採用、不採用、保留のいずれ
 - 既存bootstrap reviewテスト、故障注入、公式全テスト、差分検査が合格すること
 - 反対側モデルの独立レビューがverifiedとなり、Human段完了承認を得ること
 
-後続作業：指示文品質関門を通過した後、実装担当が新規受入テストのRED確認から開始する。
+後続作業：再監査・再判定が合格した後、実装担当が新規受入テストのRED確認から開始する。
 
 ## blocker・Human判断待ち
 
-- blocker：PA-PC-001〜006のHuman裁定が未了のため、実装担当を起動できない。
-- Human判断待ち：PA-PC-001〜006の採用、不採用、保留を所見ごとに決める必要がある。実装後の段完了承認も別に必要。
+- blocker：再監査・再判定が未了のため実装担当をまだ起動しない。Human判断待ちではなく品質関門の実行待ち。
+- Human判断待ち：再監査で新規所見が出た場合は所見裁定が必要。実装後の段完了承認も別に必要。
 
 ## stale・deferred
 
@@ -56,7 +56,7 @@ HumanがPA-PC-001〜006を所見ごとに採用、不採用、保留のいずれ
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：既存bootstrap review関連23 passed、終了コード0。指示文監査6件、判定担当は6件全件accept推奨、新規所見0件。新規受入テストは未着手。
+- 直近の関連Test：既存bootstrap review関連23 passed、終了コード0。旧指示書の監査6所見はHumanが全件採用し、v2の要求識別子27件は定義重複0・未知参照0。新規受入テストは未着手。
 - 直近の全Test：直近の公式全Testは1470 passed、failed 0、errors 0、終了コード0。実装後に再実行する。
 - 差分検査：`git diff --check`合格
 
