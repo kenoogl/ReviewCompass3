@@ -96,6 +96,7 @@ def test_preflight_reads_git_state_mechanically(tmp_path):
             expected_kwargs,
         ),
         (("git", "diff", "--name-only", "HEAD", "--"), expected_kwargs),
+        (("git", "ls-files", "-v"), expected_kwargs),
     ]
 
 
