@@ -176,6 +176,38 @@ def _run_checked(run, command, *, project_root, failure):
     return result
 
 
+#: receiptの置き場所として許す領域（project root相対）。
+RECEIPT_ALLOWED_PREFIXES = ("records/",)
+
+
+def _require_receipt_outside_source(project_root, receipt_output):
+    """receiptで実行対象sourceを上書きできないようにする。
+
+    receipt pathがsource fileと同一だと、runnerはそのfileを
+    `source_state_digest`から除外したうえでreceiptへ置換してしまう。
+    """
+
+    resolved = receipt_output.resolve()
+    if resolved.exists() and resolved.is_dir():
+        raise TestRunnerPolicyError(
+            "receipt_path_invalid: receipt path is a directory"
+        )
+    try:
+        relative = resolved.relative_to(project_root)
+    except ValueError:
+        # project root外は実行対象sourceを含まないため許す。
+        return
+    if resolved.exists() and resolved.suffix == ".py":
+        raise TestRunnerPolicyError(
+            "receipt_path_invalid: receipt path targets a source file"
+        )
+    posix = relative.as_posix()
+    if not any(posix.startswith(prefix) for prefix in RECEIPT_ALLOWED_PREFIXES):
+        raise TestRunnerPolicyError(
+            "receipt_path_invalid: receipt must be written under records/"
+        )
+
+
 def _write_receipt(path, receipt):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -234,9 +266,15 @@ def execute(
     receipt_output = Path(receipt_path)
     if not receipt_output.is_absolute():
         receipt_output = project_root / receipt_output
+    _require_receipt_outside_source(project_root, receipt_output)
 
     # 集計の受け渡しfileはreceiptの隣に置き、読み終えたら消す。source state digestからは除く。
     summary_output = receipt_output.with_name(receipt_output.name + ".summary.json")
+    # 実行前から在る集計を現在runの結果として読まない（古い件数の流用を断つ）。
+    if summary_output.exists():
+        raise TestRunnerPolicyError(
+            "test_summary_stale: summary path is not empty before the run"
+        )
     source_state_digest = _source_state_digest(
         project_root,
         excluded_paths=(receipt_output, summary_output),
@@ -264,6 +302,11 @@ def execute(
     if status == "passed" and (test_summary["failed"] or test_summary["errors"]):
         raise TestRunnerPolicyError(
             "test_summary_inconsistent: passed status with failed or errored tests"
+        )
+    # 実合格が1件も無い実行を公式合格にしない（skip・xfailだけのsuiteを拒否）。
+    if status == "passed" and test_summary["passed"] < 1:
+        raise TestRunnerPolicyError(
+            "test_summary_inconsistent: passed status without any passing test"
         )
     receipt = {
         "receipt_kind": "policy_test_verification_run",

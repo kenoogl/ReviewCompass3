@@ -24,6 +24,12 @@ def pytest_runtest_logreport(report):
     pytest_summary.record_report(_COUNTS, report)
 
 
+def pytest_collectreport(report):
+    """収集段階の失敗を数える。test単位のreportが出ない経路を落とさない。"""
+
+    pytest_summary.record_collect_report(_COUNTS, report)
+
+
 def pytest_sessionfinish(session, exitstatus):
     """session終了時に、要求された場所へ集計を書き出す。"""
 

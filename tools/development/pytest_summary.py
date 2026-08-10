@@ -41,10 +41,50 @@ class TestSummaryError(Exception):
     """構造化集計を安全に扱えない。"""
 
 
+#: 内訳と同居させない作業用key。確定時に取り除く。
+_SEEN_KEY = "_seen"
+
+
 def new_counts():
     """内訳を0で初期化する。"""
 
-    return {field: 0 for field in _COUNT_FIELDS}
+    counts = {field: 0 for field in _COUNT_FIELDS}
+    counts[_SEEN_KEY] = set()
+    return counts
+
+
+def _already_counted(counts, when, nodeid):
+    """同一testの同一段階を二重に数えない。
+
+    pytestは再実行や複数pluginの経路で同じreportを複数回渡しうる。
+    nodeidと段階の組で一度だけ数える。nodeidを持たないreportは
+    同一性を判定できないため、従来どおり毎件数える。
+    """
+
+    seen = counts.get(_SEEN_KEY)
+    if seen is None or nodeid is None:
+        return False
+    key = (when, nodeid)
+    if key in seen:
+        return True
+    seen.add(key)
+    return False
+
+
+def record_collect_report(counts, report):
+    """収集段階のreportを数える。収集errorはerrorsへ算入する。
+
+    収集errorはtest単位のreportを生まないため、これを数えないと
+    `errors=0,total=0`のまま「実行できなかった」ことが隠れる。
+    """
+
+    if getattr(report, "outcome", None) != "failed":
+        return counts
+    nodeid = getattr(report, "nodeid", None)
+    if _already_counted(counts, "collect", nodeid):
+        return counts
+    counts["errors"] += 1
+    return counts
 
 
 def record_report(counts, report):
@@ -57,6 +97,8 @@ def record_report(counts, report):
     when = getattr(report, "when", None)
     outcome = getattr(report, "outcome", None)
     expected_failure = hasattr(report, "wasxfail")
+    if _already_counted(counts, when, getattr(report, "nodeid", None)):
+        return counts
 
     if when != "call":
         if outcome == "failed":
@@ -77,7 +119,9 @@ def record_report(counts, report):
 def finalize(counts):
     """内訳へ`total`を足した集計を返す。"""
 
-    if not isinstance(counts, dict) or set(counts) != set(_COUNT_FIELDS):
+    if not isinstance(counts, dict) or set(counts) - {_SEEN_KEY} != set(
+        _COUNT_FIELDS
+    ):
         raise TestSummaryError("test_summary_invalid: counts")
     summary = {field: counts[field] for field in _COUNT_FIELDS}
     summary["total"] = sum(summary[field] for field in _COUNT_FIELDS)

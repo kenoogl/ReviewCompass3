@@ -4,6 +4,7 @@ import argparse
 import dataclasses
 import json
 import subprocess
+from pathlib import Path
 
 
 class WorkUnitTransitionError(Exception):
@@ -18,7 +19,13 @@ class TransitionResult:
     reminder: object
 
 
-def evaluate_transition(*, work_status, porcelain):
+def evaluate_transition(*, work_status, porcelain, head_difference=""):
+    """完了作業単位の未コミットを判定する。
+
+    `porcelain`はGitの表示、`head_difference`はHEADとのbytes差である。
+    `skip-worktree`等でindex表示を消しても、bytes差が残れば停止する。
+    """
+
     if work_status != "completed":
         return TransitionResult(
             status="not_applicable",
@@ -26,7 +33,7 @@ def evaluate_transition(*, work_status, porcelain):
             findings=(),
             reminder=None,
         )
-    if porcelain.strip():
+    if porcelain.strip() or (head_difference or "").strip():
         return TransitionResult(
             status="blocked",
             next_work_allowed=False,
@@ -44,25 +51,57 @@ def evaluate_transition(*, work_status, porcelain):
     )
 
 
+def _git(run, arguments, project_root, failure):
+    result = run(
+        ("git", *arguments),
+        cwd=str(project_root),
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise WorkUnitTransitionError(failure)
+    return result.stdout
+
+
 def preflight_next_work(
     *,
     work_status,
     project_root=".",
     run=subprocess.run,
 ):
-    result = run(
-        ("git", "status", "--porcelain=v1", "--untracked-files=all"),
-        cwd=str(project_root),
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
+    """要求されたrootのGit状態だけを見る。
+
+    別のclean Git rootへ差し替えて合格させられないよう、Gitが答えたtop levelが
+    要求rootと同一実体であることを束縛する。
+    """
+
+    top_level = _git(
+        run,
+        ("rev-parse", "--show-toplevel"),
+        project_root,
+        "cannot resolve the Git repository root",
+    ).strip()
+    requested = Path(project_root).resolve()
+    if not top_level or Path(top_level).resolve() != requested:
         raise WorkUnitTransitionError(
-            "cannot inspect Git worktree state"
+            "requested project root is not the Git repository root"
         )
+    porcelain = _git(
+        run,
+        ("status", "--porcelain=v1", "--untracked-files=all"),
+        project_root,
+        "cannot inspect Git worktree state",
+    )
+    head_difference = _git(
+        run,
+        ("diff", "--name-only", "HEAD", "--"),
+        project_root,
+        "cannot inspect differences against HEAD",
+    )
     return evaluate_transition(
         work_status=work_status,
-        porcelain=result.stdout,
+        porcelain=porcelain,
+        head_difference=head_difference,
     )
 
 

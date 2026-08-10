@@ -47,7 +47,7 @@
     {
       "role": "fixed_tests_checker",
       "path": "tests/test_declaration_red_map_check.py",
-      "sha256": "901a4ea19a9945a615f3328122f9a759820eea1bd126cf4a29e410e94a23fe42",
+      "sha256": "b2e42d3fe719744468f0710ea0de93fe1681f1f763a8a218106972c28d1720b2",
       "reference_kind": "immutable_record"
     },
     {

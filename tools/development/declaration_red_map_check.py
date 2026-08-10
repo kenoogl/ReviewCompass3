@@ -178,6 +178,18 @@ def check_declaration_red_map(
 
     machine_count["declarations"] = len(declarations)
 
+    # completeを名乗る対応表が、宣言とfileを同時に空にして検査を素通りできないようにする。
+    if scope_kind == "complete" and not declarations:
+        findings.append(
+            "complete_scope_without_declarations: complete scope requires "
+            "at least one declaration"
+        )
+    if scope_kind == "complete" and not test_files:
+        findings.append(
+            "complete_scope_without_test_files: complete scope requires "
+            "at least one listed test file"
+        )
+
     bound = {}
     owner = {}
     for key in sorted(declarations):
@@ -195,6 +207,11 @@ def check_declaration_red_map(
                 machine_count["listed_tests_missing_in_file"] += 1
                 findings.append(f"listed_test_reference_invalid: {key}: {reference}")
                 continue
+            if "red_now" in item and not isinstance(item["red_now"], bool):
+                findings.append(
+                    f"red_now_not_boolean: {key}: {reference}: "
+                    f"{type(item['red_now']).__name__}"
+                )
             file_part, name = reference.split("::", 1)
             bound.setdefault(file_part, set()).add(name)
             # 一つのtestを複数の宣言で使い回すと、宣言の数だけ被覆があるように
@@ -209,8 +226,15 @@ def check_declaration_red_map(
 
     universe_files = sorted(set(test_files) | set(bound))
     actual = {}
+    root = Path(project_root).resolve()
     for relative in universe_files:
         target = Path(project_root) / relative
+        # 対応表がproject root外のfileを対象にできないようにする。
+        resolved = target.resolve()
+        if resolved != root and root not in resolved.parents:
+            actual[relative] = None
+            findings.append(f"test_file_outside_project_root: {relative}")
+            continue
         try:
             actual[relative] = _collect_test_functions(target)
         except (OSError, SyntaxError, ValueError) as error:
