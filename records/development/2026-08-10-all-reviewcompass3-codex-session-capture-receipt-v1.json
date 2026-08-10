@@ -1,0 +1,107 @@
+{
+  "receipt_id": "RC3-ALL-REVIEWCOMPASS3-CODEX-SESSION-CAPTURE-2026-08-10-V1",
+  "recorded_at": "2026-08-10T23:57:41+09:00",
+  "status": "verified_with_live_boundary",
+  "confidentiality_class": "project-internal-value-safe",
+  "authority_binding": {
+    "human_decision": {
+      "path": "records/development/2026-08-10-all-reviewcompass3-codex-session-capture-decision-v1.json",
+      "sha256": "6d1367e121959197cd71a8e33a2e9aa45a95b20b18decc20688c708ef68ecbc6"
+    },
+    "task_contract": {
+      "path": "records/task-contract/session-transcript-eventual-preservation-v3.json",
+      "sha256": "4e9498e3514aa5efcf4a9803b2ca49ba16e774500e5be51b571c728d74bd480f"
+    },
+    "fixed_source_count": 10,
+    "fixed_sources_verified": true
+  },
+  "capture_scope": {
+    "provider": "codex",
+    "source_kind": "codex_rollout",
+    "selection_rule": "session_meta.payload.cwd resolves to the ReviewCompass3 repository root or one of its descendants",
+    "selected_source_count": 81,
+    "relative_path_manifest_sha256": "6814e2002b0a42dc906fe5b1598d4565f8945d606b30a0e552f6009168cbd298",
+    "non_reviewcompass3_capture": false,
+    "claude_capture": false
+  },
+  "parser_tdd": {
+    "red_commit": "aba54c73ef21f184d65d55981b906994b7d3c47c",
+    "red_result": "1 failed, 2 passed",
+    "green_commit": "1a37d3d0c542570582ca36abea3cb29d454c76b0",
+    "supported_records": [
+      "inter_agent_communication_metadata",
+      "agent_message",
+      "tool_search_call",
+      "tool_search_output"
+    ],
+    "actual_source_scan_count": 81,
+    "actual_source_scan_issue_count": 0,
+    "encrypted_internal_content_emitted": false
+  },
+  "execution": {
+    "preflight": {
+      "existing_source_count": 2,
+      "append_bytes_available": 168967,
+      "diverged_source_count": 0
+    },
+    "first_pass": {
+      "created": 79,
+      "updated": 2,
+      "reconciled": 81,
+      "event_count": 25545,
+      "issue_count": 0
+    },
+    "immediate_second_pass": {
+      "unchanged": 81,
+      "reconciled": 81,
+      "event_count": 25545,
+      "issue_count": 0
+    },
+    "raw_bytes_total_at_capture": 204915411,
+    "verbatim_bytes_total_at_capture": 73704951
+  },
+  "artifact_counts": {
+    "raw": 81,
+    "verbatim": 81,
+    "cursor": 81,
+    "provenance": 81,
+    "integrity_ledger": 1,
+    "redacted": 0
+  },
+  "verification": {
+    "capture_time_source_raw_equal_count": 81,
+    "artifact_missing_count": 0,
+    "parse_issue_count": 0,
+    "verbatim_regeneration_mismatch_count": 0,
+    "bad_directory_mode_count": 0,
+    "bad_file_mode_count": 0,
+    "temporary_or_lock_file_count": 0,
+    "repository_external_private_storage": true,
+    "private_content_recorded_in_receipt": false,
+    "live_boundary_observation": {
+      "observed_at": "2026-08-10T23:57:41+09:00",
+      "fully_equal_source_count": 80,
+      "live_source_count": 1,
+      "append_only_live_tail_bytes": 36083,
+      "diverged_source_count": 0,
+      "reason": "The active Codex task appends the capture result and later tool activity after a synchronous capture returns."
+    }
+  },
+  "test_verification": {
+    "targeted_parser": "3 passed",
+    "related_parser_and_preservation": "28 passed",
+    "all_session_log_tests": "177 passed",
+    "full_suite": "1470 passed in 13.92s",
+    "exit_code": 0
+  },
+  "not_performed": [
+    "capture of non-ReviewCompass3 Codex sessions",
+    "Claude session capture",
+    "redacted transcript generation",
+    "hook, watcher, scheduler, service, or background automation activation",
+    "provider source mutation",
+    "external transmission",
+    "retention deletion or backup",
+    "Git storage of private transcript artifacts"
+  ]
+}

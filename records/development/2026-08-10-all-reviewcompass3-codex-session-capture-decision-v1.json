@@ -1,0 +1,48 @@
+{
+  "decision_id": "RC3-ALL-REVIEWCOMPASS3-CODEX-SESSION-CAPTURE-2026-08-10-V1",
+  "decided_at": "2026-08-10T23:45:31+09:00",
+  "status": "approved_effective",
+  "decision_maker": "human",
+  "human_instruction": "ReviewCompass3に属する未記録分をすべて記録して",
+  "scope_change": {
+    "prior_decision_path": "records/development/2026-08-06-session-transcript-repair-and-recapture-decision-v1.json",
+    "prior_decision_sha256": "c6ff5904d86049f4e414e93dd3342b0ab793b1a50d0b4f664f507e2faf5c05a5",
+    "prior_scope": "one previously authorized current Codex Desktop rollout only",
+    "new_scope": "all locally available Codex rollout logs whose session working directory is the ReviewCompass3 repository root or one of its descendants",
+    "historical_codex_capture_authorized": true
+  },
+  "authorized_capture": {
+    "provider": "codex",
+    "source_kind": "codex_rollout",
+    "selection_rule": "session_meta.payload.cwd resolves to the ReviewCompass3 repository root or one of its descendants",
+    "preflight_source_count": 81,
+    "preflight_relative_path_manifest_sha256": "6814e2002b0a42dc906fe5b1598d4565f8945d606b30a0e552f6009168cbd298",
+    "include_never_recorded": true,
+    "include_append_pending": true,
+    "include_live_session_to_available_boundary": true,
+    "artifacts": [
+      "byte_exact_raw",
+      "private_verbatim_transcript",
+      "durable_cursor",
+      "private_provenance",
+      "integrity_ledger"
+    ]
+  },
+  "authorized_storage": {
+    "logical_path": "<runtime_root>/projects/reviewcompass3/development/sensitive/eventual-preservation",
+    "repository_external_required": true,
+    "directories": "0700",
+    "files": "0600"
+  },
+  "required_boundaries": [
+    "do not capture Codex logs belonging to another working directory",
+    "do not capture Claude logs",
+    "do not modify provider source logs",
+    "do not place private transcript artifacts in Git",
+    "do not transmit artifacts externally",
+    "do not enable a hook, watcher, scheduler, service, or background process",
+    "do not delete or overwrite a diverged preserved prefix",
+    "report the unavoidable live-session tail after the final synchronous capture"
+  ],
+  "redacted_transcript": false
+}

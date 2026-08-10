@@ -1,0 +1,113 @@
+{
+  "task_contract_id": "TC-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-10-V3",
+  "created_at": "2026-08-10T23:45:31+09:00",
+  "status": "active",
+  "owner": "reviewcompass3-development",
+  "goal": "Capture every locally available ReviewCompass3 Codex rollout into the repository-external private archive, reconcile the previously captured rollout, and verify the resulting private artifacts without capturing another project or provider.",
+  "supersedes": {
+    "task_contract_id": "TC-SESSION-TRANSCRIPT-EVENTUAL-PRESERVATION-2026-08-06-V2",
+    "path": "records/task-contract/session-transcript-eventual-preservation-v2.json",
+    "sha256": "d75049cb8f53dc0d7ae7429270c00ca539e90485133d1984edde07f61158355a",
+    "reason": "The Human instruction on 2026-08-10 explicitly expands the authorized Codex capture scope from one rollout to all locally available ReviewCompass3 rollouts. Version 2 remains historical and its fixed Development Policy digest is stale."
+  },
+  "fixed_sources": [
+    {
+      "path": "docs/design/2026-08-03-session-transcript-eventual-preservation-design.md",
+      "sha256": "b387b9cf913b11a0d39e13cbd5aa6222527fdb4f801e478f1110683c3dd8d1fe"
+    },
+    {
+      "path": "records/development/2026-08-03-session-transcript-eventual-preservation-decision.json",
+      "sha256": "620fde82dc424141f4f5a9e8ce383fd9669506149e764eceebff0ada6addfcba"
+    },
+    {
+      "path": "records/development/2026-08-03-session-transcript-source-formats-completion-evidence-v1.md",
+      "sha256": "bf8aba264810f19bb8ac495ce579412d6df589e286a72484f83efc88ed3f8fd4"
+    },
+    {
+      "path": "docs/development/2026-08-02-development-policy.md",
+      "sha256": "08bea1f9d5937ba5c212512ad041a0d03583d743dcc27742ad77c8741a22ad1c"
+    },
+    {
+      "path": "records/development/2026-08-03-session-transcript-eventual-preservation-implementation-decision.json",
+      "sha256": "1fe3c2a6cf8a3430ffb9a290a437dbc34777d2514beac910a26f52a419732262"
+    },
+    {
+      "path": "records/development/2026-08-06-preservation-layout-v3-migration-decision-v1.md",
+      "sha256": "b9aa5bc3bc2f6324e42032d3537e3b96f48a63e44c19f530dddafbcf0054843e"
+    },
+    {
+      "path": "records/development/2026-08-07-preservation-layout-v3-migration-evidence-v1.md",
+      "sha256": "7e5f8b3701d9df8498d972f42a528552ee96d88eca92845f197ad86df812653f"
+    },
+    {
+      "path": "records/development/2026-08-10-all-reviewcompass3-codex-session-capture-decision-v1.json",
+      "sha256": "6d1367e121959197cd71a8e33a2e9aa45a95b20b18decc20688c708ef68ecbc6"
+    },
+    {
+      "path": "tools/session_logs/parse_codex_rollout.py",
+      "sha256": "758e93ebe23edddbd849bd8c840f57f992e4f0ed5d375a86960dd29a746778f7"
+    },
+    {
+      "path": "tests/test_session_log_parse_codex_rollout.py",
+      "sha256": "9dc19b89b73220faab7b7333922b251a099f23d20cd549a6ec8a98584ab9cc9d"
+    }
+  ],
+  "authorized_sources": {
+    "provider": "codex",
+    "source_kind": "codex_rollout",
+    "selection_rule": "session_meta.payload.cwd resolves to the ReviewCompass3 repository root or one of its descendants",
+    "preflight_source_count": 81,
+    "preflight_relative_path_manifest_sha256": "6814e2002b0a42dc906fe5b1598d4565f8945d606b30a0e552f6009168cbd298"
+  },
+  "in_scope": [
+    "verify all fixed source digests and the deterministic source selection before capture",
+    "preserve each selected Codex rollout as byte-exact raw outside the repository",
+    "generate or regenerate the private verbatim transcript for every selected source",
+    "create or update each durable cursor and private provenance record",
+    "update the shared integrity ledger without replacing a divergent preserved prefix",
+    "repeat the selected-source capture once to absorb the live task growth available at that boundary",
+    "verify source-to-raw equality or report the live task tail after capture",
+    "verify artifact digests, parse results, permissions, temporary files, and Git boundary"
+  ],
+  "out_of_scope": [
+    "Codex rollouts whose working directory is outside ReviewCompass3",
+    "Claude session capture",
+    "redacted transcript generation",
+    "hook, watcher, scheduler, service, or background automation activation",
+    "provider source mutation",
+    "external storage or transmission",
+    "retention deletion, backup, or application-layer encryption",
+    "Git storage of private transcript artifacts",
+    "session-log implementation changes"
+  ],
+  "acceptance": [
+    "all fixed source digests match before capture",
+    "the selected relative-path list contains 81 sources and matches the fixed manifest digest",
+    "all existing preserved raw files are exact prefixes of their selected sources before update",
+    "every selected source reports reconciled without divergence, parse failure, or unsupported source",
+    "a second pass reports unchanged except for bytes appended by the live task between passes",
+    "stored raw, verbatim, cursor, provenance, and ledger agree after reread",
+    "all parsed sources have zero parse issues",
+    "private output remains outside the repository with directories 0700 and files 0600",
+    "no temporary or lock file remains",
+    "no non-ReviewCompass3 or non-Codex source is captured",
+    "the final synchronous report states any unavoidable tail added by the live session itself"
+  ],
+  "stop_conditions": [
+    "a fixed source digest differs",
+    "the selected source count or manifest digest differs from preflight",
+    "an existing archive is not an exact prefix of its source",
+    "a selected source does not belong to ReviewCompass3",
+    "a private output may enter the repository or Git boundary",
+    "the collector reports divergence, parse failure, unsupported source, or artifact checkpoint failure",
+    "provider source mutation would be required",
+    "the repository worktree changes outside the authority records and result evidence for this operation"
+  ],
+  "recovery": [
+    "preserve the last valid raw and cursor on write failure",
+    "rerun the failed selected source from its durable cursor after interruption",
+    "record divergence without overwriting the archive",
+    "regenerate derived artifacts from preserved raw",
+    "stop and request Human review if the fixed selection changes before capture"
+  ]
+}
