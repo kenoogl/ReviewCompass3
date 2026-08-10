@@ -56,33 +56,46 @@ def test_does_not_misclassify_in_progress_changes_as_completed_work():
     assert result.reminder is None
 
 
-def test_preflight_reads_git_state_mechanically():
+def test_preflight_reads_git_state_mechanically(tmp_path):
+    """機械的にGit状態を読み、未コミットならblockedを返す。
+
+    Human承認（2026-08-10）「conftest.pyの追加と既存テスト1件の更新を承認する」により、
+    F-B5修正後の呼び出し形へ更新した。検査している性質は変えていない。
+    """
+
     calls = []
+    project_root = tmp_path / "project"
+    project_root.mkdir()
 
     def fake_run(command, **kwargs):
         calls.append((tuple(command), kwargs))
-        return SimpleNamespace(
-            returncode=0,
-            stdout=" M TODO_NEXT_SESSION.md\n",
-            stderr="",
-        )
+        if "rev-parse" in command:
+            stdout = "%s\n" % project_root
+        elif "status" in command:
+            stdout = " M TODO_NEXT_SESSION.md\n"
+        else:
+            stdout = ""
+        return SimpleNamespace(returncode=0, stdout=stdout, stderr="")
 
     result = _module().preflight_next_work(
         work_status="completed",
-        project_root="/project",
+        project_root=project_root,
         run=fake_run,
     )
 
     assert result.status == "blocked"
+    expected_kwargs = {
+        "cwd": str(project_root),
+        "capture_output": True,
+        "text": True,
+    }
     assert calls == [
+        (("git", "rev-parse", "--show-toplevel"), expected_kwargs),
         (
             ("git", "status", "--porcelain=v1", "--untracked-files=all"),
-            {
-                "cwd": "/project",
-                "capture_output": True,
-                "text": True,
-            },
-        )
+            expected_kwargs,
+        ),
+        (("git", "diff", "--name-only", "HEAD", "--"), expected_kwargs),
     ]
 
 
