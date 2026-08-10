@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計とHuman段完了承認を終え、最初の機械処理縦切りへ着手した。
-- 現在作業：最小実装依頼v2の再監査で旧6所見中5件がclosed、PA-PC-006だけopenとなり、判定担当はholdを推奨した。同種実装失敗2回の停止条件を今回から外して第2縦切りへ移すか、今回へ追加実装するかのHuman判断待ち。
+- 現在作業：HumanがST-PC-005の第2縦切りへの完全移管を裁定し、v2の要求を26件へ限定するv3追補を作成した。v2とv3を合わせた実効指示の最終再確認待ちで、実装担当は未起動。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -19,19 +19,21 @@
 - [操縦者別連携 最小実装依頼 v2](records/session-handoffs/2026-08-11-pilot-collaboration-entry-implementation-request-v2.md) — SHA-256 `7310fa0c88e3becd4bf36e43c1363247d325d2ad013f809c8ffdbb78c96d6363`
 - [操縦者別連携 指示文所見 Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-entry-prompt-findings-human-decision-v1.md) — SHA-256 `de176de8ee6798de493010ef81e18e37c6ffb73bfeb95c54f23a865e1e5bbc57`
 - [操縦者別連携 指示文品質再確認 v2](records/session-handoffs/2026-08-11-pilot-collaboration-entry-prompt-quality-rereview-v2.md) — SHA-256 `f78c23eb48452d85a0849fff1ce23556b52cdd6c4e4377d22bf527cec0efff86`
+- [操縦者別連携 最小実装依頼 v3追補](records/session-handoffs/2026-08-11-pilot-collaboration-entry-implementation-request-v3.md) — SHA-256 `a3bbd01c73d0efe54513dc1f06a965e6ac4385c72d86aab5f84f167c03d2ccdd`
+- [操縦者別連携 PA-PC-006 Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-pa-pc-006-human-decision-v1.md) — SHA-256 `f131eea737a8396e7d1284633ed96895e86d9b68176363e82cbdbb6c5d36c513`
 - [操縦者別のClaude／Codex連携方法](docs/development/pilot-specific-claude-codex-collaboration.md) — SHA-256 `aee8c8b72487e26395615c8442710b0695b035ec0aa129b4a777c6142864489d`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
 - [ReviewCompass3 開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `08bea1f9d5937ba5c212512ad041a0d03583d743dcc27742ad77c8741a22ad1c`
 
 ## 次に行う一作業
 
-HumanがPA-PC-006について、ST-PC-005を第2縦切りへ完全移管するか、今回へrun間失敗記録を追加するかを決める。
+v2とv3を合わせた実効指示について、PA-PC-006の閉鎖、要求26件の整合、実装可能性を新しい監査・判定担当で最終確認する。
 
 開始条件：
 
-- 指示文品質再確認v2と対象依頼v2のSHA-256が固定されていること
-- HumanがPA-PC-006の扱いを明示すること
-- 保留が解けるまで実装担当を起動しないこと
+- v2、v3、PA-PC-006 Human裁定のSHA-256が固定されていること
+- 監査担当と判定担当を別の新しい会話状態で起動すること
+- 最終確認が合格するまで実装担当を起動しないこと
 
 完了条件：
 
@@ -39,12 +41,12 @@ HumanがPA-PC-006について、ST-PC-005を第2縦切りへ完全移管する�
 - 既存bootstrap reviewテスト、故障注入、公式全テスト、差分検査が合格すること
 - 反対側モデルの独立レビューがverifiedとなり、Human段完了承認を得ること
 
-後続作業：Human裁定を反映した指示書を再確認し、品質関門を通過した後に実装担当を起動する。
+後続作業：品質関門を通過した後、実装担当が新規受入テストのRED確認から開始する。
 
 ## blocker・Human判断待ち
 
-- blocker：PA-PC-006がopenかつ判定担当の推奨がholdのため、実装担当を起動できない。
-- Human判断待ち：推奨案はST-PC-005を今回から外し、同形所見2周停止とrun間失敗記録を第2縦切りへ完全移管すること。今回へ追加実装する案も選べる。
+- blocker：Human裁定は完了したが、v2とv3を合わせた実効指示の最終品質確認が未了のため実装担当をまだ起動しない。
+- Human判断待ち：最終確認で新規所見が出た場合は裁定が必要。実装後の段完了承認も別に必要。
 
 ## stale・deferred
 
@@ -57,7 +59,7 @@ HumanがPA-PC-006について、ST-PC-005を第2縦切りへ完全移管する�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：既存bootstrap review関連23 passed、終了コード0。v2再監査は旧所見5 closed・1 open、新規所見0、判定担当はPA-PC-006をhold推奨。新規受入テストは未着手。
+- 直近の関連Test：既存bootstrap review関連23 passed、終了コード0。PA-PC-006はHuman裁定により今回の要求から外して第2縦切りへ移管し、今回の要求集合は26件。新規受入テストは未着手。
 - 直近の全Test：直近の公式全Testは1470 passed、failed 0、errors 0、終了コード0。実装後に再実行する。
 - 差分検査：`git diff --check`合格
 
