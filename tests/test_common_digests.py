@@ -160,14 +160,28 @@ class TestJsonCompatibilityIsEnforced:
             identity.seal(document)
 
     def test_validate_record_rejects_non_json_compatible_record(self):
+        """修正前のcanonical仕様で自己整合するNaN recordを拒否する。
+
+        照合値を不一致にすると、JSON互換検査が無くてもDigest不一致だけで
+        拒否されてしまい、対象欠陥を検出できない（完了レビューv1 F-CG-COMP-001）。
+        修正前の仕様（allow_nan既定）で計算した正しいDigestを与える。
+        """
         identity = self._identity()
         document = {
             "record_kind": "requirement_binding",
             "record_id": "RB-1",
             "record_version": 1,
             "value": float("nan"),
-            "content_digest": "0" * 64,
         }
+        legacy_digest = hashlib.sha256(
+            json.dumps(
+                document,
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+        document["content_digest"] = legacy_digest
         with pytest.raises(identity.ContractError):
             identity.validate_record(document)
 
