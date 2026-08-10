@@ -4,46 +4,112 @@
 
 決定日：2026-08-11
 
-共通レビュー基準：`docs/development/work-review-protocol.md`
+## 1. 本書の位置づけ
 
-関連文書：
+本書は、ClaudeとCodexが共同で開発作業を行うときの役割分担と受け渡し方法の入口である。
+作業開始時に`collaboration_method: pilot_specific_claude_codex`を選んだ場合、本書を最初に読む。
 
-- `docs/development/pilot-driven-record-handoff.md`
-- `docs/development/codex-claude-collaboration.md`
-- `docs/development/role-neutral-pilot-review-collaboration.md`
+本書を適用する作業では、`role_neutral_pilot_review`を同時に適用しない。
+既存の作業記録は遡って変更せず、その作業で固定済みの方式を使う。
 
-## 1. 目的
+関連する既存文書の位置づけは次のとおりである。
 
-ClaudeとCodexの分担を、操縦者に応じて二つの方式へ分ける。
+| 文書 | 位置づけ | 適用する場面 | 適用しない場面 |
+| --- | --- | --- | --- |
+| `docs/development/work-review-protocol.md` | 共通のレビュー基準 | Claudeが実装した結果をCodexが確認するとき | 担当者や起動方向の決定 |
+| `docs/development/pilot-driven-record-handoff.md` | ClaudeからCodexを起動する方法の詳細 | `pilot: claude`でCodexをレビュー担当として起動するとき | `pilot: codex`からClaudeへ実装を依頼するとき |
+| `docs/development/codex-claude-collaboration.md` | CodexからClaudeへ実装を依頼する方法と、人による中継方法の詳細 | `pilot: codex`でClaudeへ実装を依頼するとき | `pilot: claude`からCodexをレビュー担当として起動するとき |
+| `docs/development/role-neutral-pilot-review-collaboration.md` | 先行試行の役割方式 | その文書を参照して開始済みの既存作業 | 本書を参照して開始する新しい作業 |
 
-ここでいう操縦者（`pilot`）とは、Humanから作業項目を受け取り、上流文書を確認し、作業範囲を固定し、
-次の担当へ依頼し、停止地点を管理する担当をいう。
+担当者を決める規則は本書を正とする。既存三文書は、本書で決めた担当を変更せず、該当する方向の
+受け渡し方法または過去作業の解釈にだけ使う。
 
-本書を適用する作業では、次の二つだけを認める。
+## 2. 用語と固定する役割
 
-1. `pilot: claude`：Claudeが依頼、実装、進行管理を行い、Codexがレビューする。
-2. `pilot: codex`：Codexが依頼、進行管理、レビューを行い、Claudeは実装だけを行う。
+操縦者（`pilot`）とは、Humanから作業項目を受け取り、上流文書を確認し、範囲を固定し、次の担当へ依頼し、
+停止地点を管理する担当をいう。
 
-`pilot: codex`でClaudeをレビュー担当にする方式は使わない。
+実装担当（`implementer`）とは、固定された依頼に従って、テスト作成、実装、機械検証、実装証拠の記録を
+行う担当をいう。
 
-作業開始時に`collaboration_method: pilot_specific_claude_codex`を固定した場合、本書を役割分担の
-入口とする。同じ作業へ`role_neutral_pilot_review`を同時に適用しない。
-`pilot-driven-record-handoff.md`は`pilot: claude`でCodexをレビュー担当として起動する方法に使い、
-`codex-claude-collaboration.md`は`pilot: codex`でClaudeへ実装を依頼する方法に使う。
+レビュー担当（`reviewer`）とは、実装を変更せず、上流文書、差分、テスト、証拠、実行後の状態を独立に
+確認する担当をいう。
 
-## 2. Humanの決定
+本書では、操縦者がどちらの場合も、実装担当とレビュー担当を次のように固定する。
+
+```text
+implementer: claude
+reviewer: codex
+```
+
+操縦者だけを、作業ごとにClaudeまたはCodexから選ぶ。
+
+## 3. Humanの決定
 
 Humanは2026-08-11、次の分担を決定した。
 
-- ClaudeからCodexを起動し、Claudeが実装、Codexがレビューする方式は、`pilot: claude`の場合に限る。
-- `pilot: codex`の場合は、以前の連携方式と同じく、Codexが実装依頼を作り、Claudeが実装だけを行い、
-  Codexが実装結果をレビューする。
+- `pilot: claude`では、Claudeが依頼、実装、進行管理を行い、Codexがレビューする。
+- `pilot: codex`では、Codexが依頼、進行管理、レビューを行い、Claudeは実装だけを行う。
+- ClaudeからCodexを起動する方式は、`pilot: claude`の場合に限る。
+- `pilot: codex`でClaudeをレビュー担当にしない。
 
-この決定は、既存の作業記録を遡って変更しない。本書を参照して開始する新しい作業から適用する。
+二つの方式で異なるのは、Humanとの窓口、範囲固定、実装依頼、修正管理を誰が行うかである。
+実装担当がClaude、レビュー担当がCodexである点は共通とする。
 
-## 3. 共通規則
+## 4. 二つの方式の対応表
 
-### 3.1 内容の正本
+| 作業段階 | `pilot: claude` | `pilot: codex` |
+| --- | --- | --- |
+| Humanとの窓口 | Claude | Codex |
+| 上流文書の確認 | Claude | Codex |
+| 範囲固定 | Claude | Codex |
+| 危険度の提案 | Claude | Codex |
+| 危険度と再開の承認 | Human | Human |
+| 実装依頼の作成 | Claude | Codex |
+| テスト作成と実装 | Claude | Claude |
+| 実装証拠の記録 | Claude | Claude |
+| レビュー依頼の作成 | Claude | Codex |
+| 実装結果のレビュー | Codex | Codex |
+| 修正範囲の固定 | Claude | Codex |
+| 修正実装 | Claude | Claude |
+| 完了反映 | Humanが指定した担当 | CodexまたはHumanが指定した担当 |
+
+`pilot: claude`では、Claudeが操縦者と実装担当を兼ねる。
+`pilot: codex`では、Codexが操縦者とレビュー担当を兼ねるが、実装はClaudeへ分離する。
+
+## 5. 共通の作業順序
+
+二つの方式は、同じ順序で進める。担当だけを§4の対応表で切り替える。
+
+| 順序 | 作業 | `pilot: claude`の担当 | `pilot: codex`の担当 |
+| --- | --- | --- | --- |
+| 1 | Humanから作業項目を受け取る | Claude | Codex |
+| 2 | 上流文書、受入条件、変更範囲、禁止事項、停止条件を固定する | Claude | Codex |
+| 3 | 必要なHuman承認を得る | Claudeが依頼する | Codexが依頼する |
+| 4 | テストを先に作り、失敗を確認してから実装する | Claude | Claude |
+| 5 | 実装結果と証拠をコミットして停止する | Claude | Claude |
+| 6 | 実装を変更せず独立レビューする | Codex | Codex |
+| 7 | 不合格なら修正範囲を固定して実装担当へ戻す | Claude | Codex |
+| 8 | 合格後に完了反映する | Humanが指定した担当 | CodexまたはHumanが指定した担当 |
+
+レビュー結果が`verified`（必要な証拠が揃い、実状態と一致する状態）になるまで、完了反映へ進まない。
+
+## 6. 起動方向と受け渡し方法
+
+役割分担と起動方法を混同しない。起動は作業を渡す手段であり、担当を決める根拠ではない。
+
+| 操縦者 | 起動方向 | 起動される担当 | 目的 | 方法 |
+| --- | --- | --- | --- | --- |
+| Claude | ClaudeからCodex | レビュー担当のCodex | 実装結果の独立レビュー | `pilot-driven-record-handoff.md`の固定起動文とCodex CLI |
+| Codex | CodexからClaude | 実装担当のClaude | 固定済み依頼の実装 | 承認済みのClaude起動経路。完成までは`codex-claude-collaboration.md`のHuman中継 |
+
+直接起動が使えない、認証が切れている、または異常応答となった場合は、自動的に別の認証、別の送信先、
+別の権限へ切り替えない。操縦者が事象と未実施範囲をHumanへ報告して停止する。
+
+Human中継を使う場合、Humanはコミット済み記録の場所と開始・停止の合図だけを運ぶ。作業指示や判定内容を
+チャットだけで作り直さない。
+
+## 7. 内容の正本
 
 担当間で受け渡す作業指示、実装結果、レビュー結果の正本は、Gitへコミットした記録だけとする。
 チャットの文章、起動時の短い指示、担当者の終了報告は、通知または開始合図として扱う。
@@ -51,103 +117,33 @@ Humanは2026-08-11、次の分担を決定した。
 ただし、Humanによる作業項目の指定、危険度の確定、再開・段完了の承認、意味的な裁定は、Humanの
 チャット文言を正とする。操縦者はその文言を範囲固定文書または依頼書へ転記し、対象と内容を固定する。
 
-### 3.2 実装とレビューの分離
-
-実装担当とレビュー担当は同じ担当にしない。
-
-- 実装担当は、承認された範囲内でテストを先に作り、実装し、検証結果を記録する。
-- レビュー担当は、実装を変更せず、上流文書、差分、テスト、記録、実行後の状態を独立に確認する。
-- レビューで修正が必要になった場合は、操縦者が修正依頼を固定し、実装担当へ戻す。
-
-### 3.3 Human境界
-
-方針変更、外部送信、不可逆操作、意味的な裁定、危険度の確定、再開・段完了は、担当間の受け渡し方法に
-かかわらずHumanの承認を必要とする。
-
-## 4. `pilot: claude`の方式
-
-### 4.1 分担
-
-| 作業 | 担当 |
-| --- | --- |
-| Humanとの窓口 | Claude |
-| 上流文書の確認 | Claude |
-| 範囲固定と実装計画 | Claude |
-| 実装依頼の管理 | Claude |
-| テスト作成と実装 | Claude |
-| 実装結果のレビュー | Codex |
-| 修正依頼と再開管理 | Claude |
-| 完了反映 | Humanが指定した担当 |
-
-### 4.2 手順
-
-1. ClaudeがHumanから作業項目を受け取り、範囲固定文書を作成して単独コミットする。
-2. 必要なHuman承認を得た後、Claudeがテスト先行で実装する。
-3. Claudeがレビュー依頼書を作成して単独コミットする。
-4. Claudeが固定した短い起動文でCodex CLIを実行し、Codexをレビュー担当として起動する。
-5. Codexは実装を変更せず、独立レビューを行い、結果記録だけを単独コミットして停止する。
-6. Claudeは結果記録とGitの状態を照合し、修正または完了反映へ進む。
-
-この方式では、Codexは実装を行わない。Claudeの実装中に同じファイルを変更しない。
-
-Codex CLIが利用できない、認証が切れている、または異常応答となった場合は、自動的に別経路へ切り替えず、
-ClaudeがHumanへ状況を報告して停止する。Human中継を使う場合も、受け渡す内容の正本はコミット済みの
-記録とする。
-
-## 5. `pilot: codex`の方式
-
-### 5.1 分担
-
-| 作業 | 担当 |
-| --- | --- |
-| Humanとの窓口 | Codex |
-| 上流文書の確認 | Codex |
-| 範囲固定と実装計画 | Codex |
-| Claude向け実装依頼 | Codex |
-| テスト作成と実装 | Claude |
-| 実装結果のレビュー | Codex |
-| 修正依頼と再開管理 | Codex |
-| 完了反映 | CodexまたはHumanが指定した担当 |
-
-### 5.2 手順
-
-1. CodexがHumanから作業項目を受け取り、上流文書、受入条件、変更可能範囲、禁止事項、停止条件を確認する。
-2. CodexがClaude向け実装依頼書を作成し、単独コミットする。
-3. 必要なHuman承認を得た後、Claudeへ実装依頼書の場所だけを伝えて実装を開始させる。
-4. Claudeは依頼書の範囲内でテストを先に作り、実装、検証、実装結果の記録を行い、指定された単位で
-   コミットして停止する。
-5. CodexはClaudeの終了報告を完了根拠にせず、コミット、差分、テスト、検証結果、停止境界を独立に確認する。
-6. Codexがレビュー結果を記録する。修正が必要なら、修正範囲を新しい依頼書へ固定してClaudeへ戻す。
-7. レビュー結果が`verified`（必要な証拠が揃い、実状態と一致する状態）になった後だけ、完了反映へ進む。
-
-この方式では、Claudeは実装担当であり、依頼内容の決定、レビュー、Human判断の代行を行わない。
-「実装」には、依頼書で指定されたテストの作成、実装コードの変更、決定的な検証、実装証拠の記録を含む。
-
-CodexからClaudeを直接起動する承認済み経路が完成するまでは、
-`docs/development/codex-claude-collaboration.md`のHuman中継を使う。承認済み経路の完成後は、運搬だけを
-直接起動へ置き換え、Codexが依頼とレビューを行い、Claudeが実装だけを行う分担は変えない。
-
-## 6. 危険度が高い作業
+## 8. 危険度が高い作業
 
 外部送信、承認関門、検証器、改竄拒否など、誤った合格が重大な影響を生む作業は危険度`high`とする。
 
-- `pilot: claude`では、Claudeが作成した範囲と実装をCodexが独立にレビューする。
-- `pilot: codex`では、Codexが範囲と依頼を作り、Humanが危険度と実装開始を承認する。Claudeが実装した後、
-  Codexが実装前の予想やClaudeのテストだけに頼らず、上流文書から確認条件と反証を独立に導出してレビューする。
+| 確認事項 | `pilot: claude` | `pilot: codex` |
+| --- | --- | --- |
+| 範囲と危険度の提案 | Claude | Codex |
+| 危険度と実装開始の確定 | Human | Human |
+| 実装 | Claude | Claude |
+| 完了レビュー | Codex | Codex |
+| 独立した反証 | Codexが新作して機械実行 | Codexが新作して機械実行 |
 
-危険度`high`では、レビュー担当が実装担当のテストにない反証を最低1件作り、機械実行する。
+CodexはClaudeのテストだけに頼らず、上流文書から確認条件と反証を独立に導出する。
+危険度`high`では、Claudeのテストにない反証を最低1件作り、機械実行する。
 外部送信そのものを重複実行して反証にしてはならない。
 
-## 7. 禁止事項
+## 9. 禁止事項
 
-- `pilot: claude`で、ClaudeがCodexへ実装を任せ、Claude自身がレビュー担当になること。
+- `pilot: claude`で、Codexを実装担当、Claudeをレビュー担当にすること。
 - `pilot: codex`で、Claudeをレビュー担当にすること。
-- `pilot: codex`で、Claudeが依頼範囲、受入条件、Human承認の意味を独自に変更すること。
-- レビュー担当がレビュー中に実装対象を修正すること。
-- コミットされていないチャット報告だけで、実装完了またはレビュー合格と判断すること。
-- 直接起動に失敗した際、承認のない別経路、別の認証、別の送信先へ自動的に切り替えること。
+- Claudeが固定済みの依頼範囲、受入条件、Human承認の意味を独自に変更すること。
+- Codexがレビュー中に実装対象を修正すること。
+- コミットされていない終了報告だけで、実装完了またはレビュー合格と判断すること。
+- 直接起動に失敗した際、承認のない別経路、別の認証、別の送信先へ切り替えること。
+- 一つの作業に本書と`role_neutral_pilot_review`を同時適用すること。
 
-## 8. 作業開始時の固定項目
+## 10. 作業開始時の固定項目
 
 各作業は、開始時に最低限、次を記録する。
 
@@ -160,8 +156,5 @@ closer: codex | claude | humanが指定した担当
 work_item: <一つの作業項目>
 ```
 
-`pilot: claude`では`pilot`と`implementer`が同じになる。
-`pilot: codex`では`pilot`と`reviewer`が同じになるが、実装担当はClaudeとして分離する。
-
 本書が定めるのは担当と受け渡し方法である。レビュー手順、テスト先行、Git規律、証拠規則、Human承認境界は、
-既存の共通文書を変更せず、そのまま適用する。
+`docs/development/work-review-protocol.md`と開発方針をそのまま適用する。
