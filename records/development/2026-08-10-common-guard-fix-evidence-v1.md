@@ -103,7 +103,39 @@ pin更新のHuman承認根拠：2026-08-10「組A修正 risk highを確定、着
 | `tests/test_common_module_pins.py` | `fc7dcde0b182b1ee0a8a57759f0c8bf240c5956e9258e63ae77e2c2d0cdd392e` |
 | 公式receipt | `429ca5d4ae990893837df90509837fc5f2e6f73ff83438e6fb87bda38cdb3fd5` |
 
-## 7. 未実施
+## 7. F-CG-COMP-001修正（完了レビューv1反映）
+
+完了レビューv1（`records/session-handoffs/2026-08-10-codex-review-result-common-guard-fix-v1.md`、
+commit `fb0e2ea`、判定`reported_unverified`・blocking 1件）への対応。
+Human承認（2026-08-10）：「テスト修正を承認する」。
+
+- **指摘**：`test_validate_record_rejects_non_json_compatible_record`が、NaN recordへ
+  不一致Digest（`"0"*64`）を与えていたため、JSON互換検査が無くても
+  **Digest不一致だけで拒否され合格**していた。対象欠陥を検出できない偽陰性であり、
+  RED境界（実装前に反証どおり失敗する）も満たしていなかった。
+- **修正理由**：反証の成立条件そのものの誤り。実装は変更せず、test入力のみを直す。
+- **修正内容**：当該record 1件のDigestを、**修正前のcanonical仕様（`allow_nan`既定）で
+  計算した自己整合値**へ置き換えた。testの追加・削除・他testの変更はしていない。
+- **修正RED commit**：`9461f34`（test 1 fileのみ）
+- **機械確認**：
+  - 修正後のtestを**修正前実装**（`git checkout a84b8ca -- tools/common/digests.py
+    tools/common/paths.py tools/task_contract/identity.py`）に対して単独実行 →
+    **`1 failed`**（`DID NOT RAISE`）。実装を`HEAD`へ戻して再実行 → 合格。
+    これにより、対象欠陥がある状態で失敗し、修正済み実装で合格することを固定した。
+  - targeted：`pytest tests/test_common_digests.py
+    tests/test_common_errors_paths_output.py` → **57 passed**、exit `0`
+  - 公式全Test（再実行）：`policy_test_runner --suite full --receipt
+    records/development/2026-08-10-common-guard-fix-test-receipt-v2.json` →
+    **1451 passed**、status `passed`、exit `0`
+
+| file | SHA-256（本節で有効） |
+| --- | --- |
+| `tests/test_common_digests.py` | `c5b23a77222693afece6f38848a6c111d5f7d9428fa806116952c15760972b2c` |
+| 公式receipt（v2） | `614866bfefdc830c521c46d99ab05421b1f26858a4775344be8186f3a22bb892` |
+
+実装3 fileとpin、他のtestは§6のSHA-256から変更していない。
+
+## 8. 未実施
 
 group B（5件）・C（5件）・D（7件）の計17件は判定recordのまま保持。
 TODO・checklist反映はCloser。push・履歴書換えは未実施。
