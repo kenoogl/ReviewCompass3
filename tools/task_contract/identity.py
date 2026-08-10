@@ -77,16 +77,31 @@ class ContractError(FailClosedError):
     """最小Review Task Contractのfail-closed条件に触れた。"""
 
 
+from tools.common.digests import (
+    DigestInputError,
+    canonical_json_bytes,
+    canonical_content_digest as content_digest,
+    file_sha256 as file_sha256,
+)
+
+
 def canonical_bytes(value):
-    return json.dumps(
-        value, ensure_ascii=False, separators=(",", ":"), sort_keys=True
-    ).encode("utf-8")
+    """canonical JSONのbytes。JSON互換でない値はstop codeで拒否する。"""
+    try:
+        return canonical_json_bytes(value)
+    except DigestInputError as error:
+        raise ContractError("schema_violation", error.detail) from None
 
 
-from tools.common.digests import canonical_content_digest as content_digest
+def _content_digest_or_stop(document):
+    """共通正本のDigestを求め、JSON互換違反をstop codeへ変換する。
 
-
-from tools.common.digests import file_sha256 as file_sha256
+    `content_digest`自体は共通正本への直結を維持する（写しの禁止）。
+    """
+    try:
+        return content_digest(document)
+    except DigestInputError as error:
+        raise ContractError("schema_violation", error.detail) from None
 
 
 def seal(document):
@@ -94,7 +109,7 @@ def seal(document):
 
     if document.get("record_kind") not in RECORD_KINDS:
         raise ContractError("schema_violation", str(document.get("record_kind")))
-    document["content_digest"] = content_digest(document)
+    document["content_digest"] = _content_digest_or_stop(document)
     return document
 
 
@@ -136,7 +151,7 @@ def validate_record(document):
         for section in CONTRACT_SECTIONS:
             if not document.get(section):
                 raise ContractError("contract_section_missing", section)
-    if content_digest(document) != document["content_digest"]:
+    if _content_digest_or_stop(document) != document["content_digest"]:
         raise ContractError("schema_violation", "content_digest")
     return document
 

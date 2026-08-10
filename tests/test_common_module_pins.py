@@ -17,9 +17,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 _PINS = {
     "tools/common/__init__.py": "fdb99f627d54b0661d5b3d3f487c2a3e0266df9ac97ea642529c39e6b17774cd",
-    "tools/common/digests.py": "db6b830592f5d57ef7b42b5ec32fd398f4c36957a978604166525fc54da3396f",
+    "tools/common/digests.py": "fc2d728c4c2cfd1b4e70b7eef6d0e6d4ce9a4a033712b93402bd2c7f984624f7",
     "tools/common/errors.py": "1d2fefcc075080138f3ab9a8b19775e0ff0fb333e811d6918a06c6730236c4c0",
-    "tools/common/paths.py": "daa325791b5bead80c240eb298c7084f6c26ff2d96ca850cc65449686cc4826d",
+    "tools/common/paths.py": "039512f579bf6e939d4086c1e75f848b0b4e5dba7f7170b63c21fd005b48e1ec",
     "tools/common/output.py": "77990e9d7781cb843f4fa2d9d1074776be6369efd4ced4a79c5f632719901d9b",
 }
 
