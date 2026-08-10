@@ -113,8 +113,8 @@
 | `policy_test_runner.py` | 該当 | 公式Test実行のoracleとreceipt生成。誤集計＝全体の誤合格 | ③ | 高 |
 | `pytest_summary.py` | 該当 | 公式Test件数の構造化集計（runnerのreceipt数値の正本） | ③ | 高 |
 | `python_ast_boundary_check.py` | 該当 | Python source操作のAST境界検査 | ③ | 中 |
-| `reuse_search_record.py` | 非該当 | 実装前検索のnew-only記録（記録生成） | — | — |
-| `session_log_bootstrap.py` | 非該当 | Session Log Bootstrapとprojection生成 | — | — |
+| `reuse_search_record.py` | 該当 | `validate_reuse_search_record`・`gate_check`がDigest・鮮度を検査し着手可否`start_allowed`を決める | ③ | 中 |
+| `session_log_bootstrap.py` | 該当 | 固定入力の欠落・競合・staleを検査し`authority_status`の有効・無効を判定する | ③ | 中 |
 | `structured_argv_executor.py` | 該当 | 読み取り専用の構造化argv executor＝許可command制限の実行境界 | ③ | 高 |
 | `task_python_cache.py` | 該当 | task専用bytecode cacheの隔離境界（明示初期化のみ） | ③ | 中 |
 | `todo_compaction.py` | 該当 | compaction結果の検証とbyte-exact復元照合 | ③ | 中 |
@@ -152,9 +152,9 @@
 | `empirical_revalidation.py` | 非該当 | follow_upの再検証材料 | — | — |
 | `essence_ledger.py` | 非該当 | エッセンス台帳schema（データ定義） | — | — |
 | `file_edges.py` | 非該当 | 実在依存辺の抽出（解析） | — | — |
-| `followup_resolution.py` | 非該当 | follow_upの再検証（調査） | — | — |
+| `followup_resolution.py` | 該当 | 参照と再集計を検証し`resolved`／`follow_up`の別を決める | ③ | 低 |
 | `group_coverage.py` | 該当 | 既知正例群の抽出被覆判定（抽出漏れの検出器） | ③ | 低 |
-| `known_positives.py` | 非該当 | 既知正例の再発見（材料） | — | — |
+| `known_positives.py` | 非該当（要Human判定） | 既知正例の再発見（材料）。ただし証拠欠落時はfail-closedで失敗する | — | — |
 | `population.py` | 非該当 | 抽出母集団の分類 | — | — |
 | `priority_batches.py` | 非該当 | 優先度付きbatchの生成 | — | — |
 | `reassessment.py` | 非該当 | 生材料の独立再判定（調査） | — | — |
@@ -182,13 +182,13 @@
 | `fixed_inputs.py` | 該当 | 第4段の固定入力照合 | ③ | 低 |
 | `requirement_batch.py` | 該当 | requirements batch契約の検証 | ③ | 低 |
 | `source_trace.py` | 該当 | requirement由来記録契約の検証 | ③ | 低 |
-| `unified_migration.py` | 非該当 | Legacy定義の決定的移行（変換。検証は上記validator） | — | — |
+| `unified_migration.py` | 該当 | `validate_evidence_record`・`check_migration_plan`がEvidenceと移行結果を検証する | ③ | 低 |
 
 ### 4.10 tools/session_logs（39）
 
 | module | 判定 | 理由 | 区分 | 優先度 |
 | --- | --- | --- | --- | --- |
-| `cli.py` | 非該当 | 暫定CLI入口（委譲） | — | — |
+| `cli.py` | 該当 | `--verify`経路が保存成果物を再生成照合し、一致・不一致を終了コードで決める | ③ | 中 |
 | `config.py` | 該当 | 設定境界（伏字規則の登録・機微path設定を含む） | ②（E5） | 低 |
 | `deployment_lifecycle.py` | 該当 | ポータブル設定の安全な移行・解除（破壊防止境界） | ③ | 中 |
 | `deployment_paths.py` | 非該当 | OS標準配置先の解決 | — | — |
@@ -202,7 +202,7 @@
 | `limited_approval.py` | 該当 | 限定配置の未承認候補生成（承認境界の一部） | ③ | 中 |
 | `limited_deployment.py` | 該当 | 明示承認対象だけを扱う限定配置境界 | ③ | 中 |
 | `locking.py` | 該当 | 所有権付き排他制御（並行破壊の防止） | ③ | 中 |
-| `native_evidence.py` | 非該当 | 値なしartifactの件数証拠への集約（生成） | — | — |
+| `native_evidence.py` | 該当 | 6組のCI artifactを完全一致検査し`passed`／`failed`を決める | ③ | 低 |
 | `native_validation.py` | 該当 | ネイティブ環境での配布境界の値なし検証 | ③ | 低 |
 | `parse_claude.py` | 非該当 | Claude生ログの解析 | — | — |
 | `parse_codex.py` | 非該当 | Codex exec JSONLの解析 | — | — |
@@ -217,16 +217,16 @@
 | `regeneration.py` | 該当 | 記録済み範囲からの転写再生成の照合 | ③ | 中 |
 | `repository_context.py` | 該当 | 明示Git範囲からの**安全な**要約材料収集（機微除外の境界） | ③ | 中 |
 | `schedule_backends.py` | 非該当 | OS別定期実行の共通接続（設定） | — | — |
-| `scheduler.py` | 非該当 | LaunchAgent設定（定期実行） | — | — |
+| `scheduler.py` | 該当 | launchd設定の所有物照合を行い、非所有物の有効化・解除を拒否する | ③ | 中 |
 | `source_adapter.py` | 非該当 | 2形式を1入口で解析するadapter | — | — |
 | `source_kind.py` | 非該当（要Human判定） | 生ログ種別の識別。誤識別は解析誤りに波及するが合否判定ではない | — | — |
 | `stage_gate.py` | 該当 | 第0段セッションログ完了関門の機械監査 | ③ | 中 |
 | `storage.py` | 該当 | 成果物の配置と追記専用保存（上書き拒否） | ③ | 中 |
 | `summary.py` | 非該当 | 人が読む要約の生成 | — | — |
-| `systemd_scheduler.py` | 非該当 | systemd userによる定期保全（設定） | — | — |
+| `systemd_scheduler.py` | 該当 | systemd unitの所有物照合を行い、非所有物の操作を拒否する | ③ | 中 |
 | `transcript.py` | 非該当 | 生ログの最小転写（生成） | — | — |
 | `updates.py` | 該当 | 追記専用更新と変更検知 | ③ | 中 |
-| `windows_scheduler.py` | 非該当 | Windows Task Schedulerによる定期保全（設定） | — | — |
+| `windows_scheduler.py` | 該当 | Windows task定義の所有物照合を行い、非所有物の操作を拒否する | ③ | 中 |
 
 ### 4.11 tools/task_contract（4）
 
@@ -266,16 +266,38 @@
 | `development/policy.py` | 方針の決定的評価は「他成果物の合否」でなく「進め方」を決める。§3定義に含めるか |
 | `session_logs/pipeline.py` | 統括の順序固定（保全→伏字化）を守り役と数えるか |
 | `session_logs/source_kind.py` | 種別誤識別は解析誤りへ波及するが、合否判定ではない。非該当でよいか |
+| `extraction/known_positives.py` | 材料生成だが証拠欠落時はfail-closedで失敗する。それ自体を守り役と数えるか（完了レビューv1のF2提案） |
 
 ## 7. 集計
 
-- 全133 module中、守り役**該当 82**・非該当 51（要Human判定5件は上表の暫定判定で計上）。
-- 区分①（現基準済）4件、区分②（反証歴あり）3件、区分③（後追い対象）**75件**。
-- 区分③の内訳：高19・中44・低12。
+- 全133 module中、守り役**該当 91**・非該当 42（要Human判定6件は上表の暫定判定で計上）。
+- 区分①（現基準済）4件、区分②（反証歴あり）3件、区分③（後追い対象）**84件**。
+- 区分③の内訳：高19・中50・低15。
 - 本節の数値は表からの機械集計（行数133＝§1の列挙件数と一致）で照合済み。
+- ※F1修正（§9）反映後の値。修正前は該当82・非該当51・③75（高19・中44・低12）だった。
 
 ## 8. 本recordが行わないこと
 
 個別moduleの後追いレビュー実施、code・test・既存recordの変更、優先度の確定、
 レビュー日程の計画（いずれもscope §6のとおり範囲外。優先度と要Human判定の
 確定は次のHuman裁定へ渡す）。
+
+## 9. F1修正（完了レビューv1反映）
+
+完了レビューv1（`records/session-handoffs/2026-08-10-codex-review-result-guard-backfill-inventory-v1.md`、
+commit `66ee561`、判定`report_execution_mismatch`・blocking 1件）のF1を、
+Human承認（2026-08-10「F1の修正を承認する」）に基づき本recordへ反映した。
+
+- 原因：初版の判定はmodule冒頭の説明文のみを根拠とし、公開関数の実装
+  （合否・可否を決める検証関数）まで確認していなかった。Reviewerは該当する
+  負例test 14件の機械実行（`14 passed`）で守り役実装を実証した。
+- 再分類（非該当→該当③）9件：`development/reuse_search_record.py`（中）・
+  `development/session_log_bootstrap.py`（中）・`extraction/followup_resolution.py`（低）・
+  `requirements/unified_migration.py`（低）・`session_logs/cli.py`（中）・
+  `session_logs/native_evidence.py`（低）・`session_logs/scheduler.py`（中）・
+  `session_logs/systemd_scheduler.py`（中）・`session_logs/windows_scheduler.py`（中）。
+  優先度の考え方：着手関門・照合入口・利用者環境の所有物境界は「中」、
+  完了済み段の検証や外部CI向け値なし検査は「低」。
+- F2（non-blocking）反映：`extraction/known_positives.py`を§6の要Human判定へ追加
+  （表上の暫定判定は非該当のまま）。
+- §7集計を修正後の値へ更新し、修正前の値を併記した。
