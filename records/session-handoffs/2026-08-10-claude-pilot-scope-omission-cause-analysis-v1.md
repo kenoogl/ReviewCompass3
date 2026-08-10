@@ -93,3 +93,60 @@ testが検査する）であり、1 fileの変更が連鎖しやすい。これ�
 - §5の5手順で、§1の12件の事象が**実際に事前検出できたか**を、少なくとも
   group A（pin file）とgroup B（conftest・契約record）について機械的に検証すること。
   検出できない事象があれば、対策の不足として指摘すること。
+
+## 7. 訂正（Codexレビュー反映）
+
+Codexの完了レビュー（`records/session-handoffs/2026-08-10-codex-review-result-scope-omission-cause-analysis-v1.md`、
+commit `ca747c1`、判定`report_execution_mismatch`）を受け、Human承認
+（2026-08-10「分析と規約を指摘どおり修正せよ。5手順は『巻き添え防止』に限定し、
+検査の正しさは別項目として立てよ」）に基づき本節で訂正する。**本節が§1・§2.1・§3・§5を
+再置換する。**
+
+### 7.1 §1の件数（CA-REVIEW-002）を単位ごとに分離
+
+旧「範囲の作り直し8回・実装中の停止4回」は3種の数え方を混ぜていた。次の**4つの
+別々の指標**へ分離する（いずれも守り役後追い修正4単位＝E/A/B/Cが対象）。
+
+| 指標 | 定義 | 値 | 機械抽出 |
+| --- | --- | ---: | --- |
+| a. scope改訂commit数 | 各単位のscope v2以降の`Fix scope`commit | **7** | `git log --oneline`で E:2・A:1・B:2・C:2 |
+| b. 範囲レビュー要修正回数 | scope reviewの判定が`要修正`だった回数 | **4** | egress v1・common v1・position v1・position v2 |
+| c. 完了レビューblocking件数 | 完了レビューで出たblocking finding | **3** | group A完了v1:1（F-CG-COMP-001）、group B完了v1:2（F-C1・F-C2） |
+| d. 実装中のHuman停止回数 | GREEN着手後にscope外事由で停止した回数 | **3** | group B `conftest`結線・group B契約pin・group C CRLF |
+
+以後、この4指標を混ぜて総数で語らない。
+
+### 7.2 §2.1のDigest照合test数（CA-REVIEW-003）を訂正
+
+旧「16 file」は絞り込み条件を書いていなかった。実測を次へ訂正する。
+
+- `grep -rln "read_bytes()).hexdigest()\|_sha256(" tests` → **35 file**（終了コード0）。
+  これは**fixture用のDigest計算を含む**ため、pin照合testの数ではない。
+- そのうち`assert`でpin期待値と比較する行を持つもの
+  （`grep -q "assert.*==.*expected\|_PINS\|immutable_record\|fixed_sources"`）→ **23 file**。
+- 「16」は独立再現できないため撤回する。**Digest照合を含むtestは広めに見て35、
+  pin期待値との比較を持つものは23**とする。Digest密度32/40の主張は§2.1のscriptで
+  再現し、維持する。
+
+### 7.3 §3・§4の原因帰属（CA-REVIEW-004）を共同寄与へ改める
+
+旧§3・§4は主因をPilotの手順不足に一元化していた。Codexは自らの記録も寄与したと
+認めた。次へ改める。
+
+- **Pilot側の寄与**（旧§3の1〜5）は維持する。
+- **上流Finding側の寄与**を追加する：group C判定 F-C5は対象欄を
+  `todo_update_path.py`と記したが、実処理は`todo_record_generation.py`にある
+  （対象欄の誤帰属）。group B範囲レビューv1は`conftest.py`を発見しつつ
+  「変更必須の固定値は無い」と判断し、結線を範囲へ入れなかった。
+- ただしFinding recordは実装scopeを網羅すると宣言した文書ではない。
+  したがって**Pilot要因・上流記録要因のいずれか一方を主因とは判定しない**（共同寄与）。
+- §4の「設計要因ではない」は維持する（相互監視設計は意図されたもの）。
+
+### 7.4 §5の対策（CA-REVIEW-001）を2本立てへ分離
+
+5手順は**巻き添え防止**の手順であり、**検査の正しさ**（誤った合格の残存）は防げない。
+これを混同して「全事象を事前検出できる対策」と扱わない。対策の確定形は
+裁定record `records/development/2026-08-10-scope-prescan-rule-decision-v1.md`の
+改訂版（同日）に置く。本分析は、5手順が**bのうち巻き添え型**（group Aのpin・
+group Bのconftestと契約pin・group CのCRLF所在）を事前検出できることだけを主張し、
+c（完了レビューblocking＝検査の正しさ）とREDの失敗理由は**対象外**と明記する。
