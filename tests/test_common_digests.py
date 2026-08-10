@@ -103,3 +103,122 @@ class TestModuleLaunch:
             text=True,
         )
         assert result.returncode == 0, result.stderr
+
+
+class TestJsonCompatibilityIsEnforced:
+    """F-A1反証：JSON互換でないrecordを同一Digestで合格させない。"""
+
+    def _identity(self):
+        return importlib.import_module("tools.task_contract.identity")
+
+    @pytest.mark.parametrize(
+        "document",
+        [
+            {1: "value"},
+            {"nested": {2: "value"}},
+            {"items": (1, 2)},
+            {"nested": {"items": (1, 2)}},
+            {"value": float("nan")},
+            {"value": float("inf")},
+            {"value": float("-inf")},
+            {"nested": {"value": float("nan")}},
+            {"value": {1, 2}},
+            {"value": b"bytes"},
+        ],
+    )
+    def test_non_json_compatible_document_is_rejected(self, document):
+        digests = _digests()
+        with pytest.raises(Exception) as caught:
+            digests.canonical_content_digest(document)
+        assert not isinstance(caught.value, AssertionError)
+
+    @pytest.mark.parametrize(
+        "left, right",
+        [
+            ({1: "value"}, {"1": "value"}),
+            ({"items": (1, 2)}, {"items": [1, 2]}),
+        ],
+    )
+    def test_distinct_values_never_share_a_digest(self, left, right):
+        digests = _digests()
+        try:
+            left_digest = digests.canonical_content_digest(left)
+        except Exception:
+            return
+        right_digest = digests.canonical_content_digest(right)
+        assert left_digest != right_digest
+
+    def test_seal_rejects_non_json_compatible_record(self):
+        identity = self._identity()
+        document = {
+            "record_kind": "requirement_binding",
+            "record_id": "RB-1",
+            "record_version": 1,
+            "items": (1, 2),
+        }
+        with pytest.raises(identity.ContractError):
+            identity.seal(document)
+
+    def test_validate_record_rejects_non_json_compatible_record(self):
+        identity = self._identity()
+        document = {
+            "record_kind": "requirement_binding",
+            "record_id": "RB-1",
+            "record_version": 1,
+            "value": float("nan"),
+            "content_digest": "0" * 64,
+        }
+        with pytest.raises(identity.ContractError):
+            identity.validate_record(document)
+
+    def test_canonical_bytes_rejects_non_json_compatible_value(self):
+        identity = self._identity()
+        with pytest.raises(identity.ContractError):
+            identity.canonical_bytes({"items": (1, 2)})
+
+
+class TestExistingDigestValuesAreUnchanged:
+    """正例：JSON互換な既存recordのDigest値は修正前と一致する。"""
+
+    @pytest.mark.parametrize(
+        "document",
+        [
+            {"b": 1, "a": [1, {"z": None}], "content_digest": "x", "た": "文"},
+            {"値": "文字列", "flag": True, "none": None, "num": 1, "real": 1.5},
+            {"nested": {"list": [1, "a", None, False]}},
+        ],
+    )
+    def test_known_documents_keep_their_digest(self, document):
+        digests = _digests()
+        oracle = hashlib.sha256(
+            json.dumps(
+                {
+                    key: value
+                    for key, value in document.items()
+                    if key != "content_digest"
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+        assert digests.canonical_content_digest(document) == oracle
+
+    def test_real_ledger_records_keep_their_digest(self):
+        """実台帳の代表recordが、修正後も宣言Digestと一致し続ける。"""
+        digests = _digests()
+        root = PROJECT_ROOT / "records" / "development"
+        checked = 0
+        for path in sorted(root.glob("*.json"))[:200]:
+            try:
+                document = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if not isinstance(document, dict):
+                continue
+            declared = document.get("content_digest")
+            if not isinstance(declared, str) or len(declared) != 64:
+                continue
+            assert digests.canonical_content_digest(document) == declared, path
+            checked += 1
+        assert checked >= 1

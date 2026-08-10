@@ -7,6 +7,8 @@ promotion_required: true
 
 import importlib
 import json
+import os
+import unicodedata
 
 import pytest
 
@@ -94,3 +96,57 @@ class TestPrintJson:
         output = _common("output")
         module = importlib.import_module(module_name)
         assert getattr(module, attribute) is output.print_json
+
+
+class TestWithinHandlesPathAliases:
+    """F-A2反証：case差・Unicode正規化差だけの実在pathをroot外と誤判定しない。"""
+
+    def _paths(self):
+        return importlib.import_module("tools.common.paths")
+
+    def test_case_alias_matches_samefile(self, tmp_path):
+        paths = self._paths()
+        root = tmp_path / "Root"
+        root.mkdir()
+        alias = tmp_path / "root"
+        if not os.path.exists(alias):
+            pytest.skip("case-insensitive filesystem is required")
+        assert os.path.samefile(alias, root) is True
+        assert paths.within(alias, root) is True
+
+    def test_unicode_form_alias_matches_samefile(self, tmp_path):
+        paths = self._paths()
+        composed = tmp_path / unicodedata.normalize("NFC", "ガ")
+        composed.mkdir()
+        decomposed = tmp_path / unicodedata.normalize("NFD", "ガ")
+        if not os.path.exists(decomposed):
+            pytest.skip("unicode-normalising filesystem is required")
+        assert os.path.samefile(decomposed, composed) is True
+        assert paths.within(decomposed, composed) is True
+
+    def test_child_under_case_alias_is_inside(self, tmp_path):
+        paths = self._paths()
+        root = tmp_path / "Root"
+        root.mkdir()
+        child = root / "inner.txt"
+        child.write_text("x", encoding="utf-8")
+        alias_child = tmp_path / "root" / "inner.txt"
+        if not os.path.exists(alias_child):
+            pytest.skip("case-insensitive filesystem is required")
+        assert paths.within(alias_child, root) is True
+
+    def test_outside_path_is_still_rejected(self, tmp_path):
+        paths = self._paths()
+        root = tmp_path / "root"
+        root.mkdir()
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        assert paths.within(outside, root) is False
+        assert paths.within(tmp_path, root) is False
+
+    def test_missing_path_falls_back_to_resolved_comparison(self, tmp_path):
+        paths = self._paths()
+        root = tmp_path / "root"
+        root.mkdir()
+        assert paths.within(root / "absent" / "file.txt", root) is True
+        assert paths.within(tmp_path / "absent-outside.txt", root) is False
