@@ -108,7 +108,11 @@ def cut_code_fragment(repository_root, code_reference):
 
 
 def verify_fragment_provenance(repository_root, fragment):
-  """断片が現在のfile内容から機械切り出しされたものと一致するかを照合する。"""
+  """断片が現在のfile内容から機械切り出しされたものと一致するかを照合する。
+
+  申告Digestだけでなく本文そのものを再切出し結果と突き合わせる。
+  Digestを元のまま残して本文だけをsource外の文字列へ差し替えたものは通らない。
+  """
   recut = cut_code_fragment(
     repository_root,
     {
@@ -117,7 +121,13 @@ def verify_fragment_provenance(repository_root, fragment):
       "end_line": fragment.end_line,
     },
   )
-  if recut.content_sha256 != fragment.content_sha256:
+  if (
+    recut.content != fragment.content
+    or recut.content_sha256 != fragment.content_sha256
+    or hashlib.sha256(
+      fragment.content.encode("utf-8")
+    ).hexdigest() != fragment.content_sha256
+  ):
     raise PayloadError(
       "fragment no longer matches its source: "
       f"{fragment.relative_path} {fragment.start_line}-{fragment.end_line}"
@@ -157,7 +167,8 @@ def resolve_question(question_id):
   return QUESTION_TEMPLATES[question_id]
 
 
-def _fragment_document(fragment):
+def fragment_document(fragment):
+  """断片の正準表現。送信JSONとpayload fieldの相互照合に用いる。"""
   return {
     "relative_path": fragment.relative_path,
     "start_line": fragment.start_line,
@@ -165,6 +176,28 @@ def _fragment_document(fragment):
     "content": fragment.content,
     "content_sha256": fragment.content_sha256,
   }
+
+
+_fragment_document = fragment_document
+
+
+def machine_feature_violations(features):
+  """機械特徴量のfield名と値の型・列挙を検査し、違反の一覧を返す。"""
+  if not isinstance(features, dict):
+    return ["machine features must be a mapping"]
+  violations = []
+  for field, value in sorted(features.items()):
+    if field not in MACHINE_FEATURE_ALLOWLIST:
+      violations.append(f"{field} is outside the allowlist")
+      continue
+    allowed_enum = _ENUM_FEATURE_VALUES.get(field)
+    if allowed_enum is not None:
+      if value not in allowed_enum:
+        violations.append(f"{field} has a non-enumerated value")
+      continue
+    if isinstance(value, bool) or not isinstance(value, int):
+      violations.append(f"{field} must be an integer")
+  return violations
 
 
 def build_pair_payload(

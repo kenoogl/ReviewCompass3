@@ -16,7 +16,7 @@ import json
 import os
 import re
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -32,11 +32,18 @@ _SECRET_PATTERNS = (
   re.compile(r"\b(?:token|password|passwd|secret)\s*[:=]\s*\S+", re.I),
   re.compile(r"\bBearer\s+[A-Za-z0-9._~+/=-]{16,}", re.I),
   re.compile(r"\bsk-[A-Za-z0-9_-]{8,}"),
+  # Human承認（2026-08-10）：資格情報3形式を走査対象へ追加する。
+  re.compile(r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b"),
+  re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}"),
+  re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----"),
 )
 _EMAIL_PATTERN = re.compile(
   r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
 )
 _PHONE_PATTERN = re.compile(r"\+?\d[\d ()-]{8,}\d")
+# Human承認（2026-08-10）：64桁hex（Digest表現）は個人識別子判定の対象外。
+# Digestは全payloadへ構造上必ず現れるため、除外しないと正常な送信が止まる。
+_DIGEST_HEX_PATTERN = re.compile(r"\b[0-9a-fA-F]{64}\b")
 
 
 def payload_list_digest(digests):
@@ -53,7 +60,8 @@ def scan_outbound_text(text):
   if _EMAIL_PATTERN.search(text):
     findings.append("personal identifier (email) detected in outbound text")
   else:
-    for match in _PHONE_PATTERN.finditer(text):
+    without_digests = _DIGEST_HEX_PATTERN.sub(" ", text)
+    for match in _PHONE_PATTERN.finditer(without_digests):
       if len(re.sub(r"\D", "", match.group(0))) >= 10:
         findings.append(
           "personal identifier (phone) detected in outbound text"
@@ -81,9 +89,12 @@ def validate_approval_record(
   provider,
   model,
   purpose,
-  now,
 ):
-  """承認recordの7項目を照合する。一つでも合わなければApprovalError。"""
+  """承認recordの7項目を照合する。一つでも合わなければApprovalError。
+
+  有効期限はcallerが渡す時刻ではなく実時刻で判定する（過去時刻の注入で
+  期限切れrecordを合格させられないため）。
+  """
   if not isinstance(record, dict):
     raise ApprovalError("approval record must be a mapping")
   errors = []
@@ -98,10 +109,9 @@ def validate_approval_record(
   if record.get("model") != model:
     errors.append("model mismatch")
   expires_at = _parse_expiry(record.get("expires_at"))
-  reference = _parse_expiry(now)
-  if expires_at is None or reference is None:
+  if expires_at is None:
     errors.append("expires_at must be a timezone-aware ISO datetime")
-  elif expires_at <= reference:
+  elif expires_at <= datetime.now(timezone.utc):
     errors.append("approval record is expired")
   if (
     record.get("purpose") not in APPROVED_PURPOSES
@@ -118,12 +128,57 @@ def validate_approval_record(
     )
   ):
     errors.append("material_policy must enable all three protections")
-  if record.get("consumed") is True:
+  consumed = record.get("consumed")
+  if not isinstance(consumed, bool):
+    errors.append("consumed must be present and boolean")
+  elif consumed:
     errors.append("approval record is already consumed")
   if errors:
     raise ApprovalError(
       "approval validation failed: " + "; ".join(errors)
     )
+
+
+def load_approval_file(
+  record_path,
+  *,
+  sha256,
+  payload_list_digest,
+  provider,
+  model,
+  purpose,
+):
+  """Human作成の承認record fileを読み、path＋SHA-256で束縛して検証する。
+
+  一時辞書やcaller生成の値は承認として通らない。
+  """
+  path = Path(record_path)
+  try:
+    raw = path.read_bytes()
+  except OSError as error:
+    raise ApprovalError(
+      f"approval record file is unreadable: {path}"
+    ) from error
+  if not isinstance(sha256, str) or hashlib.sha256(
+    raw
+  ).hexdigest() != sha256:
+    raise ApprovalError(
+      f"approval record file does not match its declared digest: {path}"
+    )
+  try:
+    record = json.loads(raw.decode("utf-8"))
+  except (UnicodeDecodeError, ValueError) as error:
+    raise ApprovalError(
+      f"approval record file is not valid JSON: {path}"
+    ) from error
+  validate_approval_record(
+    record,
+    payload_list_digest=payload_list_digest,
+    provider=provider,
+    model=model,
+    purpose=purpose,
+  )
+  return record
 
 
 def _claim_path(record_path):

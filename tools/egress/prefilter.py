@@ -11,6 +11,7 @@ promotion_required: true
 """
 
 import dataclasses
+import math
 import re
 
 
@@ -54,6 +55,38 @@ DEFAULT_THRESHOLDS = Thresholds(
   name_weight=0.2,
   feature_weight=0.2,
 )
+
+
+def _validate_thresholds(thresholds):
+  """閾値と重みがHuman承認済みの形（有限・範囲内・重み合計1）であることを検査する。
+
+  非有限値は比較が常に偽になり、既定の分類を迂回できるためfail-closedで拒否する。
+  """
+  if not isinstance(thresholds, Thresholds):
+    raise PrefilterError("thresholds must be a Thresholds value")
+  values = {
+    "same_min": thresholds.same_min,
+    "diff_max": thresholds.diff_max,
+    "body_weight": thresholds.body_weight,
+    "name_weight": thresholds.name_weight,
+    "feature_weight": thresholds.feature_weight,
+  }
+  for name, value in values.items():
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+      raise PrefilterError(f"threshold {name} must be a number")
+    if not math.isfinite(value):
+      raise PrefilterError(f"threshold {name} must be finite")
+    if not 0.0 <= value <= 1.0:
+      raise PrefilterError(f"threshold {name} must be within 0..1")
+  if not thresholds.diff_max < thresholds.same_min:
+    raise PrefilterError("diff_max must be below same_min")
+  weight_sum = (
+    thresholds.body_weight
+    + thresholds.name_weight
+    + thresholds.feature_weight
+  )
+  if abs(weight_sum - 1.0) > 1e-9:
+    raise PrefilterError("weights must sum to 1")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -139,6 +172,7 @@ def classify_pair(
   thresholds=DEFAULT_THRESHOLDS,
 ):
   """組を3帯に分類する。外部送信の対象は「曖昧」帯のみである。"""
+  _validate_thresholds(thresholds)
   body_similarity = jaccard(
     identifier_tokens(code_a), identifier_tokens(code_b)
   )

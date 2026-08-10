@@ -10,7 +10,7 @@ normative_status: non-normative
 promotion_required: true
 """
 
-from tools.egress.gate import run_egress_gate
+from tools.egress.gate import APPROVED_REDACTION_HOOK, run_egress_gate
 
 
 class EgressGateRefusal(Exception):
@@ -25,25 +25,35 @@ def build_stage_one_runner(
   *,
   repository_root,
   approved_payload_digests,
-  approval_record,
+  approval_record_path,
+  approval_record_sha256,
   provider,
   model,
   redaction_hook,
-  now,
   size_limit_kb=None,
 ):
-  """関門つきrunnerを作る。段階1では関門合格でも送信しない。"""
+  """関門つきrunnerを作る。段階1では関門合格でも送信しない。
+
+  許可実装でないcallbackは、関門へ渡す前に拒否する（実行しない）。
+  """
 
   def runner(assignment, payload):
+    if redaction_hook is not None and (
+      redaction_hook is not APPROVED_REDACTION_HOOK
+    ):
+      raise EgressGateRefusal(
+        "伏字化hookが許可実装ではない（実行せず停止・外部送信せず停止）\n"
+        "復旧: gate.APPROVED_REDACTION_HOOKだけを渡す"
+      )
     arguments = {
       "payload": payload,
       "repository_root": repository_root,
       "approved_payload_digests": approved_payload_digests,
-      "approval_record": approval_record,
+      "approval_record_path": approval_record_path,
+      "approval_record_sha256": approval_record_sha256,
       "provider": provider,
       "model": model,
       "redaction_hook": redaction_hook,
-      "now": now,
     }
     if size_limit_kb is not None:
       arguments["size_limit_kb"] = size_limit_kb

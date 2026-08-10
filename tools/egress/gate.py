@@ -17,19 +17,34 @@ import json
 
 from tools.egress.approval import (
   ApprovalError,
+  load_approval_file,
   payload_list_digest,
   scan_outbound_text,
-  validate_approval_record,
 )
 from tools.egress.payload import (
   MACHINE_FEATURE_ALLOWLIST,
   EgressPayload,
   PayloadError,
+  fragment_document,
+  machine_feature_violations,
   resolve_question,
   verify_fragment_provenance,
 )
+from tools.session_logs.redaction import default_pattern_rules, redact_text
 
 DEFAULT_SIZE_LIMIT_KB = 45
+
+
+def approved_redaction_hook(text):
+  """段階1で許可される唯一の伏字化実装（出口設計v4 §8）。
+
+  caller注入の任意callbackは実行しない。合格の根拠にはせず、
+  内容が変わった場合は「本来入らない物が入っていた兆候」として拒否する。
+  """
+  return redact_text(text, default_pattern_rules()).text
+
+
+APPROVED_REDACTION_HOOK = approved_redaction_hook
 
 _EXPECTED_CONTENT_KEYS = frozenset({
   "schema_version",
@@ -54,14 +69,18 @@ def run_egress_gate(
   payload,
   repository_root,
   approved_payload_digests,
-  approval_record,
+  approval_record_path,
+  approval_record_sha256,
   provider,
   model,
   redaction_hook,
-  now,
   size_limit_kb=DEFAULT_SIZE_LIMIT_KB,
 ):
-  """条件1〜6・8を検査する。全て合格のときだけallowed。"""
+  """条件1〜6・8を検査する。全て合格のときだけallowed。
+
+  承認はHuman作成record file（path＋SHA-256）で渡す。辞書は受け取らない。
+  伏字化hookは許可実装だけを受け付け、それ以外は**実行せず**拒否する。
+  """
   reasons = []
   recovery = []
 
@@ -108,14 +127,29 @@ def run_egress_gate(
         "問いが承認済みtemplateの定型文と一致しない",
         "resolve_questionの定型文だけを用いて組み立て直す",
       )
-    for side in ("machine_features_a", "machine_features_b"):
+    for side, expected_features in (
+      ("machine_features_a", payload.machine_features_a),
+      ("machine_features_b", payload.machine_features_b),
+    ):
       features = document.get(side)
-      if not isinstance(features, dict) or not (
-        set(features) <= set(MACHINE_FEATURE_ALLOWLIST)
-      ):
+      if machine_feature_violations(features):
         block(
-          f"{side}にallowlist外のfieldが含まれる",
+          f"{side}にallowlist外のfieldまたは型違反の値が含まれる",
           "build_machine_featuresだけを用いて組み立て直す",
+        )
+      elif features != expected_features:
+        block(
+          f"{side}が送信JSONとpayload fieldで一致しない",
+          "build_pair_payloadで組み立て直す",
+        )
+    for side, expected_fragment in (
+      ("fragment_a", payload.fragment_a),
+      ("fragment_b", payload.fragment_b),
+    ):
+      if document.get(side) != fragment_document(expected_fragment):
+        block(
+          f"{side}が送信JSONとpayload fieldで一致しない（自由文混入の兆候）",
+          "build_pair_payloadで組み立て直す",
         )
 
   for fragment in (payload.fragment_a, payload.fragment_b):
@@ -134,13 +168,13 @@ def run_egress_gate(
       "dry-runで一覧を再生成し、Humanの一覧承認を得る",
     )
   try:
-    validate_approval_record(
-      approval_record,
+    load_approval_file(
+      approval_record_path,
+      sha256=approval_record_sha256,
       payload_list_digest=payload_list_digest(approved),
       provider=provider,
       model=model,
       purpose="implementation_sameness_judgment",
-      now=now,
     )
   except ApprovalError as error:
     block(str(error), "承認recordを確認し、必要ならHumanの承認を取り直す")
@@ -149,6 +183,11 @@ def run_egress_gate(
     block(
       "伏字化が適用されていない",
       "伏字化hookを結線して再実行する（合格を送信根拠にはしない）",
+    )
+  elif redaction_hook is not APPROVED_REDACTION_HOOK:
+    block(
+      "伏字化hookが許可実装ではない（実行せず拒否）",
+      "gate.APPROVED_REDACTION_HOOKだけを渡す。任意callbackは段階1で実行しない",
     )
   else:
     masked = redaction_hook(payload.content)
