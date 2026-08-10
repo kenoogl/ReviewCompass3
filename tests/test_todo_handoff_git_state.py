@@ -151,3 +151,99 @@ def test_cli_returns_failure_when_compaction_rejects_git_stable_todo(
     output = capsys.readouterr().out
     assert '"status": "failed"' in output
     assert "TODO exceeds 12288 bytes" in output
+
+
+class TestGitFieldForgeryIsRejected:
+    """F-C1・F-C2反証：SHA表記・branch・欄境界の別表現で検査を逃げられない。"""
+
+    def _document(self, *, branch="main", extra_lines=(), heading="## Git・Test"):
+        lines = [
+            "# TODO_NEXT_SESSION",
+            "",
+            heading,
+            "",
+            f"- branch：`{branch}`",
+            "- commit境界：本handoffを含むcommit完了時点",
+            "- Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する",
+            "- worktree：本handoffを含むcommit完了時点でclean",
+            "- 直近の全Test：`490 passed`",
+        ]
+        lines.extend(extra_lines)
+        lines.extend(["", "## 更新規則", ""])
+        return "\n".join(lines)
+
+    def _validate(self, document, *, current_branch="main"):
+        return _module().validate_commit_stable_git_section(
+            document, current_branch=current_branch
+        )
+
+    def test_baseline_document_passes(self):
+        result = self._validate(self._document())
+        assert result.status == "passed"
+        assert result.findings == ()
+
+    def test_short_lowercase_sha_snapshot_is_rejected(self):
+        """H1：4文字SHAでも自己snapshotとして拒否する。"""
+        result = self._validate(
+            self._document(extra_lines=["- 直近commit：`a1b2`"])
+        )
+        assert result.status == "failed"
+        assert "self_commit_sha_snapshot" in result.findings
+
+    def test_uppercase_forty_character_sha_snapshot_is_rejected(self):
+        """H2：大文字40文字SHAでも拒否する。"""
+        result = self._validate(
+            self._document(extra_lines=["- 直近commit：`" + "A1B2C3D4" * 5 + "`"])
+        )
+        assert result.status == "failed"
+        assert "self_commit_sha_snapshot" in result.findings
+
+    def test_branch_mismatch_is_rejected(self):
+        """H3：実Gitの現在branchと異なる記載を拒否する。"""
+        result = self._validate(
+            self._document(branch="feature/x"), current_branch="main"
+        )
+        assert result.status == "failed"
+        assert "branch_mismatch" in result.findings
+
+    def test_matching_branch_passes(self):
+        result = self._validate(
+            self._document(branch="work"), current_branch="work"
+        )
+        assert result.status == "passed"
+
+    def test_trailing_space_heading_variant_is_counted(self):
+        """H4：末尾空白付きの別名見出しも同じ節として数える。"""
+        document = self._document() + "\n## Git・Test \n\n- 直近commit：`a1b2c3d`\n"
+        result = self._validate(document)
+        assert result.status == "failed"
+        assert (
+            "git_section_duplicated" in result.findings
+            or "self_commit_sha_snapshot" in result.findings
+        )
+
+    def test_alternative_git_section_heading_is_counted(self):
+        """H5：別のGit状態節へ逃がした可変状態も検査対象にする。"""
+        document = self._document() + "\n## Git状態\n\n- 直近commit：`a1b2c3d`\n"
+        result = self._validate(document)
+        assert result.status == "failed"
+
+    def test_unicode_space_line_is_normalised(self):
+        """H6：全角空白等の非正規行で必須文の行構造を逃げられない。"""
+        lines = [
+            "# TODO_NEXT_SESSION",
+            "",
+            "## Git・Test",
+            "",
+            "- branch：`main`",
+            "-　commit境界：本handoffを含むcommit完了時点",
+            "- Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する",
+            "- worktree：本handoffを含むcommit完了時点でclean",
+            "- 直近commit：`a1b2c3d`",
+            "",
+            "## 更新規則",
+            "",
+        ]
+        result = self._validate("\n".join(lines))
+        assert result.status == "failed"
+        assert "self_commit_sha_snapshot" in result.findings

@@ -790,3 +790,98 @@ def test_cli_reports_a_second_run_exception_as_a_stop(update_path, tmp_path, cap
     assert "Traceback" not in captured.out
     assert len(calls) == 2
     assert todo.read_bytes() == before
+
+
+class TestSecondReceiptIsVerified:
+    """F-C3・F-C4・F-C5反証：二段確認の偽造・差替え・改行破壊を許さない。"""
+
+    def _module(self):
+        import importlib
+
+        return importlib.import_module("tools.development.todo_update_path")
+
+    def _receipt(self, **overrides):
+        receipt = {
+            "receipt_kind": "policy_test_verification_run",
+            "runner_id": "RC3-DEVELOPMENT-TEST-RUNNER",
+            "suite": "full",
+            "python_version": "3.9.6",
+            "pytest_version": "8.4.2",
+            "fallback_used": False,
+            "status": "passed",
+            "exit_code": 0,
+            "test_summary": {
+                "passed": 10, "failed": 0, "skipped": 0, "xfailed": 0,
+                "xpassed": 0, "errors": 0, "total": 10,
+            },
+        }
+        receipt.update(overrides)
+        return receipt
+
+    def test_unknown_receipt_kind_is_rejected(self):
+        """U1：未知kindの第2receiptを受理しない。"""
+        module = self._module()
+        with pytest.raises(module.TodoUpdatePathError):
+            module.compare_receipts(
+                self._receipt(), self._receipt(receipt_kind="forged")
+            )
+
+    def test_nonzero_exit_code_is_rejected(self):
+        """U1：exit code 9の第2receiptを受理しない。"""
+        module = self._module()
+        with pytest.raises(module.TodoUpdatePathError):
+            module.compare_receipts(self._receipt(), self._receipt(exit_code=9))
+
+    def test_boolean_and_integer_are_not_equal(self):
+        """U1：`False == 0`や整数同値の浮動小数を一致としない。"""
+        module = self._module()
+        with pytest.raises(module.TodoUpdatePathError):
+            module.compare_receipts(
+                self._receipt(), self._receipt(fallback_used=0)
+            )
+        forged = self._receipt()
+        summary = dict(forged["test_summary"])
+        summary["passed"] = 10.0
+        with pytest.raises(module.TodoUpdatePathError):
+            module.compare_receipts(
+                self._receipt(), self._receipt(test_summary=summary)
+            )
+
+    def test_matching_receipts_still_compare_equal(self):
+        module = self._module()
+        assert module.compare_receipts(self._receipt(), self._receipt()) is True
+
+    def test_todo_swapped_after_verification_is_detected(
+        self, tmp_path, monkeypatch
+    ):
+        """U3：確認後にTODOを差し替えても確定させない。
+
+        候補生成は本反証の対象ではないため差し替え、`run_two_phase_update`の
+        transaction境界だけを検査する（別理由での失敗と取り違えない）。
+        """
+
+        module = self._module()
+        generation = importlib.import_module(
+            "tools.development.todo_record_generation"
+        )
+        todo_path = tmp_path / "TODO_NEXT_SESSION.md"
+        todo_path.write_bytes(b"original\n")
+        candidate = b"candidate\n"
+        monkeypatch.setattr(
+            generation, "build_todo_candidate", lambda **kwargs: candidate
+        )
+        receipts = iter([self._receipt(), self._receipt()])
+
+        def run_official_tests(phase):
+            if phase == "second":
+                todo_path.write_bytes(b"swapped after verification\n")
+            return next(receipts)
+
+        with pytest.raises(module.TodoUpdatePathError):
+            module.run_two_phase_update(
+                project_root=tmp_path,
+                todo_path=todo_path,
+                run_official_tests=run_official_tests,
+                verify=lambda path, root: True,
+            )
+        assert todo_path.read_bytes() == b"original\n"
