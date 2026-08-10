@@ -6,8 +6,8 @@
 
 ## 現在位置
 
-- 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続が完了。Work 7Aは4種root分離と第2項の前駆sliceまで完了し、deferred #7のテストfixture重複共通化、deferred #5のauthority参照Digest検査器、deferred #1のV4 Issue resolve toolも独立レビュー済みで完了した。
-- 現在作業：deferred #1はtargeted 24件、関連67件、公式全1381件と独立反証4系統の確認を経てverified / completed。着手承認済みの進行待ち行列は#6（守り役後追いレビュー）のみ。#2・#3・#4は保留継続であり、現在は本線のHuman行き先指示待ち。Work 7A第2項checkbox全体は未完了。
+- 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続が完了。Work 7Aは4種root分離と第2項の前駆sliceまで完了し、deferred #7、#5、#1に加えて、deferred #6第1単位の守り役後追いレビュー対象一覧も独立レビュー済みで完了した。
+- 現在作業：deferred #6第1単位は、一覧record commit 68a659dと完了レビューv2 commit 0768a9fによりverified / completed。全133 moduleを網羅し、後追い対象84件（高19・中50・低15）と要Human判定6件を固定した。次はHuman裁定待ちで、個別後追いレビューは未着手。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,44 +16,39 @@
 
 ## 最新のauthority／Evidence
 
-- [V4 Issue resolve tool 再レビューresult v2](records/session-handoffs/2026-08-10-codex-review-result-issue-resolution-v4-v2.md) — SHA-256 `0f53e5527772f8d74fec7c71a420c07c2e2155951be070423ff87ac70e157bd5`
-- [V4 Issue resolve tool GREEN Evidence](records/development/2026-08-10-issue-resolution-v4-green-evidence-v1.md) — SHA-256 `35d38a4a4b80ef7e44aa92719f2b3fa3f3a24fe786b303077a09f9466c4dc525`
-- [V4 Issue resolve tool 公式全Test receipt](records/development/2026-08-10-issue-resolution-v4-green-test-receipt-v1.json) — SHA-256 `1f351b652e45722c4c64932841baa6957caae3d421fb2c1b7a53e1ea7544d006`
+- [守り役後追いレビュー対象一覧 完了レビューv2](records/session-handoffs/2026-08-10-codex-review-result-guard-backfill-inventory-v2.md) — SHA-256 `bc6359f81c5e5522cb3a5bc36f8a8c48166d8f7ca0ebdba87df501fc3bb46ed4`
+- [守り役code後追いレビュー対象一覧 v1](records/development/2026-08-10-guard-code-backfill-review-inventory-v1.md) — SHA-256 `77b6ba9fc0bfd7ea17e071dc4e4df59e12f84f4a7d23798dedafe58b6ea6571e`
+- [deferred #6第1単位 範囲固定 v1](records/session-handoffs/2026-08-10-claude-pilot-guard-backfill-inventory-scope-v1.md) — SHA-256 `b81ecaacfbe866719e25cb35764cd4754092d72ad55af63c83b7c429b6567204`
 - [Deferred項目の仕分け裁定 v1](records/development/2026-08-09-deferred-items-triage-decision-v1.md) — SHA-256 `0171453f6025451d955b1dc08083ed06d2ccc28e8f110a3bb951ff97c48e3c91`
-- [Work 7A checkout relocation 前駆slice Completion Evidence](records/development/2026-08-09-work7a-checkout-relocation-precursor-completion-evidence-v1.md) — SHA-256 `2a2e3752d5b91b672786549e1f7f93d40838bade06f56d4d1c170b63a240dcfd`
-- [Work 7A checkout relocation 独立review result v3](records/session-handoffs/2026-08-09-codex-review-result-work7a-checkout-relocation-v3.md) — SHA-256 `ec30754f1ff8d6e06b791b1be78c58dd558e1966b80c34716807b15c0d497a3c`
-- [Work 7A第2項 前駆slice scope v2](records/session-handoffs/2026-08-09-claude-pilot-work7a-checkout-relocation-scope-v2.md) — SHA-256 `f127351d05bc621af95a042506dc726790ca59ecc928cec4c34257ee23d473a8`
-- [Layout Baseline v3承認Decision](records/development/2026-08-04-layout-baseline-v3-project-first-approval-decision.json) — SHA-256 `793be4403d37806b41696031abf6576c98bc2047f28574e0792d3c6ab8ae6275`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
 - [V4 resolution永続化gap 改善候補](.reviewcompass/workflow/improvement-candidates/ic-v4-issue-resolution-persistence-gap-001--v1.json) — SHA-256 `90fad5def3a731f27c4c320a3074808bb170323b8661fdea46140cbbdbf2c231`
 
 ## 次に行う一作業
 
-Work 7A第2項の後続slice。Project Bindingを承認済みstorage shapeへ耐久保存し、project移動・別checkoutからidentityを照合して復元できることをTDDで固定する。
+deferred #6の後続方針について、Humanが一覧recordの提案を裁定する。
 
 開始条件：
 
-- Humanの着手指示
-- 前駆slice Completion Evidence、独立review result v3、Layout v3のProject Binding authorityを固定入力にして新しいscopeを作ること
-- 守り役codeとしてrisk highの範囲レビューを行い、Human再開承認までREDを開始しないこと
+- 一覧record commit 68a659d、完了レビューv2 commit 0768a9f、範囲固定 commit b1f96dcを固定入力として参照すること
+- 裁定が固定されるまで、個別moduleの後追いレビュー、code・test・既存recordの変更を開始しないこと
 
 完了条件：
 
-- state_root/projects/<project_id>/bindings/<binding_id>.jsonの承認済みshapeへBindingをDigest付きで保存し、project移動・別checkoutから安全に復元する正例・負例・境界Testを固定すること
-- 耐久Bindingの改竄・identity不一致・欠落をfail-closedに拒否し、独立レビューでverifiedになること
-- Verification Run復元とWork 7A第2項checkbox完了は後続へ残すこと
+- 後追い対象84件の優先度を確定すること
+- 実施対象を選定すること
+- 要Human判定6件を判定すること
 
-後続作業：Work 7A第2項のVerification Run復元sliceへ進む。
+後続作業：Humanが選定した実施対象について、別の範囲固定と着手指示を得て後追いレビューへ進む。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。進行待ち行列は#6のみで、本線を阻害しない。
-- Human判断待ち：Project Binding耐久保存・復元sliceへの着手指示。行き先変更も可。
+- blocker：技術上のblockerはなし。後続の個別レビューはHuman裁定まで開始しない
+- Human判断待ち：後追い対象84件の優先度確定、実施対象の選定、要Human判定6件の判定
 
 ## stale・deferred
 
 - stale：Work 7A第2項を単一sliceで完了する旧projectionは、Human裁定「分割案1」と前駆sliceのverified Completion Evidenceにより置換済み。
-- deferred：#2 C／Dの扱い、#3 既存保全データへの遡及適用、#4 原子的filesystem競合防止は保留継続。authority参照Digest検査器の実docsへの適用・修復は未実施でHuman判断待ち。`ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001`や`ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`等の実Issueのresolveも未実施のままであり、toolのverified後にHuman裁定を得て別作業単位で行う。
+- deferred：#2 C／Dの扱い、#3既存保全データへの遡及適用、#4原子的filesystem競合防止は保留継続。Work 7A第2項の後続slice、authority参照Digest検査器の実docsへの適用・修復、既存IssueのresolveもHuman判断待ち
 
 ## Git・Test
 
@@ -61,8 +56,8 @@ Work 7A第2項の後続slice。Project Bindingを承認済みstorage shapeへ耐
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：V4 Issue resolve tool targeted 24 passed、関連67 passed、独立反証4系統を期待どおり拒否
-- 直近の全Test：Reviewer独立実行のvenv公式runner 1381 passed、Python 3.9.6、pytest 8.4.2、fallback false
+- 直近の関連Test：完了レビューv2でF1負例14件がpassed。全133件、後追い84件、要Human判定6件の再集計が一覧recordと一致
+- 直近の全Test：直近のReviewer独立実行では公式runner 1381 passed、Python 3.9.6、pytest 8.4.2、fallback false
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
