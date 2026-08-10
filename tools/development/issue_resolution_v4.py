@@ -26,7 +26,16 @@ from tools.development import issue_intake_v4 as intake
 
 
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
+_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2}$")
 _RECORDS_PREFIX = "records/development/"
+_RULING_FIELDS = {
+    "decision_maker",
+    "human_id",
+    "decided_at",
+    "issue_id",
+    "target_state",
+    "wording",
+}
 
 
 class ResolutionError(Exception):
@@ -73,12 +82,21 @@ def _parse_evidence(items, project_root):
     return references
 
 
-def _verify_ruling(project_root, relative, sha256_value, human_id, decided_at):
+def _verify_ruling(
+    project_root,
+    relative,
+    sha256_value,
+    human_id,
+    decided_at,
+    issue_id,
+    target_state,
+):
+    """裁定recordの構造化束縛（scope v3 §2）。file同一性だけでは合格させない。"""
+
     if (
         not isinstance(human_id, str)
         or not human_id.strip()
-        or not isinstance(decided_at, str)
-        or not decided_at.strip()
+        or _TIMESTAMP.fullmatch(decided_at or "") is None
     ):
         raise ResolutionError("human_ruling_invalid")
     _safe_relative(relative, "human_ruling_invalid")
@@ -88,6 +106,22 @@ def _verify_ruling(project_root, relative, sha256_value, human_id, decided_at):
     if not file.is_file():
         raise ResolutionError("human_ruling_invalid")
     if hashlib.sha256(file.read_bytes()).hexdigest() != sha256_value:
+        raise ResolutionError("human_ruling_invalid")
+    try:
+        document = json.loads(file.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        raise ResolutionError("human_ruling_invalid") from None
+    if (
+        not isinstance(document, dict)
+        or set(document) != _RULING_FIELDS
+        or document["decision_maker"] != "human"
+        or document["human_id"] != human_id
+        or document["decided_at"] != decided_at
+        or document["issue_id"] != issue_id
+        or document["target_state"] != target_state
+        or not isinstance(document["wording"], str)
+        or not document["wording"].strip()
+    ):
         raise ResolutionError("human_ruling_invalid")
     return {"path": relative, "sha256": sha256_value}
 
@@ -140,6 +174,20 @@ def _write_json_bytes(document):
     ).encode("utf-8")
 
 
+def _atomic_write(path, data, stop_code):
+    """一時file＋原子的置換で書く。失敗時は対象を変えず残骸も残さない。"""
+
+    temporary = path.with_name(path.name + ".tmp")
+    try:
+        temporary.write_bytes(data)
+        temporary.replace(path)
+    except OSError:
+        temporary.unlink(missing_ok=True)
+        raise ResolutionError(stop_code) from None
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def resolve_issue(
     *,
     config_path,
@@ -164,7 +212,15 @@ def resolve_issue(
         raise ResolutionError("config_invalid") from None
     issue_file, original_bytes, record = _load_issue(root, issue_path, config)
     updated = _transition(record, target_state, config)
-    ruling = _verify_ruling(root, ruling_path, ruling_sha256, human_id, decided_at)
+    ruling = _verify_ruling(
+        root,
+        ruling_path,
+        ruling_sha256,
+        human_id,
+        decided_at,
+        record["issue_id"],
+        target_state,
+    )
     evidence = _parse_evidence(evidence_items, root)
     record_file = _resolution_record_target(root, resolution_record_path)
 
@@ -185,24 +241,25 @@ def resolve_issue(
         "evidence": evidence,
     }
 
-    issue_file.write_bytes(_write_json_bytes(updated))
+    _atomic_write(issue_file, _write_json_bytes(updated), "issue_write_failed")
     try:
         intake.validate_v4_issue_record(
             updated, path=issue_path, project_root=root, config=config
         )
         intake.validate_v4_issue_repository(project_root=root, config=config)
-    except intake.IntakeError:
-        issue_file.write_bytes(original_bytes)
-        raise ResolutionError("post_validation_failed") from None
     except Exception:
-        issue_file.write_bytes(original_bytes)
+        _atomic_write(issue_file, original_bytes, "post_validation_failed")
         raise ResolutionError("post_validation_failed") from None
 
     try:
         record_file.parent.mkdir(parents=True, exist_ok=True)
-        record_file.write_bytes(_write_json_bytes(resolution_document))
-    except OSError:
-        issue_file.write_bytes(original_bytes)
+        _atomic_write(
+            record_file,
+            _write_json_bytes(resolution_document),
+            "resolution_record_write_failed",
+        )
+    except ResolutionError:
+        _atomic_write(issue_file, original_bytes, "resolution_record_write_failed")
         raise ResolutionError("resolution_record_write_failed") from None
 
     return {

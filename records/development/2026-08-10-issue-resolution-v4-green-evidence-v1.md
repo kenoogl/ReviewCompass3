@@ -76,7 +76,34 @@
 | `tests/test_issue_resolution_v4.py` | `29be67ce761ad0449f1adc2ba5d58e8a9a1d27ebaade4b2d7a7c8c8586e2e4a6` |
 | 公式receipt | `a4887275f7074302b464020b171effdd1691d14011589cfea348588326341fe5` |
 
-## 7. 禁止境界と未実施範囲
+## 7. IR-COMP-001〜003修正（完了レビューv1反映）
+
+完了レビューv1（`records/session-handoffs/2026-08-10-codex-review-result-issue-resolution-v4-v1.md`、
+判定`report_execution_mismatch`、blocking 3件）へのHuman裁定（2026-08-10
+「IR-COMP-001と002の修正を承認する。IR-COMP-003は(a)scope改定とする」）を、
+scope v3（`a873544`）に基づき修正した。**本節が§3のClaimと§6のDigestを再置換する。**
+
+- 修正RED commit：`4f39479`（Test変更のみ：裁定fixtureをscope v3 §2の厳密形JSONへ更新
+  ＋束縛違反6態様＋部分書込み障害注入2系統を追加。実装前は新規8件のみが反証どおり
+  失敗、先行16件合格、exit `1`）
+- **IR-COMP-001修正**：`_verify_ruling`を構造化束縛へ変更——厳密形field、
+  `decision_maker == "human"`限定、human_id・decided_at（timestamp形式検査）のCLI一致、
+  対象issue_id・遷移先の一致、wording非空。file同一性だけでは合格しない。
+- **IR-COMP-002修正**：issue更新・復元・解決record作成のすべてを`_atomic_write`
+  （一時file＋原子的置換、失敗時は対象不変・一時file残骸なし）へ変更。
+- **IR-COMP-003**：scope v3 §1のHuman裁定により、実configの読み取り専用fixture利用が
+  scope上正規化された（Test側の変更は不要）。
+- Test結果（全て単独command）：targeted 24 passed（exit `0`）、関連回帰67 passed
+  （exit `0`）、公式全Test 1381 passed・status `passed`（receipt更新・再読込みで
+  failed 0確認）、`git diff --check`指摘なし。
+
+| file | SHA-256（本節で有効） |
+| --- | --- |
+| `tools/development/issue_resolution_v4.py` | `770585427e6185730506ec6aa5da8004a79d77e2cee00e9b4210290d03a2bae8` |
+| `tests/test_issue_resolution_v4.py` | `d1d09ab998ebed10a85a9f93613463ba756593052a214853d02b52aab749a4fb` |
+| 公式receipt（更新済み） | `1f351b652e45722c4c64932841baa6957caae3d421fb2c1b7a53e1ea7544d006` |
+
+## 8. 禁止境界と未実施範囲
 
 - `issue_intake_v4.py`・config・schema・実workflow台帳・TODO・checklist：未変更。
 - **実Issueのresolve実行は未実施**（動機Issue `ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001`等の
