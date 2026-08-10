@@ -208,3 +208,79 @@ class TestTransitionCannotBeBypassed:
                 project_root=other_root,
                 run=fake_run,
             )
+
+
+def _init_repository(path):
+  """使い捨ての一時repositoryを作る。実repositoryの索引には触れない。"""
+
+  path.mkdir(parents=True, exist_ok=True)
+  for command in (
+    ("git", "init", "-q"),
+    ("git", "config", "user.email", "test@example.invalid"),
+    ("git", "config", "user.name", "test"),
+  ):
+    subprocess.run(command, cwd=str(path), check=True, capture_output=True)
+  tracked = path / "tracked.txt"
+  tracked.write_text("original\n", encoding="utf-8")
+  subprocess.run(
+    ("git", "add", "tracked.txt"), cwd=str(path), check=True, capture_output=True
+  )
+  subprocess.run(
+    ("git", "commit", "-q", "-m", "initial"),
+    cwd=str(path),
+    check=True,
+    capture_output=True,
+  )
+  return tracked
+
+
+class TestHiddenIndexCannotBypassTheGate:
+  """F-C1反証：索引の隠蔽指定でも未コミット変更を見逃さない。"""
+
+  @pytest.mark.parametrize("flag", ["--skip-worktree", "--assume-unchanged"])
+  def test_hidden_tracked_change_still_blocks(self, tmp_path, flag):
+    repository = tmp_path / "repository"
+    tracked = _init_repository(repository)
+    subprocess.run(
+      ("git", "update-index", flag, "tracked.txt"),
+      cwd=str(repository),
+      check=True,
+      capture_output=True,
+    )
+    tracked.write_text("modified after hiding\n", encoding="utf-8")
+
+    porcelain = subprocess.run(
+      ("git", "status", "--porcelain=v1", "--untracked-files=all"),
+      cwd=str(repository),
+      capture_output=True,
+      text=True,
+    )
+    assert porcelain.stdout.strip() == ""
+
+    result = _module().preflight_next_work(
+      work_status="completed",
+      project_root=repository,
+    )
+    assert result.status == "blocked"
+    assert result.next_work_allowed is False
+
+  def test_clean_repository_still_passes(self, tmp_path):
+    repository = tmp_path / "clean"
+    _init_repository(repository)
+    result = _module().preflight_next_work(
+      work_status="completed",
+      project_root=repository,
+    )
+    assert result.status == "passed"
+    assert result.next_work_allowed is True
+
+  def test_requested_root_must_be_the_git_root(self, tmp_path):
+    repository = tmp_path / "repository"
+    _init_repository(repository)
+    nested = repository / "nested"
+    nested.mkdir()
+    with pytest.raises(_module().WorkUnitTransitionError):
+      _module().preflight_next_work(
+        work_status="completed",
+        project_root=nested,
+      )
