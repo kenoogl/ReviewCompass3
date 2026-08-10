@@ -97,36 +97,72 @@ testが検査する）であり、1 fileの変更が連鎖しやすい。これ�
 ## 7. 訂正（Codexレビュー反映）
 
 Codexの完了レビュー（`records/session-handoffs/2026-08-10-codex-review-result-scope-omission-cause-analysis-v1.md`、
-commit `ca747c1`、判定`report_execution_mismatch`）を受け、Human承認
+commit `ca747c1`、判定`report_execution_mismatch`）と再レビュー
+（`…-v2.md`、commit `90b7e2b`、blocking 2件・non-blocking 3件）を受け、Human承認
 （2026-08-10「分析と規約を指摘どおり修正せよ。5手順は『巻き添え防止』に限定し、
-検査の正しさは別項目として立てよ」）に基づき本節で訂正する。**本節が§1・§2.1・§3・§5を
-再置換する。**
+検査の正しさは別項目として立てよ」／「指摘5件すべてを修正せよ。規約Bは防げる範囲を
+正確に書き、残余は未対応と明記せよ」）に基づき本節で訂正する。
+**本節が§1・§2.1・§3・§4・§5を再置換する**（CA-V2-REVIEW-002により§4を追加）。
+
+### 7.0 数値の作り方（方針の順守）
+
+上流方針「LLMは意味分析・説明・文章化に限定し、Digestや件数を目視で裁定しない」
+（`docs/design/2026-08-03-session-transcript-eventual-preservation-design.md` §9）に従い、
+**本節の数値はすべて実行commandの出力をそのまま転記する**。初版と第1訂正で
+数値を手書きしたことが、CA-REVIEW-002/003とCA-V2-REVIEW-003/004/005の
+直接原因である。
 
 ### 7.1 §1の件数（CA-REVIEW-002）を単位ごとに分離
 
 旧「範囲の作り直し8回・実装中の停止4回」は3種の数え方を混ぜていた。次の**4つの
 別々の指標**へ分離する（いずれも守り役後追い修正4単位＝E/A/B/Cが対象）。
 
-| 指標 | 定義 | 値 | 機械抽出 |
-| --- | --- | ---: | --- |
-| a. scope改訂commit数 | 各単位のscope v2以降の`Fix scope`commit | **7** | `git log --oneline`で E:2・A:1・B:2・C:2 |
-| b. 範囲レビュー要修正回数 | scope reviewの判定が`要修正`だった回数 | **4** | egress v1・common v1・position v1・position v2 |
-| c. 完了レビューblocking件数 | 完了レビューで出たblocking finding | **3** | group A完了v1:1（F-CG-COMP-001）、group B完了v1:2（F-C1・F-C2） |
-| d. 実装中のHuman停止回数 | GREEN着手後にscope外事由で停止した回数 | **3** | group B `conftest`結線・group B契約pin・group C CRLF |
+| 指標 | 定義 | 値 |
+| --- | --- | ---: |
+| a. scope改訂commit数 | 4単位のscope v2以降の`Fix scope`commit | **7** |
+| b. 範囲レビュー要修正回数 | scope reviewの判定が要修正だった回数 | **4** |
+| c. 完了レビューblocking件数 | 完了レビューで出たblocking finding | **3** |
+| d1. 実装中の停止回数 | scope外事由でHumanへ諮った停止の**回数** | **2** |
+| d2. 停止理由の件数 | 上記2回の停止で挙げた**理由の数** | **3** |
 
-以後、この4指標を混ぜて総数で語らない。
+CA-V2-REVIEW-003により、旧「d. Human停止3回」を**d1（回数2）とd2（理由3）**へ分離した。
+group Bのscope v2は1回の停止に2理由（`conftest.py`結線・既存test契約更新）を並べており、
+group Cは1回の停止に1理由（CRLF実処理の所在）である。
+
+再現command（出力をそのまま転記）：
+
+```text
+$ git log --format='%h %s' | grep -E "^[0-9a-f]+ Fix scope v[2-9]" \
+    | grep -E "group E|group A|group C|F-C1 and F-C2|conftest wiring|RED definition" | wc -l
+7
+$ grep -c "^### 1\.[0-9]" records/session-handoffs/2026-08-10-claude-pilot-official-oracle-fix-scope-v2.md
+2
+```
+
+指標bの内訳：egress v1・common v1・position v1・position v2。
+指標cの内訳：group A完了v1が1件（`F-CG-COMP-001`）、group B完了v1が2件（`F-C1`・`F-C2`）。
+d1の内訳：group B（scope v2で停止）、group C（RED後に停止。GREEN commitは存在しない）。
+
+以後、この5指標を混ぜて総数で語らない。
 
 ### 7.2 §2.1のDigest照合test数（CA-REVIEW-003）を訂正
 
-旧「16 file」は絞り込み条件を書いていなかった。実測を次へ訂正する。
+旧「16 file」は絞り込み条件が無く撤回した。第1訂正の「23 file」も、記載した
+二段階条件では再現しなかった（CA-V2-REVIEW-004）。**実行出力を次へ転記する。**
 
-- `grep -rln "read_bytes()).hexdigest()\|_sha256(" tests` → **35 file**（終了コード0）。
-  これは**fixture用のDigest計算を含む**ため、pin照合testの数ではない。
-- そのうち`assert`でpin期待値と比較する行を持つもの
-  （`grep -q "assert.*==.*expected\|_PINS\|immutable_record\|fixed_sources"`）→ **23 file**。
-- 「16」は独立再現できないため撤回する。**Digest照合を含むtestは広めに見て35、
-  pin期待値との比較を持つものは23**とする。Digest密度32/40の主張は§2.1のscriptで
-  再現し、維持する。
+```text
+$ grep -rln "read_bytes()).hexdigest()\|_sha256(" tests | wc -l
+35
+$ for f in $(grep -rln "read_bytes()).hexdigest()\|_sha256(" tests); do \
+    grep -qE "assert.*==.*expected|_PINS|immutable_record|fixed_sources" "$f" && echo x; done | wc -l
+12
+$ grep -rlE "assert.*==.*expected|_PINS|immutable_record|fixed_sources" tests | wc -l
+23
+```
+
+確定値：**Digest計算を含むtestは35 file**、そのうち**pin期待値との比較を併せ持つものは
+12 file**。23は第2条件だけを`tests/`全体へ掛けた値であり、二段階条件の結果ではない。
+第1訂正の「23」は誤りとして撤回する。Digest密度32/40の主張は§2.1のscriptで再現し、維持する。
 
 ### 7.3 §3・§4の原因帰属（CA-REVIEW-004）を共同寄与へ改める
 
@@ -147,6 +183,21 @@ commit `ca747c1`、判定`report_execution_mismatch`）を受け、Human承認
 5手順は**巻き添え防止**の手順であり、**検査の正しさ**（誤った合格の残存）は防げない。
 これを混同して「全事象を事前検出できる対策」と扱わない。対策の確定形は
 裁定record `records/development/2026-08-10-scope-prescan-rule-decision-v1.md`の
-改訂版（同日）に置く。本分析は、5手順が**bのうち巻き添え型**（group Aのpin・
-group Bのconftestと契約pin・group CのCRLF所在）を事前検出できることだけを主張し、
-c（完了レビューblocking＝検査の正しさ）とREDの失敗理由は**対象外**と明記する。
+改訂版（同日）に置く。
+
+本分析が主張する範囲は次に限る（CA-V2-REVIEW-005により参照先を訂正。
+これらは指標b ではなく**指標d2（停止理由3件）**である）。
+
+- 規約Aが事前検出できる：group Aの指紋pin file、group Bの`conftest.py`結線と
+  契約recordのpin、group CのCRLF実処理の所在。
+- 規約Aの**対象外**：指標c（完了レビューblocking＝検査の正しさ）、
+  REDの失敗理由、拒否前副作用、安全側の正例、commit境界、完了関門の実入力による迂回。
+
+### 7.5 §4（設計要因との切り分け）の再置換
+
+CA-V2-REVIEW-002により、旧§4も本節の置換対象とする。確定形は次のとおり。
+
+- 対象は守り役どうしが相互に監視する設計であり、1 fileの変更が連鎖しやすい。
+  これは意図された設計であり、**設計の欠陥ではない**（旧§4の主張を維持）。
+- ただし主因の帰属は**Pilot要因・上流記録要因の共同寄与**であり（§7.3）、
+  旧§4の「Pilot要因が主因」という一元化は撤回する。
