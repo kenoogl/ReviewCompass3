@@ -106,7 +106,60 @@ F-B4の反証3件を同fileへ**追加**したため指紋が変わり、`tests/
 | `tests/test_work_unit_transition.py` | `d4b4f63af8b820d06cfcbdf101b71d26f49bfe265fe4d739aa00ebe0c857ea40` |
 | 公式receipt | `e3bf3347bdb094fde6831dff51eeda04dd64d4b2fe1e34a6db09c2e4a1c9cd3e` |
 
-## 8. 未実施
+## 8. F-C1・F-C2修正（完了レビューv1反映）
+
+完了レビューv1（`records/session-handoffs/2026-08-10-codex-review-result-official-oracle-fix-v1.md`、
+commit `9c9d9a7`、判定`report_execution_mismatch`・blocking 2件）への対応。
+Human承認（2026-08-10）：「F-C1とF-C2の修正を承認する」。
+範囲固定：scope v3（`6ce4d03`）。
+
+### 8.1 F-C2（scope境界）の是正
+
+契約recordのpin更新はHuman承認済みだったが、**scopeの変更file境界へ追記していなかった**。
+scope v3 §2で
+`records/development/2026-08-07-work5b-implementation-task-contract-v2.json`を
+変更可能pathへ加え、変更範囲を`sha256`値1箇所に限定して明記した。
+過去commitの書き換えは行わず、範囲固定側を正した。
+
+### 8.2 F-C1（完了関門の迂回）の修正
+
+- **原因**：`skip-worktree`・`assume-unchanged`は`git status --porcelain`だけでなく
+  `git diff --name-only HEAD --`も黙らせるため、追加したHEAD差分照合をすり抜けた。
+- **修正**：`_hidden_entries`／`_hidden_entry_difference`を新設。`git ls-files -v`で
+  隠蔽指定された追跡fileを列挙し、各fileについて`git rev-parse HEAD:<path>`（committed blob id）と
+  `git hash-object -- <path>`（作業treeのblob id）を**索引を経由せず**直接比較する。
+  取得不能はfail-closedで差ありとみなす。結果は`head_difference`へ合流し、
+  従来どおり`blocked`になる。
+- **限界（scope v3 §3.1）**：呼び出し側が別の正当なrepositoryを対象として指定した場合
+  （W2型）、それが誤りかをtool単体では判定できない（利用者が対象を選ぶ自由と区別できない）。
+  本修正が保証するのは「**指定されたrootについて、索引の隠蔽指定に関わらず未コミット変更を
+  見逃さないこと**」である。要求rootとGitが答えるrootの食い違いは従来どおり拒否する。
+
+### 8.3 commit系列と機械確認
+
+| 種別 | SHA | 内容 |
+| --- | --- | --- |
+| 完了レビューv1 | `9c9d9a7` | Codex作成。blocking 2件 |
+| SCOPE v3 | `6ce4d03` | 範囲固定のみ |
+| 修正RED | `b44e1a6` | `tests/test_work_unit_transition.py`のみ。使い捨ての一時repositoryで`skip-worktree`・`assume-unchanged`・nested rootの3反証を追加。実装前は隠蔽2態様が失敗（`2 failed / 11 passed`） |
+| 修正RED（契約更新） | `dddaf9b` | 同fileのみ。`test_preflight_reads_git_state_mechanically`の期待call列へ`git ls-files -v`を追加。**修正前実装に対して`1 failed`**を機械確認（`git checkout b44e1a6 -- tools/development/work_unit_transition.py`で当て、確認後に復元）。検査性質は不変 |
+
+- 反証は**すべて一時repository**（`tmp_path`）に対して実行し、実repositoryの索引・
+  作業treeには触れていない。
+- targeted：`pytest tests/test_work_unit_transition.py` → **13 passed**、exit `0`
+- 公式全Test：`policy_test_runner --suite full --receipt
+  records/development/2026-08-10-official-oracle-fix-test-receipt-v2.json` →
+  **1469 passed**、status `passed`、exit `0`
+
+| file | SHA-256（本節で有効） |
+| --- | --- |
+| `tools/development/work_unit_transition.py` | `93e005fe299bd0e33d0ada6b92ad1732d05194ebe4d92e100e5111bd659b33b6` |
+| `tests/test_work_unit_transition.py` | `f811eb9caa276f7b88e3ae237cec5c745cf2a85b93bf27eed12aacb33c01b40d` |
+| 公式receipt（v2） | `49785d1bf32b458f9f673f91dee0c03344e0e95c26871f06e88847542e94f870` |
+
+他の実装3 fileと`conftest.py`、契約recordは§7のSHA-256から変更していない。
+
+## 9. 未実施
 
 group C（5件）・D（7件）の計12件は判定recordのまま保持。TODO・checklist反映はCloser。
 push・履歴書換えは未実施。
