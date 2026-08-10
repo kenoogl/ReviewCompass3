@@ -207,6 +207,129 @@ def test_parses_rollout_messages_and_complete_tool_payloads(tmp_path):
   assert result.issues == ()
 
 
+def test_parses_inter_agent_messages_and_tool_search_records(tmp_path):
+  raw_log = tmp_path / "rollout.jsonl"
+  discovered_tools = [
+    {
+      "description": "検索用の道具群。",
+      "name": "project-tools",
+      "tools": [
+        {
+          "description": "案件内を検索する。",
+          "name": "search_project",
+          "parameters": {
+            "properties": {
+              "query": {"type": "string"},
+            },
+            "required": ["query"],
+            "type": "object",
+          },
+          "strict": True,
+          "type": "function",
+        },
+      ],
+      "type": "namespace",
+    },
+  ]
+  _write_records(raw_log, (
+    {
+      "timestamp": "2026-08-10T10:00:00Z",
+      "type": "session_meta",
+      "payload": {"id": "thread-1", "cwd": "/workspace/project"},
+    },
+    {
+      "timestamp": "2026-08-10T10:00:01Z",
+      "type": "inter_agent_communication_metadata",
+      "payload": {"trigger_turn": True},
+    },
+    {
+      "timestamp": "2026-08-10T10:00:02Z",
+      "type": "response_item",
+      "payload": {
+        "author": "/root/reviewer",
+        "content": [
+          {"type": "input_text", "text": "検査結果を共有します。"},
+          {
+            "type": "encrypted_content",
+            "text": "逐語記録へ出してはならない内部値",
+          },
+        ],
+        "id": "agent-message-1",
+        "internal_chat_message_metadata_passthrough": {
+          "turn_id": "turn-1",
+        },
+        "recipient": "/root",
+        "type": "agent_message",
+      },
+    },
+    {
+      "timestamp": "2026-08-10T10:00:03Z",
+      "type": "response_item",
+      "payload": {
+        "arguments": {"query": "対象を探す"},
+        "call_id": "call-search-1",
+        "execution": "client",
+        "id": "tool-search-call-1",
+        "status": "completed",
+        "type": "tool_search_call",
+      },
+    },
+    {
+      "timestamp": "2026-08-10T10:00:04Z",
+      "type": "response_item",
+      "payload": {
+        "call_id": "call-search-1",
+        "execution": "client",
+        "id": "tool-search-output-1",
+        "status": "completed",
+        "tools": discovered_tools,
+        "type": "tool_search_output",
+      },
+    },
+  ))
+  parser = importlib.import_module(
+    "tools.session_logs.parse_codex_rollout"
+  )
+  common = importlib.import_module("tools.session_logs.parse_claude")
+
+  result = parser.parse_codex_rollout_log(raw_log)
+
+  assert result.events == (
+    common.Event(
+      event_id="agent-message-1",
+      role="agent",
+      text=(
+        "author: /root/reviewer\n"
+        "recipient: /root\n\n"
+        "検査結果を共有します。"
+      ),
+      line_no=3,
+    ),
+    common.ToolCall(
+      event_id="tool-search-call-1",
+      call_id="call-search-1",
+      name="tool_search",
+      arguments={"query": "対象を探す"},
+      line_no=4,
+      block_index=0,
+    ),
+    common.ToolResult(
+      event_id="tool-search-output-1",
+      call_id="call-search-1",
+      text=json.dumps(
+        discovered_tools,
+        ensure_ascii=False,
+        sort_keys=True,
+      ),
+      is_error=False,
+      line_no=5,
+      block_index=0,
+    ),
+  )
+  assert result.issues == ()
+  assert "内部値" not in result.events[0].text
+
+
 def test_reports_unknown_rollout_records_without_guessing(tmp_path):
   raw_log = tmp_path / "rollout.jsonl"
   _write_records(raw_log, (
