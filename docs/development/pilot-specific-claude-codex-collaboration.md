@@ -35,47 +35,71 @@
 レビュー担当（`reviewer`）とは、実装を変更せず、上流文書、差分、テスト、証拠、実行後の状態を独立に
 確認する担当をいう。
 
-本書では、操縦者がどちらの場合も、実装担当とレビュー担当を次のように固定する。
+本書では、操縦者がどちらの場合も、実装担当とレビュー担当の系統を次のように固定する。
 
 ```text
 implementer: claude
 reviewer: codex
 ```
 
-操縦者だけを、作業ごとにClaudeまたはCodexから選ぶ。
+操縦者だけを、作業ごとにClaudeまたはCodexから選ぶ。`pilot: codex`では、Codexの主担当が
+レビューを依頼し、別のCodexサブエージェント（限定されたレビューだけを行う別実行単位）が
+実際のレビューを行う。
+
+### 2.1 `pilot: codex`のモデル対応
+
+`pilot: codex`では、主担当とレビュー用サブエージェントのモデルを次のように交差させる。
+
+| Codex主担当のモデル | レビュー用サブエージェントのモデル |
+| --- | --- |
+| `gpt-5.6-sol` | `gpt-5.6-terra` |
+| `gpt-5.6-terra` | `gpt-5.6-sol` |
+
+主担当はレビュー依頼、結果の受領、Git状態との照合、完了反映を担当する。レビュー用サブエージェントは、
+実装結果の確認、テストの再実行、反証、判定記録の作成を担当する。
+
+レビュー用サブエージェントには、コミット済みの範囲固定文書、実装依頼、実装結果、上流文書だけを渡す。
+主担当の結論、期待する判定、非公開の推論過程を渡さない。判定記録には主担当とレビュー担当のモデル名を
+記録する。
+
+主担当のモデルが表の2種類以外である場合、または対応する反対側のモデルを利用できない場合、同じモデルや
+別名のモデルへ黙って置き換えず、レビューを開始せずHumanへ報告して停止する。
 
 ## 3. Humanの決定
 
 Humanは2026-08-11、次の分担を決定した。
 
 - `pilot: claude`では、Claudeが依頼、実装、進行管理を行い、Codexがレビューする。
-- `pilot: codex`では、Codexが依頼、進行管理、レビューを行い、Claudeは実装だけを行う。
+- `pilot: codex`では、Codexの主担当が依頼と進行管理を行い、Claudeは実装だけを行い、反対側のモデルを
+  使うCodexサブエージェントがレビューする。
 - ClaudeからCodexを起動する方式は、`pilot: claude`の場合に限る。
 - `pilot: codex`でClaudeをレビュー担当にしない。
 
 二つの方式で異なるのは、Humanとの窓口、範囲固定、実装依頼、修正管理を誰が行うかである。
-実装担当がClaude、レビュー担当がCodexである点は共通とする。
+実装担当がClaude、レビュー担当の系統がCodexである点は共通とする。`pilot: codex`では、操縦と
+レビュー実行を同じCodex実行単位へ戻さない。
 
 ## 4. 二つの方式の対応表
 
 | 作業段階 | `pilot: claude` | `pilot: codex` |
 | --- | --- | --- |
-| Humanとの窓口 | Claude | Codex |
-| 上流文書の確認 | Claude | Codex |
-| 範囲固定 | Claude | Codex |
-| 危険度の提案 | Claude | Codex |
+| Humanとの窓口 | Claude | Codex主担当 |
+| 上流文書の確認 | Claude | Codex主担当 |
+| 範囲固定 | Claude | Codex主担当 |
+| 危険度の提案 | Claude | Codex主担当 |
 | 危険度と再開の承認 | Human | Human |
-| 実装依頼の作成 | Claude | Codex |
+| 実装依頼の作成 | Claude | Codex主担当 |
 | テスト作成と実装 | Claude | Claude |
 | 実装証拠の記録 | Claude | Claude |
-| レビュー依頼の作成 | Claude | Codex |
-| 実装結果のレビュー | Codex | Codex |
-| 修正範囲の固定 | Claude | Codex |
+| レビュー依頼の作成 | Claude | Codex主担当 |
+| 実装結果のレビュー | Codex | 反対側のモデルを使うCodexサブエージェント |
+| 修正範囲の固定 | Claude | Codex主担当 |
 | 修正実装 | Claude | Claude |
-| 完了反映 | Humanが指定した担当 | CodexまたはHumanが指定した担当 |
+| 完了反映 | Humanが指定した担当 | Codex主担当またはHumanが指定した担当 |
 
 `pilot: claude`では、Claudeが操縦者と実装担当を兼ねる。
-`pilot: codex`では、Codexが操縦者とレビュー担当を兼ねるが、実装はClaudeへ分離する。
+`pilot: codex`では、Codex主担当が操縦者とレビュー依頼者を兼ねる。実装はClaudeへ、レビュー実行は
+反対側のモデルを使うCodexサブエージェントへ分離する。
 
 ## 5. 共通の作業順序
 
@@ -83,14 +107,14 @@ Humanは2026-08-11、次の分担を決定した。
 
 | 順序 | 作業 | `pilot: claude`の担当 | `pilot: codex`の担当 |
 | --- | --- | --- | --- |
-| 1 | Humanから作業項目を受け取る | Claude | Codex |
-| 2 | 上流文書、受入条件、変更範囲、禁止事項、停止条件を固定する | Claude | Codex |
-| 3 | 必要なHuman承認を得る | Claudeが依頼する | Codexが依頼する |
+| 1 | Humanから作業項目を受け取る | Claude | Codex主担当 |
+| 2 | 上流文書、受入条件、変更範囲、禁止事項、停止条件を固定する | Claude | Codex主担当 |
+| 3 | 必要なHuman承認を得る | Claudeが依頼する | Codex主担当が依頼する |
 | 4 | テストを先に作り、失敗を確認してから実装する | Claude | Claude |
 | 5 | 実装結果と証拠をコミットして停止する | Claude | Claude |
-| 6 | 実装を変更せず独立レビューする | Codex | Codex |
-| 7 | 不合格なら修正範囲を固定して実装担当へ戻す | Claude | Codex |
-| 8 | 合格後に完了反映する | Humanが指定した担当 | CodexまたはHumanが指定した担当 |
+| 6 | 実装を変更せず独立レビューする | Codex | 反対側のモデルを使うCodexサブエージェント |
+| 7 | 不合格なら修正範囲を固定して実装担当へ戻す | Claude | Codex主担当 |
+| 8 | 合格後に完了反映する | Humanが指定した担当 | Codex主担当またはHumanが指定した担当 |
 
 レビュー結果が`verified`（必要な証拠が揃い、実状態と一致する状態）になるまで、完了反映へ進まない。
 
@@ -98,10 +122,11 @@ Humanは2026-08-11、次の分担を決定した。
 
 役割分担と起動方法を混同しない。起動は作業を渡す手段であり、担当を決める根拠ではない。
 
-| 操縦者 | 起動方向 | 起動される担当 | 目的 | 方法 |
-| --- | --- | --- | --- | --- |
-| Claude | ClaudeからCodex | レビュー担当のCodex | 実装結果の独立レビュー | `pilot-driven-record-handoff.md`の固定起動文とCodex CLI |
-| Codex | CodexからClaude | 実装担当のClaude | 固定済み依頼の実装 | 承認済みのClaude起動経路。完成までは`codex-claude-collaboration.md`のHuman中継 |
+| 操縦者 | 作業段階 | 起動方向 | 起動される担当 | 目的 | 方法 |
+| --- | --- | --- | --- | --- | --- |
+| Claude | レビュー | ClaudeからCodex | レビュー担当のCodex | 実装結果の独立レビュー | `pilot-driven-record-handoff.md`の固定起動文とCodex CLI |
+| Codex | 実装 | Codex主担当からClaude | 実装担当のClaude | 固定済み依頼の実装 | 承認済みのClaude起動経路。完成までは`codex-claude-collaboration.md`のHuman中継 |
+| Codex | レビュー | Codex主担当からCodexサブエージェント | 反対側のモデルを使うレビュー担当 | 実装結果の独立レビュー | §2.1のモデル対応とコミット済みレビュー依頼 |
 
 直接起動が使えない、認証が切れている、または異常応答となった場合は、自動的に別の認証、別の送信先、
 別の権限へ切り替えない。操縦者が事象と未実施範囲をHumanへ報告して停止する。
@@ -123,11 +148,11 @@ Human中継を使う場合、Humanはコミット済み記録の場所と開始�
 
 | 確認事項 | `pilot: claude` | `pilot: codex` |
 | --- | --- | --- |
-| 範囲と危険度の提案 | Claude | Codex |
+| 範囲と危険度の提案 | Claude | Codex主担当 |
 | 危険度と実装開始の確定 | Human | Human |
 | 実装 | Claude | Claude |
-| 完了レビュー | Codex | Codex |
-| 独立した反証 | Codexが新作して機械実行 | Codexが新作して機械実行 |
+| 完了レビュー | Codex | 反対側のモデルを使うCodexサブエージェント |
+| 独立した反証 | Codexが新作して機械実行 | Codexサブエージェントが新作して機械実行 |
 
 CodexはClaudeのテストだけに頼らず、上流文書から確認条件と反証を独立に導出する。
 危険度`high`では、Claudeのテストにない反証を最低1件作り、機械実行する。
@@ -139,6 +164,9 @@ CodexはClaudeのテストだけに頼らず、上流文書から確認条件と
 - `pilot: codex`で、Claudeをレビュー担当にすること。
 - Claudeが固定済みの依頼範囲、受入条件、Human承認の意味を独自に変更すること。
 - Codexがレビュー中に実装対象を修正すること。
+- `pilot: codex`で、Codex主担当が自分で完了レビューを行うこと。
+- `pilot: codex`で、主担当とレビュー担当に同じモデルを使うこと。
+- 反対側のモデルが利用できないとき、同じモデルまたは別のモデルへ無承認で置き換えること。
 - コミットされていない終了報告だけで、実装完了またはレビュー合格と判断すること。
 - 直接起動に失敗した際、承認のない別経路、別の認証、別の送信先へ切り替えること。
 - 一つの作業に本書と`role_neutral_pilot_review`を同時適用すること。
@@ -154,6 +182,16 @@ implementer: claude
 reviewer: codex
 closer: codex | claude | humanが指定した担当
 work_item: <一つの作業項目>
+```
+
+`pilot: codex`では、さらに次を固定する。
+
+```text
+review_requester: codex_main
+review_executor: codex_subagent
+pilot_model: gpt-5.6-sol | gpt-5.6-terra
+reviewer_model: pilot_modelと反対側のモデル
+closer: codex_main | humanが指定した担当
 ```
 
 本書が定めるのは担当と受け渡し方法である。レビュー手順、テスト先行、Git規律、証拠規則、Human承認境界は、
