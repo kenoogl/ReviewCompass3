@@ -63,6 +63,40 @@ def _safe_relative_path(value) -> Path:
   return relative_path
 
 
+def _bind_inside_root(root, path, message) -> Path:
+  """解決後pathがroot内であることを束縛する。
+
+  字句上の相対関係だけでは、symlink（別の場所を指すfile・directory）で
+  root外を読み書きできる。祖先componentも含めて解決してから照合する。
+  """
+  try:
+    resolved_root = Path(root).resolve()
+    resolved = Path(path).resolve()
+  except OSError as error:
+    raise PreservationError(message) from error
+  if resolved != resolved_root and resolved_root not in resolved.parents:
+    raise PreservationError(message)
+  return resolved
+
+
+def _verify_existing_backup(ledger_path, relative_path, backup_bytes):
+  """既存backupを台帳へ照合してから台帳を更新する（改変の正当化を断つ）。"""
+  if ledger_path is None:
+    return
+  ledger = _load_ledger(ledger_path)
+  entry = ledger["entries"].get(Path(relative_path).as_posix())
+  if entry is None:
+    return
+  if not isinstance(entry, dict) or entry.get(
+    "sha256"
+  ) != hashlib.sha256(backup_bytes).hexdigest() or entry.get("size") != len(
+    backup_bytes
+  ):
+    raise PreservationIntegrityError(
+      "Preserved raw log integrity mismatch"
+    )
+
+
 def _load_ledger(path):
   ledger_path = Path(path)
   if not ledger_path.exists():
@@ -158,12 +192,18 @@ def preserve_raw_log(
   lock_timeout_seconds=300,
 ) -> PreservationResult:
   source_path = Path(raw_log)
+  resolved_source = _bind_inside_root(
+    raw_root, source_path, "Raw log escapes the raw root"
+  )
   try:
-    relative_path = source_path.relative_to(Path(raw_root))
-    source_bytes = source_path.read_bytes()
+    relative_path = resolved_source.relative_to(Path(raw_root).resolve())
+    source_bytes = resolved_source.read_bytes()
   except (OSError, ValueError) as error:
     raise PreservationError("Cannot read raw log for preservation") from error
   backup_path = Path(backup_root) / relative_path
+  _bind_inside_root(
+    backup_root, backup_path, "Backup path escapes the backup root"
+  )
   lock_path = backup_path.with_name(backup_path.name + ".lock")
 
   with _preservation_lock(
@@ -179,6 +219,7 @@ def preserve_raw_log(
         backup_bytes = backup_path.read_bytes()
       except OSError as error:
         raise PreservationError("Cannot read preserved raw log") from error
+      _verify_existing_backup(ledger_path, relative_path, backup_bytes)
       if source_bytes == backup_bytes:
         action = "unchanged"
       elif source_bytes.startswith(backup_bytes):
@@ -214,6 +255,12 @@ def restore_raw_log(
   safe_path = _safe_relative_path(relative_path)
   source_path = Path(raw_root) / safe_path
   backup_path = Path(backup_root) / safe_path
+  _bind_inside_root(
+    raw_root, source_path, "Restore target escapes the raw root"
+  )
+  _bind_inside_root(
+    backup_root, backup_path, "Backup path escapes the backup root"
+  )
   lock_path = backup_path.with_name(backup_path.name + ".lock")
   with _preservation_lock(
     lock_path,

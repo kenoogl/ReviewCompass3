@@ -107,7 +107,59 @@
 | `tests/test_egress_adversarial.py` | `e865785bbe30536adae69897cd63144e436dc290b5e27c61b76afada0f254da6` |
 | 公式receipt（slice 1） | `c4c1a9287483ddb925cae86634368d63e40c66f534794d0c8ae5a36fc55ef34a` |
 
-## 7. 未実施（slice 2以降）
+## 7. slice 2（保全：F-E6・F-E7）
 
-F-E6・F-E7（`tools/session_logs/preservation.py`）はRED-2・GREEN-2で扱う。
-本record §8としてslice 2の節を追記する。TODO・checklist反映はCloser。
+上流：`docs/design/2026-08-03-session-transcript-eventual-preservation-design.md` §5.3
+Raw Archive（追記専用・prefix検査・atomic replace・lock・integrity ledger）。
+
+### 7.1 commit系列
+
+| 種別 | SHA | 内容 |
+| --- | --- | --- |
+| GREEN-1 | `e7c25fa` | slice 1（`tools/egress/`・Evidence・receipt） |
+| RED-2 | `f78a57e` | `tests/test_session_log_preservation.py`のみ |
+
+### 7.2 RED-2（実装前・単独実行）
+
+- command：`.venv/bin/python3 -m pytest tests/test_session_log_preservation.py`
+- 結果：**4 failed / 4 passed**、exit `1`。既存4件は更新せずそのまま合格した
+  （slice 2では既存testの契約更新は不要だった）
+- 追加した反証4件：
+  1. `test_tampered_backup_is_not_legitimised_by_a_later_preservation`（F-E6。
+     保全を1回挟んで改変値を台帳の正本にできること、その後の復元で改変値が
+     復元されることを反証）
+  2. `test_raw_log_symlink_pointing_outside_root_is_rejected`（F-E7・読取り側）
+  3. `test_backup_directory_symlink_escaping_root_is_rejected`（F-E7・書込み側）
+  4. `test_restore_target_symlink_escaping_raw_root_is_rejected`（F-E7・復元側）
+
+### 7.3 GREEN-2実装
+
+| finding | 実装 |
+| --- | --- |
+| F-E6 | `_verify_existing_backup`を新設し、既存backupを**台帳へ照合してから**台帳を更新する順序へ変更。台帳entryと不一致のbackupは`PreservationIntegrityError`で拒否し、台帳を書き換えない（改変の正当化を断つ） |
+| F-E7 | `_bind_inside_root`を新設し、raw・backup・復元先の各pathを**解決後**にroot内束縛で照合。`relative_to`も解決後pathで計算するため、最終component・祖先componentのsymlinkでroot外を読み書きできない |
+
+- schema・config・上流設計・他moduleは未変更。lock・atomic replace・追記専用の
+  既存性質は維持。
+
+### 7.4 Test実行の記録（slice 2）
+
+| 区分 | command | 結果 | exit code |
+| --- | --- | --- | --- |
+| RED-2（実装前） | `pytest tests/test_session_log_preservation.py` | 4 failed / 4 passed | `1` |
+| targeted GREEN-2 | 同上 | **8 passed** | `0` |
+| 関連回帰 | `pytest tests/test_session_log_eventual_preservation.py tests/test_preservation_migration.py tests/test_redaction_registration_preservation_path.py tests/test_session_log_pipeline.py` | 36 passed | `0` |
+| 公式全Test | `policy_test_runner --suite full --receipt records/development/2026-08-10-egress-guard-fix-slice2-test-receipt-v1.json` | **1427 passed**、status `passed`（failed 0・error 0・skipped 0） | `0` |
+
+### 7.5 SHA-256（slice 2完了時点）
+
+| file | SHA-256 |
+| --- | --- |
+| `tools/session_logs/preservation.py` | `645e2430c15fe8bd8c4cabc94a21349335902299abefc533e9b363b02725ea5e` |
+| `tests/test_session_log_preservation.py` | `bacb8ed2cff642269c2c3bd8762a043c07e4f5cd6f841dd3143e5bbddeff35f1` |
+| 公式receipt（slice 2） | `dfa98e0f5d01e877cc8654eeec957c9a1942b0aa2cb94bd858d7c7329e333b06` |
+
+## 8. 未実施
+
+- group A〜Dのblocking 19件（裁定record `4bb1c9b`の順序に従い、A→B→C→Dで別単位）。
+- TODO・checklist反映（Closer）。実際の外部送信、push、履歴書換え：未実施。
