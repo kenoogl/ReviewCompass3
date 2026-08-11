@@ -5,12 +5,60 @@ import subprocess
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-BASE_COMMIT = "30925a54a0e8ee7c53e3503eccfda7a73fa11752"
 PROMPT_PATH = "docs/development/prompts/pilot-collaboration-run.md"
 INSTRUCTION_PATH = (
     "records/session-handoffs/"
     "2026-08-11-pilot-collaboration-entry-implementation-request-v6.md"
 )
+ALLOWED_PATHS = {
+    "tools/development/pilot_collaboration.py",
+    "tools/development/pilot_collaboration_cli.py",
+    "tools/bootstrap/immutable_result_store.py",
+    "tools/bootstrap/raw_review_store.py",
+    "tests/test_pilot_collaboration.py",
+    "tests/test_pilot_collaboration_cli.py",
+    "tests/test_bootstrap_immutable_result_store.py",
+    "docs/development/prompts/pilot-collaboration-run.md",
+    "tests/test_pilot_collaboration_entrypoints.py",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "pyproject.toml",
+}
+
+
+def _git(repository, *arguments):
+    return subprocess.run(
+        ("git", *arguments),
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
+def _latest_implementation_commit(repository, allowed_paths):
+    return _git(
+        repository,
+        "log",
+        "-1",
+        "--format=%H",
+        "--",
+        *sorted(allowed_paths),
+    )
+
+
+def _commit_changed_paths(repository, commit):
+    return set(
+        _git(
+            repository,
+            "diff-tree",
+            "--root",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            commit,
+        ).splitlines()
+    )
 
 
 def test_repository_exposes_one_common_pilot_entrypoint():
@@ -58,35 +106,57 @@ def test_common_prompt_names_only_the_canonical_instruction_and_commands():
 
 
 def test_change_scope_contains_only_v6_allowlisted_paths():
-    allowed = {
-        "tools/development/pilot_collaboration.py",
-        "tools/development/pilot_collaboration_cli.py",
-        "tools/bootstrap/immutable_result_store.py",
-        "tools/bootstrap/raw_review_store.py",
-        "tests/test_pilot_collaboration.py",
-        "tests/test_pilot_collaboration_cli.py",
-        "tests/test_bootstrap_immutable_result_store.py",
-        "docs/development/prompts/pilot-collaboration-run.md",
-        "tests/test_pilot_collaboration_entrypoints.py",
-        "AGENTS.md",
-        "CLAUDE.md",
-        "pyproject.toml",
+    implementation_commit = _latest_implementation_commit(
+        PROJECT_ROOT,
+        ALLOWED_PATHS,
+    )
+
+    assert implementation_commit
+    assert _commit_changed_paths(PROJECT_ROOT, implementation_commit) <= ALLOWED_PATHS
+
+
+def test_change_scope_ignores_later_record_and_todo_commits(tmp_path):
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    _git(repository, "init", "--quiet")
+    implementation_path = repository / "tools/development/pilot_collaboration.py"
+    implementation_path.parent.mkdir(parents=True)
+    implementation_path.write_text("# implementation\n", encoding="utf-8")
+    _git(repository, "add", "tools/development/pilot_collaboration.py")
+    _git(
+        repository,
+        "-c",
+        "user.name=Acceptance Test",
+        "-c",
+        "user.email=acceptance@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "implementation",
+    )
+    implementation_commit = _git(repository, "rev-parse", "HEAD")
+    record = repository / "records/session-handoffs/review.md"
+    record.parent.mkdir(parents=True)
+    record.write_text("review\n", encoding="utf-8")
+    (repository / "TODO_NEXT_SESSION.md").write_text("next\n", encoding="utf-8")
+    _git(repository, "add", "records/session-handoffs/review.md", "TODO_NEXT_SESSION.md")
+    _git(
+        repository,
+        "-c",
+        "user.name=Acceptance Test",
+        "-c",
+        "user.email=acceptance@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "follow-up records",
+    )
+    head = _git(repository, "rev-parse", "HEAD")
+
+    selected = _latest_implementation_commit(repository, ALLOWED_PATHS)
+
+    assert selected == implementation_commit
+    assert selected != head
+    assert _commit_changed_paths(repository, selected) == {
+        "tools/development/pilot_collaboration.py"
     }
-
-    committed = subprocess.run(
-        ("git", "diff", "--name-only", BASE_COMMIT, "HEAD"),
-        cwd=PROJECT_ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.splitlines()
-    status = subprocess.run(
-        ("git", "status", "--porcelain", "--untracked-files=all"),
-        cwd=PROJECT_ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.splitlines()
-    uncommitted = [line[3:] for line in status if len(line) >= 4]
-
-    assert set(committed) | set(uncommitted) <= allowed

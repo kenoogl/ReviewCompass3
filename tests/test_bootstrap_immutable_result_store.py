@@ -3,7 +3,6 @@
 import dataclasses
 import importlib
 import json
-from pathlib import Path
 
 import pytest
 
@@ -70,11 +69,65 @@ def test_common_store_rejects_symlinked_parent(tmp_path):
     assert not (outside / "result.json").exists()
 
 
-def test_existing_raw_review_store_uses_common_immutable_boundary():
-    raw_store_path = Path(__file__).resolve().parents[1] / "tools/bootstrap/raw_review_store.py"
-    source = raw_store_path.read_text(encoding="utf-8")
+def test_existing_raw_review_store_calls_common_immutable_boundary(
+    tmp_path,
+    monkeypatch,
+):
+    common_store = importlib.import_module("tools.bootstrap.immutable_result_store")
+    raw_store = importlib.import_module("tools.bootstrap.raw_review_store")
+    review_execution = importlib.import_module("tools.bootstrap.review_execution")
+    original_store = common_store.store_immutable_json
+    observed_paths = []
 
-    assert "tools.bootstrap.immutable_result_store" in source
+    def observing_store(storage_root, relative_path, document):
+        observed_paths.append(relative_path)
+        return original_store(storage_root, relative_path, document)
+
+    monkeypatch.setattr(common_store, "store_immutable_json", observing_store)
+    raw_store = importlib.reload(raw_store)
+    assignments = (
+        review_execution.ReviewAssignment(
+            name="main",
+            provider="provider-a",
+            model="model-a",
+            route="main",
+        ),
+        review_execution.ReviewAssignment(
+            name="independent",
+            provider="provider-b",
+            model="model-b",
+            route="independent",
+        ),
+    )
+    executions = tuple(
+        review_execution.ReviewExecution(
+            assignment=assignment,
+            status="succeeded",
+            raw_response=f'{{"assignment":"{assignment.name}"}}',
+            error=None,
+            contracted_payload_digest="a" * 64,
+        )
+        for assignment in assignments
+    )
+
+    try:
+        records = raw_store.store_raw_executions(
+            tmp_path,
+            "attempt-001",
+            executions,
+        )
+    finally:
+        monkeypatch.setattr(common_store, "store_immutable_json", original_store)
+        importlib.reload(raw_store)
+
+    assert tuple(record.assignment_name for record in records) == (
+        "independent",
+        "main",
+    )
+    assert observed_paths == [
+        "attempt-001/independent.raw.json",
+        "attempt-001/main.raw.json",
+    ]
 
 
 def test_existing_raw_review_store_public_contract_is_unchanged():

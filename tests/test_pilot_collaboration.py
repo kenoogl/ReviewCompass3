@@ -12,6 +12,12 @@ import pytest
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+TEST_FILE_PATHS = (
+    "tests/test_pilot_collaboration.py",
+    "tests/test_pilot_collaboration_cli.py",
+    "tests/test_bootstrap_immutable_result_store.py",
+    "tests/test_pilot_collaboration_entrypoints.py",
+)
 INSTRUCTION_PATH = (
     "records/session-handoffs/"
     "2026-08-11-pilot-collaboration-entry-implementation-request-v6.md"
@@ -23,32 +29,80 @@ REQUIREMENT_IDS = tuple(
     + [f"OUT-PC-{number:03d}" for number in range(1, 7)]
 )
 TRACEABILITY = {
-    "AC-PC-001": "test_repository_exposes_one_common_pilot_entrypoint",
-    "AC-PC-002": "test_prepare_rejects_tampered_source_and_requirement_set",
-    "AC-PC-003": "test_prepare_is_deterministic_and_hashes_payload_not_saved_envelope",
-    "AC-PC-004": "test_launch_failure_is_preserved_before_stopping",
-    "AC-PC-005": "test_audit_requires_complete_requirement_coverage",
-    "AC-PC-006": "test_judgment_requires_one_recommendation_per_finding",
-    "AC-PC-007": "test_successful_audit_and_judgment_derive_state_from_event_chain",
-    "AC-PC-008": "test_cli_normalizes_invalid_arguments_to_contract_json",
-    "AC-PC-009": "test_existing_raw_review_store_uses_common_immutable_boundary",
-    "NG-PC-001": "test_pilot_code_cannot_launch_claude_codex_or_shell_commands",
-    "NG-PC-002": "test_ingest_rejects_stage_outside_prompt_quality_slice",
-    "NG-PC-003": "test_failed_ingest_never_overwrites_preserved_raw_result",
-    "NG-PC-004": "test_status_detects_stored_raw_digest_tampering",
-    "NG-PC-005": "test_pilot_does_not_reinterpret_closed_review_pipeline",
-    "NG-PC-006": "test_prepare_and_ingest_do_not_write_workflow_ledgers",
-    "NG-PC-007": "test_entrypoint_change_is_limited_to_one_reference_per_file",
-    "ST-PC-001": "test_change_scope_contains_only_v6_allowlisted_paths",
-    "ST-PC-002": "test_existing_raw_review_store_public_contract_is_unchanged",
-    "ST-PC-003": "test_prepare_rejects_unsafe_private_root_placements",
-    "ST-PC-004": "test_fixed_result_documents_reject_extra_and_missing_keys",
-    "OUT-PC-001": "process:red-test-command-receipts",
-    "OUT-PC-002": "process:committed-test-baseline",
-    "OUT-PC-003": "test_fault_injection_matrix_covers_required_failures",
-    "OUT-PC-004": "process:post-implementation-command-receipts",
-    "OUT-PC-005": "process:final-requirement-evidence-report",
-    "OUT-PC-006": "process:local-commit-receipt",
+    "AC-PC-001": ("test_repository_exposes_one_common_pilot_entrypoint",),
+    "AC-PC-002": (
+        "test_prepare_rejects_tampered_source_and_requirement_set",
+        "test_round_above_limit_stops_before_run_creation",
+    ),
+    "AC-PC-003": (
+        "test_prepare_is_deterministic_and_hashes_payload_not_saved_envelope",
+    ),
+    "AC-PC-004": (
+        "test_launch_failure_is_preserved_before_stopping",
+        "test_launch_raw_digest_mismatch_stops_before_preservation",
+    ),
+    "AC-PC-005": ("test_audit_requires_complete_requirement_coverage",),
+    "AC-PC-006": (
+        "test_judgment_requires_one_recommendation_per_finding",
+        "test_judgment_audit_digest_mismatch_preserves_before_stopping",
+    ),
+    "AC-PC-007": (
+        "test_successful_audit_and_judgment_derive_state_from_event_chain",
+        "test_empty_findings_reaches_ready_for_executor_boundary",
+        "test_ingest_rejects_stage_skip_before_writing_attempt",
+    ),
+    "AC-PC-008": (
+        "test_cli_normalizes_invalid_arguments_to_contract_json",
+        "test_launch_status_must_match_all_command_exit_codes",
+    ),
+    "AC-PC-009": (
+        "test_existing_raw_review_store_calls_common_immutable_boundary",
+        "test_existing_raw_review_store_public_contract_is_unchanged",
+    ),
+    "NG-PC-001": ("test_pilot_code_uses_only_array_git_subprocess_run",),
+    "NG-PC-002": ("test_ingest_rejects_stage_outside_prompt_quality_slice",),
+    "NG-PC-003": (
+        "test_failed_ingest_never_overwrites_preserved_raw_result",
+        "test_launch_failure_is_preserved_before_stopping",
+    ),
+    "NG-PC-004": (
+        "test_status_detects_stored_raw_digest_tampering",
+        "test_saved_envelope_file_digest_is_not_valid_input_payload_digest",
+    ),
+    "NG-PC-005": ("test_pilot_does_not_reinterpret_closed_review_pipeline",),
+    "NG-PC-006": ("test_prepare_and_ingest_do_not_write_workflow_ledgers",),
+    "NG-PC-007": ("test_change_scope_contains_only_v6_allowlisted_paths",),
+    "ST-PC-001": ("test_change_scope_contains_only_v6_allowlisted_paths",),
+    "ST-PC-002": ("test_existing_raw_review_store_public_contract_is_unchanged",),
+    "ST-PC-003": (
+        "test_prepare_rejects_unsafe_private_root_placements",
+        "test_common_store_rejects_unsafe_relative_paths",
+    ),
+    "ST-PC-004": (
+        "test_fixed_result_documents_reject_extra_and_missing_keys",
+        "test_judgment_requires_one_recommendation_per_finding",
+    ),
+    "OUT-PC-001": (
+        "test_prepare_is_deterministic_and_hashes_payload_not_saved_envelope",
+    ),
+    "OUT-PC-002": ("test_requirement_traceability_covers_all_26_ids",),
+    "OUT-PC-003": (
+        "test_prepare_rejects_tampered_source_and_requirement_set",
+        "test_prepare_rejects_unsafe_private_root_placements",
+        "test_audit_requires_complete_requirement_coverage",
+        "test_judgment_requires_one_recommendation_per_finding",
+        "test_ingest_rejects_stage_skip_before_writing_attempt",
+        "test_launch_failure_is_preserved_before_stopping",
+        "test_stale_input_digest_wins_over_launch_status",
+        "test_launch_status_must_match_all_command_exit_codes",
+        "test_saved_envelope_file_digest_is_not_valid_input_payload_digest",
+        "test_failed_ingest_never_overwrites_preserved_raw_result",
+        "test_launch_raw_digest_mismatch_stops_before_preservation",
+        "test_judgment_audit_digest_mismatch_preserves_before_stopping",
+    ),
+    "OUT-PC-004": ("test_change_scope_ignores_later_record_and_todo_commits",),
+    "OUT-PC-005": ("test_requirement_traceability_covers_all_26_ids",),
+    "OUT-PC-006": ("test_change_scope_contains_only_v6_allowlisted_paths",),
 }
 
 
@@ -329,6 +383,25 @@ def _complete_audit(tmp_path, repository, private_root, findings=None):
 def test_requirement_traceability_covers_all_26_ids():
     assert tuple(TRACEABILITY) == REQUIREMENT_IDS
     assert len(TRACEABILITY) == 26
+    defined_tests = set()
+    for relative_path in TEST_FILE_PATHS:
+        tree = ast.parse(
+            (PROJECT_ROOT / relative_path).read_text(encoding="utf-8"),
+            filename=relative_path,
+        )
+        defined_tests.update(
+            node.name
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name.startswith("test_")
+        )
+    referenced_tests = {
+        test_name
+        for test_names in TRACEABILITY.values()
+        for test_name in test_names
+    }
+
+    assert referenced_tests <= defined_tests
 
 
 def test_prepare_is_deterministic_and_hashes_payload_not_saved_envelope(tmp_path):
@@ -782,6 +855,86 @@ def test_launch_status_must_match_all_command_exit_codes(tmp_path, status, exit_
     assert not (run_root / "launch/audit-invalid-launch.json").exists()
 
 
+def test_launch_raw_digest_mismatch_stops_before_preservation(tmp_path):
+    repository, private_root, _ = _prepare(tmp_path)
+    raw_file = _raw_path(tmp_path, "audit-wrong-raw-digest.json", {"raw": True})
+    run_root = private_root / "run-001"
+    launch = _launch_path(
+        tmp_path,
+        run_id="run-001",
+        stage="prompt_audit",
+        attempt_id="audit-wrong-raw-digest",
+        input_digest=_payload_digest(run_root / "prompt-audit-envelope.json"),
+        raw_file=raw_file,
+    )
+    launch_document = json.loads(launch.read_text(encoding="utf-8"))
+    launch_document["material_observation"]["raw_sha256"] = "0" * 64
+    _write_json(launch, launch_document)
+
+    completed = _ingest(
+        repository,
+        private_root,
+        "run-001",
+        "prompt_audit",
+        "audit-wrong-raw-digest",
+        raw_file,
+        launch,
+    )
+
+    assert completed.returncode == 2
+    assert _result(completed)["stop_code"] == "raw_digest_mismatch"
+    assert not (run_root / "raw/audit-wrong-raw-digest.json").exists()
+    assert not (run_root / "launch/audit-wrong-raw-digest.json").exists()
+    assert not (run_root / "parsed/audit-wrong-raw-digest.json").exists()
+    assert tuple(path.name for path in (run_root / "events").iterdir()) == (
+        "0001-prepared.json",
+    )
+
+
+def test_judgment_audit_digest_mismatch_preserves_before_stopping(tmp_path):
+    repository, private_root, _ = _prepare(tmp_path)
+    _complete_audit(tmp_path, repository, private_root)
+    run_root = private_root / "run-001"
+    raw_file = _raw_path(
+        tmp_path,
+        "judgment-wrong-audit-digest.json",
+        {
+            "schema_version": 1,
+            "result_kind": "prompt_judgment",
+            "status": "completed",
+            "audit_parsed_sha256": "0" * 64,
+            "recommendations": [],
+        },
+    )
+    launch = _launch_path(
+        tmp_path,
+        run_id="run-001",
+        stage="prompt_judgment",
+        attempt_id="judgment-wrong-audit-digest",
+        input_digest=_payload_digest(run_root / "prompt-judgment-envelope.json"),
+        raw_file=raw_file,
+    )
+
+    completed = _ingest(
+        repository,
+        private_root,
+        "run-001",
+        "prompt_judgment",
+        "judgment-wrong-audit-digest",
+        raw_file,
+        launch,
+    )
+
+    assert completed.returncode == 2
+    assert _result(completed)["stop_code"] == "audit_digest_mismatch"
+    assert (run_root / "raw/judgment-wrong-audit-digest.json").is_file()
+    assert (run_root / "launch/judgment-wrong-audit-digest.json").is_file()
+    assert not (run_root / "parsed/judgment-wrong-audit-digest.json").exists()
+    assert (
+        run_root / "events/0003-prompt-judgment-parse-failed.json"
+    ).is_file()
+
+
 def test_saved_envelope_file_digest_is_not_valid_input_payload_digest(tmp_path):
     repository, private_root, _ = _prepare(tmp_path)
     run_root = private_root / "run-001"
@@ -958,32 +1111,186 @@ def test_fixed_result_documents_reject_extra_and_missing_keys(tmp_path, raw_muta
     assert (run_root / "raw/audit-invalid-shape.json").is_file()
 
 
-def test_pilot_code_cannot_launch_claude_codex_or_shell_commands():
-    source = PROJECT_ROOT / "tools/development/pilot_collaboration.py"
-    tree = ast.parse(source.read_text(encoding="utf-8"))
-    forbidden = ("claude", "codex", "subagent")
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Call):
-            continue
-        function_name = None
-        if isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
-            function_name = f"{node.func.value.id}.{node.func.attr}"
-        if function_name != "subprocess.run":
-            continue
-        for keyword in node.keywords:
-            assert not (keyword.arg == "shell" and isinstance(keyword.value, ast.Constant) and keyword.value.value)
-        if not node.args:
-            continue
-        literal_values = [
-            value.value.lower()
-            for value in ast.walk(node.args[0])
-            if isinstance(value, ast.Constant) and isinstance(value.value, str)
-        ]
-        assert not any(
-            marker in value
-            for marker in forbidden
-            for value in literal_values
+def _dotted_name(node):
+    values = []
+    while isinstance(node, ast.Attribute):
+        values.append(node.attr)
+        node = node.value
+    if not isinstance(node, ast.Name):
+        return None
+    values.append(node.id)
+    return ".".join(reversed(values))
+
+
+def _is_process_method(module_name, method_name):
+    if module_name == "subprocess":
+        return True
+    if module_name in ("os", "posix"):
+        return method_name in ("system", "popen") or method_name.startswith(
+            ("exec", "spawn", "posix_spawn")
         )
+    if module_name == "asyncio":
+        return method_name.startswith("create_subprocess")
+    if module_name == "multiprocessing":
+        return method_name == "Process"
+    if module_name == "pty":
+        return method_name == "spawn"
+    return False
+
+
+def _process_policy_violations(source):
+    tree = ast.parse(source)
+    parents = {
+        child: parent
+        for parent in ast.walk(tree)
+        for child in ast.iter_child_nodes(parent)
+    }
+    module_aliases = {}
+    violations = []
+    process_modules = {"subprocess", "os", "posix", "asyncio", "multiprocessing", "pty"}
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for imported in node.names:
+                root_module = imported.name.split(".", 1)[0]
+                if root_module not in process_modules:
+                    continue
+                local_name = imported.asname or root_module
+                module_aliases[local_name] = root_module
+                if root_module == "subprocess" and imported.asname is not None:
+                    violations.append("subprocess alias import")
+        elif isinstance(node, ast.ImportFrom) and node.module in process_modules:
+            for imported in node.names:
+                if node.module == "subprocess" or _is_process_method(
+                    node.module,
+                    imported.name,
+                ):
+                    violations.append(f"from-import {node.module}.{imported.name}")
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            dotted = _dotted_name(node.func)
+            if dotted in ("eval", "exec"):
+                violations.append(f"dynamic execution {dotted}")
+                continue
+            if dotted == "__import__" and node.args:
+                imported = node.args[0]
+                if (
+                    isinstance(imported, ast.Constant)
+                    and imported.value in process_modules
+                ):
+                    violations.append(f"dynamic import {imported.value}")
+                elif not isinstance(imported, ast.Constant):
+                    violations.append("dynamic import expression")
+                continue
+            if dotted == "getattr" and node.args:
+                target_name = _dotted_name(node.args[0])
+                target_module = module_aliases.get(target_name)
+                if target_module is not None:
+                    attribute = node.args[1] if len(node.args) > 1 else None
+                    if (
+                        target_module == "subprocess"
+                        or not isinstance(attribute, ast.Constant)
+                        or not isinstance(attribute.value, str)
+                        or _is_process_method(target_module, attribute.value)
+                    ):
+                        violations.append(f"dynamic process lookup {target_module}")
+                continue
+            if dotted is None or "." not in dotted:
+                continue
+            local_module, method_name = dotted.split(".", 1)
+            module_name = module_aliases.get(local_module)
+            if module_name is None or not _is_process_method(module_name, method_name):
+                continue
+            if dotted != "subprocess.run":
+                violations.append(f"process call {dotted}")
+                continue
+            if not node.args or not isinstance(node.args[0], (ast.List, ast.Tuple)):
+                violations.append("subprocess.run command is not a literal argument array")
+                continue
+            arguments = node.args[0].elts
+            if (
+                not arguments
+                or not isinstance(arguments[0], ast.Constant)
+                or arguments[0].value != "git"
+            ):
+                violations.append("subprocess.run command is not git")
+            for keyword in node.keywords:
+                if keyword.arg == "executable":
+                    violations.append("subprocess.run overrides executable")
+                if keyword.arg == "shell" and not (
+                    isinstance(keyword.value, ast.Constant)
+                    and keyword.value.value is False
+                ):
+                    violations.append("subprocess.run enables shell")
+
+        if isinstance(node, ast.Name) and node.id in module_aliases:
+            parent = parents.get(node)
+            if not (
+                isinstance(parent, ast.Attribute)
+                and parent.value is node
+            ):
+                violations.append(
+                    f"indirect process module use {module_aliases[node.id]}"
+                )
+
+        if not isinstance(node, ast.Attribute):
+            continue
+        dotted = _dotted_name(node)
+        if dotted is None or "." not in dotted:
+            continue
+        local_module, method_name = dotted.split(".", 1)
+        if module_aliases.get(local_module) != "subprocess":
+            continue
+        parent = parents.get(node)
+        if not (
+            dotted == "subprocess.run"
+            and isinstance(parent, ast.Call)
+            and parent.func is node
+        ):
+            violations.append(f"indirect subprocess attribute {method_name}")
+
+    return tuple(violations)
+
+
+def test_pilot_code_uses_only_array_git_subprocess_run():
+    for relative_path in (
+        "tools/development/pilot_collaboration.py",
+        "tools/development/pilot_collaboration_cli.py",
+    ):
+        source = (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
+        assert _process_policy_violations(source) == ()
+
+
+@pytest.mark.parametrize(
+    "source",
+    (
+        "import subprocess as sp\nsp.Popen(['claude'])",
+        "from subprocess import check_output as invoke\ninvoke(['git', 'show'])",
+        "import subprocess\ngetattr(subprocess, 'Popen')(['codex'])",
+        "import subprocess\nrunner = subprocess.run\nrunner(['git', 'show'])",
+        "import subprocess\nsubprocess.call(['git', 'show'])",
+        "import subprocess\nsubprocess.run(['claude', 'review'])",
+        "import subprocess\nsubprocess.run(build_command())",
+        "import subprocess\nsubprocess.run('git show HEAD', shell=True)",
+        "import os\ngetattr(os, method)(payload)",
+        "__import__('subprocess').Popen(['git'])",
+        "import subprocess\nvars(subprocess)[method](['git'])",
+        "__import__('sub' + 'process').Popen(['git'])",
+    ),
+)
+def test_process_policy_rejects_alias_popen_check_and_dynamic_routes(source):
+    assert _process_policy_violations(source)
+
+
+def test_process_policy_allows_only_direct_array_git_run():
+    source = (
+        "import subprocess\n"
+        "ref = 'HEAD'\n"
+        "subprocess.run(('git', 'show', ref), check=False, capture_output=True)\n"
+    )
+
+    assert _process_policy_violations(source) == ()
 
 
 def test_pilot_does_not_reinterpret_closed_review_pipeline():
