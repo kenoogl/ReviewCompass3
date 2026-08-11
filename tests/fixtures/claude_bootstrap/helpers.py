@@ -8,6 +8,7 @@ import stat
 import subprocess
 
 
+_REAL_SUBPROCESS_RUN = subprocess.run
 FIXTURE_ROOT = Path(__file__).parent
 CONTRACT = json.loads(
     (FIXTURE_ROOT / "contract-v1.json").read_text(encoding="utf-8")
@@ -45,7 +46,7 @@ def write_json(path, value, mode=None):
 
 
 def run_git(repository, *arguments):
-    return subprocess.run(
+    return _REAL_SUBPROCESS_RUN(
         ["git", *arguments],
         cwd=repository,
         check=True,
@@ -176,6 +177,7 @@ def _manifest():
 
 
 def create_scenario(tmp_path, monkeypatch):
+    tmp_path.mkdir(parents=True, exist_ok=True)
     repository = tmp_path / "repository"
     home = tmp_path / "home"
     repository.mkdir()
