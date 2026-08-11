@@ -702,11 +702,20 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
                 "authentication_not_approved",
                 preflight_process_count=preflight_count,
             ) from error
-        if auth.returncode != 0 or auth_value != {
+        expected_authentication = {
             "loggedIn": True,
             "authMethod": "claude.ai",
             "apiProvider": "firstParty",
-        }:
+        }
+        if (
+            auth.returncode != 0
+            or not isinstance(auth_value, dict)
+            or any(
+                auth_value.get(name) != expected
+                for name, expected in expected_authentication.items()
+            )
+            or "apiKeySource" in auth_value
+        ):
             raise _BootstrapStop(
                 "authentication_not_approved",
                 preflight_process_count=preflight_count,

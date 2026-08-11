@@ -368,6 +368,59 @@ def test_only_claude_ai_first_party_authentication_is_accepted(tmp_path, monkeyp
     assert scenario.fake_process.payload_calls == []
 
 
+def test_claude_ai_authentication_accepts_non_secret_status_metadata(
+    tmp_path, monkeypatch
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    original = scenario.fake_process.__call__
+
+    def authenticated_with_metadata(args, **kwargs):
+        completed = original(args, **kwargs)
+        if "auth" in args and "status" in args:
+            value = json.loads(completed.stdout)
+            value.update(
+                {
+                    "email": "reviewer@example.invalid",
+                    "orgId": "00000000-0000-4000-8000-000000000000",
+                    "orgName": "Example Organization",
+                    "subscriptionType": "max",
+                }
+            )
+            completed.stdout = json.dumps(value)
+        return completed
+
+    module = scenario.module()
+    monkeypatch.setattr(module.subprocess, "run", authenticated_with_metadata)
+
+    result = scenario.run()
+
+    assert result["result"] == "succeeded"
+    assert len(scenario.fake_process.payload_calls) == 2
+    assert "reviewer@example.invalid" not in json.dumps(result)
+
+
+def test_api_key_authentication_source_is_rejected(tmp_path, monkeypatch):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    original = scenario.fake_process.__call__
+
+    def authenticated_with_api_key_source(args, **kwargs):
+        completed = original(args, **kwargs)
+        if "auth" in args and "status" in args:
+            value = json.loads(completed.stdout)
+            value["apiKeySource"] = "ANTHROPIC_API_KEY"
+            completed.stdout = json.dumps(value)
+        return completed
+
+    module = scenario.module()
+    monkeypatch.setattr(module.subprocess, "run", authenticated_with_api_key_source)
+
+    result = scenario.run()
+
+    assert result["result"] == "stopped"
+    assert result["stop_code"] == "authentication_not_approved"
+    assert scenario.fake_process.payload_calls == []
+
+
 def test_receipt_contract_fixes_real_run_provenance_without_performing_real_run(
     tmp_path, monkeypatch
 ):
