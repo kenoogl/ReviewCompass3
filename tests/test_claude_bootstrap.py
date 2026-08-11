@@ -101,6 +101,17 @@ def test_child_environment_and_public_result_exclude_credentials_roots_and_value
     assert str(scenario.repository) not in serialized
 
 
+def test_child_environment_preserves_user_for_claude_subscription_lookup(
+    tmp_path, monkeypatch
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    monkeypatch.setenv("USER", "subscription-user")
+
+    environment = scenario.module()._child_environment()
+
+    assert environment["USER"] == "subscription-user"
+
+
 def test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory(
     tmp_path, monkeypatch
 ):

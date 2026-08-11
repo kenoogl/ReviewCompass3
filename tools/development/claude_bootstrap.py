@@ -66,6 +66,7 @@ _MATERIAL_POLICY = {
 }
 _ALLOWED_CHILD_ENVIRONMENT = (
     "HOME",
+    "USER",
     "PATH",
     "TMPDIR",
     "LANG",
