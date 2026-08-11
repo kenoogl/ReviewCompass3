@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計と第1機械処理縦切りがHuman段完了承認まで完了した。
-- 現在作業：Human採用4件を反映した範囲レビュー依頼v2の再監査でPA-CB-SR2-001が見つかり、別の判定担当は採用と選択肢1を推奨した。前回PA-CB-SR-002と同じ類型の再発のため、依頼v3を自動作成せずHumanの前提選択待ち。範囲レビュー本体、test、実装、認証、実送信は未開始。
+- 現在作業：Humanの選択肢1を反映した範囲レビュー依頼v3は品質関門に合格した。gpt-5.6-terraの独立範囲レビューはSR-CB-F-001をblockingとしてreported_unverified。範囲固定v2のHuman authorityが自身の固定入力一覧に無い。test、実装、認証、実送信は未開始。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,10 @@
 
 ## 最新のauthority／Evidence
 
+- [無工具Claude疎通経路 独立範囲レビュー v1](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-v1.md) — SHA-256 `eef8ca1cd4964a56991ff1d99adacda11acd14c3a1a0b5738780d45e650616b0`
+- [範囲レビュー依頼 最終指示文判定 v3](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-final-judgment-v3.md) — SHA-256 `1d9d089ee6b78beb2dd0adb0aa38af8c682dead7dfd9e9b2bb6dd29cbb27dc25`
+- [範囲レビュー依頼 最終指示文監査 v3](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-final-audit-v3.md) — SHA-256 `c3f8f721ceec4d17de5c4978c51821bb80f7e4c856d9e21e50f9514d25715e77`
+- [範囲レビュー依頼 v3](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-request-v3.md) — SHA-256 `205f048b736c468d1fa77075bcaccae7470cdc302170d6343da0c80932779117`
 - [範囲レビュー依頼 指示文再判定 v2](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-rejudgment-v2.md) — SHA-256 `9e5b51dcd570bff7d5652b9930520121679b57f2eb351ec5ae6d26fb8060018a`
 - [範囲レビュー依頼 指示文再監査 v2](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-reaudit-v2.md) — SHA-256 `93c09fb48c5d1f614825f35d67070c950968127a731496c7a1954a837d36514a`
 - [範囲レビュー依頼 v2](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-request-v2.md) — SHA-256 `4f374483d87cfff11714ba95d40fe6f0e38625e77c2d38fa5cb163c13d8df51e`
@@ -35,30 +39,30 @@
 
 ## 次に行う一作業
 
-HumanがPA-CB-SR2-001を採用、不採用、保留で裁定し、採用時は固定材料へ含める選択肢1か、依頼入力から分離して設計し直す選択肢2を選ぶ。
+HumanがSR-CB-F-001を採用、不採用、保留のいずれかで裁定する。
 
 開始条件：
 
-- 依頼v2の再監査と再判定が別のgpt-5.6-terraサブエージェントで実施されていること
-- PA-CB-SR2-001が対象依頼v2のSHA-256へ束縛され、同類型再発と判定されていること
-- 範囲レビュー本体をまだ開始していないこと
+- 依頼v3が別の監査・判定担当による品質関門に合格していること
+- 範囲レビュー担当がgpt-5.6-terraで、主担当・監査・判定と別の会話状態であること
+- SR-CB-F-001と機械反証が対象範囲固定v2のSHA-256へ束縛されていること
 
 完了条件：
 
-- PA-CB-SR2-001の採否と前提選択がHuman裁定へ固定されること
-- 不採用または保留なら依頼文を修正せず停止すること
-- 選択肢1を採用した場合だけHuman裁定を固定材料に含めた単一v3依頼を作ること
+- SR-CB-F-001へHuman裁定が一回だけ対応すること
+- 不採用または保留なら範囲固定を修正せず停止すること
+- 採用時は現行v2を書き換えず、無工具段階選択Human裁定を§3固定入力へ加えた次版を作ること
 
-後続作業：Human前提選択を反映した依頼が新しい品質関門に合格した後、gpt-5.6-terraの新しいレビュー用サブエージェントが範囲固定v2を独立レビューする。
+後続作業：採用時は次版の範囲固定、対象Digest、レビュー依頼を新たに固定し、品質関門と独立範囲レビューを再実行する。
 
 ## blocker・Human判断待ち
 
-- blocker：PA-CB-SR2-001が前回PA-CB-SR-002と同じ類型で再発したため、依頼文の自動修正を停止した。Claude Codeの未認証は後段の認証操作と実送信も停止する。
-- Human判断待ち：PA-CB-SR2-001の採否と、採用時の選択肢1または2を決める必要がある。判定担当は採用と選択肢1を推奨する。
+- blocker：独立範囲レビューがSR-CB-F-001によりreported_unverified。Human裁定まで範囲固定の修正、RED、実装を停止する。Claude Codeの未認証は後段の認証操作と実送信も停止する。
+- Human判断待ち：SR-CB-F-001を採用、不採用、保留で裁定する必要がある。Reviewerは無工具段階選択Human裁定を範囲固定§3へ追加する最小修正を提案する。
 
 ## stale・deferred
 
-- stale：接続段階のHuman選択待ちという旧表示は、無工具の疎通確認を選択した裁定により古い状態。先行範囲v1は実装根拠に使わない。
+- stale：接続段階のHuman選択待ちという旧表示は古い。先行範囲v1は実装根拠に使わず、範囲固定v2もレビュー結果がreported_unverifiedのためRED開始根拠に使わない。
 - deferred：実送信、認証操作、限定道具を許可する実装委譲、第2縦切り、group C・D、実装後レビュー接続、既存保全データへの伏字化遡及適用、Work 7A後続、既存Issue resolveを保留する。
 
 ## Git・Test
@@ -67,7 +71,7 @@ HumanがPA-CB-SR2-001を採用、不採用、保留で裁定し、採用時は�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：文書・指示文品質確認段階のため新規testなし。再監査の対象・固定材料・Human裁定9件のDigestは一致。直近の操縦者別連携受入89件は終了0。
+- 直近の関連Test：文書・範囲レビュー段階のため新規testなし。依頼対象と固定材料10件は全一致。SR-CB-F-001の固定入力欠落反証は終了0。直近の操縦者別連携受入89件は終了0。
 - 直近の全Test：直近の公式全Testは1559 passed、failed 0、errors 0、終了コード0。
 - 差分検査：`git diff --check`合格
 
