@@ -112,7 +112,7 @@ def test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory(
     calls = scenario.fake_process.payload_calls
     assert len(calls) == 2
     first = calls[0]["args"]
-    assert first[1:17] == [
+    assert first[1:18] == [
         "--print",
         "--safe-mode",
         "--tools",
@@ -120,6 +120,7 @@ def test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory(
         "--disallowedTools",
         "*",
         "--strict-mcp-config",
+        "--mcp-config",
         '{"mcpServers":{}}',
         "--disable-slash-commands",
         "--no-chrome",
@@ -128,7 +129,7 @@ def test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory(
         "--model",
         "fable",
         "--session-id",
-        first[16],
+        first[17],
     ]
     assert "--resume" in calls[1]["args"]
     assert all(Path(call["cwd"]) == scenario.work_directory for call in calls)

@@ -6,9 +6,10 @@ import os
 from pathlib import Path
 import stat
 import subprocess
+import types
 
 
-_REAL_SUBPROCESS_RUN = subprocess.run
+_REAL_SUBPROCESS = types.SimpleNamespace(run=subprocess.run)
 FIXTURE_ROOT = Path(__file__).parent
 CONTRACT = json.loads(
     (FIXTURE_ROOT / "contract-v1.json").read_text(encoding="utf-8")
@@ -46,7 +47,7 @@ def write_json(path, value, mode=None):
 
 
 def run_git(repository, *arguments):
-    return _REAL_SUBPROCESS_RUN(
+    return _REAL_SUBPROCESS.run(
         ["git", *arguments],
         cwd=repository,
         check=True,
