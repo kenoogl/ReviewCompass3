@@ -1,0 +1,16 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "duration_ms": 10,
+  "duration_api_ms": 8,
+  "is_error": false,
+  "num_turns": 1,
+  "result": "{\"protocol\":\"codex-pilot-claude-bootstrap-v1\",\"role\":\"reviewer\",\"nonce\":\"RC3-CPC-20260811-A\",\"reinvoke\":false}",
+  "stop_reason": null,
+  "total_cost_usd": 0,
+  "usage": {},
+  "modelUsage": {},
+  "permission_denials": [],
+  "uuid": "11111111-1111-4111-8111-111111111111",
+  "session_id": "11111111-1111-4111-8111-111111111111"
+}

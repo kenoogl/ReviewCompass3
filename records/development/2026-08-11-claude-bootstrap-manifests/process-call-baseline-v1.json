@@ -1,0 +1,643 @@
+{
+  "schema_version": 1,
+  "record_kind": "python_process_call_baseline",
+  "base_commit": "e54fcdaec38ab4b755f67371dbbdd20604447b95",
+  "roots": [
+    "tools"
+  ],
+  "entries": [
+    {
+      "path": "tools/bootstrap/migration_candidates.py",
+      "line": 11,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "483e5170f8b6887b06bd5c482d855a4b7acf6f13e8218966db70b2d36fcf300d"
+    },
+    {
+      "path": "tools/bootstrap/migration_candidates.py",
+      "line": 101,
+      "column": 13,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "483e5170f8b6887b06bd5c482d855a4b7acf6f13e8218966db70b2d36fcf300d"
+    },
+    {
+      "path": "tools/bootstrap/migration_candidates.py",
+      "line": 101,
+      "column": 13,
+      "call_kind": "call",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "483e5170f8b6887b06bd5c482d855a4b7acf6f13e8218966db70b2d36fcf300d"
+    },
+    {
+      "path": "tools/bootstrap/migration_candidates.py",
+      "line": 101,
+      "column": 13,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "483e5170f8b6887b06bd5c482d855a4b7acf6f13e8218966db70b2d36fcf300d"
+    },
+    {
+      "path": "tools/bootstrap/source_universe.py",
+      "line": 9,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "341486ce36c1b52df19ead5eb956a81473c1434fc2dc4ac495e350b7baee544b"
+    },
+    {
+      "path": "tools/bootstrap/source_universe.py",
+      "line": 18,
+      "column": 13,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "341486ce36c1b52df19ead5eb956a81473c1434fc2dc4ac495e350b7baee544b"
+    },
+    {
+      "path": "tools/bootstrap/source_universe.py",
+      "line": 18,
+      "column": 13,
+      "call_kind": "call",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "341486ce36c1b52df19ead5eb956a81473c1434fc2dc4ac495e350b7baee544b"
+    },
+    {
+      "path": "tools/bootstrap/source_universe.py",
+      "line": 18,
+      "column": 13,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "341486ce36c1b52df19ead5eb956a81473c1434fc2dc4ac495e350b7baee544b"
+    },
+    {
+      "path": "tools/deployment/checkout_relocation.py",
+      "line": 22,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "2a81b11d1355f5bcde1381ff40dd9cd9337781e2719cbb696befc5d60d44eed1"
+    },
+    {
+      "path": "tools/deployment/checkout_relocation.py",
+      "line": 108,
+      "column": 11,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "2a81b11d1355f5bcde1381ff40dd9cd9337781e2719cbb696befc5d60d44eed1"
+    },
+    {
+      "path": "tools/deployment/checkout_relocation.py",
+      "line": 108,
+      "column": 11,
+      "call_kind": "call",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "2a81b11d1355f5bcde1381ff40dd9cd9337781e2719cbb696befc5d60d44eed1"
+    },
+    {
+      "path": "tools/deployment/checkout_relocation.py",
+      "line": 108,
+      "column": 11,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "2a81b11d1355f5bcde1381ff40dd9cd9337781e2719cbb696befc5d60d44eed1"
+    },
+    {
+      "path": "tools/deployment/checkout_relocation.py",
+      "line": 130,
+      "column": 35,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.SubprocessError",
+      "file_sha256": "2a81b11d1355f5bcde1381ff40dd9cd9337781e2719cbb696befc5d60d44eed1"
+    },
+    {
+      "path": "tools/deployment/checkout_relocation.py",
+      "line": 130,
+      "column": 35,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "2a81b11d1355f5bcde1381ff40dd9cd9337781e2719cbb696befc5d60d44eed1"
+    },
+    {
+      "path": "tools/design/bootstrap_conformance.py",
+      "line": 7,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+    },
+    {
+      "path": "tools/design/bootstrap_conformance.py",
+      "line": 670,
+      "column": 16,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+    },
+    {
+      "path": "tools/design/bootstrap_conformance.py",
+      "line": 670,
+      "column": 16,
+      "call_kind": "call",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+    },
+    {
+      "path": "tools/design/bootstrap_conformance.py",
+      "line": 670,
+      "column": 16,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+    },
+    {
+      "path": "tools/design/bootstrap_conformance.py",
+      "line": 680,
+      "column": 21,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.CalledProcessError",
+      "file_sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+    },
+    {
+      "path": "tools/design/bootstrap_conformance.py",
+      "line": 680,
+      "column": 21,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "100d46a4013c3cea3981d6a665d8cfda5f372d2a6e70ccc5fd3fde346bb58fcb"
+    },
+    {
+      "path": "tools/development/bootstrap_environment.py",
+      "line": 10,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "837e44106f08f2e568c7766422ce1ac422f0106f8968de3d13defe0bbebb445c"
+    },
+    {
+      "path": "tools/development/bootstrap_environment.py",
+      "line": 114,
+      "column": 52,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "837e44106f08f2e568c7766422ce1ac422f0106f8968de3d13defe0bbebb445c"
+    },
+    {
+      "path": "tools/development/bootstrap_environment.py",
+      "line": 114,
+      "column": 52,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "837e44106f08f2e568c7766422ce1ac422f0106f8968de3d13defe0bbebb445c"
+    },
+    {
+      "path": "tools/development/bootstrap_environment.py",
+      "line": 168,
+      "column": 8,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "837e44106f08f2e568c7766422ce1ac422f0106f8968de3d13defe0bbebb445c"
+    },
+    {
+      "path": "tools/development/bootstrap_environment.py",
+      "line": 168,
+      "column": 8,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "837e44106f08f2e568c7766422ce1ac422f0106f8968de3d13defe0bbebb445c"
+    },
+    {
+      "path": "tools/development/declaration_red_map_check.py",
+      "line": 19,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "151d2ef80a3ebb0dad6999dc1db63c0790541575ef0e7d7efd9da9ac7a507a61"
+    },
+    {
+      "path": "tools/development/declaration_red_map_check.py",
+      "line": 85,
+      "column": 16,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "151d2ef80a3ebb0dad6999dc1db63c0790541575ef0e7d7efd9da9ac7a507a61"
+    },
+    {
+      "path": "tools/development/declaration_red_map_check.py",
+      "line": 85,
+      "column": 16,
+      "call_kind": "call",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "151d2ef80a3ebb0dad6999dc1db63c0790541575ef0e7d7efd9da9ac7a507a61"
+    },
+    {
+      "path": "tools/development/declaration_red_map_check.py",
+      "line": 85,
+      "column": 16,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "151d2ef80a3ebb0dad6999dc1db63c0790541575ef0e7d7efd9da9ac7a507a61"
+    },
+    {
+      "path": "tools/development/issue_resolution_pilot.py",
+      "line": 8,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "71e8daebe1a991bde307b0ab9498082218cfef9a6cab6661fa43cb093821f6ef"
+    },
+    {
+      "path": "tools/development/issue_resolution_pilot.py",
+      "line": 293,
+      "column": 13,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "71e8daebe1a991bde307b0ab9498082218cfef9a6cab6661fa43cb093821f6ef"
+    },
+    {
+      "path": "tools/development/issue_resolution_pilot.py",
+      "line": 293,
+      "column": 13,
+      "call_kind": "call",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "71e8daebe1a991bde307b0ab9498082218cfef9a6cab6661fa43cb093821f6ef"
+    },
+    {
+      "path": "tools/development/issue_resolution_pilot.py",
+      "line": 293,
+      "column": 13,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "71e8daebe1a991bde307b0ab9498082218cfef9a6cab6661fa43cb093821f6ef"
+    },
+    {
+      "path": "tools/development/pilot_collaboration.py",
+      "line": 8,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "86d7c6b3604e8a61976b9e793255dee44d8578d006672271a2e901b2d81b3eb6"
+    },
+    {
+      "path": "tools/development/pilot_collaboration.py",
+      "line": 180,
+      "column": 16,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "86d7c6b3604e8a61976b9e793255dee44d8578d006672271a2e901b2d81b3eb6"
+    },
+    {
+      "path": "tools/development/pilot_collaboration.py",
+      "line": 180,
+      "column": 16,
+      "call_kind": "call",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "86d7c6b3604e8a61976b9e793255dee44d8578d006672271a2e901b2d81b3eb6"
+    },
+    {
+      "path": "tools/development/pilot_collaboration.py",
+      "line": 180,
+      "column": 16,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "86d7c6b3604e8a61976b9e793255dee44d8578d006672271a2e901b2d81b3eb6"
+    },
+    {
+      "path": "tools/development/policy_test_runner.py",
+      "line": 16,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "0f7072ab8a7c4ab9093f394858c7629e2f60c1d2b774d5fd3b640622998e5b24"
+    },
+    {
+      "path": "tools/development/policy_test_runner.py",
+      "line": 227,
+      "column": 8,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "0f7072ab8a7c4ab9093f394858c7629e2f60c1d2b774d5fd3b640622998e5b24"
+    },
+    {
+      "path": "tools/development/policy_test_runner.py",
+      "line": 227,
+      "column": 8,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "0f7072ab8a7c4ab9093f394858c7629e2f60c1d2b774d5fd3b640622998e5b24"
+    },
+    {
+      "path": "tools/development/structured_argv_executor.py",
+      "line": 186,
+      "column": 0,
+      "call_kind": "definition",
+      "qualified_name": "tools.development.structured_argv_executor.subprocess_runner",
+      "file_sha256": "ffe09cdc619ffe71235b1c4182d7ec1d7b5246fe231c8f990c082a401bcb1a1c"
+    },
+    {
+      "path": "tools/development/structured_argv_executor.py",
+      "line": 192,
+      "column": 4,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "ffe09cdc619ffe71235b1c4182d7ec1d7b5246fe231c8f990c082a401bcb1a1c"
+    },
+    {
+      "path": "tools/development/structured_argv_executor.py",
+      "line": 194,
+      "column": 16,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "ffe09cdc619ffe71235b1c4182d7ec1d7b5246fe231c8f990c082a401bcb1a1c"
+    },
+    {
+      "path": "tools/development/structured_argv_executor.py",
+      "line": 194,
+      "column": 16,
+      "call_kind": "call",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "ffe09cdc619ffe71235b1c4182d7ec1d7b5246fe231c8f990c082a401bcb1a1c"
+    },
+    {
+      "path": "tools/development/structured_argv_executor.py",
+      "line": 194,
+      "column": 16,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "ffe09cdc619ffe71235b1c4182d7ec1d7b5246fe231c8f990c082a401bcb1a1c"
+    },
+    {
+      "path": "tools/development/work_unit_transition.py",
+      "line": 6,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "93e005fe299bd0e33d0ada6b92ad1732d05194ebe4d92e100e5111bd659b33b6"
+    },
+    {
+      "path": "tools/development/work_unit_transition.py",
+      "line": 124,
+      "column": 8,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "93e005fe299bd0e33d0ada6b92ad1732d05194ebe4d92e100e5111bd659b33b6"
+    },
+    {
+      "path": "tools/development/work_unit_transition.py",
+      "line": 124,
+      "column": 8,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "93e005fe299bd0e33d0ada6b92ad1732d05194ebe4d92e100e5111bd659b33b6"
+    },
+    {
+      "path": "tools/session_logs/distribution_validation.py",
+      "line": 11,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "2c835846559fb86abef2c07f3ebb259566d008b880169e62629ae385bdda3433"
+    },
+    {
+      "path": "tools/session_logs/distribution_validation.py",
+      "line": 176,
+      "column": 9,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "2c835846559fb86abef2c07f3ebb259566d008b880169e62629ae385bdda3433"
+    },
+    {
+      "path": "tools/session_logs/distribution_validation.py",
+      "line": 176,
+      "column": 9,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "2c835846559fb86abef2c07f3ebb259566d008b880169e62629ae385bdda3433"
+    },
+    {
+      "path": "tools/session_logs/entry.py",
+      "line": 21,
+      "column": 9,
+      "call_kind": "attribute_reference",
+      "qualified_name": "importlib.import_module",
+      "file_sha256": "ddffc769cd683ffeed8b1474d9e599c9ce1283f1ed875d460b6b0953f019bc3e"
+    },
+    {
+      "path": "tools/session_logs/entry.py",
+      "line": 21,
+      "column": 9,
+      "call_kind": "call",
+      "qualified_name": "importlib.import_module",
+      "file_sha256": "ddffc769cd683ffeed8b1474d9e599c9ce1283f1ed875d460b6b0953f019bc3e"
+    },
+    {
+      "path": "tools/session_logs/native_validation.py",
+      "line": 36,
+      "column": 12,
+      "call_kind": "attribute_reference",
+      "qualified_name": "importlib.import_module",
+      "file_sha256": "7dee03e17d8fdc3595684bb38267aa96164a9f9ba0078c155421483fddb172a6"
+    },
+    {
+      "path": "tools/session_logs/native_validation.py",
+      "line": 36,
+      "column": 12,
+      "call_kind": "call",
+      "qualified_name": "importlib.import_module",
+      "file_sha256": "7dee03e17d8fdc3595684bb38267aa96164a9f9ba0078c155421483fddb172a6"
+    },
+    {
+      "path": "tools/session_logs/private_validation.py",
+      "line": 12,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "b06ac88722c79cb3671d9aa5a46188a118a5c8ec4250e2e36103214d499481fc"
+    },
+    {
+      "path": "tools/session_logs/private_validation.py",
+      "line": 121,
+      "column": 9,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "b06ac88722c79cb3671d9aa5a46188a118a5c8ec4250e2e36103214d499481fc"
+    },
+    {
+      "path": "tools/session_logs/private_validation.py",
+      "line": 121,
+      "column": 9,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "b06ac88722c79cb3671d9aa5a46188a118a5c8ec4250e2e36103214d499481fc"
+    },
+    {
+      "path": "tools/session_logs/repository_context.py",
+      "line": 9,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "00836c7bc1c9e126f6b244ee1034a436346f896045d830cc178ac460a459d684"
+    },
+    {
+      "path": "tools/session_logs/repository_context.py",
+      "line": 65,
+      "column": 9,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "00836c7bc1c9e126f6b244ee1034a436346f896045d830cc178ac460a459d684"
+    },
+    {
+      "path": "tools/session_logs/repository_context.py",
+      "line": 65,
+      "column": 9,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "00836c7bc1c9e126f6b244ee1034a436346f896045d830cc178ac460a459d684"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 13,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 224,
+      "column": 9,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 224,
+      "column": 9,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 258,
+      "column": 9,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 258,
+      "column": 9,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 292,
+      "column": 9,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 292,
+      "column": 9,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 331,
+      "column": 29,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/scheduler.py",
+      "line": 331,
+      "column": 29,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "83182825d2ba5ed8b42108d61a4a1f6aa8cfdb666d5ab12070bc41bb847f11b4"
+    },
+    {
+      "path": "tools/session_logs/systemd_scheduler.py",
+      "line": 11,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "d3929bf49f3afd16eb1459832e664467b4c00fafb0282f87f512c8db094b3f89"
+    },
+    {
+      "path": "tools/session_logs/systemd_scheduler.py",
+      "line": 208,
+      "column": 29,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "d3929bf49f3afd16eb1459832e664467b4c00fafb0282f87f512c8db094b3f89"
+    },
+    {
+      "path": "tools/session_logs/systemd_scheduler.py",
+      "line": 208,
+      "column": 29,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "d3929bf49f3afd16eb1459832e664467b4c00fafb0282f87f512c8db094b3f89"
+    },
+    {
+      "path": "tools/session_logs/windows_scheduler.py",
+      "line": 11,
+      "column": 0,
+      "call_kind": "import",
+      "qualified_name": "subprocess",
+      "file_sha256": "a212de77597b554bc00f94c3ed49ad2f9ff193f43e5dce79d3e18737ae646410"
+    },
+    {
+      "path": "tools/session_logs/windows_scheduler.py",
+      "line": 116,
+      "column": 11,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.list2cmdline",
+      "file_sha256": "a212de77597b554bc00f94c3ed49ad2f9ff193f43e5dce79d3e18737ae646410"
+    },
+    {
+      "path": "tools/session_logs/windows_scheduler.py",
+      "line": 116,
+      "column": 11,
+      "call_kind": "call",
+      "qualified_name": "subprocess.list2cmdline",
+      "file_sha256": "a212de77597b554bc00f94c3ed49ad2f9ff193f43e5dce79d3e18737ae646410"
+    },
+    {
+      "path": "tools/session_logs/windows_scheduler.py",
+      "line": 116,
+      "column": 11,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "a212de77597b554bc00f94c3ed49ad2f9ff193f43e5dce79d3e18737ae646410"
+    },
+    {
+      "path": "tools/session_logs/windows_scheduler.py",
+      "line": 217,
+      "column": 29,
+      "call_kind": "attribute_reference",
+      "qualified_name": "subprocess.run",
+      "file_sha256": "a212de77597b554bc00f94c3ed49ad2f9ff193f43e5dce79d3e18737ae646410"
+    },
+    {
+      "path": "tools/session_logs/windows_scheduler.py",
+      "line": 217,
+      "column": 29,
+      "call_kind": "name_reference",
+      "qualified_name": "subprocess",
+      "file_sha256": "a212de77597b554bc00f94c3ed49ad2f9ff193f43e5dce79d3e18737ae646410"
+    }
+  ],
+  "inventory_sha256": "ac77df07e410374078fecf6c373f1613a470f0e8c68f79eeb79fa1cb8ffd6ec9"
+}

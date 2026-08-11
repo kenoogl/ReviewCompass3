@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "record_kind": "claude_bootstrap_declaration_red_map",
+  "scope": {
+    "kind": "complete"
+  },
+  "test_files": {
+    "tests/test_claude_bootstrap.py": [
+      "test_manifest_payload_bytes_digests_order_and_count_are_exact",
+      "test_human_approval_all_bindings_expiry_and_pending_state_are_required",
+      "test_single_preflight_rejects_redaction_secret_email_and_phone_before_payload_process",
+      "test_child_environment_and_public_result_exclude_credentials_roots_and_values",
+      "test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory",
+      "test_first_payload_failure_prevents_second_payload_retry_and_fallback",
+      "test_outer_inner_json_session_nonce_no_tools_and_exit_code_must_all_match",
+      "test_raw_launch_and_receipt_slots_are_exclusive_external_and_rereadable",
+      "test_every_stop_result_has_reason_process_counts_approval_state_and_recovery",
+      "test_fixed_manifest_payload_order_binary_and_result_schema_fail_closed",
+      "test_only_claude_ai_first_party_authentication_is_accepted",
+      "test_receipt_contract_fixes_real_run_provenance_without_performing_real_run"
+    ],
+    "tests/test_claude_bootstrap_cli.py": [
+      "test_bootstrap_is_single_cli_entry_with_two_inputs_and_single_python_function",
+      "test_bootstrap_cli_returns_one_json_line_and_distinct_exit_codes",
+      "test_bootstrap_command_cannot_be_extended_to_general_conversation_or_delegation"
+    ],
+    "tests/test_claude_bootstrap_adversarial.py": [
+      "test_token_claim_is_once_only_for_sequential_and_parallel_calls",
+      "test_public_api_rejects_prompt_file_model_provider_binary_argv_and_root_inputs",
+      "test_shell_tools_agents_fallback_retry_and_generic_runner_are_unreachable",
+      "test_missing_or_replaced_store_never_reinitializes_or_restores_pending",
+      "test_git_never_contains_raw_credentials_or_user_specific_absolute_paths",
+      "test_fake_process_proves_atomic_claim_and_external_private_storage",
+      "test_dirty_manifest_symlink_unknown_store_file_and_wide_permissions_stop",
+      "test_host_process_refusal_stops_without_alternate_route"
+    ],
+    "tests/test_claude_bootstrap_entrypoints.py": [
+      "test_process_inventory_matches_baseline_and_new_process_is_one_fixed_function",
+      "test_existing_pilot_commands_and_six_egress_files_remain_unchanged",
+      "test_egress_existing_authority_workflow_and_tests_are_not_changed",
+      "test_red_suite_uses_only_fake_process_and_never_launches_claude",
+      "test_scope_review_human_red_approval_and_all_fixed_inputs_are_pinned",
+      "test_real_send_requires_verified_completion_review_and_separate_bound_approval",
+      "test_declaration_map_keys_equal_scope_requirement_ids",
+      "test_red_evidence_keeps_green_fields_explicitly_unimplemented",
+      "test_completion_review_entry_requires_upstream_derivation_new_counterexample_and_four_classes"
+    ]
+  },
+  "declarations": {
+    "AC-CB-001": {
+      "summary": "公開入口一つ、入力二項目、Python公開関数一つを固定する。",
+      "tests": [{"test": "tests/test_claude_bootstrap_cli.py::test_bootstrap_is_single_cli_entry_with_two_inputs_and_single_python_function", "red_now": true}]
+    },
+    "AC-CB-002": {
+      "summary": "目録と二つの固定payload、その指紋と順序を完全照合する。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_manifest_payload_bytes_digests_order_and_count_are_exact", "red_now": true}]
+    },
+    "AC-CB-003": {
+      "summary": "Human承認の束縛、期限、未消費状態を完全照合する。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_human_approval_all_bindings_expiry_and_pending_state_are_required", "red_now": true}]
+    },
+    "AC-CB-004": {
+      "summary": "単一の送信前検査が危険なpayloadをprocess作成前に拒否する。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_single_preflight_rejects_redaction_secret_email_and_phone_before_payload_process", "red_now": true}]
+    },
+    "AC-CB-005": {
+      "summary": "認証、接続先、repository情報、秘密値を子processと公開出力へ伝えない。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_child_environment_and_public_result_exclude_credentials_roots_and_values", "red_now": true}]
+    },
+    "AC-CB-006": {
+      "summary": "道具を無効にする固定argvと外部の空作業directoryだけを使う。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory", "red_now": true}]
+    },
+    "AC-CB-007": {
+      "summary": "payload processを最大二つとし、失敗後の続行、再試行、代替を禁止する。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_first_payload_failure_prevents_second_payload_retry_and_fallback", "red_now": true}]
+    },
+    "AC-CB-008": {
+      "summary": "承認tokenを逐次と並行の双方で一回だけclaimする。",
+      "tests": [{"test": "tests/test_claude_bootstrap_adversarial.py::test_token_claim_is_once_only_for_sequential_and_parallel_calls", "red_now": true}]
+    },
+    "AC-CB-009": {
+      "summary": "外側・内側JSON、session、nonce、道具不使用、終了codeを完全照合する。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_outer_inner_json_session_nonce_no_tools_and_exit_code_must_all_match", "red_now": true}]
+    },
+    "AC-CB-010": {
+      "summary": "raw、実行仕様、receiptをrepository外へ排他的かつ不変に保存する。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_raw_launch_and_receipt_slots_are_exclusive_external_and_rereadable", "red_now": true}]
+    },
+    "AC-CB-011": {
+      "summary": "全停止応答へ理由、process件数、approval状態、復旧手順を含める。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_every_stop_result_has_reason_process_counts_approval_state_and_recovery", "red_now": true}]
+    },
+    "AC-CB-012": {
+      "summary": "基準目録比較と固定一関数だけの新process起動を検査する。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_process_inventory_matches_baseline_and_new_process_is_one_fixed_function", "red_now": true}]
+    },
+    "AC-CB-013": {
+      "summary": "既存pilot commandとegress六fileを壊さない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_existing_pilot_commands_and_six_egress_files_remain_unchanged", "red_now": true}]
+    },
+    "NG-CB-001": {
+      "summary": "egress、既存authority、Workflow台帳、既存testを変更しない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_egress_existing_authority_workflow_and_tests_are_not_changed", "red_now": false, "boundary_reason": "固定禁止pathが基準commitから不変であることは実装前から成立する境界である。"}]
+    },
+    "NG-CB-002": {
+      "summary": "試験中にClaude process、認証、外部送信を行わない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_red_suite_uses_only_fake_process_and_never_launches_claude", "red_now": false, "boundary_reason": "試験側がGit以外を模擬processへ閉じることは実装前から成立する境界である。"}]
+    },
+    "NG-CB-003": {
+      "summary": "任意prompt、file、model、provider、binary、argv、rootを入力にしない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_adversarial.py::test_public_api_rejects_prompt_file_model_provider_binary_argv_and_root_inputs", "red_now": true}]
+    },
+    "NG-CB-004": {
+      "summary": "shell、道具、別agent、fallback、retry、汎用runnerを使わない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_adversarial.py::test_shell_tools_agents_fallback_retry_and_generic_runner_are_unreachable", "red_now": true}]
+    },
+    "NG-CB-005": {
+      "summary": "store欠落時に自動初期化せずtokenをpendingへ戻さない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_adversarial.py::test_missing_or_replaced_store_never_reinitializes_or_restores_pending", "red_now": true}]
+    },
+    "NG-CB-006": {
+      "summary": "raw、認証値、利用者固有絶対pathをGitへ保存しない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_adversarial.py::test_git_never_contains_raw_credentials_or_user_specific_absolute_paths", "red_now": true}]
+    },
+    "NG-CB-007": {
+      "summary": "bootstrapを一般対話や実装委譲へ拡張しない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_cli.py::test_bootstrap_command_cannot_be_extended_to_general_conversation_or_delegation", "red_now": false, "boundary_reason": "既存CLIが追加optionを拒否する構文境界は実装前から成立する。"}]
+    },
+    "ST-CB-001": {
+      "summary": "範囲レビュー合格、Human RED承認、固定入力を開始前に確認する。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_scope_review_human_red_approval_and_all_fixed_inputs_are_pinned", "red_now": false, "boundary_reason": "固定recordの状態とDigestは実装前に成立する開始境界である。"}]
+    },
+    "ST-CB-002": {
+      "summary": "固定目録、payload、順序、版、応答形式が不一致なら停止する。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_fixed_manifest_payload_order_binary_and_result_schema_fail_closed", "red_now": true}]
+    },
+    "ST-CB-003": {
+      "summary": "claude.aiかつfirstParty以外の認証なら停止する。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_only_claude_ai_first_party_authentication_is_accepted", "red_now": true}]
+    },
+    "ST-CB-004": {
+      "summary": "一回性と外部保存をfake processで実証できなければ停止する。",
+      "tests": [{"test": "tests/test_claude_bootstrap_adversarial.py::test_fake_process_proves_atomic_claim_and_external_private_storage", "red_now": true}]
+    },
+    "ST-CB-005": {
+      "summary": "改竄、未知file、広い権限をprocess作成前に停止する。",
+      "tests": [{"test": "tests/test_claude_bootstrap_adversarial.py::test_dirty_manifest_symlink_unknown_store_file_and_wide_permissions_stop", "red_now": true}]
+    },
+    "ST-CB-006": {
+      "summary": "verified完了レビューと別Human送信承認が無ければ実送信しない。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_real_send_requires_verified_completion_review_and_separate_bound_approval", "red_now": true}]
+    },
+    "ST-CB-007": {
+      "summary": "host安全拒否時に別経路へ切り替えず停止する。",
+      "tests": [{"test": "tests/test_claude_bootstrap_adversarial.py::test_host_process_refusal_stops_without_alternate_route", "red_now": true}]
+    },
+    "OUT-CB-001": {
+      "summary": "正本32要求ID集合、固有test対応、RED結果、目録DigestをEvidenceへ残す。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_declaration_map_keys_equal_scope_requirement_ids", "red_now": false, "boundary_reason": "宣言key集合の完全一致はRED成果自身の静的境界である。"}]
+    },
+    "OUT-CB-002": {
+      "summary": "GREEN用の変更・検査欄をREDでは未実施と区別する。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_red_evidence_keeps_green_fields_explicitly_unimplemented", "red_now": false, "boundary_reason": "RED Evidenceの未実施表示はproduction実装前に成立する記録境界である。"}]
+    },
+    "OUT-CB-003": {
+      "summary": "CLIが成功、停止、内部失敗を区別するJSON一行だけを返す。",
+      "tests": [{"test": "tests/test_claude_bootstrap_cli.py::test_bootstrap_cli_returns_one_json_line_and_distinct_exit_codes", "red_now": true}]
+    },
+    "OUT-CB-004": {
+      "summary": "完了レビューへ独立導出、新作反証、閉じた四類型を要求する入口を残す。",
+      "tests": [{"test": "tests/test_claude_bootstrap_entrypoints.py::test_completion_review_entry_requires_upstream_derivation_new_counterexample_and_four_classes", "red_now": true}]
+    },
+    "OUT-CB-005": {
+      "summary": "別承認の実Run receipt必須項目を固定し実Runは行わない。",
+      "tests": [{"test": "tests/test_claude_bootstrap.py::test_receipt_contract_fixes_real_run_provenance_without_performing_real_run", "red_now": true}]
+    }
+  }
+}
