@@ -112,6 +112,62 @@ def test_child_environment_preserves_user_for_claude_subscription_lookup(
     assert environment["USER"] == "subscription-user"
 
 
+def test_missing_administrator_trusted_claude_capability_stops_before_claim(
+    tmp_path, monkeypatch
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    scenario.fake_process.trusted_transport_ready = False
+    install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "stopped"
+    assert result["stop_code"] == "trusted_transport_unavailable"
+    assert result["approval_state"] == "pending"
+    assert result["payload_process_count"] == 0
+    assert result["preflight_process_count"] == 1
+    assert scenario.token_path.is_file()
+    assert list((scenario.store_root / "claimed").iterdir()) == []
+    assert list((scenario.store_root / "consumed").iterdir()) == []
+    assert list(
+        (
+            scenario.runtime_root
+            / "projects"
+            / "reviewcompass3-bootstrap-test"
+            / "development"
+            / "sensitive"
+            / "claude-bootstrap"
+            / "runs"
+            / scenario.approval_id
+        ).iterdir()
+    ) == []
+    assert [call["args"] for call in scenario.fake_process.calls] == [
+        [
+            "/usr/local/libexec/reviewcompass/trusted-review-send",
+            "--capabilities",
+        ]
+    ]
+
+
+def test_missing_administrator_trusted_entry_file_stops_before_claim(
+    tmp_path, monkeypatch
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    scenario.fake_process.trusted_transport_missing = True
+    install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "stopped"
+    assert result["stop_code"] == "trusted_transport_unavailable"
+    assert result["approval_state"] == "pending"
+    assert result["payload_process_count"] == 0
+    assert result["preflight_process_count"] == 1
+    assert scenario.token_path.is_file()
+    assert list((scenario.store_root / "claimed").iterdir()) == []
+    assert list((scenario.store_root / "consumed").iterdir()) == []
+
+
 def test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory(
     tmp_path, monkeypatch
 ):

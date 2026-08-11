@@ -1,0 +1,28 @@
+#!/usr/bin/python3 -I
+"""既存の正式送信入口へ固定Claude疎通を追加する管理者設置wrapper。"""
+
+import sys
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from tools.api_providers.trusted_review_send import (  # noqa: E402
+    main as base_main,
+    trusted_review_capabilities,
+)
+from tools.api_providers.trusted_review_send_dispatch import (  # noqa: E402
+    main as dispatch_main,
+)
+
+
+if __name__ == "__main__":
+    sys.exit(
+        dispatch_main(
+            sys.argv[1:],
+            base_main=base_main,
+            base_capabilities=trusted_review_capabilities,
+        )
+    )

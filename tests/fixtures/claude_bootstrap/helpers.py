@@ -72,6 +72,8 @@ class FakeClaudeProcess:
     def __init__(self):
         self.calls = []
         self.payload_results = []
+        self.trusted_transport_missing = False
+        self.trusted_transport_ready = True
         self.fail_first_payload = False
         self.response_models = ["claude-fable-5", "claude-fable-5"]
         self.result_text_wrappers = ["raw", "raw"]
@@ -99,6 +101,29 @@ class FakeClaudeProcess:
             raise AssertionError("shell must remain disabled")
         if not isinstance(args, (list, tuple)):
             raise AssertionError("argv must be a structured sequence")
+        if list(args) == [
+            "/usr/local/libexec/reviewcompass/trusted-review-send",
+            "--capabilities",
+        ]:
+            if self.trusted_transport_missing:
+                raise FileNotFoundError("missing trusted sender")
+            roles = {}
+            if self.trusted_transport_ready:
+                roles["claude_session_bootstrap"] = {
+                    "model": "claude-fable-5",
+                    "purpose": "codex-pilot-no-tool-claude-bootstrap",
+                    "topology": "same_session_two_payload",
+                }
+            return FakeCompletedProcess(
+                args=args,
+                stdout=json.dumps(
+                    {
+                        "status": "capabilities",
+                        "schema_version": "trusted-review-send-v1",
+                        "roles": roles,
+                    }
+                ),
+            )
         if "--version" in args:
             return FakeCompletedProcess(
                 args=args,

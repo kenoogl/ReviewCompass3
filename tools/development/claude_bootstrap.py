@@ -26,6 +26,14 @@ _ORIGINAL_RUN = subprocess.run
 _PURPOSE = "codex-pilot-no-tool-claude-bootstrap"
 _SESSION_NAME = "reviewcompass3-no-tool-bootstrap"
 _PROVIDER = "claude-code-first-party"
+_TRUSTED_SEND_ENTRY = Path(
+    "/usr/local/libexec/reviewcompass/trusted-review-send"
+)
+_TRUSTED_TRANSPORT_CAPABILITY = {
+    "model": "claude-fable-5",
+    "purpose": _PURPOSE,
+    "topology": "same_session_two_payload",
+}
 _VERSION = "2.1.220"
 _EXECUTABLE_SHA256 = (
     "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081"
@@ -530,6 +538,23 @@ def _validate_outer(value, session_id):
     return True
 
 
+def _trusted_transport_ready(completed):
+    if completed.returncode != 0 or completed.stderr:
+        return False
+    try:
+        value = json.loads(completed.stdout)
+    except (TypeError, json.JSONDecodeError):
+        return False
+    return (
+        isinstance(value, dict)
+        and value.get("status") == "capabilities"
+        and value.get("schema_version") == "trusted-review-send-v1"
+        and isinstance(value.get("roles"), dict)
+        and value["roles"].get("claude_session_bootstrap")
+        == _TRUSTED_TRANSPORT_CAPABILITY
+    )
+
+
 def _validate_result(completed, session_id, expected_inner, allowed_models):
     if completed.returncode != 0:
         return None, [], "process_exit_nonzero"
@@ -748,8 +773,36 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
         if not _safe_directory(runtime["work"], repository, empty=True):
             raise _BootstrapStop("work_directory_invalid")
 
-        executable = _resolve_executable(repository)
         environment = _child_environment()
+        try:
+            trusted_transport = _invoke(
+                [str(_TRUSTED_SEND_ENTRY), "--capabilities"],
+                cwd=runtime["work"],
+                environment=environment,
+                payload_count=payload_count,
+                preflight_count=preflight_count,
+            )
+        except FileNotFoundError as error:
+            raise _BootstrapStop(
+                "trusted_transport_unavailable",
+                preflight_process_count=preflight_count + 1,
+                recovery=(
+                    "管理者設置の正式送信入口へClaude機能を配置し、"
+                    "能力確認が合格してから再開してください。"
+                ),
+            ) from error
+        preflight_count += 1
+        if not _trusted_transport_ready(trusted_transport):
+            raise _BootstrapStop(
+                "trusted_transport_unavailable",
+                preflight_process_count=preflight_count,
+                recovery=(
+                    "管理者設置の正式送信入口へClaude機能を配置し、"
+                    "能力確認が合格してから再開してください。"
+                ),
+            )
+
+        executable = _resolve_executable(repository)
         version = _invoke(
             [executable, "--version"],
             cwd=runtime["work"],
