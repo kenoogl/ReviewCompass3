@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計とHuman段完了承認を終え、最初の機械処理縦切りへ着手した。
-- 現在作業：HumanがPA-PC-010を採用して限定単一v6を作成し、限定監査・独立判定が新規所見0件で合格した。PA-PC-008・009・010はclosed、要求26件と範囲不増加も確認済み。指示文改訂を止め、実装担当の受入テスト作成へ移れる状態。
+- 現在作業：単一v6に従うRED受入テスト4件をgpt-5.6-sol実装担当がcommit df48bbaで作成した。構文収集と既存1470件は合格し未実装由来のREDを確認したが、gpt-5.6-terra独立レビューが誤った合格3件と後続commitによる誤った失敗1件をRT-PC-001〜004として検出した。Human裁定待ちでproduction実装は未着手。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -21,6 +21,7 @@
 - [操縦者別連携 単一v4指示文品質確認](records/session-handoffs/2026-08-11-pilot-collaboration-entry-prompt-quality-review-v4.md) — SHA-256 `d5550321827e0bc7e297569c9bbabc63259ef380f1d26f284f84028055679191`
 - [操縦者別連携 単一v5指示文品質確認](records/session-handoffs/2026-08-11-pilot-collaboration-entry-prompt-quality-review-v5.md) — SHA-256 `20ba3fefa01ec2ff3db177713839af919d2d1789e99c3a169026e82e0c4df7e6`
 - [操縦者別連携 単一v6限定指示文品質確認](records/session-handoffs/2026-08-11-pilot-collaboration-entry-prompt-quality-review-v6.md) — SHA-256 `d5fe00279566a6b37c51697c4c2ca7fdf1835c0943750ecdeca6cf5617b9cab3`
+- [操縦者別連携 RED受入テスト 独立レビュー v1](records/session-handoffs/2026-08-11-pilot-collaboration-red-test-review-v1.md) — SHA-256 `6cf381e20fd4bc1f18d808d0b2237a94cf434a35ddfef8780e1374cc3b295607`
 - [操縦者別のClaude／Codex連携方法](docs/development/pilot-specific-claude-codex-collaboration.md) — SHA-256 `aee8c8b72487e26395615c8442710b0695b035ec0aa129b4a777c6142864489d`
 - [委譲作業の共通レビュープロトコル](docs/development/work-review-protocol.md) — SHA-256 `b7eb8f08c7b3f585d64d163a7a2f93e758e57e830bb973cc2441bfadbc98a3df`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
@@ -28,13 +29,13 @@
 
 ## 次に行う一作業
 
-Codex実装用サブエージェントへ単一v6だけを実装指示として渡し、新規受入テストを作成して対象機能不在による失敗を単独コマンドで確認させる。
+HumanがRT-PC-001からRT-PC-004までを採用、不採用または保留のいずれかに裁定する。
 
 開始条件：
 
-- v6と単一v6限定指示文品質確認のSHA-256が固定されていること
-- 実装担当はgpt-5.6-solの新しい会話状態とし、v6以前を実装指示として併用しないこと
-- 最初は許可された新規テストだけを変更し、実装コードを書かないこと
+- RED test commit df48bbaと独立レビュー記録のSHA-256が固定されていること
+- RT-PC-001〜004についてHuman裁定が記録されること
+- 裁定とRED再レビューが完了するまでproduction実装へ進まないこと
 
 完了条件：
 
@@ -42,17 +43,17 @@ Codex実装用サブエージェントへ単一v6だけを実装指示として�
 - 既存bootstrap reviewテスト、故障注入、公式全テスト、差分検査が合格すること
 - 反対側モデルの独立レビューがverifiedとなり、Human段完了承認を得ること
 
-後続作業：受入テストの期待と失敗理由を主担当が確認した後、固定したテストを変更せず実装コードを進める。
+後続作業：全件採用時は新規テスト4件だけを修正し、単独RED、50件収集、既存1470件、差分検査、別会話の再レビューを行う。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。限定品質関門は合格し、実装担当の受入テスト作成へ進める。
-- Human判断待ち：現在のHuman裁定待ちはない。実装後の段完了承認は別に必要。
+- blocker：RT-PC-001〜004が未裁定。現行RED testは、禁止起動、共通保存境界、digest不一致、要求対応表を誤って合格させ得て、後続record commitを実装scope違反として誤って失敗させ得る。
+- Human判断待ち：RT-PC-001〜004を採用、不採用または保留のいずれかに裁定する必要がある。実装後の段完了承認も別に必要。
 
 ## stale・deferred
 
 - stale：group C・Dを直ちに次作業とする旧表示は、本作業を現在の一作業に選んだHuman判断により古い状態。group C・Dの裁定記録自体は有効なまま保持する。
-- deferred：group C・D、外部送信、Claude／Codex CLI実起動、実装後レビュー接続、既存保全データへの伏字化遡及適用、Work 7A後続、既存Issue resolveを保留する。
+- deferred：production実装、group C・D、外部送信、Claude／Codex CLI実起動、実装後レビュー接続、既存保全データへの伏字化遡及適用、Work 7A後続、既存Issue resolveを保留する。
 
 ## Git・Test
 
@@ -60,7 +61,7 @@ Codex実装用サブエージェントへ単一v6だけを実装指示として�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：既存bootstrap review関連23 passed、終了コード0。v6の要求集合は26件で欠落・余分0件。限定監査findings 0、PA-PC-008・009・010 closed、範囲不増加pass。独立判定accept、実装担当起動可。新規受入テストは未着手。
+- 直近の関連Test：新規4 test fileは計50件collect成功。単独REDは27 failed/1 passed、7 failed、10 failed/1 passed、3 failed/1 passedで全て終了1。既存1470件は終了0。独立レビューはRT-PC-001〜004 blocking、reported_unverified。
 - 直近の全Test：直近の公式全Testは1470 passed、failed 0、errors 0、終了コード0。実装後に再実行する。
 - 差分検査：`git diff --check`合格
 
