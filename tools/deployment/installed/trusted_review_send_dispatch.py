@@ -1,11 +1,11 @@
 """管理者設置の既存送信入口へClaude疎通を固定接続する振り分け処理。"""
 
-import hashlib
-import importlib
 import json
+import os
 from pathlib import Path
 import re
-import sys
+
+from tools.development import claude_bootstrap
 
 
 CLAUDE_CAPABILITY = {
@@ -13,26 +13,8 @@ CLAUDE_CAPABILITY = {
     "purpose": "codex-pilot-no-tool-claude-bootstrap",
     "topology": "same_session_two_payload",
 }
-PINNED_WORKSPACE_FILES = {
-    "tools/development/claude_bootstrap.py": (
-        "14f352afb54353ccac45d84db2ce2a02c7c8a97204c0712651a5bd6218bc4133"
-    ),
-    "tools/common/__init__.py": (
-        "fdb99f627d54b0661d5b3d3f487c2a3e0266df9ac97ea642529c39e6b17774cd"
-    ),
-    "tools/common/digests.py": (
-        "fc2d728c4c2cfd1b4e70b7eef6d0e6d4ce9a4a033712b93402bd2c7f984624f7"
-    ),
-    "tools/common/errors.py": (
-        "1d2fefcc075080138f3ab9a8b19775e0ff0fb333e811d6918a06c6730236c4c0"
-    ),
-}
 _HEX_64 = re.compile(r"[0-9a-f]{64}")
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
-
-
-def _sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def with_claude_capability(base):
@@ -64,27 +46,13 @@ def _validate_workspace(workspace_root):
         raise ValueError("trusted workspace invalid") from error
     if not isinstance(project, dict) or project.get("project_id") != "reviewcompass3":
         raise ValueError("trusted workspace invalid")
-    for relative, expected_digest in PINNED_WORKSPACE_FILES.items():
-        path = root / relative
-        if (
-            path.is_symlink()
-            or not path.is_file()
-            or _sha256(path) != expected_digest
-        ):
-            raise ValueError("trusted workspace source mismatch")
     return root
 
 
 def _load_bootstrap(workspace_root):
     root = _validate_workspace(workspace_root)
-    root_text = str(root)
-    if root_text not in sys.path:
-        sys.path.insert(0, root_text)
-    module = importlib.import_module("tools.development.claude_bootstrap")
-    expected = root / "tools/development/claude_bootstrap.py"
-    if Path(module.__file__).resolve() != expected:
-        raise ValueError("trusted workspace import mismatch")
-    return module
+    os.chdir(root)
+    return claude_bootstrap
 
 
 def _blocked():

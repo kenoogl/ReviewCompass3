@@ -23,6 +23,12 @@ _TARGET_DISPATCH = Path("tools/api_providers/trusted_review_send_dispatch.py")
 _TARGET_BASE = Path("tools/api_providers/trusted_review_send.py")
 _TARGET_WRAPPER = Path("trusted-review-send")
 _BACKUP_WRAPPER = Path("trusted-review-send.pre-claude-bootstrap-v1")
+TRUSTED_RUNTIME_FILES = (
+    Path("tools/development/claude_bootstrap.py"),
+    Path("tools/common/__init__.py"),
+    Path("tools/common/digests.py"),
+    Path("tools/common/errors.py"),
+)
 
 
 def _source_root():
@@ -45,7 +51,12 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
     target_dispatch = install_root / _TARGET_DISPATCH
     target_base = install_root / _TARGET_BASE
     target_wrapper = install_root / _TARGET_WRAPPER
-    if not _regular(source_dispatch) or not _regular(source_wrapper):
+    source_runtime = [source_root / path for path in TRUSTED_RUNTIME_FILES]
+    if (
+        not _regular(source_dispatch)
+        or not _regular(source_wrapper)
+        or any(not _regular(path) for path in source_runtime)
+    ):
         return {"schema_version": 1, "state": "source_invalid"}
     source_dispatch_digest = _digest(source_dispatch)
     source_wrapper_digest = _digest(source_wrapper)
@@ -60,11 +71,33 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
     wrapper_current = wrapper_digest == source_wrapper_digest
     wrapper_legacy = wrapper_digest == EXPECTED_LEGACY_WRAPPER_SHA256
     dispatch_current = dispatch_digest == source_dispatch_digest
-    if base_matches and wrapper_current and dispatch_current:
+    runtime_files_current = all(
+        _regular(install_root / relative)
+        and (install_root / relative).read_bytes()
+        == (source_root / relative).read_bytes()
+        for relative in TRUSTED_RUNTIME_FILES
+    )
+    runtime_files_absent_or_current = all(
+        not (install_root / relative).exists()
+        or (
+            _regular(install_root / relative)
+            and (install_root / relative).read_bytes()
+            == (source_root / relative).read_bytes()
+        )
+        for relative in TRUSTED_RUNTIME_FILES
+    )
+    if (
+        base_matches
+        and wrapper_current
+        and dispatch_current
+        and runtime_files_current
+    ):
         state = "ready"
-    elif base_matches and wrapper_legacy and dispatch_digest in (
-        None,
-        source_dispatch_digest,
+    elif (
+        base_matches
+        and wrapper_legacy
+        and dispatch_digest in (None, source_dispatch_digest)
+        and runtime_files_absent_or_current
     ):
         state = "claude_capability_missing"
     else:
@@ -75,6 +108,7 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
         "base_sender_matches": base_matches,
         "wrapper_current": wrapper_current,
         "dispatch_current": dispatch_current,
+        "runtime_files_current": runtime_files_current,
     }
 
 
@@ -99,6 +133,14 @@ def _replace(path, data, mode):
     finally:
         if temporary.exists() and not temporary.is_symlink():
             temporary.unlink()
+
+
+def _ensure_directory(path):
+    if path.exists() or path.is_symlink():
+        if path.is_symlink() or not path.is_dir():
+            raise ValueError("trusted transport directory mismatch")
+        return
+    path.mkdir(mode=0o755)
 
 
 def install_trusted_transport(
@@ -136,6 +178,17 @@ def install_trusted_transport(
             raise ValueError("trusted entry backup mismatch")
     else:
         _write_new(backup_wrapper, legacy_bytes, 0o755)
+    _ensure_directory(install_root / "tools/development")
+    _ensure_directory(install_root / "tools/common")
+    for relative in TRUSTED_RUNTIME_FILES:
+        source = source_root / relative
+        target = install_root / relative
+        source_bytes = source.read_bytes()
+        if target.exists() or target.is_symlink():
+            if not _regular(target) or target.read_bytes() != source_bytes:
+                raise ValueError("installed trusted runtime mismatch")
+        else:
+            _write_new(target, source_bytes, 0o644)
     dispatch_bytes = source_dispatch.read_bytes()
     if target_dispatch.exists() or target_dispatch.is_symlink():
         if not _regular(target_dispatch) or target_dispatch.read_bytes() != dispatch_bytes:

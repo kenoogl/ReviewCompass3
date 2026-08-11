@@ -93,34 +93,22 @@ def test_dispatch_accepts_only_fixed_claude_inputs(monkeypatch, capsys):
     assert calls == []
 
 
-def test_workspace_source_digest_mismatch_stops_before_loading(tmp_path, monkeypatch):
+def test_workspace_project_identity_mismatch_stops_before_loading(tmp_path):
     module = _module()
     workspace = tmp_path / "workspace"
-    source = workspace / "tools/development/claude_bootstrap.py"
-    source.parent.mkdir(parents=True)
-    source.write_text("approved source\n", encoding="utf-8")
     manifest = workspace / ".reviewcompass/project-manifest.json"
     manifest.parent.mkdir(parents=True)
     manifest.write_text(
-        json.dumps({"project_id": "reviewcompass3"}),
+        json.dumps({"project_id": "other-project"}),
         encoding="utf-8",
-    )
-    monkeypatch.setattr(
-        module,
-        "PINNED_WORKSPACE_FILES",
-        {
-            "tools/development/claude_bootstrap.py": hashlib.sha256(
-                b"different source\n"
-            ).hexdigest()
-        },
     )
 
     try:
         module._validate_workspace(workspace)
     except ValueError as error:
-        assert str(error) == "trusted workspace source mismatch"
+        assert str(error) == "trusted workspace invalid"
     else:
-        raise AssertionError("tampered workspace source must be rejected")
+        raise AssertionError("other project must be rejected")
 
 
 def test_non_claude_commands_remain_owned_by_existing_trusted_sender():
@@ -168,6 +156,10 @@ def test_administrator_install_is_fixed_backed_up_and_post_verified(
     ):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
+    for relative in installer.TRUSTED_RUNTIME_FILES:
+        path = source_root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(f"approved {relative}\n".encode("utf-8"))
     monkeypatch.setattr(
         installer,
         "EXPECTED_BASE_SENDER_SHA256",
@@ -198,6 +190,10 @@ def test_administrator_install_is_fixed_backed_up_and_post_verified(
     assert after["state"] == "ready"
     assert target_dispatch.read_bytes() == source_dispatch.read_bytes()
     assert target_wrapper.read_bytes() == source_wrapper.read_bytes()
+    for relative in installer.TRUSTED_RUNTIME_FILES:
+        assert (install_root / relative).read_bytes() == (
+            source_root / relative
+        ).read_bytes()
     assert (
         install_root / "trusted-review-send.pre-claude-bootstrap-v1"
     ).read_bytes() == b"legacy wrapper\n"
@@ -222,6 +218,10 @@ def test_install_refuses_unreviewed_existing_entry(tmp_path, monkeypatch):
     for path, content in paths.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
+    for relative in installer.TRUSTED_RUNTIME_FILES:
+        path = source_root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(f"approved {relative}\n".encode("utf-8"))
     monkeypatch.setattr(
         installer,
         "EXPECTED_BASE_SENDER_SHA256",
