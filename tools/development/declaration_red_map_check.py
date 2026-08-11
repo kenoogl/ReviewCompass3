@@ -18,12 +18,13 @@ import json
 import re
 import subprocess
 import sys
+import tempfile as _tempfile
 from pathlib import Path
+from xml.etree import ElementTree
 
 
 class DeclarationRedMapCheckError(Exception):
     """検査器の使用方法自体が不正な場合の失敗。"""
-
 
 def _collect_test_functions(path):
     tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -78,20 +79,83 @@ def parse_pytest_outcomes(output, *, node_ids):
 
 
 def pytest_runner(node_ids, *, project_root):
-    """node idごとの結果を返す既定runner。判定はpytestの報告に従う。"""
-
+    """node idごとの結果と失敗理由をpytestの報告から返す。"""
     if not node_ids:
         return {}
     completed = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "--no-header", "-rA", *sorted(node_ids)],
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "--no-header",
+            "-rA",
+            f"--junitxml={(junit := _tempfile.NamedTemporaryFile(delete=False)).name}",
+            *sorted(node_ids),
+        ],
         cwd=str(project_root),
         capture_output=True,
         text=True,
     )
-    return parse_pytest_outcomes(completed.stdout, node_ids=sorted(node_ids))
+    junit.close()
+    junit_path = Path(junit.name)
+    try:
+        junit_xml = junit_path.read_text(encoding="utf-8")
+    except OSError:
+        junit_xml = ""
+    finally:
+        junit_path.unlink(missing_ok=True)
+    return _structured_pytest_outcomes(
+        completed.stdout,
+        junit_xml=junit_xml,
+        node_ids=sorted(node_ids),
+    )
 
 
-def _verify_red_claims(*, declarations, project_root, runner):
+def _junit_failure_reasons(junit_xml, *, node_ids):
+    if not junit_xml:
+        return {}
+    try:
+        root = ElementTree.fromstring(junit_xml)
+    except Exception:
+        return {}
+    by_key = {}
+    for case in root.iter("testcase"):
+        failure = case.find("failure")
+        if failure is None:
+            continue
+        by_key[(case.get("classname", ""), case.get("name", ""))] = "\n".join(
+            part for part in (failure.get("message", ""), failure.text or "") if part
+        )
+    reasons = {}
+    for node_id in node_ids:
+        parts = node_id.split("::")
+        module = parts[0][:-3].replace("/", ".")
+        classname = ".".join((module, *parts[1:-1]))
+        reason = by_key.get((classname, parts[-1]))
+        if reason is not None:
+            reasons[node_id] = reason
+    return reasons
+
+
+def _structured_pytest_outcomes(output, *, junit_xml, node_ids):
+    outcomes = parse_pytest_outcomes(output, node_ids=node_ids)
+    reasons = _junit_failure_reasons(junit_xml, node_ids=node_ids)
+    return {
+        node_id: {
+            "outcome": outcome,
+            "reason": reasons.get(
+                node_id,
+                "pytest collection or setup error" if outcome == "error" else "",
+            ),
+        }
+        for node_id, outcome in outcomes.items()
+    }
+
+
+def _verify_red_claims(
+    *, declarations, project_root, runner, contract_version
+):
     """宣言のred_now主張を実行結果と突き合わせる。不明はfail-closedで扱う。
 
     red_now: trueは対象testが実際に失敗していること、falseは実際に成功して
@@ -103,17 +167,66 @@ def _verify_red_claims(*, declarations, project_root, runner):
         entry = declarations[key]
         for item in entry.get("tests") or []:
             if isinstance(item, dict) and isinstance(item.get("test"), str):
-                claims[item["test"]] = (key, bool(item.get("red_now")))
+                claims[item["test"]] = (
+                    key,
+                    bool(item.get("red_now")),
+                    item.get("expected_failure_reason"),
+                )
 
     outcomes = runner(sorted(claims), project_root=project_root)
     findings = []
     verified = mismatched = unknown = 0
+    execution_errors = reason_mismatched = reason_verified = 0
     for node_id in sorted(claims):
-        declaration_key, expects_red = claims[node_id]
-        outcome = outcomes.get(node_id)
-        if outcome is None:
+        declaration_key, expects_red, expected_reason = claims[node_id]
+        raw_outcome = outcomes.get(node_id)
+        if raw_outcome is None:
             unknown += 1
             findings.append(f"red_outcome_unknown: {declaration_key}: {node_id}")
+            continue
+        if isinstance(raw_outcome, str):
+            outcome = raw_outcome
+            reason = ""
+        elif (
+            isinstance(raw_outcome, dict)
+            and isinstance(raw_outcome.get("outcome"), str)
+            and isinstance(raw_outcome.get("reason"), str)
+        ):
+            outcome = raw_outcome["outcome"]
+            reason = raw_outcome["reason"]
+        else:
+            unknown += 1
+            findings.append(f"red_outcome_unknown: {declaration_key}: {node_id}")
+            continue
+        if contract_version >= 2:
+            if outcome == "error":
+                execution_errors += 1
+                findings.append(
+                    f"red_execution_error: {declaration_key}: {node_id}: {reason}"
+                )
+                continue
+            if expects_red and outcome == "failed":
+                if (
+                    isinstance(expected_reason, str)
+                    and expected_reason
+                    and expected_reason in reason
+                ):
+                    verified += 1
+                    reason_verified += 1
+                else:
+                    mismatched += 1
+                    reason_mismatched += 1
+                    findings.append(
+                        "red_failure_reason_mismatch: "
+                        f"{declaration_key}: {node_id}: {reason}"
+                    )
+                continue
+            if not expects_red and outcome == "passed":
+                verified += 1
+                continue
+            mismatched += 1
+            code = "red_claim_unmet" if expects_red else "boundary_claim_unmet"
+            findings.append(f"{code}: {declaration_key}: {node_id}: {outcome}")
             continue
         actually_red = outcome in ("failed", "error")
         if actually_red == expects_red:
@@ -124,15 +237,24 @@ def _verify_red_claims(*, declarations, project_root, runner):
             findings.append(f"{code}: {declaration_key}: {node_id}: {outcome}")
     summary = {
         "checked": len(claims),
+        "contract_version": contract_version,
+        "execution_errors": execution_errors,
         "verified": verified,
         "mismatched": mismatched,
+        "reason_mismatched": reason_mismatched,
+        "reason_verified": reason_verified,
         "unknown": unknown,
     }
     return summary, findings
 
 
 def check_declaration_red_map(
-    *, map_path, project_root=".", verify_red=False, runner=None
+    *,
+    map_path,
+    project_root=".",
+    verify_red=False,
+    runner=None,
+    minimum_red_contract_version=1,
 ):
     """対応表を検査し、status、findings、machine_countを返す。fail-closed。
 
@@ -157,6 +279,24 @@ def check_declaration_red_map(
     if not isinstance(document, dict):
         findings.append(f"map_unreadable: {map_file} (not a mapping)")
         return _result("failed", findings, machine_count)
+
+    contract = document.get("red_verification_contract", {"version": 1})
+    if (
+        not isinstance(contract, dict)
+        or set(contract) != {"version"}
+        or contract.get("version") not in (1, 2)
+    ):
+        findings.append("red_contract_invalid")
+        contract_version = 1
+    else:
+        contract_version = contract["version"]
+    if minimum_red_contract_version not in (1, 2):
+        findings.append("minimum_red_contract_version_invalid")
+    elif contract_version < minimum_red_contract_version:
+        findings.append(
+            "red_contract_too_old: "
+            f"{contract_version} < {minimum_red_contract_version}"
+        )
 
     test_files = document.get("test_files")
     declarations = document.get("declarations")
@@ -211,6 +351,20 @@ def check_declaration_red_map(
                 findings.append(
                     f"red_now_not_boolean: {key}: {reference}: "
                     f"{type(item['red_now']).__name__}"
+                )
+            if contract_version >= 2 and item.get("red_now") is True:
+                expected_reason = item.get("expected_failure_reason")
+                if not isinstance(expected_reason, str) or not expected_reason.strip():
+                    findings.append(
+                        f"expected_failure_reason_missing: {key}: {reference}"
+                    )
+            if (
+                contract_version >= 2
+                and item.get("red_now") is False
+                and "expected_failure_reason" in item
+            ):
+                findings.append(
+                    f"boundary_expected_failure_forbidden: {key}: {reference}"
                 )
             file_part, name = reference.split("::", 1)
             bound.setdefault(file_part, set()).add(name)
@@ -280,6 +434,7 @@ def check_declaration_red_map(
             declarations=declarations,
             project_root=project_root,
             runner=runner or pytest_runner,
+            contract_version=contract_version,
         )
         findings.extend(red_findings)
 

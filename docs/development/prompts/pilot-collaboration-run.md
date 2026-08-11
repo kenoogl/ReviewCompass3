@@ -13,3 +13,6 @@
 
 固定二payloadによる無工具Claude疎通は、用途を限定した
 `docs/development/prompts/claude-bootstrap-run.md`を入口とする。
+
+レビューの対象、確認項目、担当数、最大周回数を機械生成する場合は、
+`docs/development/prompts/review-plan-run.md`を入口とする。

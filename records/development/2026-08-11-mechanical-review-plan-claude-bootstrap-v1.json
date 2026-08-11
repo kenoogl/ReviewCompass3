@@ -1,0 +1,61 @@
+{
+  "base_commit": "df6364448c2f24c6f931d17893bd0483b4e2eec9",
+  "blocking_classes": [
+    "authority_conflict",
+    "human_boundary_missing",
+    "demonstrable_false_verdict",
+    "scope_or_schema_violation"
+  ],
+  "changed_paths": [
+    "docs/development/prompts/claude-bootstrap-run.md",
+    "docs/development/prompts/pilot-collaboration-run.md",
+    "records/development/2026-08-11-claude-bootstrap-manifests/declaration-red-map-v1.json",
+    "records/development/2026-08-11-claude-bootstrap-manifests/green-evidence-v1.md",
+    "records/development/2026-08-11-claude-bootstrap-manifests/process-call-baseline-v1.json",
+    "records/development/2026-08-11-claude-bootstrap-manifests/red-evidence-v1.md",
+    "records/development/2026-08-11-claude-bootstrap-manifests/red-review-result-v1.md",
+    "tests/fixtures/claude_bootstrap/__init__.py",
+    "tests/fixtures/claude_bootstrap/contract-v1.json",
+    "tests/fixtures/claude_bootstrap/error-during-execution-v1.json",
+    "tests/fixtures/claude_bootstrap/error-max-budget-v1.json",
+    "tests/fixtures/claude_bootstrap/error-max-structured-output-retries-v1.json",
+    "tests/fixtures/claude_bootstrap/error-max-turns-v1.json",
+    "tests/fixtures/claude_bootstrap/helpers.py",
+    "tests/fixtures/claude_bootstrap/result-schema-provenance-v1.json",
+    "tests/fixtures/claude_bootstrap/success-result-v1.json",
+    "tests/test_claude_bootstrap.py",
+    "tests/test_claude_bootstrap_adversarial.py",
+    "tests/test_claude_bootstrap_cli.py",
+    "tests/test_claude_bootstrap_entrypoints.py",
+    "tools/development/claude_bootstrap.py",
+    "tools/development/claude_bootstrap_cli.py",
+    "tools/development/pilot_collaboration_cli.py",
+    "tools/development/process_call_inventory.py"
+  ],
+  "plan_sha256": "268a1b1fb625dadf476d7c7370799a12520a0c51b4d7931adc5bae5597a9161d",
+  "policy_id": "reviewcompass3-development-policy-v5",
+  "policy_sha256": "d190a75e8826b5b240364eee6db5ab490dcca2b5c4023b828e42bdf5ce8f0e8b",
+  "record_kind": "mechanical_review_plan",
+  "result": "completed",
+  "risk": "high",
+  "round_limit": 1,
+  "schema_version": 1,
+  "scope_expansion": "forbidden",
+  "semantic_assignments": [
+    {
+      "role": "independent_reviewer",
+      "round": 1,
+      "sequence": 1
+    }
+  ],
+  "semantic_call_count": 1,
+  "stage": "completion",
+  "target_commit": "d58ac5fdfc31836cc6937218a728410f0a10b8ca",
+  "verification_requirements": [
+    "relevant_automated_tests",
+    "full_test_suite",
+    "mutation_or_equivalent_fault_injection",
+    "representative_data_validation",
+    "independent_review"
+  ]
+}
