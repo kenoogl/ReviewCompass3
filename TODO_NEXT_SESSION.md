@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計とHuman段完了承認を終え、最初の機械処理縦切りへ着手した。
-- 現在作業：Humanはproduction実装所見IR-PC-001〜004を全件採用した。4件を一つの再実装単位とし、production修正前に反証testを追加してREDを確認する。
+- 現在作業：IR-PC-001〜004の反証testをtest-only commit 69fe9d8へ固定した。13件が現在実装の欠陥を原因にRED、参照欠落3件と既存1543件はGREEN。固定testを変えずproductionを再実装する。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -29,6 +29,7 @@
 - [操縦者別連携 RED受入テスト 独立再レビュー v4](records/session-handoffs/2026-08-11-pilot-collaboration-red-test-rereview-v4.md) — SHA-256 `da0c56616b101987158ceb624da25bfb2bf2cb012d56dbdbe755fe17ca30699c`
 - [操縦者別連携 production実装 独立レビュー v1](records/session-handoffs/2026-08-11-pilot-collaboration-implementation-review-v1.md) — SHA-256 `ddb97a5f8a28f10533ebf025f4b359985a90dc593a4250ca7bdfe006ea20cd2e`
 - [操縦者別連携 production実装所見 Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-implementation-findings-human-decision-v1.md) — SHA-256 `3469cb2ddf0c58c75c05b2f16a0e821013d1386cc65839026cb48187008075c8`
+- [操縦者別連携 production実装所見 反証test v1](records/session-handoffs/2026-08-11-pilot-collaboration-implementation-findings-red-tests-v1.md) — SHA-256 `d7457fd1c70afa514641db563dbb9bc4ad86b9d6d4feaabbc8f8a0ce623c082f`
 - [操縦者別のClaude／Codex連携方法](docs/development/pilot-specific-claude-codex-collaboration.md) — SHA-256 `aee8c8b72487e26395615c8442710b0695b035ec0aa129b4a777c6142864489d`
 - [委譲作業の共通レビュープロトコル](docs/development/work-review-protocol.md) — SHA-256 `b7eb8f08c7b3f585d64d163a7a2f93e758e57e830bb973cc2441bfadbc98a3df`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
@@ -36,13 +37,13 @@
 
 ## 次に行う一作業
 
-IR-PC-001〜004の反証testをproduction修正前に追加し、各所見を原因として失敗することを確認する。
+固定した反証testを変更せず、IR-PC-001〜004のproduction実装を修正して全1559件をGREENにする。
 
 開始条件：
 
 - production実装commit 0974769d2ce91210dfb62a7a9a6179fd98e7f614が固定されていること
 - production実装独立レビューv1のpathとSHA-256が固定されていること
-- IR-PC-001〜004のHuman裁定記録のpathとSHA-256が固定されていること
+- test-only commit 69fe9d89cfbcd16da70e3c41e356aebd9d0ef1f3とtest SHA-256が固定されていること
 
 完了条件：
 
@@ -50,11 +51,11 @@ IR-PC-001〜004の反証testをproduction修正前に追加し、各所見を原
 - 既存bootstrap reviewテスト、故障注入、公式全テスト、差分検査が合格すること
 - 反対側モデルの独立レビューがverifiedとなり、Human段完了承認を得ること
 
-後続作業：反証testを固定した後、productionを修正し、固定73件を含む全testと別会話の独立再レビューを行う。
+後続作業：production修正後、固定73件と追加16件を含む全1559件を実行し、別会話の独立再レビューを行う。
 
 ## blocker・Human判断待ち
 
-- blocker：Human採否待ちは解消した。IR-PC-001〜004の反証test追加と再実装が未完了。
+- blocker：Human採否待ちと反証test追加は完了。IR-PC-001〜004のproduction再実装と独立再レビューが未完了。
 - Human判断待ち：IR-PC-001〜004を全件採用し、一つの再実装単位として扱う。実装後の段完了承認は別に必要。
 
 ## stale・deferred
@@ -68,8 +69,8 @@ IR-PC-001〜004の反証testをproduction修正前に追加し、各所見を原
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：固定73件はGREEN。production独立レビューは既存bootstrap review 27件、公式1543件、差分検査に合格したが、独立反証でIR-PC-001〜004のblocking 4件。
-- 直近の全Test：直近の公式全Testは1543 passed、failed 0、errors 0、終了コード0。所見採用時は修正後に再実行する。
+- 直近の関連Test：新規16件中13件は意図どおりRED、参照欠落3件はGREEN。既存73件を含む既存1543件は終了0。test SHA-256 8157394b5d40222196253dba5aaf2a645282864a4860fb2a5efc108c2b2dcb22。
+- 直近の全Test：新規16件を除く既存1543件は終了コード0。修正後は全1559件を再実行する。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
