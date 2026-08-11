@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "record_kind": "claude_cli_result_schema_provenance",
+  "source": {
+    "claude_code_version": "2.1.220",
+    "build_git_sha": "4073f59596e272f39393db4f96abc5f4b10eff21",
+    "executable_locator": "installed_version_store/2.1.220",
+    "executable_size_bytes": 256908272,
+    "executable_sha256": "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081",
+    "inspection_mode": "static_binary_utf8_subsequence",
+    "claude_process_created": false,
+    "network_used": false
+  },
+  "extraction": {
+    "start_marker": "zuT=Se(()=>E.object({type:E.literal(\"result\")",
+    "end_marker": "YuT=Se(()=>E.union([zuT(),KuT()]))",
+    "start_marker_count": 1,
+    "error_marker_count": 1,
+    "end_marker_count": 1,
+    "fragment_length_bytes": 1644,
+    "fragment_sha256": "b53d8252b4013f018047e2f31732c8fc3c75838b69cb98a8009842adb700e111",
+    "normalization_rule": "outer object keys and referenced value types are transcribed from the uniquely bounded static schema fragment; key order is source order"
+  },
+  "success": {
+    "required": {
+      "type": "literal:result",
+      "subtype": "literal:success",
+      "duration_ms": "integer",
+      "duration_api_ms": "integer",
+      "is_error": "boolean",
+      "num_turns": "integer",
+      "result": "string",
+      "stop_reason": "string|null",
+      "total_cost_usd": "number",
+      "usage": "unknown_json_value",
+      "modelUsage": "record<string,model_usage>",
+      "permission_denials": "array<permission_denial>",
+      "uuid": "string",
+      "session_id": "string"
+    },
+    "optional": {
+      "ttft_ms": "integer",
+      "ttft_stream_ms": "integer",
+      "time_to_request_ms": "integer",
+      "user_message_uuid": "string",
+      "request_sent_wall_ms": "number",
+      "time_to_request_from_spawn_ms": "integer",
+      "warm_spare_claimed": "boolean",
+      "time_origin_ms": "number",
+      "api_error_status": "integer|null",
+      "structured_output": "unknown_json_value",
+      "deferred_tool_use": "deferred_tool_use",
+      "terminal_reason": "terminal_reason",
+      "fast_mode_state": "fast_mode_state",
+      "fast_mode_disabled_reason": "fast_mode_disabled_reason",
+      "origin": "origin_union"
+    },
+    "acceptance_constraints": {
+      "is_error": false,
+      "permission_denials": "must_be_empty",
+      "unknown_outer_keys": "reject",
+      "fixture_optional_key_policy": "omit_all_optional_keys"
+    }
+  },
+  "error": {
+    "required": {
+      "type": "literal:result",
+      "subtype": "enum:error_during_execution|error_max_turns|error_max_budget_usd|error_max_structured_output_retries",
+      "duration_ms": "integer",
+      "duration_api_ms": "integer",
+      "is_error": "boolean",
+      "num_turns": "integer",
+      "stop_reason": "string|null",
+      "total_cost_usd": "number",
+      "usage": "unknown_json_value",
+      "modelUsage": "record<string,model_usage>",
+      "permission_denials": "array<permission_denial>",
+      "errors": "array<string>",
+      "uuid": "string",
+      "session_id": "string"
+    },
+    "optional": {
+      "terminal_reason": "terminal_reason",
+      "fast_mode_state": "fast_mode_state",
+      "fast_mode_disabled_reason": "fast_mode_disabled_reason",
+      "origin": "origin_union"
+    },
+    "acceptance_constraints": {
+      "is_error": true,
+      "always_reject_as_success": true,
+      "unknown_outer_keys": "reject",
+      "fixture_optional_key_policy": "omit_all_optional_keys"
+    }
+  },
+  "referenced_types": {
+    "model_usage": {
+      "required": {
+        "inputTokens": "integer",
+        "outputTokens": "integer",
+        "cacheReadInputTokens": "integer",
+        "cacheCreationInputTokens": "integer",
+        "webSearchRequests": "integer",
+        "costUSD": "number",
+        "contextWindow": "integer",
+        "maxOutputTokens": "integer"
+      },
+      "optional": {
+        "canonicalModel": "string",
+        "provider": "string"
+      }
+    },
+    "permission_denial": {
+      "required": {
+        "tool_name": "string",
+        "tool_use_id": "string",
+        "tool_input": "record<string,unknown_json_value>"
+      }
+    },
+    "deferred_tool_use": {
+      "required": {
+        "id": "string",
+        "name": "string",
+        "input": "record<string,unknown_json_value>"
+      }
+    },
+    "terminal_reason": [
+      "blocking_limit",
+      "rapid_refill_breaker",
+      "prompt_too_long",
+      "image_error",
+      "model_error",
+      "api_error",
+      "malformed_tool_use_exhausted",
+      "aborted_streaming",
+      "aborted_tools",
+      "stop_hook_prevented",
+      "hook_stopped",
+      "tool_deferred",
+      "max_turns",
+      "background_requested",
+      "completed",
+      "budget_exhausted",
+      "structured_output_retry_exhausted",
+      "tool_deferred_unavailable",
+      "turn_setup_failed"
+    ],
+    "fast_mode_state": [
+      "off",
+      "cooldown",
+      "on"
+    ],
+    "fast_mode_disabled_reason": [
+      "free",
+      "preference",
+      "extra_usage_disabled",
+      "network_error",
+      "unknown",
+      "not_first_party",
+      "disabled_by_env",
+      "model_not_allowed",
+      "sdk_opt_in_required",
+      "pending"
+    ],
+    "origin_union": {
+      "source_reference": "cyl",
+      "fixture_policy": "omit because the outer result schema marks origin optional"
+    }
+  },
+  "test_fixture_rules": {
+    "success_fixture": "include every success required key, omit every optional key, use empty modelUsage and permission_denials",
+    "error_fixtures": "one fixture for each of the four error subtypes, include every error required key, omit every optional key",
+    "negative_fixtures": [
+      "unknown_outer_key",
+      "missing_each_required_key",
+      "success_with_is_error_true",
+      "success_with_permission_denial",
+      "each_error_subtype"
+    ],
+    "real_response_forbidden": true,
+    "user_specific_absolute_path_forbidden": true,
+    "credential_value_forbidden": true
+  }
+}
