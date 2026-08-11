@@ -262,6 +262,77 @@ def test_response_model_outside_human_approved_set_stops(tmp_path, monkeypatch):
     assert result["payload_process_count"] == 1
 
 
+def test_single_json_fence_is_normalized_before_exact_inner_comparison(
+    tmp_path, monkeypatch
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    scenario.fake_process.result_text_wrappers = ["json_fence", "json_fence"]
+    install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "succeeded"
+    assert len(scenario.fake_process.payload_calls) == 2
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_reason"),
+    (
+        ("prefixed", "inner_not_json"),
+        ("fenced_with_prefix", "inner_not_json"),
+        ("double_fence", "inner_not_json"),
+        ("unknown_outer", "outer_contract_mismatch"),
+        ("stderr", "stderr_present"),
+    ),
+)
+def test_invalid_response_is_saved_with_precise_replayable_reason(
+    tmp_path, monkeypatch, mutation, expected_reason
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    if mutation in {"prefixed", "fenced_with_prefix", "double_fence"}:
+        scenario.fake_process.result_text_wrappers[0] = mutation
+    elif mutation == "unknown_outer":
+        scenario.fake_process.result_outer_updates[0] = {"unexpected": True}
+    else:
+        scenario.fake_process.payload_stderr[0] = "non-empty diagnostic"
+    module = install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "stopped"
+    assert result["stop_code"] == "claude_result_invalid"
+    assert result["payload_process_count"] == 1
+    result_root = (
+        scenario.runtime_root
+        / "projects"
+        / "reviewcompass3-bootstrap-test"
+        / "development/sensitive/claude-bootstrap/runs"
+        / APPROVAL_ID
+    )
+    raw_path = result_root / "raw-1.json"
+    raw = json.loads(raw_path.read_text(encoding="utf-8"))
+    assert raw["returncode"] == 0
+    assert set(raw) == {"schema_version", "returncode", "stdout", "stderr"}
+    receipt = json.loads(
+        (result_root / "receipt.json").read_text(encoding="utf-8")
+    )
+    assert receipt["validation_failures"] == [
+        {"payload_index": 1, "reason": expected_reason}
+    ]
+    assert receipt["raw_sha256"] == [sha256_bytes(raw_path.read_bytes())]
+
+    calls_before_replay = len(scenario.fake_process.calls)
+    replay = module._revalidate_saved_response(result_root, 1)
+
+    assert replay == {
+        "schema_version": 1,
+        "payload_index": 1,
+        "valid": False,
+        "reason": expected_reason,
+    }
+    assert len(scenario.fake_process.calls) == calls_before_replay
+
+
 def test_user_selected_model_is_loaded_from_approved_manifest(
     tmp_path, monkeypatch
 ):

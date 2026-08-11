@@ -74,6 +74,9 @@ class FakeClaudeProcess:
         self.payload_results = []
         self.fail_first_payload = False
         self.response_models = ["claude-fable-5", "claude-fable-5"]
+        self.result_text_wrappers = ["raw", "raw"]
+        self.result_outer_updates = [{}, {}]
+        self.payload_stderr = ["", ""]
 
     @property
     def payload_calls(self):
@@ -140,8 +143,24 @@ class FakeClaudeProcess:
         else:
             session_id = args[args.index("--session-id") + 1]
             result["session_id"] = session_id
+        wrapper = self.result_text_wrappers[payload_index]
+        if wrapper == "json_fence":
+            result["result"] = f"```json\n{result['result']}\n```"
+        elif wrapper == "prefixed":
+            result["result"] = f"result follows\n{result['result']}"
+        elif wrapper == "fenced_with_prefix":
+            result["result"] = f"result follows\n```json\n{result['result']}\n```"
+        elif wrapper == "double_fence":
+            result["result"] = (
+                f"```json\n```json\n{result['result']}\n```\n```"
+            )
+        result.update(self.result_outer_updates[payload_index])
         self.payload_results.append(result)
-        return FakeCompletedProcess(args=args, stdout=json.dumps(result))
+        return FakeCompletedProcess(
+            args=args,
+            stdout=json.dumps(result),
+            stderr=self.payload_stderr[payload_index],
+        )
 
 
 class BootstrapScenario:

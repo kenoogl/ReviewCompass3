@@ -59,6 +59,20 @@ _PAYLOADS = (
         ),
     },
 )
+_EXPECTED_INNER = (
+    {
+        "protocol": "codex-pilot-claude-bootstrap-v1",
+        "role": "reviewer",
+        "nonce": "RC3-CPC-20260811-A",
+        "reinvoke": False,
+    },
+    {
+        "protocol": "codex-pilot-claude-bootstrap-v1",
+        "continued": True,
+        "nonce": "RC3-CPC-20260811-A",
+        "reinvoke": False,
+    },
+)
 _MATERIAL_POLICY = {
     "require_secret_scan": True,
     "forbid_credentials": True,
@@ -516,28 +530,92 @@ def _validate_outer(value, session_id):
 
 
 def _validate_result(completed, session_id, expected_inner, allowed_models):
-    if completed.returncode != 0 or completed.stderr:
-        return None
+    if completed.returncode != 0:
+        return None, [], "process_exit_nonzero"
+    if completed.stderr:
+        return None, [], "stderr_present"
     try:
         outer = json.loads(completed.stdout)
     except (TypeError, json.JSONDecodeError):
-        return None
+        return None, [], "outer_not_json"
     if not _validate_outer(outer, session_id):
-        return None
+        return None, [], "outer_contract_mismatch"
     actual_models = []
     for model, usage in outer["modelUsage"].items():
         if model not in allowed_models or not isinstance(usage, dict):
-            return None
+            return outer, [], "response_model_invalid"
         actual_models.append(model)
     if not actual_models:
-        return None
+        return outer, [], "response_model_missing"
+    inner_text = outer["result"]
     try:
-        inner = json.loads(outer["result"])
+        inner = json.loads(inner_text)
     except json.JSONDecodeError:
-        return None
+        prefix = "```json\n"
+        suffix = "\n```"
+        if (
+            not inner_text.startswith(prefix)
+            or not inner_text.endswith(suffix)
+            or "```" in inner_text[len(prefix):-len(suffix)]
+        ):
+            return outer, sorted(actual_models), "inner_not_json"
+        try:
+            inner = json.loads(inner_text[len(prefix):-len(suffix)])
+        except json.JSONDecodeError:
+            return outer, sorted(actual_models), "inner_not_json"
     if inner != expected_inner:
-        return None
-    return outer, sorted(actual_models)
+        return outer, sorted(actual_models), "inner_mismatch"
+    return outer, sorted(actual_models), None
+
+
+def _revalidate_saved_response(result_root, payload_index):
+    try:
+        result_root = Path(result_root)
+        launch = json.loads(
+            (result_root / "launch.json").read_text(encoding="utf-8")
+        )
+        raw = json.loads(
+            (result_root / f"raw-{payload_index}.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        if (
+            payload_index not in (1, 2)
+            or set(raw)
+            != {"schema_version", "returncode", "stdout", "stderr"}
+            or raw["schema_version"] != 1
+        ):
+            raise ValueError
+        argv = launch["argv"][payload_index - 1]
+        flag = "--session-id" if payload_index == 1 else "--resume"
+        session_id = argv[argv.index(flag) + 1]
+        completed = subprocess.CompletedProcess(
+            argv,
+            raw["returncode"],
+            stdout=raw["stdout"],
+            stderr=raw["stderr"],
+        )
+        _, _, reason = _validate_result(
+            completed,
+            session_id,
+            _EXPECTED_INNER[payload_index - 1],
+            launch["allowed_response_models"],
+        )
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        IndexError,
+        TypeError,
+        json.JSONDecodeError,
+    ):
+        reason = "saved_response_invalid"
+    return {
+        "schema_version": 1,
+        "payload_index": payload_index,
+        "valid": reason is None,
+        "reason": reason or "valid",
+    }
 
 
 def _reserve_result_files(result_root, repository):
@@ -611,6 +689,7 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
     requested_model = None
     allowed_response_models = []
     actual_models_by_payload = []
+    validation_failures = []
     try:
         if (
             not isinstance(manifest_digest, str)
@@ -770,20 +849,6 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
                 "argv": [first_argv, second_argv],
             },
         )
-        expected_inner = (
-            {
-                "protocol": "codex-pilot-claude-bootstrap-v1",
-                "role": "reviewer",
-                "nonce": "RC3-CPC-20260811-A",
-                "reinvoke": False,
-            },
-            {
-                "protocol": "codex-pilot-claude-bootstrap-v1",
-                "continued": True,
-                "nonce": "RC3-CPC-20260811-A",
-                "reinvoke": False,
-            },
-        )
         outer_values = []
         for index, argv in enumerate((first_argv, second_argv), start=1):
             completed = _invoke(
@@ -795,22 +860,38 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             )
             payload_count += 1
             exit_codes.append(completed.returncode)
-            validated = _validate_result(
+            outer, actual_models, validation_reason = _validate_result(
                 completed,
                 session_id,
-                expected_inner[index - 1],
+                _EXPECTED_INNER[index - 1],
                 allowed_response_models,
             )
-            if validated is None:
+            if actual_models:
+                actual_models_by_payload.append(actual_models)
+            if validation_reason is not None:
+                raw_record = {
+                    "schema_version": 1,
+                    "returncode": completed.returncode,
+                    "stdout": completed.stdout,
+                    "stderr": completed.stderr,
+                }
+                _write_json(paths[f"raw_{index}"], raw_record)
+                raw_digests.append(
+                    digests.sha256_hex(paths[f"raw_{index}"].read_bytes())
+                )
+                validation_failures.append(
+                    {
+                        "payload_index": index,
+                        "reason": validation_reason,
+                    }
+                )
                 raise _BootstrapStop(
                     "claude_result_invalid",
                     approval_state="claimed",
                     payload_process_count=payload_count,
                     preflight_process_count=preflight_count,
                 )
-            outer, actual_models = validated
             outer_values.append(outer)
-            actual_models_by_payload.append(actual_models)
             raw_bytes = _canonical_bytes(outer)
             raw_digests.append(digests.sha256_hex(raw_bytes))
             paths[f"raw_{index}"].write_bytes(raw_bytes)
@@ -827,6 +908,7 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             "requested_model": requested_model,
             "allowed_response_models": allowed_response_models,
             "actual_models_by_payload": actual_models_by_payload,
+            "validation_failures": validation_failures,
             "auth_method": "claude.ai",
             "payload_sha256": [item["sha256"] for item in _PAYLOADS],
             "raw_sha256": raw_digests,
@@ -872,6 +954,7 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
                 "requested_model": requested_model,
                 "allowed_response_models": allowed_response_models,
                 "actual_models_by_payload": actual_models_by_payload,
+                "validation_failures": validation_failures,
                 "payload_sha256": [item["sha256"] for item in _PAYLOADS],
                 "raw_sha256": raw_digests,
                 "exit_code": exit_codes,
