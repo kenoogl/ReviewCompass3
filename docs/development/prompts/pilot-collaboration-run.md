@@ -10,3 +10,6 @@
 - `reviewcompass3-pilot prepare`
 - `reviewcompass3-pilot ingest`
 - `reviewcompass3-pilot status`
+
+固定二payloadによる無工具Claude疎通は、用途を限定した
+`docs/development/prompts/claude-bootstrap-run.md`を入口とする。

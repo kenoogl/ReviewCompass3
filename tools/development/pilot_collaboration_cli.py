@@ -10,9 +10,11 @@ from tools.development.pilot_collaboration import (
     prepare,
     status,
 )
+from tools.development import claude_bootstrap_cli
 
 
 COMMAND_FLAGS = {
+    "bootstrap": ("manifest-digest", "approval-id"),
     "prepare": ("config", "private-root"),
     "ingest": (
         "private-root",
@@ -25,6 +27,7 @@ COMMAND_FLAGS = {
     "status": ("private-root", "run-id"),
 }
 PATH_FLAGS = {
+    "bootstrap": (),
     "prepare": ("config", "private-root"),
     "ingest": ("private-root", "raw-file", "launch-record"),
     "status": ("private-root",),
@@ -71,6 +74,22 @@ def _parse(argv):
     if set(values) != set(COMMAND_FLAGS[command]):
         code = "stage_invalid" if command == "ingest" and "stage" in values and values["stage"] not in ("prompt_audit", "prompt_judgment") else "config_invalid"
         raise PilotStop(code)
+    if command == "bootstrap":
+        digest = values["manifest-digest"]
+        approval_id = values["approval-id"]
+        if (
+            len(digest) != 64
+            or any(character not in "0123456789abcdef" for character in digest)
+            or not approval_id
+            or any(
+                not (
+                    character.isalnum()
+                    or character in "._-"
+                )
+                for character in approval_id
+            )
+        ):
+            raise PilotStop("config_invalid")
     run_id = values.get("run-id")
     if run_id is not None and not _identifier(run_id):
         raise PilotStop("config_invalid")
@@ -113,6 +132,22 @@ def run(argv=None):
     try:
         command, values = _parse(arguments)
         repository = Path.cwd().resolve()
+        if command == "bootstrap":
+            response, exit_code = claude_bootstrap_cli._run(
+                values["manifest-digest"],
+                values["approval-id"],
+            )
+            response = {"command": "bootstrap", **response}
+            sys.stdout.write(
+                json.dumps(
+                    response,
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                    sort_keys=True,
+                )
+                + "\n"
+            )
+            return exit_code
         if command == "prepare":
             outcome = prepare(
                 repository,
@@ -147,7 +182,19 @@ def run(argv=None):
         response_run_id = (
             error.run_id if error.run_id is not None else known_run_id
         )
-        if error.code == "internal_error":
+        if command == "bootstrap":
+            response = {
+                "schema_version": 1,
+                "command": "bootstrap",
+                "result": "stopped",
+                "stop_code": error.code,
+                "payload_process_count": 0,
+                "preflight_process_count": 0,
+                "approval_state": "pending",
+                "recovery": "入力とHuman承認を確認してください。",
+            }
+            exit_code = 2
+        elif error.code == "internal_error":
             response = _response(
                 command,
                 result="failed",
