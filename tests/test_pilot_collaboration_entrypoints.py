@@ -52,9 +52,11 @@ def _commit_changed_paths(repository, commit):
 
 
 def _is_followup_record(path):
-    return path == "TODO_NEXT_SESSION.md" or path.startswith(
-        "records/session-handoffs/"
-    )
+    if path == "TODO_NEXT_SESSION.md":
+        return True
+    if not path.startswith("records/session-handoffs/"):
+        return False
+    return path.endswith(".md") or path.endswith(".manifest.json")
 
 
 def _implementation_paths_since_base(repository, base_commit, target_commit="HEAD"):
@@ -227,4 +229,29 @@ def test_change_scope_rejects_forbidden_commit_before_later_allowed_commit(tmp_p
     )
 
     assert "tools/development/forbidden_production.py" in implementation_paths
+    assert not implementation_paths <= ALLOWED_PATHS
+
+
+def test_change_scope_does_not_hide_code_inside_handoff_directory(tmp_path):
+    repository, base_commit = _initialize_test_repository(tmp_path)
+    forbidden_path = "records/session-handoffs/forbidden_production.py"
+    _commit_test_change(
+        repository,
+        forbidden_path,
+        "# forbidden\n",
+        "forbidden handoff code",
+    )
+    _commit_test_change(
+        repository,
+        "tests/test_pilot_collaboration.py",
+        "# later allowed test\n",
+        "later allowed test",
+    )
+
+    implementation_paths = _implementation_paths_since_base(
+        repository,
+        base_commit,
+    )
+
+    assert forbidden_path in implementation_paths
     assert not implementation_paths <= ALLOWED_PATHS

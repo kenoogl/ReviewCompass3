@@ -74,10 +74,12 @@ TRACEABILITY = {
     "NG-PC-007": (
         "test_change_scope_contains_only_v6_allowlisted_paths",
         "test_change_scope_rejects_forbidden_commit_before_later_allowed_commit",
+        "test_change_scope_does_not_hide_code_inside_handoff_directory",
     ),
     "ST-PC-001": (
         "test_change_scope_contains_only_v6_allowlisted_paths",
         "test_change_scope_rejects_forbidden_commit_before_later_allowed_commit",
+        "test_change_scope_does_not_hide_code_inside_handoff_directory",
     ),
     "ST-PC-002": ("test_existing_raw_review_store_public_contract_is_unchanged",),
     "ST-PC-003": (
@@ -109,6 +111,7 @@ TRACEABILITY = {
     "OUT-PC-004": (
         "test_change_scope_ignores_later_record_and_todo_commits",
         "test_change_scope_rejects_forbidden_commit_before_later_allowed_commit",
+        "test_change_scope_does_not_hide_code_inside_handoff_directory",
     ),
     "OUT-PC-005": ("test_requirement_traceability_covers_all_26_ids",),
     "OUT-PC-006": ("test_change_scope_contains_only_v6_allowlisted_paths",),
@@ -1155,12 +1158,16 @@ def _process_policy_violations(source):
         for child in ast.iter_child_nodes(parent)
     }
     module_aliases = {}
+    importlib_module_aliases = set()
+    import_module_aliases = set()
     violations = []
     process_modules = {"subprocess", "os", "posix", "asyncio", "multiprocessing", "pty"}
 
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for imported in node.names:
+                if imported.name == "importlib":
+                    importlib_module_aliases.add(imported.asname or "importlib")
                 root_module = imported.name.split(".", 1)[0]
                 if root_module not in process_modules:
                     continue
@@ -1168,13 +1175,22 @@ def _process_policy_violations(source):
                 module_aliases[local_name] = root_module
                 if root_module == "subprocess" and imported.asname is not None:
                     violations.append("subprocess alias import")
-        elif isinstance(node, ast.ImportFrom) and node.module in process_modules:
-            for imported in node.names:
-                if node.module == "subprocess" or _is_process_method(
-                    node.module,
-                    imported.name,
-                ):
-                    violations.append(f"from-import {node.module}.{imported.name}")
+        elif isinstance(node, ast.ImportFrom):
+            if node.module == "importlib":
+                import_module_aliases.update(
+                    imported.asname or imported.name
+                    for imported in node.names
+                    if imported.name == "import_module"
+                )
+            if node.module in process_modules:
+                for imported in node.names:
+                    if node.module == "subprocess" or _is_process_method(
+                        node.module,
+                        imported.name,
+                    ):
+                        violations.append(
+                            f"from-import {node.module}.{imported.name}"
+                        )
 
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
@@ -1192,7 +1208,14 @@ def _process_policy_violations(source):
                 elif not isinstance(imported, ast.Constant):
                     violations.append("dynamic import expression")
                 continue
-            if dotted == "importlib.import_module" and node.args:
+            import_module_call = (
+                dotted in import_module_aliases
+                or any(
+                    dotted == f"{module_alias}.import_module"
+                    for module_alias in importlib_module_aliases
+                )
+            )
+            if import_module_call and node.args:
                 imported = node.args[0]
                 if (
                     not isinstance(imported, ast.Constant)
@@ -1298,6 +1321,9 @@ def test_pilot_code_uses_only_array_git_subprocess_run():
         "__import__('sub' + 'process').Popen(['git'])",
         "import importlib\nimportlib.import_module('subprocess').Popen(['claude'])",
         "import subprocess\nsubprocess.run(['git', 'show'], **{'shell': True})",
+        "from importlib import import_module\nimport_module('subprocess').Popen(['claude'])",
+        "from importlib import import_module as load\nload('subprocess').Popen(['claude'])",
+        "import importlib as il\nil.import_module('subprocess').Popen(['claude'])",
     ),
 )
 def test_process_policy_rejects_alias_popen_check_and_dynamic_routes(source):
