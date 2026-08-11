@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "record_kind": "claude_bootstrap_completion_review",
-  "review_id": "RC3-CB-COMPLETION-REVIEW-20260811-V1",
+  "review_id": "RC3-CB-COMPLETION-REVIEW-20260811-V2",
   "status": "verified",
-  "target_commit": "7d26f79596d150921665c5704778018349021ac5",
-  "manifest_sha256": "b45af2796a08cc4721b4a0e364e2226c000fb344e27e9575bfe181b4dc75d619",
+  "target_commit": "f913b1c4f99daf40d2a66476e517e0d0d5d36fdd",
+  "manifest_sha256": "d62b8f10a0620bab06d6cf0218593394ee2bd12ee3f00cf97f39068d5a090221",
   "ordered_payload_sha256": "26933d4f45ed497f9d1d9f5fdc741aca87b0ad37c3ed3c35fd99ebff6b2bd8a0",
   "blocking_finding_count": 0
 }
