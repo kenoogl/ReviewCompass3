@@ -2,8 +2,8 @@
   "schema_version": 1,
   "record_kind": "human_claude_bootstrap_send_approval",
   "approved_by": "user",
-  "approval_id": "RC3-CB-APPROVAL-20260812-004",
-  "store_identity": "store-0faf2e5d-b34e-4edf-a06f-337f5a3bf7df",
+  "approval_id": "RC3-CB-APPROVAL-20260812-005",
+  "store_identity": "store-712b9ef4-2e08-479f-ad02-ce85bba2e85c",
   "purpose": "codex-pilot-no-tool-claude-bootstrap",
   "provider": "claude-code-first-party",
   "model": "claude-fable-5",
@@ -21,9 +21,9 @@
     "forbid_credentials": true,
     "forbid_personal_identifiers": true
   },
-  "result_root_identity": "05d9b353c0135cbcafe542bd3255457675e76650ce71431998430ed0a0e4382d",
-  "completion_review_id": "RC3-CB-COMPLETION-REVIEW-20260812-V3",
+  "result_root_identity": "d5561dbd8569b890c2158d13202e6b0551cd12befa31cdfed20d6ccff738faf3",
+  "completion_review_id": "RC3-CB-COMPLETION-REVIEW-20260812-V4",
   "completion_review_path": "records/development/claude-bootstrap-completion-review-v1.json",
-  "completion_review_sha256": "4a78b0282338be073d831be3b1841d780930165c28ad23e3048fb73f3eb81db8",
-  "completion_review_target_commit": "a0defdafaff41717400e649c4beb00a64deca7df"
+  "completion_review_sha256": "fda3230fffe9a4510d51747f760e84fd8ed07340f25f34327bbd9da56bf55879",
+  "completion_review_target_commit": "2138e9eab18f0e52140c967cfe726b9b7b5a103c"
 }
