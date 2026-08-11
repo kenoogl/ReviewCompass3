@@ -121,12 +121,8 @@ class FakeClaudeProcess:
         result = copy.deepcopy(SUCCESS_RESULT)
         payload_index = len(self.payload_calls) - 1
         response_model = self.response_models[payload_index]
-        result["modelUsage"] = {
-            response_model: {
-                "canonicalModel": response_model,
-                "provider": "firstParty",
-            }
-        }
+        usage = next(iter(result["modelUsage"].values()))
+        result["modelUsage"] = {response_model: usage}
         if "--resume" in args:
             session_id = args[args.index("--resume") + 1]
             result["session_id"] = session_id

@@ -526,12 +526,7 @@ def _validate_result(completed, session_id, expected_inner, allowed_models):
         return None
     actual_models = []
     for model, usage in outer["modelUsage"].items():
-        if (
-            model not in allowed_models
-            or not isinstance(usage, dict)
-            or usage.get("canonicalModel") != model
-            or usage.get("provider") != "firstParty"
-        ):
+        if model not in allowed_models or not isinstance(usage, dict):
             return None
         actual_models.append(model)
     if not actual_models:

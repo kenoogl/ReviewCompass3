@@ -11,8 +11,14 @@
   "usage": {},
   "modelUsage": {
     "claude-fable-5": {
-      "canonicalModel": "claude-fable-5",
-      "provider": "firstParty"
+      "inputTokens": 1,
+      "outputTokens": 1,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0,
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000
     }
   },
   "permission_denials": [],
