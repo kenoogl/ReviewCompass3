@@ -37,6 +37,20 @@ def _identifier(value):
     return all(character.islower() or character.isdigit() or character in "._-" for character in value) and value[0].isalnum()
 
 
+def _known_run_id(arguments):
+    if not arguments or arguments[0] not in ("ingest", "status"):
+        return None
+    positions = [
+        index
+        for index, value in enumerate(arguments[:-1])
+        if value == "--run-id"
+    ]
+    if len(positions) != 1:
+        return None
+    candidate = arguments[positions[0] + 1]
+    return candidate if _identifier(candidate) else None
+
+
 def _parse(argv):
     if not argv or argv[0] not in COMMAND_FLAGS:
         raise PilotStop("config_invalid")
@@ -95,6 +109,7 @@ def _response(
 def run(argv=None):
     arguments = tuple(sys.argv[1:] if argv is None else argv)
     command = arguments[0] if arguments and arguments[0] in COMMAND_FLAGS else None
+    known_run_id = _known_run_id(arguments)
     try:
         command, values = _parse(arguments)
         repository = Path.cwd().resolve()
@@ -129,12 +144,15 @@ def run(argv=None):
         )
         exit_code = 0
     except PilotStop as error:
+        response_run_id = (
+            error.run_id if error.run_id is not None else known_run_id
+        )
         if error.code == "internal_error":
             response = _response(
                 command,
                 result="failed",
                 state=error.state,
-                run_id=error.run_id,
+                run_id=response_run_id,
                 event_id=error.event_id,
                 stop_code="internal_error",
                 detail=error.detail,
@@ -145,7 +163,7 @@ def run(argv=None):
                 command,
                 result="stopped",
                 state=error.state,
-                run_id=error.run_id,
+                run_id=response_run_id,
                 event_id=error.event_id,
                 stop_code=error.code,
                 detail=error.detail,

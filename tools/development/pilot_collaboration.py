@@ -338,13 +338,18 @@ def _verify_sources(repository, config, *, current_mismatch_code):
 
 def _validate_private_root(repository, private_root):
     root = Path(private_root)
+    try:
+        resolved_root = root.resolve(strict=True)
+        resolved_repository = repository.resolve(strict=True)
+    except OSError:
+        _stop("private_root_invalid")
     if (
         not root.is_absolute()
         or root.is_symlink()
         or not root.is_dir()
-        or root == repository
-        or root == repository.parent
-        or repository in root.parents
+        or resolved_root == resolved_repository
+        or resolved_root == resolved_repository.parent
+        or resolved_repository in resolved_root.parents
     ):
         _stop("private_root_invalid")
     return root
@@ -404,15 +409,20 @@ def prepare(repository, config_path, private_root):
     repository = Path(repository).resolve()
     if not (repository / ".git").exists():
         _stop("repository_invalid")
-    root = _validate_private_root(repository, private_root)
     config_bytes = _read_external_file(config_path, "config_invalid")
     config = _validate_start_config(_decode_json(config_bytes, "config_invalid"))
-    instruction_text = _verify_sources(
-        repository,
-        config,
-        current_mismatch_code="source_blob_invalid",
-    )
     run_id = config["run_id"]
+    try:
+        root = _validate_private_root(repository, private_root)
+        instruction_text = _verify_sources(
+            repository,
+            config,
+            current_mismatch_code="source_blob_invalid",
+        )
+    except PilotStop as error:
+        if error.run_id is None:
+            error.run_id = run_id
+        raise
     run_root = root / run_id
     candidate = root / f".{run_id}.candidate"
     if run_root.exists() or candidate.exists():
@@ -466,9 +476,11 @@ def prepare(repository, config_path, private_root):
         ):
             _read_stored_json(candidate / relative_path)
         os.rename(candidate, run_root)
-    except PilotStop:
+    except PilotStop as error:
         if candidate.exists():
             shutil.rmtree(candidate)
+        if error.run_id is None:
+            error.run_id = run_id
         raise
     except (OSError, ImmutableResultStoreError):
         if candidate.exists():
@@ -536,6 +548,31 @@ def _load_events(run_root, manifest):
         events.append(event)
         previous = event
     return events
+
+
+def _validate_attempt_artifact_inventory(run_root, events):
+    expected = {"launch": set(), "raw": set(), "parsed": set()}
+    for event in events[1:]:
+        attempt_id = event["attempt_id"]
+        if not _is_identifier(attempt_id):
+            _stop("stored_record_invalid", state="blocked")
+        filename = f"{attempt_id}.json"
+        expected["launch"].add(filename)
+        expected["raw"].add(filename)
+        if event["event_type"].endswith("_parsed"):
+            expected["parsed"].add(filename)
+    for directory_name, expected_names in expected.items():
+        directory = run_root / directory_name
+        if directory.is_symlink() or not directory.is_dir():
+            _stop("stored_record_invalid", state="blocked")
+        try:
+            entries = tuple(directory.iterdir())
+        except OSError:
+            _stop("stored_record_invalid", state="blocked")
+        if any(entry.is_symlink() or not entry.is_file() for entry in entries):
+            _stop("stored_record_invalid", state="blocked")
+        if {entry.name for entry in entries} != expected_names:
+            _stop("stored_record_invalid", state="blocked")
 
 
 def _load_envelope(run_root, stage):
@@ -1007,7 +1044,23 @@ def status(repository, private_root, run_id):
     manifest = _load_manifest(run_root)
     if manifest["repository_root"] != str(repository) or manifest["start_config"]["run_id"] != run_id:
         _stop("stored_record_invalid", state="blocked", run_id=run_id)
+    try:
+        _verify_sources(
+            repository,
+            manifest["start_config"],
+            current_mismatch_code="stale_input",
+        )
+    except PilotStop as error:
+        if error.code in (
+            "stale_input",
+            "source_blob_invalid",
+            "source_digest_mismatch",
+            "requirement_mismatch",
+        ):
+            _stop("stale_input", state="stale", run_id=run_id)
+        raise
     events = _load_events(run_root, manifest)
+    _validate_attempt_artifact_inventory(run_root, events)
     first = events[0]
     if (
         first["event_type"] != "prepared"
@@ -1037,21 +1090,6 @@ def status(repository, private_root, run_id):
         if event["event_type"] not in allowed_transitions.get(previous["event_type"], set()):
             _stop("stored_record_invalid", state="blocked", run_id=run_id)
         _validate_stored_attempt(run_root, manifest, event)
-    try:
-        _verify_sources(
-            repository,
-            manifest["start_config"],
-            current_mismatch_code="stale_input",
-        )
-    except PilotStop as error:
-        if error.code in (
-            "stale_input",
-            "source_blob_invalid",
-            "source_digest_mismatch",
-            "requirement_mismatch",
-        ):
-            _stop("stale_input", state="stale", run_id=run_id)
-        raise
     last_type = events[-1]["event_type"]
     if last_type == "prepared":
         state = "ready_for_prompt_audit"
