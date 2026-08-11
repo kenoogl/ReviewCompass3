@@ -13,6 +13,8 @@ from tests.fixtures.claude_bootstrap.helpers import all_managed_paths
 from tests.fixtures.claude_bootstrap.helpers import assert_stop
 from tests.fixtures.claude_bootstrap.helpers import create_scenario
 from tests.fixtures.claude_bootstrap.helpers import install_fake_process
+from tests.fixtures.claude_bootstrap.helpers import rebind_completion_review
+from tests.fixtures.claude_bootstrap.helpers import rebind_decision
 from tests.fixtures.claude_bootstrap.helpers import write_json
 
 
@@ -170,3 +172,64 @@ def test_host_process_refusal_stops_without_alternate_route(tmp_path, monkeypatc
     assert result["result"] == "stopped"
     assert result["stop_code"] == "host_safety_rejected"
     assert len(calls) == 1
+
+
+def test_completion_review_identity_digest_status_and_target_are_required(
+    tmp_path, monkeypatch
+):
+    faults = ("missing", "identity", "digest", "status", "target")
+    for fault in faults:
+        with monkeypatch.context() as local:
+            scenario = create_scenario(tmp_path / fault, local)
+            if fault == "missing":
+                scenario.completion_review_path.unlink()
+            elif fault == "identity":
+                rebind_completion_review(
+                    scenario,
+                    lambda value: value.update({"review_id": "other-review"}),
+                )
+            elif fault == "digest":
+                rebind_decision(
+                    scenario,
+                    lambda value: value.update(
+                        {"completion_review_sha256": "0" * 64}
+                    ),
+                )
+            elif fault == "status":
+                rebind_completion_review(
+                    scenario,
+                    lambda value: value.update({"status": "blocked"}),
+                )
+            else:
+                rebind_completion_review(
+                    scenario,
+                    lambda value: value.update({"target_commit": "0" * 40}),
+                )
+            install_fake_process(local, scenario)
+
+            result = scenario.run()
+
+            assert result.get("stop_code") == "completion_review_invalid", (
+                "completion review identity, digest, status, and target must "
+                "be verified before process creation"
+            )
+            assert scenario.fake_process.calls == []
+
+
+def test_child_environment_allows_only_fixed_non_secret_names(tmp_path, monkeypatch):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    secrets = {
+        "AWS_SECRET_ACCESS_KEY": "aws-secret-value",
+        "GITHUB_TOKEN": "github-secret-value",
+        "DATABASE_URL": "postgres://secret.invalid/database",
+        "UNLISTED_CREDENTIAL": "unlisted-secret-value",
+    }
+    for name, value in secrets.items():
+        monkeypatch.setenv(name, value)
+
+    environment = scenario.module()._child_environment()
+
+    assert not set(secrets) & set(environment), (
+        "unknown credential environment variables must not reach child processes"
+    )
+    assert environment["HOME"] == str(scenario.home)

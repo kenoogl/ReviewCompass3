@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "record_kind": "declaration_red_map",
+  "scope": {
+    "kind": "partial",
+    "reason": "Humanが採用したCB-REVIEW-F-001〜002の修復試験2件だけを理由付きRED照合する。"
+  },
+  "red_verification_contract": {
+    "version": 2
+  },
+  "test_files": {
+    "tests/test_claude_bootstrap_adversarial.py": [
+      "test_completion_review_identity_digest_status_and_target_are_required",
+      "test_child_environment_allows_only_fixed_non_secret_names"
+    ]
+  },
+  "declarations": {
+    "CB-RR-001-002": {
+      "summary": "完了レビューの識別子、指紋、状態、対象commitをprocess作成前に検証する。",
+      "tests": [
+        {
+          "test": "tests/test_claude_bootstrap_adversarial.py::test_completion_review_identity_digest_status_and_target_are_required",
+          "red_now": true,
+          "expected_failure_reason": "completion review identity, digest, status, and target must be verified before process creation"
+        }
+      ]
+    },
+    "CB-RR-003": {
+      "summary": "子processへ渡す環境変数を固定した非機密の名前だけに限定する。",
+      "tests": [
+        {
+          "test": "tests/test_claude_bootstrap_adversarial.py::test_child_environment_allows_only_fixed_non_secret_names",
+          "red_now": true,
+          "expected_failure_reason": "unknown credential environment variables must not reach child processes"
+        }
+      ]
+    }
+  }
+}

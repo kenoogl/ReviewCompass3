@@ -24,6 +24,10 @@ ERROR_RESULTS = [
 APPROVAL_ID = "RC3-CB-APPROVAL-20260811-TEST"
 STORE_IDENTITY = "store-11111111-1111-4111-8111-111111111111"
 PROJECT_ID = "reviewcompass3-bootstrap-test"
+COMPLETION_REVIEW_ID = "RC3-CB-COMPLETION-REVIEW-TEST"
+COMPLETION_REVIEW_RELATIVE_PATH = (
+    "records/development/claude-bootstrap-completion-review-v1.json"
+)
 
 
 def canonical_bytes(value):
@@ -137,17 +141,19 @@ class FakeClaudeProcess:
 
 class BootstrapScenario:
     def __init__(self, *, repository, home, runtime_root, manifest_path,
-                 decision_path, token_path, store_root, work_directory,
-                 manifest_digest, fake_process):
+                 completion_review_path, decision_path, token_path, store_root,
+                 work_directory, manifest_digest, target_commit, fake_process):
         self.repository = repository
         self.home = home
         self.runtime_root = runtime_root
         self.manifest_path = manifest_path
+        self.completion_review_path = completion_review_path
         self.decision_path = decision_path
         self.token_path = token_path
         self.store_root = store_root
         self.work_directory = work_directory
         self.manifest_digest = manifest_digest
+        self.target_commit = target_commit
         self.approval_id = APPROVAL_ID
         self.fake_process = fake_process
 
@@ -203,6 +209,14 @@ def create_scenario(tmp_path, monkeypatch):
     )
     write_json(manifest_path, _manifest())
     manifest_digest = sha256_bytes(manifest_path.read_bytes())
+    run_git(repository, "add", ".reviewcompass/project-manifest.json")
+    run_git(
+        repository,
+        "add",
+        "records/development/claude-bootstrap-send-manifest-v1.json",
+    )
+    run_git(repository, "commit", "-q", "-m", "fixture target")
+    target_commit = run_git(repository, "rev-parse", "HEAD").stdout.strip()
 
     runtime_root = home / ".reviewcompass3"
     profile_root = runtime_root / "projects" / PROJECT_ID / "development"
@@ -231,6 +245,18 @@ def create_scenario(tmp_path, monkeypatch):
         mode=0o600,
     )
 
+    completion_review_path = repository / COMPLETION_REVIEW_RELATIVE_PATH
+    completion_review = {
+        "schema_version": 1,
+        "record_kind": "claude_bootstrap_completion_review",
+        "review_id": COMPLETION_REVIEW_ID,
+        "status": "verified",
+        "target_commit": target_commit,
+        "manifest_sha256": manifest_digest,
+        "ordered_payload_sha256": CONTRACT["ordered_payload_sha256"],
+        "blocking_finding_count": 0,
+    }
+    write_json(completion_review_path, completion_review)
     decision_path = (
         repository
         / "records/development/claude-bootstrap-human-decision-v1.json"
@@ -250,6 +276,12 @@ def create_scenario(tmp_path, monkeypatch):
         "expires_at": "2999-12-31T23:59:59Z",
         "material_policy": CONTRACT["material_policy"],
         "result_root_identity": sha256_bytes(str(result_root).encode("utf-8")),
+        "completion_review_id": COMPLETION_REVIEW_ID,
+        "completion_review_path": COMPLETION_REVIEW_RELATIVE_PATH,
+        "completion_review_sha256": sha256_bytes(
+            completion_review_path.read_bytes()
+        ),
+        "completion_review_target_commit": target_commit,
     }
     write_json(decision_path, decision)
     token_path = store_root / "pending" / f"{APPROVAL_ID}.json"
@@ -270,10 +302,9 @@ def create_scenario(tmp_path, monkeypatch):
         },
         mode=0o600,
     )
-    run_git(repository, "add", ".reviewcompass/project-manifest.json")
-    run_git(repository, "add", "records/development/claude-bootstrap-send-manifest-v1.json")
+    run_git(repository, "add", COMPLETION_REVIEW_RELATIVE_PATH)
     run_git(repository, "add", "records/development/claude-bootstrap-human-decision-v1.json")
-    run_git(repository, "commit", "-q", "-m", "fixture")
+    run_git(repository, "commit", "-q", "-m", "fixture approval")
 
     monkeypatch.chdir(repository)
     monkeypatch.setenv("HOME", str(home))
@@ -290,11 +321,13 @@ def create_scenario(tmp_path, monkeypatch):
         home=home,
         runtime_root=runtime_root,
         manifest_path=manifest_path,
+        completion_review_path=completion_review_path,
         decision_path=decision_path,
         token_path=token_path,
         store_root=store_root,
         work_directory=work_directory,
         manifest_digest=manifest_digest,
+        target_commit=target_commit,
         fake_process=fake_process,
     )
 
@@ -320,6 +353,48 @@ def rebind_manifest(scenario, mutator):
     run_git(scenario.repository, "add", str(scenario.manifest_path.relative_to(scenario.repository)))
     run_git(scenario.repository, "add", str(scenario.decision_path.relative_to(scenario.repository)))
     run_git(scenario.repository, "commit", "-q", "-m", "rebind fixture")
+
+
+def rebind_completion_review(scenario, mutator):
+    review = json.loads(
+        scenario.completion_review_path.read_text(encoding="utf-8")
+    )
+    mutator(review)
+    write_json(scenario.completion_review_path, review)
+    decision = json.loads(scenario.decision_path.read_text(encoding="utf-8"))
+    decision["completion_review_sha256"] = sha256_bytes(
+        scenario.completion_review_path.read_bytes()
+    )
+    write_json(scenario.decision_path, decision)
+    token = json.loads(scenario.token_path.read_text(encoding="utf-8"))
+    token["decision_sha256"] = sha256_bytes(scenario.decision_path.read_bytes())
+    write_json(scenario.token_path, token, mode=0o600)
+    run_git(
+        scenario.repository,
+        "add",
+        str(scenario.completion_review_path.relative_to(scenario.repository)),
+    )
+    run_git(
+        scenario.repository,
+        "add",
+        str(scenario.decision_path.relative_to(scenario.repository)),
+    )
+    run_git(scenario.repository, "commit", "-q", "-m", "rebind review")
+
+
+def rebind_decision(scenario, mutator):
+    decision = json.loads(scenario.decision_path.read_text(encoding="utf-8"))
+    mutator(decision)
+    write_json(scenario.decision_path, decision)
+    token = json.loads(scenario.token_path.read_text(encoding="utf-8"))
+    token["decision_sha256"] = sha256_bytes(scenario.decision_path.read_bytes())
+    write_json(scenario.token_path, token, mode=0o600)
+    run_git(
+        scenario.repository,
+        "add",
+        str(scenario.decision_path.relative_to(scenario.repository)),
+    )
+    run_git(scenario.repository, "commit", "-q", "-m", "rebind decision")
 
 
 def assert_stop(result, code, scenario):
