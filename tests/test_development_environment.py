@@ -2,6 +2,7 @@
 
 import hashlib
 import importlib
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -16,6 +17,29 @@ def _module():
     return importlib.import_module(
         "tools.development.bootstrap_environment"
     )
+
+
+def _write_project_scripts(project):
+    (project / "pyproject.toml").write_text(
+        """[project]
+name = "reviewcompass3"
+
+[project.scripts]
+reviewcompass3-session-logs = "tools.session_logs.entry:main"
+reviewcompass3-bootstrap-review = "tools.bootstrap.review_cli:main"
+reviewcompass3-pilot = "tools.development.pilot_collaboration_cli:main"
+reviewcompass3-review-plan = "tools.development.review_plan_cli:main"
+""",
+        encoding="utf-8",
+    )
+
+
+DECLARED_SCRIPTS = {
+    "reviewcompass3-session-logs": "tools.session_logs.entry:main",
+    "reviewcompass3-bootstrap-review": "tools.bootstrap.review_cli:main",
+    "reviewcompass3-pilot": "tools.development.pilot_collaboration_cli:main",
+    "reviewcompass3-review-plan": "tools.development.review_plan_cli:main",
+}
 
 
 def test_repository_declares_one_ignored_venv_and_exact_lock():
@@ -199,6 +223,7 @@ def test_verify_accepts_standard_venv_python_symlink(tmp_path):
     python = project / config["venv_python"]
     python.parent.mkdir(parents=True)
     python.symlink_to(target)
+    _write_project_scripts(project)
 
     def fake_run(command, **kwargs):
         if command[-1] == "--version" and "pytest" not in command:
@@ -207,6 +232,8 @@ def test_verify_accepts_standard_venv_python_symlink(tmp_path):
             output = "pytest 8.4.2\n"
         elif "'platformdirs'" in command[-1]:
             output = "4.4.0\n"
+        elif "entry_points" in command[-1]:
+            output = json.dumps(DECLARED_SCRIPTS)
         else:
             output = "6.0.3\n"
         return SimpleNamespace(returncode=0, stdout=output, stderr="")
@@ -218,3 +245,37 @@ def test_verify_accepts_standard_venv_python_symlink(tmp_path):
     )
 
     assert result.status == "verified"
+
+
+def test_verify_rejects_missing_declared_project_script(tmp_path):
+    config = _module().load_config(CONFIG)
+    project = tmp_path / "project"
+    python = project / config["venv_python"]
+    python.parent.mkdir(parents=True)
+    python.write_text("executable\n")
+    _write_project_scripts(project)
+    installed = dict(DECLARED_SCRIPTS)
+    installed.pop("reviewcompass3-pilot")
+
+    def fake_run(command, **kwargs):
+        if command[-1] == "--version" and "pytest" not in command:
+            output = "Python 3.9.6\n"
+        elif command[-1] == "--version":
+            output = "pytest 8.4.2\n"
+        elif "'platformdirs'" in command[-1]:
+            output = "4.4.0\n"
+        elif "entry_points" in command[-1]:
+            output = json.dumps(installed)
+        else:
+            output = "6.0.3\n"
+        return SimpleNamespace(returncode=0, stdout=output, stderr="")
+
+    with pytest.raises(
+        _module().DevelopmentEnvironmentError,
+        match="project_scripts_mismatch",
+    ):
+        _module().verify_environment(
+            config=config,
+            project_root=project,
+            run=fake_run,
+        )
