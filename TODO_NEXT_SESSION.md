@@ -6,13 +6,13 @@
 
 ## 現在位置
 
-- 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計とHuman段完了承認を終え、最初の機械処理縦切りへ着手した。
-- 現在作業：IR-PC-001〜004のproduction再実装commit 7888ff7は独立再レビューverified。受入89件と公式1559件が合格し、blocking/non-blocking所見は0件。Human段完了承認待ち。
+- 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計と第1機械処理縦切りがHuman段完了承認まで完了した。
+- 現在作業：操縦者別連携の第1機械処理縦切りはHuman段完了承認済み。受入89件と公式1559件が合格し、独立再レビューverified、所見0件。機械的保証状態はspecified_onlyのまま。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001`：`registered / nonblocking（V4 resolve toolはverified、実Issueのresolveは未実施）`、影響：実Issue recordのstateはregisteredのままだが、本縦切りを妨げない、次：本縦切り完了後の別作業単位でHuman裁定を得て実Issueをresolveする
+- `ISSUE-TODO-HANDOFF-VERIFICATION-GAP-001`：`registered / nonblocking（V4 resolve toolはverified、実Issueのresolveは未実施）`、影響：実Issue recordのstateはregisteredのままだが、本縦切りを妨げない、次：次作業の選択時に、別作業単位でHuman裁定を得て実Issueをresolveする候補として提示する
 
 ## 最新のauthority／Evidence
 
@@ -31,6 +31,7 @@
 - [操縦者別連携 production実装所見 Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-implementation-findings-human-decision-v1.md) — SHA-256 `3469cb2ddf0c58c75c05b2f16a0e821013d1386cc65839026cb48187008075c8`
 - [操縦者別連携 production実装所見 反証test v1](records/session-handoffs/2026-08-11-pilot-collaboration-implementation-findings-red-tests-v1.md) — SHA-256 `d7457fd1c70afa514641db563dbb9bc4ad86b9d6d4feaabbc8f8a0ce623c082f`
 - [操縦者別連携 production再実装 独立再レビュー v2](records/session-handoffs/2026-08-11-pilot-collaboration-implementation-rereview-v2.md) — SHA-256 `828a7538f6923c765e045acdd3d44849aba2bee904e7ebdadbdbb730544193b0`
+- [操縦者別連携 第1縦切り 段完了Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-first-slice-stage-completion-human-decision-v1.md) — SHA-256 `fbb8c49ba6f993a1248a4600b1c0c497a2a98680db22be704fe4ee97fcfef34e`
 - [操縦者別のClaude／Codex連携方法](docs/development/pilot-specific-claude-codex-collaboration.md) — SHA-256 `aee8c8b72487e26395615c8442710b0695b035ec0aa129b4a777c6142864489d`
 - [委譲作業の共通レビュープロトコル](docs/development/work-review-protocol.md) — SHA-256 `b7eb8f08c7b3f585d64d163a7a2f93e758e57e830bb973cc2441bfadbc98a3df`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
@@ -38,32 +39,29 @@
 
 ## 次に行う一作業
 
-Humanが本縦切りの段完了を承認する。
+Humanが次に着手する作業を選択する。
 
 開始条件：
 
-- production実装commit 0974769d2ce91210dfb62a7a9a6179fd98e7f614が固定されていること
-- production実装独立レビューv1のpathとSHA-256が固定されていること
-- 再実装commit 7888ff745f2cafa6b41d07a5850e98aa989ebeddが固定されていること
-- 独立再レビューv2のpathとSHA-256が固定され、判定がverifiedであること
+- 第1縦切りの段完了Human裁定のpathとSHA-256が固定されていること
+- 第2縦切り、外部実行経路接続、または既存保留作業のいずれへ進むかHumanが明示すること
 
 完了条件：
 
-- 新規受入テストのRED確認後、固定したテストがGREENになること
-- 既存bootstrap reviewテスト、故障注入、公式全テスト、差分検査が合格すること
-- 反対側モデルの独立レビューがverifiedとなり、Human段完了承認を得ること
+- 選択した次作業の範囲と開始条件が固定されること
+- 今回完了した第1縦切りの範囲を黙って拡張しないこと
 
-後続作業：Human段完了承認後に本縦切りを完了扱いとする。外部実行経路接続と実運用確認は後続境界で扱う。
+後続作業：第2縦切りを選ぶ場合はv6 §9の5要求を先に固定する。外部実行経路接続を選ぶ場合は外部送信とHuman承認境界を別途固定する。
 
 ## blocker・Human判断待ち
 
-- blocker：production再実装と独立再レビューは完了。Human段完了承認まで本縦切りを完了扱いにせず次段へ進まない。
-- Human判断待ち：本縦切りの段完了承認が必要。外部実行経路接続と実運用確認は今回の完了範囲に含めない。
+- blocker：なし。第1縦切りは完了。次作業はHumanが選択するまで開始しない。
+- Human判断待ち：第1縦切りの段完了は承認済み。次に着手する作業の選択が必要。
 
 ## stale・deferred
 
 - stale：group C・Dを直ちに次作業とする旧表示は、本作業を現在の一作業に選んだHuman判断により古い状態。group C・Dの裁定記録自体は有効なまま保持する。
-- deferred：group C・D、外部送信、Claude／Codex CLI実起動、実装後レビュー接続、既存保全データへの伏字化遡及適用、Work 7A後続、既存Issue resolveを保留する。
+- deferred：第2縦切り、group C・D、外部送信、Claude／Codex CLI実起動、実装後レビュー接続、既存保全データへの伏字化遡及適用、Work 7A後続、既存Issue resolveを保留する。
 
 ## Git・Test
 
