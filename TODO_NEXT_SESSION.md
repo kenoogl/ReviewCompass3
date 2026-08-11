@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計とHuman段完了承認を終え、最初の機械処理縦切りへ着手した。
-- 現在作業：Human採用済みRT-PC-001〜004をtest-only commit f2e4be9へ反映した。66件収集と既存1470件は合格したが、独立再レビューでRT-PC-001・004の修正不足と、v6のraw digest保存前停止に対してHuman裁定記録の要約が保存を一括要求するRT-PC-002の上流矛盾を確認した。production実装は未着手。
+- 現在作業：HumanはRT-PC-002をv6どおり保存前停止と補足裁定した。raw digest不一致時はraw・launch・eventを作らずraw_digest_mismatchで停止し、先行裁定の『保存』はaudit_digest_mismatchだけへ適用する。RT-PC-001・004の修正不足をtest-onlyで直す。production実装は未着手。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -24,6 +24,7 @@
 - [操縦者別連携 RED受入テスト 独立レビュー v1](records/session-handoffs/2026-08-11-pilot-collaboration-red-test-review-v1.md) — SHA-256 `6cf381e20fd4bc1f18d808d0b2237a94cf434a35ddfef8780e1374cc3b295607`
 - [操縦者別連携 RED受入テスト所見 Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-red-test-findings-human-decision-v1.md) — SHA-256 `d350bb7d21b0a427b3306fb878c2044f75ccb9a7d0eb19438b8c68c965042e7a`
 - [操縦者別連携 RED受入テスト 独立再レビュー v2](records/session-handoffs/2026-08-11-pilot-collaboration-red-test-rereview-v2.md) — SHA-256 `914c3d6a466fe439f50e000407fe3a2f0a5d70ace9616e86ed36ed18239553d2`
+- [操縦者別連携 RT-PC-002 Human補足裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-rt-pc-002-human-clarification-v1.md) — SHA-256 `c0c985689e5e2878e1351a6267597499f02eeb8771adff599fed9d794f705add`
 - [操縦者別のClaude／Codex連携方法](docs/development/pilot-specific-claude-codex-collaboration.md) — SHA-256 `aee8c8b72487e26395615c8442710b0695b035ec0aa129b4a777c6142864489d`
 - [委譲作業の共通レビュープロトコル](docs/development/work-review-protocol.md) — SHA-256 `b7eb8f08c7b3f585d64d163a7a2f93e758e57e830bb973cc2441bfadbc98a3df`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
@@ -31,13 +32,13 @@
 
 ## 次に行う一作業
 
-HumanがRT-PC-002のraw SHA-256不一致を保存前停止とするか、不変保存後停止へ変更するかを明示する。
+RT-PC-001の動的module取得・展開keyword拒否、RT-PC-004のbase以降全commit検査を新規test群だけへ反映し、RT-PC-002の保存前停止境界を維持する。
 
 開始条件：
 
 - 修正後RED commit f2e4be9と独立再レビュー記録のSHA-256が固定されていること
-- RT-PC-002についてHumanが保存前または保存後の境界を明示すること
-- Human判断とRED再レビューが完了するまでproduction実装へ進まないこと
+- RT-PC-002 Human補足裁定のpathとSHA-256が固定されていること
+- RED再レビューがverifiedになるまでproduction実装へ進まないこと
 
 完了条件：
 
@@ -45,12 +46,12 @@ HumanがRT-PC-002のraw SHA-256不一致を保存前停止とするか、不変�
 - 既存bootstrap reviewテスト、故障注入、公式全テスト、差分検査が合格すること
 - 反対側モデルの独立レビューがverifiedとなり、Human段完了承認を得ること
 
-後続作業：Human判断後、RT-PC-001の動的取得・展開keyword拒否、RT-PC-002の選択境界、RT-PC-004のbase以降全commit検査を新規test群だけへ反映し、単独RED・66件以上収集・既存1470件・別会話再レビューを行う。
+後続作業：修正後に単独RED・66件以上収集・既存1470件・別会話再レビューを行う。RT-PC-002はraw digest不一致時にraw・launch・eventを作らない保存前停止、audit digest不一致時だけ保存後停止として検証する。
 
 ## blocker・Human判断待ち
 
-- blocker：RT-PC-002の上流矛盾が未裁定。RT-PC-001と004も独立反証が成立してopenのため、production実装へ進まない。
-- Human判断待ち：raw SHA-256不一致をv6どおり保存前停止とするか、v6を改訂して不変保存後停止とするかの明示が必要。実装後の段完了承認も別に必要。
+- blocker：RT-PC-002の上流矛盾は解消した。RT-PC-001と004は独立反証が成立してopenのため、test修正と再レビュー完了までproduction実装へ進まない。
+- Human判断待ち：RT-PC-002はv6どおり保存前停止とする。raw・launch・eventは作らずraw_digest_mismatchで停止し、先行裁定の『保存』はaudit_digest_mismatchだけに適用する。実装後の段完了承認は別に必要。
 
 ## stale・deferred
 
@@ -63,7 +64,7 @@ HumanがRT-PC-002のraw SHA-256不一致を保存前停止とするか、不変�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：修正後4 test fileは66件collect成功。単独REDは29 failed/14 passed、7 failed、10 failed/1 passed、3 failed/2 passedで全て終了1。既存1470件は終了0。再レビューはRT-PC-003 closed、RT-PC-001・004 open、RT-PC-002 Human clarification required。
+- 直近の関連Test：修正後4 test fileは66件collect成功。単独REDは29 failed/14 passed、7 failed、10 failed/1 passed、3 failed/2 passedで全て終了1。既存1470件は終了0。再レビューはRT-PC-003 closed、RT-PC-001・004 open。RT-PC-002はHuman補足裁定により保存前停止へ確定。
 - 直近の全Test：直近の公式全Testは1470 passed、failed 0、errors 0、終了コード0。実装後に再実行する。
 - 差分検査：`git diff --check`合格
 
