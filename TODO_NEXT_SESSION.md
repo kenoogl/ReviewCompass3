@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計とHuman段完了承認を終え、最初の機械処理縦切りへ着手した。
-- 現在作業：HumanがRED受入テストの独立レビュー所見RT-PC-001〜004を全件採用した。裁定を固定し、新規テスト4件だけを修正してRED再確認・独立再レビューへ進む。production実装は未着手。
+- 現在作業：Human採用済みRT-PC-001〜004をtest-only commit f2e4be9へ反映した。66件収集と既存1470件は合格したが、独立再レビューでRT-PC-001・004の修正不足と、v6のraw digest保存前停止に対してHuman裁定記録の要約が保存を一括要求するRT-PC-002の上流矛盾を確認した。production実装は未着手。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -23,6 +23,7 @@
 - [操縦者別連携 単一v6限定指示文品質確認](records/session-handoffs/2026-08-11-pilot-collaboration-entry-prompt-quality-review-v6.md) — SHA-256 `d5fe00279566a6b37c51697c4c2ca7fdf1835c0943750ecdeca6cf5617b9cab3`
 - [操縦者別連携 RED受入テスト 独立レビュー v1](records/session-handoffs/2026-08-11-pilot-collaboration-red-test-review-v1.md) — SHA-256 `6cf381e20fd4bc1f18d808d0b2237a94cf434a35ddfef8780e1374cc3b295607`
 - [操縦者別連携 RED受入テスト所見 Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-red-test-findings-human-decision-v1.md) — SHA-256 `d350bb7d21b0a427b3306fb878c2044f75ccb9a7d0eb19438b8c68c965042e7a`
+- [操縦者別連携 RED受入テスト 独立再レビュー v2](records/session-handoffs/2026-08-11-pilot-collaboration-red-test-rereview-v2.md) — SHA-256 `914c3d6a466fe439f50e000407fe3a2f0a5d70ace9616e86ed36ed18239553d2`
 - [操縦者別のClaude／Codex連携方法](docs/development/pilot-specific-claude-codex-collaboration.md) — SHA-256 `aee8c8b72487e26395615c8442710b0695b035ec0aa129b4a777c6142864489d`
 - [委譲作業の共通レビュープロトコル](docs/development/work-review-protocol.md) — SHA-256 `b7eb8f08c7b3f585d64d163a7a2f93e758e57e830bb973cc2441bfadbc98a3df`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
@@ -30,13 +31,13 @@
 
 ## 次に行う一作業
 
-gpt-5.6-sol実装担当がHuman採用済みRT-PC-001〜004を新規テスト4件だけへ反映し、REDを再確認して意味単位commitを作る。
+HumanがRT-PC-002のraw SHA-256不一致を保存前停止とするか、不変保存後停止へ変更するかを明示する。
 
 開始条件：
 
-- RED test commit df48bba、独立レビュー、Human裁定のidentityとSHA-256が固定されていること
-- 変更は既存の新規test 4件だけとし、production code、既存test、文書、設定を変更しないこと
-- RED再レビューがverifiedになるまでproduction実装へ進まないこと
+- 修正後RED commit f2e4be9と独立再レビュー記録のSHA-256が固定されていること
+- RT-PC-002についてHumanが保存前または保存後の境界を明示すること
+- Human判断とRED再レビューが完了するまでproduction実装へ進まないこと
 
 完了条件：
 
@@ -44,12 +45,12 @@ gpt-5.6-sol実装担当がHuman採用済みRT-PC-001〜004を新規テスト4件
 - 既存bootstrap reviewテスト、故障注入、公式全テスト、差分検査が合格すること
 - 反対側モデルの独立レビューがverifiedとなり、Human段完了承認を得ること
 
-後続作業：修正後に単独RED、計50件以上の収集、既存1470件、差分検査を行い、別会話のgpt-5.6-terraで再レビューする。
+後続作業：Human判断後、RT-PC-001の動的取得・展開keyword拒否、RT-PC-002の選択境界、RT-PC-004のbase以降全commit検査を新規test群だけへ反映し、単独RED・66件以上収集・既存1470件・別会話再レビューを行う。
 
 ## blocker・Human判断待ち
 
-- blocker：Human裁定は完了したが、RT-PC-001〜004のtest修正と独立再レビューが未了のためproduction実装へ進まない。
-- Human判断待ち：現在のHuman裁定待ちはない。修正後レビューで新規所見が出た場合は裁定が必要。実装後の段完了承認も別に必要。
+- blocker：RT-PC-002の上流矛盾が未裁定。RT-PC-001と004も独立反証が成立してopenのため、production実装へ進まない。
+- Human判断待ち：raw SHA-256不一致をv6どおり保存前停止とするか、v6を改訂して不変保存後停止とするかの明示が必要。実装後の段完了承認も別に必要。
 
 ## stale・deferred
 
@@ -62,7 +63,7 @@ gpt-5.6-sol実装担当がHuman採用済みRT-PC-001〜004を新規テスト4件
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：修正前の新規4 test fileは計50件collect成功。単独REDは27 failed/1 passed、7 failed、10 failed/1 passed、3 failed/1 passedで全て終了1。既存1470件は終了0。RT-PC-001〜004はHumanが全件採用、修正再実行は未着手。
+- 直近の関連Test：修正後4 test fileは66件collect成功。単独REDは29 failed/14 passed、7 failed、10 failed/1 passed、3 failed/2 passedで全て終了1。既存1470件は終了0。再レビューはRT-PC-003 closed、RT-PC-001・004 open、RT-PC-002 Human clarification required。
 - 直近の全Test：直近の公式全Testは1470 passed、failed 0、errors 0、終了コード0。実装後に再実行する。
 - 差分検査：`git diff --check`合格
 
