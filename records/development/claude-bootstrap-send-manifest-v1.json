@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "record_kind": "approved_no_tool_claude_bootstrap_manifest",
+  "purpose": "codex-pilot-no-tool-claude-bootstrap",
+  "provider": "claude-code-first-party",
+  "model": "fable",
+  "claude_code_version": "2.1.220",
+  "claude_executable_sha256": "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081",
+  "payloads": [
+    {
+      "ordinal": 1,
+      "utf8_bytes": 296,
+      "sha256": "18059aa0f32b93bae5b117092a45fbf4e985381546b8c64507168f0226f4ad64",
+      "text": "あなたはClaude Reviewerです。Codex Pilotからの疎通確認です。ツールを使わず、他のエージェントを起動せず、次のJSONだけを返してください。{\"protocol\":\"codex-pilot-claude-bootstrap-v1\",\"role\":\"reviewer\",\"nonce\":\"RC3-CPC-20260811-A\",\"reinvoke\":false}"
+    },
+    {
+      "ordinal": 2,
+      "utf8_bytes": 221,
+      "sha256": "c2309f2624ba0d0f36fd00894dcbc67ccd66e83429960c4083f4e10b2f18982a",
+      "text": "同じセッションの継続確認です。前回のnonceを使い、次のJSONだけを返してください。{\"protocol\":\"codex-pilot-claude-bootstrap-v1\",\"continued\":true,\"nonce\":\"<前回のnonce>\",\"reinvoke\":false}"
+    }
+  ],
+  "ordered_payload_sha256": "26933d4f45ed497f9d1d9f5fdc741aca87b0ad37c3ed3c35fd99ebff6b2bd8a0",
+  "material_policy": {
+    "require_secret_scan": true,
+    "forbid_credentials": true,
+    "forbid_personal_identifiers": true
+  }
+}
