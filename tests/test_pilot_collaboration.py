@@ -71,8 +71,14 @@ TRACEABILITY = {
     ),
     "NG-PC-005": ("test_pilot_does_not_reinterpret_closed_review_pipeline",),
     "NG-PC-006": ("test_prepare_and_ingest_do_not_write_workflow_ledgers",),
-    "NG-PC-007": ("test_change_scope_contains_only_v6_allowlisted_paths",),
-    "ST-PC-001": ("test_change_scope_contains_only_v6_allowlisted_paths",),
+    "NG-PC-007": (
+        "test_change_scope_contains_only_v6_allowlisted_paths",
+        "test_change_scope_rejects_forbidden_commit_before_later_allowed_commit",
+    ),
+    "ST-PC-001": (
+        "test_change_scope_contains_only_v6_allowlisted_paths",
+        "test_change_scope_rejects_forbidden_commit_before_later_allowed_commit",
+    ),
     "ST-PC-002": ("test_existing_raw_review_store_public_contract_is_unchanged",),
     "ST-PC-003": (
         "test_prepare_rejects_unsafe_private_root_placements",
@@ -100,7 +106,10 @@ TRACEABILITY = {
         "test_launch_raw_digest_mismatch_stops_before_preservation",
         "test_judgment_audit_digest_mismatch_preserves_before_stopping",
     ),
-    "OUT-PC-004": ("test_change_scope_ignores_later_record_and_todo_commits",),
+    "OUT-PC-004": (
+        "test_change_scope_ignores_later_record_and_todo_commits",
+        "test_change_scope_rejects_forbidden_commit_before_later_allowed_commit",
+    ),
     "OUT-PC-005": ("test_requirement_traceability_covers_all_26_ids",),
     "OUT-PC-006": ("test_change_scope_contains_only_v6_allowlisted_paths",),
 }
@@ -1183,6 +1192,14 @@ def _process_policy_violations(source):
                 elif not isinstance(imported, ast.Constant):
                     violations.append("dynamic import expression")
                 continue
+            if dotted == "importlib.import_module" and node.args:
+                imported = node.args[0]
+                if (
+                    not isinstance(imported, ast.Constant)
+                    or imported.value == "subprocess"
+                ):
+                    violations.append("dynamic subprocess module import")
+                continue
             if dotted == "getattr" and node.args:
                 target_name = _dotted_name(node.args[0])
                 target_module = module_aliases.get(target_name)
@@ -1216,6 +1233,8 @@ def _process_policy_violations(source):
             ):
                 violations.append("subprocess.run command is not git")
             for keyword in node.keywords:
+                if keyword.arg is None:
+                    violations.append("subprocess.run expands dynamic keywords")
                 if keyword.arg == "executable":
                     violations.append("subprocess.run overrides executable")
                 if keyword.arg == "shell" and not (
@@ -1277,6 +1296,8 @@ def test_pilot_code_uses_only_array_git_subprocess_run():
         "__import__('subprocess').Popen(['git'])",
         "import subprocess\nvars(subprocess)[method](['git'])",
         "__import__('sub' + 'process').Popen(['git'])",
+        "import importlib\nimportlib.import_module('subprocess').Popen(['claude'])",
+        "import subprocess\nsubprocess.run(['git', 'show'], **{'shell': True})",
     ),
 )
 def test_process_policy_rejects_alias_popen_check_and_dynamic_routes(source):

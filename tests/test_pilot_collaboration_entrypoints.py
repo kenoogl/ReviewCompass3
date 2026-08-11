@@ -5,6 +5,7 @@ import subprocess
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+BASE_COMMIT = "30925a54a0e8ee7c53e3503eccfda7a73fa11752"
 PROMPT_PATH = "docs/development/prompts/pilot-collaboration-run.md"
 INSTRUCTION_PATH = (
     "records/session-handoffs/"
@@ -36,17 +37,6 @@ def _git(repository, *arguments):
     ).stdout.strip()
 
 
-def _latest_implementation_commit(repository, allowed_paths):
-    return _git(
-        repository,
-        "log",
-        "-1",
-        "--format=%H",
-        "--",
-        *sorted(allowed_paths),
-    )
-
-
 def _commit_changed_paths(repository, commit):
     return set(
         _git(
@@ -58,6 +48,67 @@ def _commit_changed_paths(repository, commit):
             "-r",
             commit,
         ).splitlines()
+    )
+
+
+def _is_followup_record(path):
+    return path == "TODO_NEXT_SESSION.md" or path.startswith(
+        "records/session-handoffs/"
+    )
+
+
+def _implementation_paths_since_base(repository, base_commit, target_commit="HEAD"):
+    commits = _git(
+        repository,
+        "rev-list",
+        "--reverse",
+        f"{base_commit}..{target_commit}",
+    ).splitlines()
+    changed_paths = set()
+    for commit in commits:
+        changed_paths.update(_commit_changed_paths(repository, commit))
+    return {
+        path
+        for path in changed_paths
+        if not _is_followup_record(path)
+    }
+
+
+def _initialize_test_repository(tmp_path):
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    _git(repository, "init", "--quiet")
+    (repository / "README.md").write_text("fixed base\n", encoding="utf-8")
+    _git(repository, "add", "README.md")
+    _git(
+        repository,
+        "-c",
+        "user.name=Acceptance Test",
+        "-c",
+        "user.email=acceptance@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "fixed base",
+    )
+    return repository, _git(repository, "rev-parse", "HEAD")
+
+
+def _commit_test_change(repository, relative_path, content, message):
+    path = repository / relative_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    _git(repository, "add", relative_path)
+    _git(
+        repository,
+        "-c",
+        "user.name=Acceptance Test",
+        "-c",
+        "user.email=acceptance@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        message,
     )
 
 
@@ -106,35 +157,23 @@ def test_common_prompt_names_only_the_canonical_instruction_and_commands():
 
 
 def test_change_scope_contains_only_v6_allowlisted_paths():
-    implementation_commit = _latest_implementation_commit(
+    implementation_paths = _implementation_paths_since_base(
         PROJECT_ROOT,
-        ALLOWED_PATHS,
+        BASE_COMMIT,
     )
 
-    assert implementation_commit
-    assert _commit_changed_paths(PROJECT_ROOT, implementation_commit) <= ALLOWED_PATHS
+    assert implementation_paths
+    assert implementation_paths <= ALLOWED_PATHS
 
 
 def test_change_scope_ignores_later_record_and_todo_commits(tmp_path):
-    repository = tmp_path / "repository"
-    repository.mkdir()
-    _git(repository, "init", "--quiet")
-    implementation_path = repository / "tools/development/pilot_collaboration.py"
-    implementation_path.parent.mkdir(parents=True)
-    implementation_path.write_text("# implementation\n", encoding="utf-8")
-    _git(repository, "add", "tools/development/pilot_collaboration.py")
-    _git(
+    repository, base_commit = _initialize_test_repository(tmp_path)
+    _commit_test_change(
         repository,
-        "-c",
-        "user.name=Acceptance Test",
-        "-c",
-        "user.email=acceptance@example.invalid",
-        "commit",
-        "--quiet",
-        "-m",
+        "tools/development/pilot_collaboration.py",
+        "# implementation\n",
         "implementation",
     )
-    implementation_commit = _git(repository, "rev-parse", "HEAD")
     record = repository / "records/session-handoffs/review.md"
     record.parent.mkdir(parents=True)
     record.write_text("review\n", encoding="utf-8")
@@ -151,12 +190,41 @@ def test_change_scope_ignores_later_record_and_todo_commits(tmp_path):
         "-m",
         "follow-up records",
     )
-    head = _git(repository, "rev-parse", "HEAD")
+    implementation_paths = _implementation_paths_since_base(
+        repository,
+        base_commit,
+    )
 
-    selected = _latest_implementation_commit(repository, ALLOWED_PATHS)
-
-    assert selected == implementation_commit
-    assert selected != head
-    assert _commit_changed_paths(repository, selected) == {
+    assert implementation_paths == {
         "tools/development/pilot_collaboration.py"
     }
+
+
+def test_change_scope_rejects_forbidden_commit_before_later_allowed_commit(tmp_path):
+    repository, base_commit = _initialize_test_repository(tmp_path)
+    _commit_test_change(
+        repository,
+        "tools/development/forbidden_production.py",
+        "# forbidden\n",
+        "forbidden production",
+    )
+    _commit_test_change(
+        repository,
+        "tests/test_pilot_collaboration.py",
+        "# later allowed test\n",
+        "later allowed test",
+    )
+    _commit_test_change(
+        repository,
+        "records/session-handoffs/review.md",
+        "review\n",
+        "follow-up record",
+    )
+
+    implementation_paths = _implementation_paths_since_base(
+        repository,
+        base_commit,
+    )
+
+    assert "tools/development/forbidden_production.py" in implementation_paths
+    assert not implementation_paths <= ALLOWED_PATHS
