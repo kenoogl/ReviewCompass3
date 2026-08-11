@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計と第1機械処理縦切りがHuman段完了承認まで完了した。
-- 現在作業：Humanの選択肢1を反映した範囲レビュー依頼v3は品質関門に合格した。gpt-5.6-terraの独立範囲レビューはSR-CB-F-001をblockingとしてreported_unverified。範囲固定v2のHuman authorityが自身の固定入力一覧に無い。test、実装、認証、実送信は未開始。
+- 現在作業：Human採用SR-CB-F-001を反映した範囲固定v3とレビュー依頼v4を作成した。依頼v4の品質監査でPA-CB-SR4-001が見つかり、別の判定担当は採用を推奨した。同類型再発のため自動修正せずHuman裁定待ち。範囲固定v3のレビュー本体、test、実装、認証、実送信は未開始。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,11 @@
 
 ## 最新のauthority／Evidence
 
+- [範囲レビュー依頼 指示文判定 v4](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-judgment-v4.md) — SHA-256 `f9d80a38fc4e7eb6b006f44d142290e9e446a16a62cbba29c6900b2e3aa31911`
+- [範囲レビュー依頼 指示文監査 v4](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-audit-v4.md) — SHA-256 `b9e193f3a5cd72ca9a5cd97a1dc8af69f338dbd7ac1316d19a447ac4803e0e5e`
+- [範囲固定v3向けレビュー依頼 v4](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-request-v4.md) — SHA-256 `8b66594ebbc3675a438ab405058aaaa5839c8a0a0582ce8c401fc488f2ded6e7`
+- [無工具Claude疎通経路 範囲固定 v3](records/session-handoffs/2026-08-11-codex-pilot-approved-claude-send-path-scope-v3.md) — SHA-256 `02a4f6786875a9eeb87165e387ac1e65d520423930bf3849cb967249639861a7`
+- [範囲レビュー所見 Human裁定 v1](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-finding-human-decision-v1.md) — SHA-256 `8b9300c035430606586c33aad9a0c02f95d0d3e503cd01b54eb8e30e5e077bca`
 - [無工具Claude疎通経路 独立範囲レビュー v1](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-v1.md) — SHA-256 `eef8ca1cd4964a56991ff1d99adacda11acd14c3a1a0b5738780d45e650616b0`
 - [範囲レビュー依頼 最終指示文判定 v3](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-final-judgment-v3.md) — SHA-256 `1d9d089ee6b78beb2dd0adb0aa38af8c682dead7dfd9e9b2bb6dd29cbb27dc25`
 - [範囲レビュー依頼 最終指示文監査 v3](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-final-audit-v3.md) — SHA-256 `c3f8f721ceec4d17de5c4978c51821bb80f7e4c856d9e21e50f9514d25715e77`
@@ -39,30 +44,30 @@
 
 ## 次に行う一作業
 
-HumanがSR-CB-F-001を採用、不採用、保留のいずれかで裁定する。
+HumanがPA-CB-SR4-001を採用、不採用、保留のいずれかで裁定する。
 
 開始条件：
 
-- 依頼v3が別の監査・判定担当による品質関門に合格していること
-- 範囲レビュー担当がgpt-5.6-terraで、主担当・監査・判定と別の会話状態であること
-- SR-CB-F-001と機械反証が対象範囲固定v2のSHA-256へ束縛されていること
+- 範囲固定v3と依頼v4が別commitへ固定され、対象Digestと固定材料11件が一致すること
+- 指示文監査と判定が別のgpt-5.6-terraサブエージェントで実施されていること
+- PA-CB-SR4-001が依頼v4のSHA-256へ束縛され、同類型再発と判定されていること
 
 完了条件：
 
-- SR-CB-F-001へHuman裁定が一回だけ対応すること
-- 不採用または保留なら範囲固定を修正せず停止すること
-- 採用時は現行v2を書き換えず、無工具段階選択Human裁定を§3固定入力へ加えた次版を作ること
+- PA-CB-SR4-001へHuman裁定が一回だけ対応すること
+- 不採用または保留なら依頼を修正せず停止すること
+- 採用時は依頼v4を書き換えず、外部実行経路選択Human裁定を固定材料へ加えた次版を作ること
 
-後続作業：採用時は次版の範囲固定、対象Digest、レビュー依頼を新たに固定し、品質関門と独立範囲レビューを再実行する。
+後続作業：依頼次版が品質関門に合格した後、過去の担当と別のgpt-5.6-terraが範囲固定v3を独立レビューする。
 
 ## blocker・Human判断待ち
 
-- blocker：独立範囲レビューがSR-CB-F-001によりreported_unverified。Human裁定まで範囲固定の修正、RED、実装を停止する。Claude Codeの未認証は後段の認証操作と実送信も停止する。
-- Human判断待ち：SR-CB-F-001を採用、不採用、保留で裁定する必要がある。Reviewerは無工具段階選択Human裁定を範囲固定§3へ追加する最小修正を提案する。
+- blocker：PA-CB-SR4-001が固定材料の照合・停止経路漏れという同類型で再発したため、依頼の自動修正を停止した。Claude Codeの未認証は後段の認証操作と実送信も停止する。
+- Human判断待ち：PA-CB-SR4-001を採用、不採用、保留で裁定する必要がある。監査・判定担当は外部実行経路選択Human裁定を依頼の固定材料へ追加することを推奨する。
 
 ## stale・deferred
 
-- stale：接続段階のHuman選択待ちという旧表示は古い。先行範囲v1は実装根拠に使わず、範囲固定v2もレビュー結果がreported_unverifiedのためRED開始根拠に使わない。
+- stale：接続段階のHuman選択待ちという旧表示は古い。先行範囲v1・v2は実装根拠に使わない。依頼v4は品質未合格のため範囲固定v3のレビュー開始根拠に使わない。
 - deferred：実送信、認証操作、限定道具を許可する実装委譲、第2縦切り、group C・D、実装後レビュー接続、既存保全データへの伏字化遡及適用、Work 7A後続、既存Issue resolveを保留する。
 
 ## Git・Test
@@ -71,7 +76,7 @@ HumanがSR-CB-F-001を採用、不採用、保留のいずれかで裁定する�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：文書・範囲レビュー段階のため新規testなし。依頼対象と固定材料10件は全一致。SR-CB-F-001の固定入力欠落反証は終了0。直近の操縦者別連携受入89件は終了0。
+- 直近の関連Test：文書・指示文品質確認段階のため新規testなし。対象と固定材料11件は一致。PA-CB-SR4-001のpath欠落反証は終了0。直近の操縦者別連携受入89件は終了0。
 - 直近の全Test：直近の公式全Testは1559 passed、failed 0、errors 0、終了コード0。
 - 差分検査：`git diff --check`合格
 
