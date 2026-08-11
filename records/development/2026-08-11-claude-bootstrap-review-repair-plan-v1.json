@@ -1,0 +1,39 @@
+{
+  "base_commit": "2a68870e76ad459e0271bcf149d86a87e0d2b778",
+  "blocking_classes": [
+    "authority_conflict",
+    "human_boundary_missing",
+    "demonstrable_false_verdict",
+    "scope_or_schema_violation"
+  ],
+  "changed_paths": [
+    "records/development/2026-08-11-claude-bootstrap-review-repair-green-evidence-v1.md",
+    "tools/development/claude_bootstrap.py"
+  ],
+  "plan_sha256": "3995f65e472e8f8c3a2eaef113a6ae4a49ddd683463db10ce55bd5cc630002ef",
+  "policy_id": "reviewcompass3-development-policy-v5",
+  "policy_sha256": "d190a75e8826b5b240364eee6db5ab490dcca2b5c4023b828e42bdf5ce8f0e8b",
+  "record_kind": "mechanical_review_plan",
+  "result": "completed",
+  "risk": "high",
+  "round_limit": 1,
+  "schema_version": 1,
+  "scope_expansion": "forbidden",
+  "semantic_assignments": [
+    {
+      "role": "independent_reviewer",
+      "round": 1,
+      "sequence": 1
+    }
+  ],
+  "semantic_call_count": 1,
+  "stage": "completion",
+  "target_commit": "34d13a303b85c127e9918ba1985c3f2d17e7611c",
+  "verification_requirements": [
+    "relevant_automated_tests",
+    "full_test_suite",
+    "mutation_or_equivalent_fault_injection",
+    "representative_data_validation",
+    "independent_review"
+  ]
+}
