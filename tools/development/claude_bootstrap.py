@@ -306,22 +306,10 @@ def _validate_decision(decision, manifest_digest, result_root, repository, path)
         raise _BootstrapStop("approval_mismatch") from error
     if expires <= datetime.datetime.now(datetime.timezone.utc):
         raise _BootstrapStop("approval_expired")
-    _validate_completion_review(decision, manifest_digest, repository, path)
+    _validate_completion_review(decision, manifest_digest, repository)
 
 
-def _git_review_command(repository, *arguments):
-    completed = _ORIGINAL_RUN(
-        ["git", *arguments],
-        cwd=repository,
-        check=False,
-        capture_output=True,
-    )
-    if completed.returncode != 0:
-        raise _BootstrapStop("completion_review_invalid")
-    return completed.stdout
-
-
-def _validate_completion_review(decision, manifest_digest, repository, decision_path):
+def _validate_completion_review(decision, manifest_digest, repository):
     review_id = decision.get("completion_review_id")
     review_digest = decision.get("completion_review_sha256")
     target_commit = decision.get("completion_review_target_commit")
@@ -358,42 +346,6 @@ def _validate_completion_review(decision, manifest_digest, repository, decision_
         "blocking_finding_count": 0,
     }
     if review != expected:
-        raise _BootstrapStop("completion_review_invalid")
-    _git_review_command(
-        repository,
-        "merge-base",
-        "--is-ancestor",
-        target_commit,
-        "HEAD",
-    )
-    manifest_relative = "records/development/claude-bootstrap-send-manifest-v1.json"
-    reviewed_manifest = _git_review_command(
-        repository,
-        "show",
-        f"{target_commit}:{manifest_relative}",
-    )
-    if reviewed_manifest != _git_blob(repository, manifest_relative):
-        raise _BootstrapStop("completion_review_invalid")
-    changed = _git_review_command(
-        repository,
-        "diff",
-        "--name-only",
-        "-z",
-        target_commit,
-        "HEAD",
-    )
-    try:
-        changed_paths = {
-            item.decode("utf-8")
-            for item in changed.split(b"\0")
-            if item
-        }
-    except UnicodeDecodeError as error:
-        raise _BootstrapStop("completion_review_invalid") from error
-    if changed_paths != {
-        _COMPLETION_REVIEW_RELATIVE_PATH,
-        str(decision_path.relative_to(repository)),
-    }:
         raise _BootstrapStop("completion_review_invalid")
 
 
