@@ -1,0 +1,28 @@
+{
+  "schema_version": 2,
+  "record_kind": "declaration_red_map",
+  "scope": {
+    "kind": "partial",
+    "reason": "過剰な履歴監視を除く訂正CB-RC-001の正常系1件だけを理由付きRED照合する。"
+  },
+  "red_verification_contract": {
+    "version": 2
+  },
+  "test_files": {
+    "tests/test_claude_bootstrap_adversarial.py": [
+      "test_review_plan_record_after_target_does_not_block_approved_run"
+    ]
+  },
+  "declarations": {
+    "CB-RC-001": {
+      "summary": "レビュー対象commit後の正規レビュー計画記録を許可する。",
+      "tests": [
+        {
+          "test": "tests/test_claude_bootstrap_adversarial.py::test_review_plan_record_after_target_does_not_block_approved_run",
+          "red_now": true,
+          "expected_failure_reason": "review plan records added after the reviewed commit must not block the approved run"
+        }
+      ]
+    }
+  }
+}

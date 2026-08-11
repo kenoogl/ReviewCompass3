@@ -15,6 +15,7 @@ from tests.fixtures.claude_bootstrap.helpers import create_scenario
 from tests.fixtures.claude_bootstrap.helpers import install_fake_process
 from tests.fixtures.claude_bootstrap.helpers import rebind_completion_review
 from tests.fixtures.claude_bootstrap.helpers import rebind_decision
+from tests.fixtures.claude_bootstrap.helpers import run_git
 from tests.fixtures.claude_bootstrap.helpers import write_json
 
 
@@ -233,3 +234,28 @@ def test_child_environment_allows_only_fixed_non_secret_names(tmp_path, monkeypa
         "unknown credential environment variables must not reach child processes"
     )
     assert environment["HOME"] == str(scenario.home)
+
+
+def test_review_plan_record_after_target_does_not_block_approved_run(
+    tmp_path, monkeypatch
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    plan = scenario.repository / "records/development/review-plan.json"
+    write_json(
+        plan,
+        {
+            "schema_version": 1,
+            "record_kind": "mechanical_review_plan",
+        },
+    )
+    run_git(scenario.repository, "add", str(plan.relative_to(scenario.repository)))
+    run_git(scenario.repository, "commit", "-q", "-m", "review plan")
+    install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "succeeded", (
+        "review plan records added after the reviewed commit must not block "
+        "the approved run"
+    )
+    assert len(scenario.fake_process.payload_calls) == 2
