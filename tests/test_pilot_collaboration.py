@@ -392,6 +392,52 @@ def _complete_audit(tmp_path, repository, private_root, findings=None):
     return _result(completed)
 
 
+def _complete_empty_judgment(tmp_path, repository, private_root):
+    run_root = private_root / "run-001"
+    judgment_envelope = json.loads(
+        (run_root / "prompt-judgment-envelope.json").read_text(encoding="utf-8")
+    )
+    raw_file = _raw_path(
+        tmp_path,
+        "judgment-empty.json",
+        {
+            "schema_version": 1,
+            "result_kind": "prompt_judgment",
+            "status": "completed",
+            "audit_parsed_sha256": judgment_envelope["audit_parsed_sha256"],
+            "recommendations": [],
+        },
+    )
+    launch_file = _launch_path(
+        tmp_path,
+        run_id="run-001",
+        stage="prompt_judgment",
+        attempt_id="judgment-empty",
+        input_digest=_payload_digest(run_root / "prompt-judgment-envelope.json"),
+        raw_file=raw_file,
+    )
+    completed = _ingest(
+        repository,
+        private_root,
+        "run-001",
+        "prompt_judgment",
+        "judgment-empty",
+        raw_file,
+        launch_file,
+    )
+    assert completed.returncode == 0, completed.stderr or completed.stdout
+    return _result(completed)
+
+
+def _advance_to_persisted_state(tmp_path, repository, private_root, state):
+    if state == "prepared":
+        return
+    _complete_audit(tmp_path, repository, private_root)
+    if state == "prompt_audit_parsed":
+        return
+    _complete_empty_judgment(tmp_path, repository, private_root)
+
+
 def test_requirement_traceability_covers_all_26_ids():
     assert tuple(TRACEABILITY) == REQUIREMENT_IDS
     assert len(TRACEABILITY) == 26
@@ -497,6 +543,31 @@ def test_prepare_rejects_tampered_source_and_requirement_set(
     assert not (private_root / "run-001").exists()
 
 
+def test_prepare_source_digest_mismatch_response_preserves_known_run_id(tmp_path):
+    repository, source_commit = _create_repository(tmp_path)
+    private_root = tmp_path / "private"
+    private_root.mkdir()
+    config = _start_config(repository, source_commit)
+    config["instruction"]["sha256"] = "0" * 64
+    config_path = tmp_path / "start.json"
+    _write_json(config_path, config)
+
+    completed = _run_cli(
+        repository,
+        "prepare",
+        "--config",
+        str(config_path),
+        "--private-root",
+        str(private_root),
+    )
+
+    assert completed.returncode == 2
+    result = _result(completed)
+    assert result["stop_code"] == "source_digest_mismatch"
+    assert result["run_id"] == "run-001"
+    assert not (private_root / "run-001").exists()
+
+
 @pytest.mark.parametrize("placement", ("inside", "parent", "symlink"))
 def test_prepare_rejects_unsafe_private_root_placements(tmp_path, placement):
     repository, source_commit = _create_repository(tmp_path)
@@ -525,6 +596,32 @@ def test_prepare_rejects_unsafe_private_root_placements(tmp_path, placement):
     assert completed.returncode == 2
     assert _result(completed)["stop_code"] == "private_root_invalid"
     assert not (private_root / "run-001").exists()
+
+
+def test_prepare_rejects_private_root_beneath_parent_symlink_to_repository(
+    tmp_path,
+):
+    repository, source_commit = _create_repository(tmp_path)
+    config_path = tmp_path / "start.json"
+    _write_json(config_path, _start_config(repository, source_commit))
+    repository_alias = tmp_path / "repository-alias"
+    repository_alias.symlink_to(repository, target_is_directory=True)
+    private_root = repository_alias / "private"
+    private_root.mkdir()
+
+    completed = _run_cli(
+        repository,
+        "prepare",
+        "--config",
+        str(config_path),
+        "--private-root",
+        str(private_root),
+    )
+
+    assert completed.returncode == 2
+    result = _result(completed)
+    assert result["stop_code"] == "private_root_invalid"
+    assert not (repository / "private" / "run-001").exists()
 
 
 def test_successful_audit_and_judgment_derive_state_from_event_chain(tmp_path):
@@ -599,42 +696,11 @@ def test_empty_findings_reaches_ready_for_executor_boundary(tmp_path):
     assert _complete_audit(tmp_path, repository, private_root)["state"] == (
         "ready_for_prompt_judgment"
     )
-    run_root = private_root / "run-001"
-    judgment_envelope = json.loads(
-        (run_root / "prompt-judgment-envelope.json").read_text(encoding="utf-8")
-    )
-    raw_file = _raw_path(
+    assert _complete_empty_judgment(
         tmp_path,
-        "judgment-empty.json",
-        {
-            "schema_version": 1,
-            "result_kind": "prompt_judgment",
-            "status": "completed",
-            "audit_parsed_sha256": judgment_envelope["audit_parsed_sha256"],
-            "recommendations": [],
-        },
-    )
-    launch = _launch_path(
-        tmp_path,
-        run_id="run-001",
-        stage="prompt_judgment",
-        attempt_id="judgment-empty",
-        input_digest=_payload_digest(run_root / "prompt-judgment-envelope.json"),
-        raw_file=raw_file,
-    )
-
-    completed = _ingest(
         repository,
         private_root,
-        "run-001",
-        "prompt_judgment",
-        "judgment-empty",
-        raw_file,
-        launch,
-    )
-
-    assert completed.returncode == 0
-    assert _result(completed)["state"] == "ready_for_executor"
+    )["state"] == "ready_for_executor"
 
 
 def test_audit_requires_complete_requirement_coverage(tmp_path):
@@ -1075,6 +1141,129 @@ def test_status_reports_stale_when_current_instruction_differs_from_commit(tmp_p
     result = _result(completed)
     assert result["state"] == "stale"
     assert result["stop_code"] == "stale_input"
+
+
+@pytest.mark.parametrize(
+    "persisted_state",
+    ("prepared", "prompt_audit_parsed", "prompt_judgment_parsed"),
+)
+@pytest.mark.parametrize("directory", ("launch", "raw", "parsed"))
+def test_status_rejects_orphan_artifact_at_each_persisted_state(
+    tmp_path,
+    persisted_state,
+    directory,
+):
+    repository, private_root, _ = _prepare(tmp_path)
+    _advance_to_persisted_state(
+        tmp_path,
+        repository,
+        private_root,
+        persisted_state,
+    )
+    run_root = private_root / "run-001"
+    _write_json(run_root / directory / "orphan.json", {"orphan": True})
+
+    completed = _run_cli(
+        repository,
+        "status",
+        "--private-root",
+        str(private_root),
+        "--run-id",
+        "run-001",
+    )
+
+    assert completed.returncode == 2
+    result = _result(completed)
+    assert result["state"] == "blocked"
+    assert result["stop_code"] == "stored_record_invalid"
+
+
+@pytest.mark.parametrize("directory", ("launch", "raw", "parsed"))
+def test_status_rejects_missing_referenced_attempt_artifact(tmp_path, directory):
+    repository, private_root, _ = _prepare(tmp_path)
+    _complete_audit(tmp_path, repository, private_root)
+    run_root = private_root / "run-001"
+    (run_root / directory / "audit-001.json").unlink()
+
+    completed = _run_cli(
+        repository,
+        "status",
+        "--private-root",
+        str(private_root),
+        "--run-id",
+        "run-001",
+    )
+
+    assert completed.returncode == 2
+    result = _result(completed)
+    assert result["state"] == "blocked"
+    assert result["stop_code"] == "stored_record_invalid"
+
+
+def test_status_prioritizes_stale_input_over_stored_raw_tampering(tmp_path):
+    repository, private_root, _ = _prepare(tmp_path)
+    raw_file = _raw_path(tmp_path, "failed-stale.json", {"diagnostic": "failed"})
+    run_root = private_root / "run-001"
+    launch = _launch_path(
+        tmp_path,
+        run_id="run-001",
+        stage="prompt_audit",
+        attempt_id="audit-failed-stale",
+        input_digest=_payload_digest(run_root / "prompt-audit-envelope.json"),
+        raw_file=raw_file,
+        status="failed",
+        exit_code=7,
+    )
+    assert _ingest(
+        repository,
+        private_root,
+        "run-001",
+        "prompt_audit",
+        "audit-failed-stale",
+        raw_file,
+        launch,
+    ).returncode == 2
+    stored_raw = run_root / "raw/audit-failed-stale.json"
+    stored_raw.write_bytes(stored_raw.read_bytes().replace(b"failed", b"forged", 1))
+    instruction = repository / INSTRUCTION_PATH
+    instruction.write_bytes(instruction.read_bytes() + b"\nchanged after prepare\n")
+
+    completed = _run_cli(
+        repository,
+        "status",
+        "--private-root",
+        str(private_root),
+        "--run-id",
+        "run-001",
+    )
+
+    assert completed.returncode == 2
+    result = _result(completed)
+    assert result["state"] == "stale"
+    assert result["stop_code"] == "stale_input"
+    assert result["run_id"] == "run-001"
+
+
+def test_status_stored_record_error_preserves_known_run_id(tmp_path):
+    repository, private_root, _ = _prepare(tmp_path)
+    _complete_audit(tmp_path, repository, private_root)
+    run_root = private_root / "run-001"
+    (run_root / "launch/audit-001.json").unlink()
+
+    completed = _run_cli(
+        repository,
+        "status",
+        "--private-root",
+        str(private_root),
+        "--run-id",
+        "run-001",
+    )
+
+    assert completed.returncode == 2
+    result = _result(completed)
+    assert result["state"] == "blocked"
+    assert result["stop_code"] == "stored_record_invalid"
+    assert result["run_id"] == "run-001"
 
 
 @pytest.mark.parametrize(
