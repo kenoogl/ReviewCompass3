@@ -233,7 +233,7 @@ def test_verify_accepts_standard_venv_python_symlink(tmp_path):
         elif "'platformdirs'" in command[-1]:
             output = "4.4.0\n"
         elif "entry_points" in command[-1]:
-            output = json.dumps(DECLARED_SCRIPTS)
+            output = json.dumps(sorted(DECLARED_SCRIPTS.items()))
         else:
             output = "6.0.3\n"
         return SimpleNamespace(returncode=0, stdout=output, stderr="")
@@ -265,7 +265,7 @@ def test_verify_rejects_missing_declared_project_script(tmp_path):
         elif "'platformdirs'" in command[-1]:
             output = "4.4.0\n"
         elif "entry_points" in command[-1]:
-            output = json.dumps(installed)
+            output = json.dumps(sorted(installed.items()))
         else:
             output = "6.0.3\n"
         return SimpleNamespace(returncode=0, stdout=output, stderr="")

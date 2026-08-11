@@ -111,6 +111,81 @@ def _validate_lock(config, project_root):
         raise DevelopmentEnvironmentError("dependency_lock_digest_mismatch")
 
 
+def _declared_project_scripts(project_root):
+    path = _project_path(project_root, "pyproject.toml")
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError) as error:
+        raise DevelopmentEnvironmentError("project_scripts_invalid") from error
+    section = None
+    distribution = None
+    scripts = {}
+    section_pattern = re.compile(r"\[([A-Za-z0-9_.-]+)\]")
+    assignment_pattern = re.compile(
+        r'([A-Za-z0-9_.-]+)\s*=\s*"([^"]+)"\s*(?:#.*)?'
+    )
+    for line in lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        section_match = section_pattern.fullmatch(stripped)
+        if section_match is not None:
+            section = section_match.group(1)
+            continue
+        if section not in {"project", "project.scripts"}:
+            continue
+        assignment = assignment_pattern.fullmatch(stripped)
+        if assignment is None:
+            if section == "project.scripts":
+                raise DevelopmentEnvironmentError("project_scripts_invalid")
+            continue
+        name, value = assignment.groups()
+        if section == "project" and name == "name":
+            if distribution is not None:
+                raise DevelopmentEnvironmentError("project_scripts_invalid")
+            distribution = value
+        elif section == "project.scripts":
+            if name in scripts:
+                raise DevelopmentEnvironmentError("project_scripts_invalid")
+            scripts[name] = value
+    if distribution is None or not scripts:
+        raise DevelopmentEnvironmentError("project_scripts_invalid")
+    return distribution, scripts
+
+
+def _installed_project_scripts(config, project_root, distribution, run):
+    script = (
+        "import importlib.metadata as m,json; "
+        f"d=m.distribution({distribution!r}); "
+        "print(json.dumps(sorted((e.name,e.value) for e in d.entry_points "
+        "if e.group==\"console_scripts\")))"
+    )
+    result = _run(
+        run,
+        (config["venv_python"], "-c", script),
+        project_root=project_root,
+        failure="project_scripts_unavailable",
+    )
+    try:
+        pairs = json.loads(result.stdout)
+        if (
+            not isinstance(pairs, list)
+            or any(
+                not isinstance(pair, list)
+                or len(pair) != 2
+                or not all(isinstance(value, str) for value in pair)
+                for pair in pairs
+            )
+        ):
+            raise ValueError
+        installed = dict(pairs)
+    except (json.JSONDecodeError, TypeError, ValueError) as error:
+        raise DevelopmentEnvironmentError("project_scripts_unavailable") from error
+    if len(installed) != len(pairs):
+        raise DevelopmentEnvironmentError("project_scripts_unavailable")
+    return installed
+
+
 def verify_environment(*, config, project_root, run=subprocess.run):
     root = Path(project_root).resolve()
     python = _project_path(root, config["venv_python"])
@@ -153,6 +228,15 @@ def verify_environment(*, config, project_root, run=subprocess.run):
             raise DevelopmentEnvironmentError(
                 f"required_import_version_mismatch:{package}"
             )
+    distribution, declared_scripts = _declared_project_scripts(root)
+    installed_scripts = _installed_project_scripts(
+        config,
+        root,
+        distribution,
+        run,
+    )
+    if installed_scripts != declared_scripts:
+        raise DevelopmentEnvironmentError("project_scripts_mismatch")
     return DevelopmentEnvironmentResult(
         status="verified",
         python_version=python_version,
