@@ -220,6 +220,7 @@ def create_scenario(tmp_path, monkeypatch):
     ):
         path.mkdir(parents=True, exist_ok=True)
         path.chmod(0o700)
+    store_root.chmod(0o700)
     write_json(
         store_root / "store.json",
         {
