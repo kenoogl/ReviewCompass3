@@ -2,7 +2,12 @@
   "schema_version": 1,
   "purpose": "codex-pilot-no-tool-claude-bootstrap",
   "provider": "claude-code-first-party",
-  "model": "fable",
+  "model": "claude-fable-5",
+  "allowed_response_models": [
+    "claude-fable-5",
+    "claude-opus-5",
+    "claude-opus-4-8"
+  ],
   "claude_code_version": "2.1.220",
   "claude_executable_sha256": "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081",
   "payloads": [

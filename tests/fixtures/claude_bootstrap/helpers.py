@@ -73,6 +73,7 @@ class FakeClaudeProcess:
         self.calls = []
         self.payload_results = []
         self.fail_first_payload = False
+        self.response_models = ["claude-fable-5", "claude-fable-5"]
 
     @property
     def payload_calls(self):
@@ -118,6 +119,14 @@ class FakeClaudeProcess:
             self.payload_results.append(result)
             return FakeCompletedProcess(args=args, returncode=1, stdout=json.dumps(result))
         result = copy.deepcopy(SUCCESS_RESULT)
+        payload_index = len(self.payload_calls) - 1
+        response_model = self.response_models[payload_index]
+        result["modelUsage"] = {
+            response_model: {
+                "canonicalModel": response_model,
+                "provider": "firstParty",
+            }
+        }
         if "--resume" in args:
             session_id = args[args.index("--resume") + 1]
             result["session_id"] = session_id
@@ -175,6 +184,7 @@ def _manifest():
         "purpose": CONTRACT["purpose"],
         "provider": CONTRACT["provider"],
         "model": CONTRACT["model"],
+        "allowed_response_models": CONTRACT["allowed_response_models"],
         "claude_code_version": CONTRACT["claude_code_version"],
         "claude_executable_sha256": CONTRACT["claude_executable_sha256"],
         "payloads": CONTRACT["payloads"],
@@ -270,6 +280,7 @@ def create_scenario(tmp_path, monkeypatch):
         "purpose": CONTRACT["purpose"],
         "provider": CONTRACT["provider"],
         "model": CONTRACT["model"],
+        "allowed_response_models": CONTRACT["allowed_response_models"],
         "manifest_sha256": manifest_digest,
         "ordered_payload_sha256": CONTRACT["ordered_payload_sha256"],
         "claude_executable_sha256": CONTRACT["claude_executable_sha256"],
@@ -296,6 +307,7 @@ def create_scenario(tmp_path, monkeypatch):
             "ordered_payload_sha256": CONTRACT["ordered_payload_sha256"],
             "provider": CONTRACT["provider"],
             "model": CONTRACT["model"],
+            "allowed_response_models": CONTRACT["allowed_response_models"],
             "purpose": CONTRACT["purpose"],
             "claude_executable_sha256": CONTRACT["claude_executable_sha256"],
             "expires_at": "2999-12-31T23:59:59Z",

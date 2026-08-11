@@ -127,7 +127,7 @@ def test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory(
         "--output-format",
         "json",
         "--model",
-        "fable",
+        "claude-fable-5",
         "--session-id",
         first[17],
     ]
@@ -210,6 +210,45 @@ def test_outer_inner_json_session_nonce_no_tools_and_exit_code_must_all_match(
             result = scenario.run()
 
             assert result["result"] == "stopped"
+
+
+@pytest.mark.parametrize(
+    "response_models",
+    (
+        ["claude-fable-5", "claude-fable-5"],
+        ["claude-opus-5", "claude-opus-5"],
+        ["claude-opus-4-8", "claude-opus-4-8"],
+        ["claude-fable-5", "claude-opus-5"],
+    ),
+)
+def test_human_selected_fable_allows_only_approved_response_models(
+    tmp_path, monkeypatch, response_models
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    scenario.fake_process.response_models = response_models
+    install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "succeeded"
+    receipt = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
+    assert receipt["requested_model"] == "claude-fable-5"
+    assert receipt["actual_models_by_payload"] == [
+        [response_models[0]],
+        [response_models[1]],
+    ]
+
+
+def test_response_model_outside_human_approved_set_stops(tmp_path, monkeypatch):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    scenario.fake_process.response_models[0] = "claude-sonnet-5"
+    install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "stopped"
+    assert result["stop_code"] == "claude_result_invalid"
+    assert result["payload_process_count"] == 1
 
 
 def test_raw_launch_and_receipt_slots_are_exclusive_external_and_rereadable(
@@ -317,7 +356,16 @@ def test_receipt_contract_fixes_real_run_provenance_without_performing_real_run(
     assert receipt["approval_id"] == APPROVAL_ID
     assert receipt["approval_state"] == "consumed"
     assert receipt["provider"] == "claude-code-first-party"
-    assert receipt["model"] == "fable"
+    assert receipt["requested_model"] == "claude-fable-5"
+    assert receipt["allowed_response_models"] == [
+        "claude-fable-5",
+        "claude-opus-5",
+        "claude-opus-4-8",
+    ]
+    assert receipt["actual_models_by_payload"] == [
+        ["claude-fable-5"],
+        ["claude-fable-5"],
+    ]
     assert receipt["auth_method"] == "claude.ai"
     assert receipt["payload_sha256"] == [
         item["sha256"] for item in CONTRACT["payloads"]
