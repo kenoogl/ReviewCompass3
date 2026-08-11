@@ -251,6 +251,31 @@ def test_response_model_outside_human_approved_set_stops(tmp_path, monkeypatch):
     assert result["payload_process_count"] == 1
 
 
+def test_user_selected_model_is_loaded_from_approved_manifest(
+    tmp_path, monkeypatch
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+
+    def select_opus_5(manifest):
+        manifest["model"] = "claude-opus-5"
+        manifest["allowed_response_models"] = ["claude-opus-5"]
+
+    rebind_manifest(scenario, select_opus_5)
+    scenario.fake_process.response_models = ["claude-opus-5", "claude-opus-5"]
+    install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "succeeded"
+    assert all(
+        call["args"][call["args"].index("--model") + 1] == "claude-opus-5"
+        for call in scenario.fake_process.payload_calls
+    )
+    receipt = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
+    assert receipt["requested_model"] == "claude-opus-5"
+    assert receipt["allowed_response_models"] == ["claude-opus-5"]
+
+
 def test_raw_launch_and_receipt_slots_are_exclusive_external_and_rereadable(
     tmp_path, monkeypatch
 ):

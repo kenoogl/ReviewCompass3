@@ -355,15 +355,31 @@ def rebind_manifest(scenario, mutator):
     mutator(manifest)
     write_json(scenario.manifest_path, manifest)
     scenario.manifest_digest = sha256_bytes(scenario.manifest_path.read_bytes())
+    completion_review = json.loads(
+        scenario.completion_review_path.read_text(encoding="utf-8")
+    )
+    completion_review["manifest_sha256"] = scenario.manifest_digest
+    write_json(scenario.completion_review_path, completion_review)
     decision = json.loads(scenario.decision_path.read_text(encoding="utf-8"))
     decision["manifest_sha256"] = scenario.manifest_digest
+    decision["model"] = manifest["model"]
+    decision["allowed_response_models"] = manifest["allowed_response_models"]
+    decision["completion_review_sha256"] = sha256_bytes(
+        scenario.completion_review_path.read_bytes()
+    )
     write_json(scenario.decision_path, decision)
     token = json.loads(scenario.token_path.read_text(encoding="utf-8"))
     token["manifest_sha256"] = scenario.manifest_digest
+    token["model"] = manifest["model"]
+    token["allowed_response_models"] = manifest["allowed_response_models"]
     token["decision_sha256"] = sha256_bytes(scenario.decision_path.read_bytes())
     write_json(scenario.token_path, token, mode=0o600)
-    run_git(scenario.repository, "add", str(scenario.manifest_path.relative_to(scenario.repository)))
-    run_git(scenario.repository, "add", str(scenario.decision_path.relative_to(scenario.repository)))
+    for path in (
+        scenario.manifest_path,
+        scenario.completion_review_path,
+        scenario.decision_path,
+    ):
+        run_git(scenario.repository, "add", str(path.relative_to(scenario.repository)))
     run_git(scenario.repository, "commit", "-q", "-m", "rebind fixture")
 
 

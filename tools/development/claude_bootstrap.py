@@ -25,7 +25,6 @@ _COMPLETION_REVIEW_RELATIVE_PATH = (
 _ORIGINAL_RUN = subprocess.run
 _PURPOSE = "codex-pilot-no-tool-claude-bootstrap"
 _PROVIDER = "claude-code-first-party"
-_MODEL = "fable"
 _VERSION = "2.1.220"
 _EXECUTABLE_SHA256 = (
     "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081"
@@ -112,6 +111,7 @@ _EXECUTABLE_DIGEST_CACHE = {}
 _HEX_64 = re.compile(r"[0-9a-f]{64}")
 _HEX_40 = re.compile(r"[0-9a-f]{40}")
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+_MODEL_IDENTIFIER = re.compile(r"claude-[a-z0-9]+(?:-[a-z0-9]+)*")
 _EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 _PHONE = re.compile(r"(?:\+?\d[\d -]{7,}\d)")
 _SECRET = re.compile(
@@ -236,7 +236,22 @@ def _validate_manifest(manifest):
     if not isinstance(manifest, dict):
         raise _BootstrapStop("manifest_contract_mismatch")
     payloads = manifest.get("payloads")
-    if not isinstance(payloads, list):
+    model = manifest.get("model")
+    allowed_models = manifest.get("allowed_response_models")
+    if (
+        not isinstance(payloads, list)
+        or not isinstance(model, str)
+        or _MODEL_IDENTIFIER.fullmatch(model) is None
+        or not isinstance(allowed_models, list)
+        or not allowed_models
+        or model not in allowed_models
+        or len(allowed_models) != len(set(allowed_models))
+        or any(
+            not isinstance(value, str)
+            or _MODEL_IDENTIFIER.fullmatch(value) is None
+            for value in allowed_models
+        )
+    ):
         raise _BootstrapStop("manifest_contract_mismatch")
     texts = [
         item.get("text", "")
@@ -251,7 +266,8 @@ def _validate_manifest(manifest):
         "record_kind": "approved_no_tool_claude_bootstrap_manifest",
         "purpose": _PURPOSE,
         "provider": _PROVIDER,
-        "model": _MODEL,
+        "model": model,
+        "allowed_response_models": allowed_models,
         "claude_code_version": _VERSION,
         "claude_executable_sha256": _EXECUTABLE_SHA256,
         "payloads": list(_PAYLOADS),
@@ -268,7 +284,14 @@ def _validate_manifest(manifest):
         raise _BootstrapStop("manifest_contract_mismatch")
 
 
-def _validate_decision(decision, manifest_digest, result_root, repository, path):
+def _validate_decision(
+    decision,
+    manifest,
+    manifest_digest,
+    result_root,
+    repository,
+    path,
+):
     relative = str(path.relative_to(repository))
     if _git_blob(repository, relative) != path.read_bytes():
         raise _BootstrapStop("approval_mismatch")
@@ -280,7 +303,8 @@ def _validate_decision(decision, manifest_digest, result_root, repository, path)
         "store_identity": decision.get("store_identity"),
         "purpose": _PURPOSE,
         "provider": _PROVIDER,
-        "model": _MODEL,
+        "model": manifest["model"],
+        "allowed_response_models": manifest["allowed_response_models"],
         "manifest_sha256": manifest_digest,
         "ordered_payload_sha256": _ORDERED_PAYLOAD_SHA256,
         "claude_executable_sha256": _EXECUTABLE_SHA256,
@@ -349,7 +373,14 @@ def _validate_completion_review(decision, manifest_digest, repository):
         raise _BootstrapStop("completion_review_invalid")
 
 
-def _validate_store(store, approval_id, decision, decision_path, manifest_digest):
+def _validate_store(
+    store,
+    approval_id,
+    decision,
+    decision_path,
+    manifest,
+    manifest_digest,
+):
     if not _safe_directory(store, Path.cwd().resolve()):
         raise _BootstrapStop("approval_store_missing")
     allowed = {"store.json", "pending", "claimed", "consumed"}
@@ -387,7 +418,8 @@ def _validate_store(store, approval_id, decision, decision_path, manifest_digest
         "manifest_sha256": manifest_digest,
         "ordered_payload_sha256": _ORDERED_PAYLOAD_SHA256,
         "provider": _PROVIDER,
-        "model": _MODEL,
+        "model": manifest["model"],
+        "allowed_response_models": manifest["allowed_response_models"],
         "purpose": _PURPOSE,
         "claude_executable_sha256": _EXECUTABLE_SHA256,
         "expires_at": decision["expires_at"],
@@ -482,7 +514,7 @@ def _validate_outer(value, session_id):
     return True
 
 
-def _validate_result(completed, session_id, expected_inner):
+def _validate_result(completed, session_id, expected_inner, allowed_models):
     if completed.returncode != 0 or completed.stderr:
         return None
     try:
@@ -491,13 +523,25 @@ def _validate_result(completed, session_id, expected_inner):
         return None
     if not _validate_outer(outer, session_id):
         return None
+    actual_models = []
+    for model, usage in outer["modelUsage"].items():
+        if (
+            model not in allowed_models
+            or not isinstance(usage, dict)
+            or usage.get("canonicalModel") != model
+            or usage.get("provider") != "firstParty"
+        ):
+            return None
+        actual_models.append(model)
+    if not actual_models:
+        return None
     try:
         inner = json.loads(outer["result"])
     except json.JSONDecodeError:
         return None
     if inner != expected_inner:
         return None
-    return outer
+    return outer, sorted(actual_models)
 
 
 def _reserve_result_files(result_root, repository):
@@ -568,6 +612,9 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
     raw_digests = []
     exit_codes = []
     session_id = None
+    requested_model = None
+    allowed_response_models = []
+    actual_models_by_payload = []
     try:
         if (
             not isinstance(manifest_digest, str)
@@ -597,6 +644,8 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
         except (UnicodeError, json.JSONDecodeError) as error:
             raise _BootstrapStop("manifest_contract_mismatch") from error
         _validate_manifest(manifest)
+        requested_model = manifest["model"]
+        allowed_response_models = manifest["allowed_response_models"]
         decision_path = (
             repository
             / "records/development/claude-bootstrap-human-decision-v1.json"
@@ -606,6 +655,7 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             raise _BootstrapStop("approval_mismatch")
         _validate_decision(
             decision,
+            manifest,
             manifest_digest,
             runtime["result"],
             repository,
@@ -616,6 +666,7 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             approval_id,
             decision,
             decision_path,
+            manifest,
             manifest_digest,
         )
         if not _safe_directory(runtime["work"], repository, empty=True):
@@ -689,7 +740,7 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             "--output-format",
             "json",
             "--model",
-            _MODEL,
+            requested_model,
         ]
         first_argv = [
             *base,
@@ -708,7 +759,8 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             {
                 "schema_version": 1,
                 "provider": _PROVIDER,
-                "model": _MODEL,
+                "requested_model": requested_model,
+                "allowed_response_models": allowed_response_models,
                 "payload_sha256": [item["sha256"] for item in _PAYLOADS],
                 "argv": [first_argv, second_argv],
             },
@@ -738,19 +790,22 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             )
             payload_count += 1
             exit_codes.append(completed.returncode)
-            outer = _validate_result(
+            validated = _validate_result(
                 completed,
                 session_id,
                 expected_inner[index - 1],
+                allowed_response_models,
             )
-            if outer is None:
+            if validated is None:
                 raise _BootstrapStop(
                     "claude_result_invalid",
                     approval_state="claimed",
                     payload_process_count=payload_count,
                     preflight_process_count=preflight_count,
                 )
+            outer, actual_models = validated
             outer_values.append(outer)
+            actual_models_by_payload.append(actual_models)
             raw_bytes = _canonical_bytes(outer)
             raw_digests.append(digests.sha256_hex(raw_bytes))
             paths[f"raw_{index}"].write_bytes(raw_bytes)
@@ -764,7 +819,9 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             "approval_id": approval_id,
             "approval_state": approval_state,
             "provider": _PROVIDER,
-            "model": _MODEL,
+            "requested_model": requested_model,
+            "allowed_response_models": allowed_response_models,
+            "actual_models_by_payload": actual_models_by_payload,
             "auth_method": "claude.ai",
             "payload_sha256": [item["sha256"] for item in _PAYLOADS],
             "raw_sha256": raw_digests,
@@ -807,6 +864,9 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
                 "approval_state": approval_state,
                 "payload_process_count": error.payload_process_count,
                 "preflight_process_count": error.preflight_process_count,
+                "requested_model": requested_model,
+                "allowed_response_models": allowed_response_models,
+                "actual_models_by_payload": actual_models_by_payload,
                 "payload_sha256": [item["sha256"] for item in _PAYLOADS],
                 "raw_sha256": raw_digests,
                 "exit_code": exit_codes,
