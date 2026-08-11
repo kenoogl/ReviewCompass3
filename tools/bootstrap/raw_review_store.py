@@ -7,10 +7,13 @@ promotion_required: true
 
 import dataclasses
 import hashlib
-import json
 from pathlib import Path
 import re
 
+from tools.bootstrap.immutable_result_store import (
+  ImmutableResultStoreError,
+  store_immutable_json,
+)
 from tools.bootstrap.review_execution import ReviewExecution
 
 
@@ -133,20 +136,11 @@ def store_raw_executions(
         "raw_response": execution.raw_response,
         "status": execution.status,
       }
-      encoded = (
-        json.dumps(
-          document,
-          ensure_ascii=False,
-          separators=(",", ":"),
-          sort_keys=True,
-        )
-        + "\n"
+      store_immutable_json(
+        root,
+        relative_path,
+        document,
       )
-      with (root / relative_path).open(
-        "x",
-        encoding="utf-8",
-      ) as output:
-        output.write(encoded)
       records.append(RawReviewRecord(
         attempt_id=attempt_id,
         assignment_name=execution.assignment.name,
@@ -158,7 +152,7 @@ def store_raw_executions(
         raw_digest=raw_digest,
         relative_path=relative_path,
       ))
-  except OSError as error:
+  except (OSError, ImmutableResultStoreError) as error:
     raise RawReviewStoreError(
       "Cannot preserve immutable raw review evidence"
     ) from error

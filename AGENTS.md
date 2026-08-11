@@ -13,6 +13,7 @@
 - `TODO_NEXT_SESSION.md`の読取・作成・更新・検証は`docs/development/prompts/todo-handoff-update.md`
   の共通手順だけを使う。
 - 委譲した作業のレビューは`docs/development/work-review-protocol.md`を共通入口とする。
+- Pilot連携は`docs/development/prompts/pilot-collaboration-run.md`を共通入口とする。
 
 ## 2. 報告と判断の規則
 
