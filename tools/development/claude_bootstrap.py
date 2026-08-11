@@ -18,6 +18,10 @@ REQUIRED_COMPLETION_REVIEW_STATUS = "verified"
 REQUIRED_SEND_APPROVAL_RECORD_KIND = "human_claude_bootstrap_send_approval"
 RED_START_APPROVAL_IS_NOT_SEND_APPROVAL = True
 
+_COMPLETION_REVIEW_RELATIVE_PATH = (
+    "records/development/claude-bootstrap-completion-review-v1.json"
+)
+
 _ORIGINAL_RUN = subprocess.run
 _PURPOSE = "codex-pilot-no-tool-claude-bootstrap"
 _PROVIDER = "claude-code-first-party"
@@ -61,15 +65,16 @@ _MATERIAL_POLICY = {
     "forbid_credentials": True,
     "forbid_personal_identifiers": True,
 }
-_FORBIDDEN_ENVIRONMENT = {
-    "ANTHROPIC_API_KEY",
-    "ANTHROPIC_AUTH_TOKEN",
-    "ANTHROPIC_BASE_URL",
-    "CLAUDE_CODE_OAUTH_TOKEN",
-    "CLAUDE_CODE_USE_BEDROCK",
-    "CLAUDE_CODE_USE_VERTEX",
-    "CLAUDE_CODE_USE_FOUNDRY",
-}
+_ALLOWED_CHILD_ENVIRONMENT = (
+    "HOME",
+    "PATH",
+    "TMPDIR",
+    "LANG",
+    "LC_ALL",
+    "LC_CTYPE",
+    "TERM",
+    "NO_COLOR",
+)
 _SUCCESS_REQUIRED = {
     "type",
     "subtype",
@@ -105,6 +110,7 @@ _SUCCESS_OPTIONAL = {
 }
 _EXECUTABLE_DIGEST_CACHE = {}
 _HEX_64 = re.compile(r"[0-9a-f]{64}")
+_HEX_40 = re.compile(r"[0-9a-f]{40}")
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 _EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 _PHONE = re.compile(r"(?:\+?\d[\d -]{7,}\d)")
@@ -283,6 +289,12 @@ def _validate_decision(decision, manifest_digest, result_root, repository, path)
         "result_root_identity": digests.sha256_hex(
             str(result_root).encode("utf-8")
         ),
+        "completion_review_id": decision.get("completion_review_id"),
+        "completion_review_path": _COMPLETION_REVIEW_RELATIVE_PATH,
+        "completion_review_sha256": decision.get("completion_review_sha256"),
+        "completion_review_target_commit": decision.get(
+            "completion_review_target_commit"
+        ),
     }
     if decision != required or decision.get("approved_by") != "user":
         raise _BootstrapStop("approval_mismatch")
@@ -294,6 +306,95 @@ def _validate_decision(decision, manifest_digest, result_root, repository, path)
         raise _BootstrapStop("approval_mismatch") from error
     if expires <= datetime.datetime.now(datetime.timezone.utc):
         raise _BootstrapStop("approval_expired")
+    _validate_completion_review(decision, manifest_digest, repository, path)
+
+
+def _git_review_command(repository, *arguments):
+    completed = _ORIGINAL_RUN(
+        ["git", *arguments],
+        cwd=repository,
+        check=False,
+        capture_output=True,
+    )
+    if completed.returncode != 0:
+        raise _BootstrapStop("completion_review_invalid")
+    return completed.stdout
+
+
+def _validate_completion_review(decision, manifest_digest, repository, decision_path):
+    review_id = decision.get("completion_review_id")
+    review_digest = decision.get("completion_review_sha256")
+    target_commit = decision.get("completion_review_target_commit")
+    if (
+        not isinstance(review_id, str)
+        or _IDENTIFIER.fullmatch(review_id) is None
+        or not isinstance(review_digest, str)
+        or _HEX_64.fullmatch(review_digest) is None
+        or not isinstance(target_commit, str)
+        or _HEX_40.fullmatch(target_commit) is None
+    ):
+        raise _BootstrapStop("completion_review_invalid")
+    review_path = repository / _COMPLETION_REVIEW_RELATIVE_PATH
+    if review_path.is_symlink() or not review_path.is_file():
+        raise _BootstrapStop("completion_review_invalid")
+    try:
+        review_bytes = review_path.read_bytes()
+        review = json.loads(review_bytes.decode("utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise _BootstrapStop("completion_review_invalid") from error
+    if (
+        _git_blob(repository, _COMPLETION_REVIEW_RELATIVE_PATH) != review_bytes
+        or digests.sha256_hex(review_bytes) != review_digest
+    ):
+        raise _BootstrapStop("completion_review_invalid")
+    expected = {
+        "schema_version": 1,
+        "record_kind": "claude_bootstrap_completion_review",
+        "review_id": review_id,
+        "status": REQUIRED_COMPLETION_REVIEW_STATUS,
+        "target_commit": target_commit,
+        "manifest_sha256": manifest_digest,
+        "ordered_payload_sha256": _ORDERED_PAYLOAD_SHA256,
+        "blocking_finding_count": 0,
+    }
+    if review != expected:
+        raise _BootstrapStop("completion_review_invalid")
+    _git_review_command(
+        repository,
+        "merge-base",
+        "--is-ancestor",
+        target_commit,
+        "HEAD",
+    )
+    manifest_relative = "records/development/claude-bootstrap-send-manifest-v1.json"
+    reviewed_manifest = _git_review_command(
+        repository,
+        "show",
+        f"{target_commit}:{manifest_relative}",
+    )
+    if reviewed_manifest != _git_blob(repository, manifest_relative):
+        raise _BootstrapStop("completion_review_invalid")
+    changed = _git_review_command(
+        repository,
+        "diff",
+        "--name-only",
+        "-z",
+        target_commit,
+        "HEAD",
+    )
+    try:
+        changed_paths = {
+            item.decode("utf-8")
+            for item in changed.split(b"\0")
+            if item
+        }
+    except UnicodeDecodeError as error:
+        raise _BootstrapStop("completion_review_invalid") from error
+    if changed_paths != {
+        _COMPLETION_REVIEW_RELATIVE_PATH,
+        str(decision_path.relative_to(repository)),
+    }:
+        raise _BootstrapStop("completion_review_invalid")
 
 
 def _validate_store(store, approval_id, decision, decision_path, manifest_digest):
@@ -375,10 +476,9 @@ def _resolve_executable(repository):
 
 def _child_environment():
     return {
-        name: value
-        for name, value in os.environ.items()
-        if name not in _FORBIDDEN_ENVIRONMENT
-        and not (name.startswith("REVIEWCOMPASS3_") and name.endswith("_ROOT"))
+        name: os.environ[name]
+        for name in _ALLOWED_CHILD_ENVIRONMENT
+        if name in os.environ
     }
 
 
