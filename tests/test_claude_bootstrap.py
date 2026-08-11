@@ -123,9 +123,12 @@ def test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory(
     calls = scenario.fake_process.payload_calls
     assert len(calls) == 2
     first = calls[0]["args"]
-    assert first[1:18] == [
+    session_id = first[first.index("--session-id") + 1]
+    assert first[1:20] == [
         "--print",
         "--safe-mode",
+        "--name",
+        "reviewcompass3-no-tool-bootstrap",
         "--tools",
         "",
         "--disallowedTools",
@@ -140,7 +143,11 @@ def test_fixed_argv_disables_tools_and_uses_only_external_empty_work_directory(
         "--model",
         "claude-fable-5",
         "--session-id",
-        first[17],
+        session_id,
+    ]
+    assert calls[1]["args"][3:5] == [
+        "--name",
+        "reviewcompass3-no-tool-bootstrap",
     ]
     assert "--resume" in calls[1]["args"]
     assert all(Path(call["cwd"]) == scenario.work_directory for call in calls)

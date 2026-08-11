@@ -24,6 +24,7 @@ _COMPLETION_REVIEW_RELATIVE_PATH = (
 
 _ORIGINAL_RUN = subprocess.run
 _PURPOSE = "codex-pilot-no-tool-claude-bootstrap"
+_SESSION_NAME = "reviewcompass3-no-tool-bootstrap"
 _PROVIDER = "claude-code-first-party"
 _VERSION = "2.1.220"
 _EXECUTABLE_SHA256 = (
@@ -812,6 +813,8 @@ def run_approved_no_tool_bootstrap(manifest_digest, approval_id):
             executable,
             "--print",
             "--safe-mode",
+            "--name",
+            _SESSION_NAME,
             "--tools",
             "",
             "--disallowedTools",
