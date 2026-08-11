@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計と第1機械処理縦切りがHuman段完了承認まで完了した。
-- 現在作業：操縦者別連携の第1機械処理縦切りはHuman段完了承認済み。受入89件と公式1559件が合格し、独立再レビューverified、所見0件。機械的保証状態はspecified_onlyのまま。
+- 現在作業：Humanは次作業に外部実行経路の接続を選択した。Claude Code 2.1.220と実行file digestは先行記録と一致したが、認証情報を除外した現在状態はloggedIn false。実送信は未承認・未実施。接続段階のHuman選択待ち。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -32,6 +32,7 @@
 - [操縦者別連携 production実装所見 反証test v1](records/session-handoffs/2026-08-11-pilot-collaboration-implementation-findings-red-tests-v1.md) — SHA-256 `d7457fd1c70afa514641db563dbb9bc4ad86b9d6d4feaabbc8f8a0ce623c082f`
 - [操縦者別連携 production再実装 独立再レビュー v2](records/session-handoffs/2026-08-11-pilot-collaboration-implementation-rereview-v2.md) — SHA-256 `828a7538f6923c765e045acdd3d44849aba2bee904e7ebdadbdbb730544193b0`
 - [操縦者別連携 第1縦切り 段完了Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-first-slice-stage-completion-human-decision-v1.md) — SHA-256 `fbb8c49ba6f993a1248a4600b1c0c497a2a98680db22be704fe4ee97fcfef34e`
+- [操縦者別連携 外部実行経路 選択Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-external-route-selection-human-decision-v1.md) — SHA-256 `58d7809b547b339c3641f336cc23b2729aca6e09d7d50a109ed4c7f984de7983`
 - [操縦者別のClaude／Codex連携方法](docs/development/pilot-specific-claude-codex-collaboration.md) — SHA-256 `aee8c8b72487e26395615c8442710b0695b035ec0aa129b4a777c6142864489d`
 - [委譲作業の共通レビュープロトコル](docs/development/work-review-protocol.md) — SHA-256 `b7eb8f08c7b3f585d64d163a7a2f93e758e57e830bb973cc2441bfadbc98a3df`
 - [Initial Development Checklist](docs/development/2026-08-03-initial-development-checklist.md) — SHA-256 `4bf42b4bce858bdc2e299a08582e94411698db2e143a0af4b47840712756f38c`
@@ -39,29 +40,30 @@
 
 ## 次に行う一作業
 
-Humanが次に着手する作業を選択する。
+Humanが、無工具の疎通確認から始めるか、実装委譲に必要な限定道具経路まで設計するかを選択する。
 
 開始条件：
 
-- 第1縦切りの段完了Human裁定のpathとSHA-256が固定されていること
-- 第2縦切り、外部実行経路接続、または既存保留作業のいずれへ進むかHumanが明示すること
+- 外部実行経路の選択Human裁定のpathとSHA-256が固定されていること
+- 接続段階をHumanが明示すること
+- 実送信前にClaude Codeの契約認証を再確認できること
 
 完了条件：
 
-- 選択した次作業の範囲と開始条件が固定されること
-- 今回完了した第1縦切りの範囲を黙って拡張しないこと
+- 選択した接続段階の送信内容、権限、承認、一回性、保存、停止条件が固定されること
+- 独立範囲レビューとHumanのhigh risk再開承認までtest・実装・送信を開始しないこと
 
-後続作業：第2縦切りを選ぶ場合はv6 §9の5要求を先に固定する。外部実行経路接続を選ぶ場合は外部送信とHuman承認境界を別途固定する。
+後続作業：無工具の疎通確認を選ぶ場合は先行範囲レビューF1〜F4を解消した範囲v2を作る。実装委譲を選ぶ場合は許可する道具とrepository送信範囲を別のhigh risk範囲として固定する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。第1縦切りは完了。次作業はHumanが選択するまで開始しない。
-- Human判断待ち：第1縦切りの段完了は承認済み。次に着手する作業の選択が必要。
+- blocker：Claude Codeは現在未認証。接続段階と実送信は未承認。範囲設計より後へ進まない。
+- Human判断待ち：無工具の疎通確認、または限定道具を許可する実装委譲経路のどちらから始めるかの選択が必要。実送信承認は別に必要。
 
 ## stale・deferred
 
 - stale：group C・Dを直ちに次作業とする旧表示は、本作業を現在の一作業に選んだHuman判断により古い状態。group C・Dの裁定記録自体は有効なまま保持する。
-- deferred：第2縦切り、group C・D、外部送信、Claude／Codex CLI実起動、実装後レビュー接続、既存保全データへの伏字化遡及適用、Work 7A後続、既存Issue resolveを保留する。
+- deferred：第2縦切り、group C・D、実送信、Claude／Codex CLI実起動、実装後レビュー接続、既存保全データへの伏字化遡及適用、Work 7A後続、既存Issue resolveを保留する。
 
 ## Git・Test
 
