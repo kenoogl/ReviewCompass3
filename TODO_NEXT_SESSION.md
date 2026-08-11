@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：Work 1B〜5B、Issue Resolution早期Pilot、開発venv baseline、Project-first Runtime Layout v3、Work 4A再利用探索baseline、共通関数掃討、TODO検証単一入口、伏字化規則の実保全入口接続、ReviewCompass3所属Codex session保存が完了。操縦者別連携の文書設計と第1機械処理縦切りがHuman段完了承認まで完了した。
-- 現在作業：Humanは外部実行経路の最初の段階に無工具のClaude疎通確認を選択した。先行範囲レビューF1〜F4を反映した範囲固定v2を作成済み。test・実装・認証・実送信は未開始で、独立範囲レビュー前の状態。
+- 現在作業：Humanは主担当gpt-5.6-sol、レビュー担当gpt-5.6-terraを固定した。範囲レビュー依頼の指示文監査はPA-CB-SR-001〜004を提示し、別の判定担当は全件採用を推奨した。範囲レビュー本体、test、実装、認証、実送信は未開始。
 - Task Contract：`none`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,10 @@
 
 ## 最新のauthority／Evidence
 
+- [範囲レビュー依頼 指示文判定 v1](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-judgment-v1.md) — SHA-256 `f1c92e44375e4c1aacc554c675bda6a3ae4b1fb3b2415624bbaf2f2ffaf72ad7`
+- [範囲レビュー依頼 指示文監査 v1](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-prompt-audit-v1.md) — SHA-256 `0ba70036d413f28ede3d5cb5132a94afa4dbef4380ef2df4e0c88b889c8a615e`
+- [範囲レビュー依頼 v1](records/session-handoffs/2026-08-11-no-tool-bootstrap-scope-review-request-v1.md) — SHA-256 `a087e9f8544c08eb3b63df8076fabf0812a123063c518370f06f62794e85c435`
+- [範囲レビュー担当モデル Human裁定 v1](records/session-handoffs/2026-08-11-no-tool-bootstrap-review-model-human-decision-v1.md) — SHA-256 `5a709bff5f814595284b7540ebd842c2dec2c702ac47be9e822488f544c974c7`
 - [無工具Claude疎通経路 範囲固定 v2](records/session-handoffs/2026-08-11-codex-pilot-approved-claude-send-path-scope-v2.md) — SHA-256 `aefa05876b38a5b192d923f43dc17609678053ca33a4936b992e8a6646845c82`
 - [無工具疎通確認 選択Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-no-tool-bootstrap-selection-human-decision-v1.md) — SHA-256 `3b29567232320f6751a2badd40d31b7f8ab321d731d7777f8fdd1b0f11afa0da`
 - [外部実行経路 選択Human裁定 v1](records/session-handoffs/2026-08-11-pilot-collaboration-external-route-selection-human-decision-v1.md) — SHA-256 `58d7809b547b339c3641f336cc23b2729aca6e09d7d50a109ed4c7f984de7983`
@@ -27,26 +31,26 @@
 
 ## 次に行う一作業
 
-反対側のCodexモデルを使うレビュー用サブエージェントが、範囲固定v2を実装変更なしで独立レビューする。
+HumanがPA-CB-SR-001〜004を所見ごとに採用、不採用、保留のいずれかで裁定する。
 
 開始条件：
 
-- 範囲固定v2、無工具段階選択Human裁定、TODOが同一の意味単位としてcommit済みであること
-- 固定入力とレビュー材料のSHA-256が現在内容に一致すること
-- 主担当とレビュー担当のモデル対応が操縦者別連携文書に一致すること
+- 指示文監査と指示文判定が別のgpt-5.6-terraサブエージェントで実施されていること
+- 監査4件が対象依頼SHA-256へ束縛され、判定担当が全件を一回ずつ照合していること
+- 範囲レビュー本体をまだ開始していないこと
 
 完了条件：
 
-- 先行F1〜F4、上流authority、Human境界、受入条件、変更範囲、停止条件が独立に確認されること
-- レビュー結果がcommitされ、blocking所見があればHuman裁定へ戻ること
-- レビューがverifiedでもHumanのhigh risk・RED開始承認までtest・実装・認証・送信を開始しないこと
+- PA-CB-SR-001〜004の全件へHuman裁定が一回ずつ対応すること
+- 保留が一件でもあれば依頼文を修正せず停止すること
+- 採用所見だけを反映した単一v2依頼を作り、新しい監査・判定周回へ戻ること
 
-後続作業：範囲レビュー結果をHumanへ提示し、所見の採否、high risk、変更範囲、RED開始を一つの再開裁定として求める。実送信承認は実装完了レビュー後の別境界に残す。
+後続作業：修正した範囲レビュー依頼が品質関門に合格した後、gpt-5.6-terraの新しいレビュー用サブエージェントが範囲固定v2を独立レビューする。
 
 ## blocker・Human判断待ち
 
-- blocker：Claude Codeは現在未認証。これは範囲レビューを妨げないが、認証操作と実送信を停止する。
-- Human判断待ち：範囲レビュー後に、所見の採否とhigh riskのRED開始をHumanが判断する。現在の無工具段階選択は実装・認証・送信承認ではない。
+- blocker：範囲レビュー依頼の指示文監査所見4件がHuman裁定待ち。Claude Codeの未認証は後段の認証操作と実送信も停止する。
+- Human判断待ち：PA-CB-SR-001〜004を所見ごとに採用、不採用、保留で裁定する必要がある。全件採用がモデルの推奨だが、確定ではない。
 
 ## stale・deferred
 
@@ -59,7 +63,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：文書・範囲固定段階のため新規testなし。直近の操縦者別連携受入89件は終了0。
+- 直近の関連Test：文書・指示文品質確認段階のため新規testなし。対象と固定材料のDigestは監査担当が全件一致を確認。直近の操縦者別連携受入89件は終了0。
 - 直近の全Test：直近の公式全Testは1559 passed、failed 0、errors 0、終了コード0。
 - 差分検査：`git diff --check`合格
 
