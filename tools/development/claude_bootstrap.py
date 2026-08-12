@@ -605,22 +605,30 @@ def _revalidate_saved_response(result_root, payload_index):
                 encoding="utf-8"
             )
         )
-        if (
-            payload_index not in (1, 2)
-            or set(raw)
-            != {"schema_version", "returncode", "stdout", "stderr"}
-            or raw["schema_version"] != 1
-        ):
+        if payload_index not in (1, 2) or not isinstance(raw, dict):
             raise ValueError
         argv = launch["argv"][payload_index - 1]
         flag = "--session-id" if payload_index == 1 else "--resume"
         session_id = argv[argv.index(flag) + 1]
-        completed = subprocess.CompletedProcess(
-            argv,
-            raw["returncode"],
-            stdout=raw["stdout"],
-            stderr=raw["stderr"],
-        )
+        if (
+            set(raw) == {"schema_version", "returncode", "stdout", "stderr"}
+            and raw["schema_version"] == 1
+        ):
+            completed = subprocess.CompletedProcess(
+                argv,
+                raw["returncode"],
+                stdout=raw["stdout"],
+                stderr=raw["stderr"],
+            )
+        elif raw.get("type") == "result":
+            completed = subprocess.CompletedProcess(
+                argv,
+                0,
+                stdout=_canonical_bytes(raw).decode("utf-8"),
+                stderr="",
+            )
+        else:
+            raise ValueError
         _, _, reason = _validate_result(
             completed,
             session_id,

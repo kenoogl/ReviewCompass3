@@ -396,6 +396,32 @@ def test_invalid_response_is_saved_with_precise_replayable_reason(
     assert len(scenario.fake_process.calls) == calls_before_replay
 
 
+def test_successful_saved_responses_are_revalidated_without_process(
+    tmp_path, monkeypatch
+):
+    scenario = create_scenario(tmp_path, monkeypatch)
+    module = install_fake_process(monkeypatch, scenario)
+
+    result = scenario.run()
+
+    assert result["result"] == "succeeded"
+    result_root = Path(result["receipt_path"]).parent
+    calls_before_replay = len(scenario.fake_process.calls)
+    assert module._revalidate_saved_response(result_root, 1) == {
+        "schema_version": 1,
+        "payload_index": 1,
+        "valid": True,
+        "reason": "valid",
+    }
+    assert module._revalidate_saved_response(result_root, 2) == {
+        "schema_version": 1,
+        "payload_index": 2,
+        "valid": True,
+        "reason": "valid",
+    }
+    assert len(scenario.fake_process.calls) == calls_before_replay
+
+
 def test_user_selected_model_is_loaded_from_approved_manifest(
     tmp_path, monkeypatch
 ):
