@@ -3,8 +3,8 @@
 - 記録ID：`RC3-CLEAN-DEVELOPMENT-REPOSITORY-FUTURE-2026-08-12-V1`
 - 作成日：2026-08-12
 - 状態：`将来候補 / 未着手`
-- 関連提案：`docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v4.md`
-- 関連提案SHA-256：`05a9b6c0746dcb07e4d52be698a1f716f5197ba27af5472946e5b551891404ee`
+- 関連提案：`docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md`
+- 関連提案SHA-256：`c57336dd2df961e6fe65b8f7c46665db6bce8e0df66111fc90796398a48dd812`
 
 ## 1. 候補の目的
 

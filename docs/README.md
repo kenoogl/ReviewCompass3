@@ -18,9 +18,9 @@ successor候補であり、front matterの生成元pathとDigestから詳細と�
 
 開発停滞の原因、立て直しの原則、ブートストラップから製品本線へ戻る五段階は、次の最新版を読む。
 
-- `plan/2026-08-12-project-stall-review-and-recovery-proposal-v4.md`
+- `plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md`
 
-v1からv3は同じ`plan/`配下に旧版として保持し、最新版から先行版の内容識別値をたどれる。
+v1からv4は同じ`plan/`配下に旧版として保持し、最新版から先行版の内容識別値をたどれる。
 
 ## 当面の開発入口
 
