@@ -15,6 +15,9 @@
 - 立て直し期間の開発は`docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md`を入口とし、
   第1段から第4段は§5の軽量作業票と§6のレビュー手順で進める。採用判断は
   `records/development/2026-08-12-project-stall-recovery-plan-v5-adoption-decision-v1.md`に固定する。
+- 作業の重要度と不確かさに応じて確認の深さを決めるときは、
+  `docs/development/2026-08-13-risk-proportional-verification-method-note-v1.md`を判断補助の入口とする。
+  軽い作業へ重い確認を一律に強制せず、既存計画の必須レビューと承認境界を優先する。
 - `docs/development/2026-08-03-initial-development-checklist.md`は現在位置とEvidenceを確認する入力として使い、
   立て直し中の作業順は上記計画を優先する。checkboxだけを完了根拠にしない。
 - `TODO_NEXT_SESSION.md`の読取・作成・更新・検証は`docs/development/prompts/todo-handoff-update.md`

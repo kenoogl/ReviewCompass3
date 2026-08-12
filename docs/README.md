@@ -74,6 +74,21 @@ Task Contract中心化に関する詳細な生成元は次の順に読む。
 `execution-claim-verification`は、会話上の実施報告を完了Evidenceとみなさず、実施・結果・判断Claimを
 固定Evidenceと観測した事後状態へ照合し、不一致時に進行を停止する規律を保持する。
 
+## 単独文書の現在位置
+
+2026-08-13に`docs/`配下の文書を機械照合し、ほかの文書から参照されていなかった4件を次のように分類した。
+参照がないことだけを理由に現役入口へ追加せず、内容が現在も有効かと、後続の利用者決定を先に確認した。
+
+| 文書 | 判定 | 現在の参照先 |
+| --- | --- | --- |
+| `design/2026-08-04-project-first-runtime-root-memo.md` | `一部だけ有効`。project-first配置、開発用と実行用の分離、必要なrootだけの作成は現役。原文全体は非正本で、Windowsの利用者限定権限などは後続扱い | `../records/development/2026-08-04-layout-baseline-v3-project-first-approval-decision.json`と、その承認対象`../records/development/2026-08-04-layout-baseline-v3-project-first-candidate.json` |
+| `design/2026-08-04-work-4a-v2-start-condition-specification.md` | `置換済み`。Work 4A v3設計がv2を置き換えたため履歴として保持 | `design/2026-08-04-work-4a-rebuild-design-v3-proposal.md`と`../records/development/2026-08-04-work-4a-rebuild-design-v3-approval-decision-v1.md` |
+| `development/2026-08-04-work-4a-v3-shared-context-for-codex.md` | `履歴のみ`。作成時点の引き継ぎ資料であり、文書自身が非正本と明記 | `development/2026-08-03-initial-development-checklist.md`のWork 4A現在位置と、同欄が示す設計・決定記録 |
+| `design/2026-08-08-consolidation-evaluation2-proposal.md` | `置換済み`。利用者指摘を反映したv2へ差し替え済み | `design/2026-08-08-consolidation-evaluation2-proposal-v2.md`と`../records/development/2026-08-08-consolidation-eval2-approval-decision-v1.md` |
+
+配置メモの中核が現在も有効であることは、Layout Baseline v3の承認記録、現在の配置処理、関連する19試験の
+成功で照合した。古い文書の未採用部分を現行保証へ広げない。
+
 議論の固定原文と変更判断は次へ保持する。
 
 - `../records/sources/2026-08-02-source-catalog.json`
