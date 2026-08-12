@@ -12,11 +12,15 @@
 ## 1. 入口
 
 - 指示を受けたら自分の理解で復唱し、作業開始前に作業項目を適切な粒度で示す。
-- 開発は`docs/development/2026-08-03-initial-development-checklist.md`を入口とし、authority文書との
-  一致と各節の固定Evidenceを確認する。checkboxだけを完了根拠にしない。
+- 立て直し期間の開発は`docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md`を入口とし、
+  第1段から第4段は§5の軽量作業票と§6のレビュー手順で進める。採用判断は
+  `records/development/2026-08-12-project-stall-recovery-plan-v5-adoption-decision-v1.md`に固定する。
+- `docs/development/2026-08-03-initial-development-checklist.md`は現在位置とEvidenceを確認する入力として使い、
+  立て直し中の作業順は上記計画を優先する。checkboxだけを完了根拠にしない。
 - `TODO_NEXT_SESSION.md`の読取・作成・更新・検証は`docs/development/prompts/todo-handoff-update.md`
   の共通手順だけを使う。
-- 委譲した作業のレビューは`docs/development/work-review-protocol.md`を共通入口とする。
+- 委譲した作業のレビューは`docs/development/work-review-protocol.md`を共通入口とする。ただし、立て直し計画の
+  第1段から第4段では同計画§6を入口とし、§6.8が限定する深さで共通プロトコルを適用する。
 - Pilot連携は`docs/development/prompts/pilot-collaboration-run.md`を共通入口とする。
 
 ## 2. 報告と判断の規則

@@ -16,23 +16,27 @@ successor候補であり、front matterの生成元pathとDigestから詳細と�
 
 ## 立て直し計画
 
-開発停滞の原因、立て直しの原則、ブートストラップから製品本線へ戻る五段階は、次の最新版を読む。
+開発停滞の原因、立て直しの原則、ブートストラップから製品本線へ戻る五段階は、次の採用済み計画を読む。
 
 - `plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md`
+- `../records/development/2026-08-12-project-stall-recovery-plan-v5-adoption-decision-v1.md`（採用判断）
 
 v1からv4は同じ`plan/`配下に旧版として保持し、最新版から先行版の内容識別値をたどれる。
 
 ## 当面の開発入口
 
-開発作業は、次のoperational checklistを開始入口とする。
+立て直し期間の開発作業は、採用済み立て直し計画を開始入口とする。既存のoperational checklistは、
+現在位置とEvidenceを確認する入力として使う。
 
+- `plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md`
 - `development/2026-08-03-initial-development-checklist.md`
 - `../TODO_NEXT_SESSION.md`（session更新・引き継ぎメモ）
 - `development/templates/TODO_NEXT_SESSION.template.md`（TODO新規作成・構造復元用）
 - `../records/session-handoffs/2026-07-28-todo-next-session-snapshot.md`（過去snapshot）
 
-checklistはIntent、Requirements、計画を置き換えず、現在の作業順、確認項目、完了Evidenceを一つの
-操作viewへまとめる。checkboxだけを完了根拠にせず、参照するauthorityと固定Evidenceを確認する。
+checklistはIntent、Requirements、計画を置き換えず、立て直し前の作業順、確認項目、完了Evidenceを一つの
+操作viewへまとめた資料として使う。立て直し中の作業順は採用済み計画に従い、checkboxだけを完了根拠にせず、
+参照するauthorityと固定Evidenceを確認する。
 ルートTODOも状態正本ではなく、最新状況と次作業からauthority／Evidenceへ移るための人向け入口とする。
 過去内容はTODOへ累積せず、独立保持する価値があるmilestoneだけ`records/session-handoffs/`へ保存する。
 
