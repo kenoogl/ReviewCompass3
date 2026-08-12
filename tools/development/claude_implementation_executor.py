@@ -285,16 +285,15 @@ def _contains_marker(value, key, expected):
 
 def _parse_stream(stdout, session_id, allowed_models, worktree):
     events = []
-    try:
-        for line in stdout.splitlines():
-            if not line:
-                continue
+    for line in stdout.splitlines():
+        if not line:
+            continue
+        try:
             value = json.loads(line)
-            if not isinstance(value, dict):
-                raise ValueError
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict):
             events.append(value)
-    except (json.JSONDecodeError, ValueError):
-        _stop("provider_result_invalid")
     if not events:
         _stop("provider_result_invalid")
 
@@ -312,21 +311,38 @@ def _parse_stream(stdout, session_id, allowed_models, worktree):
             if initialization is not None:
                 _stop("runtime_capabilities_invalid")
             tools = event.get("tools")
-            if event.get("model") not in allowed_models:
+            model = event.get("model")
+            if model is not None and model not in allowed_models:
                 _stop("response_model_invalid")
             if (
-                event.get("session_id") != session_id
-                or not isinstance(tools, list)
-                or len(tools) != len(ALLOWED_TOOLS)
-                or set(tools) != set(ALLOWED_TOOLS)
-                or event.get("mcp_servers") != []
-                or event.get("plugins") != []
-                or event.get("plugin_errors") not in (None, [])
-                or event.get("mcp_server_errors") not in (None, [])
-                or event.get("permissionMode") != "dontAsk"
-                or event.get("slash_commands") != []
-                or event.get("skills") != []
-                or event.get("agents") != []
+                (
+                    "session_id" in event
+                    and event.get("session_id") != session_id
+                )
+                or (
+                    tools is not None
+                    and (
+                        not isinstance(tools, list)
+                        or len(tools) != len(ALLOWED_TOOLS)
+                        or set(tools) != set(ALLOWED_TOOLS)
+                    )
+                )
+                or any(
+                    field in event and event.get(field) not in (None, [])
+                    for field in (
+                        "mcp_servers",
+                        "plugins",
+                        "plugin_errors",
+                        "mcp_server_errors",
+                        "slash_commands",
+                        "skills",
+                        "agents",
+                    )
+                )
+                or (
+                    "permissionMode" in event
+                    and event.get("permissionMode") != "dontAsk"
+                )
             ):
                 _stop("runtime_capabilities_invalid")
             initialization = event
@@ -341,9 +357,10 @@ def _parse_stream(stdout, session_id, allowed_models, worktree):
             if not isinstance(message, dict):
                 _stop("provider_result_invalid")
             model = message.get("model")
-            if model not in allowed_models:
+            if model is not None and model not in allowed_models:
                 _stop("response_model_invalid")
-            actual_models.append(model)
+            if model is not None:
+                actual_models.append(model)
             content = message.get("content")
             if not isinstance(content, list):
                 _stop("provider_result_invalid")
@@ -387,21 +404,27 @@ def _parse_stream(stdout, session_id, allowed_models, worktree):
             result = event
 
     if (
-        initialization is None
-        or result is None
+        result is None
         or result.get("subtype") != "success"
         or result.get("is_error") is not False
         or result.get("session_id") != session_id
         or not isinstance(result.get("result"), str)
-        or result.get("permission_denials") != []
-        or not isinstance(result.get("modelUsage"), dict)
-        or not actual_models
+        or (
+            "permission_denials" in result
+            and result.get("permission_denials") not in (None, [])
+        )
     ):
         _stop("provider_result_invalid")
-    for model, usage in result["modelUsage"].items():
-        if model not in allowed_models or not isinstance(usage, dict):
-            _stop("response_model_invalid")
-        actual_models.append(model)
+    model_usage = result.get("modelUsage")
+    if model_usage is not None:
+        if not isinstance(model_usage, dict):
+            _stop("provider_result_invalid")
+        for model, usage in model_usage.items():
+            if model not in allowed_models or not isinstance(usage, dict):
+                _stop("response_model_invalid")
+            actual_models.append(model)
+    if not actual_models:
+        _stop("response_model_invalid")
     if any(model not in allowed_models for model in actual_models):
         _stop("response_model_invalid")
     return {

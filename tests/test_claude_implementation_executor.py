@@ -260,6 +260,101 @@ def test_parser_ignores_non_action_metadata_without_knowing_its_name(tmp_path):
     assert result["tool_uses"][0]["path"] == "tests/test_feature.py"
 
 
+@pytest.mark.parametrize(
+    "variation",
+    (
+        "non_json_notice",
+        "init_optional_fields_missing",
+        "init_event_missing",
+        "result_optional_fields_missing",
+    ),
+)
+def test_parser_requires_outcome_evidence_but_tolerates_transport_drift(
+    tmp_path,
+    variation,
+):
+    executor = _executor()
+    worktree = tmp_path / "worktree"
+    worktree.mkdir()
+    session_id = "session-transport-drift"
+    events = [
+        json.loads(line)
+        for line in _outer_result(
+            session_id,
+            "Write",
+            worktree / "tests/test_feature.py",
+        ).splitlines()
+    ]
+    prefix = []
+    if variation == "non_json_notice":
+        prefix = ["Claude Code notice: optional telemetry changed", "[]"]
+    elif variation == "init_optional_fields_missing":
+        events[0] = {
+            "type": "system",
+            "subtype": "init",
+            "session_id": session_id,
+            "model": "claude-fable-5",
+            "tools": ["Edit", "Glob", "Grep", "Read", "Write"],
+        }
+    elif variation == "init_event_missing":
+        events.pop(0)
+    else:
+        events[-1].pop("modelUsage")
+        events[-1].pop("permission_denials")
+
+    stdout = "\n".join(
+        [*prefix, *(json.dumps(event) for event in events)]
+    ) + "\n"
+    result = executor._parse_stream(
+        stdout,
+        session_id,
+        ALLOWED_RESPONSE_MODELS,
+        worktree,
+    )
+
+    assert result["response_model"] == "claude-fable-5"
+    assert result["tool_uses"][0]["path"] == "tests/test_feature.py"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("tools", ["Edit", "Glob", "Grep", "Read", "Write", "Bash"]),
+        ("mcp_servers", [{"name": "unapproved"}]),
+        ("plugins", [{"name": "unapproved"}]),
+        ("permissionMode", "acceptEdits"),
+    ),
+)
+def test_parser_rejects_explicit_runtime_capability_contradictions(
+    tmp_path,
+    field,
+    value,
+):
+    executor = _executor()
+    worktree = tmp_path / "worktree"
+    worktree.mkdir()
+    session_id = "session-explicit-capability"
+    events = [
+        json.loads(line)
+        for line in _outer_result(
+            session_id,
+            "Write",
+            worktree / "tests/test_feature.py",
+        ).splitlines()
+    ]
+    events[0][field] = value
+
+    with pytest.raises(executor.ExecutorStop) as caught:
+        executor._parse_stream(
+            "\n".join(json.dumps(event) for event in events) + "\n",
+            session_id,
+            ALLOWED_RESPONSE_MODELS,
+            worktree,
+        )
+
+    assert caught.value.code == "runtime_capabilities_invalid"
+
+
 def test_parser_rejects_tool_use_hidden_in_unknown_event(tmp_path):
     executor = _executor()
     worktree = tmp_path / "worktree"
