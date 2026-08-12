@@ -44,6 +44,8 @@ def runner():
 def test_repository_policy_has_one_machine_test_command(runner):
     config = runner.load_config(CONFIG_PATH)
 
+    assert config["python"]["minimum_version"] == "3.13"
+    assert config["python"]["maximum_exclusive_version"] == "3.14"
     assert runner.command_for(config, "full") == (
         ".venv/bin/python3",
         "-m",
@@ -88,7 +90,7 @@ def test_runner_performs_preflight_test_and_writes_verification_receipt(
     def fake_run(command, **kwargs):
         calls.append(tuple(command))
         if command[-1] == "--version" and "pytest" not in command:
-            return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
+            return SimpleNamespace(returncode=0, stdout="Python 3.13.1\n", stderr="")
         if command[-1] == "--version":
             return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
         _write_summary(kwargs["env"], passed=448)
@@ -117,7 +119,7 @@ def test_runner_performs_preflight_test_and_writes_verification_receipt(
     assert result.status == "passed"
     assert receipt["status"] == "passed"
     assert receipt["command"] == ".venv/bin/python3 -m pytest -q"
-    assert receipt["python_version"] == "3.9.6"
+    assert receipt["python_version"] == "3.13.1"
     assert receipt["pytest_version"] == "8.4.2"
     assert receipt["fallback_used"] is False
     assert len(receipt["config_digest"]) == 64
@@ -170,7 +172,7 @@ def test_runner_records_failed_test_without_reclassifying_environment(
 
     def fake_run(command, **kwargs):
         if command == [".venv/bin/python3", "--version"]:
-            return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
+            return SimpleNamespace(returncode=0, stdout="Python 3.13.1\n", stderr="")
         if command[-1] == "--version":
             return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
         _write_summary(kwargs["env"], passed=0, failed=1)
@@ -194,7 +196,7 @@ def test_source_digest_excludes_local_environment_and_install_metadata(
     tmp_path,
 ):
     source = tmp_path / "source.py"
-    venv_file = tmp_path / ".venv/lib/python3.9/site-packages/package.py"
+    venv_file = tmp_path / ".venv/lib/python3.13/site-packages/package.py"
     egg_info = tmp_path / "reviewcompass3.egg-info/PKG-INFO"
     source.write_text("value = 1\n")
     venv_file.parent.mkdir(parents=True)
@@ -213,7 +215,7 @@ def _preflight(command):
     """preflight 2回分の応答。testの本体実行以外を共通化する。"""
 
     if command[-1] == "--version" and "pytest" not in command:
-        return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
+        return SimpleNamespace(returncode=0, stdout="Python 3.13.1\n", stderr="")
     if command[-1] == "--version":
         return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
     return None

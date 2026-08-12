@@ -47,6 +47,12 @@ def test_repository_declares_one_ignored_venv_and_exact_lock():
     assert ignore.splitlines().count(".venv/") == 1
 
     config = _module().load_config(CONFIG)
+    assert config["base_python"] == "python3.13"
+    assert config["python"] == {
+        "minimum_version": "3.13",
+        "maximum_exclusive_version": "3.14",
+    }
+    assert config["lock"]["path"] == "constraints/development-py313.txt"
     lock = ROOT / config["lock"]["path"]
     content = lock.read_bytes()
     assert hashlib.sha256(content).hexdigest() == config["lock"]["sha256"]
@@ -96,7 +102,7 @@ def test_bootstrap_stops_for_unsupported_python_before_creating_venv():
         calls.append(tuple(command))
         return SimpleNamespace(
             returncode=0,
-            stdout="Python 3.10.1\n",
+            stdout="Python 3.9.6\n",
             stderr="",
         )
 
@@ -111,7 +117,7 @@ def test_bootstrap_stops_for_unsupported_python_before_creating_venv():
             run=fake_run,
         )
 
-    assert calls == [("python3", "--version")]
+    assert calls == [("python3.13", "--version")]
 
 
 def test_bootstrap_uses_venv_and_locked_editable_install(tmp_path):
@@ -124,10 +130,10 @@ def test_bootstrap_uses_venv_and_locked_editable_install(tmp_path):
 
     def fake_run(command, **kwargs):
         calls.append(tuple(command))
-        if command == ["python3", "--version"]:
+        if command == ["python3.13", "--version"]:
             return SimpleNamespace(
                 returncode=0,
-                stdout="Python 3.9.6\n",
+                stdout="Python 3.13.1\n",
                 stderr="",
             )
         if command[1:3] == ["-m", "venv"]:
@@ -147,8 +153,8 @@ def test_bootstrap_uses_venv_and_locked_editable_install(tmp_path):
 
     assert result.status == "created"
     assert calls == [
-        ("python3", "--version"),
-        ("python3", "-m", "venv", ".venv"),
+        ("python3.13", "--version"),
+        ("python3.13", "-m", "venv", ".venv"),
         tuple(config["toolchain_command"]),
         (
             ".venv/bin/python3",
@@ -156,7 +162,7 @@ def test_bootstrap_uses_venv_and_locked_editable_install(tmp_path):
             "pip",
             "install",
             "--constraint",
-            "constraints/development-py39.txt",
+            "constraints/development-py313.txt",
             "--no-build-isolation",
             "--editable",
             ".[development]",
@@ -195,7 +201,7 @@ def test_verify_rejects_wrong_pytest_version(tmp_path):
         if command[-1] == "--version" and "pytest" not in command:
             return SimpleNamespace(
                 returncode=0,
-                stdout="Python 3.9.6\n",
+                stdout="Python 3.13.1\n",
                 stderr="",
             )
         return SimpleNamespace(
@@ -227,7 +233,7 @@ def test_verify_accepts_standard_venv_python_symlink(tmp_path):
 
     def fake_run(command, **kwargs):
         if command[-1] == "--version" and "pytest" not in command:
-            output = "Python 3.9.6\n"
+            output = "Python 3.13.1\n"
         elif command[-1] == "--version":
             output = "pytest 8.4.2\n"
         elif "'platformdirs'" in command[-1]:
@@ -259,7 +265,7 @@ def test_verify_rejects_missing_declared_project_script(tmp_path):
 
     def fake_run(command, **kwargs):
         if command[-1] == "--version" and "pytest" not in command:
-            output = "Python 3.9.6\n"
+            output = "Python 3.13.1\n"
         elif command[-1] == "--version":
             output = "pytest 8.4.2\n"
         elif "'platformdirs'" in command[-1]:

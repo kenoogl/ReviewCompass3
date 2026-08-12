@@ -46,7 +46,7 @@ def _report(*, when, outcome, wasxfail=False):
 def _fake_run_factory(summary_module, *, counts, returncode=0, write=True):
     def fake_run(command, **kwargs):
         if command[-1] == "--version" and "pytest" not in command:
-            return SimpleNamespace(returncode=0, stdout="Python 3.9.6\n", stderr="")
+            return SimpleNamespace(returncode=0, stdout="Python 3.13.1\n", stderr="")
         if command[-1] == "--version":
             return SimpleNamespace(returncode=0, stdout="pytest 8.4.2\n", stderr="")
         if write:
