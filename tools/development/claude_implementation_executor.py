@@ -272,6 +272,17 @@ def _relative_read_path(value, worktree):
     return relative.as_posix()
 
 
+def _contains_marker(value, key, expected):
+    if isinstance(value, dict):
+        return value.get(key) == expected or any(
+            _contains_marker(item, key, expected)
+            for item in value.values()
+        )
+    if isinstance(value, list):
+        return any(_contains_marker(item, key, expected) for item in value)
+    return False
+
+
 def _parse_stream(stdout, session_id, allowed_models, worktree):
     events = []
     try:
@@ -289,15 +300,43 @@ def _parse_stream(stdout, session_id, allowed_models, worktree):
 
     tool_uses = []
     actual_models = []
+    initialization = None
     result = None
     for event in events:
         event_type = event.get("type")
-        if event_type == "system":
-            if event.get("subtype") == "api_retry":
-                _stop("automatic_retry_detected")
-            if event.get("subtype") != "init":
-                _stop("provider_result_invalid")
-        elif event_type == "assistant":
+        if _contains_marker(event, "subtype", "api_retry"):
+            _stop("automatic_retry_detected")
+        if event_type == "system" and event.get("subtype") == "permission_denied":
+            _stop("permission_denied")
+        if event_type == "system" and event.get("subtype") == "init":
+            if initialization is not None:
+                _stop("runtime_capabilities_invalid")
+            tools = event.get("tools")
+            if event.get("model") not in allowed_models:
+                _stop("response_model_invalid")
+            if (
+                event.get("session_id") != session_id
+                or not isinstance(tools, list)
+                or len(tools) != len(ALLOWED_TOOLS)
+                or set(tools) != set(ALLOWED_TOOLS)
+                or event.get("mcp_servers") != []
+                or event.get("plugins") != []
+                or event.get("plugin_errors") not in (None, [])
+                or event.get("mcp_server_errors") not in (None, [])
+                or event.get("permissionMode") != "dontAsk"
+                or event.get("slash_commands") != []
+                or event.get("skills") != []
+                or event.get("agents") != []
+            ):
+                _stop("runtime_capabilities_invalid")
+            initialization = event
+        if event_type != "assistant" and _contains_marker(
+            event,
+            "type",
+            "tool_use",
+        ):
+            _stop("forbidden_tool_use")
+        if event_type == "assistant":
             message = event.get("message")
             if not isinstance(message, dict):
                 _stop("provider_result_invalid")
@@ -342,17 +381,14 @@ def _parse_stream(stdout, session_id, allowed_models, worktree):
                         if Path(pattern).is_absolute() or ".." in Path(pattern).parts:
                             _relative_read_path(pattern, worktree)
                 tool_uses.append(normalized)
-        elif event_type == "user":
-            continue
         elif event_type == "result":
             if result is not None:
                 _stop("provider_result_invalid")
             result = event
-        else:
-            _stop("provider_result_invalid")
 
     if (
-        result is None
+        initialization is None
+        or result is None
         or result.get("subtype") != "success"
         or result.get("is_error") is not False
         or result.get("session_id") != session_id
@@ -425,119 +461,21 @@ def _arguments(config, launch, worktree, session_id, turn):
     return [*base, "--resume", session_id, launch["prompt"]]
 
 
-def _execute_approved_turn(
+def _record_parsed_turn(
     repository,
     private_root,
     run_id,
     turn,
-    approval_id,
-    manifest_path,
-    manifest_sha256,
+    run_root,
+    config,
+    launch_path,
+    session_id,
+    provider_raw_path,
+    provider_raw_sha256,
+    parsed,
+    *,
+    revalidated_without_process,
 ):
-    repository = Path(repository).resolve()
-    private_root = Path(private_root).resolve()
-    if turn not in ("test", "implementation"):
-        _stop("turn_invalid")
-    run_root = private_root / run_id
-    worktree = run_root / "worktree"
-    config_path = run_root / "configuration" / "start.json"
-    config = _read_canonical_json(
-        config_path,
-        "run_not_found",
-    )
-    manifest_path = Path(manifest_path)
-    if (
-        not manifest_path.is_absolute()
-        or manifest_path.is_symlink()
-        or _SHA256.fullmatch(manifest_sha256 or "") is None
-    ):
-        _stop("manifest_mismatch")
-    _read_canonical_json(manifest_path, "manifest_mismatch")
-    try:
-        manifest_bytes = manifest_path.read_bytes()
-        config_bytes = config_path.read_bytes()
-    except OSError:
-        _stop("manifest_mismatch")
-    if (
-        manifest_bytes != config_bytes
-        or sha256_hex(manifest_bytes) != manifest_sha256
-    ):
-        _stop("manifest_mismatch")
-    launch_path = run_root / "launch" / f"{turn}.json"
-    launch = _read_canonical_json(launch_path, "launch_request_invalid")
-    expected_state = (
-        "ready_for_test_turn"
-        if turn == "test"
-        else "ready_for_implementation_turn"
-    )
-    try:
-        current = route.status(repository, private_root, run_id)
-    except route.RouteStop as error:
-        _stop(error.code)
-    if current.get("state") != expected_state:
-        _stop("state_not_ready")
-    prompt = config.get("turn_prompts", {}).get(turn)
-    if (
-        not isinstance(prompt, str)
-        or launch.get("run_id") != run_id
-        or launch.get("turn") != turn
-        or launch.get("prompt") != prompt
-        or launch.get("prompt_sha256") != sha256_hex(prompt.encode("utf-8"))
-        or launch.get("turn_prompts_sha256")
-        != config.get("turn_prompts_sha256")
-    ):
-        _stop("launch_request_invalid")
-    execution_root = run_root / "executor" / turn
-    if execution_root.exists() or execution_root.is_symlink():
-        _stop("execution_already_started")
-
-    token_path, approval_directories = _send_approval(
-        private_root,
-        run_id,
-        approval_id,
-        config_path,
-        turn,
-    )
-    environment = _child_environment()
-    _validate_preflight(config, worktree, environment)
-    if turn == "test":
-        token_path = _move_approval(
-            token_path,
-            approval_directories["claimed"] / token_path.name,
-        )
-    session_id = _session_id(run_root, turn)
-    arguments = _arguments(config, launch, worktree, session_id, turn)
-    invocation_path, _ = _store(
-        run_root,
-        f"executor/{turn}/invocation.json",
-        {
-            "schema_version": 1,
-            "turn": turn,
-            "session_id": session_id,
-            "argv": arguments,
-            "environment_keys": sorted(environment),
-            "launch_request_sha256": sha256_hex(launch_path.read_bytes()),
-        },
-    )
-    completed = _invoke(arguments, worktree, environment)
-    provider_raw_path, provider_raw_sha256 = _store(
-        run_root,
-        f"executor/{turn}/provider-raw.json",
-        {
-            "schema_version": 1,
-            "returncode": completed.returncode,
-            "stdout": completed.stdout,
-            "stderr": completed.stderr,
-        },
-    )
-    if completed.returncode != 0 or completed.stderr:
-        _stop("claude_process_failed")
-    parsed = _parse_stream(
-        completed.stdout,
-        session_id,
-        config["claude_runtime"]["allowed_response_models"],
-        worktree,
-    )
     normalized_raw_path, normalized_raw_sha256 = _store(
         run_root,
         f"executor/{turn}/normalized-raw.json",
@@ -604,17 +542,259 @@ def _execute_approved_turn(
             "status": "completed",
             "state": outcome["state"],
             "provider_raw_sha256": provider_raw_sha256,
+            "revalidated_without_process": revalidated_without_process,
         },
     )
     result = dict(outcome)
     result["execution"] = {
-        "invocation": str(invocation_path),
+        "invocation": str(run_root / f"executor/{turn}/invocation.json"),
         "provider_raw": str(provider_raw_path),
         "normalized_raw": str(normalized_raw_path),
         "launch_record": str(launch_record_path),
         "receipt": str(receipt_path),
+        "revalidated_without_process": revalidated_without_process,
     }
     return result
+
+
+def _recover_saved_turn(
+    repository,
+    private_root,
+    run_id,
+    turn,
+    approval_id,
+    run_root,
+    config,
+    launch,
+    launch_path,
+    worktree,
+):
+    execution_root = run_root / "executor" / turn
+    if execution_root.is_symlink() or not execution_root.is_dir():
+        _stop("execution_already_started")
+    if {path.name for path in execution_root.iterdir()} != {
+        "invocation.json",
+        "provider-raw.json",
+    }:
+        _stop("execution_already_started")
+    invocation = _read_canonical_json(
+        execution_root / "invocation.json",
+        "saved_response_invalid",
+    )
+    raw_path = execution_root / "provider-raw.json"
+    raw = _read_canonical_json(raw_path, "saved_response_invalid")
+    session_id = invocation.get("session_id")
+    expected_arguments = _arguments(
+        config,
+        launch,
+        worktree,
+        session_id,
+        turn,
+    )
+    if (
+        set(invocation)
+        != {
+            "schema_version",
+            "turn",
+            "session_id",
+            "argv",
+            "environment_keys",
+            "launch_request_sha256",
+        }
+        or invocation.get("schema_version") != 1
+        or invocation.get("turn") != turn
+        or not isinstance(session_id, str)
+        or not session_id
+        or invocation.get("argv") != expected_arguments
+        or invocation.get("launch_request_sha256")
+        != sha256_hex(launch_path.read_bytes())
+        or set(raw) != {"schema_version", "returncode", "stdout", "stderr"}
+        or raw.get("schema_version") != 1
+        or raw.get("returncode") != 0
+        or not isinstance(raw.get("stdout"), str)
+        or not isinstance(raw.get("stderr"), str)
+    ):
+        _stop("saved_response_invalid")
+    consumed = (
+        private_root
+        / "approval-store/consumed"
+        / f"{approval_id}.json"
+    )
+    token = _read_canonical_json(consumed, "external_send_approval_required")
+    if (
+        token.get("approval_id") != approval_id
+        or token.get("run_id") != run_id
+        or token.get("configuration_sha256")
+        != sha256_hex((run_root / "configuration/start.json").read_bytes())
+        or token.get("maximum_payload_processes") != 2
+    ):
+        _stop("external_send_approval_required")
+    parsed = _parse_stream(
+        raw["stdout"],
+        session_id,
+        config["claude_runtime"]["allowed_response_models"],
+        worktree,
+    )
+    result = _record_parsed_turn(
+        repository,
+        private_root,
+        run_id,
+        turn,
+        run_root,
+        config,
+        launch_path,
+        session_id,
+        raw_path,
+        sha256_hex(raw_path.read_bytes()),
+        parsed,
+        revalidated_without_process=True,
+    )
+    if turn == "test":
+        _move_approval(
+            consumed,
+            private_root / "approval-store/claimed" / consumed.name,
+        )
+    return result
+
+
+def _execute_approved_turn(
+    repository,
+    private_root,
+    run_id,
+    turn,
+    approval_id,
+    manifest_path,
+    manifest_sha256,
+):
+    repository = Path(repository).resolve()
+    private_root = Path(private_root).resolve()
+    if turn not in ("test", "implementation"):
+        _stop("turn_invalid")
+    run_root = private_root / run_id
+    worktree = run_root / "worktree"
+    config_path = run_root / "configuration" / "start.json"
+    config = _read_canonical_json(
+        config_path,
+        "run_not_found",
+    )
+    manifest_path = Path(manifest_path)
+    if (
+        not manifest_path.is_absolute()
+        or manifest_path.is_symlink()
+        or _SHA256.fullmatch(manifest_sha256 or "") is None
+    ):
+        _stop("manifest_mismatch")
+    _read_canonical_json(manifest_path, "manifest_mismatch")
+    try:
+        manifest_bytes = manifest_path.read_bytes()
+        config_bytes = config_path.read_bytes()
+    except OSError:
+        _stop("manifest_mismatch")
+    if (
+        manifest_bytes != config_bytes
+        or sha256_hex(manifest_bytes) != manifest_sha256
+    ):
+        _stop("manifest_mismatch")
+    launch_path = run_root / "launch" / f"{turn}.json"
+    launch = _read_canonical_json(launch_path, "launch_request_invalid")
+    expected_state = (
+        "ready_for_test_turn"
+        if turn == "test"
+        else "ready_for_implementation_turn"
+    )
+    try:
+        current = route.status(repository, private_root, run_id)
+    except route.RouteStop as error:
+        _stop(error.code)
+    if current.get("state") != expected_state:
+        _stop("state_not_ready")
+    prompt = config.get("turn_prompts", {}).get(turn)
+    if (
+        not isinstance(prompt, str)
+        or launch.get("run_id") != run_id
+        or launch.get("turn") != turn
+        or launch.get("prompt") != prompt
+        or launch.get("prompt_sha256") != sha256_hex(prompt.encode("utf-8"))
+        or launch.get("turn_prompts_sha256")
+        != config.get("turn_prompts_sha256")
+    ):
+        _stop("launch_request_invalid")
+    execution_root = run_root / "executor" / turn
+    if execution_root.exists() or execution_root.is_symlink():
+        return _recover_saved_turn(
+            repository,
+            private_root,
+            run_id,
+            turn,
+            approval_id,
+            run_root,
+            config,
+            launch,
+            launch_path,
+            worktree,
+        )
+
+    token_path, approval_directories = _send_approval(
+        private_root,
+        run_id,
+        approval_id,
+        config_path,
+        turn,
+    )
+    environment = _child_environment()
+    _validate_preflight(config, worktree, environment)
+    if turn == "test":
+        token_path = _move_approval(
+            token_path,
+            approval_directories["claimed"] / token_path.name,
+        )
+    session_id = _session_id(run_root, turn)
+    arguments = _arguments(config, launch, worktree, session_id, turn)
+    invocation_path, _ = _store(
+        run_root,
+        f"executor/{turn}/invocation.json",
+        {
+            "schema_version": 1,
+            "turn": turn,
+            "session_id": session_id,
+            "argv": arguments,
+            "environment_keys": sorted(environment),
+            "launch_request_sha256": sha256_hex(launch_path.read_bytes()),
+        },
+    )
+    completed = _invoke(arguments, worktree, environment)
+    provider_raw_path, provider_raw_sha256 = _store(
+        run_root,
+        f"executor/{turn}/provider-raw.json",
+        {
+            "schema_version": 1,
+            "returncode": completed.returncode,
+            "stdout": completed.stdout,
+            "stderr": completed.stderr,
+        },
+    )
+    if completed.returncode != 0:
+        _stop("claude_process_failed")
+    parsed = _parse_stream(
+        completed.stdout,
+        session_id,
+        config["claude_runtime"]["allowed_response_models"],
+        worktree,
+    )
+    return _record_parsed_turn(
+        repository,
+        private_root,
+        run_id,
+        turn,
+        run_root,
+        config,
+        launch_path,
+        session_id,
+        provider_raw_path,
+        provider_raw_sha256,
+        parsed,
+        revalidated_without_process=False,
+    )
 
 
 def _consume_claimed_approval(private_root, approval_id):
@@ -660,6 +840,9 @@ def execute_turn(
             except ExecutorStop:
                 pass
         raise
-    if turn == "implementation":
+    if (
+        turn == "implementation"
+        and result["execution"]["revalidated_without_process"] is not True
+    ):
         _consume_claimed_approval(private_root, approval_id)
     return result

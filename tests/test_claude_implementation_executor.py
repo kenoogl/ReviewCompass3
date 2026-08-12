@@ -93,6 +93,14 @@ def _outer_result(
                 "type": "system",
                 "subtype": "init",
                 "session_id": session_id,
+                "model": model,
+                "tools": ["Edit", "Glob", "Grep", "Read", "Write"],
+                "mcp_servers": [],
+                "plugins": [],
+                "permissionMode": "dontAsk",
+                "slash_commands": [],
+                "skills": [],
+                "agents": [],
             },
             {
                 "type": "assistant",
@@ -135,6 +143,7 @@ class FakeClaudeProcess:
         self.tool_name = "Write"
         self.tool_input = None
         self.emit_retry = False
+        self.payload_stderr = ""
 
     def __call__(
         self,
@@ -192,13 +201,176 @@ class FakeClaudeProcess:
                 {"type": "system", "subtype": "api_retry", "attempt": 1}
             )
             output = retry + "\n" + output
-        return subprocess.CompletedProcess(arguments, 0, output, "")
+        return subprocess.CompletedProcess(
+            arguments,
+            0,
+            output,
+            self.payload_stderr,
+        )
 
 
 def _install_fake(monkeypatch, executor, case):
     fake = FakeClaudeProcess(case)
     monkeypatch.setattr(executor.subprocess, "run", fake)
     return fake
+
+
+def test_parser_ignores_non_action_metadata_without_knowing_its_name(tmp_path):
+    executor = _executor()
+    worktree = tmp_path / "worktree"
+    worktree.mkdir()
+    session_id = "session-observed-metadata"
+    base_events = _outer_result(
+        session_id,
+        "Write",
+        worktree / "tests/test_feature.py",
+    ).splitlines()
+    events = [
+        base_events[0],
+        json.dumps(
+            {
+                "type": "system",
+                "subtype": "thinking_tokens",
+                "token_count": 128,
+            }
+        ),
+        json.dumps(
+            {
+                "type": "rate_limit_event",
+                "rate_limit_info": {"status": "allowed"},
+            }
+        ),
+        json.dumps(
+            {
+                "type": "future_non_action_metadata",
+                "payload": {"new_field": [1, 2, 3]},
+            }
+        ),
+        *base_events[1:],
+    ]
+
+    result = executor._parse_stream(
+        "\n".join(events) + "\n",
+        session_id,
+        ALLOWED_RESPONSE_MODELS,
+        worktree,
+    )
+
+    assert result["response_model"] == "claude-fable-5"
+    assert result["tool_uses"][0]["path"] == "tests/test_feature.py"
+
+
+def test_parser_rejects_tool_use_hidden_in_unknown_event(tmp_path):
+    executor = _executor()
+    worktree = tmp_path / "worktree"
+    worktree.mkdir()
+    session_id = "session-hidden-action"
+    events = [
+        json.dumps(
+            {
+                "type": "future_event",
+                "payload": {
+                    "type": "tool_use",
+                    "name": "Bash",
+                    "input": {"command": "echo forbidden"},
+                },
+            }
+        ),
+        *_outer_result(
+            session_id,
+            "Write",
+            worktree / "tests/test_feature.py",
+        ).splitlines(),
+    ]
+
+    with pytest.raises(executor.ExecutorStop) as caught:
+        executor._parse_stream(
+            "\n".join(events) + "\n",
+            session_id,
+            ALLOWED_RESPONSE_MODELS,
+            worktree,
+        )
+
+    assert caught.value.code == "forbidden_tool_use"
+
+
+def test_parser_rejects_runtime_capabilities_that_exceed_approval(tmp_path):
+    executor = _executor()
+    worktree = tmp_path / "worktree"
+    worktree.mkdir()
+    session_id = "session-extra-capability"
+    output = _outer_result(
+        session_id,
+        "Write",
+        worktree / "tests/test_feature.py",
+    )
+    events = [json.loads(line) for line in output.splitlines()]
+    events[0]["tools"].append("Bash")
+
+    with pytest.raises(executor.ExecutorStop) as caught:
+        executor._parse_stream(
+            "\n".join(json.dumps(event) for event in events) + "\n",
+            session_id,
+            ALLOWED_RESPONSE_MODELS,
+            worktree,
+        )
+
+    assert caught.value.code == "runtime_capabilities_invalid"
+
+
+def test_executor_accepts_harmless_stderr_when_result_is_valid(
+    tmp_path,
+    monkeypatch,
+):
+    executor = _executor()
+    _, case = _prepared_case(tmp_path)
+    fake = _install_fake(monkeypatch, executor, case)
+    fake.payload_stderr = "non-fatal provider notice\n"
+
+    result = executor.execute_turn(
+        case.repository,
+        case.private_root,
+        case.run_id,
+        "test",
+        APPROVAL_ID,
+        *_manifest_arguments(case),
+    )
+
+    assert result["state"] == "ready_for_implementation_turn"
+    provider_raw = json.loads(Path(result["execution"]["provider_raw"]).read_text())
+    assert provider_raw["stderr"] == "non-fatal provider notice\n"
+
+
+def test_parser_rejects_explicit_permission_denial(tmp_path):
+    executor = _executor()
+    worktree = tmp_path / "worktree"
+    worktree.mkdir()
+    session_id = "session-permission-denied"
+    events = [
+        json.dumps(
+            {
+                "type": "system",
+                "subtype": "permission_denied",
+                "session_id": session_id,
+                "tool_name": "Write",
+            }
+        ),
+        *_outer_result(
+            session_id,
+            "Write",
+            worktree / "tests/test_feature.py",
+        ).splitlines(),
+    ]
+
+    with pytest.raises(executor.ExecutorStop) as caught:
+        executor._parse_stream(
+            "\n".join(events) + "\n",
+            session_id,
+            ALLOWED_RESPONSE_MODELS,
+            worktree,
+        )
+
+    assert caught.value.code == "permission_denied"
 
 
 def test_executor_runs_two_fixed_turns_and_core_becomes_ready_for_review(
@@ -488,3 +660,121 @@ def test_executor_rejects_manifest_mismatch_before_any_process(
 
     assert caught.value.code == "manifest_mismatch"
     assert fake.calls == []
+
+
+def test_executor_revalidates_saved_response_without_resending(
+    tmp_path,
+    monkeypatch,
+):
+    executor = _executor()
+    route, case = _prepared_case(tmp_path)
+    fake = _install_fake(monkeypatch, executor, case)
+    original_parser = executor._parse_stream
+
+    def local_parser_failure(*arguments):
+        del arguments
+        raise executor.ExecutorStop("provider_result_invalid")
+
+    monkeypatch.setattr(executor, "_parse_stream", local_parser_failure)
+    with pytest.raises(executor.ExecutorStop) as first_failure:
+        executor.execute_turn(
+            case.repository,
+            case.private_root,
+            case.run_id,
+            "test",
+            APPROVAL_ID,
+            *_manifest_arguments(case),
+        )
+    assert first_failure.value.code == "provider_result_invalid"
+    assert len(fake.payload_calls) == 1
+
+    claimed = (
+        case.private_root / "approval-store/claimed" / f"{APPROVAL_ID}.json"
+    )
+    consumed = (
+        case.private_root / "approval-store/consumed" / f"{APPROVAL_ID}.json"
+    )
+    if claimed.is_file():
+        claimed.replace(consumed)
+    monkeypatch.setattr(executor, "_parse_stream", original_parser)
+
+    recovered = executor.execute_turn(
+        case.repository,
+        case.private_root,
+        case.run_id,
+        "test",
+        APPROVAL_ID,
+        *_manifest_arguments(case),
+    )
+
+    assert recovered["state"] == "ready_for_implementation_turn"
+    assert recovered["execution"]["revalidated_without_process"] is True
+    assert len(fake.payload_calls) == 1
+    assert claimed.is_file()
+    assert not consumed.exists()
+    assert route.status(case.repository, case.private_root, case.run_id)["state"] == (
+        "ready_for_implementation_turn"
+    )
+
+    completed = executor.execute_turn(
+        case.repository,
+        case.private_root,
+        case.run_id,
+        "implementation",
+        APPROVAL_ID,
+        *_manifest_arguments(case),
+    )
+    assert completed["state"] == "ready_for_review"
+    assert len(fake.payload_calls) == 2
+    assert consumed.is_file()
+
+
+def test_executor_revalidates_saved_implementation_without_double_consuming(
+    tmp_path,
+    monkeypatch,
+):
+    executor = _executor()
+    _, case = _prepared_case(tmp_path)
+    fake = _install_fake(monkeypatch, executor, case)
+    executor.execute_turn(
+        case.repository,
+        case.private_root,
+        case.run_id,
+        "test",
+        APPROVAL_ID,
+        *_manifest_arguments(case),
+    )
+    original_parser = executor._parse_stream
+
+    def local_parser_failure(*arguments):
+        del arguments
+        raise executor.ExecutorStop("provider_result_invalid")
+
+    monkeypatch.setattr(executor, "_parse_stream", local_parser_failure)
+    with pytest.raises(executor.ExecutorStop):
+        executor.execute_turn(
+            case.repository,
+            case.private_root,
+            case.run_id,
+            "implementation",
+            APPROVAL_ID,
+            *_manifest_arguments(case),
+        )
+    assert len(fake.payload_calls) == 2
+    monkeypatch.setattr(executor, "_parse_stream", original_parser)
+
+    recovered = executor.execute_turn(
+        case.repository,
+        case.private_root,
+        case.run_id,
+        "implementation",
+        APPROVAL_ID,
+        *_manifest_arguments(case),
+    )
+
+    assert recovered["state"] == "ready_for_review"
+    assert recovered["execution"]["revalidated_without_process"] is True
+    assert len(fake.payload_calls) == 2
+    assert (
+        case.private_root / "approval-store/consumed" / f"{APPROVAL_ID}.json"
+    ).is_file()
