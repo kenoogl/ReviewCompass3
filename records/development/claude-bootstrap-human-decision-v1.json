@@ -2,7 +2,7 @@
   "schema_version": 1,
   "record_kind": "human_claude_bootstrap_send_approval",
   "approved_by": "user",
-  "approval_id": "RC3-CB-APPROVAL-20260812-006",
+  "approval_id": "RC3-CB-APPROVAL-20260812-007",
   "store_identity": "store-712b9ef4-2e08-479f-ad02-ce85bba2e85c",
   "purpose": "codex-pilot-no-tool-claude-bootstrap",
   "provider": "claude-code-first-party",
@@ -15,15 +15,15 @@
   "manifest_sha256": "d62b8f10a0620bab06d6cf0218593394ee2bd12ee3f00cf97f39068d5a090221",
   "ordered_payload_sha256": "26933d4f45ed497f9d1d9f5fdc741aca87b0ad37c3ed3c35fd99ebff6b2bd8a0",
   "claude_executable_sha256": "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081",
-  "expires_at": "2026-08-12T00:30:00Z",
+  "expires_at": "2026-08-12T01:14:47Z",
   "material_policy": {
     "require_secret_scan": true,
     "forbid_credentials": true,
     "forbid_personal_identifiers": true
   },
-  "result_root_identity": "0f1a090340978b66f12d3a3dd0d50c688e1b07c4d9b327a1f7a66732d95fec36",
-  "completion_review_id": "RC3-CB-COMPLETION-REVIEW-20260812-V5",
+  "result_root_identity": "2774fa1d2297c084df0193a85e5727fcc14012bab23ea1321a93bcff384c13d5",
+  "completion_review_id": "RC3-CB-COMPLETION-REVIEW-20260812-V6",
   "completion_review_path": "records/development/claude-bootstrap-completion-review-v1.json",
-  "completion_review_sha256": "87d90164121f37b00cbc5822242a7b929d48dbdc0c674e117505d759c7639333",
-  "completion_review_target_commit": "fdb58d85d096562db841ea6613046a9af1802798"
+  "completion_review_sha256": "7da2c437b16882d1e9db349dc34b83690db230ba2653ae35506ba5ea948b31cb",
+  "completion_review_target_commit": "0ac1c4de151e082636c4ccb253fa320f04776530"
 }
