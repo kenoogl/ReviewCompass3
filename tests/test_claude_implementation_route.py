@@ -257,6 +257,7 @@ def _create_case(tmp_path):
             "scope_sha256": SCOPE_SHA256,
             "request_sha256": REQUEST_SHA256,
             "requirement_set_sha256": REQUIREMENT_SET_SHA256,
+            "test_command_sha256": _sha256(_canonical_bytes(test_command)),
         },
         "capabilities": capabilities,
         "claude_runtime": {
@@ -720,14 +721,23 @@ def test_administrator_boundaries_stop_without_writes(tmp_path, boundary):
     assert (case.repository / "README.md").read_bytes() == b"synthetic acceptance repository\n"
 
 
-@pytest.mark.parametrize("command_kind", ("shell_string", "different_array"))
+@pytest.mark.parametrize(
+    "command_kind",
+    ("shell_string", "different_array", "different_bound_array"),
+)
 def test_prepare_rejects_unfixed_or_shell_test_commands(tmp_path, command_kind):
     route = _route()
     case = _create_case(tmp_path)
     if command_kind == "shell_string":
         case.config["test_command"] = "python -m pytest -q tests/test_feature.py"
-    else:
+    elif command_kind == "different_array":
         case.config["test_command"] = [sys.executable, "-m", "pytest", "-q"]
+    else:
+        different_command = [sys.executable, "-m", "pytest", "-q", "tests/other.py"]
+        case.config["test_command"] = different_command
+        case.config["test_command_sha256"] = _sha256(
+            _canonical_bytes(different_command)
+        )
     _save_config(case)
     before = _tree_snapshot(tmp_path)
 
