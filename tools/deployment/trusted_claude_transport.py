@@ -48,7 +48,8 @@ NEW_TRUSTED_RUNTIME_FILES = {
 }
 EXPECTED_PRIOR_RUNTIME_SHA256 = {
     Path("tools/development/claude_implementation_executor.py"): (
-        "395f7f9c2e368610a2980c36c96f1910729c51a9472e19ddd53fc8b4c38fa84e"
+        "395f7f9c2e368610a2980c36c96f1910729c51a9472e19ddd53fc8b4c38fa84e",
+        "b4c4ef538e74a3310176216cdbd5dd23efd6bc9c6b74556899ca740c6f07821b",
     ),
     Path("tools/development/claude_bootstrap.py"): (
         "14f352afb54353ccac45d84db2ce2a02c7c8a97204c0712651a5bd6218bc4133"
@@ -75,6 +76,13 @@ def _regular(path):
 
 def _digest(path):
     return digests.sha256_hex(path.read_bytes())
+
+
+def _prior_runtime_digests(relative):
+    values = EXPECTED_PRIOR_RUNTIME_SHA256.get(relative, ())
+    if isinstance(values, str):
+        return {values}
+    return set(values)
 
 
 def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
@@ -137,7 +145,7 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
             and _digest(install_root / relative)
             in {
                 _digest(source_root / relative),
-                EXPECTED_PRIOR_RUNTIME_SHA256.get(relative),
+                *_prior_runtime_digests(relative),
             }
         )
         for relative in TRUSTED_RUNTIME_FILES
@@ -269,8 +277,9 @@ def install_trusted_transport(
                 raise ValueError("installed trusted runtime mismatch")
             if target.read_bytes() == source_bytes:
                 continue
-            if not updating_runtime or _digest(target) != (
-                EXPECTED_PRIOR_RUNTIME_SHA256.get(relative)
+            if (
+                not updating_runtime
+                or _digest(target) not in _prior_runtime_digests(relative)
             ):
                 raise ValueError("installed trusted runtime mismatch")
             _replace(target, source_bytes, 0o644)

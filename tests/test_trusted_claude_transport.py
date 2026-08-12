@@ -550,6 +550,37 @@ def test_administrator_install_updates_only_exact_pinned_prior_runtime(
     assert fixture.backup_wrapper.read_bytes() == b"legacy wrapper\n"
 
 
+def test_administrator_install_accepts_any_explicitly_pinned_prior_generation(
+    tmp_path,
+    monkeypatch,
+):
+    fixture = _runtime_upgrade_fixture(tmp_path, monkeypatch)
+    prior = dict(fixture.installer.EXPECTED_PRIOR_RUNTIME_SHA256)
+    relative = fixture.installer.TRUSTED_RUNTIME_FILES[0]
+    prior[relative] = (
+        "0" * 64,
+        prior[relative],
+    )
+    monkeypatch.setattr(
+        fixture.installer,
+        "EXPECTED_PRIOR_RUNTIME_SHA256",
+        prior,
+    )
+
+    before = fixture.installer.deployment_status(
+        install_root=fixture.install_root,
+        source_root=fixture.source_root,
+    )
+    result = fixture.installer.install_trusted_transport(
+        install_root=fixture.install_root,
+        source_root=fixture.source_root,
+        effective_user_id=0,
+    )
+
+    assert before["state"] == "trusted_runtime_update_required"
+    assert result["state"] == "ready"
+
+
 def test_new_implementation_runtime_and_exact_prior_dispatch_are_upgraded(
     tmp_path, monkeypatch
 ):
