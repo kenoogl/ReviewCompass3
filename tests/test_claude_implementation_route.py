@@ -16,6 +16,9 @@ REQUEST_SHA256 = "bfc2b7ca72ebc731dd72a304d9e645ab0335416b72c683bd39b1ed31e78192
 REQUIREMENT_SET_SHA256 = (
     "ca2b28f5dc156fc45c1c20808fe16b1e89874bead52da34dc07688015a2a2d69"
 )
+CONFIRMATION_INSTRUCTION_SHA256 = (
+    "83933a6ff8da30722a74df8fbef0a6f816059edfd2dfc8b084b3427c5d72f9ec"
+)
 REQUIREMENT_IDS = tuple(
     [f"AC-CD-{number:03d}" for number in range(1, 8)]
     + [f"NG-CD-{number:03d}" for number in range(1, 8)]
@@ -234,12 +237,16 @@ def _create_case(tmp_path):
     config = {
         "schema_version": 1,
         "run_id": "claude-route-001",
+        "purpose": "claude_implementation_executor_confirmation",
         "workflow_state": "ready_for_executor",
         "source_commit": source_commit,
         "fixed_input": {
             "scope_sha256": SCOPE_SHA256,
             "request_sha256": REQUEST_SHA256,
             "requirement_set_sha256": REQUIREMENT_SET_SHA256,
+            "confirmation_instruction_sha256": (
+                CONFIRMATION_INSTRUCTION_SHA256
+            ),
             "instruction": {
                 "path": INSTRUCTION_PATH,
                 "sha256": _sha256(files[INSTRUCTION_PATH]),
@@ -255,13 +262,17 @@ def _create_case(tmp_path):
         "requirement_ids": list(REQUIREMENT_IDS),
         "approval": {
             "approval_id": "RC3-CD-RED-APPROVAL-001",
+            "approved_by": "user",
             "decision": "approved",
-            "purpose": "claude_implementation_route_red_test",
+            "purpose": "claude_implementation_executor_confirmation",
             "one_time": True,
             "used": False,
             "scope_sha256": SCOPE_SHA256,
             "request_sha256": REQUEST_SHA256,
             "requirement_set_sha256": REQUIREMENT_SET_SHA256,
+            "confirmation_instruction_sha256": (
+                CONFIRMATION_INSTRUCTION_SHA256
+            ),
             "test_command_sha256": _sha256(_canonical_bytes(test_command)),
             "turn_prompts_sha256": turn_prompts_sha256,
         },
@@ -498,6 +509,20 @@ def test_happy_path_records_red_then_green_and_becomes_ready_for_review(tmp_path
         (lambda config: config.update(workflow_state="human_decision_required"), "state_not_ready"),
         (lambda config: config["fixed_input"].update(freshness="stale"), "stale_input"),
         (lambda config: config["approval"].update(used=True), "approval_already_used"),
+        (
+            lambda config: config.update(purpose="other"),
+            "approval_purpose_mismatch",
+        ),
+        (
+            lambda config: config["fixed_input"].update(
+                confirmation_instruction_sha256="0" * 64
+            ),
+            "fixed_input_mismatch",
+        ),
+        (
+            lambda config: config["requirement_ids"].pop(),
+            "fixed_input_mismatch",
+        ),
     ),
 )
 def test_prepare_rejects_invalid_start_boundary_without_artifacts(

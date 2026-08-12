@@ -17,6 +17,16 @@ from tools.common.digests import sha256_hex
 SCOPE_SHA256 = "063d4299e78c11c2060b012ff7f09d7feaa2eca318e879e35bd418a7015e689f"
 REQUEST_SHA256 = "bfc2b7ca72ebc731dd72a304d9e645ab0335416b72c683bd39b1ed31e7819213"
 REQUIREMENT_SET_SHA256 = "ca2b28f5dc156fc45c1c20808fe16b1e89874bead52da34dc07688015a2a2d69"
+CONFIRMATION_INSTRUCTION_SHA256 = (
+    "83933a6ff8da30722a74df8fbef0a6f816059edfd2dfc8b084b3427c5d72f9ec"
+)
+PURPOSE = "claude_implementation_executor_confirmation"
+REQUIREMENT_IDS = tuple(
+    [f"AC-CD-{number:03d}" for number in range(1, 8)]
+    + [f"NG-CD-{number:03d}" for number in range(1, 8)]
+    + [f"ST-CD-{number:03d}" for number in range(1, 7)]
+    + [f"OUT-CD-{number:03d}" for number in range(1, 6)]
+)
 ALLOWED_TOOLS = ("Read", "Glob", "Grep", "Edit", "Write")
 DISABLED_FEATURES = (
     "agents",
@@ -94,7 +104,12 @@ def _validate_start(repository, config):
         _stop("approval_required")
     if approval.get("used") is not False:
         _stop("approval_already_used")
-    if approval.get("purpose") != "claude_implementation_route_red_test":
+    if (
+        config.get("purpose") != PURPOSE
+        or approval.get("purpose") != PURPOSE
+        or approval.get("approved_by") != "user"
+        or approval.get("one_time") is not True
+    ):
         _stop("approval_purpose_mismatch")
 
     fixed = config.get("fixed_input", {})
@@ -102,6 +117,9 @@ def _validate_start(repository, config):
         "scope_sha256": SCOPE_SHA256,
         "request_sha256": REQUEST_SHA256,
         "requirement_set_sha256": REQUIREMENT_SET_SHA256,
+        "confirmation_instruction_sha256": (
+            CONFIRMATION_INSTRUCTION_SHA256
+        ),
     }
     if any(fixed.get(name) != digest for name, digest in expected_digests.items()):
         _stop("fixed_input_mismatch")
@@ -109,6 +127,14 @@ def _validate_start(repository, config):
         _stop("fixed_input_mismatch")
     if fixed.get("freshness") != "current":
         _stop("stale_input")
+    if (
+        config.get("requirement_ids") != list(REQUIREMENT_IDS)
+        or sha256_hex(
+            ("\n".join(config["requirement_ids"]) + "\n").encode("utf-8")
+        )
+        != REQUIREMENT_SET_SHA256
+    ):
+        _stop("fixed_input_mismatch")
 
     if config.get("source_commit") != _head(repository):
         _stop("fixed_input_mismatch")
