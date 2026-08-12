@@ -3,6 +3,7 @@
 import importlib
 import json
 from pathlib import Path
+import stat
 import subprocess
 import sys
 
@@ -156,3 +157,50 @@ def test_confirmation_has_one_json_command_entry(tmp_path, capsys):
         'reviewcompass3-claude-confirmation = '
         '"tools.development.claude_implementation_confirmation:main"'
     ) in pyproject
+
+
+def test_activate_confirmation_creates_one_token_and_work_directories(
+    tmp_path,
+    capsys,
+):
+    output_root, prepared = _prepare(tmp_path)
+    module = _module()
+
+    exit_code = module.run(
+        [
+            "activate",
+            "--output-root",
+            str(output_root),
+            "--candidate-sha256",
+            prepared["approval_candidate_sha256"],
+        ]
+    )
+    result = json.loads(capsys.readouterr().out)
+
+    token = (
+        output_root
+        / "private/approval-store/pending"
+        / f"{APPROVAL_ID}.json"
+    )
+    value = json.loads(token.read_text(encoding="utf-8"))
+    assert exit_code == 0
+    assert result["state"] == "approval_activated"
+    assert value["approved_by"] == "user"
+    assert value["configuration_sha256"] == prepared["configuration_sha256"]
+    assert stat.S_IMODE(token.stat().st_mode) == 0o600
+    for state in ("pending", "claimed", "consumed"):
+        directory = output_root / "private/approval-store" / state
+        assert stat.S_IMODE(directory.stat().st_mode) == 0o700
+    worktree = output_root / "private" / RUN_ID / "worktree"
+    assert (worktree / "tests").is_dir()
+    assert (worktree / "src").is_dir()
+
+    try:
+        module.activate_approval(
+            output_root=output_root,
+            expected_candidate_sha256=prepared["approval_candidate_sha256"],
+        )
+    except module.ConfirmationPreparationStop as error:
+        assert error.code == "approval_activation_invalid"
+    else:
+        raise AssertionError("approval must be activated only once")

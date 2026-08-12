@@ -34,6 +34,7 @@ ALLOWED_RESPONSE_MODELS = (
     "claude-opus-4-8",
 )
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+_SHA256 = re.compile(r"[0-9a-f]{64}")
 
 
 class ConfirmationPreparationStop(Exception):
@@ -75,6 +76,20 @@ def _write_new(path, data, mode):
 
 def _write_json(path, value):
     _write_new(path, canonical_json_bytes(value) + b"\n", 0o600)
+
+
+def _read_json(path, code):
+    path = Path(path)
+    if path.is_symlink() or not path.is_file():
+        _stop(code)
+    try:
+        data = path.read_bytes()
+        value = json.loads(data.decode("utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        _stop(code)
+    if data != canonical_json_bytes(value) + b"\n":
+        _stop(code)
+    return value
 
 
 def _inside(path, parent):
@@ -416,9 +431,116 @@ def prepare_confirmation(
     return receipt
 
 
+def activate_approval(*, output_root, expected_candidate_sha256):
+    output_root = Path(output_root)
+    if (
+        not output_root.is_absolute()
+        or output_root.is_symlink()
+        or not output_root.is_dir()
+        or _SHA256.fullmatch(expected_candidate_sha256) is None
+    ):
+        _stop("approval_activation_invalid")
+    candidate_path = output_root / "candidates/send-approval.json"
+    receipt_path = output_root / "preparation-receipt.json"
+    config_path = output_root / "start.json"
+    if (
+        sha256_hex(candidate_path.read_bytes()) != expected_candidate_sha256
+        or (output_root / "private/approval-store").exists()
+        or (output_root / "private/approval-store").is_symlink()
+    ):
+        _stop("approval_activation_invalid")
+    candidate = _read_json(candidate_path, "approval_activation_invalid")
+    receipt = _read_json(receipt_path, "approval_activation_invalid")
+    proposed = candidate.get("proposed_token")
+    if (
+        set(candidate)
+        != {
+            "schema_version",
+            "record_kind",
+            "candidate_status",
+            "proposed_token",
+        }
+        or candidate.get("schema_version") != 1
+        or candidate.get("record_kind")
+        != "human_claude_implementation_send_approval_candidate"
+        or candidate.get("candidate_status") != "awaiting_human_approval"
+        or not isinstance(proposed, dict)
+        or set(proposed)
+        != {
+            "schema_version",
+            "approval_id",
+            "purpose",
+            "run_id",
+            "configuration_sha256",
+            "private_root_sha256",
+            "expires_at",
+            "maximum_payload_processes",
+        }
+        or proposed.get("schema_version") != 1
+        or _IDENTIFIER.fullmatch(proposed.get("approval_id", "")) is None
+        or proposed.get("purpose") != PURPOSE
+        or proposed.get("run_id") != receipt.get("run_id")
+        or proposed.get("configuration_sha256")
+        != receipt.get("configuration_sha256")
+        or proposed.get("configuration_sha256")
+        != sha256_hex(config_path.read_bytes())
+        or proposed.get("private_root_sha256")
+        != receipt.get("private_root_sha256")
+        or proposed.get("private_root_sha256")
+        != sha256_hex(str((output_root / "private").resolve()).encode("utf-8"))
+        or proposed.get("maximum_payload_processes") != 2
+        or receipt.get("approval_token_activated") is not False
+        or receipt.get("state") != "prepared_not_approved"
+    ):
+        _stop("approval_activation_invalid")
+    try:
+        expires = datetime.datetime.fromisoformat(
+            proposed["expires_at"].replace("Z", "+00:00")
+        )
+    except (AttributeError, ValueError):
+        _stop("approval_activation_invalid")
+    if expires <= datetime.datetime.now(datetime.timezone.utc):
+        _stop("confirmation_expiry_invalid")
+
+    worktree = output_root / "private" / proposed["run_id"] / "worktree"
+    if worktree.is_symlink() or not worktree.is_dir():
+        _stop("approval_activation_invalid")
+    for relative in ("tests", "src"):
+        directory = worktree / relative
+        if directory.exists() or directory.is_symlink():
+            _stop("approval_activation_invalid")
+
+    store = output_root / "private/approval-store"
+    store.mkdir(mode=0o700)
+    directories = {}
+    for state in ("pending", "claimed", "consumed"):
+        directory = store / state
+        directory.mkdir(mode=0o700)
+        directories[state] = directory
+    token = dict(proposed)
+    token["approved_by"] = "user"
+    token_path = directories["pending"] / f"{proposed['approval_id']}.json"
+    _write_json(token_path, token)
+    for relative in ("tests", "src"):
+        (worktree / relative).mkdir(mode=0o700)
+    result = {
+        "schema_version": 1,
+        "state": "approval_activated",
+        "run_id": proposed["run_id"],
+        "approval_id": proposed["approval_id"],
+        "approval_state": "pending",
+        "token_path": str(token_path),
+        "token_sha256": sha256_hex(token_path.read_bytes()),
+        "claude_process_count": 0,
+        "external_send_count": 0,
+    }
+    _write_json(output_root / "candidates/activation-receipt.json", result)
+    return result
+
+
 def run(argv=None):
     arguments = list(sys.argv[1:] if argv is None else argv)
-    flags = (
+    prepare_flags = (
         "--workspace-root",
         "--output-root",
         "--run-id",
@@ -427,16 +549,24 @@ def run(argv=None):
         "--claude-executable",
         "--python-executable",
     )
-    valid = (
+    prepare_valid = (
         len(arguments) == 15
         and arguments[0] == "prepare"
-        and all(arguments[1 + index * 2] == flag for index, flag in enumerate(flags))
         and all(
-            Path(arguments[index]).is_absolute()
-            for index in (2, 4, 12, 14)
+            arguments[1 + index * 2] == flag
+            for index, flag in enumerate(prepare_flags)
         )
+        and all(Path(arguments[index]).is_absolute() for index in (2, 4, 12, 14))
     )
-    if not valid:
+    activate_valid = (
+        len(arguments) == 5
+        and arguments[0] == "activate"
+        and arguments[1] == "--output-root"
+        and Path(arguments[2]).is_absolute()
+        and arguments[3] == "--candidate-sha256"
+        and _SHA256.fullmatch(arguments[4]) is not None
+    )
+    if not prepare_valid and not activate_valid:
         result = {
             "schema_version": 1,
             "state": "stopped",
@@ -445,15 +575,21 @@ def run(argv=None):
         exit_code = 2
     else:
         try:
-            result = prepare_confirmation(
-                workspace_root=arguments[2],
-                output_root=arguments[4],
-                run_id=arguments[6],
-                approval_id=arguments[8],
-                expires_at=arguments[10],
-                claude_executable=arguments[12],
-                python_executable=arguments[14],
-            )
+            if prepare_valid:
+                result = prepare_confirmation(
+                    workspace_root=arguments[2],
+                    output_root=arguments[4],
+                    run_id=arguments[6],
+                    approval_id=arguments[8],
+                    expires_at=arguments[10],
+                    claude_executable=arguments[12],
+                    python_executable=arguments[14],
+                )
+            else:
+                result = activate_approval(
+                    output_root=arguments[2],
+                    expected_candidate_sha256=arguments[4],
+                )
             exit_code = 0
         except ConfirmationPreparationStop as error:
             result = {
