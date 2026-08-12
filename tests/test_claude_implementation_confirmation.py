@@ -254,13 +254,14 @@ def test_run_approved_confirmation_derives_and_runs_both_turns_once(
         }
 
     monkeypatch.setattr(module, "_run_trusted_command", fake_trusted)
+    states = iter(("ready_for_test_turn", "ready_for_review"))
     monkeypatch.setattr(
         module.route,
         "status",
         lambda repository, private_root, run_id: {
             "schema_version": 1,
             "run_id": run_id,
-            "state": "ready_for_review",
+            "state": next(states),
             "independent_review": "pending",
             "human_stage_completion_approval": "pending",
         },
@@ -343,6 +344,88 @@ def test_run_approved_confirmation_stops_before_second_turn_on_first_failure(
     else:
         raise AssertionError("failed first turn must stop the run")
     assert payload_turns == ["test"]
+
+
+def test_run_approved_confirmation_resumes_activated_run_without_reactivation(
+    tmp_path,
+    monkeypatch,
+):
+    output_root, prepared = _prepare(tmp_path)
+    module = _module()
+    module.activate_approval(
+        output_root=output_root,
+        expected_candidate_sha256=prepared["approval_candidate_sha256"],
+    )
+    pending = (
+        output_root
+        / "private/approval-store/pending"
+        / f"{APPROVAL_ID}.json"
+    )
+    consumed = pending.parent.parent / "consumed" / pending.name
+    pending.replace(consumed)
+    trusted = tmp_path / "trusted-review-send"
+    trusted.write_text("trusted fixture\n", encoding="utf-8")
+    trusted.chmod(0o755)
+    monkeypatch.setattr(module, "TRUSTED_EXECUTABLE", trusted)
+    turns = []
+
+    def fake_trusted(arguments, cwd):
+        del cwd
+        if arguments == [str(trusted), "--capabilities"]:
+            return {
+                "schema_version": "trusted-review-send-v1",
+                "status": "capabilities",
+                "roles": {
+                    "claude_implementation_executor": {
+                        "model": "from-approved-launch",
+                        "purpose": "claude_implementation_executor",
+                        "topology": "same_session_test_then_implementation",
+                    }
+                },
+            }
+        turn = arguments[arguments.index("--turn") + 1]
+        turns.append(turn)
+        token_root = output_root / "private/approval-store"
+        if turn == "test":
+            (token_root / "consumed" / consumed.name).replace(
+                token_root / "claimed" / consumed.name
+            )
+            state = "ready_for_implementation_turn"
+        else:
+            (token_root / "claimed" / consumed.name).replace(
+                token_root / "consumed" / consumed.name
+            )
+            state = "ready_for_review"
+        return {"schema_version": 1, "run_id": RUN_ID, "state": state}
+
+    states = iter(("ready_for_test_turn", "ready_for_review"))
+    monkeypatch.setattr(module, "_run_trusted_command", fake_trusted)
+    monkeypatch.setattr(
+        module.route,
+        "status",
+        lambda repository, private_root, run_id: {
+            "schema_version": 1,
+            "run_id": run_id,
+            "state": next(states),
+            "independent_review": "pending",
+            "human_stage_completion_approval": "pending",
+        },
+    )
+    monkeypatch.setattr(
+        module,
+        "activate_approval",
+        lambda **values: (_ for _ in ()).throw(
+            AssertionError("activated run must not be activated again")
+        ),
+    )
+
+    result = module.run_approved_confirmation(
+        output_root=output_root,
+        expected_candidate_sha256=prepared["approval_candidate_sha256"],
+    )
+
+    assert result["state"] == "ready_for_independent_review"
+    assert turns == ["test", "implementation"]
 
 
 def test_run_approved_cli_requires_only_prepared_root_and_candidate_digest(

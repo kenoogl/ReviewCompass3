@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import subprocess
 import sys
 
@@ -513,6 +514,47 @@ def _trusted_turn_arguments(
     ]
 
 
+def _validate_existing_activation(
+    output_root,
+    proposed,
+    expected_candidate_sha256,
+):
+    candidate_path = output_root / "candidates/send-approval.json"
+    store = output_root / "private/approval-store"
+    if (
+        sha256_hex(candidate_path.read_bytes()) != expected_candidate_sha256
+        or store.is_symlink()
+        or not store.is_dir()
+        or stat.S_IMODE(store.stat().st_mode) != 0o700
+    ):
+        _stop("approval_activation_invalid")
+    states = []
+    for state in ("pending", "claimed", "consumed"):
+        directory = store / state
+        if (
+            directory.is_symlink()
+            or not directory.is_dir()
+            or stat.S_IMODE(directory.stat().st_mode) != 0o700
+        ):
+            _stop("approval_activation_invalid")
+        states.extend((state, path) for path in directory.iterdir())
+    if len(states) != 1 or states[0][1].name != f"{proposed['approval_id']}.json":
+        _stop("approval_activation_invalid")
+    token_path = states[0][1]
+    if (
+        token_path.is_symlink()
+        or not token_path.is_file()
+        or stat.S_IMODE(token_path.stat().st_mode) != 0o600
+    ):
+        _stop("approval_activation_invalid")
+    token = _read_json(token_path, "approval_activation_invalid")
+    expected = dict(proposed)
+    expected["approved_by"] = "user"
+    if token != expected:
+        _stop("approval_activation_invalid")
+    return states[0][0]
+
+
 def run_approved_confirmation(*, output_root, expected_candidate_sha256):
     output_root = Path(output_root)
     receipt = _read_json(
@@ -553,17 +595,38 @@ def run_approved_confirmation(*, output_root, expected_candidate_sha256):
     ):
         _stop("approval_activation_invalid")
     trusted = _validate_trusted_entry(workspace_root)
-    activate_approval(
-        output_root=output_root,
-        expected_candidate_sha256=expected_candidate_sha256,
-    )
+    store = private_root / "approval-store"
+    if not store.exists() and not store.is_symlink():
+        activate_approval(
+            output_root=output_root,
+            expected_candidate_sha256=expected_candidate_sha256,
+        )
+    else:
+        _validate_existing_activation(
+            output_root,
+            proposed,
+            expected_candidate_sha256,
+        )
+
+    try:
+        initial_status = route.status(repository, private_root, run_id)
+    except route.RouteStop as error:
+        _stop(error.code)
+    turns_by_state = {
+        "ready_for_test_turn": ("test", "implementation"),
+        "ready_for_implementation_turn": ("implementation",),
+        "ready_for_review": (),
+    }
+    turns = turns_by_state.get(initial_status.get("state"))
+    if turns is None:
+        _stop("confirmation_result_invalid")
 
     states = {
         "test": "ready_for_implementation_turn",
         "implementation": "ready_for_review",
     }
     turn_results = []
-    for turn in ("test", "implementation"):
+    for turn in turns:
         result = _run_trusted_command(
             _trusted_turn_arguments(
                 trusted,
