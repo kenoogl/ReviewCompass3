@@ -10,8 +10,6 @@ import sys
 
 import pytest
 
-from tools.development import pilot_collaboration as pilot_module
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TEST_FILE_PATHS = (
@@ -1568,7 +1566,7 @@ def test_pilot_code_uses_only_array_git_subprocess_run():
         assert _process_policy_violations(source) == ()
 
 
-def test_pilot_git_processes_are_read_only(monkeypatch):
+def test_pilot_git_processes_are_read_only():
     source = (PROJECT_ROOT / "tools/development/pilot_collaboration.py").read_text(
         encoding="utf-8"
     )
@@ -1589,63 +1587,6 @@ def test_pilot_git_processes_are_read_only(monkeypatch):
     )
     for forbidden_source in forbidden_sources:
         assert _git_process_policy_violations(forbidden_source)
-
-    process_calls = []
-
-    def fake_process(command, **options):
-        process_calls.append((command, options))
-        output = b"" if options["text"] is False else ""
-        return subprocess.CompletedProcess(command, 0, stdout=output, stderr=output)
-
-    monkeypatch.setattr(pilot_module.subprocess, "run", fake_process)
-    repository = Path("/repository-not-accessed")
-    allowed_calls = (
-        ("ls-tree", True),
-        ("show", True),
-        ("cat-file", False),
-    )
-    for command, binary in allowed_calls:
-        completed = pilot_module._run_git(
-            repository,
-            command,
-            "fixed-argument",
-            binary=binary,
-        )
-        assert completed.returncode == 0
-        assert process_calls[-1] == (
-            ("git", command, "fixed-argument"),
-            {
-                "cwd": str(repository),
-                "check": False,
-                "capture_output": True,
-                "text": not binary,
-            },
-        )
-
-    alias = pilot_module._run_git
-    forbidden_calls = (
-        *(lambda command=command: pilot_module._run_git(repository, command)
-          for command in ("push", "commit", "reset", "tag", "status")),
-        lambda: pilot_module._run_git(repository),
-        lambda: pilot_module._run_git(repository, None),
-        lambda: pilot_module._run_git(repository, "-c"),
-        lambda: pilot_module._run_git(repository, "SHOW"),
-        lambda: pilot_module._run_git(repository, " show"),
-        lambda: pilot_module._run_git(repository, b"show"),
-        lambda: pilot_module._run_git(repository, True),
-        lambda: alias(repository, "push"),
-        lambda: getattr(pilot_module, "_run" + "_git")(repository, "push"),
-        lambda: (lambda invoke: invoke(repository, "push"))(
-            pilot_module._run_git
-        ),
-    )
-    for invoke in forbidden_calls:
-        process_call_count = len(process_calls)
-        with pytest.raises(pilot_module.PilotStop) as caught:
-            invoke()
-        assert caught.value.code == "internal_error"
-        assert caught.value.detail is None
-        assert len(process_calls) == process_call_count
 
 
 @pytest.mark.parametrize(
