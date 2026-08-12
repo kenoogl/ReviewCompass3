@@ -33,6 +33,7 @@ ALLOWED_RESPONSE_MODELS = (
     "claude-opus-5",
     "claude-opus-4-8",
 )
+TRUSTED_EXECUTABLE = Path("/usr/local/libexec/reviewcompass/trusted-review-send")
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 
@@ -49,14 +50,15 @@ def _stop(code):
     raise ConfirmationPreparationStop(code)
 
 
-def _run(arguments, cwd):
+def _run(arguments, cwd, *, check=True):
     try:
         return subprocess.run(
             list(arguments),
             cwd=str(cwd),
-            check=True,
+            check=check,
             capture_output=True,
             text=True,
+            shell=False,
         )
     except (OSError, subprocess.CalledProcessError):
         _stop("confirmation_machine_command_failed")
@@ -89,6 +91,22 @@ def _read_json(path, code):
         _stop(code)
     if data != canonical_json_bytes(value) + b"\n":
         _stop(code)
+    return value
+
+
+def _run_trusted_command(arguments, cwd):
+    completed = _run(arguments, cwd, check=False)
+    try:
+        value = json.loads(completed.stdout)
+    except (TypeError, json.JSONDecodeError):
+        _stop("trusted_transport_unavailable")
+    if (
+        completed.returncode != 0
+        or completed.stderr
+        or not isinstance(value, dict)
+    ):
+        code = value.get("stop_code") if isinstance(value, dict) else None
+        _stop(code if isinstance(code, str) and code else "trusted_transport_unavailable")
     return value
 
 
@@ -411,6 +429,7 @@ def prepare_confirmation(
         "schema_version": 1,
         "state": "prepared_not_approved",
         "run_id": run_id,
+        "workspace_root": str(workspace_root),
         "repository": str(repository),
         "private_root": str(private_root),
         "source_commit": source_commit,
@@ -429,6 +448,166 @@ def prepare_confirmation(
     }
     _write_json(output_root / "preparation-receipt.json", receipt)
     return receipt
+
+
+def _validate_trusted_entry(workspace_root):
+    trusted = Path(TRUSTED_EXECUTABLE)
+    if (
+        not trusted.is_absolute()
+        or trusted.is_symlink()
+        or not trusted.is_file()
+        or not os.access(trusted, os.X_OK)
+    ):
+        _stop("trusted_transport_unavailable")
+    capabilities = _run_trusted_command(
+        [str(trusted), "--capabilities"],
+        workspace_root,
+    )
+    role = capabilities.get("roles", {}).get(
+        "claude_implementation_executor",
+    )
+    if (
+        capabilities.get("schema_version") != "trusted-review-send-v1"
+        or capabilities.get("status") != "capabilities"
+        or role
+        != {
+            "model": "from-approved-launch",
+            "purpose": "claude_implementation_executor",
+            "topology": "same_session_test_then_implementation",
+        }
+    ):
+        _stop("trusted_transport_unavailable")
+    return trusted
+
+
+def _trusted_turn_arguments(
+    trusted,
+    workspace_root,
+    repository,
+    private_root,
+    run_id,
+    turn,
+    approval_id,
+    manifest_path,
+    manifest_sha256,
+):
+    return [
+        str(trusted),
+        "claude-implementation-execute",
+        "--workspace-root",
+        str(workspace_root),
+        "--repository",
+        str(repository),
+        "--private-root",
+        str(private_root),
+        "--run-id",
+        run_id,
+        "--turn",
+        turn,
+        "--approval-id",
+        approval_id,
+        "--manifest-path",
+        str(manifest_path),
+        "--manifest-sha256",
+        manifest_sha256,
+    ]
+
+
+def run_approved_confirmation(*, output_root, expected_candidate_sha256):
+    output_root = Path(output_root)
+    receipt = _read_json(
+        output_root / "preparation-receipt.json",
+        "approval_activation_invalid",
+    )
+    workspace_root = Path(receipt.get("workspace_root", ""))
+    repository = Path(receipt.get("repository", ""))
+    private_root = Path(receipt.get("private_root", ""))
+    manifest_path = Path(receipt.get("configuration_path", ""))
+    run_id = receipt.get("run_id")
+    candidate = _read_json(
+        output_root / "candidates/send-approval.json",
+        "approval_activation_invalid",
+    )
+    proposed = candidate.get("proposed_token", {})
+    approval_id = proposed.get("approval_id")
+    manifest_sha256 = receipt.get("configuration_sha256")
+    if (
+        not output_root.is_absolute()
+        or output_root.is_symlink()
+        or not workspace_root.is_absolute()
+        or workspace_root.is_symlink()
+        or not workspace_root.is_dir()
+        or not repository.is_absolute()
+        or repository.is_symlink()
+        or not repository.is_dir()
+        or not private_root.is_absolute()
+        or private_root.is_symlink()
+        or not private_root.is_dir()
+        or not manifest_path.is_absolute()
+        or manifest_path.is_symlink()
+        or not manifest_path.is_file()
+        or _IDENTIFIER.fullmatch(run_id or "") is None
+        or _IDENTIFIER.fullmatch(approval_id or "") is None
+        or _SHA256.fullmatch(manifest_sha256 or "") is None
+        or manifest_sha256 != sha256_hex(manifest_path.read_bytes())
+    ):
+        _stop("approval_activation_invalid")
+    trusted = _validate_trusted_entry(workspace_root)
+    activate_approval(
+        output_root=output_root,
+        expected_candidate_sha256=expected_candidate_sha256,
+    )
+
+    states = {
+        "test": "ready_for_implementation_turn",
+        "implementation": "ready_for_review",
+    }
+    turn_results = []
+    for turn in ("test", "implementation"):
+        result = _run_trusted_command(
+            _trusted_turn_arguments(
+                trusted,
+                workspace_root,
+                repository,
+                private_root,
+                run_id,
+                turn,
+                approval_id,
+                manifest_path,
+                manifest_sha256,
+            ),
+            workspace_root,
+        )
+        if (
+            result.get("run_id") != run_id
+            or result.get("state") != states[turn]
+        ):
+            _stop("trusted_transport_result_invalid")
+        turn_results.append(turn)
+
+    try:
+        status = route.status(repository, private_root, run_id)
+    except route.RouteStop as error:
+        _stop(error.code)
+    if (
+        status.get("state") != "ready_for_review"
+        or status.get("independent_review") != "pending"
+        or status.get("human_stage_completion_approval") != "pending"
+    ):
+        _stop("confirmation_result_invalid")
+    result = {
+        "schema_version": 1,
+        "state": "ready_for_independent_review",
+        "run_id": run_id,
+        "approval_id": approval_id,
+        "configuration_sha256": manifest_sha256,
+        "turns": turn_results,
+        "claude_process_count": 2,
+        "external_send_count": 2,
+        "route_status": status,
+    }
+    _write_json(output_root / "machine-completion-receipt.json", result)
+    return result
 
 
 def activate_approval(*, output_root, expected_candidate_sha256):
@@ -566,7 +745,15 @@ def run(argv=None):
         and arguments[3] == "--candidate-sha256"
         and _SHA256.fullmatch(arguments[4]) is not None
     )
-    if not prepare_valid and not activate_valid:
+    run_approved_valid = (
+        len(arguments) == 5
+        and arguments[0] == "run-approved"
+        and arguments[1] == "--output-root"
+        and Path(arguments[2]).is_absolute()
+        and arguments[3] == "--candidate-sha256"
+        and _SHA256.fullmatch(arguments[4]) is not None
+    )
+    if not prepare_valid and not activate_valid and not run_approved_valid:
         result = {
             "schema_version": 1,
             "state": "stopped",
@@ -585,8 +772,13 @@ def run(argv=None):
                     claude_executable=arguments[12],
                     python_executable=arguments[14],
                 )
-            else:
+            elif activate_valid:
                 result = activate_approval(
+                    output_root=arguments[2],
+                    expected_candidate_sha256=arguments[4],
+                )
+            else:
+                result = run_approved_confirmation(
                     output_root=arguments[2],
                     expected_candidate_sha256=arguments[4],
                 )

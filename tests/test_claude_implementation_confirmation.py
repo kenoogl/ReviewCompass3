@@ -204,3 +204,182 @@ def test_activate_confirmation_creates_one_token_and_work_directories(
         assert error.code == "approval_activation_invalid"
     else:
         raise AssertionError("approval must be activated only once")
+
+
+def test_run_approved_confirmation_derives_and_runs_both_turns_once(
+    tmp_path,
+    monkeypatch,
+):
+    output_root, prepared = _prepare(tmp_path)
+    module = _module()
+    trusted = tmp_path / "trusted-review-send"
+    trusted.write_text("trusted fixture\n", encoding="utf-8")
+    trusted.chmod(0o755)
+    monkeypatch.setattr(module, "TRUSTED_EXECUTABLE", trusted)
+    calls = []
+
+    def fake_trusted(arguments, cwd):
+        calls.append((list(arguments), Path(cwd)))
+        if arguments == [str(trusted), "--capabilities"]:
+            return {
+                "schema_version": "trusted-review-send-v1",
+                "status": "capabilities",
+                "roles": {
+                    "claude_implementation_executor": {
+                        "model": "from-approved-launch",
+                        "purpose": "claude_implementation_executor",
+                        "topology": "same_session_test_then_implementation",
+                    }
+                },
+            }
+        turn = arguments[arguments.index("--turn") + 1]
+        token = (
+            output_root
+            / "private/approval-store"
+            / ("pending" if turn == "test" else "claimed")
+            / f"{APPROVAL_ID}.json"
+        )
+        target = token.parent.parent / (
+            "claimed" if turn == "test" else "consumed"
+        ) / token.name
+        token.replace(target)
+        return {
+            "schema_version": 1,
+            "run_id": RUN_ID,
+            "state": (
+                "ready_for_implementation_turn"
+                if turn == "test"
+                else "ready_for_review"
+            ),
+        }
+
+    monkeypatch.setattr(module, "_run_trusted_command", fake_trusted)
+    monkeypatch.setattr(
+        module.route,
+        "status",
+        lambda repository, private_root, run_id: {
+            "schema_version": 1,
+            "run_id": run_id,
+            "state": "ready_for_review",
+            "independent_review": "pending",
+            "human_stage_completion_approval": "pending",
+        },
+    )
+
+    result = module.run_approved_confirmation(
+        output_root=output_root,
+        expected_candidate_sha256=prepared["approval_candidate_sha256"],
+    )
+
+    assert result["state"] == "ready_for_independent_review"
+    assert result["external_send_count"] == 2
+    assert result["turns"] == ["test", "implementation"]
+    assert [
+        arguments[arguments.index("--turn") + 1]
+        for arguments, _ in calls[1:]
+    ] == ["test", "implementation"]
+    for arguments, cwd in calls[1:]:
+        assert cwd == PROJECT_ROOT
+        assert arguments[0] == str(trusted)
+        assert arguments[1] == "claude-implementation-execute"
+        assert arguments[arguments.index("--repository") + 1] == str(
+            output_root / "repository"
+        )
+        assert arguments[arguments.index("--private-root") + 1] == str(
+            output_root / "private"
+        )
+        assert arguments[arguments.index("--run-id") + 1] == RUN_ID
+        assert arguments[arguments.index("--approval-id") + 1] == APPROVAL_ID
+        assert arguments[arguments.index("--manifest-path") + 1] == str(
+            output_root / "start.json"
+        )
+        assert arguments[arguments.index("--manifest-sha256") + 1] == (
+            prepared["configuration_sha256"]
+        )
+    assert (
+        output_root / "private/approval-store/consumed" / f"{APPROVAL_ID}.json"
+    ).is_file()
+    assert (output_root / "machine-completion-receipt.json").is_file()
+
+
+def test_run_approved_confirmation_stops_before_second_turn_on_first_failure(
+    tmp_path,
+    monkeypatch,
+):
+    output_root, prepared = _prepare(tmp_path)
+    module = _module()
+    trusted = tmp_path / "trusted-review-send"
+    trusted.write_text("trusted fixture\n", encoding="utf-8")
+    trusted.chmod(0o755)
+    monkeypatch.setattr(module, "TRUSTED_EXECUTABLE", trusted)
+    payload_turns = []
+
+    def fake_trusted(arguments, cwd):
+        del cwd
+        if arguments == [str(trusted), "--capabilities"]:
+            return {
+                "schema_version": "trusted-review-send-v1",
+                "status": "capabilities",
+                "roles": {
+                    "claude_implementation_executor": {
+                        "model": "from-approved-launch",
+                        "purpose": "claude_implementation_executor",
+                        "topology": "same_session_test_then_implementation",
+                    }
+                },
+            }
+        payload_turns.append(arguments[arguments.index("--turn") + 1])
+        raise module.ConfirmationPreparationStop("claude_process_failed")
+
+    monkeypatch.setattr(module, "_run_trusted_command", fake_trusted)
+
+    try:
+        module.run_approved_confirmation(
+            output_root=output_root,
+            expected_candidate_sha256=prepared["approval_candidate_sha256"],
+        )
+    except module.ConfirmationPreparationStop as error:
+        assert error.code == "claude_process_failed"
+    else:
+        raise AssertionError("failed first turn must stop the run")
+    assert payload_turns == ["test"]
+
+
+def test_run_approved_cli_requires_only_prepared_root_and_candidate_digest(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    module = _module()
+    output_root = tmp_path / "prepared"
+    observed = []
+    monkeypatch.setattr(
+        module,
+        "run_approved_confirmation",
+        lambda **values: observed.append(values)
+        or {
+            "schema_version": 1,
+            "state": "ready_for_independent_review",
+        },
+    )
+
+    exit_code = module.run(
+        [
+            "run-approved",
+            "--output-root",
+            str(output_root),
+            "--candidate-sha256",
+            "a" * 64,
+        ]
+    )
+
+    assert exit_code == 0
+    assert observed == [
+        {
+            "output_root": str(output_root),
+            "expected_candidate_sha256": "a" * 64,
+        }
+    ]
+    assert json.loads(capsys.readouterr().out)["state"] == (
+        "ready_for_independent_review"
+    )
