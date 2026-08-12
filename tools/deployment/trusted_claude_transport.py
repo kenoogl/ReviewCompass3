@@ -21,6 +21,9 @@ EXPECTED_PRIOR_DISPATCH_SHA256 = (
 EXPECTED_EXECUTOR_PRIOR_DISPATCH_SHA256 = (
     "c1586a46d0d39fb681d8265305bbf32533b79afec12d2f13b15c73f7108bd267"
 )
+EXPECTED_MANIFEST_PRIOR_DISPATCH_SHA256 = (
+    "b5f4dfaad2e1472ea9cc6761b0dfc449e24d85bf806fcb8523f27937e17fd24b"
+)
 _SOURCE_DISPATCH = Path(
     "tools/deployment/installed/trusted_review_send_dispatch.py"
 )
@@ -44,6 +47,9 @@ NEW_TRUSTED_RUNTIME_FILES = {
     Path("tools/bootstrap/immutable_result_store.py"),
 }
 EXPECTED_PRIOR_RUNTIME_SHA256 = {
+    Path("tools/development/claude_implementation_executor.py"): (
+        "071ba8d034789ace02d037e5dbe1f1d0429d0fa14d7fd3161d99e031f19e9b49"
+    ),
     Path("tools/development/claude_bootstrap.py"): (
         "14f352afb54353ccac45d84db2ce2a02c7c8a97204c0712651a5bd6218bc4133"
     ),
@@ -157,6 +163,7 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
             source_dispatch_digest,
             EXPECTED_PRIOR_DISPATCH_SHA256,
             EXPECTED_EXECUTOR_PRIOR_DISPATCH_SHA256,
+            EXPECTED_MANIFEST_PRIOR_DISPATCH_SHA256,
         )
         and runtime_files_known
     ):
@@ -280,6 +287,7 @@ def install_trusted_transport(
                 not in (
                     EXPECTED_PRIOR_DISPATCH_SHA256,
                     EXPECTED_EXECUTOR_PRIOR_DISPATCH_SHA256,
+                    EXPECTED_MANIFEST_PRIOR_DISPATCH_SHA256,
                 )
             ):
                 raise ValueError("installed trusted dispatch mismatch")

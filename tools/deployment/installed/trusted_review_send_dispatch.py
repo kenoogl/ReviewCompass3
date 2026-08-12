@@ -108,20 +108,23 @@ def main(argv, *, base_main, base_capabilities):
         return 0
     if arguments and arguments[0] == "claude-implementation-execute":
         if (
-            len(arguments) != 13
+            len(arguments) != 17
             or arguments[1] != "--workspace-root"
             or arguments[3] != "--repository"
             or arguments[5] != "--private-root"
             or arguments[7] != "--run-id"
             or arguments[9] != "--turn"
             or arguments[11] != "--approval-id"
+            or arguments[13] != "--manifest-path"
+            or arguments[15] != "--manifest-sha256"
             or any(
                 not Path(arguments[index]).is_absolute()
-                for index in (2, 4, 6)
+                for index in (2, 4, 6, 14)
             )
             or _IDENTIFIER.fullmatch(arguments[8]) is None
             or arguments[10] not in ("test", "implementation")
             or _IDENTIFIER.fullmatch(arguments[12]) is None
+            or _HEX_64.fullmatch(arguments[16]) is None
         ):
             return _blocked()
         try:
@@ -132,6 +135,8 @@ def main(argv, *, base_main, base_capabilities):
                 arguments[8],
                 arguments[10],
                 arguments[12],
+                Path(arguments[14]),
+                arguments[16],
             )
         except Exception:
             return _blocked()

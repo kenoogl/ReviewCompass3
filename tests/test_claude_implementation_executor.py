@@ -59,6 +59,11 @@ def _write_send_approval(case):
     token.chmod(0o600)
 
 
+def _manifest_arguments(case):
+    path = case.private_root / case.run_id / "configuration/start.json"
+    return path, route_test._sha256(path.read_bytes())
+
+
 def _prepared_case(tmp_path, *, approval=True):
     route = route_test._route()
     case = route_test._create_case(tmp_path)
@@ -210,6 +215,7 @@ def test_executor_runs_two_fixed_turns_and_core_becomes_ready_for_review(
         case.run_id,
         "test",
         APPROVAL_ID,
+        *_manifest_arguments(case),
     )
     second = executor.execute_turn(
         case.repository,
@@ -217,6 +223,7 @@ def test_executor_runs_two_fixed_turns_and_core_becomes_ready_for_review(
         case.run_id,
         "implementation",
         APPROVAL_ID,
+        *_manifest_arguments(case),
     )
 
     assert first["state"] == "ready_for_implementation_turn"
@@ -277,6 +284,7 @@ def test_executor_preserves_provider_raw_and_normalizes_tool_use(
         case.run_id,
         "test",
         APPROVAL_ID,
+        *_manifest_arguments(case),
     )
 
     execution = result["execution"]
@@ -328,6 +336,7 @@ def test_executor_stops_invalid_provider_results_before_core_ingest(
             case.run_id,
             "test",
             APPROVAL_ID,
+            *_manifest_arguments(case),
         )
 
     assert caught.value.code == stop_code
@@ -371,6 +380,7 @@ def test_executor_rejects_read_tools_outside_worktree(
             case.run_id,
             "test",
             APPROVAL_ID,
+            *_manifest_arguments(case),
         )
 
     assert caught.value.code == "administrator_boundary_violation"
@@ -398,6 +408,7 @@ def test_executor_rejects_unapproved_prompt_before_any_process(
             case.run_id,
             "test",
             APPROVAL_ID,
+            *_manifest_arguments(case),
         )
 
     assert caught.value.code == "launch_request_invalid"
@@ -420,6 +431,7 @@ def test_executor_rejects_api_key_environment_before_any_process(
             case.run_id,
             "test",
             APPROVAL_ID,
+            *_manifest_arguments(case),
         )
 
     assert caught.value.code == "api_key_environment_forbidden"
@@ -441,7 +453,32 @@ def test_executor_requires_separate_one_time_send_approval_before_any_process(
             case.run_id,
             "test",
             APPROVAL_ID,
+            *_manifest_arguments(case),
         )
 
     assert caught.value.code == "external_send_approval_required"
+    assert fake.calls == []
+
+
+def test_executor_rejects_manifest_mismatch_before_any_process(
+    tmp_path,
+    monkeypatch,
+):
+    executor = _executor()
+    _, case = _prepared_case(tmp_path)
+    fake = _install_fake(monkeypatch, executor, case)
+    manifest_path, _ = _manifest_arguments(case)
+
+    with pytest.raises(executor.ExecutorStop) as caught:
+        executor.execute_turn(
+            case.repository,
+            case.private_root,
+            case.run_id,
+            "test",
+            APPROVAL_ID,
+            manifest_path,
+            "0" * 64,
+        )
+
+    assert caught.value.code == "manifest_mismatch"
     assert fake.calls == []

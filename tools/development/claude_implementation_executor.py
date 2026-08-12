@@ -48,6 +48,7 @@ FORBIDDEN_AUTH_ENVIRONMENT = (
     "AWS_BEARER_TOKEN_BEDROCK",
 )
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+_SHA256 = re.compile(r"[0-9a-f]{64}")
 
 
 class _SubprocessFacade:
@@ -425,7 +426,15 @@ def _arguments(config, launch, worktree, session_id, turn):
     return [*base, "--resume", session_id, launch["prompt"]]
 
 
-def _execute_approved_turn(repository, private_root, run_id, turn, approval_id):
+def _execute_approved_turn(
+    repository,
+    private_root,
+    run_id,
+    turn,
+    approval_id,
+    manifest_path,
+    manifest_sha256,
+):
     repository = Path(repository).resolve()
     private_root = Path(private_root).resolve()
     if turn not in ("test", "implementation"):
@@ -437,6 +446,24 @@ def _execute_approved_turn(repository, private_root, run_id, turn, approval_id):
         config_path,
         "run_not_found",
     )
+    manifest_path = Path(manifest_path)
+    if (
+        not manifest_path.is_absolute()
+        or manifest_path.is_symlink()
+        or _SHA256.fullmatch(manifest_sha256 or "") is None
+    ):
+        _stop("manifest_mismatch")
+    _read_canonical_json(manifest_path, "manifest_mismatch")
+    try:
+        manifest_bytes = manifest_path.read_bytes()
+        config_bytes = config_path.read_bytes()
+    except OSError:
+        _stop("manifest_mismatch")
+    if (
+        manifest_bytes != config_bytes
+        or sha256_hex(manifest_bytes) != manifest_sha256
+    ):
+        _stop("manifest_mismatch")
     launch_path = run_root / "launch" / f"{turn}.json"
     launch = _read_canonical_json(launch_path, "launch_request_invalid")
     expected_state = (
@@ -601,7 +628,15 @@ def _consume_claimed_approval(private_root, approval_id):
     )
 
 
-def execute_turn(repository, private_root, run_id, turn, approval_id):
+def execute_turn(
+    repository,
+    private_root,
+    run_id,
+    turn,
+    approval_id,
+    manifest_path,
+    manifest_sha256,
+):
     private_root = Path(private_root).resolve()
     try:
         result = _execute_approved_turn(
@@ -610,6 +645,8 @@ def execute_turn(repository, private_root, run_id, turn, approval_id):
             run_id,
             turn,
             approval_id,
+            manifest_path,
+            manifest_sha256,
         )
     except ExecutorStop:
         execution_root = private_root / run_id / "executor" / turn

@@ -201,6 +201,7 @@ def test_dispatch_executes_one_fixed_claude_implementation_turn(
     monkeypatch.setattr(module, "_load_executor", lambda root: fake_executor)
     repository = tmp_path / "repository"
     private_root = tmp_path / "private"
+    manifest = tmp_path / "start.json"
 
     exit_code = module.main(
         [
@@ -217,6 +218,10 @@ def test_dispatch_executes_one_fixed_claude_implementation_turn(
             "test",
             "--approval-id",
             "RC3-CD-SEND-APPROVAL-001",
+            "--manifest-path",
+            str(manifest),
+            "--manifest-sha256",
+            "a" * 64,
         ],
         base_main=lambda argv: 99,
         base_capabilities=lambda: {},
@@ -234,6 +239,8 @@ def test_dispatch_executes_one_fixed_claude_implementation_turn(
             "run-001",
             "test",
             "RC3-CD-SEND-APPROVAL-001",
+            manifest,
+            "a" * 64,
         )
     ]
 
@@ -265,6 +272,10 @@ def test_dispatch_blocks_invalid_execute_arguments_before_loading(
             "review",
             "--approval-id",
             "RC3-CD-SEND-APPROVAL-001",
+            "--manifest-path",
+            str(tmp_path / "start.json"),
+            "--manifest-sha256",
+            "a" * 64,
         ],
         base_main=lambda argv: 99,
         base_capabilities=lambda: {},
