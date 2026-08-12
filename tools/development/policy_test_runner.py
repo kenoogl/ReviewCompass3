@@ -27,6 +27,16 @@ class TestEnvironmentUnavailable(Exception):
     """設定されたTest環境を利用できない。"""
 
 
+TEST_ENVIRONMENT_EXCLUDED_NAMES = (
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_FOUNDRY_API_KEY",
+    "ANTHROPIC_VERTEX_PROJECT_ID",
+    "AWS_BEARER_TOKEN_BEDROCK",
+)
+
+
 @dataclasses.dataclass(frozen=True)
 class TestExecution:
     status: str
@@ -85,6 +95,7 @@ def load_config(path):
         "runner_version",
         "python",
         "pytest",
+        "test_environment_excluded_names",
         "suites",
         "fallback",
         "receipt_required",
@@ -95,12 +106,20 @@ def load_config(path):
         )
     if (
         config["runner_id"] != "RC3-DEVELOPMENT-TEST-RUNNER"
-        or config["runner_version"] < 1
+        or config["runner_version"] != 2
         or config["fallback"] != "forbidden"
         or config["receipt_required"] is not True
     ):
         raise TestRunnerPolicyError(
             "Test runner policy identity or safety boundary is invalid"
+        )
+    excluded_names = config["test_environment_excluded_names"]
+    if (
+        not isinstance(excluded_names, list)
+        or tuple(excluded_names) != TEST_ENVIRONMENT_EXCLUDED_NAMES
+    ):
+        raise TestRunnerPolicyError(
+            "Test runner environment exclusions are invalid"
         )
     for suite, command in config["suites"].items():
         if (
@@ -279,16 +298,19 @@ def execute(
         project_root,
         excluded_paths=(receipt_output, summary_output),
     )
+    test_environment = dict(os.environ)
+    for name in config["test_environment_excluded_names"]:
+        test_environment.pop(name, None)
+    test_environment[pytest_summary.SUMMARY_ENVIRONMENT_VARIABLE] = str(
+        summary_output
+    )
     try:
         test_result = run(
             list(command),
             cwd=project_root,
             capture_output=True,
             text=True,
-            env=dict(
-                os.environ,
-                **{pytest_summary.SUMMARY_ENVIRONMENT_VARIABLE: str(summary_output)},
-            ),
+            env=test_environment,
         )
         try:
             test_summary = pytest_summary.read_summary(summary_output)

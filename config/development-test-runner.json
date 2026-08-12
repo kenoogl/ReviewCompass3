@@ -1,6 +1,6 @@
 {
   "runner_id": "RC3-DEVELOPMENT-TEST-RUNNER",
-  "runner_version": 1,
+  "runner_version": 2,
   "python": {
     "command": ".venv/bin/python3",
     "minimum_version": "3.9",
@@ -10,6 +10,14 @@
     "minimum_version": "8.4",
     "maximum_exclusive_version": "9.0"
   },
+  "test_environment_excluded_names": [
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_FOUNDRY_API_KEY",
+    "ANTHROPIC_VERTEX_PROJECT_ID",
+    "AWS_BEARER_TOKEN_BEDROCK"
+  ],
   "suites": {
     "full": [
       ".venv/bin/python3",
