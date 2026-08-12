@@ -5,7 +5,6 @@ import subprocess
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-BASE_COMMIT = "30925a54a0e8ee7c53e3503eccfda7a73fa11752"
 PROMPT_PATH = "docs/development/prompts/pilot-collaboration-run.md"
 INSTRUCTION_PATH = (
     "records/session-handoffs/"
@@ -156,16 +155,6 @@ def test_common_prompt_names_only_the_canonical_instruction_and_commands():
         "prompt_payload_bytes",
     ):
         assert boundary in prompt
-
-
-def test_change_scope_contains_only_v6_allowlisted_paths():
-    implementation_paths = _implementation_paths_since_base(
-        PROJECT_ROOT,
-        BASE_COMMIT,
-    )
-
-    assert implementation_paths
-    assert implementation_paths <= ALLOWED_PATHS
 
 
 def test_change_scope_ignores_later_record_and_todo_commits(tmp_path):

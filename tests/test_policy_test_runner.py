@@ -2,6 +2,7 @@
 
 import importlib
 import json
+import os
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -11,6 +12,14 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config/development-test-runner.json"
 SUMMARY_VARIABLE = "RC3_TEST_SUMMARY_PATH"
+EXCLUDED_TEST_ENVIRONMENT_NAMES = (
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_FOUNDRY_API_KEY",
+    "ANTHROPIC_VERTEX_PROJECT_ID",
+    "AWS_BEARER_TOKEN_BEDROCK",
+)
 
 
 def _write_summary(environment, *, passed, failed=0):
@@ -113,6 +122,44 @@ def test_runner_performs_preflight_test_and_writes_verification_receipt(
     assert receipt["fallback_used"] is False
     assert len(receipt["config_digest"]) == 64
     assert len(receipt["source_state_digest"]) == 64
+
+
+def test_full_suite_child_environment_excludes_fixed_auth_names(
+    runner,
+    tmp_path,
+    monkeypatch,
+):
+    config = runner.load_config(CONFIG_PATH)
+    child_environment = {}
+    for name in EXCLUDED_TEST_ENVIRONMENT_NAMES:
+        monkeypatch.setenv(name, "test-presence-marker")
+    monkeypatch.setenv("RC3_TEST_BENIGN", "preserved")
+
+    def fake_run(command, **kwargs):
+        prepared = _preflight(command)
+        if prepared is not None:
+            return prepared
+        child_environment.update(kwargs["env"])
+        _write_summary(kwargs["env"], passed=1)
+        return SimpleNamespace(returncode=0, stdout="1 passed\n", stderr="")
+
+    runner.execute(
+        config=config,
+        project_root=PROJECT_ROOT,
+        suite="full",
+        receipt_path=tmp_path / "isolated.json",
+        locate=lambda command: "/usr/bin/python3",
+        run=fake_run,
+    )
+
+    assert not set(EXCLUDED_TEST_ENVIRONMENT_NAMES) & set(child_environment)
+    assert child_environment["RC3_TEST_BENIGN"] == "preserved"
+    assert child_environment[SUMMARY_VARIABLE]
+    assert tuple(config["test_environment_excluded_names"]) == (
+        EXCLUDED_TEST_ENVIRONMENT_NAMES
+    )
+    for name in EXCLUDED_TEST_ENVIRONMENT_NAMES:
+        assert os.environ[name] == "test-presence-marker"
 
 
 def test_runner_records_failed_test_without_reclassifying_environment(
