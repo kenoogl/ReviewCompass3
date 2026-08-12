@@ -57,7 +57,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：文書だけの変更。TODO引継ぎの単一検証入口を、最終追加前に単独実行する。
+- 直近の関連Test：`python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`を単独実行し、終了コード0、`passed`。
 - 直近の全Test：文書だけの変更のため実行しない。第1段独立完了レビューの合格を段完了根拠とする。
 - 差分検査：`git diff --check`合格
 
