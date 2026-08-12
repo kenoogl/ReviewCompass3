@@ -164,6 +164,45 @@ def test_full_suite_child_environment_excludes_fixed_auth_names(
         assert os.environ[name] == "test-presence-marker"
 
 
+def test_full_suite_uses_temporary_bytecode_cache_outside_project(
+    runner,
+    tmp_path,
+    monkeypatch,
+):
+    config = runner.load_config(CONFIG_PATH)
+    inherited_cache = tmp_path / "inherited-cache"
+    inherited_cache.mkdir()
+    monkeypatch.setenv("PYTHONPYCACHEPREFIX", str(inherited_cache))
+    observed = {}
+
+    def fake_run(command, **kwargs):
+        prepared = _preflight(command)
+        if prepared is not None:
+            return prepared
+        cache_path = Path(kwargs["env"]["PYTHONPYCACHEPREFIX"])
+        observed["path"] = cache_path
+        observed["exists_during_run"] = cache_path.is_dir()
+        _write_summary(kwargs["env"], passed=1)
+        return SimpleNamespace(returncode=0, stdout="1 passed\n", stderr="")
+
+    runner.execute(
+        config=config,
+        project_root=PROJECT_ROOT,
+        suite="full",
+        receipt_path=tmp_path / "isolated-cache.json",
+        locate=lambda command: "/usr/bin/python3",
+        run=fake_run,
+    )
+
+    cache_path = observed["path"]
+    assert cache_path != inherited_cache
+    assert cache_path.is_absolute()
+    assert cache_path != PROJECT_ROOT and PROJECT_ROOT not in cache_path.parents
+    assert observed["exists_during_run"] is True
+    assert not cache_path.exists()
+    assert os.environ["PYTHONPYCACHEPREFIX"] == str(inherited_cache)
+
+
 def test_runner_records_failed_test_without_reclassifying_environment(
     runner,
     tmp_path,
