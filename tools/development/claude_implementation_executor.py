@@ -390,11 +390,10 @@ def _session_id(run_root, turn):
 
 def _arguments(config, launch, worktree, session_id, turn):
     runtime = config["claude_runtime"]
-    allowed_path = worktree / config["allowed_paths"][turn][0]
+    allowed_path = config["allowed_paths"][turn][0]
     allowed_rules = (
         "Read(/**)",
-        f"Edit({allowed_path})",
-        f"Write({allowed_path})",
+        f"Edit(/{allowed_path})",
     )
     base = [
         runtime["executable"],

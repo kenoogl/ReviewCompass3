@@ -48,7 +48,7 @@ NEW_TRUSTED_RUNTIME_FILES = {
 }
 EXPECTED_PRIOR_RUNTIME_SHA256 = {
     Path("tools/development/claude_implementation_executor.py"): (
-        "071ba8d034789ace02d037e5dbe1f1d0429d0fa14d7fd3161d99e031f19e9b49"
+        "2ae3fb729aab775566ae6362a9b1f815c0c607d4bd691b1d7ec6cbc49acabfe2"
     ),
     Path("tools/development/claude_bootstrap.py"): (
         "14f352afb54353ccac45d84db2ce2a02c7c8a97204c0712651a5bd6218bc4133"

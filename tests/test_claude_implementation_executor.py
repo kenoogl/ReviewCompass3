@@ -246,10 +246,16 @@ def test_executor_runs_two_fixed_turns_and_core_becomes_ready_for_review(
         "Read,Glob,Grep,Edit,Write"
     )
     allowed_index = first_arguments.index("--allowedTools")
-    assert first_arguments[allowed_index + 1:allowed_index + 4] == [
+    assert first_arguments[allowed_index + 1:allowed_index + 3] == [
         "Read(/**)",
-        f"Edit({case.worktree / route_test.TEST_PATH})",
-        f"Write({case.worktree / route_test.TEST_PATH})",
+        f"Edit(/{route_test.TEST_PATH})",
+    ]
+    second_allowed_index = second_arguments.index("--allowedTools")
+    assert second_arguments[
+        second_allowed_index + 1:second_allowed_index + 3
+    ] == [
+        "Read(/**)",
+        f"Edit(/{route_test.PRODUCTION_PATH})",
     ]
     disallowed_index = first_arguments.index("--disallowedTools")
     assert first_arguments[disallowed_index + 1:disallowed_index + 8] == list(
