@@ -47,6 +47,9 @@ NEW_TRUSTED_RUNTIME_FILES = {
     Path("tools/bootstrap/immutable_result_store.py"),
 }
 EXPECTED_PRIOR_RUNTIME_SHA256 = {
+    Path("tools/development/claude_implementation_route.py"): (
+        "2e31ea2f7ac6c1d4265743af155485c90522e212620bc9f1cfea78d4a37e059f",
+    ),
     Path("tools/development/claude_implementation_executor.py"): (
         "395f7f9c2e368610a2980c36c96f1910729c51a9472e19ddd53fc8b4c38fa84e",
         "b4c4ef538e74a3310176216cdbd5dd23efd6bc9c6b74556899ca740c6f07821b",
