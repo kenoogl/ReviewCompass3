@@ -203,6 +203,50 @@ def test_full_suite_uses_temporary_bytecode_cache_outside_project(
     assert os.environ["PYTHONPYCACHEPREFIX"] == str(inherited_cache)
 
 
+def test_preflight_uses_temporary_bytecode_cache_outside_project(
+    runner,
+    tmp_path,
+):
+    config = runner.load_config(CONFIG_PATH)
+    observed = []
+
+    def fake_run(command, **kwargs):
+        environment = kwargs.get("env")
+        cache_path = (
+            Path(environment["PYTHONPYCACHEPREFIX"])
+            if environment is not None
+            else None
+        )
+        observed.append(
+            {
+                "path": cache_path,
+                "exists_during_run": cache_path is not None and cache_path.is_dir(),
+            }
+        )
+        prepared = _preflight(command)
+        if prepared is not None:
+            return prepared
+        _write_summary(environment, passed=1)
+        return SimpleNamespace(returncode=0, stdout="1 passed\n", stderr="")
+
+    runner.execute(
+        config=config,
+        project_root=PROJECT_ROOT,
+        suite="full",
+        receipt_path=tmp_path / "preflight-cache.json",
+        locate=lambda command: "/usr/bin/python3",
+        run=fake_run,
+    )
+
+    assert len(observed) == 3
+    for call in observed:
+        cache_path = call["path"]
+        assert cache_path is not None and cache_path.is_absolute()
+        assert cache_path != PROJECT_ROOT and PROJECT_ROOT not in cache_path.parents
+        assert call["exists_during_run"] is True
+        assert not cache_path.exists()
+
+
 def test_runner_records_failed_test_without_reclassifying_environment(
     runner,
     tmp_path,
