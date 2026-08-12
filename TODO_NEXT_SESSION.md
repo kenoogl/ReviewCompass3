@@ -1,54 +1,51 @@
 # TODO_NEXT_SESSION
 
-更新日：2026-08-12
+更新日：2026-08-13
 
 > 人向けの現在位置入口。Workflow stateと完了Evidenceの正本ではない。
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段は完了した。第2段は公式全試験15件失敗により停止しており、その原因を分離して公式試験入口を正常化する作業が開始承認済みである。
-- 現在作業：承認済み軽量作業票v1に従い、試験3 fileだけで環境分離のREDを固定し、期限付き3件を恒久検査から分離する。
+- 全体：立て直し計画v5の第1段は完了。第2段は四領域の採用候補が受け入れ済みで、公式試験入口は復旧済み。必須条件だったPython 3.13移行も完了し、第2段の完了判断待ちである。
+- 現在作業：Python 3.13移行の完了判断を固定し、引継ぎを現在状態へ更新する。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`：`registered`、影響：公式試験入口の合否判定を変更するため、試験を弱めると誤合格の危険がある、次：承認済みの試験3 fileだけで修正前後を区別するREDを固定し、GREEN中は変更しない
+- `ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`：`registered`、影響：未レビューの守り役コードと既知の静的Git検査の見逃しは、第2段の保証根拠に使えない、次：第2段完了作業で保証外と使用停止を維持し、一括修正は開始しない
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `c57336dd2df961e6fe65b8f7c46665db6bce8e0df66111fc90796398a48dd812`
-- [第2段採用表候補v1](records/development/2026-08-12-stage2-minimum-trust-foundation-adoption-table-candidate-v1.md) — SHA-256 `f8749c543da4753b4e357375241b40b144cbd26edf831437048b2589fa873121`
-- [公式試験入口正常化の軽量作業票v1](docs/development/2026-08-12-stage2-official-test-entry-restoration-bootstrap-work-ticket-v1.md) — SHA-256 `5af82a43c618481e08abf398abdc50d289388eb1388da9aa58ae0ee9a4d1d00f`
-- [独立開始前レビューv1](records/development/2026-08-12-stage2-official-test-entry-restoration-bootstrap-start-review-v1.md) — SHA-256 `5dc23327f1072fd5438ca8ff2e2c22634f4257dd8970426471f69696be3a80ad`
-- [開始判断v1](records/development/2026-08-12-stage2-official-test-entry-restoration-start-decision-v1.md) — SHA-256 `d1477c89f14cc05674ac9787fe887e544e638f4d9449431c1ffbe4a536c274c6`
+- [第2段最小信頼基盤の再判定・利用者判断v1](records/development/2026-08-13-stage2-minimum-trust-foundation-reassessment-decision-v1.md) — SHA-256 `6ecd6ae710edefdefe5d7d6ca18aa9ddb98895f2122cef3eee6e167b4e3dabfb`
+- [Python 3.13キャッシュ過剰対応の回復証跡v1](records/development/2026-08-13-python-313-pycache-overengineering-recovery-evidence-v1.md) — SHA-256 `1d0b2804a883a93fb85cf0322fecc4d5f2e84cb2410dad9e92c3db4250c97e3a`
+- [Python 3.13開発環境移行完了判断v1](records/development/2026-08-13-python-313-development-environment-migration-completion-decision-v1.md) — SHA-256 `0394afcbf3cda411df9582222e0301105f03aac2508ad25f475125feda2449e2`
 
 ## 次に行う一作業
 
-試験3 fileだけを変更し、公式試験入口が認証・接続用の6変数を子処理へ渡す現行動作を新しい試験で失敗させ、期限付き3件を恒久検査から分離する。
+四領域の採用、使用停止範囲、未確認範囲を現在状態で確認し、第2段の完了候補を利用者判断へ渡す。
 
 開始条件：
 
-- 開始判断v1が作業票、独立開始前レビュー、利用者承認へ結び付いていること
-- 試験3 file以外に未コミット差分がなく、設定と実装が未変更であること
-- 新しい試験が6名の除外、無害な環境の維持、親処理の不変を検査すること
+- Python 3.13移行完了判断と本引継ぎが同じ意味単位でcommitされ、作業ツリーがcleanである
+- 外部実装経路の使用停止と、既知の静的Git検査を保証根拠に使わない判断を維持する
 
 完了条件：
 
-- 新しい環境分離試験だけが修正前実装を理由に失敗し、同じfileの他試験が成功すること
-- 期限付き3件の削除または縮小後も、固定基準再生成、egress 6 file、使い捨てGitの禁止path検出が残ること
-- 試験3 fileだけが意味的に完結したRED commitへ固定されること
+- 履歴保存、開発コード管理、テストコード管理、レビューの四領域について、現役入口、案内導線、代表正常処理、採用理由、未確認範囲が確定する
+- 外部実装経路と既知の静的Git検査の扱いを広げず、既存の独立レビュー結果と現在の証跡を対応付け、利用者の段完了判断を証跡に残す
 
-後続作業：RED commit後、版付き設定と公式試験入口を実装し、RED試験を変更せず関連試験と公式全試験を正常終了させる。
+後続作業：第3段を開始し、1,338件以降に増えた試験を機械列挙したうえで、最初の低危険度の一整理単位を実際に削減する
 
 ## blocker・Human判断待ち
 
-- blocker：なし。独立開始前レビューは開始可で、利用者が固定範囲の実装開始を承認済み。
-- Human判断待ち：現在作業の開始についてはなし。独立完了レビュー後に、テストコード管理候補の採用と第2段へ戻る判断が必要。
+- blocker：なし
+- Human判断待ち：第2段の四領域と段完了の最終判断
 
 ## stale・deferred
 
-- stale：独立開始前レビュー待ちとする旧TODO表示は、開始前レビューと開始判断v1により失効した。
-- deferred：Python 3.13移行、第2段採用表の更新、重大な欠陥12件の修復、外部送信・認証・応答解析・配置、第3段以降は未開始。
+- stale：旧TODOの公式全試験15件失敗、Python 3.9.6、環境分離RED開始前という現在位置は、復旧とPython 3.13移行完了により失効した
+- deferred：外部実装経路の再開とその前の保証範囲再裁定、選択入口が依存しない重大な欠陥の修復、第3段以降
 
 ## Git・Test
 
@@ -56,8 +53,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：6変数を当該処理だけから外したexecutor試験は28件成功。期限付き3件は同じ隔離状態でも3件失敗し、残す恒久検査3件は成功。
-- 直近の全Test：公式入口は1,736件中1,721件成功、15件失敗、終了コード1。GREENで同じ正規入口を再実行する。
+- 直近の関連Test：キャッシュ回復後の関連4ファイル93件成功、終了コード0
+- 直近の全Test：独立した公式入口で1,736件成功、失敗・エラー・除外0、Python 3.13.14、代替実行なし、終了コード0
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
