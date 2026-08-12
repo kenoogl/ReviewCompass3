@@ -6,50 +6,49 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段は完了した。第2段『最小信頼基盤を選び、既存資産を評価する』は、軽量作業票v1への利用者承認を得て開始可能になった。
-- 現在作業：承認済み第2段軽量作業票v1の範囲で、四領域の採用表候補一件を作成する。
+- 全体：立て直し計画v5の第1段は完了した。第2段は採用表候補を作成したが、公式全試験15件失敗によりテストコード管理が保留となり、段完了前で停止している。
+- 現在作業：第2段の公式試験入口を正常化する軽量作業票v1を固定し、危険度highの独立開始前レビューへ渡す。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`：`registered`、影響：未レビューの守り役コードへ依存する入口を最小信頼基盤として選ぶと、誤合格の危険がある、次：選定候補から未修正の重大な欠陥への依存だけを機械確認し、依存する候補を採用候補にしない
+- `ISSUE-UNREVIEWED-WORK-REVIEW-BACKLOG-001`：`registered`、影響：公式試験入口を変更する際、合否判定の安全境界を弱めると誤合格の危険がある、次：変更可能pathと既存試験変更の意味を軽量作業票へ固定し、異なる実行単位が開始前に確認する
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `c57336dd2df961e6fe65b8f7c46665db6bce8e0df66111fc90796398a48dd812`
-- [第1段現在位置・利用経路表v1](records/development/2026-08-12-stage1-current-position-and-active-routes-v1.md) — SHA-256 `8b5668243831a0f4d87783fab1fc540a2c7cf6874826f0032f00df820a5e3efd`
-- [第2段軽量作業票v1](docs/development/2026-08-12-stage2-minimum-trust-foundation-bootstrap-work-ticket-v1.md) — SHA-256 `6d9dfeab0fcf4394eef5a73c61171dce935133de7cce4757605eef2e295c621a`
-- [第2段開始承認判断v1](records/development/2026-08-12-stage2-minimum-trust-foundation-start-decision-v1.md) — SHA-256 `0fd490a6d303a0a1b7dc49ac8d1e8fc54b4a8a043c9c19ee19965deabe0f121a`
+- [第2段採用表候補v1](records/development/2026-08-12-stage2-minimum-trust-foundation-adoption-table-candidate-v1.md) — SHA-256 `f8749c543da4753b4e357375241b40b144cbd26edf831437048b2589fa873121`
+- [第2段修正後確認v1](records/development/2026-08-12-stage2-minimum-trust-foundation-post-fix-review-v1.md) — SHA-256 `763e09d72dc7f2595b1042e05e204a5242d1392b966302c20f730f88d2213cdd`
+- [公式試験入口正常化の軽量作業票v1](docs/development/2026-08-12-stage2-official-test-entry-restoration-bootstrap-work-ticket-v1.md) — SHA-256 `5af82a43c618481e08abf398abdc50d289388eb1388da9aa58ae0ee9a4d1d00f`
 - [未レビューコード課題の正本](.reviewcompass/workflow/issues-v4/issue-unreviewed-work-review-backlog-001--v1.json) — SHA-256 `a23f7c20101e610d7b828079b93f57f1d80cb6c7015f9408be3661e0ead00e14`
 
 ## 次に行う一作業
 
-承認済み作業票の固定範囲だけで、履歴保存、開発コード管理、テストコード管理、レビューの採用表候補一件を作成し、意味的に完結したコミットへ固定する。
+作業担当と異なる実行単位が、公式試験入口正常化の軽量作業票v1を変更せずに一回だけ開始前レビューする。
 
 開始条件：
 
-- 開始承認判断が作業票v1とそのSHA-256へ結び付いていること
-- 基準コミット、固定入力9件、四つの比較元、成果物未作成が一致していること
-- コード、試験、設定、Python環境を変更せず、候補全体を16件以内に限定すること
+- 軽量作業票v1が基準コミット、固定入力、変更可能path、REDとGREEN、停止条件へ結び付いていること
+- 危険度high、既存試験3件の意味変更、版付き設定への項目追加が明示されていること
+- 作業票とTODOだけが未コミット差分であり、コード、試験、設定が未変更であること
 
 完了条件：
 
-- 四領域すべてに責務、候補、五条件の判定、提案状態、根拠、未確認範囲があること
-- 各領域の選定候補について代表正常処理を一例だけ確認すること
-- 重大な欠陥への依存とPython 3.13移行候補の位置付けを示すこと
-- 対象外変更がなく、成果物一件が意味的に完結したコミットへ固定されること
+- 開始前レビューが計画v5第6章の最小項目を持つ一件の記録へ固定されること
+- 判定が開始可または修正要で、環境分離、期限付き試験、Python 3.13との分離を根拠付きで示すこと
+- 利用者による実装開始判断とその対象が明示されること
 
-後続作業：作業担当と異なる実行単位が、成果物を変更せず一回の独立完了レビューを行う。
+後続作業：開始可の場合、利用者が既存試験3件の整理と版付き設定項目追加を含む実装開始を判断する。修正要の場合、作業票を直して一回だけ再確認する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。第2段の開始承認済み。
-- Human判断待ち：現在作業の開始についてはなし。独立完了レビュー後に四領域の採否と第2段完了判断が必要。
+- blocker：公式全試験は15件失敗しており、第2段のテストコード管理候補と段完了は保留中。開始前レビュー自体を妨げるものはない。
+- Human判断待ち：独立開始前レビュー後に、既存試験3件の整理、設定版2と環境除外項目の追加、RED開始を承認するか判断する。
 
 ## stale・deferred
 
-- stale：第2段の開始確認待ちとする旧TODO表示は、開始承認判断v1により失効した。
-- deferred：未完了の外部送信・認証・応答解析・配置更新は使用停止を維持する。重大な欠陥12件の一括修復、コードと試験の整理、正式な作業契約の導入、第3段以降は未開始。Python 3.13移行は位置付けだけを評価し、移行自体は別作業とする。
+- stale：第2段の採用表候補作成中とする旧TODO表示は、採用表候補と修正後確認の各コミットにより失効した。
+- deferred：Python 3.13移行は公式試験入口を現行3.9で正常化した後の別作業とする。重大な欠陥12件の修復、外部送信・認証・応答解析・配置、第3段以降は未開始。
 
 ## Git・Test
 
@@ -57,8 +56,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：`python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`を単独実行し、終了コード0、`passed`。
-- 直近の全Test：開始判断と引継ぎ文書だけの変更のため実行しない。第2段本作業の代表正常処理として後続で公式全試験を一回実行する。
+- 直近の関連Test：認証・接続用の6環境変数を当該処理だけから外したexecutor試験は28件成功、終了コード0。期限付き3件の隔離実行は3件失敗、終了コード1。
+- 直近の全Test：公式入口は1,736件中1,721件成功、15件失敗、終了コード1。結果記録SHA-256は `cd482d418928f3956f8d70340cc039b3f2c7e4ea8e79d3ee0243ff884600d686`。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
