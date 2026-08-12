@@ -1,5 +1,10 @@
 # Python 3.13開発環境移行 軽量作業票 v5
 
+> **後続訂正（2026-08-13）**
+> 本作業票の一時キャッシュ隔離案は過剰と判断し、取り下げた。現在の判断と回復結果は
+> `records/development/2026-08-13-python-313-pycache-overengineering-recovery-evidence-v1.md`を参照する。
+> 以下は訂正前の経過を保存したもので、実装指示として使わない。
+
 - 作業票ID：`BTW-PYTHON-313-DEVELOPMENT-ENVIRONMENT-MIGRATION-001`
 - 作成日：2026-08-13
 - 状態：`awaiting_correction_review`

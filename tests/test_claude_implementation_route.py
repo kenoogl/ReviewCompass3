@@ -188,6 +188,7 @@ def _create_case(tmp_path):
     repository = tmp_path / "repository"
     repository.mkdir()
     files = {
+        ".gitignore": b"__pycache__/\n",
         INSTRUCTION_PATH: b"Add a deterministic double function.\n",
         MATERIAL_PATH: b"double(4) must return 8.\n",
         "README.md": b"synthetic acceptance repository\n",

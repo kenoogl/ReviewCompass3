@@ -14,7 +14,6 @@ import os
 import re
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
 
 from tools.development import pytest_summary
@@ -182,29 +181,18 @@ def _source_state_digest(project_root, *, excluded_paths=()):
     return digest.hexdigest()
 
 
-def _run_checked(run, command, *, project_root, failure, environment):
+def _run_checked(run, command, *, project_root, failure):
     result = run(
         list(command),
         cwd=project_root,
         capture_output=True,
         text=True,
-        env=environment,
     )
     if result.returncode != 0:
         raise TestEnvironmentUnavailable(
             f"test_environment_unavailable: {failure}"
         )
     return result
-
-
-def _require_cache_outside_project(cache_path, project_root):
-    try:
-        cache_path.relative_to(project_root)
-    except ValueError:
-        return
-    raise TestRunnerPolicyError(
-        "test_cache_path_invalid: cache must be outside project"
-    )
 
 
 #: receiptの置き場所として許す領域（project root相対）。
@@ -265,41 +253,30 @@ def execute(
             "test_environment_unavailable: configured_python_missing"
         )
 
-    with tempfile.TemporaryDirectory(
-        prefix="reviewcompass-policy-test-preflight-cache-"
-    ) as temporary_preflight_cache:
-        preflight_cache_path = Path(temporary_preflight_cache).resolve()
-        _require_cache_outside_project(preflight_cache_path, project_root)
-        preflight_environment = dict(os.environ)
-        preflight_environment["PYTHONPYCACHEPREFIX"] = str(
-            preflight_cache_path
-        )
-        python_result = _run_checked(
-            run,
-            (python_command, "--version"),
-            project_root=project_root,
-            failure="python_preflight_failed",
-            environment=preflight_environment,
-        )
-        python_output = python_result.stdout or python_result.stderr
-        python_version = _check_version(
-            "python",
-            python_output,
-            config["python"],
-        )
-        pytest_result = _run_checked(
-            run,
-            (python_command, "-m", "pytest", "--version"),
-            project_root=project_root,
-            failure="pytest_preflight_failed",
-            environment=preflight_environment,
-        )
-        pytest_output = pytest_result.stdout or pytest_result.stderr
-        pytest_version = _check_version(
-            "pytest",
-            pytest_output,
-            config["pytest"],
-        )
+    python_result = _run_checked(
+        run,
+        (python_command, "--version"),
+        project_root=project_root,
+        failure="python_preflight_failed",
+    )
+    python_output = python_result.stdout or python_result.stderr
+    python_version = _check_version(
+        "python",
+        python_output,
+        config["python"],
+    )
+    pytest_result = _run_checked(
+        run,
+        (python_command, "-m", "pytest", "--version"),
+        project_root=project_root,
+        failure="pytest_preflight_failed",
+    )
+    pytest_output = pytest_result.stdout or pytest_result.stderr
+    pytest_version = _check_version(
+        "pytest",
+        pytest_output,
+        config["pytest"],
+    )
     if receipt_path is None and config["receipt_required"]:
         raise TestRunnerPolicyError(
             "official Test execution requires a receipt path"
@@ -327,27 +304,21 @@ def execute(
     test_environment[pytest_summary.SUMMARY_ENVIRONMENT_VARIABLE] = str(
         summary_output
     )
-    with tempfile.TemporaryDirectory(
-        prefix="reviewcompass-policy-test-cache-"
-    ) as temporary_cache:
-        cache_path = Path(temporary_cache).resolve()
-        _require_cache_outside_project(cache_path, project_root)
-        test_environment["PYTHONPYCACHEPREFIX"] = str(cache_path)
+    try:
+        test_result = run(
+            list(command),
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            env=test_environment,
+        )
         try:
-            test_result = run(
-                list(command),
-                cwd=project_root,
-                capture_output=True,
-                text=True,
-                env=test_environment,
-            )
-            try:
-                test_summary = pytest_summary.read_summary(summary_output)
-            except pytest_summary.TestSummaryError as error:
-                raise TestRunnerPolicyError(str(error)) from error
-        finally:
-            if summary_output.exists():
-                summary_output.unlink()
+            test_summary = pytest_summary.read_summary(summary_output)
+        except pytest_summary.TestSummaryError as error:
+            raise TestRunnerPolicyError(str(error)) from error
+    finally:
+        if summary_output.exists():
+            summary_output.unlink()
 
     status = "passed" if test_result.returncode == 0 else "failed"
     if status == "passed" and (test_summary["failed"] or test_summary["errors"]):

@@ -1,5 +1,11 @@
 # Python 3.13開発環境移行 Evidence v1
 
+> **後続訂正（2026-08-13）**
+> Python 3.13移行の事実は維持するが、本記録の一時キャッシュ隔離案と`verified`候補は取り下げた。
+> 現在の判断と回復結果は
+> `records/development/2026-08-13-python-313-pycache-overengineering-recovery-evidence-v1.md`を参照する。
+> 以下のキャッシュ関連部分は、訂正前の経過として保存する。
+
 - 日付：2026-08-13
 - 作業票ID：`BTW-PYTHON-313-DEVELOPMENT-ENVIRONMENT-MIGRATION-001`
 - 最終作業票：`docs/development/2026-08-13-python-313-development-environment-migration-bootstrap-work-ticket-v5.md`
