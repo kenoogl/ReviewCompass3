@@ -1,12 +1,12 @@
 {
   "environment_id": "RC3-DEVELOPMENT-VENV",
   "environment_version": 1,
-  "base_python": "python3",
+  "base_python": "python3.13",
   "venv_path": ".venv",
   "venv_python": ".venv/bin/python3",
   "python": {
-    "minimum_version": "3.9",
-    "maximum_exclusive_version": "3.10"
+    "minimum_version": "3.13",
+    "maximum_exclusive_version": "3.14"
   },
   "pytest": {
     "exact_version": "8.4.2"
@@ -16,8 +16,8 @@
     "PyYAML": "6.0.3"
   },
   "lock": {
-    "path": "constraints/development-py39.txt",
-    "sha256": "1307ed9075ddcc312697d18114b8f5b594796f047ab5df586e7a7b448058c8f2"
+    "path": "constraints/development-py313.txt",
+    "sha256": "f8d4343c239413d073270441c6882208a60184807b75e0bbc0caa0652bb97db4"
   },
   "toolchain_command": [
     ".venv/bin/python3",
@@ -25,7 +25,7 @@
     "pip",
     "install",
     "--constraint",
-    "constraints/development-py39.txt",
+    "constraints/development-py313.txt",
     "pip==26.0.1",
     "setuptools==80.9.0",
     "wheel==0.45.1"
@@ -36,7 +36,7 @@
     "pip",
     "install",
     "--constraint",
-    "constraints/development-py39.txt",
+    "constraints/development-py313.txt",
     "--no-build-isolation",
     "--editable",
     ".[development]"

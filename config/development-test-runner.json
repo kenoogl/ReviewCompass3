@@ -3,8 +3,8 @@
   "runner_version": 2,
   "python": {
     "command": ".venv/bin/python3",
-    "minimum_version": "3.9",
-    "maximum_exclusive_version": "3.10"
+    "minimum_version": "3.13",
+    "maximum_exclusive_version": "3.14"
   },
   "pytest": {
     "minimum_version": "8.4",
