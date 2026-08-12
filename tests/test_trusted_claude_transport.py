@@ -37,7 +37,13 @@ def test_capabilities_add_only_fixed_claude_bootstrap_role():
         "purpose": "codex-pilot-no-tool-claude-bootstrap",
         "topology": "same_session_two_payload",
     }
+    assert result["roles"]["claude_implementation_executor"] == {
+        "model": "from-approved-launch",
+        "purpose": "claude_implementation_executor",
+        "topology": "same_session_test_then_implementation",
+    }
     assert base["roles"].get("claude_session_bootstrap") is None
+    assert base["roles"].get("claude_implementation_executor") is None
 
 
 def test_dispatch_accepts_only_fixed_claude_inputs(monkeypatch, capsys):
@@ -123,6 +129,150 @@ def test_non_claude_commands_remain_owned_by_existing_trusted_sender():
 
     assert exit_code == 7
     assert calls == [("--manifest", "existing.yaml", "--dry-run")]
+
+
+def test_dispatch_records_fixed_claude_implementation_inputs(
+    tmp_path, monkeypatch, capsys
+):
+    module = _module()
+    calls = []
+    outcome = {"schema_version": 1, "run_id": "run-001", "state": "recorded"}
+    fake_route = types.SimpleNamespace(
+        record_turn=lambda *arguments: calls.append(arguments) or outcome
+    )
+    monkeypatch.setattr(module, "_load_implementation", lambda root: fake_route)
+    repository = tmp_path / "repository"
+    private_root = tmp_path / "private"
+    launch = tmp_path / "launch.json"
+    raw = tmp_path / "raw.json"
+
+    exit_code = module.main(
+        [
+            "claude-implementation-record",
+            "--workspace-root",
+            str(PROJECT_ROOT),
+            "--repository",
+            str(repository),
+            "--private-root",
+            str(private_root),
+            "--run-id",
+            "run-001",
+            "--turn",
+            "implementation",
+            "--launch-record",
+            str(launch),
+            "--raw-file",
+            str(raw),
+        ],
+        base_main=lambda argv: 99,
+        base_capabilities=lambda: {},
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert captured.err == ""
+    assert captured.out.count("\n") == 1
+    assert json.loads(captured.out) == outcome
+    assert calls == [
+        (
+            repository,
+            private_root,
+            "run-001",
+            "implementation",
+            launch,
+            raw,
+        )
+    ]
+
+
+def test_dispatch_blocks_invalid_implementation_arguments_before_loading(
+    tmp_path, monkeypatch, capsys
+):
+    module = _module()
+    loaded = []
+    monkeypatch.setattr(
+        module,
+        "_load_implementation",
+        lambda root: loaded.append(root),
+    )
+
+    exit_code = module.main(
+        [
+            "claude-implementation-record",
+            "--workspace-root",
+            str(PROJECT_ROOT),
+            "--repository",
+            "relative/repository",
+            "--private-root",
+            str(tmp_path / "private"),
+            "--run-id",
+            "run-001",
+            "--turn",
+            "review",
+            "--launch-record",
+            str(tmp_path / "launch.json"),
+            "--raw-file",
+            str(tmp_path / "raw.json"),
+        ],
+        base_main=lambda argv: 99,
+        base_capabilities=lambda: {},
+    )
+
+    assert exit_code == 2
+    assert loaded == []
+    assert json.loads(capsys.readouterr().out) == {
+        "schema_version": 1,
+        "result": "stopped",
+        "stop_code": "trusted_transport_unavailable",
+    }
+
+
+def test_dispatch_blocks_implementation_stop_and_exception_without_detail(
+    tmp_path, monkeypatch, capsys
+):
+    module = _module()
+
+    class FakeStop(Exception):
+        pass
+
+    arguments = [
+        "claude-implementation-record",
+        "--workspace-root",
+        str(PROJECT_ROOT),
+        "--repository",
+        str(tmp_path / "repository"),
+        "--private-root",
+        str(tmp_path / "private"),
+        "--run-id",
+        "run-001",
+        "--turn",
+        "test",
+        "--launch-record",
+        str(tmp_path / "launch.json"),
+        "--raw-file",
+        str(tmp_path / "raw.json"),
+    ]
+    for error in (FakeStop("secret-one"), RuntimeError("secret-two")):
+        fake_route = types.SimpleNamespace(
+            RouteStop=FakeStop,
+            record_turn=lambda *values, current=error: (_ for _ in ()).throw(current),
+        )
+        monkeypatch.setattr(
+            module,
+            "_load_implementation",
+            lambda root, current=fake_route: current,
+        )
+
+        exit_code = module.main(
+            arguments,
+            base_main=lambda argv: 99,
+            base_capabilities=lambda: {},
+        )
+        output = capsys.readouterr().out
+
+        assert exit_code == 2
+        assert "secret" not in output
+        assert json.loads(output)["stop_code"] == "trusted_transport_unavailable"
 
 
 def test_administrator_install_is_fixed_backed_up_and_post_verified(
@@ -287,13 +437,102 @@ def test_administrator_install_updates_only_exact_pinned_prior_runtime(
         effective_user_id=0,
     )
 
-    assert before["state"] == "trusted_runtime_update_required"
     assert result["state"] == "ready"
     for relative in fixture.installer.TRUSTED_RUNTIME_FILES:
         assert (fixture.install_root / relative).read_bytes() == (
             fixture.source_root / relative
         ).read_bytes()
     assert fixture.backup_wrapper.read_bytes() == b"legacy wrapper\n"
+
+
+def test_new_implementation_runtime_and_exact_prior_dispatch_are_upgraded(
+    tmp_path, monkeypatch
+):
+    installer = importlib.import_module(
+        "tools.deployment.trusted_claude_transport"
+    )
+    assert installer.EXPECTED_PRIOR_DISPATCH_SHA256 == (
+        "ee6bf62f8c5e57f1c262176cc92dabffae3f487debcfd04e2f1283b88a362ef7"
+    )
+    assert Path("tools/development/claude_implementation_route.py") in (
+        installer.TRUSTED_RUNTIME_FILES
+    )
+    assert Path("tools/bootstrap/immutable_result_store.py") in (
+        installer.TRUSTED_RUNTIME_FILES
+    )
+
+    source_root = tmp_path / "source"
+    install_root = tmp_path / "installed"
+    source_dispatch = source_root / installer._SOURCE_DISPATCH
+    source_wrapper = source_root / installer._SOURCE_WRAPPER
+    target_dispatch = install_root / installer._TARGET_DISPATCH
+    target_base = install_root / installer._TARGET_BASE
+    target_wrapper = install_root / installer._TARGET_WRAPPER
+    backup_wrapper = install_root / installer._BACKUP_WRAPPER
+    prior_dispatch = b"exact prior dispatch\n"
+    for path, content in (
+        (source_dispatch, b"new dispatch\n"),
+        (source_wrapper, b"current wrapper\n"),
+        (target_dispatch, prior_dispatch),
+        (target_base, b"base\n"),
+        (target_wrapper, b"current wrapper\n"),
+        (backup_wrapper, b"legacy wrapper\n"),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+    new_runtime = {
+        Path("tools/development/claude_implementation_route.py"),
+        Path("tools/bootstrap/immutable_result_store.py"),
+    }
+    prior_digests = {}
+    for relative in installer.TRUSTED_RUNTIME_FILES:
+        source = source_root / relative
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.write_bytes(f"new {relative}\n".encode())
+        if relative not in new_runtime:
+            target = install_root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            prior = f"prior {relative}\n".encode()
+            target.write_bytes(prior)
+            prior_digests[relative] = hashlib.sha256(prior).hexdigest()
+    monkeypatch.setattr(
+        installer,
+        "EXPECTED_BASE_SENDER_SHA256",
+        hashlib.sha256(b"base\n").hexdigest(),
+    )
+    monkeypatch.setattr(
+        installer,
+        "EXPECTED_LEGACY_WRAPPER_SHA256",
+        hashlib.sha256(b"legacy wrapper\n").hexdigest(),
+    )
+    monkeypatch.setattr(
+        installer,
+        "EXPECTED_PRIOR_DISPATCH_SHA256",
+        hashlib.sha256(prior_dispatch).hexdigest(),
+    )
+    monkeypatch.setattr(
+        installer,
+        "EXPECTED_PRIOR_RUNTIME_SHA256",
+        prior_digests,
+    )
+
+    before = installer.deployment_status(
+        install_root=install_root,
+        source_root=source_root,
+    )
+    assert before["state"] == "trusted_runtime_update_required"
+    result = installer.install_trusted_transport(
+        install_root=install_root,
+        source_root=source_root,
+        effective_user_id=0,
+    )
+
+    assert result["state"] == "ready"
+    assert target_dispatch.read_bytes() == b"new dispatch\n"
+    for relative in installer.TRUSTED_RUNTIME_FILES:
+        assert (install_root / relative).read_bytes() == (
+            source_root / relative
+        ).read_bytes()
 
 
 def test_install_refuses_unknown_existing_runtime(tmp_path, monkeypatch):

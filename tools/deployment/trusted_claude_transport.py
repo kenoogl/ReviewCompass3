@@ -15,6 +15,9 @@ EXPECTED_BASE_SENDER_SHA256 = (
 EXPECTED_LEGACY_WRAPPER_SHA256 = (
     "346e0638958d402ce9c0867a692f9356141b5ca4040f225e1e8aacfa61445893"
 )
+EXPECTED_PRIOR_DISPATCH_SHA256 = (
+    "ee6bf62f8c5e57f1c262176cc92dabffae3f487debcfd04e2f1283b88a362ef7"
+)
 _SOURCE_DISPATCH = Path(
     "tools/deployment/installed/trusted_review_send_dispatch.py"
 )
@@ -25,10 +28,16 @@ _TARGET_WRAPPER = Path("trusted-review-send")
 _BACKUP_WRAPPER = Path("trusted-review-send.pre-claude-bootstrap-v1")
 TRUSTED_RUNTIME_FILES = (
     Path("tools/development/claude_bootstrap.py"),
+    Path("tools/development/claude_implementation_route.py"),
+    Path("tools/bootstrap/immutable_result_store.py"),
     Path("tools/common/__init__.py"),
     Path("tools/common/digests.py"),
     Path("tools/common/errors.py"),
 )
+NEW_TRUSTED_RUNTIME_FILES = {
+    Path("tools/development/claude_implementation_route.py"),
+    Path("tools/bootstrap/immutable_result_store.py"),
+}
 EXPECTED_PRIOR_RUNTIME_SHA256 = {
     Path("tools/development/claude_bootstrap.py"): (
         "14f352afb54353ccac45d84db2ce2a02c7c8a97204c0712651a5bd6218bc4133"
@@ -70,7 +79,9 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
         not _regular(source_dispatch)
         or not _regular(source_wrapper)
         or any(not _regular(path) for path in source_runtime)
-        or set(EXPECTED_PRIOR_RUNTIME_SHA256) != set(TRUSTED_RUNTIME_FILES)
+        or not set(TRUSTED_RUNTIME_FILES) - NEW_TRUSTED_RUNTIME_FILES
+        <= set(EXPECTED_PRIOR_RUNTIME_SHA256)
+        or not set(EXPECTED_PRIOR_RUNTIME_SHA256) <= set(TRUSTED_RUNTIME_FILES)
     ):
         return {"schema_version": 1, "state": "source_invalid"}
     source_dispatch_digest = _digest(source_dispatch)
@@ -105,12 +116,19 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
         for relative in TRUSTED_RUNTIME_FILES
     )
     runtime_files_known = all(
-        _regular(install_root / relative)
-        and _digest(install_root / relative)
-        in {
-            _digest(source_root / relative),
-            EXPECTED_PRIOR_RUNTIME_SHA256[relative],
-        }
+        (
+            relative in NEW_TRUSTED_RUNTIME_FILES
+            and not (install_root / relative).exists()
+            and not (install_root / relative).is_symlink()
+        )
+        or (
+            _regular(install_root / relative)
+            and _digest(install_root / relative)
+            in {
+                _digest(source_root / relative),
+                EXPECTED_PRIOR_RUNTIME_SHA256.get(relative),
+            }
+        )
         for relative in TRUSTED_RUNTIME_FILES
     )
     if (
@@ -130,7 +148,10 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
     elif (
         base_matches
         and wrapper_current
-        and dispatch_current
+        and dispatch_digest in (
+            source_dispatch_digest,
+            EXPECTED_PRIOR_DISPATCH_SHA256,
+        )
         and runtime_files_known
     ):
         state = "trusted_runtime_update_required"
@@ -224,6 +245,7 @@ def install_trusted_transport(
         else:
             _write_new(backup_wrapper, legacy_bytes, 0o755)
     _ensure_directory(install_root / "tools/development")
+    _ensure_directory(install_root / "tools/bootstrap")
     _ensure_directory(install_root / "tools/common")
     for relative in TRUSTED_RUNTIME_FILES:
         source = source_root / relative
@@ -234,9 +256,8 @@ def install_trusted_transport(
                 raise ValueError("installed trusted runtime mismatch")
             if target.read_bytes() == source_bytes:
                 continue
-            if (
-                not updating_runtime
-                or _digest(target) != EXPECTED_PRIOR_RUNTIME_SHA256[relative]
+            if not updating_runtime or _digest(target) != (
+                EXPECTED_PRIOR_RUNTIME_SHA256.get(relative)
             ):
                 raise ValueError("installed trusted runtime mismatch")
             _replace(target, source_bytes, 0o644)
@@ -244,8 +265,15 @@ def install_trusted_transport(
             _write_new(target, source_bytes, 0o644)
     dispatch_bytes = source_dispatch.read_bytes()
     if target_dispatch.exists() or target_dispatch.is_symlink():
-        if not _regular(target_dispatch) or target_dispatch.read_bytes() != dispatch_bytes:
+        if not _regular(target_dispatch):
             raise ValueError("installed trusted dispatch mismatch")
+        if target_dispatch.read_bytes() != dispatch_bytes:
+            if (
+                not updating_runtime
+                or _digest(target_dispatch) != EXPECTED_PRIOR_DISPATCH_SHA256
+            ):
+                raise ValueError("installed trusted dispatch mismatch")
+            _replace(target_dispatch, dispatch_bytes, 0o644)
     else:
         _write_new(target_dispatch, dispatch_bytes, 0o644)
     if not updating_runtime:

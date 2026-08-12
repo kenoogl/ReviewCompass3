@@ -13,6 +13,11 @@ CLAUDE_CAPABILITY = {
     "purpose": "codex-pilot-no-tool-claude-bootstrap",
     "topology": "same_session_two_payload",
 }
+CLAUDE_IMPLEMENTATION_CAPABILITY = {
+    "model": "from-approved-launch",
+    "purpose": "claude_implementation_executor",
+    "topology": "same_session_test_then_implementation",
+}
 _HEX_64 = re.compile(r"[0-9a-f]{64}")
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
@@ -26,9 +31,15 @@ def with_claude_capability(base):
         or not isinstance(value.get("roles"), dict)
     ):
         raise ValueError("base trusted capabilities invalid")
-    if "claude_session_bootstrap" in value["roles"]:
+    if (
+        "claude_session_bootstrap" in value["roles"]
+        or "claude_implementation_executor" in value["roles"]
+    ):
         raise ValueError("base trusted Claude capability conflicts")
     value["roles"]["claude_session_bootstrap"] = dict(CLAUDE_CAPABILITY)
+    value["roles"]["claude_implementation_executor"] = dict(
+        CLAUDE_IMPLEMENTATION_CAPABILITY
+    )
     return value
 
 
@@ -55,6 +66,14 @@ def _load_bootstrap(workspace_root):
     return claude_bootstrap
 
 
+def _load_implementation(workspace_root):
+    root = _validate_workspace(workspace_root)
+    os.chdir(root)
+    from tools.development import claude_implementation_route
+
+    return claude_implementation_route
+
+
 def _blocked():
     print(
         json.dumps(
@@ -78,6 +97,45 @@ def main(argv, *, base_main, base_capabilities):
         except (TypeError, ValueError, json.JSONDecodeError):
             return _blocked()
         print(json.dumps(value, separators=(",", ":"), sort_keys=True))
+        return 0
+    if arguments and arguments[0] == "claude-implementation-record":
+        if (
+            len(arguments) != 15
+            or arguments[1] != "--workspace-root"
+            or arguments[3] != "--repository"
+            or arguments[5] != "--private-root"
+            or arguments[7] != "--run-id"
+            or arguments[9] != "--turn"
+            or arguments[11] != "--launch-record"
+            or arguments[13] != "--raw-file"
+            or any(
+                not Path(arguments[index]).is_absolute()
+                for index in (2, 4, 6, 12, 14)
+            )
+            or _IDENTIFIER.fullmatch(arguments[8]) is None
+            or arguments[10] not in ("test", "implementation")
+        ):
+            return _blocked()
+        try:
+            implementation = _load_implementation(arguments[2])
+            result = implementation.record_turn(
+                Path(arguments[4]),
+                Path(arguments[6]),
+                arguments[8],
+                arguments[10],
+                Path(arguments[12]),
+                Path(arguments[14]),
+            )
+        except Exception:
+            return _blocked()
+        print(
+            json.dumps(
+                result,
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
         return 0
     if not arguments or arguments[0] != "claude-bootstrap":
         return base_main(arguments)
