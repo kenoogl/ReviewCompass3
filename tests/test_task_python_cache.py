@@ -174,8 +174,9 @@ def test_environment_mapping_holds_only_the_bytecode_prefix(cache_module, tmp_pa
 
 
 def test_environment_mapping_does_not_change_the_running_process(
-    cache_module, tmp_path
+    cache_module, tmp_path, monkeypatch
 ):
+    monkeypatch.delenv("PYTHONPYCACHEPREFIX", raising=False)
     before = dict(os.environ)
     resolution = _resolve(cache_module, tmp_path)
 

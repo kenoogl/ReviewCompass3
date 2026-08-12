@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 from tools.development import pytest_summary
@@ -304,21 +305,34 @@ def execute(
     test_environment[pytest_summary.SUMMARY_ENVIRONMENT_VARIABLE] = str(
         summary_output
     )
-    try:
-        test_result = run(
-            list(command),
-            cwd=project_root,
-            capture_output=True,
-            text=True,
-            env=test_environment,
-        )
+    with tempfile.TemporaryDirectory(
+        prefix="reviewcompass-policy-test-cache-"
+    ) as temporary_cache:
+        cache_path = Path(temporary_cache).resolve()
         try:
-            test_summary = pytest_summary.read_summary(summary_output)
-        except pytest_summary.TestSummaryError as error:
-            raise TestRunnerPolicyError(str(error)) from error
-    finally:
-        if summary_output.exists():
-            summary_output.unlink()
+            cache_path.relative_to(project_root)
+        except ValueError:
+            pass
+        else:
+            raise TestRunnerPolicyError(
+                "test_cache_path_invalid: cache must be outside project"
+            )
+        test_environment["PYTHONPYCACHEPREFIX"] = str(cache_path)
+        try:
+            test_result = run(
+                list(command),
+                cwd=project_root,
+                capture_output=True,
+                text=True,
+                env=test_environment,
+            )
+            try:
+                test_summary = pytest_summary.read_summary(summary_output)
+            except pytest_summary.TestSummaryError as error:
+                raise TestRunnerPolicyError(str(error)) from error
+        finally:
+            if summary_output.exists():
+                summary_output.unlink()
 
     status = "passed" if test_result.returncode == 0 else "failed"
     if status == "passed" and (test_summary["failed"] or test_summary["errors"]):
