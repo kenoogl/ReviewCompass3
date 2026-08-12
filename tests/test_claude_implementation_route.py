@@ -226,6 +226,11 @@ def _create_case(tmp_path):
         "disabled_features": list(DISABLED_FEATURES),
         "command_tool": False,
     }
+    turn_prompts = {
+        "test": "Create only tests/test_feature.py. Do not run commands.",
+        "implementation": "Create only src/feature.py. Do not run commands.",
+    }
+    turn_prompts_sha256 = _sha256(_canonical_bytes(turn_prompts))
     config = {
         "schema_version": 1,
         "run_id": "claude-route-001",
@@ -258,7 +263,10 @@ def _create_case(tmp_path):
             "request_sha256": REQUEST_SHA256,
             "requirement_set_sha256": REQUIREMENT_SET_SHA256,
             "test_command_sha256": _sha256(_canonical_bytes(test_command)),
+            "turn_prompts_sha256": turn_prompts_sha256,
         },
+        "turn_prompts": turn_prompts,
+        "turn_prompts_sha256": turn_prompts_sha256,
         "capabilities": capabilities,
         "claude_runtime": {
             "version": "1.0.0-pinned",
@@ -525,6 +533,26 @@ def test_prepare_emits_only_the_fixed_safe_claude_capabilities(tmp_path):
     assert launch["disabled_features"] == list(DISABLED_FEATURES)
     assert launch["command_tool"] is False
     assert launch["external_process_count"] == 0
+    assert launch["prompt"] == case.config["turn_prompts"]["test"]
+    assert launch["prompt_sha256"] == _sha256(
+        launch["prompt"].encode("utf-8")
+    )
+
+
+def test_prepare_rejects_prompt_and_digest_changed_together(tmp_path):
+    route = _route()
+    case = _create_case(tmp_path)
+    case.config["turn_prompts"]["test"] = "Run an unapproved instruction."
+    case.config["turn_prompts_sha256"] = _sha256(
+        _canonical_bytes(case.config["turn_prompts"])
+    )
+    _save_config(case)
+
+    _assert_stop(
+        route,
+        "fixed_input_mismatch",
+        lambda: route.prepare(case.repository, case.config_path, case.private_root),
+    )
 
 
 @pytest.mark.parametrize(

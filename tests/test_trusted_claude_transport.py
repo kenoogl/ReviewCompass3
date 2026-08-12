@@ -185,6 +185,100 @@ def test_dispatch_records_fixed_claude_implementation_inputs(
     ]
 
 
+def test_dispatch_executes_one_fixed_claude_implementation_turn(
+    tmp_path, monkeypatch, capsys
+):
+    module = _module()
+    calls = []
+    outcome = {
+        "schema_version": 1,
+        "run_id": "run-001",
+        "state": "ready_for_implementation_turn",
+    }
+    fake_executor = types.SimpleNamespace(
+        execute_turn=lambda *arguments: calls.append(arguments) or outcome
+    )
+    monkeypatch.setattr(module, "_load_executor", lambda root: fake_executor)
+    repository = tmp_path / "repository"
+    private_root = tmp_path / "private"
+
+    exit_code = module.main(
+        [
+            "claude-implementation-execute",
+            "--workspace-root",
+            str(PROJECT_ROOT),
+            "--repository",
+            str(repository),
+            "--private-root",
+            str(private_root),
+            "--run-id",
+            "run-001",
+            "--turn",
+            "test",
+            "--approval-id",
+            "RC3-CD-SEND-APPROVAL-001",
+        ],
+        base_main=lambda argv: 99,
+        base_capabilities=lambda: {},
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert captured.err == ""
+    assert captured.out.count("\n") == 1
+    assert json.loads(captured.out) == outcome
+    assert calls == [
+        (
+            repository,
+            private_root,
+            "run-001",
+            "test",
+            "RC3-CD-SEND-APPROVAL-001",
+        )
+    ]
+
+
+def test_dispatch_blocks_invalid_execute_arguments_before_loading(
+    tmp_path, monkeypatch, capsys
+):
+    module = _module()
+    loaded = []
+    monkeypatch.setattr(
+        module,
+        "_load_executor",
+        lambda root: loaded.append(root),
+        raising=False,
+    )
+
+    exit_code = module.main(
+        [
+            "claude-implementation-execute",
+            "--workspace-root",
+            str(PROJECT_ROOT),
+            "--repository",
+            "relative/repository",
+            "--private-root",
+            str(tmp_path / "private"),
+            "--run-id",
+            "run-001",
+            "--turn",
+            "review",
+            "--approval-id",
+            "RC3-CD-SEND-APPROVAL-001",
+        ],
+        base_main=lambda argv: 99,
+        base_capabilities=lambda: {},
+    )
+
+    assert exit_code == 2
+    assert loaded == []
+    assert json.loads(capsys.readouterr().out) == {
+        "schema_version": 1,
+        "result": "stopped",
+        "stop_code": "trusted_transport_unavailable",
+    }
+
+
 def test_dispatch_blocks_invalid_implementation_arguments_before_loading(
     tmp_path, monkeypatch, capsys
 ):
@@ -457,6 +551,9 @@ def test_new_implementation_runtime_and_exact_prior_dispatch_are_upgraded(
     assert Path("tools/development/claude_implementation_route.py") in (
         installer.TRUSTED_RUNTIME_FILES
     )
+    assert Path("tools/development/claude_implementation_executor.py") in (
+        installer.TRUSTED_RUNTIME_FILES
+    )
     assert Path("tools/bootstrap/immutable_result_store.py") in (
         installer.TRUSTED_RUNTIME_FILES
     )
@@ -482,6 +579,7 @@ def test_new_implementation_runtime_and_exact_prior_dispatch_are_upgraded(
         path.write_bytes(content)
     new_runtime = {
         Path("tools/development/claude_implementation_route.py"),
+        Path("tools/development/claude_implementation_executor.py"),
         Path("tools/bootstrap/immutable_result_store.py"),
     }
     prior_digests = {}

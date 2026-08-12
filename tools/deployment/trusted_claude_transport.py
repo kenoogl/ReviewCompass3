@@ -18,6 +18,9 @@ EXPECTED_LEGACY_WRAPPER_SHA256 = (
 EXPECTED_PRIOR_DISPATCH_SHA256 = (
     "ee6bf62f8c5e57f1c262176cc92dabffae3f487debcfd04e2f1283b88a362ef7"
 )
+EXPECTED_EXECUTOR_PRIOR_DISPATCH_SHA256 = (
+    "c1586a46d0d39fb681d8265305bbf32533b79afec12d2f13b15c73f7108bd267"
+)
 _SOURCE_DISPATCH = Path(
     "tools/deployment/installed/trusted_review_send_dispatch.py"
 )
@@ -29,6 +32,7 @@ _BACKUP_WRAPPER = Path("trusted-review-send.pre-claude-bootstrap-v1")
 TRUSTED_RUNTIME_FILES = (
     Path("tools/development/claude_bootstrap.py"),
     Path("tools/development/claude_implementation_route.py"),
+    Path("tools/development/claude_implementation_executor.py"),
     Path("tools/bootstrap/immutable_result_store.py"),
     Path("tools/common/__init__.py"),
     Path("tools/common/digests.py"),
@@ -36,6 +40,7 @@ TRUSTED_RUNTIME_FILES = (
 )
 NEW_TRUSTED_RUNTIME_FILES = {
     Path("tools/development/claude_implementation_route.py"),
+    Path("tools/development/claude_implementation_executor.py"),
     Path("tools/bootstrap/immutable_result_store.py"),
 }
 EXPECTED_PRIOR_RUNTIME_SHA256 = {
@@ -151,6 +156,7 @@ def deployment_status(*, install_root=INSTALL_ROOT, source_root=None):
         and dispatch_digest in (
             source_dispatch_digest,
             EXPECTED_PRIOR_DISPATCH_SHA256,
+            EXPECTED_EXECUTOR_PRIOR_DISPATCH_SHA256,
         )
         and runtime_files_known
     ):
@@ -270,7 +276,11 @@ def install_trusted_transport(
         if target_dispatch.read_bytes() != dispatch_bytes:
             if (
                 not updating_runtime
-                or _digest(target_dispatch) != EXPECTED_PRIOR_DISPATCH_SHA256
+                or _digest(target_dispatch)
+                not in (
+                    EXPECTED_PRIOR_DISPATCH_SHA256,
+                    EXPECTED_EXECUTOR_PRIOR_DISPATCH_SHA256,
+                )
             ):
                 raise ValueError("installed trusted dispatch mismatch")
             _replace(target_dispatch, dispatch_bytes, 0o644)

@@ -180,6 +180,21 @@ def _validate_start(repository, config):
     ):
         _stop("test_command_invalid")
 
+    turn_prompts = config.get("turn_prompts")
+    if (
+        not isinstance(turn_prompts, dict)
+        or set(turn_prompts) != {"test", "implementation"}
+        or not all(
+            isinstance(prompt, str) and prompt and "\x00" not in prompt
+            for prompt in turn_prompts.values()
+        )
+        or sha256_hex(canonical_json_bytes(turn_prompts))
+        != config.get("turn_prompts_sha256")
+        or approval.get("turn_prompts_sha256")
+        != config.get("turn_prompts_sha256")
+    ):
+        _stop("fixed_input_mismatch")
+
     proof = config.get("proof", {})
     if proof.get("repository_kind") != "synthetic_fixture" or proof.get("project_identity") == "ReviewCompass3":
         _stop("proof_repository_forbidden")
@@ -209,6 +224,7 @@ def _store(root, relative_path, document):
 
 def _launch_document(config, turn):
     runtime = config["claude_runtime"]
+    prompt = config["turn_prompts"][turn]
     return {
         "schema_version": 1,
         "run_id": config["run_id"],
@@ -224,6 +240,9 @@ def _launch_document(config, turn):
         "allowed_response_models": runtime["allowed_response_models"],
         "authentication": runtime["authentication"],
         "fixed_input": config["fixed_input"],
+        "prompt": prompt,
+        "prompt_sha256": sha256_hex(prompt.encode("utf-8")),
+        "turn_prompts_sha256": config["turn_prompts_sha256"],
     }
 
 
@@ -305,7 +324,13 @@ def _validate_turn_inputs(config, turn, launch_path, raw_path, expected_launch_p
         or raw.get("turn") != turn
         or launch.get("status") != "completed"
         or raw.get("status") != "completed"
-        or launch.get("external_process_count") != 0
+    ):
+        _stop("turn_input_mismatch")
+    process_kind = launch.get("process_kind")
+    process_count = launch.get("external_process_count")
+    if not (
+        (process_kind == "synthetic_fixture" and process_count == 0)
+        or (process_kind == "claude_code_first_party" and process_count == 1)
     ):
         _stop("turn_input_mismatch")
     runtime = config["claude_runtime"]

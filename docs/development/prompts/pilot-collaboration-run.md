@@ -32,6 +32,22 @@ reviewcompass3-claude-implementation prepare \
 準備は、一時作業ツリーと固定された起動依頼を作るだけである。Claudeを起動せず、外部へ送信しない。
 Claudeの起動と送信には、対象、モデル、起動依頼、材料、期限へ結び付いた別のHuman承認が必要である。
 
+別の一回限りHuman送信承認tokenが用意された後だけ、管理者が配置した信頼済み入口から各ターンを起動する。
+
+```text
+trusted-review-send claude-implementation-execute \
+  --workspace-root <ReviewCompass3作業場所の絶対パス> \
+  --repository <対象リポジトリの絶対パス> \
+  --private-root <保護された保存場所の絶対パス> \
+  --run-id <実行識別子> \
+  --turn <testまたはimplementation> \
+  --approval-id <一回限りHuman送信承認の識別子>
+```
+
+tokenは開始設定全体のSHA-256、実行識別子、保存場所、期限へ結び付く。第1ターン開始時にclaimし、
+第2ターン終了時または外部処理後の停止時にconsumeする。token不在・不一致・期限切れ・再利用では、
+Claudeのprocessを作る前に停止する。
+
 Claudeの一回の処理が終わった後、機械処理が起動記録と未加工応答を取り込む。
 
 ```text
@@ -56,8 +72,8 @@ trusted-review-send claude-implementation-record \
   --raw-file <未加工応答の絶対パス>
 ```
 
-信頼済み入口も、保存済み結果を中核の取込み処理へ渡すだけである。Claudeを起動せず、外部へ送信せず、
-失敗時に別モデル、別認証、別経路へ切り替えず、同じ処理を自動再試行しない。
+`claude-implementation-record`は保存済み結果を中核の取込み処理へ渡すだけであり、Claudeを起動しない。
+`claude-implementation-execute`も、失敗時に別モデル、別認証、別経路へ切り替えず、同じ処理を自動再試行しない。
 
 現在状態は次の形で確認する。
 

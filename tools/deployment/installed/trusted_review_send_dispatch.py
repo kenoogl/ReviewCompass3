@@ -74,6 +74,14 @@ def _load_implementation(workspace_root):
     return claude_implementation_route
 
 
+def _load_executor(workspace_root):
+    root = _validate_workspace(workspace_root)
+    os.chdir(root)
+    from tools.development import claude_implementation_executor
+
+    return claude_implementation_executor
+
+
 def _blocked():
     print(
         json.dumps(
@@ -97,6 +105,44 @@ def main(argv, *, base_main, base_capabilities):
         except (TypeError, ValueError, json.JSONDecodeError):
             return _blocked()
         print(json.dumps(value, separators=(",", ":"), sort_keys=True))
+        return 0
+    if arguments and arguments[0] == "claude-implementation-execute":
+        if (
+            len(arguments) != 13
+            or arguments[1] != "--workspace-root"
+            or arguments[3] != "--repository"
+            or arguments[5] != "--private-root"
+            or arguments[7] != "--run-id"
+            or arguments[9] != "--turn"
+            or arguments[11] != "--approval-id"
+            or any(
+                not Path(arguments[index]).is_absolute()
+                for index in (2, 4, 6)
+            )
+            or _IDENTIFIER.fullmatch(arguments[8]) is None
+            or arguments[10] not in ("test", "implementation")
+            or _IDENTIFIER.fullmatch(arguments[12]) is None
+        ):
+            return _blocked()
+        try:
+            executor = _load_executor(arguments[2])
+            result = executor.execute_turn(
+                Path(arguments[4]),
+                Path(arguments[6]),
+                arguments[8],
+                arguments[10],
+                arguments[12],
+            )
+        except Exception:
+            return _blocked()
+        print(
+            json.dumps(
+                result,
+                ensure_ascii=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
         return 0
     if arguments and arguments[0] == "claude-implementation-record":
         if (
