@@ -168,7 +168,7 @@ SHA-256はそれぞれ`0f7072ab8a7c4ab9093f394858c7629e2f60c1d2b774d5fd3b6406229
 【実測】現行の`.venv/bin/python3`は
 `/Library/Developer/CommandLineTools/usr/bin/python3`を指すPython 3.9.6である。
 `config/development-environment.json`と`config/development-test-runner.json`はPythonを3.9以上3.10未満へ
-固定し、`constraints/development-py39.txt`は12 packageを固定する。`pyproject.toml`と`setup.py`の公開条件は
+固定し、`constraints/development-py39.txt`は13 packageを固定する。`pyproject.toml`と`setup.py`の公開条件は
 3.9以上である。`command -v python3.13`は終了コード1で、観測環境のPATH上にPython 3.13はなかった。
 
 【記録】2026-08-12にPython公式情報を確認した。Python 3.9.25の公開ページは3.9系列が2025-10-31に
