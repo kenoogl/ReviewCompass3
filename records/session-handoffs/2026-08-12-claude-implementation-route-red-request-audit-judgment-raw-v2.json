@@ -1,0 +1,1 @@
+{"target_sha256":"bfc2b7ca72ebc731dd72a304d9e645ab0335416b72c683bd39b1ed31e7819213","audit_raw_sha256":"cd3ab015ae149865422af7030d37966390ae362861e2adfd232008121c768138","judge_model":"gpt-5.6-terra","expected_finding_count":0,"actual_finding_count":0,"resolved_prior_findings":{"PA-CD-RED-001":"resolved","PA-CD-RED-002":"resolved","PA-CD-RED-003":"resolved"},"verdict":"complete"}
