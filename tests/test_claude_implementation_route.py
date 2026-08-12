@@ -501,6 +501,35 @@ def test_happy_path_records_red_then_green_and_becomes_ready_for_review(tmp_path
     assert status["implementation_commit"] == green["implementation_commit"]
 
 
+def test_record_turn_separates_read_scope_from_write_scope(tmp_path):
+    route, case = _prepare(tmp_path)
+    _write_test_change(case)
+    launch_path, raw_path = _turn_inputs(
+        case,
+        "test",
+        case.launch_request_path,
+        [
+            {"tool": "Read", "path": INSTRUCTION_PATH},
+            {"tool": "Read", "path": MATERIAL_PATH},
+            {"tool": "Glob"},
+            {"tool": "Write", "path": TEST_PATH},
+        ],
+        reported_exit=0,
+    )
+
+    outcome = route.record_turn(
+        case.repository,
+        case.private_root,
+        case.run_id,
+        "test",
+        launch_path,
+        raw_path,
+    )
+
+    assert outcome["state"] == "ready_for_implementation_turn"
+    assert outcome["changed_paths"] == [TEST_PATH]
+
+
 @pytest.mark.parametrize(
     ("mutate", "stop_code"),
     (

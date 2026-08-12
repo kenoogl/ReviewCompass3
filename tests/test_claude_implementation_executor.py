@@ -824,6 +824,60 @@ def test_executor_revalidates_saved_response_without_resending(
     assert consumed.is_file()
 
 
+def test_executor_recovers_saved_response_after_local_ingest_failure(
+    tmp_path,
+    monkeypatch,
+):
+    executor = _executor()
+    route, case = _prepared_case(tmp_path)
+    fake = _install_fake(monkeypatch, executor, case)
+    original_record_turn = executor.route.record_turn
+
+    def local_ingest_failure(*arguments):
+        del arguments
+        raise executor.route.RouteStop("change_scope_violation")
+
+    monkeypatch.setattr(executor.route, "record_turn", local_ingest_failure)
+    with pytest.raises(executor.ExecutorStop) as first_failure:
+        executor.execute_turn(
+            case.repository,
+            case.private_root,
+            case.run_id,
+            "test",
+            APPROVAL_ID,
+            *_manifest_arguments(case),
+        )
+    assert first_failure.value.code == "change_scope_violation"
+    assert len(fake.payload_calls) == 1
+    execution_root = case.private_root / case.run_id / "executor/test"
+    assert {path.name for path in execution_root.iterdir()} == {
+        "invocation.json",
+        "launch-record.json",
+        "normalized-raw.json",
+        "provider-raw.json",
+        "receipt.json",
+    }
+
+    monkeypatch.setattr(executor.route, "record_turn", original_record_turn)
+    recovered = executor.execute_turn(
+        case.repository,
+        case.private_root,
+        case.run_id,
+        "test",
+        APPROVAL_ID,
+        *_manifest_arguments(case),
+    )
+
+    assert recovered["state"] == "ready_for_implementation_turn"
+    assert recovered["execution"]["revalidated_without_process"] is True
+    assert len(fake.payload_calls) == 1
+    assert (execution_root / "receipt.json").is_file()
+    assert (execution_root / "recovery-receipt.json").is_file()
+    assert route.status(case.repository, case.private_root, case.run_id)["state"] == (
+        "ready_for_implementation_turn"
+    )
+
+
 def test_executor_revalidates_saved_implementation_without_double_consuming(
     tmp_path,
     monkeypatch,

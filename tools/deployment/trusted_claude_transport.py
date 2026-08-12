@@ -50,6 +50,7 @@ EXPECTED_PRIOR_RUNTIME_SHA256 = {
     Path("tools/development/claude_implementation_executor.py"): (
         "395f7f9c2e368610a2980c36c96f1910729c51a9472e19ddd53fc8b4c38fa84e",
         "b4c4ef538e74a3310176216cdbd5dd23efd6bc9c6b74556899ca740c6f07821b",
+        "97a644b1bb2eae39d53eab185f1ae6a489d26397800fa237960b56df052b671e",
     ),
     Path("tools/development/claude_bootstrap.py"): (
         "14f352afb54353ccac45d84db2ce2a02c7c8a97204c0712651a5bd6218bc4133"

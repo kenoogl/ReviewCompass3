@@ -94,6 +94,22 @@ def _store(root, relative_path, document):
     return Path(root) / stored.relative_path, stored.file_sha256
 
 
+def _store_or_match(root, relative_path, document):
+    path = Path(root) / relative_path
+    if not path.exists() and not path.is_symlink():
+        return _store(root, relative_path, document)
+    if path.is_symlink() or not path.is_file():
+        _stop("saved_response_invalid")
+    expected = canonical_json_bytes(document) + b"\n"
+    try:
+        actual = path.read_bytes()
+    except OSError:
+        _stop("saved_response_invalid")
+    if actual != expected:
+        _stop("saved_response_invalid")
+    return path, sha256_hex(actual)
+
+
 def _safe_approval_directory(path):
     return (
         path.is_dir()
@@ -499,38 +515,40 @@ def _record_parsed_turn(
     *,
     revalidated_without_process,
 ):
-    normalized_raw_path, normalized_raw_sha256 = _store(
+    normalized_raw_document = {
+        "schema_version": 1,
+        "run_id": run_id,
+        "turn": turn,
+        "status": "completed",
+        "response_model": parsed["response_model"],
+        "text": parsed["text"],
+        "tool_uses": parsed["tool_uses"],
+        "reported_test_exit_code": None,
+        "provider_raw_sha256": provider_raw_sha256,
+    }
+    normalized_raw_path, normalized_raw_sha256 = _store_or_match(
         run_root,
         f"executor/{turn}/normalized-raw.json",
-        {
-            "schema_version": 1,
-            "run_id": run_id,
-            "turn": turn,
-            "status": "completed",
-            "response_model": parsed["response_model"],
-            "text": parsed["text"],
-            "tool_uses": parsed["tool_uses"],
-            "reported_test_exit_code": None,
-            "provider_raw_sha256": provider_raw_sha256,
-        },
+        normalized_raw_document,
     )
-    launch_record_path, _ = _store(
+    launch_record_document = {
+        "schema_version": 1,
+        "run_id": run_id,
+        "turn": turn,
+        "session_id": session_id,
+        "status": "completed",
+        "launch_request_sha256": sha256_hex(launch_path.read_bytes()),
+        "raw_sha256": normalized_raw_sha256,
+        "process_kind": "claude_code_first_party",
+        "external_process_count": 1,
+        "model": parsed["response_model"],
+        "authentication": config["claude_runtime"]["authentication"],
+        "provider_raw_sha256": provider_raw_sha256,
+    }
+    launch_record_path, _ = _store_or_match(
         run_root,
         f"executor/{turn}/launch-record.json",
-        {
-            "schema_version": 1,
-            "run_id": run_id,
-            "turn": turn,
-            "session_id": session_id,
-            "status": "completed",
-            "launch_request_sha256": sha256_hex(launch_path.read_bytes()),
-            "raw_sha256": normalized_raw_sha256,
-            "process_kind": "claude_code_first_party",
-            "external_process_count": 1,
-            "model": parsed["response_model"],
-            "authentication": config["claude_runtime"]["authentication"],
-            "provider_raw_sha256": provider_raw_sha256,
-        },
+        launch_record_document,
     )
     try:
         outcome = route.record_turn(
@@ -542,7 +560,7 @@ def _record_parsed_turn(
             normalized_raw_path,
         )
     except route.RouteStop as error:
-        _store(
+        _store_or_match(
             run_root,
             f"executor/{turn}/receipt.json",
             {
@@ -555,9 +573,13 @@ def _record_parsed_turn(
             },
         )
         _stop(error.code)
+    receipt_relative = f"executor/{turn}/receipt.json"
+    receipt_path = run_root / receipt_relative
+    if receipt_path.exists() or receipt_path.is_symlink():
+        receipt_relative = f"executor/{turn}/recovery-receipt.json"
     receipt_path, _ = _store(
         run_root,
-        f"executor/{turn}/receipt.json",
+        receipt_relative,
         {
             "schema_version": 1,
             "turn": turn,
@@ -595,10 +617,15 @@ def _recover_saved_turn(
     execution_root = run_root / "executor" / turn
     if execution_root.is_symlink() or not execution_root.is_dir():
         _stop("execution_already_started")
-    if {path.name for path in execution_root.iterdir()} != {
-        "invocation.json",
-        "provider-raw.json",
-    }:
+    names = {path.name for path in execution_root.iterdir()}
+    required = {"invocation.json", "provider-raw.json"}
+    allowed = {
+        *required,
+        "normalized-raw.json",
+        "launch-record.json",
+        "receipt.json",
+    }
+    if not required <= names or not names <= allowed:
         _stop("execution_already_started")
     invocation = _read_canonical_json(
         execution_root / "invocation.json",
@@ -638,6 +665,21 @@ def _recover_saved_turn(
         or not isinstance(raw.get("stderr"), str)
     ):
         _stop("saved_response_invalid")
+    if "receipt.json" in names:
+        stopped_receipt = _read_canonical_json(
+            execution_root / "receipt.json",
+            "saved_response_invalid",
+        )
+        if (
+            stopped_receipt.get("schema_version") != 1
+            or stopped_receipt.get("turn") != turn
+            or stopped_receipt.get("session_id") != session_id
+            or stopped_receipt.get("status") != "stopped"
+            or not isinstance(stopped_receipt.get("stop_code"), str)
+            or stopped_receipt.get("provider_raw_sha256")
+            != sha256_hex(raw_path.read_bytes())
+        ):
+            _stop("saved_response_invalid")
     consumed = (
         private_root
         / "approval-store/consumed"

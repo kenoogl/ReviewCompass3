@@ -315,13 +315,16 @@ def _validate_tool_uses(raw, allowed_paths, worktree):
     for use in tool_uses:
         if not isinstance(use, dict) or use.get("tool") not in ALLOWED_TOOLS:
             _stop("forbidden_tool_use")
+        tool = use["tool"]
         path = use.get("path")
         if path is not None:
             if not _safe_relative_path(path):
                 _discard_worktree_changes(worktree)
                 _stop("administrator_boundary_violation")
-            if path not in allowed_paths:
-                _stop("change_scope_violation")
+        if tool in ("Edit", "Write") and (
+            path is None or path not in allowed_paths
+        ):
+            _stop("change_scope_violation")
 
 
 def _load_run(private_root, run_id):
