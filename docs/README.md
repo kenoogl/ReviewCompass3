@@ -14,6 +14,14 @@ Intent統合最新版は製品目的、利用者、原則、非目標、成功�
 日本語表示名、canonical token、意味、旧語の読み替えを保持する。3文書はHuman承認前の
 successor候補であり、front matterの生成元pathとDigestから詳細と変更Evidenceへ戻れる。
 
+## 立て直し計画
+
+開発停滞の原因、立て直しの原則、ブートストラップから製品本線へ戻る五段階は、次の最新版を読む。
+
+- `plan/2026-08-12-project-stall-review-and-recovery-proposal-v4.md`
+
+v1からv3は同じ`plan/`配下に旧版として保持し、最新版から先行版の内容識別値をたどれる。
+
 ## 当面の開発入口
 
 開発作業は、次のoperational checklistを開始入口とする。

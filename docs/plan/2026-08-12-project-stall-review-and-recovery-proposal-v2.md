@@ -3,7 +3,7 @@
 - 記録ID：`RC3-PROJECT-STALL-REVIEW-AND-RECOVERY-2026-08-12-V2`
 - 作成日：2026-08-12
 - 状態：`提案 / 利用者判断待ち`
-- 先行版：`records/development/2026-08-12-project-stall-review-and-recovery-proposal-v1.md`
+- 先行版：`docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v1.md`
 - 先行版SHA-256：`a73c2a55c7797839d8f377407febeb3bfdc5bae44a052902bc56dc94e02d43d4`
 - 対象：開発本線、履歴保存、開発コード管理、テストコード管理、レビュー、開発方法、Claude連携試行
 
@@ -432,7 +432,7 @@ Git履歴から復元できる。現役の作業場所へ残す費用と、将�
 
 ## 14. 主な根拠
 
-- `records/development/2026-08-12-project-stall-review-and-recovery-proposal-v1.md`
+- `docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v1.md`
 - `records/sources/2026-08-02-reviewcompass-conformance-evaluation.md`
 - `records/sources/2026-08-02-reviewcompass2-cross-cutting-lessons.md`
 - `records/sources/2026-08-02-reviewcompass2-change-scaled-review-input.md`
