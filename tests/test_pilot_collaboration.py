@@ -72,12 +72,10 @@ TRACEABILITY = {
     "NG-PC-005": ("test_pilot_does_not_reinterpret_closed_review_pipeline",),
     "NG-PC-006": ("test_prepare_and_ingest_do_not_write_workflow_ledgers",),
     "NG-PC-007": (
-        "test_change_scope_contains_only_v6_allowlisted_paths",
         "test_change_scope_rejects_forbidden_commit_before_later_allowed_commit",
         "test_change_scope_does_not_hide_code_inside_handoff_directory",
     ),
     "ST-PC-001": (
-        "test_change_scope_contains_only_v6_allowlisted_paths",
         "test_change_scope_rejects_forbidden_commit_before_later_allowed_commit",
         "test_change_scope_does_not_hide_code_inside_handoff_directory",
     ),
@@ -114,7 +112,7 @@ TRACEABILITY = {
         "test_change_scope_does_not_hide_code_inside_handoff_directory",
     ),
     "OUT-PC-005": ("test_requirement_traceability_covers_all_26_ids",),
-    "OUT-PC-006": ("test_change_scope_contains_only_v6_allowlisted_paths",),
+    "OUT-PC-006": ("test_pilot_git_processes_are_read_only",),
 }
 
 
@@ -1484,6 +1482,81 @@ def _process_policy_violations(source):
     return tuple(violations)
 
 
+def _git_process_policy_violations(source):
+    tree = ast.parse(source)
+    parents = {
+        child: parent
+        for parent in ast.walk(tree)
+        for child in ast.iter_child_nodes(parent)
+    }
+    violations = []
+    allowed_commands = {"ls-tree", "show", "cat-file"}
+    wrappers = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "_run_git"
+    ]
+    if len(wrappers) != 1:
+        violations.append("_run_git definition count is not one")
+    wrapper = wrappers[0] if len(wrappers) == 1 else None
+
+    def enclosing_function(node):
+        parent = parents.get(node)
+        while parent is not None:
+            if isinstance(parent, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                return parent
+            parent = parents.get(parent)
+        return None
+
+    direct_commands = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            dotted = _dotted_name(node.func)
+            if dotted in {"globals", "locals", "vars", "eval", "exec"}:
+                violations.append(f"dynamic name resolution {dotted}")
+            if dotted == "subprocess.run":
+                if enclosing_function(node) is not wrapper:
+                    violations.append("subprocess.run is outside _run_git")
+                elif (
+                    not node.args
+                    or not isinstance(node.args[0], ast.Tuple)
+                    or len(node.args[0].elts) != 2
+                    or not isinstance(node.args[0].elts[0], ast.Constant)
+                    or node.args[0].elts[0].value != "git"
+                    or not isinstance(node.args[0].elts[1], ast.Starred)
+                    or not isinstance(node.args[0].elts[1].value, ast.Name)
+                    or node.args[0].elts[1].value.id != "arguments"
+                ):
+                    violations.append("_run_git process shape is invalid")
+            if isinstance(node.func, ast.Name) and node.func.id == "_run_git":
+                if (
+                    len(node.args) < 2
+                    or not isinstance(node.args[1], ast.Constant)
+                    or not isinstance(node.args[1].value, str)
+                ):
+                    violations.append("_run_git command is not literal")
+                else:
+                    command = node.args[1].value
+                    direct_commands.append(command)
+                    if command not in allowed_commands:
+                        violations.append(f"_run_git command is not read-only: {command}")
+
+        if isinstance(node, ast.Name) and node.id == "_run_git":
+            parent = parents.get(node)
+            if not (
+                isinstance(parent, ast.Call)
+                and parent.func is node
+            ):
+                violations.append("indirect _run_git reference")
+        if isinstance(node, ast.Constant) and node.value == "_run_git":
+            violations.append("dynamic _run_git name")
+
+    if wrapper is not None and direct_commands != ["ls-tree", "show", "cat-file"]:
+        violations.append("_run_git call inventory is invalid")
+    return tuple(violations)
+
+
 def test_pilot_code_uses_only_array_git_subprocess_run():
     for relative_path in (
         "tools/development/pilot_collaboration.py",
@@ -1491,6 +1564,29 @@ def test_pilot_code_uses_only_array_git_subprocess_run():
     ):
         source = (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
         assert _process_policy_violations(source) == ()
+
+
+def test_pilot_git_processes_are_read_only():
+    source = (PROJECT_ROOT / "tools/development/pilot_collaboration.py").read_text(
+        encoding="utf-8"
+    )
+    assert _git_process_policy_violations(source) == ()
+
+    wrapper = (
+        "import subprocess\n"
+        "def _run_git(repository, *arguments):\n"
+        "    return subprocess.run(('git', *arguments))\n"
+    )
+    forbidden_sources = (
+        *(wrapper + f"_run_git(repository, {command!r})\n"
+          for command in ("push", "commit", "reset", "tag")),
+        wrapper + "git_writer = _run_git\ngit_writer(repository, 'push')\n",
+        wrapper + "globals()['_run_git'](repository, 'push')\n",
+        wrapper + "(lambda invoke: invoke(repository, 'push'))(_run_git)\n",
+        "import subprocess\nsubprocess.run(['git', 'push', 'origin', 'main'])\n",
+    )
+    for forbidden_source in forbidden_sources:
+        assert _git_process_policy_violations(forbidden_source)
 
 
 @pytest.mark.parametrize(
