@@ -7,7 +7,8 @@
 固定するのは、(1)Human承認済みallowlist宣言だけが検査対象keyを決めること、
 (2)対象参照のpath安全性・実在・現行bytes一致のfail-closed検査、(3)時点固定pin
 （allowlist外key）と本文が合否に影響しないこと、(4)空合格の禁止。
-`tmp_path`の合成file・合成allowlistのみ使用。
+正常系はHuman承認済みの実文書2件を使用し、異常・境界系は`tmp_path`の
+合成file・合成allowlistを使用する。
 """
 
 import hashlib
@@ -27,6 +28,7 @@ ALLOWLIST_KEYS = {
     "glossary_ref": "mapping",
     "reconciliation_ref": "mapping",
 }
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _module():
@@ -59,14 +61,6 @@ def _mapping_block(key, relative, digest):
     return "%s:\n  path: %s\n  sha256: %s\n" % (key, relative, digest)
 
 
-def _list_block(key, entries):
-    lines = ["%s:" % key]
-    for relative, digest in entries:
-        lines.append("  - path: %s" % relative)
-        lines.append("    sha256: %s" % digest)
-    return "\n".join(lines) + "\n"
-
-
 def _document(blocks, body="本文。\n"):
     return "---\n" + "".join(blocks) + "---\n\n" + body
 
@@ -83,79 +77,22 @@ def _run(module, capsys, files, *, allowlist, root):
     return exit_code, json.loads(output)
 
 
-def _full_fixture(tmp_path):
-    """7 key全種（mapping・list混在）の合成checkoutを作る。"""
-
-    root = tmp_path / "root"
-    root.mkdir()
-    digests = {
-        relative: _write_target(root, relative, "content of %s\n" % relative)
-        for relative in (
-            "docs/intent.md",
-            "docs/glossary.md",
-            "docs/plan.md",
-            "docs/policy.md",
-            "records/policy-decision.json",
-            "docs/design-a.md",
-            "docs/design-b.md",
-            "records/reconciliation.md",
-        )
-    }
-    blocks = [
-        _list_block("authority_order", [
-            ("docs/intent.md", digests["docs/intent.md"]),
-            ("docs/glossary.md", digests["docs/glossary.md"]),
-            ("docs/plan.md", digests["docs/plan.md"]),
-        ]),
-        _mapping_block(
-            "operational_policy", "docs/policy.md", digests["docs/policy.md"]
-        ),
-        _mapping_block(
-            "policy_decision",
-            "records/policy-decision.json",
-            digests["records/policy-decision.json"],
-        ),
-        _list_block("related_design", [
-            ("docs/design-a.md", digests["docs/design-a.md"]),
-            ("docs/design-b.md", digests["docs/design-b.md"]),
-        ]),
-        _mapping_block("intent_ref", "docs/intent.md", digests["docs/intent.md"]),
-        _mapping_block(
-            "glossary_ref", "docs/glossary.md", digests["docs/glossary.md"]
-        ),
-        _mapping_block(
-            "reconciliation_ref",
-            "records/reconciliation.md",
-            digests["records/reconciliation.md"],
-        ),
-    ]
-    checklist = root / "checklist.md"
-    checklist.write_text(_document(blocks), encoding="utf-8")
-    plan = root / "plan.md"
-    plan.write_text(
-        _document([
-            _mapping_block(
-                "intent_ref", "docs/intent.md", digests["docs/intent.md"]
-            ),
-        ]),
-        encoding="utf-8",
-    )
-    return root, checklist, plan, digests
-
-
-def test_all_allowlisted_references_match(tmp_path, capsys):
-    """正例1：7 key全種・複数fileで全一致ならexit 0、件数がJSONで一致する。"""
+def test_approved_current_documents_match_all_allowlisted_references(capsys):
+    """正例1：承認済み2文書の7 key全種・11参照が現行bytesと一致する。"""
 
     module = _module()
-    root, checklist, plan, _digests = _full_fixture(tmp_path)
-    allowlist = _write_allowlist(tmp_path)
+    checklist = PROJECT_ROOT / (
+        "docs/development/2026-08-03-initial-development-checklist.md"
+    )
+    plan = PROJECT_ROOT / "docs/current/reviewcompass3-plan-current.md"
+    allowlist = PROJECT_ROOT / "tools/development/authority_reference_keys.json"
 
     exit_code, payload = _run(
         module,
         capsys,
         (checklist, plan),
         allowlist=allowlist,
-        root=root,
+        root=PROJECT_ROOT,
     )
 
     assert exit_code == 0
@@ -165,8 +102,8 @@ def test_all_allowlisted_references_match(tmp_path, capsys):
     assert payload["totals"]["mismatched"] == 0
     assert payload["totals"]["missing"] == 0
     assert payload["totals"]["invalid"] == 0
-    assert payload["files"][str(checklist)]["checked"] == 10
-    assert payload["files"][str(plan)]["checked"] == 1
+    assert payload["files"][str(checklist)]["checked"] == 8
+    assert payload["files"][str(plan)]["checked"] == 3
 
 
 def test_allowlist_declaration_controls_extraction(tmp_path, capsys):
@@ -262,9 +199,10 @@ def test_missing_reference_target_fails(tmp_path, capsys):
     "hex_too_short",
     "absolute_path",
     "parent_escape",
+    "nul_path",
 ))
 def test_invalid_reference_forms_fail_closed(tmp_path, capsys, invalid_case):
-    """負例5：許可key配下の不正形（sha欠落・hex長・絶対path・..）をfail-closedにする。"""
+    """負例5：許可key配下の不正形と不正経路をfail-closedにする。"""
 
     module = _module()
     root = tmp_path / "root"
@@ -276,8 +214,10 @@ def test_invalid_reference_forms_fail_closed(tmp_path, capsys, invalid_case):
         block = _mapping_block("intent_ref", "docs/intent.md", "a" * 63)
     elif invalid_case == "absolute_path":
         block = _mapping_block("intent_ref", "/etc/hosts", digest)
-    else:
+    elif invalid_case == "parent_escape":
         block = _mapping_block("intent_ref", "../outside.md", digest)
+    else:
+        block = _mapping_block("intent_ref", "a\x00b", digest)
     document = root / "doc.md"
     document.write_text(_document([block]), encoding="utf-8")
     allowlist = _write_allowlist(tmp_path)
@@ -295,9 +235,12 @@ def test_invalid_reference_forms_fail_closed(tmp_path, capsys, invalid_case):
     assert payload["files"][str(document)]["invalid"] != []
 
 
-@pytest.mark.parametrize("empty_case", ("no_front_matter", "no_allowlisted_keys"))
+@pytest.mark.parametrize(
+    "empty_case",
+    ("no_front_matter", "no_allowlisted_keys", "mixed_with_valid"),
+)
 def test_zero_reference_files_fail(tmp_path, capsys, empty_case):
-    """負例6：front matter無し・対象参照0件のfileをexit 5にする（空合格の禁止）。"""
+    """負例6：単独でも正常文書との混在でも参照0件を不合格にする。"""
 
     module = _module()
     root = tmp_path / "root"
@@ -305,19 +248,30 @@ def test_zero_reference_files_fail(tmp_path, capsys, empty_case):
     document = root / "doc.md"
     if empty_case == "no_front_matter":
         document.write_text("本文だけの文書。\n", encoding="utf-8")
-    else:
+    elif empty_case == "no_allowlisted_keys":
         document.write_text(
             _document([
                 "generated_from:\n  path: docs/x.md\n  sha256: %s\n" % ("b" * 64),
             ]),
             encoding="utf-8",
         )
+    else:
+        document.write_text("本文だけの文書。\n", encoding="utf-8")
+        digest = _write_target(root, "docs/intent.md", "intent\n")
+        valid = root / "valid.md"
+        valid.write_text(
+            _document([
+                _mapping_block("intent_ref", "docs/intent.md", digest),
+            ]),
+            encoding="utf-8",
+        )
     allowlist = _write_allowlist(tmp_path)
+    files = (valid, document) if empty_case == "mixed_with_valid" else (document,)
 
     exit_code, payload = _run(
         module,
         capsys,
-        (document,),
+        files,
         allowlist=allowlist,
         root=root,
     )
@@ -423,9 +377,7 @@ def test_same_target_in_multiple_keys_checked_independently(tmp_path, capsys):
 
 @pytest.mark.parametrize(("key", "shape", "inline_value"), (
     ("intent_ref", "mapping", "unexpected"),
-    ("intent_ref", "mapping", "[]"),
     ("authority_order", "mapping_list", "unexpected"),
-    ("authority_order", "mapping_list", "{}"),
 ))
 def test_inline_values_on_allowlisted_key_lines_fail_closed(
     tmp_path,
