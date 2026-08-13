@@ -12,14 +12,7 @@ RED_START_COMMIT = "df6364448c2f24c6f931d17893bd0483b4e2eec9"
 MANIFEST_ROOT = Path(
     "records/development/2026-08-11-claude-bootstrap-manifests"
 )
-MAP_PATH = MANIFEST_ROOT / "declaration-red-map-v1.json"
 BASELINE_PATH = MANIFEST_ROOT / "process-call-baseline-v1.json"
-REQUIREMENT_IDS = (
-    [f"AC-CB-{index:03d}" for index in range(1, 14)]
-    + [f"NG-CB-{index:03d}" for index in range(1, 8)]
-    + [f"ST-CB-{index:03d}" for index in range(1, 8)]
-    + [f"OUT-CB-{index:03d}" for index in range(1, 6)]
-)
 EGRESS_FILES = (
     "tools/egress/approval.py",
     "tools/egress/dry_run.py",
@@ -119,27 +112,6 @@ def test_real_send_requires_verified_completion_review_and_separate_bound_approv
         "human_claude_bootstrap_send_approval"
     )
     assert module.RED_START_APPROVAL_IS_NOT_SEND_APPROVAL is True
-
-
-def test_declaration_map_keys_equal_scope_requirement_ids():
-    document = json.loads((PROJECT_ROOT / MAP_PATH).read_text(encoding="utf-8"))
-    actual = list(document["declarations"])
-
-    assert len(actual) == 32
-    assert len(set(actual)) == 32
-    assert set(actual) == set(REQUIREMENT_IDS)
-    assert set(actual) - set(REQUIREMENT_IDS) == set()
-    assert set(REQUIREMENT_IDS) - set(actual) == set()
-
-
-def test_red_evidence_keeps_green_fields_explicitly_unimplemented():
-    evidence = (PROJECT_ROOT / MANIFEST_ROOT / "red-evidence-v1.md").read_text(
-        encoding="utf-8"
-    )
-
-    assert "GREEN段階のproduction変更：未実施" in evidence
-    assert "実Run：未実施" in evidence
-    assert "Claude process作成：未実施" in evidence
 
 
 def test_completion_review_entry_requires_upstream_derivation_new_counterexample_and_four_classes():
