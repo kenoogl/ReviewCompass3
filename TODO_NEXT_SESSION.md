@@ -7,51 +7,50 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段では401件を16意味群へ分け、現在保証と履歴固定を区別して群単位で整理している。
-- 現在作業：G04の最初の整理単位を完了し、処理目録一式は混在単位として維持した。判明した安全保証の食い違いは未解決の改善候補へ固定し、外部送信入口の再利用前に裁定する条件で後回しにした。次はG07の赤試験宣言契約を意味群として再評価する。
+- 現在作業：G07の追加8試験を再評価し、7件は固有の現在保証、1件は入力分離不足と独立確認した。現行レビュー手順が旧方式を許し、試験準備の失敗を期待どおりの赤として誤合格できる接続漏れも確認した。既存の安全な版2へ接続する案Aの利用者判断を待つ。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 16意味群分類完了 / 最初の整理単位完了 / 処理目録安全問題はdefer / G07再評価待ち`、影響：増加した試験を行数や一件単位で処分せず、現在保証・履歴固定・役割終了を意味的に分離して保守負債を減らす、次：G07の追加8 node IDだけでなく、対応する三試験file、製品処理、現役正本、履歴資料を一群として読み取り、現在の役割を裁定前まで整理する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 最初の整理単位完了 / G07再評価verified / 案A承認待ち`、影響：試験準備の失敗を予定した機能不足と取り違えて赤試験を誤承認でき、空宣言の拒否条件を壊しても既存試験が検出しない、次：利用者が、現行レビュー手順を既存版2へ接続し、既存一試験内で二つの空条件を分ける案Aを開始するか判断する
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `c57336dd2df961e6fe65b8f7c46665db6bce8e0df66111fc90796398a48dd812`
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `20c4c00a69677af9b4dc51b59b5718889c27fe6cfbbe2adc57cfcc2f601a7a42`
-- [第3段 意味群分類Evidence](records/development/2026-08-13-stage3-test-cleanup-semantic-grouping-evidence-v1.md) — SHA-256 `cc77c218bc4baefc5e734ad7310824235900f32c122bd5f3c5ecdb786cb9399e`
-- [処理目録の役割再評価 独立完了レビュー](records/development/2026-08-13-stage3-process-call-inventory-lifecycle-reassessment-independent-completion-review-v1.md) — SHA-256 `34fc8dedbea2a1be5164977244a6d2799785e574e496ea6e42e5f958657a0934`
-- [処理目録安全問題の観測](records/development/2026-08-13-process-inventory-safety-claim-observation-v1.json) — SHA-256 `5cb7208c1a0ffe40b3d2afffeae1fcb7fdd091207dfecf746de09246ac59a443`
-- [処理目録安全問題の改善候補](.reviewcompass/workflow/improvement-candidates/ic-process-inventory-safety-claim-001--v1.json) — SHA-256 `2a9704bfbbaa3a677351c76490a7a73a3cd2291443efd1121bf5600e501c0394`
+- [G07再評価 作業票](docs/development/2026-08-13-stage3-g07-declaration-red-contract-reassessment-bootstrap-work-ticket-v1.md) — SHA-256 `a9b95a250ea3f48a49474fabad2fe03a78b95f7741420b55de77cee0e1976193`
+- [G07再評価Evidence](records/development/2026-08-13-stage3-g07-declaration-red-contract-reassessment-evidence-v1.md) — SHA-256 `2f9441bdc684fa02b15c839bc3d91cc773ba2f688c747b4818831f12ed96a172`
+- [G07再評価 独立完了レビュー](records/development/2026-08-13-stage3-g07-declaration-red-contract-reassessment-independent-completion-review-v1.md) — SHA-256 `225aab836892ddea8ccd576bdd9444186e72e0ae513ef11cab9e5b9d0805e4dc`
 - [処理目録安全問題の後回し判断](.reviewcompass/workflow/triage-decisions-v4/dec-ic-process-inventory-safety-claim-001--v1.json) — SHA-256 `19c730b299cb0eb2d3bd9098427fbc0b138d5cbe8ac1ad80dffd39f87a081f01`
 
 ## 次に行う一作業
 
-G07「赤試験宣言契約」を意味的に完結する一群として読み取り再評価する。401件中の追加8 node IDを入口にするが、対象をその8試験だけへ狭めず、関連する三試験file、宣言map・実行処理、現役の正本と利用者、履歴資料を照合する。コード、試験、設定、正本は変更しない。
+利用者が案Aを開始するか判断する。案Aは、現行レビュー手順で対応表版2、予定失敗理由、最低版2を必須にし、既存の空宣言試験一件の中で「宣言だけ空」と「試験file一覧だけ空」を別々に確認する。新しい試験、検査器、台帳は追加しない。
 
 開始条件：
 
-- 処理目録安全問題の観測、改善候補、後回し判断がcommit済みである
-- 外部送信入口の再利用前に同問題を裁定する条件を維持する
-- G07の追加8 node IDと三試験fileを機械列挙し、試験件数だけを採否根拠にしない
+- G07再評価Evidenceと独立完了レビューがcommit済みで判定verifiedである
+- 旧方式の誤合格と空宣言条件の見逃しが別入力・別複製で再現済みである
+- 方針変更と試験の意味変更について利用者が案Aを承認する
 
 完了条件：
 
-- 試験、製品処理、設定・正本、履歴資料を対象種別ごとの工程で確認する
-- 現在の動作保証、履歴・監査資料、両方、役割終了へ意味単位で分類し、境界と利用者を示す
-- 代表的な正常例・異常例・境界例または反証を機械で確認し、削除・維持・修正の裁定はHumanへ返す
-- 比較のためだけの新しい試験、検査器、台帳を作らない
+- 承認前は現行レビュー手順、試験、検査処理を変更しない
+- 承認時は変更範囲を現行レビュー手順一件と既存試験file一件に限定した作業票を固定する
+- G07追加8件を削除せず、新しい試験件数を増やさない
+- 修正後は対象試験、旧方式の誤合格反例、新方式の拒否、二つの空条件を独立確認する
 
-後続作業：独立レビューで分類境界と反証を確認した後、意味的な変更候補がある場合だけ利用者へ三案比較と裁定点を示す。Claude手動確認は追加せず、第3段完了前の一回を残す。
+後続作業：案Aを実施・独立完了レビューした後、第3段の次の意味群へ戻る。承認しない場合は、保証を失わない別案を利用者判断へ戻す。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。G07は読み取り再評価から開始できる。
-- Human判断待ち：G07の読み取り再評価後に、意味的な削除・維持・修正候補が生じた場合だけ求める。現時点ではなし。
+- blocker：技術的な実施方法は既存機能で確定しているが、現行レビュー手順の意味変更を含むため利用者承認が必要。
+- Human判断待ち：案Aを開始し、G07追加8件を維持するか。操縦役と独立レビューは案Aを推奨する。
 
 ## stale・deferred
 
-- stale：G04処理目録一式を単純な未使用処理として結合削除する案、v1のG11三試験を役割終了として削除する案、分類ごとのClaude手動確認、一件ずつの削除は採用しない。
-- deferred：IC-PROCESS-INVENTORY-SAFETY-CLAIM-001（外部送信入口の再利用前にHuman裁定）、G11三試験と専用補助処理、他の未評価意味群、状態固定を宣言fileと共通検査へ置き換える作業、Work 8の変異検査。
+- stale：G07追加8件を履歴固定または重複として削除する案、旧方式のverify_redだけで赤試験を安全に照合できるという見方、空宣言試験が二つの空条件を個別に保証するという見方は採用しない。
+- deferred：IC-PROCESS-INVENTORY-SAFETY-CLAIM-001（外部送信入口の再利用前にHuman裁定）、G11三試験と専用補助処理、他の未評価意味群、状態固定を宣言fileと共通検査へ置き換える作業、Work 8の全体変異検査。
 
 ## Git・Test
 
@@ -59,8 +58,8 @@ G07「赤試験宣言契約」を意味的に完結する一群として読み�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：処理目録の基準再生成試験と現在の汎用実行器到達禁止試験は独立確認で各一件成功、終了コード0。後回し記録は候補検証とV4判断台帳検証に合格。
-- 直近の全Test：後回し記録はコード・試験・設定を変更しないため再実行しない。直前の試験整理単位では正規入口から1,737件成功、失敗・エラー・除外0、終了コード0。
+- 直近の関連Test：G07追加8件、専用四file 22件、混在二fileの関連7件はすべて成功。独立変異では7条件を各一件が検出し、空宣言条件だけは追加8件と関連22件が見逃した。
+- 直近の全Test：読み取りと記録だけのため再実行しない。直前の試験整理単位では正規入口から1,737件成功、失敗・エラー・除外0、終了コード0。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
