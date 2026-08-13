@@ -7,12 +7,12 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段では401件を16意味群へ分け、現在保証と履歴固定を区別して群単位で整理している。
-- 現在作業：最初の実施計画v1でG11の現役TRACEABILITY参照を見落としたため、G11を変更対象外へ戻したv2を独立確認済みとした。次はv2変更点だけをClaudeへ一回手動確認する。
+- 現在作業：最初の実施計画v1で見落としたG11の現役参照をv2で変更対象外へ戻した。v2は独立確認とClaude変更点確認の双方で問題なしとなり、G04二試験と専用定数二件の整理実施について利用者判断を待つ。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 16意味群分類完了 / 最初の整理計画v2独立確認済み / Claude変更点確認待ち`、影響：作業時点固定の試験を現役集合へ残すと負債が増える一方、現役対応表との接続を見落として削除すると現在保証を失う、次：固定済みプロンプトでv2変更点だけをClaudeが確認し、その結果を利用者が提示する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 16意味群分類完了 / 最初の整理計画v2確認完了 / 実施承認待ち`、影響：作業時点固定の試験を現役集合へ残すと負債が増える一方、現役対応表との接続を見落として削除すると現在保証を失う、次：利用者がG04二試験と専用定数二件の整理実施を判断する
 
 ## 最新のauthority／Evidence
 
@@ -21,30 +21,30 @@
 - [手動の他社モデル確認回数 利用者判断v1](records/development/2026-08-13-stage3-manual-external-review-limit-decision-v1.md) — SHA-256 `9c0bd9d371b1f6b59be49818b759d17e3877d645f42ff6dc4a4c0eacbeb05136`
 - [最初の試験整理 実施計画v2](docs/development/2026-08-13-stage3-first-test-cleanup-implementation-plan-v2.md) — SHA-256 `c470da1e4ed3b19c548b64db0d817bdec2d1236b747d3388f50eeccf8c6d1147`
 - [実施計画v2 一回限り修正後確認](records/development/2026-08-13-stage3-first-test-cleanup-implementation-plan-v2-one-time-correction-review-v1.md) — SHA-256 `0afc66a36878dc431d7a3e9105b82b2e49c7c0886b8129211460d4c73cf09c45`
-- [Claude向けv2変更点レビュー指示](records/session-handoffs/2026-08-13-claude-stage3-first-test-cleanup-implementation-plan-v2-delta-review-prompt-v1.md) — SHA-256 `953a92312e97181d90ff150650bc0b09d0a3daf2e974f7d1ebddf8a766957f42`
+- [Claudeによるv2変更点レビュー結果](records/development/2026-08-13-stage3-first-test-cleanup-implementation-plan-v2-claude-delta-review-result-v1.md) — SHA-256 `d2ea0a5ccde1981f2732e5b9f134b1ef3271e9ec0cd22d147a494aee7356c4dd`
 
 ## 次に行う一作業
 
-利用者が固定済みClaude向け指示をClaudeへ貼り付け、返答全文を本taskへ提示する。実装と削除はまだ行わない。
+利用者が案B、未承認の一試験の保証廃止、試験file一件・二試験・専用定数二件という変更範囲を承認または不承認にする。実装と削除はまだ行わない。
 
 開始条件：
 
-- v2計画と一回限り修正後確認のSHA-256が固定値と一致する
-- Claudeへの指示がv1→v2の変更点だけに限定されている
-- 外部送信は利用者が代行し、Codexは送信しない
+- v2計画、独立修正後確認、Claude確認結果のSHA-256が固定済みである
+- 独立確認とClaude確認がともに`verified`相当で、止める指摘0件である
+- G11三試験、専用補助処理、現行TRACEABILITYを変更しない境界が固定されている
 
 完了条件：
 
-- Claudeが判定、先行指摘、止める指摘、報告不一致、反証、利用者判断点を返す
-- 本質から外れた新機構やG11の再設計を実施条件へ混入させない
-- 結果を固定後、利用者がG04二試験と専用定数二件の整理実施を承認または不承認にする
+- 利用者が案Bの採否を明示する
+- 利用者が未承認の`test_declaration_map_keys_equal_scope_requirement_ids`の保証廃止を明示する
+- 利用者が対象file一件、二試験、専用定数二件だけという変更範囲を明示する
 
-後続作業：Claude結果がverified相当で利用者が明示承認した場合だけ、G04二試験と専用定数二件の削除を一作業単位で実施する。追加Claude確認は行わず、実装後は新規サブエージェントが独立完了レビューする。
+後続作業：利用者が三点を承認した場合だけ、G04二試験と専用定数二件の削除を一作業単位で実施する。追加Claude確認は行わず、実装後は新規サブエージェントが独立完了レビューする。
 
 ## blocker・Human判断待ち
 
-- blocker：外部送信経路をCodexから使用できないため、Claude確認の貼付けと返答回収は利用者の代行が必要。
-- Human判断待ち：Claude結果を確認後、案B、未承認の一試験の保証廃止、対象file一件・二試験・専用定数二件という実施範囲を判断する。
+- blocker：なし。実施は利用者判断まで停止する。
+- Human判断待ち：案B、未承認の一試験の保証廃止、対象file一件・二試験・専用定数二件という実施範囲を判断する。
 
 ## stale・deferred
 
