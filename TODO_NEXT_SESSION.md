@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段は401件の候補列挙と最初の一件の予備調査まで進んだが、整理判断の範囲が狭かったため、意味的な全体単位での再評価へ戻る。
-- 現在作業：最初の候補について、履歴対応表を現在状態の合否判定器として扱った独立レビューの裁定と、一関数だけを最小単位とした選定の双方を未採択とした。整理・削除は役割分類と総費用で判断する方針を正本へ追加し、変更点限定の独立レビュー待ちである。
+- 現在作業：最初の候補について、履歴対応表を現在状態の合否判定器として扱った独立レビューの裁定と、一関数だけを最小単位とした選定の双方を未採択とした。整理・削除は役割分類と総費用で判断する方針を正本へ追加し、新規Codexの変更点限定レビューはverified、Claudeへの手動受け渡し待ちである。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
@@ -20,8 +20,8 @@
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `20c4c00a69677af9b4dc51b59b5718889c27fe6cfbbe2adc57cfcc2f601a7a42`
 - [整理判断の範囲・役割・総費用 方針採用判断v1](records/development/2026-08-13-cleanup-decision-scope-and-lifecycle-policy-adoption-v1.md) — SHA-256 `a6eb37969e7c16b97f970e76b08b9b9a082ffba2336019a69ae0db4aa23778c5`
 - [試験増加・状態固定Issue現在有効性の再判定v1](records/development/2026-08-13-test-growth-state-pinning-current-validity-decision-v1.md) — SHA-256 `1609dfdd76b25c86b38bd105f4199cbbc1636614c5f68256fdee61879c3bddac`
-- [第3段 最初の試験整理候補 選定結果v1](records/development/2026-08-13-stage3-first-test-cleanup-candidate-selection-v1.md) — SHA-256 `e326bee8a340939757e7ed47503b8a7d6bb8c5567e7871277ec4a3b305c9e245`
-- [第3段 最初の試験整理候補 独立レビューv1](records/development/2026-08-13-stage3-first-test-cleanup-candidate-review-v1.md) — SHA-256 `9025ec78e68723b8fd2b4b6ab27ae47bb5bea6c70fd48264181b4fb89a5c7e91`
+- [整理判断方針のCodex変更点限定レビューv1](records/development/2026-08-13-cleanup-decision-scope-policy-delta-review-v1.md) — SHA-256 `a4fed4dcd6e8cd5849ae97618a334fd345c05aa2925af135ac225166aae6528f`
+- [Claude向け整理判断方針の変更点レビュー指示v1](records/session-handoffs/2026-08-13-claude-cleanup-decision-scope-policy-delta-review-prompt-v1.md) — SHA-256 `2d43a86a93ba69c363aa938c4bd4b2efc8ee8cbcfc3a21b83147a5bb1c46a275`
 
 ## 次に行う一作業
 
@@ -29,7 +29,7 @@
 
 開始条件：
 
-- 方針変更の変更点限定独立レビューが完了し、文言、導線、既存方針との矛盾に止める指摘がない
+- Codexと利用者が手動で受け渡すClaudeの変更点限定レビューが完了し、文言、導線、既存方針との矛盾に止める指摘がない
 - 対象試験、RED／GREEN証跡、宣言対応表、現在の関連試験と正規入口のpath・参照・時点を機械列挙する
 - 履歴時点の対応表を現在状態の合否判定器として使わず、観測した不一致と現在欠陥の裁定を分ける
 
@@ -43,8 +43,8 @@
 
 ## blocker・Human判断待ち
 
-- blocker：方針変更の独立レビュー未完了。現在候補の削除または撤回は未承認である。
-- Human判断待ち：再評価後に、最初の整理単位を当該候補群とするか、維持するか、別候補へ移るかを判断する。
+- blocker：Claudeの変更点限定レビュー未完了。現在候補の削除または撤回は未承認である。
+- Human判断待ち：Claudeへ固定指示を手動で渡し、結果を戻す。その後の再評価で、最初の整理単位を当該候補群とするか、維持するか、別候補へ移るかを判断する。
 
 ## stale・deferred
 
@@ -57,7 +57,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：現行の履歴対応表を現在試験へ照合すると、既存の欠落2件・未対応15件でfailed。これは時点の違いを示す観測であり、現在欠陥の裁定には用いない。文書変更の独立レビューは未実施。
+- 直近の関連Test：現行の履歴対応表を現在試験へ照合すると、既存の欠落2件・未対応15件でfailed。これは時点の違いを示す観測であり、現在欠陥の裁定には用いない。Codex変更点限定レビューはverified、止める指摘0件、報告不一致0件。
 - 直近の全Test：直近の公式入口は1,739件成功、失敗・エラー・除外0、Python 3.13.14、代替実行なし、終了コード0。本方針変更では再実行しない。
 - 差分検査：`git diff --check`合格
 
