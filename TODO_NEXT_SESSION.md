@@ -7,48 +7,48 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段では401件を16意味群へ分け、現在保証と履歴固定を区別して群単位で整理している。
-- 現在作業：Work 5B契約と現役試験の役割再評価を完了した。独立レビューはverifiedで、契約試験file一件・六試験だけを現役集合から外し、契約v1・v2と過去Decision・Evidenceを履歴として無変更で残す案Cの利用者承認を待つ。
+- 現在作業：Work 5B契約試験file一件・六試験を現役集合から外し、独立完了レビューはverifiedだった。全試験は1,731件成功し、契約v1・v2と過去資料は無変更である。次は承認済みG06案Bを実施する。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / Work 5B役割再評価verified / 案C承認待ち`、影響：完了済みの歴史契約を現在試験fileのbytesへ束縛する六試験が、正当な後続変更を不合格にし、固定値更新を繰り返している。六試験を外しても現在の直接試験22件が安全境界を維持することを独立確認した、次：利用者が案Cの実施と履歴record無変更を承認するか判断する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / Work 5B整理verified / G06案B実施待ち`、影響：G06の現行24件にはlist内の不正値を見逃す入力と、固有保証のない衝突確認二件・不安定な実在記録走査一件が混在する、次：承認済みG06案Bとして既存入力一件を置換し、役割終了三件を試験file一件から整理する
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `c57336dd2df961e6fe65b8f7c46665db6bce8e0df66111fc90796398a48dd812`
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `20c4c00a69677af9b4dc51b59b5718889c27fe6cfbbe2adc57cfcc2f601a7a42`
-- [Work 5B役割再評価 作業票](docs/development/2026-08-14-work5b-contract-lifecycle-reassessment-bootstrap-work-ticket-v1.md) — SHA-256 `be6e705587c0bba6c65d91ea365b803bab5fbad1b31a428166cf4b65af6aae49`
-- [Work 5B役割再評価Evidence](records/development/2026-08-14-work5b-contract-lifecycle-reassessment-evidence-v1.md) — SHA-256 `7710fc40c1eb275bd4ba286686209149ca2cced272c8c2b0e18f7833182361a9`
-- [Work 5B役割再評価 独立完了レビュー](records/development/2026-08-14-work5b-contract-lifecycle-reassessment-independent-completion-review-v1.md) — SHA-256 `471fda706322a31919a5b6bca1f3c611b2731dbdec25bb0a91dbbdeacb49a87f`
+- [Work 5B試験整理Evidence](records/development/2026-08-14-work5b-contract-test-cleanup-evidence-v1.md) — SHA-256 `a1b5c61528ffe8aab9f3b2180bc28ba0a43cc11f1c4ddb41863f526e796a94ac`
+- [Work 5B試験整理 独立完了レビュー](records/development/2026-08-14-work5b-contract-test-cleanup-independent-completion-review-v1.md) — SHA-256 `dd2d72331e9ffdc92fec9242d507d3451456f1d7df25d9d2451ba54c9a94d17d`
+- [G06再評価 限定修正後確認](records/development/2026-08-13-stage3-g06-common-guards-reassessment-correction-review-v1.md) — SHA-256 `e0613030767c04d38014e9842388c2b302cc071f0a1c5b463bb3914bf6d7d36a`
 
 ## 次に行う一作業
 
-利用者が案Cを採用するか判断する。案Cはtests/test_work5b_contract.py一件・六試験だけを削除する。Work 5B契約v1・v2、固定source Decision・Evidence、初期開発チェックリスト、現在の検査コードと直接試験は変更せず、v2の自己内容識別値不一致も追加訂正しない。
+G06案Bを実施する。tests/test_common_digests.pyの入れ子tuple入力一件をlist内tupleへ置換し、固有保証のない衝突確認二件と、名前順先頭200件だけを走査する実在記録試験一件を削除する。経路五件、閉じたJSON入力、Task Contract三境界は維持する。
 
 開始条件：
 
-- 役割再評価Evidenceと独立完了レビューがcommit済みで判定verifiedである
-- 案C模擬で現在の直接試験22件が成功し、常時許可・常時拒否の欠陥を既存直接試験が検出済みである
-- 利用者が案C、試験file一件・六試験の削除、履歴record無変更を承認する
+- G06再評価の限定修正後確認がverifiedである
+- 案B模擬でG06 21件・関連84件が成功し、list再帰欠陥で置換一件が失敗済みである
+- 利用者が案Bを承認済みで、Work 5B整理がverifiedで完了している
 
 完了条件：
 
-- 承認前は試験、契約、Decision、Evidenceを変更しない
-- 承認時は変更範囲を試験file一件の削除と実施Evidenceに限定した作業票を固定する
-- 実施後は現在の直接試験22件、公式全試験、Gitからの履歴回復を独立完了レビューで確認する
+- 変更範囲をtests/test_common_digests.py一件と実施Evidenceに限定する
+- G06 21件、関連84件、list再帰の欠陥投入、正規全試験が成功する
+- 新しい試験、検査器、台帳を追加せず、一回の独立完了レビューを行う
 
-後続作業：案Cを実施・独立完了レビューした後、既に承認済みのG06案Bへ戻る。Claude手動確認は第3段完了前の一回を残す。
+後続作業：G06案Bの独立完了レビュー後、第3段の次の意味群へ戻る。Claude手動確認は第3段完了前の一回を残す。
 
 ## blocker・Human判断待ち
 
-- blocker：技術的な停止要因はないが、既存試験六件の削除と履歴recordを追加訂正しない裁定はHuman承認を要する。
-- Human判断待ち：案C、tests/test_work5b_contract.py一件・六試験の削除、v1・v2等を無変更で残しv2不一致を追加訂正しないことを承認するか。操縦役と独立レビューは案Cを推奨する。
+- blocker：なし。意味変更は利用者承認済みで、模擬と独立再評価も完了している。
+- Human判断待ち：なし。案Bの実施は承認済み。新しい範囲変更または段完了が生じた場合だけ再度求める。
 
 ## stale・deferred
 
-- stale：v2の固定SHA-256を現在値へ再更新すれば恒久解消するという見方、後継v3を作る必要があるという見方、六試験が現在製品の固有保証を持つという見方は採用しない。
-- deferred：承認済みG06案B、IC-PROCESS-INVENTORY-SAFETY-CLAIM-001、G11三試験と専用補助処理、他の未評価意味群、Work 8の全体変異検査。
+- stale：Work 5B契約試験六件を現役保証とする見方、G06の24件すべてが固有保証を持つという見方、先頭200件の走査を全記録整合の保証とする見方は採用しない。
+- deferred：IC-PROCESS-INVENTORY-SAFETY-CLAIM-001、G11三試験と専用補助処理、他の未評価意味群、Work 8の全体変異検査。
 
 ## Git・Test
 
@@ -56,8 +56,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：現在の契約試験は5件成功・1件失敗。案C模擬では現在処理を直接守る22件が成功し、常時許可・常時拒否の二変異を既存直接試験が検出した。
-- 直近の全Test：読み取り再評価とリポジトリ外模擬だけのため再実行しない。案C実施後に正規入口から実行する。
+- 直近の関連Test：Work 5B整理後の直接試験22件成功。G06案Bの事前模擬は21件・関連84件成功、list再帰欠陥で置換一件失敗。
+- 直近の全Test：Work 5B整理後の正規全試験は1,731件成功、失敗・エラー・除外0。G06案B実施後は三件減の1,728件を期待する。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
