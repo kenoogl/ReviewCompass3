@@ -16,12 +16,13 @@
 
 ## 最新のauthority／Evidence
 
-- [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `0ac8c8ee91f129dbb66ceaea6e5ad370d99bb71d6a5e36db443c4715a407b0ce`
+- [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `5e0ab06b682939ab0c6e5804db02ee31952059a4404b8a21fe38ef07532514b3`
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `20c4c00a69677af9b4dc51b59b5718889c27fe6cfbbe2adc57cfcc2f601a7a42`
 - [G01現役接続Evidence](records/development/2026-08-14-stage3-g01-authority-reference-guard-activation-evidence-v1.md) — SHA-256 `52022b04a72b1c5df458f949f80bde1383ef4238f8d6b6b024977eac6ad398cd`
 - [G01現役接続 独立完了レビュー](records/development/2026-08-14-stage3-g01-authority-reference-guard-activation-independent-completion-review-v1.md) — SHA-256 `c441ef796f34959cadf5a111826af50fa02e46a3e367f896768a417940f78515`
 - [第3段成果物整理の追補判断](records/development/2026-08-14-recovery-plan-v5-stage3-created-artifact-completion-condition-amendment-decision-v1.md) — SHA-256 `181c74b9b325df9544ce195e3344aee60d0090cce61ab4f136f5d8c1f9da00db`
 - [第4段正式製品コード識別の追補判断](records/development/2026-08-14-recovery-plan-v5-stage4-formal-product-code-identification-amendment-decision-v1.md) — SHA-256 `1e21e6af4be4898e98436206b950efed4e6cca825397fbc85a9030455e5e94e3`
+- [第4段軽量整理と製品機能候補の境界判断](records/development/2026-08-14-recovery-plan-v5-stage4-lightweight-code-cleanup-boundary-amendment-decision-v1.md) — SHA-256 `d54a486c93a6d0f25411765f99a7fdb669edfb1db84c7a9298a2d9b5dfb8e70a`
 
 ## 次に行う一作業
 
