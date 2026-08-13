@@ -195,6 +195,9 @@ def _group_evaluation(policy, target_kind, risk):
     elif target_kind == "validator_code":
         arguments["risk"] = _effective_risk(risk, "high")
         arguments["changes_validator"] = True
+        extra_requirements = policy.validator_assurance_requirements[
+            "medium"
+        ]
     elif target_kind == "configuration":
         arguments["changes_input_assumption"] = True
         extra_requirements = (
