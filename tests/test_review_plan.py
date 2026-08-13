@@ -291,6 +291,15 @@ def test_target_kinds_keep_their_own_review_processes(tmp_path):
         "document_consistency_check"
     ]
     assert groups["validator_code"]["effective_risk"] == "high"
+    assert "known_positive_fixture" in groups[
+        "validator_code"
+    ]["verification_requirements"]
+    assert "known_negative_fixture" in groups[
+        "validator_code"
+    ]["verification_requirements"]
+    assert "boundary_fixture" in groups[
+        "validator_code"
+    ]["verification_requirements"]
     assert "validator_mutation_or_fault_injection" in groups[
         "validator_code"
     ]["verification_requirements"]
