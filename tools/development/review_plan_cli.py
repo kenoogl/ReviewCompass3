@@ -7,7 +7,7 @@ import sys
 from tools.development.review_plan import ReviewPlanStop, build_review_plan
 
 
-_FLAGS = ("base-commit", "target-commit", "risk", "stage")
+_FLAGS = ("base-commit", "target-commit", "risk", "stage", "classification")
 
 
 def _parse(arguments):
@@ -49,6 +49,7 @@ def run(argv=None):
             target_commit=values["target-commit"],
             risk=values["risk"],
             stage=values["stage"],
+            classification_path=values["classification"],
         )
         exit_code = 0
     except ReviewPlanStop as error:
