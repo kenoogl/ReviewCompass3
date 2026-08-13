@@ -16,7 +16,7 @@
 
 ## 最新のauthority／Evidence
 
-- [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `c57336dd2df961e6fe65b8f7c46665db6bce8e0df66111fc90796398a48dd812`
+- [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `84e94e09f09a05daa96c6d56ab744d74d2e963591c344a6713ccdaf6b3906408`
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `20c4c00a69677af9b4dc51b59b5718889c27fe6cfbbe2adc57cfcc2f601a7a42`
 - [G06整理Evidence](records/development/2026-08-14-stage3-g06-common-guards-cleanup-evidence-v1.md) — SHA-256 `0286819dfbd01aa4fe77d46cf9b74dee1e6fce3c3ebb83e8f19a49d4d3ef5acc`
 - [G06整理 独立完了レビュー](records/development/2026-08-14-stage3-g06-common-guards-cleanup-independent-completion-review-v1.md) — SHA-256 `b7bcbdb2bb680e85c94b0d8168f9d06f49322d8351262abc1a73fe0e6ef36a59`
