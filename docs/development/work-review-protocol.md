@@ -84,10 +84,13 @@ Task Contract、受入条件、Test、validator、Human判断などのoracleを�
 - `high`では、実行者のfixtureに存在しない反証を最低1件、reviewerが新たに作って機械で試す。
   守り役のcodeでは、誤って合格させる方向（改竄、偽装、迂回、境界値）を優先する。
   反証が成立した場合は検証結果として分離し、承認なしに実装修正へ移らない。
-- 宣言→RED対応表を作る作業では、RED固定commitの前に`verify_red=True`で実行照合し、
-  結果をRED Evidenceへ記録する。`mismatched`または`unknown`が残る間はcommitしない
-  （`DEC-RED-VERIFICATION-ADOPTION-001`）。`red_now`はRED時点の主張であり、
-  実装完了後には照合が成立しない。
+- 宣言→RED対応表を作る作業では、`red_verification_contract.version`を2にし、
+  `red_now: true`の各試験へ予定した失敗理由`expected_failure_reason`を持たせる。RED固定commitの前に
+  `tools.development.declaration_red_map_check.check_declaration_red_map`へ`verify_red=True`と
+  `minimum_red_contract_version=2`を同時に指定して実行照合し、結果をRED Evidenceへ記録する。
+  `status`が`passed`でない場合、または`execution_errors`、`reason_mismatched`、`mismatched`、`unknown`の
+  いずれかが0件でない場合はcommitしない（`DEC-RED-VERIFICATION-ADOPTION-001`）。`red_now`はRED時点の
+  主張であり、実装完了後には照合が成立しない。
 - 実行command、exit code、件数、environment、receiptを記録する。
 
 ### 4.5 WorkflowとProvenanceを確認する

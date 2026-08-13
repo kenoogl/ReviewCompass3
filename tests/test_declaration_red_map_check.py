@@ -144,21 +144,39 @@ class TestCompleteScopeCannotBeEmptied:
     """F-B4反証：宣言逃れ・型偽装・root脱出を対応表で合格させない。"""
 
     def test_complete_scope_with_no_declarations_is_rejected(self, tmp_path):
-        _write_test_file(
-            tmp_path, "def test_a():\n    pass\n"
-        )
-        map_path = tmp_path / "empty-map.json"
-        map_path.write_text(
-            json.dumps(
-                {"scope": {"kind": "complete"}, "test_files": {}, "declarations": {}},
-                ensure_ascii=False,
+        test_file = _write_test_file(tmp_path, "def test_a():\n    pass\n")
+        cases = (
+            (
+                "without-declarations",
+                {
+                    "scope": {"kind": "complete"},
+                    "test_files": {test_file: ["test_a"]},
+                    "declarations": {},
+                },
+                "complete_scope_without_declarations",
             ),
-            encoding="utf-8",
+            (
+                "without-test-files",
+                {
+                    "scope": {"kind": "complete"},
+                    "test_files": {},
+                    "declarations": {"D1": _declaration(test_file, ["test_a"])},
+                },
+                "complete_scope_without_test_files",
+            ),
         )
-        result = drmc.check_declaration_red_map(
-            map_path=map_path, project_root=tmp_path
-        )
-        assert result["status"] == "failed"
+        for name, document, expected_finding in cases:
+            map_path = tmp_path / f"{name}.json"
+            map_path.write_text(
+                json.dumps(document, ensure_ascii=False), encoding="utf-8"
+            )
+            result = drmc.check_declaration_red_map(
+                map_path=map_path, project_root=tmp_path
+            )
+            assert result["status"] == "failed"
+            assert any(
+                expected_finding in finding for finding in result["findings"]
+            )
 
     def test_non_boolean_red_now_is_rejected(self, tmp_path):
         _write_test_file(tmp_path, "def test_a():\n    pass\n")
