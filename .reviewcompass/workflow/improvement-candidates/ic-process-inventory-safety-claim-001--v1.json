@@ -1,0 +1,65 @@
+{
+  "record_kind": "improvement_candidate",
+  "schema_version": 1,
+  "candidate_id": "IC-PROCESS-INVENTORY-SAFETY-CLAIM-001",
+  "candidate_version": 1,
+  "created_at": "2026-08-13T22:08:08+09:00",
+  "source_work": "stage3/process-call-inventory-lifecycle-reassessment",
+  "source_identity": {
+    "kind": "observation",
+    "source_id": "OBS-RC3-PROCESS-INVENTORY-SAFETY-CLAIM-2026-08-13-V1",
+    "source_version": 1,
+    "path": "records/development/2026-08-13-process-inventory-safety-claim-observation-v1.json",
+    "sha256": "5cb7208c1a0ffe40b3d2afffeae1fcb7fdd091207dfecf746de09246ac59a443"
+  },
+  "problem": "現在のClaude疎通入口が正本として参照するAC-CB-012は処理呼出し目録の比較合格を要求するが、比較処理は関数境界を確認せず、禁止関数からのsubprocess.runを許可関数からの起動として誤表示する。後続の正常なprocess呼出し三件がある現在の先端では空listを返し、現在の安全保証として利用できない。",
+  "impact": [
+    "外部processの起動経路が正本の許可範囲外でも、許可済み関数として表示され得る",
+    "AC-CB-012を満たしたという判断と実際の検査能力が一致しない",
+    "現在は外部送信入口を使っていないが、再利用前に裁定しないと古い合格を安全保証と誤認する"
+  ],
+  "scope": [
+    "AC-CB-012を現在も要求するかのHuman裁定",
+    "要求を維持する場合に、関数境界と後続の正常追加を区別できる検査へ接続する方針の検討",
+    "要求を維持しない場合に、現行正本と処理目録コード・試験の同じ意味単位での整理を検討",
+    "外部送信入口を再利用する前の必須確認条件として扱う"
+  ],
+  "non_scope": [
+    "第3段の試験整理中の実装修正",
+    "処理目録一式の即時削除",
+    "新しい検査器、試験、台帳、強制関門の先行作成",
+    "外部送信、認証操作、Claude実行",
+    "現在のISSUE-TEST-GROWTH-STATE-PINNING-001の中へ修正を混ぜること"
+  ],
+  "classification_candidates": [
+    "test_or_oracle",
+    "process_improvement",
+    "requirement"
+  ],
+  "route_candidates": [
+    "defer",
+    "checkpoint",
+    "issue_resolution"
+  ],
+  "consumer_candidates": [
+    "claude-bootstrap",
+    "reviewcompass3-development",
+    "development-policy"
+  ],
+  "evidence_refs": [
+    {
+      "path": "records/development/2026-08-13-stage3-process-call-inventory-lifecycle-reassessment-evidence-v1.md",
+      "sha256": "887b6f71390c899461838e8e9f9eaf6387103efc6bb383a5c6dd20a379c62f50"
+    },
+    {
+      "path": "records/development/2026-08-13-stage3-process-call-inventory-lifecycle-reassessment-independent-completion-review-v1.md",
+      "sha256": "34fc8dedbea2a1be5164977244a6d2799785e574e496ea6e42e5f958657a0934"
+    },
+    {
+      "path": "records/session-handoffs/2026-08-11-codex-pilot-approved-claude-send-path-scope-v3.md",
+      "sha256": "02a4f6786875a9eeb87165e387ac1e65d520423930bf3849cb967249639861a7"
+    }
+  ],
+  "proposed_action": "利用者は2026-08-13に「候補として後回し」を選択した。現在の第3段には修正を混ぜず、本候補を未解決のまま保持する。外部送信入口を再利用する前に、AC-CB-012を維持するか、正しい検査へ接続するか、要求を改定して処理目録一式を整理するかをHumanが裁定する。裁定前に実装、正本改定、試験追加、削除を行わない。",
+  "content_digest": "9c112548ab5d70a86cb614a8404af27c0195417c2661e99b3de15a738236d25a"
+}

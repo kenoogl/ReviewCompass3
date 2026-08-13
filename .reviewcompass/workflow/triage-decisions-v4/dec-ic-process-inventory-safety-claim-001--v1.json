@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-PROCESS-INVENTORY-SAFETY-CLAIM-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-13T22:20:32+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-process-inventory-safety-claim-001--v1.json",
+    "record_sha256": "2a9704bfbbaa3a677351c76490a7a73a3cd2291443efd1121bf5600e501c0394",
+    "candidate_id": "IC-PROCESS-INVENTORY-SAFETY-CLAIM-001",
+    "candidate_content_digest": "9c112548ab5d70a86cb614a8404af27c0195417c2661e99b3de15a738236d25a"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": false,
+    "impact": "high",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "defer",
+  "blocking": false,
+  "rationale": "利用者は2026-08-13に三択の2「改善候補として固定し、第3段へ戻る。外部送信入口を再利用する前には必ず対処する」を選択した。現在は当該入口を使用しておらず直ちに副作用はないため現行Workを停止しない。一方、外部process安全とAC-CB-012の真偽に関わるため影響はhigh、着手時期は後回しの選択を機械可読語彙へ写してpriorityはlow、正式Issueへの昇格は未承認とする。",
+  "next_action": "候補を未解決のdeferとして保持し、第3段へ戻る。外部送信入口を再利用する前にHumanがAC-CB-012の維持、正しい検査への接続、要求改定と処理目録整理のいずれかを裁定する。裁定前に実装、正本改定、試験追加、削除、外部送信を行わない。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "20c30756ec3a04cae4256d50905209d4b3e973d4bf1c1d31d4c1629f5e369c89"
+}

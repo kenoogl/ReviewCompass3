@@ -1,0 +1,43 @@
+{
+  "observation_id": "OBS-RC3-PROCESS-INVENTORY-SAFETY-CLAIM-2026-08-13-V1",
+  "observed_at": "2026-08-13T22:08:08+09:00",
+  "status": "fixed_improvement_source",
+  "subject": "処理呼出し目録の比較処理が禁止関数を許可関数として誤表示し、現在の受入条件を保証できない",
+  "source": {
+    "path": "records/development/2026-08-13-stage3-process-call-inventory-lifecycle-reassessment-evidence-v1.md",
+    "sha256": "887b6f71390c899461838e8e9f9eaf6387103efc6bb383a5c6dd20a379c62f50"
+  },
+  "machine_observations": {
+    "measured_at_commit": "ded5541",
+    "baseline_entry_count": 79,
+    "current_entry_count": 110,
+    "addition_count": 37,
+    "later_out_of_scope_process_call_count": 3,
+    "current_compare_result": [],
+    "generator_python_consumer_count": 1,
+    "comparison_python_consumer_count": 0,
+    "counterexample": {
+      "actual_function": "forbidden_process_entry",
+      "reported_function": "run_approved_no_tool_bootstrap",
+      "accepted_as_allowed": true
+    },
+    "active_authority": {
+      "entry_path": "docs/development/prompts/claude-bootstrap-run.md",
+      "authority_path": "records/session-handoffs/2026-08-11-codex-pilot-approved-claude-send-path-scope-v3.md",
+      "requirement_id": "AC-CB-012"
+    }
+  },
+  "problem": "現在のClaude疎通入口が正本として参照する範囲固定v3は、AC-CB-012で処理呼出し目録の比較合格を要求する。しかしcompare_process_call_inventoriesは関数境界を構文木から確認せず、禁止された別関数のsubprocess.runを許可関数run_approved_no_tool_bootstrapの結果として返す。さらに後続の正常なprocess呼出し三件が加わった現在の先端では空listを返すため、現在の安全保証として利用できない。",
+  "impact": [
+    "外部processの起動経路が正本の許可範囲外でも、比較結果が許可済み関数として表示され得る",
+    "AC-CB-012を満たしたという判断と実際の検査能力が一致しない",
+    "現在は外部送信入口を使っていないため直ちに副作用は生じないが、再利用前に裁定しないと古い合格を安全保証と誤認する"
+  ],
+  "boundary": [
+    "本観測を不変の改善候補sourceとして保持する",
+    "第3段の試験整理中に比較処理、正本、外部送信入口を修正しない",
+    "外部送信入口を安全保証済みとして再利用する前に、AC-CB-012を維持するか、正しい検査へ接続するか、要求を改定するかをHumanが裁定する",
+    "処理目録一式を単純な未使用物として削除しない",
+    "新しい検査器、試験、台帳、強制関門を本観測だけで作らない"
+  ]
+}
