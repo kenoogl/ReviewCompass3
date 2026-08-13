@@ -7,48 +7,48 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段は401件の候補列挙と最初の一件の予備調査まで進んだが、整理判断の範囲が狭かったため、意味的な全体単位での再評価へ戻る。
-- 現在作業：整理・削除を役割分類と総費用で判断する方針は正本と現役導線へ固定され、新規Codexと利用者が手動で受け渡したClaudeの変更点限定レビューがともにverifiedとなった。最初の候補の削除・維持・撤回は未採択で、意味的な成果物群としての再評価を開始する。
+- 現在作業：最初の候補を意味的な成果物群として再評価した。実行時間を費用の中心にしたv2を利用者指摘で失効させ、v3では理解負担、過去資料との結合、変更時の調査範囲、部分保証の誤解、増殖の前例を基準に一件削除を推奨した。Codexの変更点確認はverifiedで、Claude確認待ちである。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 現在有効性を再判定済み / 401件列挙完了 / 最初の候補群を再評価待ち`、影響：試験一件だけの局所判断では、現在保証と履歴資料の役割、保持・削除・修正連鎖・将来調査の総費用を取り落とす、次：当該試験と関連するRED／GREEN証跡、宣言対応表、現在保証、正規入口を一つの候補群として読み取り再評価する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 401件列挙完了 / 最初の候補群を再評価v3へ修正済み / Claude変更点確認待ち`、影響：試験一件だけの局所判断では、現在保証と履歴資料の役割、保持・削除・修正連鎖・将来調査の総費用を取り落とす、次：Claudeへv3の費用軸、保証の必要性、一件削除推奨、保存済みメモ注記の四変更点だけを手動で確認依頼する
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `c57336dd2df961e6fe65b8f7c46665db6bce8e0df66111fc90796398a48dd812`
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `20c4c00a69677af9b4dc51b59b5718889c27fe6cfbbe2adc57cfcc2f601a7a42`
-- [整理判断の範囲・役割・総費用 方針採用判断v1](records/development/2026-08-13-cleanup-decision-scope-and-lifecycle-policy-adoption-v1.md) — SHA-256 `a6eb37969e7c16b97f970e76b08b9b9a082ffba2336019a69ae0db4aa23778c5`
-- [整理判断方針レビュー完了判断v1](records/development/2026-08-13-cleanup-decision-scope-policy-review-completion-decision-v1.md) — SHA-256 `a010c10df26ce7f75a3d53e7e67650d8a0128ccebde42253b88d9f36d221dff5`
-- [整理判断方針のCodex変更点限定レビューv1](records/development/2026-08-13-cleanup-decision-scope-policy-delta-review-v1.md) — SHA-256 `a4fed4dcd6e8cd5849ae97618a334fd345c05aa2925af135ac225166aae6528f`
-- [Claude整理判断方針の変更点限定レビュー結果v1](records/session-handoffs/2026-08-13-claude-cleanup-decision-scope-policy-delta-review-result-v1.md) — SHA-256 `e461add39d00126eb01f7743f4bf27e2fd3c518de9b54f3a7a8308e231556372`
+- [最初の試験整理候補 保守負債による再評価v3](records/development/2026-08-13-stage3-first-test-cleanup-lifecycle-reassessment-v3.md) — SHA-256 `d7c51c08221825786cc443815f6c7c44cf11797b8a3bd47ef7114a6e92ef7476`
+- [重要度に応じた確認方法の運用メモv1](docs/development/2026-08-13-risk-proportional-verification-method-note-v1.md) — SHA-256 `a701fbf8bbd52b24829e80a0372e2e03d4f3013d1e86ef153522203ea3c35819`
+- [最初の試験整理候補 v3 Codex変更点確認v1](records/development/2026-08-13-stage3-first-test-cleanup-lifecycle-v3-delta-review-v1.md) — SHA-256 `62196d3b860e7b804af321dfb5a7efe30ce64fd9dc2b10d0aabb4134d0158098`
+- [Claude向け最初の試験整理候補 v3変更点確認指示v1](records/session-handoffs/2026-08-13-claude-stage3-first-test-cleanup-lifecycle-v3-delta-review-prompt-v1.md) — SHA-256 `a33fffb13db5d871619c1db21da18b19f63f95d4d231a179fed8c08b1a775020`
 
 ## 次に行う一作業
 
-第3段の読み取り調査として、最初の候補を一関数ではなく意味的に関係する成果物群として再評価する。試験、対応表、証跡、コード、設定は変更しない。
+利用者が固定指示をClaudeへ手動で渡し、v3で直した費用の軸、保証の必要性、一件削除推奨、保存済みメモ注記の四点だけを確認して、返答をこの会話へ戻す。試験、対応表、証跡、コード、設定は変更しない。
 
 開始条件：
 
-- 整理判断方針の二つの変更点限定レビューがverifiedで、対象試験、対応表、証跡、コード、設定に未承認の変更がない
-- 対象試験、RED／GREEN証跡、宣言対応表、現在の関連試験と正規入口のpath・参照・時点を機械列挙する
-- 履歴時点の対応表を現在状態の合否判定器として使わず、観測した不一致と現在欠陥の裁定を分ける
+- 修正版v3、保存済みメモ、Codex変更点確認、Claude用指示の内容識別値が固定済みである
+- Claudeにはv1・v2全体の再レビュー、新しい反証、全試験、別候補、追加機構を依頼しない
+- 対象試験の削除または維持をClaudeへ裁定させず、利用者判断として残す
 
 完了条件：
 
-- 各構成物を現在の動作保証、履歴・監査資料、両方、役割終了へ分類し、意味的に完結した最小単位を示す
-- 維持、整理、別候補へ移る三案について、反復費用、一回費用、修正連鎖、将来調査・監査費用、回復可能性、増加誘因を比較する
-- 選んだ境界が狭すぎないかを独立レビューで反証し、削除・統合・使用停止をせず利用者判断へ渡す
+- 実行時間を費用の中心にせず、保守負債を中心にしたことが確認される
+- 対象試験の部分保証が履歴全体と現在製品保証に不要で、一件削除を推奨できることが確認される
+- 止める指摘と報告不一致が示され、file変更、試験削除、外部送信が未実施である
 
-後続作業：利用者が候補群の境界、役割分類、危険度、実施案を判断した後、その意味単位だけの作業票と開始確認へ進む。
+後続作業：二つの変更点確認が揃った後、利用者が推奨案Bの一試験削除を承認するか、維持して別候補へ移るかを判断する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。現在候補の削除、維持、撤回は再評価前なので未承認である。
-- Human判断待ち：再評価後に、最初の整理単位を当該候補群とするか、維持するか、別候補へ移るかを判断する。
+- blocker：Claudeのv3変更点確認が未完了。対象試験の削除または維持は未承認である。
+- Human判断待ち：Claude確認後に、保守負債を減らす推奨案Bとして対象試験一件を削除するか、維持して別候補へ移るかを判断する。
 
 ## stale・deferred
 
-- stale：一関数だけを最小整理単位とする案、および履歴対応表の現在不一致だけを削除案の停止根拠とする裁定は、再評価完了まで採否に使わない。
+- stale：対象試験を役割終了としたv1の分類、実行時間の小ささを維持費用の中心にしたv2、履歴対応表の現在不一致だけを削除案の停止根拠にする裁定は採否に使わない。
 - deferred：401件の残りの内容分類と試験削減、状態固定を宣言fileと共通検査へ置き換える作業、Work 8の全体的な変異検査、外部実装経路の再開と保証範囲再裁定。
 
 ## Git・Test
@@ -57,8 +57,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：現行の履歴対応表を現在試験へ照合すると既存の欠落2件・未対応15件でfailedだが、これは時点の違いを示す観測であり現在欠陥の裁定には用いない。CodexとClaudeの変更点限定レビューはともにverified、止める指摘0件、報告不一致0件。
-- 直近の全Test：直近の公式入口は1,739件成功、失敗・エラー・除外0、Python 3.13.14、代替実行なし、終了コード0。本方針変更では再実行しない。
+- 直近の関連Test：対象試験は三文言改変を検出するが、三文言以外の内容変更では三条件が真のままで、証跡全体を保証しない。Codexのv3変更点確認はverified、止める指摘0件、報告不一致0件。
+- 直近の全Test：独立レビューが現在の正規入口で1,739件成功、失敗・除外0、終了コード0を確認した。リポジトリ内の試験は変更していない。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
