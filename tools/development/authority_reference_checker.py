@@ -1,8 +1,8 @@
 """front matter authority参照のDigest検査器（deferred #5）。
 
-lifecycle: provisional
-normative_status: non-normative
-promotion_required: true
+lifecycle: active
+normative_status: operational-guard
+promotion_required: false
 
 正本authority：`ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`と改善候補
 `IC-AUTHORITY-REFERENCE-DIGEST-CHECK-001`のscope／non_scope。検査対象は
@@ -161,10 +161,13 @@ def _extract_references(matter_lines, allowlist):
 
 def _classify_reference(root, reference):
     relative = reference["path"]
-    pure = Path(relative)
-    if pure.is_absolute() or ".." in pure.parts or "\\" in relative:
+    try:
+        pure = Path(relative)
+        if pure.is_absolute() or ".." in pure.parts or "\\" in relative:
+            return "invalid"
+        resolved = (root / relative).resolve()
+    except (ValueError, OSError):
         return "invalid"
-    resolved = (root / relative).resolve()
     try:
         resolved.relative_to(root)
     except ValueError:
