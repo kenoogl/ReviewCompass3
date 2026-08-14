@@ -1,0 +1,152 @@
+# 第3段 全試験からの現行正本矛盾候補抽出 軽量作業票 v2
+
+- 作業日：2026-08-14
+- 状態：`scope_corrected_candidate_extraction_not_started`
+- 基準commit・観測commit：`1483bdf2f3e52efc383912e14a4ebb17859c7b69`
+- 対象Issue：`ISSUE-TEST-GROWTH-STATE-PINNING-001`
+- 危険度案：中。読み取りだけだが、第3段の完了判断へ渡す候補の過不足に影響する
+- 作業担当：操縦役
+- 完了レビュー担当：作業担当とは異なる新規サブエージェント一者
+- 他社モデル確認：行わない。意味判断が割れた場合だけ利用者へ戻す
+
+## 1. 目的
+
+観測commitの正規入口で収集される現役の全試験から、現在有効な要求、採用済みの設計判断、
+開発方針と矛盾する可能性がある試験だけを、再現可能な機械処理で抽出する。
+
+全試験を人が詳しく読まない。抽出候補だけを後続の人の確認へ渡す。本作業票の作成と確認では、
+候補抽出そのもの、候補の採否、試験の修正・削除・使用停止を行わない。
+
+v1は履歴として残す。本版は独立レビューの`CR-ST3-SCOPE-001`だけを直し、直接参照から後続の
+Human Decisionを限定的に逆引きする手順を追加する。目的、全試験集合、成果物、禁止範囲は変えない。
+
+## 2. 固定材料
+
+| 材料 | pathまたは値 | SHA-256 |
+| --- | --- | --- |
+| 開発入口 | `AGENTS.md` | `de803a3b720975593cbbff6b44eb17851d404a61a87f9912ecb727a89ce1069f` |
+| 立て直し計画v5 | `docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md` | `c150187e7e79ddd955942bba5c4a775dbda64537f31931bd048604ab5cb082ad` |
+| 現行開発方針 | `docs/development/2026-08-02-development-policy.md` | `b3c7ce815705ba11915d3d384ee5d7fa2b8175503a03c9ff2417e79c83aeb5dc` |
+| 重要度別確認メモ | `docs/development/2026-08-13-risk-proportional-verification-method-note-v1.md` | `1090ea3083574c6dfb9cf0345505c070240cfd2e81b87929f6f7c2a50c0c2591` |
+| 第3段方針修正判断 | `records/development/2026-08-14-recovery-plan-v5-stage3-test-authority-consistency-amendment-decision-v1.md` | `83efdd438abbb3a34df1ebafd24c7891f8ae3d265634c8ef54bd817951c2d21c` |
+| 限定修正後確認 | `records/development/2026-08-14-stage3-test-authority-consistency-policy-correction-one-time-review-v1.md` | `9bedec53936e09909376fdbf144d7a534a0cb514aa7cb15a1b3e4b32815ee18b` |
+| Issue記録 | `.reviewcompass/workflow/issues-v4/issue-test-growth-state-pinning-001--v1.json` | `13f4c9a68d90105e66f3e3b5fb2df36b334f7921ee69430b82e85cf40b6f8194` |
+| 先行作業票v1 | `docs/development/2026-08-14-stage3-test-authority-contradiction-candidate-extraction-bootstrap-work-ticket-v1.md` | `45fea595a215595afae62e7e960f180c7f80625bb1c12bf51fcc928d884afc9e` |
+| v1独立レビュー | `records/development/2026-08-14-stage3-test-authority-contradiction-candidate-extraction-scope-independent-completion-review-v1.md` | `21434a70e4c6bfa8572d4abc8536b003bf0f26d9b0c1527a6cfd848a0113341e` |
+
+【実測】観測commitで次の単独コマンドは終了コード0だった。
+
+```text
+.venv/bin/python3 -B -m pytest --collect-only -q -p no:cacheprovider
+```
+
+標準出力のうち`::`を含む試験識別子を出力順に改行で結び、末尾にも改行を一つ置いた内容は、
+1,728行、重複0件、SHA-256
+`5a22372d02cf4708809a029603945a5b9ff4d5c7c06aea66468da198b60b62e1`だった。
+この件数と内容識別値は観測commitの集合確認にだけ使い、将来の恒久的な合格値にしない。
+
+【実測】直前の方針修正前観測commit `2c08a945b4f0f1d43c0c1893630c0be7cd69cd6d`から本観測commitまで、
+`tests/`、`tools/`、`config/`、`pyproject.toml`の差分は0件である。
+
+## 3. 現行正本の範囲
+
+### 3.1 全試験に共通する正本
+
+- `AGENTS.md`が導く現行開発方針。
+- 採用済み立て直し計画v5と、本作業に関係する後続のHuman判断。
+- 対象処理について、状態が採用済みであり、後続判断で置き換えられていないHuman Decision。
+
+### 3.2 対象ごとに確認する材料
+
+- 試験対象のコードが現に読む設定と形式定義。
+- 試験または対象コードが明示的に参照する要求ID、Decision ID、文書path、版、内容識別値。
+- 現在の正常動作を固定した完了Evidence。ただしEvidenceだけを新しい要求の根拠にしない。
+
+設定、形式定義、Evidenceは現在実装の観測材料であり、それだけでHuman判断を上書きする正本にはしない。
+二つの採用済み判断が矛盾する場合は、日付だけで一方を選ばず停止条件として利用者へ戻す。
+
+### 3.3 現行正本に含めないもの
+
+- `lifecycle`が`provisional`または`proposed`の文書。
+- `normative_status`が`non-normative`、`candidate`、`review-candidate`を含む文書。
+- 採用されなかった提案、使用停止された指示、過去時点だけを保存するEvidence・レビュー・作業票。
+- 後続Decisionで置き換えられた将来手順。
+
+採用済みDecisionが上記資料の特定範囲を明示的に採用している場合は、Decisionが採用した範囲と
+固定した版だけを正本として扱う。配置が`docs/current/`であること、file名に`current`があること、
+試験が現在成功することだけでは正本とみなさない。
+
+## 4. 後続の候補抽出方法
+
+候補抽出を開始するときは、次を順に機械処理する。
+
+1. 観測commitをリポジトリ外へ読み取り専用で展開し、§2と同じ正規入口から全試験集合を再生成する。
+2. 試験識別子から試験fileを求め、対象file、`conftest.py`、その試験だけが使う補助moduleを対象にする。
+3. Pythonの構文木と文字列検索を使い、次の直接参照を列挙する。
+   - 要求ID、Decision ID、Issue ID。
+   - `.md`、`.json`、`.yaml`、`.yml`等のリポジトリ内path。
+   - 64桁の内容識別値、版、件数、file名またはfile集合の完全一致。
+   - import先、呼出し先、設定名、形式定義名。
+   - module定数または単純な文字列結合を経由した上記参照。
+4. 各試験から得た直接参照のpathまたはIDを検索語にし、`records/development/`にあるDecision記録へ
+   完全一致する参照を機械的に逆引きする。該当したDecisionだけを読み、Human判断であること、採用範囲、
+   置換範囲を確認する。全Decisionを人が順番に読む作業は行わない。
+   - 該当0件なら、採用・置換関係を確認できない未解決候補にする。
+   - 複数件に該当し、既存Decisionだけでは関係または適用順を一意に決められない場合は停止する。
+   - 該当Decision、採用範囲、置換範囲は候補の根拠に残す。
+5. 直接参照と限定逆引きの結果を§3の現行正本集合と照合し、次のものだけを候補にする。
+   - 固定した現行正本に含まれない資料への参照が、試験の期待結果を決めている。
+   - 参照した正本が変更、廃止、使用停止または後続判断で置換されている。
+   - 件数、file集合、内容識別値等の状態固定に、現在有効な要求または解除条件が見つからない。
+   - 試験の期待結果と、対象処理に適用される採用済み判断が反対である。
+6. 各候補には、試験識別子、試験file、対象処理、期待結果、直接参照、逆引きしたDecision、候補理由、
+   根拠行、現行正本候補、未解決点を付ける。
+7. 候補でない試験について、一件ごとの説明、要求対応、役割分類を作らない。全体件数、対象file数、
+   抽出条件ごとの件数、機械処理の内容識別値だけを記録する。
+
+試験名や確認式の語句だけを候補確定に使わない。動的に組み立てられた正本らしい参照を機械的に
+解決できない場合は、試験全体を詳しく読むのではなく、その未解決参照だけを候補にする。
+
+## 5. 成果物と変更可能範囲
+
+後続の候補抽出でリポジトリ内へ追加できる成果物は、次のEvidence一件だけとする。
+
+```text
+records/development/2026-08-14-stage3-test-authority-contradiction-candidate-extraction-evidence-v1.md
+```
+
+全1,728件の一覧、恒久台帳、抽出専用の新しいコード、検査器、試験、設定、承認関門を追加しない。
+一時的な一覧と照合scriptはリポジトリ外へ置き、Evidenceに再現方法、入力commit、件数、内容識別値、
+候補一覧と限界を記録する。
+
+## 6. 停止条件
+
+- 正規収集が終了コード0でない、1,728件・重複0件・§2の内容識別値と一致しない。
+- 現行正本の範囲をHuman判断なしに一意に決められない。
+- 二つの採用済み判断が矛盾し、適用順を既存Decisionから確定できない。
+- 直接参照の逆引きが複数のDecisionに一致し、関係または適用順を一意に決められない。
+- 機械抽出では候補を絞れず、全試験または全Decisionの人手確認へ戻る必要がある。
+- 候補抽出のためにコード、試験、設定、Issue、既存Decision・Evidenceの変更が必要になる。
+- 試験の修正、削除、使用停止、現行正本の変更が必要と判明する。
+
+停止時は、その場で別の仕組みを作らず、成立した事実と候補だけを利用者へ渡す。
+
+## 7. 完了条件
+
+- 観測commit、全試験集合、現行正本の範囲、除外範囲、抽出条件がEvidenceから再現できる。
+- 全試験集合の件数、重複、内容識別値が§2と一致する。
+- 固定した現行正本に含まれない資料への直接参照を候補条件に含めている。
+- 直接参照から該当Decisionだけを完全一致で逆引きし、全Decisionの人手確認を行っていない。
+- 人の詳しい確認対象を抽出候補だけに限定している。
+- 候補でない試験の個別台帳、要求対応、役割分類を作っていない。
+- 試験数、実行時間、来歴、重複して見えることだけで候補または整理対象にしていない。
+- コード、試験、設定、Issue、既存Decision・Evidenceを変更していない。
+- 新規サブエージェント一者の独立完了レビューで、候補の過不足、正本境界、停止条件を確認する。
+
+通常の全試験実行は、候補抽出だけではコード、試験、設定を変更しないため要求しない。
+試験を変更する別作業を利用者が承認した場合に実行する。
+
+## 8. 本作業票で未実施の事項
+
+【未実施】矛盾候補の抽出、試験内容の意味確認、試験の修正・削除・使用停止、宣言file・共通検査・
+変異検査、コード・設定・Issueの変更、第3段完了判断、Work 8評価、外部送信、履歴書換えは行っていない。
