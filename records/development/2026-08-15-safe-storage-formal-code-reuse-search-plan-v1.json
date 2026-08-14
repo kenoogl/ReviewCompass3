@@ -1,0 +1,42 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 1,
+  "plan_id": "FCRS-SAFE-STORAGE-2026-08-15-V1",
+  "searches": [
+    {
+      "subject": "safe_storage_formal_code_reuse_candidates_v2",
+      "target_paths": [
+        "tools/session_logs/parse_claude.py",
+        "tools/session_logs/parse_codex.py",
+        "tools/session_logs/parse_codex_rollout.py",
+        "tools/session_logs/pipeline.py",
+        "tools/session_logs/provenance.py",
+        "tools/session_logs/read_only_entry.py",
+        "tools/session_logs/redaction.py",
+        "tools/session_logs/source_adapter.py",
+        "tools/session_logs/source_kind.py",
+        "tools/session_logs/summary.py",
+        "tools/session_logs/transcript.py"
+      ],
+      "target_symbols": [],
+      "attestation_path": "records/development/2026-08-15-safe-storage-formal-code-reuse-search-attestation-v2.json"
+    },
+    {
+      "subject": "safe_storage_provisional_g26_candidates_v2",
+      "target_paths": [
+        "tools/session_logs/cli.py",
+        "tools/session_logs/config.py",
+        "tools/session_logs/discovery.py",
+        "tools/session_logs/locking.py",
+        "tools/session_logs/preservation.py",
+        "tools/session_logs/regeneration.py",
+        "tools/session_logs/repository_context.py",
+        "tools/session_logs/storage.py",
+        "tools/session_logs/updates.py"
+      ],
+      "target_symbols": [],
+      "attestation_path": "records/development/2026-08-15-safe-storage-provisional-g26-reuse-search-attestation-v2.json"
+    }
+  ],
+  "content_digest": "f2762eb20161e23174ad52ce245b840edfb92e619d55dc7a5e66ecc559657261"
+}
