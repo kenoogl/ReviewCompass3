@@ -203,6 +203,8 @@ def test_rejects_source_outside_root_before_reading(
     (
         ("value=A9fK2mQ7xR4vT8pL3nC6sW1yH5jD0bZ", "sensitive_data_remaining"),
         ("work=/Users/example/project", "absolute_path_remaining"),
+        ("absolute path:/Users/example/project", "absolute_path_remaining"),
+        ("file:///Users/example/project", "absolute_path_remaining"),
     ),
 )
 def test_stops_without_returning_unsafe_content(
