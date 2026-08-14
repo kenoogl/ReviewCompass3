@@ -12,7 +12,7 @@ authority_order:
     sha256: 1a73597605eafb65a2259ccf19431e3aba041564d03fdb279150042a9bd0962f
 operational_policy:
   path: docs/development/2026-08-02-development-policy.md
-  sha256: b3c7ce815705ba11915d3d384ee5d7fa2b8175503a03c9ff2417e79c83aeb5dc
+  sha256: 422d234a0503670e61936edfe98cd13451f4e7af6bfc1506a07824f2904f0fac
 policy_decision:
   path: records/development/development-policy-v5.json
   sha256: 88af550d5bc77406cd796e4c78efc20225134473d3d87251942854e6dc57fe98
