@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段は試験数削減を目的とせず、観測commitの現役全試験から現行正本との矛盾候補だけを機械抽出し、候補だけを人が確認する方針へ修正した。
-- 現在作業：第3段の方針文書を修正中。過去の401件列挙、16意味群、独立確認済みの修正・削除は履歴として維持し、残る群ごとの詳細整理は今後の通常経路にしない。
+- 現在作業：第3段の方針文書について、独立レビューが指摘した候補条件一件を限定修正中。過去の401件列挙、16意味群、独立確認済みの修正・削除は履歴として維持し、残る群ごとの詳細整理は今後の通常経路にしない。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,16 +16,16 @@
 
 ## 最新のauthority／Evidence
 
-- [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `33aafbd628bbed12ac56f3704e1586041e115d4e925fdea40bef732728c1b361`
-- [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `0b557970902c7a8af6b3243970ffc74f0baf287711c6ade1b57d7f333ad9a2cc`
-- [重要度別確認メモ](docs/development/2026-08-13-risk-proportional-verification-method-note-v1.md) — SHA-256 `fa9874076bbf96a1afcf78e85ebcc91e3d0ac0b9d901c7a22cb43c3baaddd0b4`
-- [第3段試験整合方針の修正判断](records/development/2026-08-14-recovery-plan-v5-stage3-test-authority-consistency-amendment-decision-v1.md) — SHA-256 `2bda4dceff9ee3cfae5077d6241a45f2ba93dd677d47ceef7ebcb8e482225a5b`
+- [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `c150187e7e79ddd955942bba5c4a775dbda64537f31931bd048604ab5cb082ad`
+- [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `b3c7ce815705ba11915d3d384ee5d7fa2b8175503a03c9ff2417e79c83aeb5dc`
+- [重要度別確認メモ](docs/development/2026-08-13-risk-proportional-verification-method-note-v1.md) — SHA-256 `1090ea3083574c6dfb9cf0345505c070240cfd2e81b87929f6f7c2a50c0c2591`
+- [第3段試験整合方針の修正判断](records/development/2026-08-14-recovery-plan-v5-stage3-test-authority-consistency-amendment-decision-v1.md) — SHA-256 `83efdd438abbb3a34df1ebafd24c7891f8ae3d265634c8ef54bd817951c2d21c`
 - [Issue解決処理の使用停止と状態反映中止判断](records/development/2026-08-14-issue-resolution-v4-use-stop-and-state-reflection-cancellation-decision-v1.md) — SHA-256 `c20ee11c368145cab3103a802af2f5aa6f64649202b684976f535c6d97a640b1`
 - [G01現役接続 独立完了レビュー](records/development/2026-08-14-stage3-g01-authority-reference-guard-activation-independent-completion-review-v1.md) — SHA-256 `c441ef796f34959cadf5a111826af50fa02e46a3e367f896768a417940f78515`
 
 ## 次に行う一作業
 
-第3段の矛盾候補抽出について、観測commit、正規入口で収集する全試験集合、現行正本の範囲、直接参照の機械抽出方法、停止条件を軽量作業票へ固定する。まだ候補抽出、試験の意味確認、修正、削除、使用停止は行わない。
+第3段の矛盾候補抽出について、観測commit、正規入口で収集する全試験集合、現行正本の範囲、固定した現行正本に含まれない資料を含む直接参照の機械抽出方法、停止条件を軽量作業票へ固定する。まだ候補抽出、試験の意味確認、修正、削除、使用停止は行わない。
 
 開始条件：
 
@@ -35,7 +35,7 @@
 
 完了条件：
 
-- 観測commit、全試験集合、確認基準、機械抽出対象、候補判定、停止条件が作業票に固定されている
+- 観測commit、全試験集合、確認基準、現行正本に含まれない直接参照を含む機械抽出対象、候補判定、停止条件が作業票に固定されている
 - 全試験を一件ずつ人が詳しく確認せず、抽出候補だけを人が確認する境界が明記されている
 - 試験数、実行時間、来歴、重複して見えることを単独の整理理由にせず、コード、試験、設定を変更していない
 
@@ -43,7 +43,7 @@
 
 ## blocker・Human判断待ち
 
-- blocker：本方針修正の独立完了レビューが未完了である。旧TODOの群単位整理と段内全成果物整理には戻らない。
+- blocker：独立レビュー指摘一件の限定修正後確認が未完了である。旧TODOの群単位整理と段内全成果物整理には戻らない。
 - Human判断待ち：なし。利用者は本方針と必要文書の修正を承認済みである。次の意味判断は矛盾候補の確認後に行う。
 
 ## stale・deferred
@@ -57,7 +57,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：文書だけの方針変更であり、コード試験は実行していない。現役方針参照、内容識別値、TODOの再生成一致を確認する。
+- 直近の関連Test：文書導線に関係する27件が成功した。現役方針参照8件、TODO参照6件、内容識別値、TODOの再生成一致を確認した。
 - 直近の全Test：観測commitの正規収集は1,728件、重複による収集エラー0、終了コード0。直近の正規全試験は1,728件成功であり、本変更ではコード、試験、設定を変更しないため再実行しない。
 - 差分検査：`git diff --check`合格
 
