@@ -6,51 +6,52 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段の正しい実装に対する誤拒否確認はverifiedで閉じ、段完了前に残る成果物ライフサイクル整理へ戻る。
-- 現在作業：承認済みの現在設計から二つの確認点を固定し、観測commitの全1,728試験が正しい現在状態を拒否しないことを独立再実行まで含めて確認した。次は第3段開始以後に追加・変更したコードと文書の整理範囲を固定する。
+- 全体：立て直し計画v5の第1段・第2段と第3段の実施作業は完了候補まで進んだ。第3段は、予定された最後の手動全体レビューとHuman段完了判断を残す。
+- 現在作業：正しい現在状態の誤拒否確認と、第3段中127成果物のライフサイクル分類はそれぞれ独立レビューでverifiedとなった。第3段完了候補とClaude向け限定レビュープロンプトを固定した。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 誤拒否確認verified・成果物整理継続`、影響：既知の正しい現在状態を全試験が拒否しないことは確認済みだが、第3段中に追加・変更したコードと文書の段完了前整理が未完了である、次：第3段開始commitと成果物列挙の対象・除外・分類方法を軽量作業票へ固定する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了候補・手動全体レビュー待ち`、影響：現行完了条件を満たす材料は揃ったが、利用者Decisionで残した他社モデル全体確認と段完了のHuman判断は未実施である、次：固定済みClaudeプロンプトを利用者が手動で渡し、返答をこのtaskへ戻す
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `8c814067511797e445d66779ad144f42ea0b139501ff6002a7d6c46e6706055c`
-- [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `422d234a0503670e61936edfe98cd13451f4e7af6bfc1506a07824f2904f0fac`
-- [第3段成果物整理の追補判断](records/development/2026-08-14-recovery-plan-v5-stage3-created-artifact-completion-condition-amendment-decision-v1.md) — SHA-256 `181c74b9b325df9544ce195e3344aee60d0090cce61ab4f136f5d8c1f9da00db`
 - [正しい実装例による方法への修正判断](records/development/2026-08-14-stage3-correct-behavior-witness-method-amendment-decision-v1.md) — SHA-256 `76aa813046a07176650e0bc5db5d5308f569a8e51011f15cd2c21341852e0d2f`
-- [既知の正しい現在状態による実施Evidence](records/development/2026-08-14-stage3-known-correct-state-witness-execution-evidence-v1.md) — SHA-256 `5d65e67b6239f9f267eaac8fce749b28267e81618ca7ea01c26614eb2ac0ebc4`
 - [既知の正しい現在状態による独立完了レビュー](records/development/2026-08-14-stage3-known-correct-state-witness-independent-completion-review-v1.md) — SHA-256 `623095ce50005400977749fa323e6bea00213db46b9487651ea42e01337afd97`
+- [成果物ライフサイクル整理Evidence](records/development/2026-08-14-stage3-created-artifact-lifecycle-inventory-evidence-v1.md) — SHA-256 `ae20e42659624b76ec378b0f7a1123a29fd277d1f345f880e06bf1b38d14e5f1`
+- [成果物ライフサイクル整理の独立完了レビュー](records/development/2026-08-14-stage3-created-artifact-lifecycle-inventory-independent-completion-review-v1.md) — SHA-256 `ea06bdb6566bc7e9f5653fa8a45e573b2966aed12e2e70fcd6de0a482a1544c8`
+- [第3段完了候補](records/development/2026-08-14-stage3-completion-candidate-v1.md) — SHA-256 `ab9fe71622c435a8e01bf1385d682ae66814f77928edaf648fd3b3355eb6b1e4`
+- [Claude向け第3段完了前全体レビュー指示](records/session-handoffs/2026-08-14-claude-stage3-completion-overall-review-prompt-v1.md) — SHA-256 `2a4f9b490007cbe5c853f5997c0754641da9441a62928c69c27f542b55581491`
 
 ## 次に行う一作業
 
-第3段開始時点から段完了候補までに追加・変更したコードと文書をGit差分から機械列挙するため、第3段開始commit、観測commit、対象種別、除外範囲、意味群、四分類、確認の深さを軽量作業票へ固定する。まだ成果物の削除、統合、使用停止、コード・試験・設定の変更は行わない。
+利用者がClaude向け第3段完了前全体レビュー指示を手動で渡し、返答をこのtaskへ貼り付ける。操縦役は返答を固定材料と照合して記録する。外部送信は代行せず、第3段完了を先に承認しない。
 
 開始条件：
 
-- 誤拒否確認の実施Evidenceと独立完了レビューがverifiedとして固定されている
-- 立て直し計画v5と第3段成果物整理の追補判断の内容識別値が実fileと一致する
-- 第3段開始commitを件数や日付から推測せず、既存Decision、Evidence、Git履歴から確定する
+- 第3段完了候補とClaude向け指示のSHA-256が実fileと一致する
+- 正しい現在状態と成果物ライフサイクルの独立完了レビューがともにverifiedである
+- レビュー対象を完了候補の中心判断に限定し、全1,728試験・127成果物の一律詳細確認へ広げない
 
 完了条件：
 
-- 第3段開始commit、観測commit、対象種別、除外範囲、列挙方法、意味群、四分類、停止条件を作業票へ固定する
-- コードと文書で確認方法を分け、重要度に応じて深さを変え、全成果物へ一律の詳細確認を課さない
-- 新しい台帳、検査器、試験、関門を追加せず、コード、試験、設定、Issueを変更しない
-- 作業担当とは異なる新規サブエージェントの独立開始前レビューを行う
+- Claude返答の判定、止める指摘、報告不一致、反証、未実施事項を出どころどおり固定する
+- 返答が固定材料と整合するかを機械照合し、本質から外れた提案を段完了条件へ混入させない
+- 止める指摘0件かつ報告不一致0件なら、第3段完了可否を利用者へ明示的に戻す
+- 外部送信、コード・試験・設定・Issue変更、第4段開始を行わない
 
-後続作業：開始可の確認後、Git差分から対象成果物を機械列挙し、意味群ごとの利用先・守る性質・重複・再利用・四分類を確認する。
+後続作業：Claude結果がverifiedなら利用者が第3段完了を判断する。指摘があれば中心判断を崩す一原因だけを最小訂正候補として扱う。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。誤拒否確認はverifiedで閉じており、第3段成果物整理の範囲固定へ進める。
-- Human判断待ち：なし。次のHuman判断は、列挙・分類結果から役割終了や整理候補が実証された場合、または第3段完了候補を提示する時点で行う。
+- blocker：技術的blockerはない。既存Decisionに基づく手動全体レビュー結果だけが段完了判断の前提として残る。
+- Human判断待ち：利用者によるClaudeへの手動受渡しと、結果確認後の第3段完了可否。
 
 ## stale・deferred
 
-- stale：参照文字列を逆引きした17件候補と495参照は現役入力にしない。全試験の詳細確認、試験数削減、実行時間短縮を第3段完了条件とする見方も失効している。
-- deferred：誤った実装の受理、守れない保証の表示、安全方針に反する副作用の見逃しは必要時のWork 8または通常開発へ分離する。ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001はregistered、issue_resolution_v4.pyは暫定・使用停止のまま維持する。
+- stale：参照文字列による17件候補・495参照、全試験の詳細人手確認、試験数削減、実行時間短縮は第3段の現役入力・完了条件にしない。
+- deferred：誤った実装の受理、守れない保証表示、安全方針に反する副作用の見逃しは必要時のWork 8または通常開発へ分離する。ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001と暫定issue_resolution_v4.pyは使用停止のまま維持する。
 
 ## Git・Test
 
@@ -58,8 +59,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：既知の正しい現在状態で正規収集1,728件・重複0・一覧SHA一致を確認し、構造化記録の二つの現在状態を再計算した。独立完了レビューはverified、止める指摘0件、報告不一致0件である。
-- 直近の全Test：観測commitの履歴付き一時複製で正規全試験1,728件成功、失敗・error・skip 0、終了コード0。独立レビューも同じ状態識別値で1,728件成功を再現した。
+- 直近の関連Test：正しい現在状態の独立確認は1,728件成功、失敗0。成果物分類はGit再生成127 path、19意味群、未分類0、重複0、役割終了0で独立レビューverified。
+- 直近の全Test：観測commitの履歴付き一時複製で正規全試験1,728件成功、失敗・error・skip 0、終了コード0。以後のコード・試験・設定差分0をGit物体で確認済み。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
