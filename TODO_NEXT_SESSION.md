@@ -6,51 +6,49 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第4段を完了した。第5段の最初の作業として、承認済みG25の固定入力から最初のTask Contract案を作り、独立した定義挑戦を行う段階である。
-- 現在作業：G25の10 pathを第5段で再利用する正式製品コード集合として採用した。他142 pathは一括廃止せず今回の集合から除外した。G25の読取り専用Session記録解析を最初のTask Contract候補とし、最小入力11項目を固定した。
-- Task Contract：`none（G25の最初のTask Contract案を次作業で定義する）`
+- 全体：立て直し計画v5の第1段から第4段を完了した。第5段では、G25の最初のTask Contract候補を作成し、独立した定義挑戦で見つかった二点を限定訂正して変更点確認まで完了した。
+- 現在作業：契約候補は、安全な出力項目の選択、低乱雑性の絶対path残存時の停止、pyproject.tomlへの正規入口登録を含む三path案としてverifiedになった。コード・試験・設定の実装は未開始である。
+- Task Contract：`TC-RC3-PRODUCT-G25-SESSION-ARTIFACT-PREPARATION-001 / candidate_pending_human_approval`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：G25のTask Contract案作成を妨げない、次：Issue状態を変更せず、状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：G25のTask Contract判断と実装開始を妨げない、次：Issue状態を変更せず、状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `8c814067511797e445d66779ad144f42ea0b139501ff6002a7d6c46e6706055c`
 - [第4段完了判断](records/development/2026-08-14-recovery-plan-v5-stage4-completion-decision-v1.md) — SHA-256 `147217192ea1d4d491005bd4cb7879f292f8739364e6b912a46d3dda8b8295b7`
-- [第4段の製品コード候補とTask Contract入力Evidence](records/development/2026-08-14-stage4-product-code-and-task-contract-input-inventory-evidence-v1.md) — SHA-256 `c55367fc6b8f72f7041612cedc11d609b359909156f619fcb72e6d72bd33e72a`
-- [第4段の限定訂正レビュー](records/development/2026-08-14-stage4-product-code-and-task-contract-input-inventory-correction-review-v1.md) — SHA-256 `2c5abce8085642ff02d81fef3552e154917145f581b63b64f1df81a9f4f92137`
-- [Task Contract中心構想候補](docs/concepts/2026-08-02-task-contract-centered-engineering.md) — SHA-256 `80f388b9308450f1758f623346e25fa6623c8d5d59cb32979436ee3831af1d91`
+- [G25最初のTask Contract候補](records/task-contract/2026-08-14-g25-session-artifact-preparation-candidate-v1.md) — SHA-256 `20e4e0551c5b1357ba3e66d6ba849f19566da27c58c54ef98e8fa1db110fb72b`
+- [G25 Task Contract定義挑戦](records/development/2026-08-14-stage5-g25-session-artifact-task-contract-definition-challenge-v1.md) — SHA-256 `0d7277f98c09cfbf2c107e94a8179aa76b4f55c189c3ba024792a087ee671f52`
+- [G25 Task Contract限定訂正レビュー](records/development/2026-08-14-stage5-g25-session-artifact-task-contract-definition-correction-review-v1.md) — SHA-256 `8f07d74cb03e4ab6134a1774af8b775e1d01c57d836f32720ad6296dd1099e91`
 
 ## 次に行う一作業
 
-G25の固定入力11項目から、最初のTask Contract案を一件作り、実装前の独立した定義挑戦を行う。契約案の作成中はコード・試験・設定を変更しない。
+利用者へG25 Task Contract候補の責務、限界、案C、三pathの実装範囲を提示し、契約の意味と実装開始を承認するか判断してもらう。判断まではコード・試験・設定を変更しない。
 
 開始条件：
 
-- 第4段完了判断、訂正後Evidence、限定訂正レビューの内容識別値が実fileと一致する
-- G25の10 pathとtree SHA-256を固定し、G26、G30、他142 pathを暗黙の実装前提へ加えない
-- 上流候補9件は暫定入力、既知の不一致3件は競合候補として扱い、正本へ自動昇格しない
-- 最初のTask Contract案と実装開始は、定義挑戦後の別のHuman判断対象とする
+- 契約候補、定義挑戦、限定訂正レビューの内容識別値が実fileと一致する
+- 定義訂正レビューがverified、止める指摘0件、報告不一致0件である
+- G25既存10 path、G26、G30、他142 path、上流候補全体を実装範囲へ加えない
 
 完了条件：
 
-- 安定した契約ID、版、source requirement候補とG25固定コードを結び付ける
-- 責務、境界、前提、必要材料、許可能力、成果、受入条件、来歴義務、Humanへ戻す条件、版付き依存を一件の契約案へ記す
-- 独立した定義挑戦で、責務の過大化、隠れた依存、未承認上流の自動採用、書込み・送信等の範囲外能力を反証する
-- 止める指摘を解消または明示した契約案を、実装開始判断とともに利用者へ戻す
+- 利用者が契約の責務、境界、前提、出力、受入条件を承認または不承認として裁定する
+- 低乱雑性の絶対path以外の機微情報をすべて検出する保証も外部送信許可もない限界を裁定する
+- 案Cの三pathだけで実装開始するかを裁定し、上流候補は暫定のままとするかを裁定する
 
-後続作業：利用者が最初のTask Contractの意味と実装開始を承認した場合だけ、契約で確定した小さい範囲へTDDを適用し、正規入口から利用者向け処理を接続する。
+後続作業：利用者が契約と実装開始を承認した場合だけ、契約で固定した三pathへTDDを適用する。不承認なら実装せず第5段の次候補を利用者へ戻す。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。第4段は利用者承認により完了した。
-- Human判断待ち：最初のTask Contract案と独立した定義挑戦の提示後に、契約の意味と実装開始を承認するか。現時点では未判断である。
+- blocker：機械的なblockerはない。実装開始はHuman承認待ちである。
+- Human判断待ち：G25 Task Contractの責務と限界、案C、新規入口・pyproject.toml・対象試験の三path実装、暫定上流候補を正式化せず進めることを承認するか。
 
 ## stale・deferred
 
-- stale：第4段の採用・完了判断待ちという表示は、本Decisionにより解消した。訂正前Evidenceの環境参照記述と最初の独立レビューのreport_execution_mismatch判定も、限定訂正レビューverifiedにより解消済みである。
-- deferred：G26のrepository_root省略反例の修正、他142 pathの個別採否、上流9文書の正式化と不一致3件の修正、G30、REQ-WORKFLOW-009、外部送信、不可逆操作、権限変更、使用停止Issue処理は開始しない。
+- stale：訂正前候補のsetup.py登録と安全な出力境界不足は、契約候補の限定訂正とverifiedレビューにより解消した。
+- deferred：G26のrepository_root省略反例、他142 pathの個別採否、上流9文書の正式化と不一致3件、G30、外部送信、保存・探索、不可逆操作、権限変更、使用停止Issue処理は開始しない。
 
 ## Git・Test
 
@@ -58,8 +56,8 @@ G25の固定入力11項目から、最初のTask Contract案を一件作り、�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：G25直接関連14 fileは55件成功、終了コード0。独立レビューでG25の10 path閉包、群外直接依存0、G26反例、上流47参照中3不一致を再現した。第4段完了判断は文書とTODOだけで、コード・試験・設定を変更していない。
-- 直近の全Test：第3段の履歴付き一時複製で正規全試験1,728件成功、失敗・error・skip 0、終了コード0。第4段ではコード・試験・設定を変更していないため再実行していない。
+- 直近の関連Test：定義挑戦でG25直接関連14 fileは55件成功、終了コード0。変更点限定レビューは文書差分だけを確認し、コード・試験・設定は変更していない。
+- 直近の全Test：第3段の履歴付き一時複製で正規全試験1,728件成功、失敗・error・skip 0、終了コード0。第4段完了後もコード・試験・設定は変更していないため再実行していない。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
