@@ -7,43 +7,43 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第4段を完了した。第5段では、G25の読取り専用入口を実装し、外部独立レビュー、利用者による製品受入、正式・安定表示への昇格まで完了した。第5段全体の完了候補を作成し、内部の独立全体レビューはverifiedとなった。
-- 現在作業：第5段完了候補は内部全体レビューで止める指摘0件、報告不一致0件となった。Claude用の読み取り専用全体レビュー指示書を固定済みであり、利用者による外部レビュー代行と、その結果を踏まえた第5段完了判断を待つ。
-- Task Contract：`TC-RC3-PRODUCT-G25-SESSION-ARTIFACT-PREPARATION-001 / product_accepted_stable_stage5_completion_candidate_internal_verified_external_review_pending`
+- 現在作業：第5段完了候補は、内部の独立全体レビューとClaudeの読み取り専用全体レビューの双方でverified、止める指摘0件、報告不一致0件となった。第5段を完了とする利用者判断だけが未実施である。
+- Task Contract：`TC-RC3-PRODUCT-G25-SESSION-ARTIFACT-PREPARATION-001 / product_accepted_stable_stage5_completion_candidate_external_verified_human_decision_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：第5段の外部全体レビューと完了判断を妨げない、次：Issue状態を変更せず、状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：第5段の完了判断を妨げない、次：Issue状態を変更せず、状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `8c814067511797e445d66779ad144f42ea0b139501ff6002a7d6c46e6706055c`
 - [第5段全体完了候補](records/development/2026-08-14-recovery-plan-v5-stage5-completion-candidate-v1.md) — SHA-256 `5e9e2adebe65372e2e315bd5fbedc07302f11451854e8ad1a52313425ed9b04a`
 - [第5段完了候補の内部独立全体レビュー](records/development/2026-08-14-recovery-plan-v5-stage5-completion-candidate-independent-overall-review-v1.md) — SHA-256 `0ff20a88464ad6b7121842a21194c073034f5396bd59de7250e1b1f3b685eda4`
-- [Claude用第5段完了候補全体レビュー指示書](records/session-handoffs/2026-08-14-claude-stage5-completion-overall-review-prompt-v1.md) — SHA-256 `92498cc9df059c419973fa9089b158c0447b4068318a09caf8b25e6bc8174d91`
+- [Claudeによる第5段完了候補の全体レビュー結果](records/development/2026-08-14-recovery-plan-v5-stage5-completion-candidate-claude-overall-review-result-v1.md) — SHA-256 `4a2a8d91e978447f4356cc4da87261074d0c07237bf93aa2cf5aa7015d7bda9e`
 - [G25最初のTask Contract](records/task-contract/2026-08-14-g25-session-artifact-preparation-candidate-v1.md) — SHA-256 `20e4e0551c5b1357ba3e66d6ba849f19566da27c58c54ef98e8fa1db110fb72b`
 
 ## 次に行う一作業
 
-利用者がClaude用指示書を手動で渡し、第5段完了候補の読み取り専用全体レビュー結果を受け取る。外部送信は利用者が代行し、ReviewCompass3側では行わない。
+内部とClaudeの全体レビュー結果を判断材料として、第5段を完了とするかを利用者が明示する。次のTask Contract定義挑戦の開始判断は分離する。
 
 開始条件：
 
-- 第5段完了候補、内部独立全体レビュー、Claude用指示書の内容識別値が実fileと一致する
-- Claudeへは観測commitと固定材料を渡し、リポジトリ内の変更、第5段完了の代行、本質外の修正提案を禁止する
-- 正規全試験は、最新独立実行後の製品コード・試験・設定差分が0件なら再実行しない
+- 第5段完了候補、内部独立全体レビュー、Claude全体レビュー結果の内容識別値が実fileと一致する
+- 二つの全体レビューがverified、止める指摘0件、報告不一致0件である
+- 1,740件は観測値であり恒久合格値にせず、G26・G30・上流候補9件・要求候補は未正式のままとする
 
 完了条件：
 
-- Claudeの判定、止める指摘、報告不一致、試した反証、利用者判断点を受領する
-- 指摘がある場合は原因へ直接対応する最小訂正だけを別判断へ戻す
-- verifiedの場合も第5段を完了とするかを利用者が別に明示する
+- 利用者が第5段を完了とするかを明示する
+- 完了承認の場合は、残る限界を引き継いだ完了判断記録と現在位置だけを更新する
+- 完了しない場合は、理由と最小の戻り先を利用者判断として固定する
 
 後続作業：第5段完了承認後にだけ、一件のSession記録と伏字化結果を安全に保存して再読込みする二つ目のTask Contract候補について、定義挑戦を開始するかを利用者へ戻す。
 
 ## blocker・Human判断待ち
 
-- blocker：コード上のblockerはない。Claudeによる読み取り専用全体レビューと利用者の第5段完了判断が未実施である。
-- Human判断待ち：Claudeの全体レビュー結果を受けた後、第5段全体を完了とするか。完了承認と次のTask Contract定義挑戦の開始は分けて判断する。
+- blocker：コード上のblockerはない。利用者の第5段完了判断だけが未実施である。
+- Human判断待ち：第5段全体を完了とするか。完了承認と次のTask Contract定義挑戦の開始は分けて判断する。
 
 ## stale・deferred
 
