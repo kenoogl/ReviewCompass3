@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段・第2段は完了し、第3段は完了候補の実施・独立確認・手動全体確認まで終えた。残るのは利用者による段完了判断である。
-- 現在作業：Claudeによる第3段完了前の全体確認はverified、止める指摘0件、報告不一致0件だった。返答を証跡へ保存し、固定材料10件と主要な差分主張を操縦役が再照合した。
+- 現在作業：Claudeによる第3段完了前の全体確認はverified、止める指摘0件、報告不一致0件だった。第3段から分離した三種類は、将来の必須一括作業にせず、具体的な開始条件と対処時期を持つ利用者判断へ詳細化した。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,6 +18,7 @@
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `8c814067511797e445d66779ad144f42ea0b139501ff6002a7d6c46e6706055c`
 - [試験増加・状態固定Issueの現在有効性判断](records/development/2026-08-13-test-growth-state-pinning-current-validity-decision-v1.md) — SHA-256 `1609dfdd76b25c86b38bd105f4199cbbc1636614c5f68256fdee61879c3bddac`
+- [第3段から分離した三種類の確認条件と扱いの判断](records/development/2026-08-14-stage3-deferred-quality-concerns-trigger-and-routing-decision-v1.md) — SHA-256 `56ab15aa55c9eeb6775247269bd78827ff1030f4830d335a5d16c43fde57ef34`
 - [正しい実装例による方法への修正判断](records/development/2026-08-14-stage3-correct-behavior-witness-method-amendment-decision-v1.md) — SHA-256 `76aa813046a07176650e0bc5db5d5308f569a8e51011f15cd2c21341852e0d2f`
 - [既知の正しい現在状態による独立完了レビュー](records/development/2026-08-14-stage3-known-correct-state-witness-independent-completion-review-v1.md) — SHA-256 `623095ce50005400977749fa323e6bea00213db46b9487651ea42e01337afd97`
 - [成果物ライフサイクル整理の独立完了レビュー](records/development/2026-08-14-stage3-created-artifact-lifecycle-inventory-independent-completion-review-v1.md) — SHA-256 `ea06bdb6566bc7e9f5653fa8a45e573b2966aed12e2e70fcd6de0a482a1544c8`
@@ -37,7 +38,7 @@
 完了条件：
 
 - 利用者が第3段完了の可否を明示する
-- 承認の場合、二確認点への限定、三種類のWork 8等への分離、1,728件を恒久値にしないことを完了Decisionへ引き継ぐ
+- 承認の場合、二確認点への限定、三種類の具体的な開始条件と対処時期、1,728件を恒久値にしないことを完了Decisionへ引き継ぐ
 - 承認の場合も対象Issueをregisteredのまま維持し、状態更新処理を自己適用しない
 - 不承認の場合、中心判断を崩す一原因と最小訂正範囲だけを別作業として固定する
 
@@ -51,7 +52,7 @@
 ## stale・deferred
 
 - stale：参照文字列による17件候補・495参照、全試験の詳細人手確認、試験数削減、実行時間短縮は第3段の現役入力・完了条件にしない。
-- deferred：誤った実装の受理、守れない保証表示、安全方針に反する副作用の見逃し、状態固定の宣言file化、変異検査は必要時のWork 8または通常開発へ残す。ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001と暫定issue_resolution_v4.pyも使用停止のまま維持する。
+- deferred：三種類は将来の必須一括作業にせず、変更予定、具体的反例、実害、高危険度の操作予定がある範囲だけ確認する。issue_resolution_v4.pyは再利用前、外部送信入口は安全保証として再利用する前、状態固定試験は変更・削除前を再開条件とする。
 
 ## Git・Test
 
