@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段は試験数削減を目的とせず、観測commitの現役全試験から現行正本との矛盾候補だけを機械抽出し、候補だけを人が確認する方針へ修正した。
-- 現在作業：第3段の方針文書について、独立レビューが指摘した候補条件一件を限定修正中。過去の401件列挙、16意味群、独立確認済みの修正・削除は履歴として維持し、残る群ごとの詳細整理は今後の通常経路にしない。
+- 現在作業：第3段の方針修正と一回限りの限定修正後確認がverifiedで完了した。過去の401件列挙、16意味群、独立確認済みの修正・削除は履歴として維持し、残る群ごとの詳細整理は今後の通常経路にしない。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
@@ -20,8 +20,8 @@
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `b3c7ce815705ba11915d3d384ee5d7fa2b8175503a03c9ff2417e79c83aeb5dc`
 - [重要度別確認メモ](docs/development/2026-08-13-risk-proportional-verification-method-note-v1.md) — SHA-256 `1090ea3083574c6dfb9cf0345505c070240cfd2e81b87929f6f7c2a50c0c2591`
 - [第3段試験整合方針の修正判断](records/development/2026-08-14-recovery-plan-v5-stage3-test-authority-consistency-amendment-decision-v1.md) — SHA-256 `83efdd438abbb3a34df1ebafd24c7891f8ae3d265634c8ef54bd817951c2d21c`
+- [第3段試験整合方針の限定修正後確認](records/development/2026-08-14-stage3-test-authority-consistency-policy-correction-one-time-review-v1.md) — SHA-256 `9bedec53936e09909376fdbf144d7a534a0cb514aa7cb15a1b3e4b32815ee18b`
 - [Issue解決処理の使用停止と状態反映中止判断](records/development/2026-08-14-issue-resolution-v4-use-stop-and-state-reflection-cancellation-decision-v1.md) — SHA-256 `c20ee11c368145cab3103a802af2f5aa6f64649202b684976f535c6d97a640b1`
-- [G01現役接続 独立完了レビュー](records/development/2026-08-14-stage3-g01-authority-reference-guard-activation-independent-completion-review-v1.md) — SHA-256 `c441ef796f34959cadf5a111826af50fa02e46a3e367f896768a417940f78515`
 
 ## 次に行う一作業
 
@@ -43,7 +43,7 @@
 
 ## blocker・Human判断待ち
 
-- blocker：独立レビュー指摘一件の限定修正後確認が未完了である。旧TODOの群単位整理と段内全成果物整理には戻らない。
+- blocker：なし。方針修正は独立確認でverifiedとなり、旧TODOの群単位整理と段内全試験の詳細整理へ戻らず次の読み取り作業へ進める。
 - Human判断待ち：なし。利用者は本方針と必要文書の修正を承認済みである。次の意味判断は矛盾候補の確認後に行う。
 
 ## stale・deferred
@@ -58,7 +58,7 @@
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
 - 直近の関連Test：文書導線に関係する27件が成功した。現役方針参照8件、TODO参照6件、内容識別値、TODOの再生成一致を確認した。
-- 直近の全Test：観測commitの正規収集は1,728件、重複による収集エラー0、終了コード0。直近の正規全試験は1,728件成功であり、本変更ではコード、試験、設定を変更しないため再実行しない。
+- 直近の全Test：観測commitの正規収集は1,728件、node ID重複0件、収集終了コード0。直近の正規全試験は1,728件成功であり、本変更ではコード、試験、設定を変更しないため再実行しない。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
