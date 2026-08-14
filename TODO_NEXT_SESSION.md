@@ -6,51 +6,50 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段では401件を16意味群へ分け、現在保証と履歴固定を区別して群単位で整理し、第3段中に増えた成果物も段完了前の整理対象としている。
-- 現在作業：G01の再評価、案Cの現役接続、独立完了レビューがverifiedで完了した。実文書2件・11参照を正規全試験へ接続し、重複2入力を不足2境界へ入れ替えた。対象19件と正規全試験1,728件は成功した。
+- 全体：立て直し計画v5の第1段と第2段、および第3段の前提接続は完了した。第3段では401件を16意味群へ分け、群単位の整理と、第3段中に増えた成果物の段完了前整理を継続する。
+- 現在作業：G01の実装と独立完了判断はverifiedのまま維持する。ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001の状態反映とissue_resolution_v4.pyの正式利用化は利用者判断により中止し、第3段の成果物整理方針へ戻った。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`：`registered / 実装と独立完了レビューverified / 状態反映判断待ち`、影響：検査コードは現役化済みだが、正式Issueの台帳状態がregisteredのままで実態と一致していない、次：利用者がresolvedへの反映を承認した場合、Human裁定記録を作成し、既存の正規Issue解決処理だけで状態と解決記録を更新する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段整理を継続`、影響：第3段の残る意味群と、第3段中に追加・変更した成果物の全体整理が未完了である、次：第3段開始commitと、段内追加成果物を列挙する範囲を固定する
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `5e0ab06b682939ab0c6e5804db02ee31952059a4404b8a21fe38ef07532514b3`
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `20c4c00a69677af9b4dc51b59b5718889c27fe6cfbbe2adc57cfcc2f601a7a42`
-- [G01現役接続Evidence](records/development/2026-08-14-stage3-g01-authority-reference-guard-activation-evidence-v1.md) — SHA-256 `52022b04a72b1c5df458f949f80bde1383ef4238f8d6b6b024977eac6ad398cd`
-- [G01現役接続 独立完了レビュー](records/development/2026-08-14-stage3-g01-authority-reference-guard-activation-independent-completion-review-v1.md) — SHA-256 `c441ef796f34959cadf5a111826af50fa02e46a3e367f896768a417940f78515`
 - [第3段成果物整理の追補判断](records/development/2026-08-14-recovery-plan-v5-stage3-created-artifact-completion-condition-amendment-decision-v1.md) — SHA-256 `181c74b9b325df9544ce195e3344aee60d0090cce61ab4f136f5d8c1f9da00db`
-- [第4段正式製品コード識別の追補判断](records/development/2026-08-14-recovery-plan-v5-stage4-formal-product-code-identification-amendment-decision-v1.md) — SHA-256 `1e21e6af4be4898e98436206b950efed4e6cca825397fbc85a9030455e5e94e3`
-- [第4段軽量整理と製品機能候補の境界判断](records/development/2026-08-14-recovery-plan-v5-stage4-lightweight-code-cleanup-boundary-amendment-decision-v1.md) — SHA-256 `d54a486c93a6d0f25411765f99a7fdb669edfb1db84c7a9298a2d9b5dfb8e70a`
+- [Issue解決処理の使用停止と状態反映中止判断](records/development/2026-08-14-issue-resolution-v4-use-stop-and-state-reflection-cancellation-decision-v1.md) — SHA-256 `c20ee11c368145cab3103a802af2f5aa6f64649202b684976f535c6d97a640b1`
+- [Issue解決処理の成熟度限定訂正レビュー](records/development/2026-08-14-issue-resolution-v4-maturity-reassessment-correction-review-v1.md) — SHA-256 `7e69b63f1dc34b9920b92acb4a388f6610319670f08550e0aa6cc7870d854470`
+- [G01現役接続 独立完了レビュー](records/development/2026-08-14-stage3-g01-authority-reference-guard-activation-independent-completion-review-v1.md) — SHA-256 `c441ef796f34959cadf5a111826af50fa02e46a3e367f896768a417940f78515`
 
 ## 次に行う一作業
 
-利用者が承認した場合、ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001をresolvedへ反映する一作業を行う。Human裁定記録を固定し、既存の正規Issue解決処理でIssueのstateとcontent_digestだけを更新し、新規の解決記録を作る。コード、試験、設定は変更しない。
+第3段の方針修正へ戻り、第3段開始時点から段完了候補までに追加・変更したコード、試験、文書を全体列挙する作業の範囲を、軽量作業票へ固定する。まだ列挙結果の採否、削除、統合、コード・試験・設定の変更は行わない。
 
 開始条件：
 
-- G01現役接続の独立完了レビューがverifiedである
-- 正式Issueがregisteredの版1であることを再確認する
-- 利用者がresolvedへの状態反映を承認する
+- Issue解決処理の使用停止と状態反映中止判断が固定され、対象Issueがregistered、対象処理が暫定のままである
+- 立て直し計画v5と第3段成果物整理の追補判断の内容識別値が一致する
+- 第3段開始commitを件数から推測せず、既存Decision、Evidence、Git履歴から確定する
 
 完了条件：
 
-- Human裁定記録が対象Issue、resolved、利用者文言、Evidenceへ機械的に結び付く
-- 正規Issue解決処理が台帳検証に合格し、stateとcontent_digest以外の既存Issue項目を変えない
-- 解決記録、TODO、作業単位遷移を確認し、コード・試験・設定を変更しない
+- 第3段開始commit、観測commit、対象種別、除外範囲、列挙方法、四分類、停止条件を作業票へ固定する
+- 新しい台帳、検査器、試験、関門を追加せず、重要度別に確認の深さを変える方針を維持する
+- コード、試験、設定、Issue、第4段資料を変更せず、新規サブエージェントの独立開始前レビューを行う
 
-後続作業：Issue反映後、第3段の未評価意味群へ戻る。第3段完了前には、段開始から増えた成果物の全体列挙とClaude手動確認一回を行う。
+後続作業：開始可の確認後、Git差分から成果物を機械列挙し、意味群ごとの整理候補を利用者判断へ渡す。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。G01のコード作業は完了している。
-- Human判断待ち：ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001をresolvedへ反映してよいか。
+- blocker：なし。Issue状態反映の枝は中止判断により閉じ、第3段の文書・読み取り作業へ戻れる。
+- Human判断待ち：なし。次のHuman判断は、第3段成果物の意味群と整理候補を作成した後に行う。
 
 ## stale・deferred
 
-- stale：G01を未接続の暫定検査とする見方、G01再評価待ち、案C実施待ちという状態は解消済み。
-- deferred：ISSUE-TEST-GROWTH-STATE-PINNING-001の残る意味群、IC-PROCESS-INVENTORY-SAFETY-CLAIM-001、G11三試験と専用補助処理、外部送信を含む高危険度群、Work 8の全体変異検査、第3段中に増えた全成果物の段完了前列挙。
+- stale：Issue状態反映判断待ち、issue_resolution_v4.pyの正式利用化候補、修正案C実施待ちは利用者の中止判断により失効した。G01を未完了または暫定とする見方も失効したままである。
+- deferred：ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001はregisteredのまま維持し、issue_resolution_v4.pyは暫定・使用停止とする。第3段の残る意味群、G11三試験と専用補助処理、外部送信を含む高危険度群、Work 8の全体変異検査は後続へ残す。
 
 ## Git・Test
 
@@ -58,8 +57,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：G01は19件成功。実文書2件・11参照が一致。実文書ずれ、同居値拒否、空文書混在、NUL文字の4欠陥を既存試験が検出した。
-- 直近の全Test：G01現役接続後の正規全試験は独立再実行でも1,728件成功、失敗・エラー・除外0、終了コード0。
+- 直近の関連Test：Issue解決処理の成熟度精査で対象24件と関連67件が成功したが、親フォルダ作成失敗時の片残り欠陥を独立再現した。G01の19件成功は変更していない。
+- 直近の全Test：G01現役接続後の正規全試験は独立再実行で1,728件成功、失敗・エラー・除外0、終了コード0。本中止判断ではコード・試験・設定を変更しないため再実行しない。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
