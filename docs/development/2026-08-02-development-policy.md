@@ -120,6 +120,16 @@ Git管理下にあるコードから毎回生成する。過去に作った処�
 新しいコードを追加しただけでは検索範囲の規則や方針の版を更新せず、新しい観測、処理一覧、比較候補、
 検索結果を内容識別値付きでnew-only生成する。過去の生成結果は時点証跡として書き換えない。
 
+実装開始の根拠に使う正式検索では、`capture_committed_observation`を入口とし、検索前にローカルの
+確定commitが存在すること、未commitの変更・追加登録・未登録fileがないこと、commit内のコード集合と
+観測集合が完全一致することを機械確認する。commit識別値は呼出し側から受け取らずGitから取得する。
+不一致時は正式検索を停止して理由を人へ返し、自動commit、変更破棄、push、外部repositoryとの一致確認を
+行わない。外部より進んだローカルcommitまたは外部repositoryを持たないローカルcommitも、これらの条件を
+満たせば正式検索に使える。
+
+未commit状態で行う`capture_observation`は予備調査に限り、結果を実装開始の合格根拠に使わない。
+予備結果を正式結果へ読み替えず、正式検索時に確定commitから新しい観測と検索結果を生成する。
+
 確認では、現在の全コード集合から対象pathと予定する責務名により候補を導き、作業ごとの固定pathを
 将来の検索元または中央一覧にしない。正式採用済み、暫定・保留、使用停止、履歴だけという区分は、
 検索対象の生成とは別に、各コードを採用・停止した不変のDecisionと現在の実コード表示からその都度導く。
@@ -144,7 +154,8 @@ Git管理下にあるコードから毎回生成する。過去に作った処�
 条件へ接続されていなかった事象、および作業ごとの固定path検索を将来の検索元と誤解できる表示により、
 新規コードの追加ごとに中央一覧を手更新する負担と更新漏れを生み得た事象と、利用者の即時修正指示である。
 実測と判断は`records/development/2026-08-15-safe-storage-preimplementation-code-management-routing-evidence-v1.md`と
-`records/development/2026-08-15-git-derived-code-search-source-correction-decision-v1.md`へ固定する。
+`records/development/2026-08-15-git-derived-code-search-source-correction-decision-v1.md`、
+`records/development/2026-08-15-committed-source-formal-search-precheck-decision-v1.md`へ固定する。
 
 ## リスクベースのテストファースト
 

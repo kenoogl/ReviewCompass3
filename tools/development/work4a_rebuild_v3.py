@@ -13,7 +13,13 @@ import dataclasses
 import hashlib
 import json
 import re
-from pathlib import Path
+import subprocess
+from pathlib import Path, PurePosixPath
+
+from tools.development.work_unit_transition import (
+    WorkUnitTransitionError,
+    preflight_next_work,
+)
 
 
 DIGEST_ALGORITHM = "sha256"
@@ -65,6 +71,9 @@ VERIFICATION_OUTCOME_CLASSES = (
     "discovery_profile_mismatch",
     "member_truncation_detected",
     "bounded_seed_not_a_basis",
+    "committed_source_unavailable",
+    "uncommitted_repository_state",
+    "committed_source_set_mismatch",
 )
 
 ANNOTATION_CLASSES = ("locator_unresolved", "locator_profile_mismatch")
@@ -829,6 +838,93 @@ def _source_content_id(universe_document, files):
             "source_universe_id": universe_document["source_universe_id"],
             "source_universe_version": universe_document["source_universe_version"],
         }
+    )
+
+
+def _git_text(project_root, *arguments):
+    result = subprocess.run(
+        ("git", *arguments),
+        cwd=str(project_root),
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise V3ValidationError("committed_source_unavailable")
+    return result.stdout
+
+
+def _matches_source_universe(relative_path, universe_document):
+    relative = PurePosixPath(relative_path)
+    include_root = PurePosixPath(universe_document["include_root"])
+    try:
+        within_root = relative.relative_to(include_root)
+    except ValueError:
+        return False
+    pattern = universe_document["include_glob"]
+    matched = within_root.match(pattern)
+    if not matched and pattern.startswith("**/"):
+        matched = within_root.match(pattern[3:])
+    if not matched:
+        return False
+    return relative.parts[0] not in set(universe_document["excluded_roots"])
+
+
+def _committed_source_head(project_root, universe_document):
+    try:
+        transition = preflight_next_work(
+            work_status="completed",
+            project_root=project_root,
+        )
+    except WorkUnitTransitionError as error:
+        raise V3ValidationError("committed_source_unavailable") from error
+    if transition.status != "passed":
+        raise V3ValidationError("uncommitted_repository_state")
+
+    head = _git_text(project_root, "rev-parse", "--verify", "HEAD^{commit}").strip()
+    tracked = _git_text(
+        project_root,
+        "ls-tree",
+        "-r",
+        "--name-only",
+        "HEAD",
+        "--",
+        universe_document["include_root"],
+    ).splitlines()
+    committed_paths = tuple(
+        sorted(
+            path
+            for path in tracked
+            if _matches_source_universe(path, universe_document)
+        )
+    )
+    observed_paths = tuple(
+        item["path"] for item in _source_files(project_root, universe_document)
+    )
+    if committed_paths != observed_paths:
+        raise V3ValidationError("committed_source_set_mismatch")
+    return head
+
+
+def capture_committed_observation(
+    *, project_root, runtime_root, profile, universe, policy, tool_version, captured_at
+):
+    """確定コミットと一致するコード集合だけを正式な観測として記録する。"""
+
+    root = Path(project_root).resolve()
+    universe_document = _read_record(
+        universe.path,
+        record_kind="work4a_source_universe",
+    )
+    head = _committed_source_head(root, universe_document)
+    return capture_observation(
+        project_root=root,
+        runtime_root=runtime_root,
+        profile=profile,
+        universe=universe,
+        policy=policy,
+        head=head,
+        tool_version=tool_version,
+        captured_at=captured_at,
     )
 
 
