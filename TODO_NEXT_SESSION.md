@@ -6,9 +6,9 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第4段を完了した。第5段では、G25の最初のTask Contract候補を作成し、独立した定義挑戦で見つかった二点を限定訂正して変更点確認まで完了した。
-- 現在作業：契約候補は、安全な出力項目の選択、低乱雑性の絶対path残存時の停止、pyproject.tomlへの正規入口登録を含む三path案としてverifiedになった。コード・試験・設定の実装は未開始である。
-- Task Contract：`TC-RC3-PRODUCT-G25-SESSION-ARTIFACT-PREPARATION-001 / candidate_pending_human_approval`
+- 全体：立て直し計画v5の第1段から第4段を完了した。第5段では、G25の最初のTask Contract version 1と三pathの実装開始が利用者に承認された。
+- 現在作業：安全な項目選択、低乱雑性の絶対path残存時の停止、pyproject.tomlへの正規入口登録を含む案Cを、承認済みの三pathだけで試験駆動実装する段階である。
+- Task Contract：`TC-RC3-PRODUCT-G25-SESSION-ARTIFACT-PREPARATION-001 / approved_for_implementation`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -21,33 +21,34 @@
 - [G25最初のTask Contract候補](records/task-contract/2026-08-14-g25-session-artifact-preparation-candidate-v1.md) — SHA-256 `20e4e0551c5b1357ba3e66d6ba849f19566da27c58c54ef98e8fa1db110fb72b`
 - [G25 Task Contract定義挑戦](records/development/2026-08-14-stage5-g25-session-artifact-task-contract-definition-challenge-v1.md) — SHA-256 `0d7277f98c09cfbf2c107e94a8179aa76b4f55c189c3ba024792a087ee671f52`
 - [G25 Task Contract限定訂正レビュー](records/development/2026-08-14-stage5-g25-session-artifact-task-contract-definition-correction-review-v1.md) — SHA-256 `8f07d74cb03e4ab6134a1774af8b775e1d01c57d836f32720ad6296dd1099e91`
+- [G25 Task Contract承認判断](records/development/2026-08-14-stage5-g25-session-artifact-task-contract-approval-decision-v1.md) — SHA-256 `dde3ad7be1a31f1c7f77e253a90fe952496950e5b6a402fcdf473388d211ae39`
 
 ## 次に行う一作業
 
-利用者へG25 Task Contract候補の責務、限界、案C、三pathの実装範囲を提示し、契約の意味と実装開始を承認するか判断してもらう。判断まではコード・試験・設定を変更しない。
+承認済みの新しい読取り専用入口について、入口固有の試験を先に作り、未実装の失敗を確認する。その後、同じ試験を変えずに新入口とpyproject.tomlの実行名一件を実装する。
 
 開始条件：
 
-- 契約候補、定義挑戦、限定訂正レビューの内容識別値が実fileと一致する
-- 定義訂正レビューがverified、止める指摘0件、報告不一致0件である
+- 契約候補、限定訂正レビュー、承認判断の内容識別値が実fileと一致する
+- 承認判断がapproved_for_implementationである
 - G25既存10 path、G26、G30、他142 path、上流候補全体を実装範囲へ加えない
 
 完了条件：
 
-- 利用者が契約の責務、境界、前提、出力、受入条件を承認または不承認として裁定する
-- 低乱雑性の絶対path以外の機微情報をすべて検出する保証も外部送信許可もない限界を裁定する
-- 案Cの三pathだけで実装開始するかを裁定し、上流候補は暫定のままとするかを裁定する
+- 新入口がない状態で入口固有試験が未実装理由により失敗する
+- 同じ試験を変更せず、新入口、pyproject.toml、対象試験の三pathだけで成功させる
+- 対象試験、G25関連55件、通常の全試験、利用者向け合成例、独立完了レビューが契約条件を満たす
 
-後続作業：利用者が契約と実装開始を承認した場合だけ、契約で固定した三pathへTDDを適用する。不承認なら実装せず第5段の次候補を利用者へ戻す。
+後続作業：独立完了レビューで止める指摘0件となった後、利用者へ実際の機能と出力例を提示し、最初の製品処理の完成を判断してもらう。
 
 ## blocker・Human判断待ち
 
-- blocker：機械的なblockerはない。実装開始はHuman承認待ちである。
-- Human判断待ち：G25 Task Contractの責務と限界、案C、新規入口・pyproject.toml・対象試験の三path実装、暫定上流候補を正式化せず進めることを承認するか。
+- blocker：なし。契約と三pathの実装開始は利用者承認済みである。
+- Human判断待ち：実装中に承認済みの責務、限界、三pathを変える必要が生じた場合だけ再判断する。実装完了と第5段完了は未判断である。
 
 ## stale・deferred
 
-- stale：訂正前候補のsetup.py登録と安全な出力境界不足は、契約候補の限定訂正とverifiedレビューにより解消した。
+- stale：契約内容と実装開始のHuman判断待ちは、承認判断により解消した。訂正前候補のsetup.py登録と安全な出力境界不足も解消済みである。
 - deferred：G26のrepository_root省略反例、他142 pathの個別採否、上流9文書の正式化と不一致3件、G30、外部送信、保存・探索、不可逆操作、権限変更、使用停止Issue処理は開始しない。
 
 ## Git・Test
