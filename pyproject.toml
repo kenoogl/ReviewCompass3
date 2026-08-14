@@ -22,6 +22,7 @@ development = [
 
 [project.scripts]
 reviewcompass3-session-logs = "tools.session_logs.entry:main"
+reviewcompass3-session-artifact = "tools.session_logs.read_only_entry:main"
 reviewcompass3-bootstrap-review = "tools.bootstrap.review_cli:main"
 reviewcompass3-pilot = "tools.development.pilot_collaboration_cli:main"
 reviewcompass3-claude-implementation = "tools.development.claude_implementation_route_cli:main"
