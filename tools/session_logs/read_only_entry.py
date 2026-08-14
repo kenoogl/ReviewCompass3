@@ -1,8 +1,8 @@
 """一件のSession記録を安全な項目だけで返す製品入口。
 
-lifecycle: stable
-normative_status: normative
-promotion_required: false
+lifecycle: provisional
+normative_status: non-normative
+promotion_required: true
 """
 
 import argparse
@@ -26,7 +26,7 @@ EXIT_PARTIAL = 3
 EXIT_STOPPED = 4
 
 _POSIX_ABSOLUTE_PATH = re.compile(
-    r"(?<![A-Za-z0-9._~:/-])/(?:[^/\s\"'<>]+/)*[^/\s\"'<>]+"
+    r"(?<![A-Za-z0-9._~/-])/(?:[^/\s\"'<>]+/)*[^/\s\"'<>]+"
 )
 _WINDOWS_ABSOLUTE_PATH = re.compile(
     r"(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/]|\\\\)[^\s\"'<>]+"
@@ -112,9 +112,10 @@ def _safe_parse_issues(issues):
 
 def _contains_absolute_path(value):
     if isinstance(value, str):
+        path_candidate = re.sub(r"(?i)\bfile://", "", value)
         return bool(
-            _POSIX_ABSOLUTE_PATH.search(value)
-            or _WINDOWS_ABSOLUTE_PATH.search(value)
+            _POSIX_ABSOLUTE_PATH.search(path_candidate)
+            or _WINDOWS_ABSOLUTE_PATH.search(path_candidate)
         )
     if isinstance(value, dict):
         return any(
