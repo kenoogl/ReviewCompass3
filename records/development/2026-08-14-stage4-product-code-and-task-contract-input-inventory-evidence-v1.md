@@ -179,12 +179,36 @@ rawと転写の保存先がrepository内でも受理される反例が成立し�
 | 出力 | `PreparedArtifact`値。種別、共通event、伏字化転写、要約、来歴、解析上の注意、伏字化件数を持つ |
 | 失敗 | 種別不明、raw読取不能、解析不能、機微情報残存、raw root外等を例外で停止 |
 | 外部作用 | file書込みなし、network送信なし、外部processなし。入力raw fileだけを読む |
-| 環境参照 | 環境依存の伏字化規則が指定された場合だけ、home、利用者名、host名をメモリ上で解決し、値を規則の内容識別値へ入れない |
+| 環境参照 | G25自身は環境値を解決しない。呼出し側から渡されたpattern規則を使い、環境依存規則の役割名だけを規則の内容識別値へ入れる |
 
 【判断】G25は外部送信、権限付与、Issue状態更新、履歴書換え、file書込みを必要としない。入力を読んで値を返すだけで、
 10 pathに閉じるため、他候補より境界を説明しやすく、戻しやすい。
 
-### 8.4 G26を保留にした反例
+### 8.4 最初のTask Contractへ渡す最小入力
+
+【記録】既存構想`docs/concepts/2026-08-02-task-contract-centered-engineering.md`の内容識別値は
+`80f388b9308450f1758f623346e25fa6623c8d5d59cb32979436ee3831af1d91`である。同文書§4.9の
+最小核と、実行可能な契約に追加する項目から、G25に必要なものだけを次のように選ぶ。
+
+| 最小項目 | G25から固定できる入力 | 第5段で確定すること |
+| --- | --- | --- |
+| Identity | 候補名G25、観測commit、10 pathのtree SHA-256、対応候補`REQ-SESSION-001`〜`003`・`REQ-PORTABLE-002`・`004` | 安定した契約ID、契約種別、版、内容識別値、source requirement IDの採否 |
+| Responsibility | 一つのローカルSession記録から、伏字化転写、要約、来歴候補をメモリ上に生成する | この一文を正式責務として承認するか |
+| Boundary | G25の10 pathと入力raw fileだけを範囲内とし、保存・発見・配布・外部送信・権限変更・Issue更新・Task Contract実行基盤を範囲外とする | downstreamの保存責務を別契約へ渡すか |
+| Preconditions | 対応する三形式のJSONL、raw root、伏字化済みpattern規則、tool版を入力とし、G25の正式製品コード採用と契約承認を開始条件とする | 上流候補の採否、入力版とfreshness |
+| Context Obligations | 固定した10 path、直接関連14試験file、55件成功記録、raw形状fixture、上流候補、既知の上流不一致3件を材料とする | 各材料のrequired／optional、freshness、競合時の扱い |
+| Allowed Capabilities | 指定された一つのraw fileの読取りとメモリ上の計算だけを許す | 読取り対象root、資源上限。書込み、network、外部process、環境値解決は許可しない |
+| Expected Outputs | `PreparedArtifact`のsource種別、共通event、伏字化転写、要約、来歴、解析上の注意、伏字化結果 | 正式な出力schemaと保持先。保持処理自体は本候補外 |
+| Acceptance Criteria | 三形式を識別して決定的な値を返し、種別不明・読取不能・解析不能・機微情報残存・raw root外では停止する | 正式oracle、受入例、完了所有者 |
+| Provenance Obligations | raw相対path・行範囲・raw／転写／要約／規則の内容識別値・tool版・任意のcommit名／変更pathと、固定コードtree SHA・試験受領記録を結ぶ | 保存期間、機密区分、実行記録の正本 |
+| Escalation Policy | 入力種別不明、機微情報残存、root逸脱、固定入力のstale、上流競合、範囲外能力が必要な場合は停止してHumanへ戻す | retry可否と、意味的裁定・外部送信・不可逆操作の承認点 |
+| 版付きdependency | G25の観測commitとtree SHA、既存構想の上記SHA、上流候補と55件の試験状態 | 契約確定時に採用する各版。未承認候補を暗黙に依存へ昇格しない |
+
+【判断】この表で、最初の契約案を作るための責務、境界、前提、材料、能力、成果、受入、来歴、Humanへ戻す条件を
+G25の現状へ対応付けられる。第5段では右列を定義挑戦とHuman判断で確定する。本記録はTask Contractそのもの、
+契約ID、schema、生成器、状態機械、実行許可機構を作らず、G30を必須依存にしない。
+
+### 8.5 G26を保留にした反例
 
 【実測】`repository_root`を持たず、raw・転写・要約・来歴の各rootを現在のrepository内へ置く一時設定を作り、
 `load_config`へ渡した。結果は次のとおりだった。
@@ -196,7 +220,7 @@ rawと転写の保存先がrepository内でも受理される反例が成立し�
 【判断】G26の保存CLIは、`repository_root`がある場合には私有データとGit管理物の境界を検査するが、省略時には検査しない。
 したがって、G26の9 pathは製品／保留とし、最初の正式製品コード集合へ含めない。修正案や追加試験は本作業の範囲外である。
 
-### 8.5 上流候補との対応
+### 8.6 上流候補との対応
 
 【記録】統合計画候補の`FEAT-SESSION-RECORDS`と`REQ-SESSION-001`〜`003`、
 `REQ-PORTABLE-002`・`004`が対応候補である。統合Intent候補の「必要な材料を明らかにする」、
@@ -205,7 +229,7 @@ rawと転写の保存先がrepository内でも受理される反例が成立し�
 【判断】これら上流文書はすべて暫定候補であり、本記録だけで正式要求・Featureへ昇格しない。G25の採用判断は、
 現状コードを第5段で再利用できる資産として識別する判断に限り、将来の振る舞いや完成を承認しない。
 
-### 8.6 試験と反証
+### 8.7 試験と反証
 
 【実測】G25のmodule名またはpathを直接参照する試験fileは14件だった。この14件を一回で実行し、
 `55 passed in 0.20s`、終了コード0だった。分割前のSession関連26試験fileも`165 passed in 0.85s`、終了コード0である。
