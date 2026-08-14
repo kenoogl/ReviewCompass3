@@ -1,8 +1,8 @@
 """一件のSession記録を安全な項目だけで返す製品入口。
 
-lifecycle: provisional
-normative_status: non-normative
-promotion_required: true
+lifecycle: stable
+normative_status: normative
+promotion_required: false
 """
 
 import argparse
