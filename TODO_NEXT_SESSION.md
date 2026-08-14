@@ -6,53 +6,50 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段・第2段は完了し、第3段は完了候補の実施・独立確認・手動全体確認まで終えた。残るのは利用者による段完了判断である。
-- 現在作業：Claudeによる第3段完了前の全体確認はverified、止める指摘0件、報告不一致0件だった。第3段から分離した三種類は、将来の必須一括作業にせず、具体的な開始条件と対処時期を持つ利用者判断へ詳細化した。
+- 全体：立て直し計画v5の第1段、第2段、第3段は完了した。次は第4段の範囲固定であり、第4段の実施と完了はまだ行っていない。
+- 現在作業：利用者が第3段完了を承認した。完了範囲、三種類の再開条件、対象Issueをregisteredで維持する条件、第4段への引継ぎを完了Decisionへ固定した。
 - Task Contract：`none（ブートストラップ立て直し中のため未導入）`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了のHuman判断待ち`、影響：第3段の誤拒否確認は完了候補になったが、宣言file化と変異検査を将来扱う元Issueの未解決範囲は残る、次：第3段完了を承認するか利用者が判断し、承認時もIssueはregisteredのままWork 8へ残す
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：第3段の完了は妨げない。状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する、次：Issue状態を変更せず、第4段の正式製品コード識別と最初の製品処理候補の範囲固定へ進む
 
 ## 最新のauthority／Evidence
 
 - [採用済み立て直し計画v5](docs/plan/2026-08-12-project-stall-review-and-recovery-proposal-v5.md) — SHA-256 `8c814067511797e445d66779ad144f42ea0b139501ff6002a7d6c46e6706055c`
-- [試験増加・状態固定Issueの現在有効性判断](records/development/2026-08-13-test-growth-state-pinning-current-validity-decision-v1.md) — SHA-256 `1609dfdd76b25c86b38bd105f4199cbbc1636614c5f68256fdee61879c3bddac`
-- [第3段から分離した三種類の確認条件と扱いの判断](records/development/2026-08-14-stage3-deferred-quality-concerns-trigger-and-routing-decision-v1.md) — SHA-256 `56ab15aa55c9eeb6775247269bd78827ff1030f4830d335a5d16c43fde57ef34`
-- [正しい実装例による方法への修正判断](records/development/2026-08-14-stage3-correct-behavior-witness-method-amendment-decision-v1.md) — SHA-256 `76aa813046a07176650e0bc5db5d5308f569a8e51011f15cd2c21341852e0d2f`
-- [既知の正しい現在状態による独立完了レビュー](records/development/2026-08-14-stage3-known-correct-state-witness-independent-completion-review-v1.md) — SHA-256 `623095ce50005400977749fa323e6bea00213db46b9487651ea42e01337afd97`
-- [成果物ライフサイクル整理の独立完了レビュー](records/development/2026-08-14-stage3-created-artifact-lifecycle-inventory-independent-completion-review-v1.md) — SHA-256 `ea06bdb6566bc7e9f5653fa8a45e573b2966aed12e2e70fcd6de0a482a1544c8`
-- [第3段完了候補](records/development/2026-08-14-stage3-completion-candidate-v1.md) — SHA-256 `ab9fe71622c435a8e01bf1385d682ae66814f77928edaf648fd3b3355eb6b1e4`
-- [Claudeによる第3段完了前全体レビュー結果](records/development/2026-08-14-stage3-completion-claude-overall-review-result-v1.md) — SHA-256 `289e804b1aae736503aaea5ae8efe2b11c309feb8595e2bac8d7c70d514b9ef9`
+- [第3段完了判断](records/development/2026-08-14-recovery-plan-v5-stage3-completion-decision-v1.md) — SHA-256 `88578d3160b046cb99c847aaaa6eb4d1ce7b6ee430d4708cfa23bc559edbe0f1`
+- [三種類の確認条件と扱いの判断](records/development/2026-08-14-stage3-deferred-quality-concerns-trigger-and-routing-decision-v1.md) — SHA-256 `56ab15aa55c9eeb6775247269bd78827ff1030f4830d335a5d16c43fde57ef34`
+- [第4段の正式製品コード識別の追補判断](records/development/2026-08-14-recovery-plan-v5-stage4-formal-product-code-identification-amendment-decision-v1.md) — SHA-256 `1e21e6af4be4898e98436206b950efed4e6cca825397fbc85a9030455e5e94e3`
+- [第4段の軽量整理と製品機能候補を分ける追補判断](records/development/2026-08-14-recovery-plan-v5-stage4-lightweight-code-cleanup-boundary-amendment-decision-v1.md) — SHA-256 `d54a486c93a6d0f25411765f99a7fdb669edfb1db84c7a9298a2d9b5dfb8e70a`
 
 ## 次に行う一作業
 
-利用者が第3段完了を承認するか判断する。承認前に完了Decision、Issue状態変更、第4段開始を行わない。
+第4段の最初の軽量作業票を作る。参照する上流文書、コードの母集合、用途と採否の二軸分類、最初の製品処理候補の選定基準、対象外、確認の深さ、停止条件を固定する。コード・試験・設定を変更せず、Task Contractの実装を始めない。
 
 開始条件：
 
-- 第3段完了候補、二つの独立完了レビュー、Claude全体レビュー結果のSHA-256が実fileと一致する
-- Claude全体レビューがverified、止める指摘0件、報告不一致0件で固定されている
-- ISSUE-TEST-GROWTH-STATE-PINNING-001がregisteredであり、段完了とIssue解決を混同しない
+- 第3段完了Decisionと第4段の二つの追補判断のSHA-256が実fileと一致する
+- 対象Issueがregistered、issue_resolution_v4.pyが暫定・使用停止のままである
+- 第4段を読み取りと候補作成に限定し、最初のTask ContractやREQ-WORKFLOW-009の実装を前倒ししない
 
 完了条件：
 
-- 利用者が第3段完了の可否を明示する
-- 承認の場合、二確認点への限定、三種類の具体的な開始条件と対処時期、1,728件を恒久値にしないことを完了Decisionへ引き継ぐ
-- 承認の場合も対象Issueをregisteredのまま維持し、状態更新処理を自己適用しない
-- 不承認の場合、中心判断を崩す一原因と最小訂正範囲だけを別作業として固定する
+- 上流文書、コードの母集合、二軸分類語彙、選定基準、対象外、確認方法、停止条件を作業票へ固定する
+- 製品、開発支援、共有、用途不明と、採用候補、保留、使用停止、履歴のみを混同しない
+- 最初の製品処理から到達するコードだけを詳しく確認し、他のコードへ一律の詳細確認を課さない
+- 作業担当と異なる新規サブエージェントの独立開始前レビューを行い、利用者へ開始判断を戻す
 
-後続作業：第3段完了承認を記録し現在位置を更新した後、立て直し計画v5の第4段へ進む。
+後続作業：開始可と利用者承認の後、Git実状態からコードを機械列挙し、意味的に完結する単位ごとに用途と今後の扱いを分類する。
 
 ## blocker・Human判断待ち
 
-- blocker：技術的blockerはない。第3段完了のHuman判断だけが残る。
-- Human判断待ち：第3段完了を承認するか。推奨は、対象Issueをregisteredのまま維持する条件付きで承認すること。
+- blocker：なし。第3段は利用者承認により完了し、第4段の範囲固定へ進める。
+- Human判断待ち：第4段の軽量作業票と独立開始前レビューを提示した時点で、固定範囲で開始するかを判断する。
 
 ## stale・deferred
 
-- stale：参照文字列による17件候補・495参照、全試験の詳細人手確認、試験数削減、実行時間短縮は第3段の現役入力・完了条件にしない。
-- deferred：三種類は将来の必須一括作業にせず、変更予定、具体的反例、実害、高危険度の操作予定がある範囲だけ確認する。issue_resolution_v4.pyは再利用前、外部送信入口は安全保証として再利用する前、状態固定試験は変更・削除前を再開条件とする。
+- stale：第3段の17件候補・495参照、試験数削減、全試験の詳細人手確認は第4段の入力にしない。第3段完了候補のHuman判断待ちは第3段完了Decisionにより解消した。
+- deferred：三種類の品質問題は具体的な開始条件が成立した範囲だけ扱う。ISSUE-TEST-GROWTH-STATE-PINNING-001はregistered、ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001とissue_resolution_v4.pyは使用停止のまま維持する。Work 8、最初のTask Contract、REQ-WORKFLOW-009の採用・実装は開始しない。
 
 ## Git・Test
 
@@ -60,8 +57,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：正しい現在状態の独立確認は1,728件成功、失敗0。成果物分類は127 path、未分類0、重複0、役割終了0。Claude全体レビューもverified。
-- 直近の全Test：履歴付き一時複製で正規全試験1,728件成功、失敗・error・skip 0、終了コード0。観測commit以後のtests・tools・config・pyproject・conftest差分0を再確認した。
+- 直近の関連Test：第3段の正しい現在状態確認は1,728件成功、失敗0。成果物分類は127 path、未分類0、重複0、役割終了0。Claude全体レビューはverified。第3段完了後のコード・試験変更はない。
+- 直近の全Test：履歴付き一時複製で正規全試験1,728件成功、失敗・error・skip 0、終了コード0。観測commit以後のtests・tools・config・pyproject・conftest差分0を確認済み。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
