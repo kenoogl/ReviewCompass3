@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "safe_storage_formal_code_reuse_candidates",
+  "external": {
+    "relative_path": "work4b/reuse-searches/2ca470ce38a01f8d1675350b1e204c08db375b2fea0e1d816984fa05176cae66.json",
+    "content_digest": "2ca470ce38a01f8d1675350b1e204c08db375b2fea0e1d816984fa05176cae66",
+    "byte_sha256": "88f1670f922da6a94c8f03fa2f114ffb5c1d9ec3eb22a95fd041715263a389b8"
+  },
+  "source_identity": {
+    "profile_run_id": "4227caa1eb155f067549434a04550b741d55dd88f7f85f08e9f8f3def5147b58",
+    "discovery_run_id": "2221b9bfa688744464faa88caf9d3853912678f01f9ea5beab8d7fb448808568",
+    "source_content_id": "c8880cb4dee72e73264e342b8a5b249b8e971c45ce3dcb8294aec6c06edefcf6",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 669,
+  "content_digest": "250351038515a7feaa7d300cde0e5a936b8ee181955dd87f0aaf4c6d959a8cb8"
+}

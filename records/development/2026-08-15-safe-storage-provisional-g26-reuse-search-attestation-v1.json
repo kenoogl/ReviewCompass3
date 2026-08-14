@@ -1,0 +1,22 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "safe_storage_provisional_g26_candidates",
+  "external": {
+    "relative_path": "work4b/reuse-searches/f326a6e3ac37331fcdaf9f00402355671755410099bd5119dc5927d5c5458ffe.json",
+    "content_digest": "f326a6e3ac37331fcdaf9f00402355671755410099bd5119dc5927d5c5458ffe",
+    "byte_sha256": "55bc09e3804fadcb89ea517f96dad25dd8dd9053f68ce62ff08ff4ea5df90154"
+  },
+  "source_identity": {
+    "profile_run_id": "4227caa1eb155f067549434a04550b741d55dd88f7f85f08e9f8f3def5147b58",
+    "discovery_run_id": "2221b9bfa688744464faa88caf9d3853912678f01f9ea5beab8d7fb448808568",
+    "source_content_id": "c8880cb4dee72e73264e342b8a5b249b8e971c45ce3dcb8294aec6c06edefcf6",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 2,
+  "hit_count": 1942,
+  "content_digest": "719b301f082420008570b3d8e04f13a783452cbd29658212c72fcd80bd9b540e"
+}
