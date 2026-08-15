@@ -64,7 +64,7 @@ def _decode_input(raw, source):
     schema_failed = False
     try:
         value = json.loads(text, object_pairs_hook=_unique_object)
-    except (json.JSONDecodeError, _DuplicateMember, RecursionError):
+    except (json.JSONDecodeError, ValueError, RecursionError):
         schema_failed = True
     if schema_failed:
         raise DesignAcceptanceStop("invalid_schema", source)
@@ -75,6 +75,10 @@ def _is_safe_identifier(value):
     return isinstance(value, str) and _SAFE_IDENTIFIER.fullmatch(value) is not None
 
 
+def _has_only_unicode_scalar_values(value):
+    return not any(0xD800 <= ord(character) <= 0xDFFF for character in value)
+
+
 def _normalize_value(value, source):
     if isinstance(value, bool):
         return value
@@ -83,7 +87,11 @@ def _normalize_value(value, source):
             return value
         raise DesignAcceptanceStop("invalid_schema", source)
     if isinstance(value, str):
-        if 1 <= len(value) <= 2000 and "\x00" not in value:
+        if (
+            1 <= len(value) <= 2000
+            and "\x00" not in value
+            and _has_only_unicode_scalar_values(value)
+        ):
             return value
         raise DesignAcceptanceStop("invalid_schema", source)
     if isinstance(value, list):
@@ -93,6 +101,7 @@ def _normalize_value(value, source):
             not isinstance(item, str)
             or not 1 <= len(item) <= 256
             or "\x00" in item
+            or not _has_only_unicode_scalar_values(item)
             for item in value
         ):
             raise DesignAcceptanceStop("invalid_schema", source)
@@ -110,8 +119,10 @@ def _normalize_design(value):
         "facts",
     }:
         raise DesignAcceptanceStop("invalid_schema", source)
-    if value["schema_version"] != 1 or not _is_safe_identifier(
-        value["design_identifier"]
+    if (
+        type(value["schema_version"]) is not int
+        or value["schema_version"] != 1
+        or not _is_safe_identifier(value["design_identifier"])
     ):
         raise DesignAcceptanceStop("invalid_schema", source)
     facts = value["facts"]
@@ -163,8 +174,10 @@ def _normalize_acceptance(value):
         "conditions",
     }:
         raise DesignAcceptanceStop("invalid_schema", source)
-    if value["schema_version"] != 1 or not _is_safe_identifier(
-        value["acceptance_identifier"]
+    if (
+        type(value["schema_version"]) is not int
+        or value["schema_version"] != 1
+        or not _is_safe_identifier(value["acceptance_identifier"])
     ):
         raise DesignAcceptanceStop("invalid_schema", source)
     conditions = value["conditions"]
