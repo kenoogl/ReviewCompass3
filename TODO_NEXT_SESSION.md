@@ -6,9 +6,9 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
-- 現在作業：六境界、対象・関連・正規全試験、高危険度反例が成功した。固定commitを別実行単位が読取り専用で契約条件1〜18と上位目的へ照合する独立完了レビューへ進む。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / implementation_verified / independent_completion_review_pending`
+- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了した。三つ目の製品処理は契約v3の実装・全試験・独立完了レビューを終え、製品受入だけを残す。
+- 現在作業：六境界、対象・関連・正規全試験、高危険度反例が成功し、固定commitの独立完了レビューも止める指摘0件・未接続条件0件で確認済みになった。合成一件で利用者向け表示を確認し、製品受入の一判断へ進む。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / independent_completion_review_verified / human_product_acceptance_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [固定commitの独立完了レビュー・確認済み](records/development/2026-08-15-one-item-review-independent-completion-review-v1.md) — SHA-256 `8c2a112a095beb93e906b8f969f1f1fc66953643f0ffca9a6c76d67cba159969`
 - [六境界・全試験・高危険度反例の最終検証](records/development/2026-08-15-one-item-review-final-verification-evidence-v1.md) — SHA-256 `3c11a18d68d50b54aba7465290534690b49cabe6c6295126f6a1c29ab1dd4aaa`
 - [境界6の配置・結合・回帰確認成功](records/development/2026-08-15-one-item-review-boundary6-green-evidence-v1.md) — SHA-256 `a9ead3decf81c48e2465eb769929f59d8f2833fe0f3902cb1ef046761991075f`
 - [境界6の別現在位置実行2件と期待失敗](records/development/2026-08-15-one-item-review-boundary6-red-evidence-v1.md) — SHA-256 `afd763b8560c85f75eb92cbb79a5c11b7dadb6b71cf7a3d0009adaec0caec3b4`
@@ -46,30 +47,30 @@
 
 ## 次に行う一作業
 
-固定commitを別実行単位が読取り専用で確認し、契約条件1〜18の未接続、誤合格、範囲外作用、上位目的への悪影響がないか判定する。
+合成一件を正式処理へ通し、内容識別値、件数、分類、人の判断一覧、安全表示を示して、製品処理として受け入れるか一判断だけを求める。
 
 開始条件：
 
-- 最終検証証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 独立担当は成果物を変更せず固定commitを読む
-- 重要な主張へ少なくとも一つ新しい反証を試す
+- 独立完了レビュー証拠と本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 合成資料だけを使い、実利用者資料、保存、外部送信、外部処理を行わない
+- 表示は内容識別値、件数、分類、人の判断一覧に限定し、資料内容と絶対pathを出さない
 
 完了条件：
 
-- 独立完了レビューが確認済みまたは修正要を根拠付きで固定する
-- 確認済みなら止める指摘と未接続条件が0件である
-- 修正要なら利用者受入へ進まず限定訂正する
+- 合成一件の機械処理結果と証拠が固定される
+- 内容識別値、結果集合識別値、件数、分類、人の判断一覧、安全表示が確認できる
+- 利用者が製品処理として受け入れるか拒否する
 
-後続作業：独立完了レビューが確認済みなら、合成一件を利用者へ示して受入判断一件だけを求める。
+後続作業：受入なら候補1を完了として固定し候補2へ進む。拒否なら理由に対応する限定訂正だけを行う。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：なし。契約v3採用と案C実装開始は承認済み。境界1は承認済み作業票v2に従うTDD実装である
+- Human判断待ち：合成一件の結果を見て、この処理を製品処理として受け入れるかの一判断だけが必要
 
 ## stale・deferred
 
-- stale：実装作業票v1と開始前レビュー待ち表示はstale。契約候補v1・v2、契約採用待ち表示、候補1選択待ち表示もstale
+- stale：独立完了レビュー待ち、実装作業票v1、開始前レビュー待ち、契約候補v1・v2、契約採用待ち、候補1選択待ちの表示はstale
 - deferred：保存、外部送信、外部処理、実利用者資料、既存G02変更は本作業の対象外のまま維持する
 
 ## Git・Test
