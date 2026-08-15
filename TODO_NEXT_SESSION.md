@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了した。三つ目の製品処理は契約v3の実装・全試験・独立完了レビューを終え、製品受入だけを残す。
-- 現在作業：六境界、対象・関連・正規全試験、高危険度反例が成功し、固定commitの独立完了レビューも止める指摘0件・未接続条件0件で確認済みになった。合成一件で利用者向け表示を確認し、製品受入の一判断へ進む。
+- 現在作業：六境界、対象・関連・正規全試験、高危険度反例、独立完了レビューが成功した。合成一件でも本文・絶対path・外部送信を出さず、全対象を人の判断一覧へ残すことを確認し、製品受入の一判断だけを残す。
 - Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / independent_completion_review_verified / human_product_acceptance_pending`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [合成一件の利用者向け受入表示Evidence](records/development/2026-08-15-one-item-review-synthetic-acceptance-evidence-v1.md) — SHA-256 `de5df0ccb9f7a41431721a59b001c2033af5421635db2c4781ea812ed5c592fe`
 - [固定commitの独立完了レビュー・確認済み](records/development/2026-08-15-one-item-review-independent-completion-review-v1.md) — SHA-256 `8c2a112a095beb93e906b8f969f1f1fc66953643f0ffca9a6c76d67cba159969`
 - [六境界・全試験・高危険度反例の最終検証](records/development/2026-08-15-one-item-review-final-verification-evidence-v1.md) — SHA-256 `3c11a18d68d50b54aba7465290534690b49cabe6c6295126f6a1c29ab1dd4aaa`
 - [境界6の配置・結合・回帰確認成功](records/development/2026-08-15-one-item-review-boundary6-green-evidence-v1.md) — SHA-256 `a9ead3decf81c48e2465eb769929f59d8f2833fe0f3902cb1ef046761991075f`
@@ -47,18 +48,16 @@
 
 ## 次に行う一作業
 
-合成一件を正式処理へ通し、内容識別値、件数、分類、人の判断一覧、安全表示を示して、製品処理として受け入れるか一判断だけを求める。
+固定済みの合成一件Evidenceを示し、この処理を製品処理として受け入れるか一判断だけを求める。
 
 開始条件：
 
-- 独立完了レビュー証拠と本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 合成資料だけを使い、実利用者資料、保存、外部送信、外部処理を行わない
-- 表示は内容識別値、件数、分類、人の判断一覧に限定し、資料内容と絶対pathを出さない
+- 合成一件Evidenceと本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 対象158件、関連142件、安全表示23件、高危険度反例40件、正規全試験2,020件の成功を維持する
+- 独立完了レビューの止める指摘0件・未接続条件0件を維持する
 
 完了条件：
 
-- 合成一件の機械処理結果と証拠が固定される
-- 内容識別値、結果集合識別値、件数、分類、人の判断一覧、安全表示が確認できる
 - 利用者が製品処理として受け入れるか拒否する
 
 後続作業：受入なら候補1を完了として固定し候補2へ進む。拒否なら理由に対応する限定訂正だけを行う。
