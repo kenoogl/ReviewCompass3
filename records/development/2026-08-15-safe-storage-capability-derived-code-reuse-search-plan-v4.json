@@ -1,0 +1,328 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-SAFE-STORAGE-CAPABILITIES-2026-08-15-V4",
+  "searches": [
+    {
+      "subject": "safe_storage_required_capabilities_v3",
+      "capabilities": [
+        {
+          "capability_id": "approved_artifact_value_handoff",
+          "responsibility": "正式な読取り専用入口が作った安全な値だけを保存処理へ渡す",
+          "inputs": [
+            "正式入口が返す安全な成果物"
+          ],
+          "outputs": [
+            "保存可能な値"
+          ],
+          "failure_behavior": [
+            "画面出力の再読込みや未承認項目の混入を許可しない"
+          ],
+          "required_properties": [
+            "値による受渡し",
+            "許可項目限定"
+          ],
+          "reference_paths": [
+            "tools/session_logs/read_only_entry.py",
+            "tools/session_logs/pipeline.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/pipeline.py:prepare_artifact",
+            "tools/session_logs/read_only_entry.py:_safe_result"
+          ],
+          "symbol_terms": [
+            "artifact",
+            "prepare"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "content_identity",
+          "responsibility": "保存内容と来歴を決定的な内容識別値へ結び付ける",
+          "inputs": [
+            "構造化した保存内容"
+          ],
+          "outputs": [
+            "内容識別値"
+          ],
+          "failure_behavior": [
+            "内容が異なるのに同一として扱わない"
+          ],
+          "required_properties": [
+            "正準化",
+            "決定的なdigest計算"
+          ],
+          "reference_paths": [
+            "tools/common/digests.py",
+            "tools/session_logs/provenance.py"
+          ],
+          "reference_symbols": [
+            "tools/common/digests.py:canonical_json_bytes",
+            "tools/common/digests.py:sha256_hex",
+            "tools/session_logs/provenance.py:verify_provenance"
+          ],
+          "symbol_terms": [
+            "digest",
+            "sha256",
+            "identity"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "storage_root_and_permission_boundary",
+          "responsibility": "許可された保存root内だけへ、所有者限定の権限で保存する",
+          "inputs": [
+            "保存root",
+            "record ID"
+          ],
+          "outputs": [
+            "境界内の保存先"
+          ],
+          "failure_behavior": [
+            "範囲外path、symlink、過剰権限を拒否する"
+          ],
+          "required_properties": [
+            "path境界確認",
+            "directory 0700相当",
+            "file 0600相当"
+          ],
+          "reference_paths": [
+            "tools/session_logs/eventual_preservation.py",
+            "tools/session_logs/preservation.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/eventual_preservation.py:_validate_boundaries",
+            "tools/session_logs/eventual_preservation.py:_secure_parent_chain",
+            "tools/session_logs/eventual_preservation.py:_secure_file",
+            "tools/session_logs/preservation.py:_bind_inside_root",
+            "tools/session_logs/preservation.py:_safe_relative_path"
+          ],
+          "symbol_terms": [
+            "root",
+            "path",
+            "permission",
+            "chmod"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "atomic_record_commit",
+          "responsibility": "一時fileから完全な保存記録だけを確定する",
+          "inputs": [
+            "保存内容",
+            "operation状態"
+          ],
+          "outputs": [
+            "確定済み記録"
+          ],
+          "failure_behavior": [
+            "一部だけを確定済みとして扱わない"
+          ],
+          "required_properties": [
+            "new-only書込み",
+            "一時file",
+            "原子的な確定"
+          ],
+          "reference_paths": [
+            "tools/session_logs/eventual_preservation.py",
+            "tools/session_logs/preservation.py",
+            "tools/session_logs/storage.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/eventual_preservation.py:_write_atomic",
+            "tools/session_logs/preservation.py:_write_atomic",
+            "tools/session_logs/storage.py:_commit_outputs"
+          ],
+          "symbol_terms": [
+            "write",
+            "replace",
+            "store",
+            "commit"
+          ],
+          "required_effect_markers": [
+            "file_write"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "interrupted_operation_recovery",
+          "responsibility": "中断した保存または削除を状態に応じて安全に再開する",
+          "inputs": [
+            "operation状態",
+            "一時file",
+            "確定印"
+          ],
+          "outputs": [
+            "再開、停止、または安全な削除結果"
+          ],
+          "failure_behavior": [
+            "状態を推測して誤った再開や削除をしない"
+          ],
+          "required_properties": [
+            "再試行可能",
+            "incomplete状態",
+            "同じ期待値での照合"
+          ],
+          "reference_paths": [
+            "tools/session_logs/eventual_preservation.py",
+            "tools/session_logs/preservation.py",
+            "tools/session_logs/storage.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/eventual_preservation.py:_checkpoint",
+            "tools/session_logs/eventual_preservation.py:_file_matches",
+            "tools/session_logs/eventual_preservation.py:_collect_locked"
+          ],
+          "symbol_terms": [
+            "recover",
+            "resume",
+            "retry",
+            "incomplete",
+            "operation"
+          ],
+          "required_effect_markers": [
+            "file_read",
+            "file_write"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "verified_reload",
+          "responsibility": "確定済み記録を再読込みし、内容識別値と完全性を確認する",
+          "inputs": [
+            "record ID",
+            "保存済み記録"
+          ],
+          "outputs": [
+            "検証済みの再読込み結果"
+          ],
+          "failure_behavior": [
+            "欠落、改変、不完全な記録を成功として返さない"
+          ],
+          "required_properties": [
+            "内容識別値照合",
+            "完全性確認"
+          ],
+          "reference_paths": [
+            "tools/session_logs/provenance.py",
+            "tools/session_logs/regeneration.py",
+            "tools/session_logs/preservation.py",
+            "tools/session_logs/eventual_preservation.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/provenance.py:verify_provenance",
+            "tools/session_logs/regeneration.py:regenerate_artifact",
+            "tools/session_logs/preservation.py:_verify_ledger",
+            "tools/session_logs/eventual_preservation.py:_load_cursor"
+          ],
+          "symbol_terms": [
+            "read",
+            "load",
+            "verify",
+            "validate"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "retryable_delete",
+          "responsibility": "保持期限後の記録を途中失敗から再試行できる順序で削除する",
+          "inputs": [
+            "削除計画",
+            "保存済み記録"
+          ],
+          "outputs": [
+            "削除済み状態"
+          ],
+          "failure_behavior": [
+            "再試行に必要な状態を先に失わない"
+          ],
+          "required_properties": [
+            "保持期限確認",
+            "削除計画",
+            "再試行可能な状態遷移"
+          ],
+          "reference_paths": [
+            "tools/session_logs/eventual_preservation.py",
+            "tools/session_logs/preservation.py",
+            "tools/session_logs/storage.py"
+          ],
+          "reference_symbols": [],
+          "symbol_terms": [
+            "delete",
+            "unlink",
+            "retention",
+            "deleting"
+          ],
+          "required_effect_markers": [
+            "file_write"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "exclusive_local_update",
+          "responsibility": "同じ記録への同時更新を一つずつ処理する",
+          "inputs": [
+            "lock path",
+            "更新処理"
+          ],
+          "outputs": [
+            "排他的に完了した更新"
+          ],
+          "failure_behavior": [
+            "競合中の更新を同時成功として扱わない"
+          ],
+          "required_properties": [
+            "排他lock",
+            "異常終了後の解放"
+          ],
+          "reference_paths": [
+            "tools/session_logs/locking.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/locking.py:exclusive_lock"
+          ],
+          "symbol_terms": [
+            "lock",
+            "exclusive"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-15-safe-storage-capability-derived-code-reuse-search-attestation-v3.json"
+    }
+  ],
+  "content_digest": "e817da66c2e58373c57701b9169696f6855a96c00b9c9be27113755cbc6a4ec6"
+}
