@@ -4,6 +4,8 @@ import hashlib
 import importlib
 import json
 import os
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -445,3 +447,112 @@ def test_store_new_does_not_commit_when_created_object_is_unsafe(
     assert caught.value.reason == reason
     assert not tuple(arguments["sensitive_root"].rglob("commit.json"))
     assert not tuple(arguments["data_root"].rglob("commit.json"))
+
+
+def _record_snapshot(record_directory):
+    return {
+        path.name: (
+            path.read_bytes(),
+            path.stat().st_ino,
+            path.stat().st_mtime_ns,
+        )
+        for path in record_directory.iterdir()
+    }
+
+
+def test_store_new_returns_unchanged_without_touching_existing_record(tmp_path):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+    times = {
+        "stored_at": "2026-08-15T00:00:00+00:00",
+        "retention_until": "2026-08-16T00:00:00+00:00",
+    }
+    first = storage.store_new(**arguments, **times)
+    record_id = first["record_id"]
+    sensitive_record = arguments["sensitive_root"] / record_id
+    data_record = arguments["data_root"] / record_id
+    before = (
+        _record_snapshot(sensitive_record),
+        _record_snapshot(data_record),
+    )
+
+    second = storage.store_new(**arguments, **times)
+
+    assert second == {**first, "status": "unchanged"}
+    assert (
+        _record_snapshot(sensitive_record),
+        _record_snapshot(data_record),
+    ) == before
+
+
+def test_store_new_rejects_different_content_for_existing_record_id(
+    tmp_path,
+    monkeypatch,
+):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+    times = {
+        "stored_at": "2026-08-15T00:00:00+00:00",
+        "retention_until": "2026-08-16T00:00:00+00:00",
+    }
+    first = storage.store_new(**arguments, **times)
+    record_id = first["record_id"]
+    sensitive_record = arguments["sensitive_root"] / record_id
+    data_record = arguments["data_root"] / record_id
+    before = (
+        _record_snapshot(sensitive_record),
+        _record_snapshot(data_record),
+    )
+    different = b"different raw bytes\n"
+    arguments["raw_log"].write_bytes(different)
+    arguments["safe_result"] = _safe_result(different)
+    monkeypatch.setattr(
+        storage,
+        "_record_id",
+        lambda identity: record_id,
+        raising=False,
+    )
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.store_new(**arguments, **times)
+
+    assert caught.value.reason == "record_conflict"
+    assert (
+        _record_snapshot(sensitive_record),
+        _record_snapshot(data_record),
+    ) == before
+
+
+def test_store_new_concurrent_calls_do_not_both_succeed(
+    tmp_path,
+    monkeypatch,
+):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+    times = {
+        "stored_at": "2026-08-15T00:00:00+00:00",
+        "retention_until": "2026-08-16T00:00:00+00:00",
+    }
+    barrier = threading.Barrier(2)
+    local = threading.local()
+    original_create = storage._create_record_directory
+
+    def synchronized_create(root_fd, record_id):
+        if not getattr(local, "first_create_seen", False):
+            local.first_create_seen = True
+            barrier.wait(timeout=5)
+        return original_create(root_fd, record_id)
+
+    monkeypatch.setattr(storage, "_create_record_directory", synchronized_create)
+
+    def attempt():
+        try:
+            return storage.store_new(**arguments, **times)["status"]
+        except storage.StorageStop as error:
+            return error.reason
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        outcomes = list(executor.map(lambda ignored: attempt(), range(2)))
+
+    assert outcomes.count("stored") == 1
+    assert outcomes.count("record_busy") == 1

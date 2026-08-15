@@ -483,6 +483,82 @@ def _operation_document(
     }
 
 
+def _record_id(identity):
+    return sha256_hex(canonical_json_bytes(identity))
+
+
+def _open_existing_record(root_fd, record_id):
+    try:
+        record_fd = os.open(record_id, _DIRECTORY_FLAGS, dir_fd=root_fd)
+    except FileNotFoundError:
+        return None
+    except OSError as error:
+        raise StorageStop("record_conflict") from error
+    try:
+        _validate_created_fd(record_fd, "directory", 0o700)
+    except Exception:
+        os.close(record_fd)
+        raise
+    return record_fd
+
+
+def _read_existing_file(record_fd, name):
+    try:
+        file_descriptor = os.open(
+            name,
+            os.O_RDONLY | os.O_NOFOLLOW,
+            dir_fd=record_fd,
+        )
+    except OSError as error:
+        raise StorageStop("record_conflict") from error
+    try:
+        _validate_created_fd(file_descriptor, "file", 0o600)
+        return _read_fd_bytes(file_descriptor)
+    finally:
+        os.close(file_descriptor)
+
+
+def _existing_store_outcome(
+    *,
+    sensitive_root_fd,
+    data_root_fd,
+    record_id,
+    expected_sensitive,
+    expected_data,
+    stored_result,
+):
+    sensitive_record_fd = _open_existing_record(
+        sensitive_root_fd,
+        record_id,
+    )
+    data_record_fd = _open_existing_record(data_root_fd, record_id)
+    if sensitive_record_fd is None or data_record_fd is None:
+        if sensitive_record_fd is not None:
+            os.close(sensitive_record_fd)
+        if data_record_fd is not None:
+            os.close(data_record_fd)
+        raise StorageStop("record_busy")
+    try:
+        sensitive_names = set(os.listdir(sensitive_record_fd))
+        data_names = set(os.listdir(data_record_fd))
+        if "commit.json" not in data_names:
+            raise StorageStop("record_busy")
+        if sensitive_names != set(expected_sensitive) or data_names != set(
+            expected_data
+        ):
+            raise StorageStop("record_conflict")
+        for name, expected in expected_sensitive.items():
+            if _read_existing_file(sensitive_record_fd, name) != expected:
+                raise StorageStop("record_conflict")
+        for name, expected in expected_data.items():
+            if _read_existing_file(data_record_fd, name) != expected:
+                raise StorageStop("record_conflict")
+    finally:
+        os.close(sensitive_record_fd)
+        os.close(data_record_fd)
+    return {**stored_result, "status": "unchanged"}
+
+
 def store_new(
     *,
     repository_root,
@@ -530,7 +606,7 @@ def store_new(
         "retention_until": retention_until,
         "tool_version": derived["provenance"]["tool_version"],
     }
-    record_id = sha256_hex(canonical_json_bytes(identity))
+    record_id = _record_id(identity)
     manifest = {
         "derived_sha256": derived_sha256,
         "raw_sha256": raw_sha256,
@@ -577,15 +653,48 @@ def store_new(
         expected_sha256=expected_sha256,
     ))
 
+    stored_result = {
+        "committed": True,
+        "derived_sha256": derived_sha256,
+        "external_send_approved": False,
+        "manifest_sha256": manifest_sha256,
+        "raw_sha256": raw_sha256,
+        "record_id": record_id,
+        "retention_until": retention_until,
+        "status": "stored",
+    }
+    expected_sensitive = {
+        "operation.json": committed_operation,
+        "raw.bin": raw_bytes,
+    }
+    expected_data = {
+        "commit.json": commit_bytes,
+        "derived.json": derived_bytes,
+        "manifest.json": manifest_bytes,
+        "operation.json": committed_operation,
+    }
+
     sensitive_root_fd = _open_directory_fd(sensitive_root)
     data_root_fd = _open_directory_fd(data_root)
     sensitive_record_fd = None
     data_record_fd = None
     try:
-        sensitive_record_fd = _create_record_directory(
-            sensitive_root_fd,
-            record_id,
-        )
+        try:
+            sensitive_record_fd = _create_record_directory(
+                sensitive_root_fd,
+                record_id,
+            )
+        except StorageStop as error:
+            if error.reason != "record_exists":
+                raise
+            return _existing_store_outcome(
+                sensitive_root_fd=sensitive_root_fd,
+                data_root_fd=data_root_fd,
+                record_id=record_id,
+                expected_sensitive=expected_sensitive,
+                expected_data=expected_data,
+                stored_result=stored_result,
+            )
         _publish_file(
             sensitive_record_fd,
             "operation.json",
@@ -619,13 +728,4 @@ def store_new(
         os.close(sensitive_root_fd)
         os.close(data_root_fd)
 
-    return {
-        "committed": True,
-        "derived_sha256": derived_sha256,
-        "external_send_approved": False,
-        "manifest_sha256": manifest_sha256,
-        "raw_sha256": raw_sha256,
-        "record_id": record_id,
-        "retention_until": retention_until,
-        "status": "stored",
-    }
+    return stored_result
