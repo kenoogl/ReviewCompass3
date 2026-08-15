@@ -415,6 +415,62 @@ def test_store_new_commits_fixed_files_with_safe_content(
         assert forbidden not in visible
 
 
+def test_manifest_and_operation_match_independent_contract_oracle(tmp_path):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    manifest = _stored_json(data_record / "manifest.json")
+    operation = _stored_json(sensitive_record / "operation.json")
+
+    assert set(manifest) == {
+        "derived_sha256",
+        "prior_contract_id",
+        "prior_contract_sha256",
+        "prior_contract_version",
+        "raw_sha256",
+        "read_only_entry_version",
+        "record_id",
+        "redaction_rules_sha256",
+        "retention_until",
+        "schema_version",
+        "storage_writer_version",
+        "stored_at",
+    }
+    assert manifest["prior_contract_id"] == (
+        "TC-RC3-PRODUCT-G25-SESSION-ARTIFACT-PREPARATION-001"
+    )
+    assert manifest["prior_contract_sha256"] == (
+        "20e4e0551c5b1357ba3e66d6ba849f19566da27c58c54ef98e8fa1db110fb72b"
+    )
+    assert manifest["prior_contract_version"] == 1
+    assert manifest["read_only_entry_version"] == "0.0.1"
+    assert manifest["redaction_rules_sha256"] == "1" * 64
+    assert manifest["storage_writer_version"] == 1
+    assert operation["files"] == {
+        "data": {
+            "final": [
+                "operation.json",
+                "derived.json",
+                "manifest.json",
+                "commit.json",
+                "deleted.json",
+            ],
+            "temporary": [
+                "operation.json.tmp",
+                "derived.json.tmp",
+                "manifest.json.tmp",
+                "commit.json.tmp",
+                "deleted.json.tmp",
+            ],
+        },
+        "sensitive": {
+            "final": ["operation.json", "raw.bin"],
+            "temporary": ["operation.json.tmp", "raw.bin.tmp"],
+        },
+    }
+
+
 @pytest.mark.parametrize(
     "reason",
     ("insecure_owner", "insecure_mode", "insecure_acl", "invalid_file_type"),
@@ -1005,3 +1061,193 @@ def test_delete_record_retries_same_confirmation_after_failure(
     )
 
     assert result["status"] == "deleted"
+
+
+def _invoke_existing_operation(storage, operation, arguments, stored, plan=None):
+    if operation == "store":
+        return storage.store_new(
+            **arguments,
+            stored_at="2026-08-15T00:00:00+00:00",
+            retention_until="2026-08-16T00:00:00+00:00",
+        )
+    if operation == "load-derived":
+        return storage.load_derived(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+            current_at="2026-08-15T12:00:00+00:00",
+        )
+    if operation == "plan-delete":
+        return storage.plan_delete(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+        )
+    return storage.delete_record(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+        confirmation_sha256=plan["confirmation_sha256"],
+        deleted_at="2026-08-15T13:00:00+00:00",
+    )
+
+
+@pytest.mark.parametrize(
+    "operation",
+    ("store", "load-derived", "plan-delete", "delete"),
+)
+def test_existing_operations_reject_changed_file_mode_without_mutation(
+    tmp_path,
+    operation,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    target = sensitive_record / "raw.bin"
+    target.chmod(0o640)
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        _invoke_existing_operation(storage, operation, arguments, stored, plan)
+
+    assert caught.value.reason == "insecure_mode"
+    assert target.stat().st_mode & 0o777 == 0o640
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+@pytest.mark.parametrize(
+    "operation",
+    ("store", "load-derived", "plan-delete", "delete"),
+)
+def test_existing_operations_reject_changed_directory_mode_without_mutation(
+    tmp_path,
+    operation,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    sensitive_record.chmod(0o750)
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        _invoke_existing_operation(storage, operation, arguments, stored, plan)
+
+    assert caught.value.reason == "insecure_mode"
+    assert sensitive_record.stat().st_mode & 0o777 == 0o750
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+@pytest.mark.parametrize(
+    "operation",
+    ("store", "load-derived", "plan-delete", "delete"),
+)
+def test_existing_operations_reject_added_file_acl_without_mutation(
+    tmp_path,
+    monkeypatch,
+    operation,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    target_inode = (sensitive_record / "raw.bin").stat().st_ino
+    original_acl_check = storage._has_extended_acl
+
+    def injected_acl(file_descriptor):
+        if os.fstat(file_descriptor).st_ino == target_inode:
+            return True
+        return original_acl_check(file_descriptor)
+
+    monkeypatch.setattr(storage, "_has_extended_acl", injected_acl)
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        _invoke_existing_operation(storage, operation, arguments, stored, plan)
+
+    assert caught.value.reason == "insecure_acl"
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+@pytest.mark.parametrize(
+    "operation",
+    ("store", "load-derived", "plan-delete", "delete"),
+)
+def test_existing_operations_reject_replaced_file_symlink_without_mutation(
+    tmp_path,
+    operation,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    target = sensitive_record / "raw.bin"
+    target.unlink()
+    target.symlink_to(arguments["raw_log"])
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        _invoke_existing_operation(storage, operation, arguments, stored, plan)
+
+    assert caught.value.reason == "record_conflict"
+    assert target.is_symlink()
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+@pytest.mark.parametrize(
+    "operation",
+    ("store", "load-derived", "plan-delete", "delete"),
+)
+@pytest.mark.parametrize("reason", ("insecure_owner", "invalid_file_type"))
+def test_existing_operations_reject_changed_owner_or_type_without_mutation(
+    tmp_path,
+    monkeypatch,
+    operation,
+    reason,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    target_inode = (sensitive_record / "raw.bin").stat().st_ino
+    original_validator = storage._validate_created_fd
+
+    def injected_attribute(file_descriptor, expected_kind, expected_mode):
+        if os.fstat(file_descriptor).st_ino == target_inode:
+            raise storage.StorageStop(reason)
+        return original_validator(file_descriptor, expected_kind, expected_mode)
+
+    monkeypatch.setattr(storage, "_validate_created_fd", injected_attribute)
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        _invoke_existing_operation(storage, operation, arguments, stored, plan)
+
+    assert caught.value.reason == reason
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before

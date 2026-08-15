@@ -18,6 +18,26 @@ _ACL_TYPE_EXTENDED = 0x00000100
 _ACL_FIRST_ENTRY = 0
 _DIRECTORY_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
 _FILE_FLAGS = os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
+_PRIOR_CONTRACT_ID = "TC-RC3-PRODUCT-G25-SESSION-ARTIFACT-PREPARATION-001"
+_PRIOR_CONTRACT_SHA256 = (
+    "20e4e0551c5b1357ba3e66d6ba849f19566da27c58c54ef98e8fa1db110fb72b"
+)
+_PRIOR_CONTRACT_VERSION = 1
+_STORAGE_WRITER_VERSION = 1
+_MANIFEST_KEYS = {
+    "derived_sha256",
+    "prior_contract_id",
+    "prior_contract_sha256",
+    "prior_contract_version",
+    "raw_sha256",
+    "read_only_entry_version",
+    "record_id",
+    "redaction_rules_sha256",
+    "retention_until",
+    "schema_version",
+    "storage_writer_version",
+    "stored_at",
+}
 
 _DERIVED_KEYS = (
     "external_send_approved",
@@ -751,10 +771,18 @@ def store_new(
     record_id = _record_id(identity)
     manifest = {
         "derived_sha256": derived_sha256,
+        "prior_contract_id": _PRIOR_CONTRACT_ID,
+        "prior_contract_sha256": _PRIOR_CONTRACT_SHA256,
+        "prior_contract_version": _PRIOR_CONTRACT_VERSION,
         "raw_sha256": raw_sha256,
+        "read_only_entry_version": derived["provenance"]["tool_version"],
         "record_id": record_id,
+        "redaction_rules_sha256": derived["provenance"][
+            "redaction_rules_sha256"
+        ],
         "retention_until": retention_until,
         "schema_version": 1,
+        "storage_writer_version": _STORAGE_WRITER_VERSION,
         "stored_at": stored_at,
     }
     manifest_bytes = canonical_json_bytes(manifest)
@@ -952,9 +980,18 @@ def load_derived(*, sensitive_root, data_root, record_id, current_at):
         }:
             raise StorageStop("record_integrity_failed")
         if (
-            manifest.get("record_id") != record_id
+            set(manifest) != _MANIFEST_KEYS
+            or manifest.get("record_id") != record_id
             or manifest.get("raw_sha256") != raw_sha256
             or manifest.get("derived_sha256") != derived_sha256
+            or manifest.get("prior_contract_id") != _PRIOR_CONTRACT_ID
+            or manifest.get("prior_contract_sha256") != _PRIOR_CONTRACT_SHA256
+            or manifest.get("prior_contract_version") != _PRIOR_CONTRACT_VERSION
+            or manifest.get("read_only_entry_version")
+            != derived.get("provenance", {}).get("tool_version")
+            or manifest.get("redaction_rules_sha256")
+            != derived.get("provenance", {}).get("redaction_rules_sha256")
+            or manifest.get("storage_writer_version") != _STORAGE_WRITER_VERSION
             or commit.get("record_id") != record_id
             or commit.get("operation_id") != operation.get("operation_id")
             or commit.get("raw_sha256") != raw_sha256
