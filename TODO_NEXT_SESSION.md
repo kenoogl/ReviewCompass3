@@ -6,9 +6,9 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第5段と、最初の製品機能G25読取り専用入口は完了した。立て直し後の二つ目の製品機能である安全保存は技術条件1から21を満たし、条件22の製品受入判断を待っている。
-- 現在作業：安全保存は対象97件、関連30件、正規全1,862件が成功し、同じ独立担当の完了再レビューv3で止める指摘0件、条件1から21の未接続0件、開始可となった。次は利用者が製品処理として受け入れるかだけを判断する。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_technical_conditions_1_21_passed_independent_completion_review_v3_startable_condition_22_human_acceptance_pending`
+- 全体：立て直し計画v5の第1段から第5段、最初の製品機能G25読取り専用入口、二つ目の製品機能である一件用安全保存の実装と製品受入が完了した。
+- 現在作業：安全保存は対象97件、関連30件、正規全1,862件が成功し、独立完了再レビューv3で止める指摘0件、条件1から21の未接続0件となった。利用者が条件22を受け入れ、製品処理としての受入まで完了した。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_conditions_1_21_verified_condition_22_human_accepted_product_acceptance_complete`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -41,33 +41,34 @@
 - [安全保存の独立完了再レビューv2修正要](records/development/2026-08-15-session-artifact-safe-storage-independent-completion-review-v2.md) — SHA-256 `d90364a873586b1be8ccf37196c2f49c5d879d87446379a54fc7194d85b77c88`
 - [安全保存の二原因修正後最終技術検証Evidence v3](records/development/2026-08-15-session-artifact-safe-storage-final-verification-evidence-v3.md) — SHA-256 `fc2d86c305b4198b774b57e550205732b599c4f4c753f8db89c52b19175facbd`
 - [安全保存の独立完了再レビューv3開始可](records/development/2026-08-15-session-artifact-safe-storage-independent-completion-review-v3.md) — SHA-256 `233b1833db6b7828e5d835550ec49b27b19e6263720a2665bec819b23d138948`
+- [安全保存の製品受入判断](records/development/2026-08-15-session-artifact-safe-storage-product-acceptance-decision-v1.md) — SHA-256 `7145f57a59efb965f64a5401f6e109685ba1920b5039fe65a4edd644af7573dc`
 
 ## 次に行う一作業
 
-条件22として、技術条件1から21と独立レビュー開始可を根拠に、固定された安全保存範囲を製品処理として受け入れるか利用者が判断する。
+現在の計画、完了記録、持越し項目を機械的に再集計し、安全保存受入後の未完了な製品作業候補を目的、根拠、合否基準、影響、推奨順付きで利用者へ提示する。
 
 開始条件：
 
-- 採用契約v3、Evidence v3、独立完了再レビューv3を固定根拠にする
-- 受入対象を合成一件の二root保存、派生物だけの再読込み、途中状態の再開または確認済み中止、確認値付き削除と監査期限保持に限定する
-- 実Session、実保存root、外部送信、自動削除、複数記録探索は受入対象に含めない
+- 安全保存の製品受入判断と現在のTODOが意味単位commitへ固定され、作業場所に未記録差分がない
+- 立て直し計画v5、現在位置記録、初期開発確認表、完了済み製品機能を固定入力にする
+- 完了済み項目を候補へ戻さず、持越し項目と新しい製品作業を分ける
 
 完了条件：
 
-- 利用者が固定範囲を製品処理として受け入れるか明示する
-- 受入なら条件22のDecision recordを固定し、非受入なら理由と戻し先を固定する
+- 候補ごとに目的、根拠、開始条件、完了条件、影響、推奨順が示される
+- 利用者が技術的な再調査をせず次の一作業だけを選べる
 
-後続作業：受入なら条件22を完了として固定し、次の製品作業候補を提示する。非受入なら指定された理由だけを対象に戻す。
+後続作業：利用者が次候補を選んだ場合だけ、その一作業の開始前境界確認へ進む。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：条件22の製品受入だけを利用者が判断する。技術条件1から21の再裁定や修正方法の選択は求めない
+- Human判断待ち：なし。安全保存の条件22は利用者の「受け入れる」により完了した
 
 ## stale・deferred
 
 - stale：最終技術検証Evidence v1とv2、および独立完了レビューv1とv2の完了判断はstale。現在根拠はEvidence v3と独立完了再レビューv3開始可である
-- deferred：設計、契約、既存入口、中央一覧、push、外部送信、自動削除、実Session記録、複数記録探索は変更・開始しない
+- deferred：次候補の提示までは設計、契約、既存入口、中央一覧、push、外部送信、自動削除、実Session記録、複数記録探索を変更・開始しない
 
 ## Git・Test
 
