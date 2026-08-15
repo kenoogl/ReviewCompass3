@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：『G02一件レビューの安全投影操作の追加』を利用者が製品受入した。実行器`reviewcompass3-operation-run`は3操作（G02材料固定・G08設計照合・G24整合検査）を持ち、受入済み検査部品のすべてが「承認済み運用契約→実行→記録着地」の導線に載った。次の縦切りの選択（G02 organize、入力組み立て支援、部品連鎖、保存統合、候補5以降）は利用者保留中で、着手していない。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v2 / accepted`
+- 現在作業：利用者はcodexCLI枯渇のため暫定レビュー体制（独立確認＝利用者がGeminiを手動利用・Human中継、codex exec停止）を決定し、次の縦切りに候補5のG20（外部送信安全境界）を選択した。Dの内部部品としてA-Cは不要（G02 prepare出力・機微検査・承認機構・安全保存を使う）と整理済み。次はG20の事前走査と契約定義である。G02安全投影までの4製品処理は受入済み。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v2 / accepted`（次契約は定義前）
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,6 +17,7 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
+- [暫定レビュー体制の決定（Gemini手動利用・Human中継）](records/development/2026-08-16-interim-gemini-review-regime-decision-v1.md) — SHA-256 `1a5fffc5792d17791f5c275b40183a0d4d076233d6d1b7a267cd91cf92174792`
 - [利用者によるG02安全投影の製品受入判断](records/development/2026-08-16-one-item-review-safe-projection-product-acceptance-decision-v1.md) — SHA-256 `2cea891bb43fa83b15259310d97a459b6f446898bdedf79630cd2e945d8008cc`
 - [Codex独立完了レビュー・verified判定](records/development/2026-08-16-one-item-review-safe-projection-independent-completion-review-v1.md) — SHA-256 `0152fb5ba32397ab651c29291f36e45d8c030f10188bc2ebf3f6f2bb2ce4a145`
 - [実装成功Evidence（RED・GREEN・全試験・自由文遮断E2E）](records/development/2026-08-16-one-item-review-safe-projection-green-evidence-v1.md) — SHA-256 `6b9e6dbd7c43f1d34dc456f3fff6bc5e17c82103a8aa5db623f0b841be84fb63`
@@ -37,24 +38,25 @@
 
 ## 次に行う一作業
 
-利用者が次の一件を選択する：(A) G02 organize操作の追加（材料固定→結果整理でG02一連が導線上で完結）、
-(B) 入力組み立て支援（雛形生成）、(C) 部品連鎖（2操作の順次実行）、(D) 候補5 G20（外部送信安全境界）、
-(E) その他（候補6以降、改善候補の仕分けなど）。選択まで新しい契約定義・実装を開始しない。
+ClaudeがG20（外部送信安全境界）の事前走査（既存egress 7 module・保留7 pathの所在・現物形・Digest固定・接続点）を
+行い、最初の縦切り（承認付き一回送信の最小経路）の契約候補v1を定義する。独立確認は暫定体制
+（依頼record作成→利用者がGeminiへ運搬→判定をClaudeが判定recordへ転記・照合）で行う。
 
 開始条件：
 
-- 受入判断record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 暫定体制の決定record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- codex execを起動しない。Claudeは外部送信を行わず、送信文面の準備までとする
 
 完了条件：
 
-- 利用者の選択がchat文言で得られ、対応する契約定義へ引き継がれる
+- 契約候補v1が固定され、Gemini独立確認の判定が判定recordへ転記・照合される
 
-後続作業：選択された縦切りを同じ手順（契約候補→独立確認→採用→失敗試験→最小実装→独立完了レビュー→受入）で進める。
+後続作業：開始可なら利用者へ縮小境界の採用と実装開始の判断を求める。
 
 ## blocker・Human判断待ち
 
-- blocker：技術blockerなし
-- Human判断待ち：次の縦切りの選択（利用者保留中）
+- blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定体制で代替）
+- Human判断待ち：なし。契約候補v1の固定後、Geminiへの運搬を利用者へ依頼する
 
 ## stale・deferred
 
