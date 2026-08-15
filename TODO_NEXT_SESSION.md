@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
-- 現在作業：境界4は試験を変えず実装し、境界1〜4の146件が成功した。境界5の正式入口、安全な表示、終了区分、禁止作用0回の失敗試験へ進む。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / boundaries_1_2_3_4_green / boundary_5_red_ready`
+- 現在作業：境界5の10試験を追加し、既存146件成功を維持したまま入口と実行名不在で失敗することを確認した。薄い入口と実行名だけを実装する。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / boundaries_1_2_3_4_green / boundary_5_red_confirmed`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [境界5の正式入口・安全表示10件と期待失敗](records/development/2026-08-15-one-item-review-boundary5-red-evidence-v1.md) — SHA-256 `32670c7428a2f0ecc5fbbf76cdfa4d275db61dd8e8bd2041b14045d106820244`
 - [境界4の分類・人の判断一覧146件成功](records/development/2026-08-15-one-item-review-boundary4-green-evidence-v1.md) — SHA-256 `f3d593576970cc65b3ca57687f564bae6cb01cac8f1056f27e6aab8cee4620fc`
 - [境界4の分類・人の判断一覧4件と期待失敗](records/development/2026-08-15-one-item-review-boundary4-red-evidence-v1.md) — SHA-256 `0149e217f15cff256530d9138cc00341ed122906caad73a4dd7df354609dac7d`
 - [境界3の結果集合検査・対象142件成功](records/development/2026-08-15-one-item-review-boundary3-green-evidence-v1.md) — SHA-256 `93b3baf8f3aa22730f327aa51b52c046e69ca1a522f529d7f73d0946a09c4b6c`
@@ -41,21 +42,21 @@
 
 ## 次に行う一作業
 
-境界5の二操作、正準JSON一件、安全な停止表示、終了区分、標準エラー空、禁止作用0回を試験へ追加し、入口不在の期待理由で失敗を確認する。
+固定試験を変えず、核を順に呼ぶ薄い入口とreviewcompass3-one-item-review実行名だけを実装し、156件を成功させる。
 
 開始条件：
 
-- 境界4実装、成功証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 変更は対象試験だけに限定する
-- 保存、外部送信、外部処理を許可しない
+- 境界5試験、失敗証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 試験を変更しない
+- 変更は新入口とpyproject.tomlの実行名一件だけに限定する
 
 完了条件：
 
-- 既存146件成功を維持する
-- 正常入口が入口不在だけで失敗する
-- 失敗時に入力値、path、例外本文を表示しない規則を固定する
+- 対象156件が成功する
+- 成功・停止ともJSON一件、末尾改行一つ、標準エラー空になる
+- 書込み、通信、外部処理を行わない
 
-後続作業：失敗確認後、薄い入口と正式実行名だけを実装する。
+後続作業：境界5を固定後、境界6の別現在位置からの配置・結合・回帰確認へ進む。
 
 ## blocker・Human判断待ち
 
@@ -73,7 +74,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：境界1〜4の対象146件が成功、失敗・error・skip 0、終了コード0。境界4の試験変更0
+- 直近の関連Test：既存146件成功、新規10件は入口と実行名不在で失敗、終了コード1で期待失敗を確認
 - 直近の全Test：製品コードと試験を変更していないため再実行していない。直近の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0
 - 差分検査：`git diff --check`合格
 

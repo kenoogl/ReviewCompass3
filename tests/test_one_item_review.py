@@ -4,6 +4,9 @@ import importlib
 import hashlib
 import json
 import os
+import socket
+import subprocess
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -917,4 +920,199 @@ def test_organization_is_independent_of_all_set_like_input_order():
     assert review.organize_results(material, first_validated) == review.organize_results(
         material,
         second_validated,
+    )
+
+
+def _entry():
+    return importlib.import_module("tools.reviews.one_item_review_entry")
+
+
+def _cli_files(tmp_path):
+    review = _review()
+    root = tmp_path / "cli-input"
+    root.mkdir()
+    material_path = root / "material.txt"
+    spec_path = root / "spec.json"
+    results_path = root / "results.json"
+    material_bytes = b"first line\nsecond line\n"
+    spec_bytes = _canonical(_valid_spec())
+    package = review.prepare_material(material_bytes, spec_bytes)
+    results_bytes = _canonical(
+        _organization_results(package["material_package_sha256"])
+    )
+    material_path.write_bytes(material_bytes)
+    spec_path.write_bytes(spec_bytes)
+    results_path.write_bytes(results_bytes)
+    return {
+        "root": root.absolute(),
+        "material": material_path.absolute(),
+        "spec": spec_path.absolute(),
+        "results": results_path.absolute(),
+        "package": package,
+        "results_bytes": results_bytes,
+    }
+
+
+def _run_entry(entry, capsys, arguments):
+    exit_code = entry.main(arguments)
+    captured = capsys.readouterr()
+    return exit_code, captured.out.encode("utf-8"), captured.err
+
+
+def test_prepare_entry_returns_one_exact_canonical_json(tmp_path, capsys):
+    entry = _entry()
+    files = _cli_files(tmp_path)
+
+    exit_code, stdout, stderr = _run_entry(entry, capsys, [
+        "prepare",
+        "--input-root", str(files["root"]),
+        "--material", str(files["material"]),
+        "--review-spec", str(files["spec"]),
+    ])
+
+    assert exit_code == 0
+    assert stdout == _canonical(files["package"]) + b"\n"
+    assert stderr == ""
+
+
+def test_organize_entry_returns_one_exact_canonical_json(tmp_path, capsys):
+    review = _review()
+    entry = _entry()
+    files = _cli_files(tmp_path)
+    validated = review.validate_results(files["package"], files["results_bytes"])
+    expected = review.organize_results(files["package"], validated)
+
+    exit_code, stdout, stderr = _run_entry(entry, capsys, [
+        "organize",
+        "--input-root", str(files["root"]),
+        "--material", str(files["material"]),
+        "--review-spec", str(files["spec"]),
+        "--results", str(files["results"]),
+    ])
+
+    assert exit_code == 0
+    assert stdout == _canonical(expected) + b"\n"
+    assert stderr == ""
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    (
+        [],
+        ["unknown"],
+        ["prepare", "--unknown", "value"],
+    ),
+)
+def test_entry_rejects_invalid_arguments_without_echoing_them(arguments, capsys):
+    entry = _entry()
+
+    exit_code, stdout, stderr = _run_entry(entry, capsys, arguments)
+
+    assert exit_code == 2
+    assert json.loads(stdout) == {
+        "external_send_approved": False,
+        "reason": "invalid_arguments",
+        "status": "stopped",
+    }
+    assert b"relative" not in stdout
+    assert b"unknown" not in stdout
+    assert stderr == ""
+
+
+def test_entry_rejects_relative_position_argument(tmp_path, capsys):
+    entry = _entry()
+    files = _cli_files(tmp_path)
+
+    exit_code, stdout, stderr = _run_entry(entry, capsys, [
+        "prepare",
+        "--input-root", "relative",
+        "--material", str(files["material"]),
+        "--review-spec", str(files["spec"]),
+    ])
+
+    assert exit_code == 2
+    assert json.loads(stdout)["reason"] == "invalid_path"
+    assert b"relative" not in stdout
+    assert stderr == ""
+
+
+def test_entry_uses_exit_three_for_sensitive_stop(tmp_path, capsys):
+    entry = _entry()
+    files = _cli_files(tmp_path)
+    files["material"].write_text("person@example.test", encoding="utf-8")
+
+    exit_code, stdout, stderr = _run_entry(entry, capsys, [
+        "prepare",
+        "--input-root", str(files["root"]),
+        "--material", str(files["material"]),
+        "--review-spec", str(files["spec"]),
+    ])
+
+    assert exit_code == 3
+    assert json.loads(stdout)["reason"] == "sensitive_data_remaining"
+    assert b"person@example.test" not in stdout
+    assert str(files["material"]).encode("utf-8") not in stdout
+    assert stderr == ""
+
+
+def test_entry_hides_internal_exception_and_path(tmp_path, capsys, monkeypatch):
+    entry = _entry()
+    files = _cli_files(tmp_path)
+    secret = "internal-secret /private/hidden"
+
+    def fail_read(**kwargs):
+        raise RuntimeError(secret)
+
+    monkeypatch.setattr(entry, "read_input_files", fail_read)
+
+    exit_code, stdout, stderr = _run_entry(entry, capsys, [
+        "prepare",
+        "--input-root", str(files["root"]),
+        "--material", str(files["material"]),
+        "--review-spec", str(files["spec"]),
+    ])
+
+    assert exit_code == 4
+    assert json.loads(stdout) == {
+        "external_send_approved": False,
+        "reason": "internal_failure",
+        "status": "stopped",
+    }
+    assert secret.encode("utf-8") not in stdout
+    assert stderr == ""
+
+
+def test_entry_has_no_forbidden_side_effects(tmp_path, capsys, monkeypatch):
+    entry = _entry()
+    files = _cli_files(tmp_path)
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("forbidden side effect")
+
+    monkeypatch.setattr(subprocess, "run", forbidden)
+    monkeypatch.setattr(subprocess, "Popen", forbidden)
+    monkeypatch.setattr(socket, "socket", forbidden)
+    monkeypatch.setattr(os, "system", forbidden)
+    monkeypatch.setattr(Path, "write_text", forbidden)
+    monkeypatch.setattr(Path, "write_bytes", forbidden)
+    monkeypatch.setattr(Path, "mkdir", forbidden)
+    monkeypatch.setattr(Path, "unlink", forbidden)
+    monkeypatch.setattr(Path, "chmod", forbidden)
+
+    exit_code, ignored, stderr = _run_entry(entry, capsys, [
+        "prepare",
+        "--input-root", str(files["root"]),
+        "--material", str(files["material"]),
+        "--review-spec", str(files["spec"]),
+    ])
+
+    assert exit_code == 0
+    assert stderr == ""
+
+
+def test_pyproject_declares_only_the_one_item_review_entry():
+    document = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+
+    assert document["project"]["scripts"]["reviewcompass3-one-item-review"] == (
+        "tools.reviews.one_item_review_entry:main"
     )
