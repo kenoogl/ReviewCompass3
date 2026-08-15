@@ -41,6 +41,10 @@
 - 手戻りが発生したら、対象操作・期待executor・実executor・手作業理由・事象とEvidence・
   機械処理候補・routeを作業後報告に含める。
 - 問題がある場合は、事象と原因を平易に説明する。
+- Human裁定を求める前に、目的、固定根拠、判断基準、推奨案、承認した場合としない場合の影響を
+  この順に平易に示す。機械処理と意味分析で先に候補を絞り、技術候補の全件判断をHumanへ渡さず、
+  意味、risk、authorityなどHumanに残す必要がある最小判断へ圧縮する（根拠：2026-08-15の説明不足と
+  `records/development/2026-08-15-safe-storage-capability-reuse-human-adjudication-decision-v1.md`）。
 
 ## 3. 機械規律
 
@@ -71,7 +75,7 @@
   上流改定・Issue昇格・risk受容・再開はHumanが判断する。採用候補はconsumerとOutcomeへ接続されるまでclosedにしない。
 - 改善候補の登録は既存経路で行う：`OBS-`観測record→`source_identity`で束縛した`IC-`候補を
   `.reviewcompass/workflow/improvement-candidates/`へ置き、
-  `python3 -m tools.development.issue_resolution_pilot --config config/development-issue-resolution-pilot-v3.json record <path>`
+  `.venv/bin/python3 -m tools.development.issue_resolution_pilot --config config/development-issue-resolution-pilot-v3.json record <path>`
   で検証する。仕分け判断は`records/development/`のDecision recordへ記録する。V4の置き場所は
   固定bundle参照に加えて単体形式N1を受け付ける（2026-08-06のN7改定。実例：
   `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）。トリアージ決定は
@@ -88,7 +92,7 @@
 - 次は引き続き明示承認を要する：方針変更・段完了・意味的裁定・不可逆操作・外部送信、
   push・tag・amend・rebase・reset・force push・履歴書換え、sandboxやhost権限の迂回。
 - 完了した作業単位を未コミットのまま次へ進めない。完了時と「次へ」相当の指示時に
-  `python3 -m tools.development.work_unit_transition --work-status completed`を実行し、
+  `.venv/bin/python3 -m tools.development.work_unit_transition --work-status completed`を実行し、
   `completed_work_unit_uncommitted`なら最小条件を満たす意味単位コミットの後に再実行する。
   満たせないときだけ停止して報告する。作業中のdirty差分だけではこの状態に分類しない。自己SHAやremote状態の転記だけを目的とする追加コミットを作らない。利用者がコミット方法を指定したらそれを優先する。
   guarded commitやhook等は導入せず、`stage_completion`など既存のHuman承認境界は緩めない。

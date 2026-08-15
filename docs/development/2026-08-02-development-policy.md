@@ -120,7 +120,7 @@ Git管理下にあるコードから毎回生成する。過去に作った処�
 新しいコードを追加しただけでは検索範囲の規則や方針の版を更新せず、新しい観測、処理一覧、比較候補、
 検索結果を内容識別値付きでnew-only生成する。過去の生成結果は時点証跡として書き換えない。
 
-実装開始の根拠に使う正式検索では、`python3 -m tools.development.formal_code_reuse_search`を一操作入口とする。
+実装開始の根拠に使う正式検索では、`.venv/bin/python3 -m tools.development.formal_code_reuse_search`を一操作入口とする。
 入口は作業別の一つの検索計画から`capture_committed_observation`、処理一覧、比較候補、宣言別検索、
 外部記録、project内証明書、最終結果を同じcommitについて順番に生成する。検索前にローカルの確定commitが
 存在すること、未commitの変更・追加登録・未登録fileがないこと、commit内のコード集合と観測集合が完全一致
@@ -267,6 +267,17 @@ Human承認を必須とするのは次の操作である。
 通常の実装、関連テスト、可逆なリファクタリング、機械検査には個別承認を要求しない。
 Human判断は、機微情報検査、内容同一性、権限などの機械関門を免除しない。
 
+Human裁定を求める前に、現在の目的、判断が必要な理由と固定根拠、判断基準、根拠に基づく推奨案、
+承認した場合としない場合の影響を、この順に平易に示す。機械で処理できる列挙、抽出、件数、重複、
+照合と、LLMが先に行える意味分析をHumanへ作業として渡さない。同じ根拠と基準で一括判断できる
+複数の技術項目は、一文の推奨方針へ圧縮し、詳細表は根拠として後置する。Humanには目的、危険受容、
+意味、方針、不可逆性など、Humanに残す必要がある最小判断だけを求める。
+
+本規則の根拠は、2026-08-15の安全保存機能の再利用方法裁定で、119件という検索上の延べ件数と
+八つの技術分類を目的より先に示し、利用者が判断の目的、根拠、基準を理解できない状態を生じさせた
+実害と、その後の説明方法を常用して裁定負荷を極力下げるよう求めた利用者判断である。実測と判断は
+`records/development/2026-08-15-safe-storage-capability-reuse-human-adjudication-decision-v1.md`へ固定する。
+
 ## 段階的自己適用
 
 ReviewCompass3自身へ適用する機能は、現行の契約とテストを満たし、`stable`と
@@ -346,7 +357,7 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 2. stage対象は明示したrepository-relative pathの列挙だけである。`git add -A`、`git add .`、
    範囲外fileの一括追加を使わない。
 3. `git diff --check`と、変更に応じたtest／validatorを実行して合格している。
-   `TODO_NEXT_SESSION.md`を含める場合は`python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`も
+   `TODO_NEXT_SESSION.md`を含める場合は`.venv/bin/python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`も
    合格している。
 4. commit後はread-onlyで状態を照合し、完了済み作業単位を未コミットのまま次の作業へ渡さない。
 
@@ -360,7 +371,7 @@ file操作はpath、diff、再読込、Digest、必要なlink検査、Test実行
 旧方針は、上の最小ガードへ置換した。push、guarded commit、hook、amend、rebase、reset、履歴書換えを
 対象外とする点は変更していない。guarded commit、hook、コミットごとの恒久的な承認file、巨大な
 commit manifestは導入しない。遷移前の機械検査には
-`python3 -m tools.development.work_unit_transition --work-status completed`を使用する。
+`.venv/bin/python3 -m tools.development.work_unit_transition --work-status completed`を使用する。
 
 最終コミットに`TODO_NEXT_SESSION.md`の引き継ぎ更新を含める場合、TODOのGit欄は、そのコミット完了と
 同時に真になるcommit安定形式へコミット前に更新する。コミット後はGitの事後状態をread-onlyで照合し、
@@ -375,7 +386,7 @@ TODOのGit欄へ次のmutable snapshotを固定しない。
 
 HEAD、upstream、ahead／behind、push状態の正本はGitとし、必要時に機械取得する。TODOには
 `本handoffを含むcommit完了時点`というcommit境界と、Gitから機械取得する旨を記録する。最終stage前に
-`python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`を実行して検査する。commit SHAが必要な
+`.venv/bin/python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`を実行して検査する。commit SHAが必要な
 Evidenceは、当該コミットと循環しない後続EvidenceまたはGit自体へ接続する。この運用にguarded commit、
 post-commit amend、hookは要求しない。
 

@@ -16,11 +16,11 @@
    `tools/development/todo_handoff.py`のcommit安定Git欄、Evidence節の参照Digest一致を次の**単一入口**で
    まとめて機械検証する。各検証の終了条件を直接判定し、pipeや`;`連結で代替しない。最終stage前に実行する。
 
-   `python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`
+   `.venv/bin/python3 -m tools.development.todo_handoff TODO_NEXT_SESSION.md`
 
 6. 完了した作業単位から次へ移る前に次を実行する。
 
-   `python3 -m tools.development.work_unit_transition --work-status completed`
+   `.venv/bin/python3 -m tools.development.work_unit_transition --work-status completed`
 
    `completed_work_unit_uncommitted`なら、`DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001`の最小条件
    （意味的に完結した単位、明示pathだけのstage、`git diff --check`と該当test／validatorの合格、
