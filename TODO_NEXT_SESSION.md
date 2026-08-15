@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段と、最初の製品機能G25読取り専用入口は完了した。現在は立て直し後の二つ目の製品機能である安全保存の実装準備を進めている。
-- 現在作業：安全保存の独立完了再レビューv2は修正要となった。前回4原因のうち3件は解消したが、確定印直前の中止と保存再開中の再中断出力の2原因が残るため、条件12・19の限定TDD修正へ戻る。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_completion_rereview_v2_fix_required_two_causes_remediation_pending`
+- 現在作業：安全保存の独立完了再レビューv2が残した2原因はREDを変えずGREENとなった。対象97件、関連30件、正規全1,862件が成功した。次は同じ独立担当による完了再々レビューを行う。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_rereview_v2_two_causes_remediated_final_verification_v3_passed_rereview_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -39,26 +39,27 @@
 - [安全保存の独立完了レビュー修正要](records/development/2026-08-15-session-artifact-safe-storage-independent-completion-review-v1.md) — SHA-256 `083ebadd2cc20e8006d2998c2cd71a812d52c59fea3f1838cb8d276980b4dc76`
 - [安全保存の四原因修正後最終技術検証Evidence v2](records/development/2026-08-15-session-artifact-safe-storage-final-verification-evidence-v2.md) — SHA-256 `dc84ab5915b636f8d7595bc3652dcedbc288f9aba26f57b245ce9817e967fc4d`
 - [安全保存の独立完了再レビューv2修正要](records/development/2026-08-15-session-artifact-safe-storage-independent-completion-review-v2.md) — SHA-256 `d90364a873586b1be8ccf37196c2f49c5d879d87446379a54fc7194d85b77c88`
+- [安全保存の二原因修正後最終技術検証Evidence v3](records/development/2026-08-15-session-artifact-safe-storage-final-verification-evidence-v3.md) — SHA-256 `fc2d86c305b4198b774b57e550205732b599c4f4c753f8db89c52b19175facbd`
 
 ## 次に行う一作業
 
-確定印なし・committed operationの削除計画と、保存再開中の再中断がincomplete/3を維持する製品入口試験を先にREDへ固定し、既存期待を変えず修正する。
+独立完了再レビューv2と最終技術検証Evidence v3を固定入力にし、同じ独立担当が残る2指摘、条件1から21、変更範囲をread-onlyで再々反証する。
 
 開始条件：
 
-- 再レビューv2記録とTODOが意味単位commitへ固定され、worktreeがcleanである
-- 採用契約v3と独立完了再レビューv2を固定入力にする
-- 条件12と19以外の設計・試験期待を変更しない
+- 二修正commit、Evidence v3、TODOが意味単位commitへ固定され、worktreeがcleanである
+- 採用契約v3、独立完了再レビューv2、Evidence v3を固定入力にする
+- レビューはread-onlyで前回反例を同条件で再実行する
 - 全Python commandに.venv/bin/python3を使う
 
 完了条件：
 
-- commit.jsonなし・committed operationがincomplete計画と確認済みdeleteで中止できる
-- 初回中断、再開中断、再々開成功がincomplete/3と秘密不在を維持する
-- 対象・関連・正規全試験が終了コード0になる
-- 独立再々レビューが止める指摘0件になる
+- 前回2指摘の反例が期待する安全結果へ変わる
+- 契約受入条件1から21の未接続が0件になる
+- 新たな責務拡張、秘密出力、既存入口変更、外部能力追加がない
+- 止める指摘0件の開始可、または残る修正要がpathと反例付きで固定される
 
-後続作業：2原因の修正と再検証後、同じ独立担当へ再々レビューを依頼する。開始可になるまで条件22を提示しない。
+後続作業：独立再々レビューが開始可なら、条件22として目的・根拠・合否基準・推奨・影響を利用者へ提示し、製品受入だけを依頼する。修正要なら受入を提示しない。
 
 ## blocker・Human判断待ち
 
@@ -67,7 +68,7 @@
 
 ## stale・deferred
 
-- stale：最終技術検証Evidence v1とv2の完了判断は再レビューv2の2指摘によりstale。試験結果は実測として保持するが製品受入根拠にしない
+- stale：最終技術検証Evidence v1とv2の完了判断はstale。現在根拠は再レビューv2とEvidence v3で、独立再々レビュー前のため製品受入根拠にはまだしない
 - deferred：独立再レビューではfileを変更しない。設計、契約、既存入口、中央一覧、push、外部送信、自動削除、実Session記録の使用は変更・開始しない
 
 ## Git・Test
@@ -76,8 +77,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：対象95件と関連30件は成功したが、独立追加反例2件が条件12・19の差を再現したため合格表示はstale
-- 直近の全Test：正規全1,860件成功は実測として保持するが、追加反例2件を未検出だったため修正後に再実行する
+- 直近の関連Test：残る2原因の新規2反例を含む保存核と新入口97件、既存正式入口・pipeline・provenance・開発環境30件が終了コード0
+- 直近の全Test：修正後の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0。receipt SHA-256はe1005f53740a3d2f1f5176a322b70a14874a63df5748cf7df5ab972dea7e3ca9
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
