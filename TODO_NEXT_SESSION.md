@@ -1,14 +1,14 @@
 # TODO_NEXT_SESSION
 
-更新日：2026-08-15
+更新日：2026-08-16
 
 > 人向けの現在位置入口。Workflow stateと完了Evidenceの正本ではない。
 
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：候補3のG24について、契約候補v3はCodex限定再確認で開始可（blocking 0件）となり、利用者が縮小境界・契約v3採用・案C実装開始を承認した。Claudeが契約§13の順（失敗試験の固定→最小実装）で「一件の要求候補整合検査」を実装する。G24全体の作成責務は未完了のまま後続に残る。
-- Task Contract：`TC-RC3-PRODUCT-ONE-REQUIREMENT-FEATURE-SOURCE-005 / v3 / adopted_implementation_started`
+- 現在作業：候補3のG24について、「一件の要求候補整合検査」の実装が完了した。対象試験111件・関連59＋21＋107件・隔離条件の正規全試験2,238件が各単独成功し、正式実行名の合成一件E2Eも成功した。次はCodexによる独立完了レビュー（受入条件21）である。G24全体の作成責務は未完了のまま後続に残る。
+- Task Contract：`TC-RC3-PRODUCT-ONE-REQUIREMENT-FEATURE-SOURCE-005 / v3 / implemented_independent_completion_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [実装成功Evidence（RED・GREEN・全試験・合成E2E）](records/development/2026-08-16-one-requirement-candidate-consistency-check-green-evidence-v1.md) — SHA-256 `50386e4a981e039e21af3bcec1fb3c37ba078739ff506b9afa19d63d806be6d2`
 - [利用者による縮小境界・契約v3採用・案C実装開始の承認](records/development/2026-08-15-one-requirement-candidate-consistency-check-adoption-decision-v1.md) — SHA-256 `35eb9a0b34d6ecf3e7d503498ca0a0f04234fd4519c33eecee3b816cf8dd5c41`
 - [Codexによる契約候補v3限定再確認・開始可判定](records/development/2026-08-15-one-requirement-candidate-consistency-check-candidate-v3-limited-rereview-v1.md) — SHA-256 `94f2650b0a5a96b273370c15e07097f5fc5675a700ad2597ab4165cb7809678b`
 - [採用された一件の要求候補整合検査契約v3](records/task-contract/2026-08-15-one-requirement-candidate-consistency-check-candidate-v3.md) — SHA-256 `7ad6da3c77632f3fc82bdbbabcb71d431d490bc78e12004d2331ef44cfdf0081`
@@ -24,32 +25,31 @@
 
 ## 次に行う一作業
 
-Claudeが契約v3の対象試験`tests/test_one_requirement_feature_source.py`を受入条件1〜22に対応する失敗試験として先に固定し、
-期待どおり失敗することを確認してから、検査核`tools/requirements/one_requirement_feature_source.py`、
-入口`tools/requirements/one_requirement_feature_source_entry.py`、`pyproject.toml`の実行名一件の最小実装で合格させる。
+Claudeが独立完了レビューの依頼recordを作成・commitし、codex execでCodexを起動する。Codexは実装済み製品を
+成果物変更なしでレビューし（受入条件21：誤合格・未接続・禁止作用・上位目的への悪影響の反証）、判定record 1件を
+単独commitして停止する。判定後の照合と利用者への受入提示はClaudeが実施する。
 
 開始条件：
 
-- 採用判断record、本TODOが意味単位commitへ固定され、作業treeがcleanである
-- 変更は契約§12の上限（検査核・入口・実行名・対象試験・作業票／Evidence／TODO）に限定する
-- §6の固定部品・保護10 path、要求schema、現行50要求、他製品処理を変更しない
+- 実装一式と成功Evidence、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- Codexは製品コード、既存試験、契約、G08、既存G24を変更せず、判定record 1件だけを作成する
 
 完了条件：
 
-- 対象試験が受入条件1〜22を覆い、失敗確認を経て最小実装で全件成功する（各単独command・終了コード0）
-- G24関連59件、要求資料関連21件、G08対象107件、保護10 path差分0が退行しない
-- 正規全試験の単独成功後、独立完了レビューと利用者受入（受入条件21〜23）へ進む
+- Codexが対象・関連・安全表示・正規全試験の各単独成功と、固定commitの誤合格・未接続・禁止作用・
+  上位目的への悪影響0件を確認し、判定recordを単独commitする
+- Claudeが判定recordの鮮度・変更path 1件・判定内容を機械照合する
 
-後続作業：独立完了レビューをCodexへ依頼し、合格後に利用者の製品受入（受入条件23）を求める。
+後続作業（Claudeが実施）：レビュー合格なら利用者へ受入条件23の製品受入（G24全体ではない縦切りの限界と後続未完了の確認を含む）を一判断として求め、不合格なら指摘だけを最小修正して再レビューへ戻る。
 
 ## blocker・Human判断待ち
 
 - blocker：技術blockerなし
-- Human判断待ち：なし。実装完了後の独立完了レビュー合格まで、段完了・製品受入の判断を求めない
+- Human判断待ち：独立完了レビュー用のCodex起動指示。レビュー合格まで製品受入の判断を求めない
 
 ## stale・deferred
 
-- stale：契約候補v2系の表示、v3の再確認待ち表示、Codex起動待ち表示はstale
+- stale：契約候補v2系の表示、v3の再確認待ち・実装開始待ちの表示はstale
 - deferred：G24の要求作成責務、現行要求変更、候補4以降、外部送信、実利用者要求資料の使用は後続境界まで対象外。`.gitignore`のclaude-to-codex無視規則とrecord正本方式の食い違いは本線の区切りで改善候補として登録する
 
 ## Git・Test
@@ -58,8 +58,8 @@ Claudeが契約v3の対象試験`tests/test_one_requirement_feature_source.py`�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：G24既存関連59件、要求artifact関連21件、G08対象107件が各単独成功、終了コード0
-- 直近の全Test：禁止認証環境6件を除く隔離条件で正規全試験2,127件成功、終了コード0。通常host環境の既存executor安全拒否はG08独立確認で退行なしと判断済み
+- 直近の関連Test：対象111件、G24既存関連59件、要求artifact関連21件、G08対象107件が各単独成功、終了コード0
+- 直近の全Test：禁止認証環境6件を除く隔離条件で正規全試験2,238件成功、終了コード0。通常host環境の既存executor安全拒否12件は実装前cleanなHEADの一時worktreeで同一再現し退行なしと確認済み
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

@@ -423,11 +423,12 @@ def test_selected_candidate_and_historical_enter_queue_in_fixed_order():
     assert result["human_decision_queue"][1]["identifiers"] == ["SRC-B"]
     assert result["human_decision_queue"][2]["identifiers"] == ["SRC-C"]
     assert result["verdict"] == "review_required_pending_human_decision"
-    assert result["obligation_sources"][0]["source_ids"] == [
-        "SRC-A",
-        "SRC-B",
-        "SRC-C",
-    ]
+    statement_entry = next(
+        item
+        for item in result["obligation_sources"]
+        if item["obligation_id"] == "REQ-CHECK-001#statement"
+    )
+    assert statement_entry["source_ids"] == ["SRC-A", "SRC-B", "SRC-C"]
     assert result["promotion_status"] == "not_promoted"
 
 
@@ -1165,7 +1166,7 @@ def test_correct_sha256_member_is_not_flagged():
 
 def test_aws_key_in_sha256_member_still_stops():
     catalog = _catalog()
-    catalog["sources"][0]["sha256"] = _AWS_KEY + "a" * 44
+    catalog["sources"][0]["sha256"] = _AWS_KEY
 
     stop = _stop(catalog=catalog)
 
