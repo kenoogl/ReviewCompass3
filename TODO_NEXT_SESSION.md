@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G30『最小運用契約実行』は契約v3採用後の実装（失敗試験58件を固定済み、commit fd24453）で契約定義欠陥を発見した。固定操作名`requirement_candidate_check`（27文字）が§8.2高乱雑性検査に実測3.63で一致し、G24操作の正例が必ず機微停止する。§8.2へ`/operation`位置の固定registry操作名除外（手順3b）を追加した契約候補v4を作成し、Codex限定再確認へ進む。実装途中fileは一時退避済み、開始可後に再開する。
-- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v4 / limited_independent_rereview_pending`
+- 現在作業：G30『最小運用契約実行』の実装が完了した。契約v4（Codex限定再確認で開始可）の下、対象試験61件・関連414件・隔離条件の正規全試験2,299件が各単独成功し、正式実行名`reviewcompass3-operation-run`のrepository外E2E（運用契約→部品実行→束縛照合→実行記録着地、標準出力とfile完全一致）も成功した。次はCodexによる独立完了レビュー（受入条件20）である。
+- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v4 / implemented_independent_completion_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,7 +17,8 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
-- [操作名除外を追加した最小運用契約実行の契約候補v4](records/task-contract/2026-08-16-minimal-operation-contract-execution-candidate-v4.md) — SHA-256 `d7b1861ccc73cb8f1c305294bf7c7e2a5fddd6ddb3fb46eab74e3204e8a2a7a1`
+- [実装成功Evidence（RED・契約欠陥発見・GREEN・全試験・E2E）](records/development/2026-08-16-minimal-operation-contract-execution-green-evidence-v1.md) — SHA-256 `145f4938b7358acf301195901dfcacdf633b712927e60539c2db8e956c088336`
+- [採用中の最小運用契約実行の契約v4](records/task-contract/2026-08-16-minimal-operation-contract-execution-candidate-v4.md) — SHA-256 `d7b1861ccc73cb8f1c305294bf7c7e2a5fddd6ddb3fb46eab74e3204e8a2a7a1`
 - [条件付き事前承認の成立による契約v3採用judgment](records/development/2026-08-16-minimal-operation-contract-execution-adoption-decision-v1.md) — SHA-256 `5f8c9fab3e3512376359f4b58ca528b87adcb74d0d488e1e86af1af06f2b6614`
 - [契約候補v3を開始可としたCodex限定再確認](records/development/2026-08-16-minimal-operation-contract-execution-v3-limited-rereview-v1.md) — SHA-256 `daa414658c2d6fc8ef712ceb47ae9b188cd787c1214be1ab826209795e97689e`
 - [利用者による一件の要求候補整合検査の製品受入判断](records/development/2026-08-16-one-requirement-candidate-consistency-check-product-acceptance-decision-v1.md) — SHA-256 `dd9edcfd5895c143f7c83c05dcc2df986d36d066030782a5577d534071866fd8`
@@ -26,22 +27,21 @@
 
 ## 次に行う一作業
 
-Codexが固定された契約候補v4を成果物変更なしで読み、v3実装中に発見した停止原因1件（固定操作名の高乱雑性一致）が
-§8.2手順3bの限定除外で閉じたかと、他境界の退行の有無だけを限定再確認し、判定record 1件を単独commitして停止する。
-起動はClaudeがcodex execで行う（利用者の本線1-4自律実行指示による）。
+Claudeが独立完了レビューの依頼recordを作成・commitし、codex execでCodexを起動する。Codexは実装済み製品を
+成果物変更なしでレビューし（受入条件20：誤合格・未接続・禁止作用・上位目的への悪影響の反証）、判定record 1件を
+単独commitして停止する。判定後の照合と利用者への受入提示はClaudeが実施する。
 
 開始条件：
 
-- 契約候補v4、依頼record、本TODOが意味単位commitへ固定され、作業treeがcleanである
-- Codexは依頼recordの鮮度検査に合格してから動く
+- 実装一式と成功Evidence、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- Codexは製品コード、既存試験、契約、再利用部品、既存G30基盤を変更せず、判定record 1件だけを作成する
 
 完了条件：
 
-- 訂正1点の閉鎖（除外が固定registry操作名の完全一致だけに限定され、後決め・拡大解釈の余地がないこと）と退行有無を確認する
-- 判定recordに開始可または修正要を書き、単独commitして停止する
+- Codexが対象・関連・正規全試験の各単独成功と、固定commitの誤合格・未接続・禁止作用・上位目的への悪影響0件を確認し、判定recordを単独commitする
 - Claudeが判定recordの鮮度・変更path 1件・判定内容を機械照合する
 
-後続作業（Claudeが実施、自律実行指示の範囲）：開始可なら退避済み実装を復元してv4準拠へ更新し、失敗試験→最小実装→退行確認→独立完了レビューへ進む。最終の製品受入だけは利用者判断として残す。
+後続作業（Claudeが実施、自律実行指示の範囲）：レビュー合格後、利用者へ受入条件22の製品受入だけを一判断として提示して停止する。合わせて本線#4（運用化目標の後続縦切りの契約定義）の候補を提示する。
 
 ## blocker・Human判断待ち
 

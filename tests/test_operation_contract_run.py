@@ -220,10 +220,16 @@ def _expected_bindings(operation, root, inputs):
     return bindings, result, payload
 
 
+_SHORT_IDENTIFIERS = {
+    "design_acceptance_check": "OC-G08-001",
+    "requirement_candidate_check": "OC-G24-001",
+}
+
+
 def _operation_contract(operation, root, inputs, bindings, output_root):
     return {
         "schema_version": 1,
-        "contract_identifier": f"OC-{operation.replace('_', '-')}-001",
+        "contract_identifier": _SHORT_IDENTIFIERS[operation],
         "human_approved": True,
         "operation": operation,
         "input_root": str(root),
@@ -544,6 +550,26 @@ def test_hex_binding_values_are_not_flagged(work_root):
 def test_high_entropy_identifier_stops_sensitive(work_root):
     contract, _, _, _ = _prepare(work_root)
     contract["contract_identifier"] = hashlib.sha256(b"leak").hexdigest()
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 3
+    assert b'"sensitive_data_remaining"' in payload
+
+
+def test_registry_operation_names_are_not_flagged(work_root):
+    contract, _, _, _ = _prepare(work_root, "requirement_candidate_check")
+    contract_path = _write_contract(work_root, contract)
+
+    code, _ = _run(contract_path)
+
+    assert code == 0
+
+
+def test_non_registry_operation_value_is_not_excluded(work_root):
+    contract, _, _, _ = _prepare(work_root)
+    contract["operation"] = hashlib.sha256(b"fake-operation").hexdigest()
     contract_path = _write_contract(work_root, contract)
 
     code, payload = _run(contract_path)
