@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。
-- 現在作業：候補2の作業契約候補v1へ内部反例を試し、条件集合の競合、利用時点の安全読取り、停止元表示の3原因を限定訂正した候補v2を固定する。採用前の独立定義確認を残す。
-- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / candidate_v2 / independent_definition_review_pending`
+- 現在作業：候補2の作業契約候補v2は独立定義確認で修正要となった。同名JSON項目、比較の不成立例、root途中symlink、危険度の4原因だけを訂正した候補v3を固定し、限定再確認へ進む。
+- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / candidate_v3 / limited_independent_rereview_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [独立確認の4原因を限定訂正した作業契約候補v3](records/task-contract/2026-08-15-one-design-acceptance-conformance-candidate-v3.md) — SHA-256 `8d8b4a608372162c68665155ecde9c1dce8122402ab1ebea0dc40e2c621bac80`
+- [作業契約候補v2の独立定義確認・修正要](records/development/2026-08-15-one-design-acceptance-contract-v2-independent-review-v1.md) — SHA-256 `41548a326e1e8ea362605a015f43a5e2beeeab858c57b7d4ce3a3d05b21bb85e`
 - [3原因を限定訂正した一件設計照合作業契約候補v2](records/task-contract/2026-08-15-one-design-acceptance-conformance-candidate-v2.md) — SHA-256 `d34c96e44a716555f61d666e35ad1c1eed5d79cdecfd43be9a95dce4e5812e15`
 - [作業契約候補v1の内部反証・修正要](records/development/2026-08-15-one-design-acceptance-contract-internal-challenge-v1.md) — SHA-256 `883c9f029253c3221dbdb18a734e92d6ce3948c07135143f3883c26f0abbf2ad`
 - [候補2の既存G08実測と契約定義Evidence](records/development/2026-08-15-one-design-acceptance-contract-definition-evidence-v1.md) — SHA-256 `9bad2d80fcddb6f97f9db71fa05a4811ce59404353aa07fb55c3070784d5f6b5`
@@ -53,13 +55,13 @@
 
 ## 次に行う一作業
 
-固定commitの作業契約候補v2を別の実行単位が読取り専用で反証し、開始可または修正要を根拠付きで固定する。
+固定commitの作業契約候補v3について、v2の4原因が解消し他条件が退行していないかを同じ独立担当が読取り専用で限定再確認する。
 
 開始条件：
 
-- 作業契約候補v2、内部反証、定義Evidence、本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 作業契約候補v3、v2独立確認、本TODOがcommitへ固定され、作業場所に未記録差分がない
 - 確認担当は成果物を変更せず、固定commitだけを読む
-- 目的の縮め過ぎ、欠落と矛盾の誤分類、安全表示、既存G08非変更へ少なくとも一つずつ反例を試す
+- 同名JSON項目、4比較不成立、root途中symlink、危険度の4点と他条件の退行だけを確認する
 
 完了条件：
 
@@ -76,7 +78,7 @@
 
 ## stale・deferred
 
-- stale：候補2の契約候補v1と作成待ち、候補1の製品受入待ち、候補1の独立完了レビュー待ち、候補1の契約採用待ちの表示はstale
+- stale：候補2の契約候補v1・v2、v2独立確認待ち、候補2の契約候補作成待ち、候補1の製品受入待ちの表示はstale
 - deferred：候補2の採用・実装、既存G08変更、保存、外部送信、外部処理、実利用者設計は次作業の対象外
 
 ## Git・Test
