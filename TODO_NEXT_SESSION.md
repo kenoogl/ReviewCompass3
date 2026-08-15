@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
-- 現在作業：実装作業票v2は独立変更点確認で開始可、止める原因0件、受入条件1〜18の未接続0件となった。製品コードは未変更で、境界1の失敗試験を先に固定する段階にいる。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / v3_adopted / option_c_implementation_start_approved / tdd_boundary_1_red_ready`
+- 現在作業：境界1の対象試験29件を固定し、正常読取り一件が製品核不在という期待理由だけで失敗するREDを確認した。試験を変えず、安全な一件読取り核だけを最小実装する段階にいる。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / v3_adopted / option_c_implementation_start_approved / tdd_boundary_1_red_confirmed`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [境界1の対象試験29件と期待RED](records/development/2026-08-15-one-item-review-boundary1-red-evidence-v1.md) — SHA-256 `145c29a0ad4d7149f06693275fc46c7b52cef73fcc7bfac0753a1a8f2bd7c33c`
 - [作業票v2の独立変更点確認・開始可](records/development/2026-08-15-one-item-review-implementation-start-correction-review-v1.md) — SHA-256 `aec75a2636be23ca4d0458abcaa8123b8e34d6c32f8e97f6468f890fb80d2201`
 - [結果集合の安全検査未接続を示した開始前レビュー](records/development/2026-08-15-one-item-review-implementation-start-review-v1.md) — SHA-256 `41e40a501942b4513300d28e4c24d4dd44e5c3626da49e5aa89b17dde9a441d4`
 - [結果集合安全検査と条件対応表を追加した実装作業票v2](docs/development/2026-08-15-one-item-review-implementation-work-ticket-v2.md) — SHA-256 `831eed390b3de03bad4ce55a9082e01eb7c97d2ad43bd5db35f0cd2b5f2b8765`
@@ -33,21 +34,21 @@
 
 ## 次に行う一作業
 
-境界1だけの対象試験を新規作成し、正常な一件読取りが製品核不在という主要理由で失敗するREDを確認する。
+固定済み試験を変えず、tools/reviews/one_item_review.pyへ境界1の明示file安全読取りだけを最小実装し、対象29件をGREENにする。
 
 開始条件：
 
-- 開始可の訂正確認、本TODOが意味単位commitへ固定され、作業場所に未記録差分がない
-- 変更pathはtests/test_one_item_review.pyだけとし、製品codeとpyproject.tomlをまだ変更しない
-- 正常読取りと境界1の拒否例を記述するが、REDは実装不在という主要理由一つで確認する
+- 境界1試験、RED証拠、本TODOが意味単位commitへ固定され、作業場所に未記録差分がない
+- tests/test_one_item_review.pyを変更しない
+- 変更pathはtools/reviews/one_item_review.pyだけとし、入口とpyproject.tomlをまだ変更しない
 
 完了条件：
 
-- 対象試験の収集に成功する
-- 正常な一件読取り試験が製品核不在の期待理由で失敗する
-- 失敗がfixture、import typo、環境依存、別境界の期待によるものではない
+- 対象29件が単独commandで成功する
+- 明示file以外の探索、書込み、環境値解決を行わない
+- schema、機微情報、材料作成、結果整理、CLIを実装しない
 
-後続作業：RED確認後、試験を変えずに境界1の安全な一件読取りだけを製品核へ最小実装し、GREENを確認する。
+後続作業：境界1をGREENで固定後、境界2の材料作成と安全停止の失敗試験を先に追加する。
 
 ## blocker・Human判断待ち
 
@@ -57,7 +58,7 @@
 ## stale・deferred
 
 - stale：実装作業票v1と開始前レビュー待ち表示はstale。契約候補v1・v2、契約採用待ち表示、候補1選択待ち表示もstale
-- deferred：境界1のRED確認までは製品codeとpyproject.tomlを変更しない。境界2以降、既存G02、保存、外部送信、外部処理、実利用者資料は現在の一作業では対象外
+- deferred：境界1のGREEN確認までは入口、pyproject.toml、境界2以降を変更しない。既存G02、保存、外部送信、外部処理、実利用者資料は現在の一作業では対象外
 
 ## Git・Test
 
@@ -65,7 +66,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：製品試験は未実施。作業票v2の独立確認は条件1〜18欠番・重複0、六境界必須欄欠落0、G02 14 file差分0、結果集合のpath・高乱雑性反証成功、終了コード0で開始可
+- 直近の関連Test：境界1試験は29件収集成功、終了コード0。正常読取り一件は製品核不在のModuleNotFoundErrorだけで1 failed、終了コード1となり期待REDを確認
 - 直近の全Test：製品コードと試験を変更していないため再実行していない。直近の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0
 - 差分検査：`git diff --check`合格
 
