@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
-- 現在作業：境界6の2試験を追加し、既存156件成功を維持したまま仮想環境の正式実行file不在で失敗することを確認した。依存追加なしで再導入し、配置と結合を確認する。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / boundaries_1_2_3_4_5_green / boundary_6_red_confirmed`
+- 現在作業：六境界が完了し、対象158件、G02関連142件、安全表示23件が成功、G02 14 file差分0となった。正規全試験と高危険度反例、独立完了レビューへ進む。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / boundaries_1_to_6_green / completion_verification_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [境界6の配置・結合・回帰確認成功](records/development/2026-08-15-one-item-review-boundary6-green-evidence-v1.md) — SHA-256 `a9ead3decf81c48e2465eb769929f59d8f2833fe0f3902cb1ef046761991075f`
 - [境界6の別現在位置実行2件と期待失敗](records/development/2026-08-15-one-item-review-boundary6-red-evidence-v1.md) — SHA-256 `afd763b8560c85f75eb92cbb79a5c11b7dadb6b71cf7a3d0009adaec0caec3b4`
 - [境界5の正式入口・安全表示156件成功](records/development/2026-08-15-one-item-review-boundary5-green-evidence-v1.md) — SHA-256 `2bf610c3dc0d45642a6e7824929e12d1bbf63bc0f780f70c832cb05cc31d7237`
 - [境界5の正式入口・安全表示10件と期待失敗](records/development/2026-08-15-one-item-review-boundary5-red-evidence-v1.md) — SHA-256 `32670c7428a2f0ecc5fbbf76cdfa4d275db61dd8e8bd2041b14045d106820244`
@@ -44,21 +45,21 @@
 
 ## 次に行う一作業
 
-仮想環境へ依存追加なしで再導入し、別現在位置から正式実行名を動かし、古い結果拒否、G02不変更、対象・関連回帰を確認する。
+正規全試験を単独実行し、改変・複製・機微情報・禁止作用の高危険度反例を確認して、独立完了レビューへ渡す固定証拠を作る。
 
 開始条件：
 
-- 境界6試験、失敗証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 依存追加とnetworkを使わない
-- 既存G02 14 fileと試験を変更しない
+- 六境界実装、境界6成功証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 全試験は正規入口から単独commandで行う
+- 独立確認は成果物を変更せず固定commitを読む
 
 完了条件：
 
-- 別現在位置から正式実行名で二操作が成功する
-- 入力変更後の古い結果をstale_materialで拒否する
-- 対象・関連試験とG02差分確認が成功する
+- 正規全試験が成功する
+- 高危険度反例が契約どおり停止・分類される
+- 独立完了レビューが契約条件1〜18を確認する
 
-後続作業：境界6後、正規全試験、高危険度反例、独立完了レビューへ進む。
+後続作業：独立完了レビューが確認済みなら、合成一件を利用者へ示して受入判断一件だけを求める。
 
 ## blocker・Human判断待ち
 
@@ -68,7 +69,7 @@
 ## stale・deferred
 
 - stale：実装作業票v1と開始前レビュー待ち表示はstale。契約候補v1・v2、契約採用待ち表示、候補1選択待ち表示もstale
-- deferred：境界6でも既存G02、保存、外部送信、外部処理、実利用者資料は変更・実行しない
+- deferred：保存、外部送信、外部処理、実利用者資料、既存G02変更は本作業の対象外のまま維持する
 
 ## Git・Test
 
@@ -76,7 +77,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：既存156件成功、新規2件は正式実行file不在だけで失敗、終了コード1で期待失敗を確認
+- 直近の関連Test：対象158件、G02関連142件、安全表示23件が成功、各終了コード0。G02 14 fileは基準commitから差分0
 - 直近の全Test：製品コードと試験を変更していないため再実行していない。直近の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0
 - 差分検査：`git diff --check`合格
 
