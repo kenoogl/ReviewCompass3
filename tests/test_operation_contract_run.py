@@ -223,6 +223,7 @@ def _expected_bindings(operation, root, inputs):
 _SHORT_IDENTIFIERS = {
     "design_acceptance_check": "OC-G08-001",
     "requirement_candidate_check": "OC-G24-001",
+    "one_item_review_prepare": "OC-G02-001",
 }
 
 
@@ -947,6 +948,244 @@ def test_cleanup_failure_after_publish_keeps_final_as_record(
 
     assert code == 2
     assert b'"invalid_output_root"' in payload
+
+
+# ---------------------------------------------------------------------------
+# G02安全投影操作（契約007 v2）
+# ---------------------------------------------------------------------------
+
+
+_MATERIAL_TEXT = "一行目の本文です。\n二行目の本文です。\n"
+_GOAL_TEXT = "目的の確認"
+_CRITERION_TEXT = "基準一の本文"
+_CONSTRAINT_TEXT = "制約一の本文"
+_PROJECTION_ROOT_KEYS = {
+    "external_send_approved",
+    "material",
+    "result_schema",
+    "review_spec",
+    "schema_version",
+    "status",
+    "material_package_sha256",
+}
+
+
+def _review_prepare_inputs(root, material_text=_MATERIAL_TEXT):
+    material_path = root / "material.txt"
+    review_spec_path = root / "review-spec.json"
+    material_path.write_bytes(material_text.encode("utf-8"))
+    review_spec_path.write_bytes(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "material_identifier": "MAT-RUN-001",
+                "goal": _GOAL_TEXT,
+                "criteria": [{"id": "C-1", "text": _CRITERION_TEXT}],
+                "constraints": [_CONSTRAINT_TEXT],
+            },
+            ensure_ascii=False,
+        ).encode("utf-8"),
+    )
+    return {"material": str(material_path), "review_spec": str(review_spec_path)}
+
+
+def _prepare_projection_oracle(inputs):
+    review = importlib.import_module("tools.reviews.one_item_review")
+    material_bytes = Path(inputs["material"]).read_bytes()
+    review_spec_bytes = Path(inputs["review_spec"]).read_bytes()
+    raw = review.prepare_material(material_bytes, review_spec_bytes)
+    projection = {
+        "external_send_approved": False,
+        "material": {
+            "content_sha256": raw["material"]["content_sha256"],
+            "identifier": raw["material"]["identifier"],
+            "line_count": raw["material"]["line_count"],
+        },
+        "result_schema": dict(raw["result_schema"]),
+        "review_spec": {"sha256": raw["review_spec"]["sha256"]},
+        "schema_version": raw["schema_version"],
+        "status": raw["status"],
+        "material_package_sha256": raw["material_package_sha256"],
+    }
+    bindings = {
+        "material": raw["material"]["content_sha256"],
+        "review_spec": raw["review_spec"]["sha256"],
+    }
+    return projection, bindings
+
+
+def _prepare_review_contract(work_root, material_text=_MATERIAL_TEXT):
+    inputs_root = work_root / "in"
+    inputs_root.mkdir()
+    output_root = work_root / "out"
+    output_root.mkdir()
+    inputs = _review_prepare_inputs(inputs_root, material_text)
+    projection, bindings = (None, None)
+    if material_text == _MATERIAL_TEXT:
+        projection, bindings = _prepare_projection_oracle(inputs)
+    else:
+        bindings = {
+            "material": hashlib.sha256(
+                Path(inputs["material"]).read_bytes(),
+            ).hexdigest(),
+            "review_spec": hashlib.sha256(b"placeholder").hexdigest(),
+        }
+    contract = _operation_contract(
+        "one_item_review_prepare",
+        inputs_root,
+        inputs,
+        bindings,
+        output_root,
+    )
+    return contract, projection, output_root
+
+
+def test_prepare_positive_run_lands_projected_record(work_root):
+    contract, projection, output_root = _prepare_review_contract(work_root)
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 0
+    expected_payload = _canonical(
+        _expected_record(
+            contract,
+            projection,
+            _canonical(projection) + b"\n",
+        ),
+    ) + b"\n"
+    assert payload == expected_payload
+    final_path = _final_path(contract, output_root)
+    assert payload == final_path.read_bytes()
+    assert not _partial_path(contract, output_root).exists()
+
+
+def test_prepare_record_excludes_free_text(work_root):
+    contract, projection, _ = _prepare_review_contract(work_root)
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 0
+    rendered = payload.decode("utf-8")
+    for free_text in (
+        "一行目の本文です。",
+        _GOAL_TEXT,
+        _CRITERION_TEXT,
+        _CONSTRAINT_TEXT,
+    ):
+        assert free_text not in rendered
+    record = json.loads(payload[:-1])
+    assert set(record["part_result"]) == _PROJECTION_ROOT_KEYS
+    assert set(record["part_result"]["material"]) == {
+        "content_sha256",
+        "identifier",
+        "line_count",
+    }
+    assert set(record["part_result"]["review_spec"]) == {"sha256"}
+
+
+def test_prepare_binding_mismatch_stops_without_files(work_root):
+    contract, _, output_root = _prepare_review_contract(work_root)
+    contract["expected_bindings"]["material"] = hashlib.sha256(
+        b"other",
+    ).hexdigest()
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 2
+    assert b'"binding_mismatch"' in payload
+    assert list(output_root.iterdir()) == []
+
+
+def test_prepare_sensitive_material_stops_as_part_stop(work_root):
+    contract, _, output_root = _prepare_review_contract(
+        work_root,
+        material_text=f"本文に {_AWS_KEY} を含む。\n",
+    )
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 5
+    record = json.loads(payload[:-1])
+    assert record["reason"] == "part_stopped"
+    assert record["source"] == "part"
+    assert record["part_reason"] == "sensitive_data_remaining"
+    assert record["part_source"] == "none"
+    assert record["part_exit_code"] == 3
+    assert _AWS_KEY.encode() not in payload
+    assert list(output_root.iterdir()) == []
+
+
+def test_prepare_absolute_path_material_stops_as_part_stop(work_root):
+    contract, _, output_root = _prepare_review_contract(
+        work_root,
+        material_text="本文に /Users/example/secret への参照を含む。\n",
+    )
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 5
+    record = json.loads(payload[:-1])
+    assert record["part_reason"] == "absolute_path_remaining"
+    assert record["part_exit_code"] == 2
+    assert list(output_root.iterdir()) == []
+
+
+def test_prepare_invalid_review_spec_stops_as_part_stop(work_root):
+    contract, _, output_root = _prepare_review_contract(work_root)
+    Path(contract["inputs"]["review_spec"]).write_bytes(b"{not json")
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 5
+    record = json.loads(payload[:-1])
+    assert record["part_reason"] == "invalid_schema"
+    assert record["part_exit_code"] == 2
+    assert list(output_root.iterdir()) == []
+
+
+def test_prepare_out_of_set_reason_is_internal_failure(work_root, monkeypatch):
+    contract, _, output_root = _prepare_review_contract(work_root)
+    contract_path = _write_contract(work_root, contract)
+    core = _core()
+    review = importlib.import_module("tools.reviews.one_item_review")
+
+    def raising_prepare(material_bytes, review_spec_bytes):
+        raise review.ReviewStop("stale_material")
+
+    monkeypatch.setattr(core, "prepare_material", raising_prepare)
+
+    code, payload = _run(contract_path)
+
+    assert code == 4
+    assert payload == _canonical(
+        {
+            "external_send_approved": False,
+            "reason": "internal_failure",
+            "source": "none",
+            "status": "stopped",
+        },
+    ) + b"\n"
+    assert list(output_root.iterdir()) == []
+
+
+def test_prepare_wrong_input_keys_stop_invalid_schema(work_root):
+    contract, _, _ = _prepare_review_contract(work_root)
+    contract["inputs"] = {
+        "design": contract["inputs"]["material"],
+        "acceptance": contract["inputs"]["review_spec"],
+    }
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 2
+    assert b'"invalid_schema"' in payload
 
 
 # ---------------------------------------------------------------------------
