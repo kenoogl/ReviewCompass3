@@ -962,3 +962,101 @@ def load_derived(*, sensitive_root, data_root, record_id, current_at):
             os.close(data_record_fd)
         os.close(sensitive_root_fd)
         os.close(data_root_fd)
+
+
+def plan_delete(*, sensitive_root, data_root, record_id):
+    """当該記録の実在固定fileだけから読取り専用の削除計画を返す。"""
+
+    sensitive_root = _path(sensitive_root)
+    data_root = _path(data_root)
+    _validate_storage_root(sensitive_root)
+    _validate_storage_root(data_root)
+    record_id = _record_name(record_id)
+    sensitive_root_fd = _open_directory_fd(sensitive_root)
+    data_root_fd = _open_directory_fd(data_root)
+    sensitive_record_fd = None
+    data_record_fd = None
+    try:
+        sensitive_record_fd = _open_existing_record(sensitive_root_fd, record_id)
+        data_record_fd = _open_existing_record(data_root_fd, record_id)
+        if sensitive_record_fd is None and data_record_fd is None:
+            raise StorageStop("record_not_found")
+        sensitive_names = (
+            set() if sensitive_record_fd is None else set(os.listdir(sensitive_record_fd))
+        )
+        data_names = set() if data_record_fd is None else set(os.listdir(data_record_fd))
+        allowed_sensitive = set(_SENSITIVE_FINAL_FILES) | {
+            f"{name}.tmp" for name in _SENSITIVE_FINAL_FILES
+        }
+        allowed_data = set(_DATA_FINAL_FILES) | {
+            f"{name}.tmp" for name in _DATA_FINAL_FILES
+        }
+        if not sensitive_names <= allowed_sensitive or not data_names <= allowed_data:
+            raise StorageStop("record_conflict")
+        operation_documents = []
+        for record_fd, names in (
+            (sensitive_record_fd, sensitive_names),
+            (data_record_fd, data_names),
+        ):
+            if record_fd is None:
+                continue
+            for name in ("operation.json", "operation.json.tmp"):
+                if name in names:
+                    content = _read_existing_file(record_fd, name)
+                    operation_documents.append((content, _integrity_json(content)))
+        if not operation_documents:
+            raise StorageStop("record_unrecoverable")
+        operation_bytes, operation = operation_documents[0]
+        if any(
+            document != operation
+            for ignored, document in operation_documents[1:]
+        ):
+            raise StorageStop("record_conflict")
+        if operation.get("record_id") != record_id:
+            raise StorageStop("record_conflict")
+        if "commit.json" in data_names:
+            state = "committed"
+            if operation.get("state") != "committed":
+                raise StorageStop("record_conflict")
+        else:
+            state = "incomplete"
+            if operation.get("state") not in {"incomplete", "committed"}:
+                raise StorageStop("record_conflict")
+        targets = []
+        for area, names in (("sensitive", sensitive_names), ("data", data_names)):
+            for name in sorted(names):
+                targets.append({
+                    "area": area,
+                    "kind": "temporary" if name.endswith(".tmp") else "final",
+                    "name": name,
+                })
+        manifest_sha256 = None
+        if data_record_fd is not None and "manifest.json" in data_names:
+            manifest_sha256 = sha256_hex(
+                _read_existing_file(data_record_fd, "manifest.json")
+            )
+        plan = {
+            "audit": {
+                "action": "retain_until",
+                "retention_until": operation.get("retention_until"),
+            },
+            "external_send_approved": False,
+            "manifest_sha256": manifest_sha256,
+            "operation_sha256": sha256_hex(operation_bytes),
+            "record_id": record_id,
+            "state": state,
+            "status": "delete_planned",
+            "target_count": len(targets),
+            "targets": targets,
+        }
+        return {
+            **plan,
+            "confirmation_sha256": sha256_hex(canonical_json_bytes(plan)),
+        }
+    finally:
+        if sensitive_record_fd is not None:
+            os.close(sensitive_record_fd)
+        if data_record_fd is not None:
+            os.close(data_record_fd)
+        os.close(sensitive_root_fd)
+        os.close(data_root_fd)

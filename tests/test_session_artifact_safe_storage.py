@@ -761,3 +761,78 @@ def test_load_derived_rejects_any_modified_fixed_file(
 
     assert caught.value.reason == "record_integrity_failed"
     assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+@pytest.mark.parametrize("state", ("committed", "incomplete"))
+def test_plan_delete_is_deterministic_and_read_only(tmp_path, monkeypatch, state):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+    times = {
+        "stored_at": "2026-08-15T00:00:00+00:00",
+        "retention_until": "2026-08-16T00:00:00+00:00",
+    }
+    if state == "committed":
+        stored = storage.store_new(**arguments, **times)
+        record_id = stored["record_id"]
+    else:
+        original_publish = storage._publish_file
+
+        def stop_after_raw(directory_fd, final_name, content):
+            result = original_publish(directory_fd, final_name, content)
+            if final_name == "raw.bin":
+                raise storage.StorageStop("injected_failure")
+            return result
+
+        monkeypatch.setattr(storage, "_publish_file", stop_after_raw)
+        with pytest.raises(storage.StorageStop):
+            storage.store_new(**arguments, **times)
+        monkeypatch.setattr(storage, "_publish_file", original_publish)
+        record_id = next(arguments["sensitive_root"].iterdir()).name
+    sensitive_record = arguments["sensitive_root"] / record_id
+    data_record = arguments["data_root"] / record_id
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    first = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=record_id,
+    )
+    second = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=record_id,
+    )
+
+    assert first == second
+    confirmation = first.pop("confirmation_sha256")
+    assert confirmation == hashlib.sha256(_canonical_bytes(first)).hexdigest()
+    assert first["status"] == "delete_planned"
+    assert first["state"] == state
+    assert first["record_id"] == record_id
+    assert first["target_count"] == len(first["targets"])
+    assert all(set(target) == {"area", "kind", "name"} for target in first["targets"])
+    serialized = _canonical_bytes(first).decode("utf-8")
+    assert str(arguments["sensitive_root"]) not in serialized
+    assert str(arguments["data_root"]) not in serialized
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+def test_plan_delete_rejects_unknown_file_without_changes(tmp_path):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    unknown = data_record / "unknown.bin"
+    unknown.write_bytes(b"unknown")
+    unknown.chmod(0o600)
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.plan_delete(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+        )
+
+    assert caught.value.reason == "record_conflict"
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
