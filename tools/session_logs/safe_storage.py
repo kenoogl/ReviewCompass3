@@ -652,6 +652,39 @@ def _read_existing_file(record_fd, name):
         os.close(file_descriptor)
 
 
+def _prevalidate_store_area(
+    record_fd,
+    names,
+    expected_files,
+    incomplete_operation,
+):
+    allowed = set(expected_files) | {
+        f"{name}.tmp" for name in expected_files
+    }
+    if not names <= allowed:
+        raise StorageStop("record_conflict")
+    committed_operation = expected_files["operation.json"]
+    operation_values = [
+        _read_existing_file(record_fd, name)
+        for name in ("operation.json", "operation.json.tmp")
+        if name in names
+    ]
+    if not operation_values:
+        raise StorageStop("record_unrecoverable" if names else "record_busy")
+    if any(
+        value not in {incomplete_operation, committed_operation}
+        for value in operation_values
+    ):
+        raise StorageStop("record_conflict")
+    for name in names:
+        if name.startswith("operation.json"):
+            continue
+        final_name = name.removesuffix(".tmp")
+        expected = expected_files.get(final_name)
+        if expected is None or _read_existing_file(record_fd, name) != expected:
+            raise StorageStop("record_conflict")
+
+
 def _existing_store_outcome(
     *,
     sensitive_root_fd,
@@ -667,13 +700,35 @@ def _existing_store_outcome(
         record_id,
     )
     data_record_fd = _open_existing_record(data_root_fd, record_id)
-    if sensitive_record_fd is None or data_record_fd is None:
-        if sensitive_record_fd is not None:
-            os.close(sensitive_record_fd)
-        if data_record_fd is not None:
-            os.close(data_record_fd)
-        raise StorageStop("record_busy")
     try:
+        if sensitive_record_fd is None and data_record_fd is None:
+            raise StorageStop("record_busy")
+        if sensitive_record_fd is None:
+            data_names = set(os.listdir(data_record_fd))
+            _prevalidate_store_area(
+                data_record_fd,
+                data_names,
+                expected_data,
+                incomplete_operation,
+            )
+            if "commit.json" in data_names:
+                raise StorageStop("record_conflict")
+            sensitive_record_fd = _create_record_directory(
+                sensitive_root_fd,
+                record_id,
+            )
+        elif data_record_fd is None:
+            sensitive_names = set(os.listdir(sensitive_record_fd))
+            _prevalidate_store_area(
+                sensitive_record_fd,
+                sensitive_names,
+                expected_sensitive,
+                incomplete_operation,
+            )
+            data_record_fd = _create_record_directory(
+                data_root_fd,
+                record_id,
+            )
         sensitive_names = set(os.listdir(sensitive_record_fd))
         data_names = set(os.listdir(data_record_fd))
         if "commit.json" not in data_names:
@@ -692,8 +747,10 @@ def _existing_store_outcome(
         _verify_expected_files(sensitive_record_fd, expected_sensitive)
         _verify_expected_files(data_record_fd, expected_data)
     finally:
-        os.close(sensitive_record_fd)
-        os.close(data_record_fd)
+        if sensitive_record_fd is not None:
+            os.close(sensitive_record_fd)
+        if data_record_fd is not None:
+            os.close(data_record_fd)
     return {**stored_result, "status": "unchanged"}
 
 
@@ -1544,8 +1601,18 @@ def delete_record(
         ):
             raise StorageStop("confirmation_mismatch")
 
-        if sensitive_record_fd is None or data_record_fd is None:
-            raise StorageStop("record_unrecoverable")
+        if sensitive_record_fd is None:
+            sensitive_record_fd = _create_record_directory(
+                sensitive_root_fd,
+                record_id,
+            )
+            sensitive_names = set()
+        if data_record_fd is None:
+            data_record_fd = _create_record_directory(
+                data_root_fd,
+                record_id,
+            )
+            data_names = set()
         deleting_bytes = canonical_json_bytes(deleting_operation)
         _finish_deleting_operation(sensitive_record_fd, deleting_bytes)
         _finish_deleting_operation(data_record_fd, deleting_bytes)

@@ -739,6 +739,77 @@ def _store_fixture(storage, tmp_path):
     return arguments, result
 
 
+def _one_root_incomplete_fixture(storage, tmp_path, monkeypatch):
+    arguments = _roots(tmp_path)
+    times = {
+        "stored_at": "2026-08-15T00:00:00+00:00",
+        "retention_until": "2026-08-16T00:00:00+00:00",
+    }
+    original_create = storage._create_record_directory
+    create_count = 0
+
+    def fail_before_second_directory(root_fd, record_id):
+        nonlocal create_count
+        create_count += 1
+        if create_count == 2:
+            raise storage.StorageStop("injected_failure")
+        return original_create(root_fd, record_id)
+
+    monkeypatch.setattr(storage, "_create_record_directory", fail_before_second_directory)
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.store_new(**arguments, **times)
+    assert caught.value.reason == "injected_failure"
+    monkeypatch.setattr(storage, "_create_record_directory", original_create)
+    sensitive_record = next(arguments["sensitive_root"].iterdir())
+    assert {path.name for path in sensitive_record.iterdir()} == {"operation.json"}
+    assert list(arguments["data_root"].iterdir()) == []
+    return arguments, times, sensitive_record.name
+
+
+def test_store_new_resumes_one_root_incomplete_record(tmp_path, monkeypatch):
+    storage = _storage()
+    arguments, times, record_id = _one_root_incomplete_fixture(
+        storage,
+        tmp_path,
+        monkeypatch,
+    )
+
+    result = storage.store_new(**arguments, **times)
+
+    assert result["status"] == "stored"
+    assert result["record_id"] == record_id
+    assert (arguments["sensitive_root"] / record_id / "raw.bin").is_file()
+    assert (arguments["data_root"] / record_id / "commit.json").is_file()
+
+
+def test_delete_record_cancels_one_root_incomplete_record(tmp_path, monkeypatch):
+    storage = _storage()
+    arguments, ignored, record_id = _one_root_incomplete_fixture(
+        storage,
+        tmp_path,
+        monkeypatch,
+    )
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=record_id,
+    )
+
+    result = storage.delete_record(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=record_id,
+        confirmation_sha256=plan["confirmation_sha256"],
+        deleted_at="2026-08-15T13:00:00+00:00",
+    )
+
+    assert result["status"] == "deleted"
+    assert list((arguments["sensitive_root"] / record_id).iterdir()) == []
+    assert {
+        path.name for path in (arguments["data_root"] / record_id).iterdir()
+    } == {"deleted.json"}
+
+
 def test_load_derived_returns_only_verified_unexpired_derived_value(tmp_path):
     storage = _storage()
     arguments, stored = _store_fixture(storage, tmp_path)
