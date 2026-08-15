@@ -482,3 +482,203 @@ def validate_results(material_package, results_bytes):
         "result_set_sha256": sha256_hex(canonical_json_bytes(normalized_root)),
         "reviews": validated_reviews,
     }
+
+
+def _finding_signature(finding):
+    return {
+        "criterion_ids": finding["criterion_ids"],
+        "description": finding["description"],
+        "end_line": finding["end_line"],
+        "severity": finding["severity"],
+        "start_line": finding["start_line"],
+        "title": finding["title"],
+    }
+
+
+def _queue_item(kind, identifiers, reason):
+    return {
+        "identifiers": sorted(identifiers),
+        "kind": kind,
+        "reason": reason,
+    }
+
+
+def organize_results(material_package, validated_results):
+    """検査済み結果を分類し、全対象を人の判断一覧へ残す。"""
+
+    review_entries = validated_results["reviews"]
+    content_sha_by_reviewer = {
+        entry["review"]["reviewer_id"]: entry["review_content_sha256"]
+        for entry in review_entries
+    }
+    grouped_findings = {}
+    signature_keys = {}
+    review_output = []
+    insufficient = []
+    finding_count = 0
+
+    duplicate_review_map = {}
+    for entry in review_entries:
+        source = entry["review"]
+        reviewer_id = source["reviewer_id"]
+        findings = source["findings"]
+        finding_count += len(findings)
+        if source["verdict"] == "insufficient_evidence":
+            insufficient.append(reviewer_id)
+        duplicate_review_map.setdefault(
+            entry["review_content_sha256"], []
+        ).append(reviewer_id)
+        review_output.append({
+            "finding_count": len(findings),
+            "review_content_sha256": entry["review_content_sha256"],
+            "review_sha256": entry["review_sha256"],
+            "reviewer_id": reviewer_id,
+            "summary": source["summary"],
+            "verdict": source["verdict"],
+        })
+        for finding in findings:
+            signature = _finding_signature(finding)
+            signature_sha256 = sha256_hex(canonical_json_bytes(signature))
+            signature_keys.setdefault(signature_sha256, set()).add(
+                finding["issue_key"]
+            )
+            grouped_findings.setdefault(finding["issue_key"], []).append({
+                "criterion_ids": finding["criterion_ids"],
+                "description": finding["description"],
+                "end_line": finding["end_line"],
+                "finding_id": finding["finding_id"],
+                "reviewer_id": reviewer_id,
+                "severity": finding["severity"],
+                "signature_sha256": signature_sha256,
+                "start_line": finding["start_line"],
+                "title": finding["title"],
+            })
+
+    possible_duplicate_reviews = [
+        {
+            "review_content_sha256": content_sha256,
+            "reviewer_ids": sorted(reviewer_ids),
+        }
+        for content_sha256, reviewer_ids in sorted(duplicate_review_map.items())
+        if len(reviewer_ids) > 1
+    ]
+    possible_duplicate_keys = [
+        {
+            "finding_signature_sha256": signature_sha256,
+            "issue_keys": sorted(issue_keys),
+        }
+        for signature_sha256, issue_keys in sorted(signature_keys.items())
+        if len(issue_keys) > 1
+    ]
+
+    issue_groups = []
+    unresolved = []
+    for issue_key, findings in sorted(grouped_findings.items()):
+        findings.sort(key=lambda item: (item["reviewer_id"], item["finding_id"]))
+        independent_contents = {
+            content_sha_by_reviewer[item["reviewer_id"]] for item in findings
+        }
+        signatures = {item["signature_sha256"] for item in findings}
+        if len(independent_contents) == 1:
+            disposition = "single_report"
+        elif len(signatures) == 1:
+            disposition = "matching_reports"
+        else:
+            disposition = "conflict"
+        if disposition in {"single_report", "conflict"}:
+            unresolved.append(issue_key)
+        public_findings = [
+            {key: value for key, value in item.items() if key != "signature_sha256"}
+            for item in findings
+        ]
+        issue_groups.append({
+            "disposition": disposition,
+            "findings": public_findings,
+            "issue_key": issue_key,
+            "reporters": sorted({item["reviewer_id"] for item in findings}),
+        })
+
+    queue = []
+    if insufficient:
+        queue.append(_queue_item(
+            "insufficient_evidence",
+            insufficient,
+            "review reported insufficient evidence",
+        ))
+    for group in issue_groups:
+        if group["disposition"] == "conflict":
+            queue.append(_queue_item(
+                "conflict",
+                [group["issue_key"]],
+                "reports with the same issue key differ",
+            ))
+    for item in possible_duplicate_reviews:
+        queue.append(_queue_item(
+            "possible_duplicate_review",
+            item["reviewer_ids"],
+            "review content is identical apart from reviewer id",
+        ))
+    for item in possible_duplicate_keys:
+        queue.append(_queue_item(
+            "possible_duplicate_key",
+            item["issue_keys"],
+            "finding content is identical under different issue keys",
+        ))
+    for group in issue_groups:
+        if group["disposition"] == "single_report":
+            queue.append(_queue_item(
+                "single_report",
+                [group["issue_key"]],
+                "issue has one independent report",
+            ))
+    for group in issue_groups:
+        if group["disposition"] == "matching_reports":
+            queue.append(_queue_item(
+                "matching_reports",
+                [group["issue_key"]],
+                "reports match but human acceptance is still required",
+            ))
+
+    kind_order = {
+        name: index
+        for index, name in enumerate((
+            "insufficient_evidence",
+            "conflict",
+            "possible_duplicate_review",
+            "possible_duplicate_key",
+            "single_report",
+            "matching_reports",
+        ))
+    }
+    queue.sort(
+        key=lambda item: (
+            kind_order[item["kind"]],
+            canonical_json_bytes(item["identifiers"]),
+        )
+    )
+    return {
+        "counts": {
+            "finding_count": finding_count,
+            "issue_count": len(issue_groups),
+            "review_count": len(review_entries),
+        },
+        "decision_status": "pending_human_decision",
+        "external_send_approved": False,
+        "grouping_basis": "supplied_issue_key",
+        "human_decision_queue": queue,
+        "insufficient_evidence_reviewers": sorted(insufficient),
+        "issue_groups": issue_groups,
+        "material": {
+            "content_sha256": material_package["material"]["content_sha256"],
+            "identifier": material_package["material"]["identifier"],
+            "material_package_sha256": material_package["material_package_sha256"],
+        },
+        "possible_duplicate_keys": possible_duplicate_keys,
+        "possible_duplicate_reviews": possible_duplicate_reviews,
+        "result_set_sha256": validated_results["result_set_sha256"],
+        "reviews": review_output,
+        "schema_version": 1,
+        "semantic_deduplication_performed": False,
+        "status": "results_organized",
+        "unresolved_issue_keys": sorted(unresolved),
+    }
