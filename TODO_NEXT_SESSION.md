@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
-- 現在作業：境界1の対象試験29件を固定し、正常読取り一件が製品核不在という期待理由だけで失敗するREDを確認した。試験を変えず、安全な一件読取り核だけを最小実装する段階にいる。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / v3_adopted / option_c_implementation_start_approved / tdd_boundary_1_red_confirmed`
+- 現在作業：境界1はRED試験を変えず安全読取り核を最小実装し、対象29件が成功した。境界2の固定材料作成と機微情報・絶対path安全停止について、失敗試験を先に固定する段階にいる。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / v3_adopted / option_c_implementation_start_approved / tdd_boundary_1_green / boundary_2_red_ready`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [境界1の安全読取り核と対象29件GREEN](records/development/2026-08-15-one-item-review-boundary1-green-evidence-v1.md) — SHA-256 `50bcd7914a4ab35cc5b5501303540e7d542a9e77b4ad4bc303ab2703efb64146`
 - [境界1の対象試験29件と期待RED](records/development/2026-08-15-one-item-review-boundary1-red-evidence-v1.md) — SHA-256 `145c29a0ad4d7149f06693275fc46c7b52cef73fcc7bfac0753a1a8f2bd7c33c`
 - [作業票v2の独立変更点確認・開始可](records/development/2026-08-15-one-item-review-implementation-start-correction-review-v1.md) — SHA-256 `aec75a2636be23ca4d0458abcaa8123b8e34d6c32f8e97f6468f890fb80d2201`
 - [結果集合の安全検査未接続を示した開始前レビュー](records/development/2026-08-15-one-item-review-implementation-start-review-v1.md) — SHA-256 `41e40a501942b4513300d28e4c24d4dd44e5c3626da49e5aa89b17dde9a441d4`
@@ -34,21 +35,21 @@
 
 ## 次に行う一作業
 
-固定済み試験を変えず、tools/reviews/one_item_review.pyへ境界1の明示file安全読取りだけを最小実装し、対象29件をGREENにする。
+tests/test_one_item_review.pyへ境界2の正常材料schema・決定性・条件schema・機微情報・四絶対path安全停止の試験を追加し、材料作成関数不在の期待理由でREDを確認する。
 
 開始条件：
 
-- 境界1試験、RED証拠、本TODOが意味単位commitへ固定され、作業場所に未記録差分がない
-- tests/test_one_item_review.pyを変更しない
-- 変更pathはtools/reviews/one_item_review.pyだけとし、入口とpyproject.tomlをまだ変更しない
+- 境界1製品核、GREEN証拠、本TODOが意味単位commitへ固定され、作業場所に未記録差分がない
+- 変更pathはtests/test_one_item_review.pyだけとし、製品核、入口、pyproject.tomlを変更しない
+- 結果集合の解析と整理、CLI表示を先取りしない
 
 完了条件：
 
-- 対象29件が単独commandで成功する
-- 明示file以外の探索、書込み、環境値解決を行わない
-- schema、機微情報、材料作成、結果整理、CLIを実装しない
+- 追加試験を含む対象試験の収集に成功する
+- 正常材料作成一件が材料作成関数不在の期待理由で失敗する
+- 境界1の29件は引き続き成功する
 
-後続作業：境界1をGREENで固定後、境界2の材料作成と安全停止の失敗試験を先に追加する。
+後続作業：境界2のRED確認後、試験を変えず条件schema、固定材料、G25二関数と四patternによる安全停止だけを最小実装する。
 
 ## blocker・Human判断待ち
 
@@ -58,7 +59,7 @@
 ## stale・deferred
 
 - stale：実装作業票v1と開始前レビュー待ち表示はstale。契約候補v1・v2、契約採用待ち表示、候補1選択待ち表示もstale
-- deferred：境界1のGREEN確認までは入口、pyproject.toml、境界2以降を変更しない。既存G02、保存、外部送信、外部処理、実利用者資料は現在の一作業では対象外
+- deferred：境界2のRED確認までは製品核、入口、pyproject.tomlを変更しない。境界3以降、既存G02、保存、外部送信、外部処理、実利用者資料は現在の一作業では対象外
 
 ## Git・Test
 
@@ -66,7 +67,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：境界1試験は29件収集成功、終了コード0。正常読取り一件は製品核不在のModuleNotFoundErrorだけで1 failed、終了コード1となり期待REDを確認
+- 直近の関連Test：境界1対象試験はRED後の変更0で29 passed、失敗・error・skip 0、終了コード0。製品核の先取り禁止語は静的検索0件
 - 直近の全Test：製品コードと試験を変更していないため再実行していない。直近の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0
 - 差分検査：`git diff --check`合格
 
