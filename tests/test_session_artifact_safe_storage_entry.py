@@ -291,6 +291,71 @@ def test_store_reports_resumable_incomplete_result(tmp_path, monkeypatch, capsys
     assert "raw-private-value" not in serialized
 
 
+def test_store_retry_keeps_incomplete_output_and_can_retry_again(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    entry = _entry()
+    storage = importlib.import_module("tools.session_logs.safe_storage")
+    roots = _roots(tmp_path)
+    monkeypatch.setattr(
+        entry,
+        "prepare_safe_result",
+        lambda raw_root, raw_log: (0, _safe_result(roots["raw_bytes"])),
+    )
+    arguments = [
+        "store",
+        "--repository-root",
+        str(roots["repository_root"]),
+        "--raw-root",
+        str(roots["raw_root"]),
+        "--raw-log",
+        str(roots["raw_log"]),
+        "--sensitive-root",
+        str(roots["sensitive_root"]),
+        "--data-root",
+        str(roots["data_root"]),
+        "--stored-at",
+        "2026-08-15T00:00:00+00:00",
+        "--retention-until",
+        "2026-08-16T00:00:00+00:00",
+    ]
+    original_publish = storage._publish_file
+
+    def stop_after_raw(directory_fd, final_name, content):
+        result = original_publish(directory_fd, final_name, content)
+        if final_name == "raw.bin":
+            raise storage.StorageStop("private first detail")
+        return result
+
+    monkeypatch.setattr(storage, "_publish_file", stop_after_raw)
+    first_code, first, first_serialized = _run(entry, capsys, arguments)
+    assert first_code == 3
+    assert first["status"] == "incomplete"
+    assert "private first detail" not in first_serialized
+
+    def stop_after_derived(directory_fd, final_name, content):
+        result = original_publish(directory_fd, final_name, content)
+        if final_name == "derived.json":
+            raise storage.StorageStop("private retry detail")
+        return result
+
+    monkeypatch.setattr(storage, "_publish_file", stop_after_derived)
+    second_code, second, second_serialized = _run(entry, capsys, arguments)
+    assert second_code == 3
+    assert second["status"] == "incomplete"
+    assert second["record_id"] == first["record_id"]
+    assert "private retry detail" not in second_serialized
+    assert "raw-private-value" not in second_serialized
+
+    monkeypatch.setattr(storage, "_publish_file", original_publish)
+    third_code, third, ignored = _run(entry, capsys, arguments)
+    assert third_code == 0
+    assert third["status"] == "stored"
+    assert third["record_id"] == first["record_id"]
+
+
 def test_delete_reports_resumable_deletion_incomplete(
     tmp_path,
     monkeypatch,

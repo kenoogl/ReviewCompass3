@@ -772,6 +772,7 @@ def _existing_store_outcome(
                 expected_sensitive=expected_sensitive,
                 expected_data=expected_data,
                 incomplete_operation=incomplete_operation,
+                record_id=record_id,
                 stored_result=stored_result,
             )
         if sensitive_names != set(expected_sensitive) or data_names != set(expected_data):
@@ -825,6 +826,7 @@ def _resume_incomplete_store(
     expected_sensitive,
     expected_data,
     incomplete_operation,
+    record_id,
     stored_result,
 ):
     allowed_sensitive = set(expected_sensitive) | {
@@ -867,29 +869,45 @@ def _resume_incomplete_store(
             if expected is None or _read_existing_file(record_fd, name) != expected:
                 raise StorageStop("record_conflict")
 
-    for record_fd in (sensitive_record_fd, data_record_fd):
-        names = set(os.listdir(record_fd))
-        if "operation.json.tmp" in names:
-            temporary = _read_existing_file(record_fd, "operation.json.tmp")
-            if temporary not in {incomplete_operation, committed_operation}:
-                raise StorageStop("record_conflict")
-            os.rename(
-                "operation.json.tmp",
-                "operation.json",
-                src_dir_fd=record_fd,
-                dst_dir_fd=record_fd,
-            )
-            os.fsync(record_fd)
-        elif "operation.json" not in names:
-            _publish_file(record_fd, "operation.json", incomplete_operation)
-    _finish_file(sensitive_record_fd, "raw.bin", expected_sensitive["raw.bin"])
-    _finish_file(data_record_fd, "derived.json", expected_data["derived.json"])
-    _finish_file(data_record_fd, "manifest.json", expected_data["manifest.json"])
-    if _read_existing_file(sensitive_record_fd, "operation.json") != committed_operation:
-        _replace_file(sensitive_record_fd, "operation.json", committed_operation)
-    if _read_existing_file(data_record_fd, "operation.json") != committed_operation:
-        _replace_file(data_record_fd, "operation.json", committed_operation)
-    _finish_file(data_record_fd, "commit.json", expected_data["commit.json"])
+    try:
+        for record_fd in (sensitive_record_fd, data_record_fd):
+            names = set(os.listdir(record_fd))
+            if "operation.json.tmp" in names:
+                temporary = _read_existing_file(record_fd, "operation.json.tmp")
+                if temporary not in {incomplete_operation, committed_operation}:
+                    raise StorageStop("record_conflict")
+                os.rename(
+                    "operation.json.tmp",
+                    "operation.json",
+                    src_dir_fd=record_fd,
+                    dst_dir_fd=record_fd,
+                )
+                os.fsync(record_fd)
+            elif "operation.json" not in names:
+                _publish_file(record_fd, "operation.json", incomplete_operation)
+        _finish_file(sensitive_record_fd, "raw.bin", expected_sensitive["raw.bin"])
+        _finish_file(data_record_fd, "derived.json", expected_data["derived.json"])
+        _finish_file(data_record_fd, "manifest.json", expected_data["manifest.json"])
+        if _read_existing_file(
+            sensitive_record_fd,
+            "operation.json",
+        ) != committed_operation:
+            _replace_file(sensitive_record_fd, "operation.json", committed_operation)
+        if _read_existing_file(
+            data_record_fd,
+            "operation.json",
+        ) != committed_operation:
+            _replace_file(data_record_fd, "operation.json", committed_operation)
+        _finish_file(data_record_fd, "commit.json", expected_data["commit.json"])
+    except StorageStop as error:
+        raise StorageIncomplete(
+            error.reason,
+            _incomplete_result(
+                "incomplete",
+                record_id,
+                operation_values[0],
+            ),
+        ) from error
     return stored_result
 
 
