@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：候補3のG24について、契約候補v2のClaude独立再確認は停止原因1件で修正要となり、最小修正(a)で契約候補v3を作成した。v3の限定再確認だけを作成者以外のCodexへ依頼する（Claudeがcodex execで起動するrecord正本方式。判定後の後続はClaudeが実施）。製品実装は未開始で、G24全体の作成責務は未完了である。
-- Task Contract：`TC-RC3-PRODUCT-ONE-REQUIREMENT-FEATURE-SOURCE-005 / v3 / limited_independent_rereview_pending`
+- 現在作業：候補3のG24について、契約候補v3はCodex限定再確認で開始可（blocking 0件）となり、利用者が縮小境界・契約v3採用・案C実装開始を承認した。Claudeが契約§13の順（失敗試験の固定→最小実装）で「一件の要求候補整合検査」を実装する。G24全体の作成責務は未完了のまま後続に残る。
+- Task Contract：`TC-RC3-PRODUCT-ONE-REQUIREMENT-FEATURE-SOURCE-005 / v3 / adopted_implementation_started`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,41 +16,41 @@
 
 ## 最新のauthority／Evidence
 
+- [利用者による縮小境界・契約v3採用・案C実装開始の承認](records/development/2026-08-15-one-requirement-candidate-consistency-check-adoption-decision-v1.md) — SHA-256 `35eb9a0b34d6ecf3e7d503498ca0a0f04234fd4519c33eecee3b816cf8dd5c41`
+- [Codexによる契約候補v3限定再確認・開始可判定](records/development/2026-08-15-one-requirement-candidate-consistency-check-candidate-v3-limited-rereview-v1.md) — SHA-256 `94f2650b0a5a96b273370c15e07097f5fc5675a700ad2597ab4165cb7809678b`
+- [採用された一件の要求候補整合検査契約v3](records/task-contract/2026-08-15-one-requirement-candidate-consistency-check-candidate-v3.md) — SHA-256 `7ad6da3c77632f3fc82bdbbabcb71d431d490bc78e12004d2331ef44cfdf0081`
 - [利用者が条件20を満たしたG08製品受入判断](records/development/2026-08-15-one-design-acceptance-product-acceptance-decision-v1.md) — SHA-256 `7e3eb626474f72ebcd3a3d5ec2646cf004ba192606f03684a50ae6f0b251ce86`
-- [CodexへのG24契約候補v3限定再確認依頼record](records/session-handoffs/2026-08-15-g24-contract-v3-limited-rereview-codex-request-v1.md) — SHA-256 `47ae10f6ef13e990a0d10a1bd5e292d2849129c4c5267402029f95169a7dc712`
-- [G24契約候補v2を停止原因1件で修正要としたClaude独立再確認](records/development/2026-08-15-one-requirement-candidate-consistency-check-contract-v2-independent-rereview-v1.md) — SHA-256 `270505d0f073fb59daf4d963824ca0eb9e2c854c580ed46dde2f63181242eb38`
-- [最小修正(a)を限定適用した一件の要求候補整合検査契約候補v3](records/task-contract/2026-08-15-one-requirement-candidate-consistency-check-candidate-v3.md) — SHA-256 `7ad6da3c77632f3fc82bdbbabcb71d431d490bc78e12004d2331ef44cfdf0081`
 - [現行50要求を解決する要求権限束v2](records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json) — SHA-256 `760e33ea2ecf6937f56d7bf8d2bd703b18b47dbd2bd6b2bd5919e0dd556d9dae`
 
 ## 次に行う一作業
 
-Claudeが依頼recordを対象にcodex execでCodexを起動し、Codexは契約候補v3の限定再確認（訂正1点の閉鎖と退行の有無だけ）を
-行い、判定record 1件を単独commitして停止する。
+Claudeが契約v3の対象試験`tests/test_one_requirement_feature_source.py`を受入条件1〜22に対応する失敗試験として先に固定し、
+期待どおり失敗することを確認してから、検査核`tools/requirements/one_requirement_feature_source.py`、
+入口`tools/requirements/one_requirement_feature_source_entry.py`、`pyproject.toml`の実行名一件の最小実装で合格させる。
 
 開始条件：
 
-- 依頼record、本TODOが意味単位commitへ固定され、作業treeがcleanである
-- 起動は利用者の指示を受けてClaudeが行い、Codexは依頼record§3の鮮度検査に合格してから動く
-- Codexは製品コード、既存試験、G08、既存G24を変更せず、判定record 1件だけを作成する
+- 採用判断record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 変更は契約§12の上限（検査核・入口・実行名・対象試験・作業票／Evidence／TODO）に限定する
+- §6の固定部品・保護10 path、要求schema、現行50要求、他製品処理を変更しない
 
 完了条件：
 
-- §6.2と受入条件13の照合対象がfile内容識別値・公開関数2名・既定pattern件数5だけになり、後決め要素がないことを再反証する
-- G24関連59件、要求資料関連21件、G08対象107件、保護10 path差分0を各単独commandで確認する
-- 判定recordに開始可または修正要を根拠、未接続条件、最小修正とともに書き、単独commitして停止する
-- Claudeが判定recordの鮮度・変更path 1件・判定内容を機械照合する
+- 対象試験が受入条件1〜22を覆い、失敗確認を経て最小実装で全件成功する（各単独command・終了コード0）
+- G24関連59件、要求資料関連21件、G08対象107件、保護10 path差分0が退行しない
+- 正規全試験の単独成功後、独立完了レビューと利用者受入（受入条件21〜23）へ進む
 
-後続作業（Claudeが実施）：開始可なら利用者へ『G24全体ではない最初の整合検査縦切り』の採用と案Cの実装開始を一判断として求め、修正要なら契約だけを次版へ訂正する。
+後続作業：独立完了レビューをCodexへ依頼し、合格後に利用者の製品受入（受入条件23）を求める。
 
 ## blocker・Human判断待ち
 
-- blocker：技術blockerなし。利用者指示により限定再確認の担当をCodex、起動と後続をClaudeとする
-- Human判断待ち：Codex起動の指示。起動後、Codexの限定再確認が開始可になるまで、縮小境界の採用と実装開始判断を求めない
+- blocker：技術blockerなし
+- Human判断待ち：なし。実装完了後の独立完了レビュー合格まで、段完了・製品受入の判断を求めない
 
 ## stale・deferred
 
-- stale：契約候補v2の独立再確認待ち、v2の規則内容識別値固定、v2からの実装開始、G24全体を本縦切りで完了できる表示、旧引継ぎメモ（Human運搬前提・後続をCodexへ割り当てた記述）はstale
-- deferred：契約候補v3の採用・製品実装、G24の要求作成責務、現行要求変更、候補4以降、外部送信、実利用者要求資料の使用は後続境界まで対象外
+- stale：契約候補v2系の表示、v3の再確認待ち表示、Codex起動待ち表示はstale
+- deferred：G24の要求作成責務、現行要求変更、候補4以降、外部送信、実利用者要求資料の使用は後続境界まで対象外。`.gitignore`のclaude-to-codex無視規則とrecord正本方式の食い違いは本線の区切りで改善候補として登録する
 
 ## Git・Test
 
