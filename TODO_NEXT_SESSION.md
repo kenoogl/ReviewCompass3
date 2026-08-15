@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
-- 現在作業：境界2はRED試験を変えず最小実装し、境界1を含む対象85件が成功した。境界3の結果集合schema、安全停止、材料束縛、内容識別値正規化について失敗試験を先に固定する段階にいる。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / v3_adopted / option_c_implementation_start_approved / boundaries_1_2_green / boundary_3_red_ready`
+- 現在作業：境界3の試験を追加し、既存85件成功を維持したまま、新しい57件が結果検査関数不在という期待理由で失敗することを確認した。試験を変えず境界3だけを実装する段階にいる。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / boundaries_1_2_green / boundary_3_red_confirmed`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [境界3の結果集合検査57件と期待失敗](records/development/2026-08-15-one-item-review-boundary3-red-evidence-v1.md) — SHA-256 `5d3c5dd8a99a959c653c41f479ac3d9ed7f86b221f5bc6f65776a0e28e96097b`
 - [境界2の固定材料と安全停止・対象85件GREEN](records/development/2026-08-15-one-item-review-boundary2-green-evidence-v1.md) — SHA-256 `62559de8569b270fdfaac8e0332617cc915c1e7c8c7a4e96e26f93bed934ffc4`
 - [境界2の対象56件と期待RED](records/development/2026-08-15-one-item-review-boundary2-red-evidence-v1.md) — SHA-256 `f2643dc006074b68b27e8639337c390d7b624cfc329096357c49a9a254bc3d59`
 - [境界1の安全読取り核と対象29件GREEN](records/development/2026-08-15-one-item-review-boundary1-green-evidence-v1.md) — SHA-256 `50bcd7914a4ab35cc5b5501303540e7d542a9e77b4ad4bc303ab2703efb64146`
@@ -37,21 +38,21 @@
 
 ## 次に行う一作業
 
-tests/test_one_item_review.pyへ境界3の結果集合完全一致schema、SHA参照、行範囲、結論整合、安全停止、正規化試験を追加し、結果検査関数不在の期待理由でREDを確認する。
+固定済み試験を変えず、結果集合の厳格検査、安全停止、材料束縛、正規化した三つの内容識別値だけを製品核へ実装し、142件を成功させる。
 
 開始条件：
 
-- 境界2製品核、GREEN証拠、本TODOが意味単位commitへ固定され、作業場所に未記録差分がない
-- 変更pathはtests/test_one_item_review.pyだけとし、製品核、入口、pyproject.tomlを変更しない
-- 群分け、人の判断一覧、CLIを先取りしない
+- 境界3試験、失敗証拠、本TODOが意味単位commitへ固定され、作業場所に未記録差分がない
+- tests/test_one_item_review.pyを変更しない
+- 分類、人の判断一覧、入口、配布設定を先取りしない
 
 完了条件：
 
-- 追加試験を含む対象試験の収集に成功する
-- 正常な結果集合検査一件が結果検査関数不在の期待理由で失敗する
-- 境界1・2の85件は引き続き成功する
+- 対象142件が成功する
+- 不正な結果を整理処理へ渡さない
+- 結果本文・検出値・絶対pathを停止理由へ含めない
 
-後続作業：境界3のRED確認後、試験を変えず結果集合の厳格検査、安全停止、正規化SHAだけを最小実装する。
+後続作業：境界3を固定後、境界4の一致・競合・重複と人の判断一覧の失敗試験へ進む。
 
 ## blocker・Human判断待ち
 
@@ -61,7 +62,7 @@ tests/test_one_item_review.pyへ境界3の結果集合完全一致schema、SHA�
 ## stale・deferred
 
 - stale：実装作業票v1と開始前レビュー待ち表示はstale。契約候補v1・v2、契約採用待ち表示、候補1選択待ち表示もstale
-- deferred：境界3のRED確認までは製品核、入口、pyproject.tomlを変更しない。境界4以降、既存G02、保存、外部送信、外部処理、実利用者資料は対象外
+- deferred：境界3完了までは入口、配布設定、境界4以降を変更しない。既存G02、保存、外部送信、外部処理、実利用者資料は対象外
 
 ## Git・Test
 
@@ -69,7 +70,7 @@ tests/test_one_item_review.pyへ境界3の結果集合完全一致schema、SHA�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：境界1・2対象試験はRED後の変更0で85 passed、失敗・error・skip 0、終了コード0。正常schema、決定性、安全停止、環境値非解決を確認
+- 直近の関連Test：対象142件を収集。既存85件成功、境界3の57件は結果検査関数不在だけで失敗し、終了コード1で期待失敗を確認
 - 直近の全Test：製品コードと試験を変更していないため再実行していない。直近の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0
 - 差分検査：`git diff --check`合格
 

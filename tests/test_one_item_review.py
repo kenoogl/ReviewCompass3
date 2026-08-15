@@ -455,3 +455,258 @@ def test_prepare_does_not_resolve_environment_sensitive_rules(monkeypatch):
     monkeypatch.setattr(redaction, "resolve_environment_rules", fail_environment_resolution)
 
     assert _prepare(review)["status"] == "material_prepared"
+
+
+def _valid_results(material_package_sha256):
+    return {
+        "schema_version": 1,
+        "material_package_sha256": material_package_sha256,
+        "reviews": [
+            {
+                "reviewer_id": "REVIEWER-2",
+                "verdict": "findings_present",
+                "summary": "Two synthetic findings.",
+                "findings": [
+                    {
+                        "finding_id": "F-2",
+                        "issue_key": "ISSUE-2",
+                        "severity": "warning",
+                        "title": "Second issue",
+                        "description": "Second description.",
+                        "criterion_ids": ["C-2", "C-1"],
+                        "start_line": 2,
+                        "end_line": 2,
+                    },
+                    {
+                        "finding_id": "F-1",
+                        "issue_key": "ISSUE-1",
+                        "severity": "error",
+                        "title": "First issue",
+                        "description": "First description.",
+                        "criterion_ids": ["C-1"],
+                        "start_line": 1,
+                        "end_line": 1,
+                    },
+                ],
+            },
+            {
+                "reviewer_id": "REVIEWER-1",
+                "verdict": "no_findings",
+                "summary": "No findings.",
+                "findings": [],
+            },
+        ],
+    }
+
+
+def _validate_results(review, results=None):
+    material = _prepare(review)
+    selected = (
+        _valid_results(material["material_package_sha256"])
+        if results is None
+        else results
+    )
+    return material, review.validate_results(material, _canonical(selected))
+
+
+def _normalized_review(review_value):
+    normalized = json.loads(json.dumps(review_value))
+    normalized["findings"] = sorted(
+        normalized["findings"],
+        key=lambda item: (item["issue_key"], item["finding_id"]),
+    )
+    for finding in normalized["findings"]:
+        finding["criterion_ids"] = sorted(finding["criterion_ids"])
+    return normalized
+
+
+def test_validates_and_normalizes_the_result_set_with_exact_hashes():
+    review = _review()
+    material = _prepare(review)
+    supplied = _valid_results(material["material_package_sha256"])
+    normalized_reviews = sorted(
+        (_normalized_review(item) for item in supplied["reviews"]),
+        key=lambda item: item["reviewer_id"],
+    )
+    normalized_root = {
+        "material_package_sha256": material["material_package_sha256"],
+        "reviews": normalized_reviews,
+        "schema_version": 1,
+    }
+    expected_reviews = []
+    for item in normalized_reviews:
+        without_reviewer = {
+            key: value for key, value in item.items() if key != "reviewer_id"
+        }
+        expected_reviews.append({
+            "review": item,
+            "review_content_sha256": hashlib.sha256(
+                _canonical(without_reviewer)
+            ).hexdigest(),
+            "review_sha256": hashlib.sha256(_canonical(item)).hexdigest(),
+        })
+
+    actual = review.validate_results(material, _canonical(supplied))
+
+    assert actual == {
+        "material_package_sha256": material["material_package_sha256"],
+        "result_set_sha256": hashlib.sha256(_canonical(normalized_root)).hexdigest(),
+        "reviews": expected_reviews,
+    }
+
+
+def test_result_hashes_ignore_set_like_input_order_only():
+    review = _review()
+    material = _prepare(review)
+    first = _valid_results(material["material_package_sha256"])
+    second = json.loads(json.dumps(first))
+    second["reviews"].reverse()
+    second["reviews"][1]["findings"].reverse()
+    second["reviews"][1]["findings"][1]["criterion_ids"].reverse()
+
+    first_value = review.validate_results(material, _canonical(first))
+    second_value = review.validate_results(material, _canonical(second))
+
+    assert first_value == second_value
+
+
+@pytest.mark.parametrize(
+    "change",
+    (
+        "invalid_json",
+        "unknown_root_key",
+        "wrong_schema_version",
+        "empty_reviews",
+        "too_many_reviews",
+        "unknown_review_key",
+        "duplicate_reviewer",
+        "invalid_reviewer",
+        "invalid_verdict",
+        "verdict_count_mismatch",
+        "unknown_finding_key",
+        "duplicate_finding",
+        "duplicate_issue_key",
+        "invalid_severity",
+        "unknown_criterion",
+        "duplicate_criterion",
+        "invalid_line_order",
+        "line_out_of_range",
+        "too_many_findings",
+    ),
+)
+def test_rejects_invalid_result_set_schema(change):
+    review = _review()
+    material = _prepare(review)
+    results = _valid_results(material["material_package_sha256"])
+    if change == "invalid_json":
+        encoded = b"{"
+    else:
+        first_review = results["reviews"][0]
+        first_finding = first_review["findings"][0]
+        if change == "unknown_root_key":
+            results["extra"] = True
+        elif change == "wrong_schema_version":
+            results["schema_version"] = 2
+        elif change == "empty_reviews":
+            results["reviews"] = []
+        elif change == "too_many_reviews":
+            template = results["reviews"][1]
+            results["reviews"] = [
+                {**template, "reviewer_id": f"REVIEWER-{index}"}
+                for index in range(9)
+            ]
+        elif change == "unknown_review_key":
+            first_review["extra"] = True
+        elif change == "duplicate_reviewer":
+            results["reviews"][1]["reviewer_id"] = first_review["reviewer_id"]
+        elif change == "invalid_reviewer":
+            first_review["reviewer_id"] = "invalid reviewer"
+        elif change == "invalid_verdict":
+            first_review["verdict"] = "approved"
+        elif change == "verdict_count_mismatch":
+            first_review["verdict"] = "no_findings"
+        elif change == "unknown_finding_key":
+            first_finding["extra"] = True
+        elif change == "duplicate_finding":
+            first_review["findings"][1]["finding_id"] = first_finding["finding_id"]
+        elif change == "duplicate_issue_key":
+            first_review["findings"][1]["issue_key"] = first_finding["issue_key"]
+        elif change == "invalid_severity":
+            first_finding["severity"] = "critical"
+        elif change == "unknown_criterion":
+            first_finding["criterion_ids"] = ["C-UNKNOWN"]
+        elif change == "duplicate_criterion":
+            first_finding["criterion_ids"] = ["C-1", "C-1"]
+        elif change == "invalid_line_order":
+            first_finding["start_line"] = 2
+            first_finding["end_line"] = 1
+        elif change == "line_out_of_range":
+            first_finding["end_line"] = 3
+        else:
+            first_review["findings"] = [
+                {
+                    **first_finding,
+                    "finding_id": f"F-{index}",
+                    "issue_key": f"ISSUE-{index}",
+                }
+                for index in range(101)
+            ]
+        encoded = _canonical(results)
+
+    with pytest.raises(review.ReviewStop) as caught:
+        review.validate_results(material, encoded)
+
+    assert caught.value.reason == "invalid_schema"
+
+
+def test_rejects_result_set_bound_to_another_material():
+    review = _review()
+    material = _prepare(review)
+    results = _valid_results("0" * 64)
+
+    with pytest.raises(review.ReviewStop) as caught:
+        review.validate_results(material, _canonical(results))
+
+    assert caught.value.reason == "stale_material"
+
+
+@pytest.mark.parametrize(
+    ("candidate", "reason"),
+    (
+        ("person@example.test", "sensitive_data_remaining"),
+        ("A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6", "sensitive_data_remaining"),
+        ("work=/Users/example/project", "absolute_path_remaining"),
+        ("path=C:\\Users\\example", "absolute_path_remaining"),
+        ("\\\\server\\share\\item", "absolute_path_remaining"),
+        ("//server/share/item", "absolute_path_remaining"),
+        ("file:///tmp/item", "absolute_path_remaining"),
+    ),
+)
+@pytest.mark.parametrize(
+    "location",
+    ("summary", "title", "description", "reviewer_id", "json_key"),
+)
+def test_rejects_unsafe_result_strings_without_exposing_them(
+    candidate,
+    reason,
+    location,
+):
+    review = _review()
+    material = _prepare(review)
+    results = _valid_results(material["material_package_sha256"])
+    if location == "summary":
+        results["reviews"][0]["summary"] = candidate
+    elif location == "title":
+        results["reviews"][0]["findings"][0]["title"] = candidate
+    elif location == "description":
+        results["reviews"][0]["findings"][0]["description"] = candidate
+    elif location == "reviewer_id":
+        results["reviews"][0]["reviewer_id"] = candidate
+    else:
+        results["reviews"][0][candidate] = "value"
+
+    with pytest.raises(review.ReviewStop) as caught:
+        review.validate_results(material, _canonical(results))
+
+    assert caught.value.reason == reason
+    assert candidate not in str(caught.value)
