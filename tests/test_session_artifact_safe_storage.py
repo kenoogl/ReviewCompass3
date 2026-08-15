@@ -671,3 +671,93 @@ def test_store_new_does_not_guess_unsafe_incomplete_record(
         _record_snapshot(sensitive_record),
         _record_snapshot(data_record),
     ) == before
+
+
+def _store_fixture(storage, tmp_path):
+    arguments = _roots(tmp_path)
+    result = storage.store_new(
+        **arguments,
+        stored_at="2026-08-15T00:00:00+00:00",
+        retention_until="2026-08-16T00:00:00+00:00",
+    )
+    return arguments, result
+
+
+def test_load_derived_returns_only_verified_unexpired_derived_value(tmp_path):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+
+    result = storage.load_derived(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+        current_at="2026-08-15T12:00:00+00:00",
+    )
+
+    assert result["status"] == "loaded"
+    assert result["record_id"] == stored["record_id"]
+    assert result["external_send_approved"] is False
+    assert result["derived"]["transcript"] == "safe transcript"
+    serialized = _canonical_bytes(result).decode("utf-8")
+    assert "source_path" not in serialized
+    assert str(arguments["sensitive_root"]) not in serialized
+    assert str(arguments["data_root"]) not in serialized
+
+
+def test_load_derived_refuses_expired_record_without_deleting(tmp_path):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    result = storage.load_derived(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+        current_at="2026-08-16T00:00:01+00:00",
+    )
+
+    assert result == {
+        "external_send_approved": False,
+        "record_id": stored["record_id"],
+        "status": "expired_pending_deletion",
+    }
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+@pytest.mark.parametrize(
+    ("area", "name"),
+    (
+        ("sensitive", "raw.bin"),
+        ("data", "derived.json"),
+        ("data", "manifest.json"),
+        ("sensitive", "operation.json"),
+        ("data", "commit.json"),
+    ),
+)
+def test_load_derived_rejects_any_modified_fixed_file(
+    tmp_path,
+    area,
+    name,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    root = arguments[f"{area}_root"] / stored["record_id"]
+    path = root / name
+    content = path.read_bytes()
+    path.write_bytes(bytes([content[0] ^ 1]) + content[1:])
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.load_derived(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+            current_at="2026-08-15T12:00:00+00:00",
+        )
+
+    assert caught.value.reason == "record_integrity_failed"
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before

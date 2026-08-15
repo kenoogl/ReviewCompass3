@@ -3,6 +3,7 @@
 import ctypes
 import errno
 import hashlib
+import json
 import os
 import stat
 import sys
@@ -841,3 +842,123 @@ def store_new(
         os.close(data_root_fd)
 
     return stored_result
+
+
+def _record_name(record_id):
+    if (
+        not isinstance(record_id, str)
+        or len(record_id) != 64
+        or any(character not in "0123456789abcdef" for character in record_id)
+    ):
+        raise StorageStop("invalid_record_id")
+    return record_id
+
+
+def _integrity_json(content):
+    try:
+        value = json.loads(content)
+    except (UnicodeError, json.JSONDecodeError) as error:
+        raise StorageStop("record_integrity_failed") from error
+    if not isinstance(value, dict) or canonical_json_bytes(value) != content:
+        raise StorageStop("record_integrity_failed")
+    return value
+
+
+def load_derived(*, sensitive_root, data_root, record_id, current_at):
+    """確定済みで改変されていない期限内の派生物だけを返す。"""
+
+    sensitive_root = _path(sensitive_root)
+    data_root = _path(data_root)
+    _validate_storage_root(sensitive_root)
+    _validate_storage_root(data_root)
+    record_id = _record_name(record_id)
+    current_time = _timestamp(current_at, "invalid_current_at")
+    sensitive_root_fd = _open_directory_fd(sensitive_root)
+    data_root_fd = _open_directory_fd(data_root)
+    sensitive_record_fd = None
+    data_record_fd = None
+    try:
+        sensitive_record_fd = _open_existing_record(sensitive_root_fd, record_id)
+        data_record_fd = _open_existing_record(data_root_fd, record_id)
+        if sensitive_record_fd is None or data_record_fd is None:
+            raise StorageStop("record_not_found")
+        if set(os.listdir(sensitive_record_fd)) != {"operation.json", "raw.bin"}:
+            raise StorageStop("record_not_committed")
+        if set(os.listdir(data_record_fd)) != {
+            "operation.json",
+            "derived.json",
+            "manifest.json",
+            "commit.json",
+        }:
+            raise StorageStop("record_not_committed")
+
+        sensitive_operation_bytes = _read_existing_file(
+            sensitive_record_fd,
+            "operation.json",
+        )
+        data_operation_bytes = _read_existing_file(data_record_fd, "operation.json")
+        raw_bytes = _read_existing_file(sensitive_record_fd, "raw.bin")
+        derived_bytes = _read_existing_file(data_record_fd, "derived.json")
+        manifest_bytes = _read_existing_file(data_record_fd, "manifest.json")
+        commit_bytes = _read_existing_file(data_record_fd, "commit.json")
+        if sensitive_operation_bytes != data_operation_bytes:
+            raise StorageStop("record_integrity_failed")
+        operation = _integrity_json(sensitive_operation_bytes)
+        derived = _integrity_json(derived_bytes)
+        manifest = _integrity_json(manifest_bytes)
+        commit = _integrity_json(commit_bytes)
+        if operation.get("state") != "committed":
+            raise StorageStop("record_not_committed")
+        raw_sha256 = sha256_hex(raw_bytes)
+        derived_sha256 = sha256_hex(derived_bytes)
+        manifest_sha256 = sha256_hex(manifest_bytes)
+        commit_sha256 = sha256_hex(commit_bytes)
+        expected = operation.get("expected_sha256")
+        if expected != {
+            "commit.json": commit_sha256,
+            "derived.json": derived_sha256,
+            "manifest.json": manifest_sha256,
+            "raw.bin": raw_sha256,
+        }:
+            raise StorageStop("record_integrity_failed")
+        if (
+            manifest.get("record_id") != record_id
+            or manifest.get("raw_sha256") != raw_sha256
+            or manifest.get("derived_sha256") != derived_sha256
+            or commit.get("record_id") != record_id
+            or commit.get("operation_id") != operation.get("operation_id")
+            or commit.get("raw_sha256") != raw_sha256
+            or commit.get("derived_sha256") != derived_sha256
+            or commit.get("manifest_sha256") != manifest_sha256
+            or commit.get("committed") is not True
+        ):
+            raise StorageStop("record_integrity_failed")
+        retention_until = operation.get("retention_until")
+        retention_time = _timestamp(retention_until, "record_integrity_failed")
+        if manifest.get("retention_until") != retention_until:
+            raise StorageStop("record_integrity_failed")
+        if _contains_absolute_path(derived) or "source_path" in derived.get(
+            "provenance",
+            {},
+        ):
+            raise StorageStop("record_integrity_failed")
+        if current_time > retention_time:
+            return {
+                "external_send_approved": False,
+                "record_id": record_id,
+                "status": "expired_pending_deletion",
+            }
+        return {
+            "derived": derived,
+            "external_send_approved": False,
+            "record_id": record_id,
+            "retention_until": retention_until,
+            "status": "loaded",
+        }
+    finally:
+        if sensitive_record_fd is not None:
+            os.close(sensitive_record_fd)
+        if data_record_fd is not None:
+            os.close(data_record_fd)
+        os.close(sensitive_root_fd)
+        os.close(data_root_fd)
