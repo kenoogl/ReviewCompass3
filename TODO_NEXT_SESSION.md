@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G30『最小運用契約実行』は利用者が製品受入した（8候補中4件目の受入済み製品処理。候補4全体は未完了）。利用者の選択により、次の縦切り『G02一件レビューの安全投影操作の追加』の契約定義へ進む。実行registryへG02 prepare操作を、自由文を実行記録へ入れない固定投影・核関数直接呼出し・停止の固定変換で追加する縦切りである。
-- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v4 / accepted`
+- 現在作業：『G02一件レビューの安全投影操作の追加』の契約候補v1を作成した。受入済み実行器のregistryへ`one_item_review_prepare`を、G02核2関数の直接呼出し・固定allowlist投影（自由文遮断）・ReviewStopの固定変換で追加する縦切りである。Codexの独立確認へ進む。実装は未開始で、開始可後に利用者の採用判断を求める。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v1 / independent_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,6 +17,7 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
+- [G02安全投影操作追加の契約候補v1](records/task-contract/2026-08-16-one-item-review-safe-projection-candidate-v1.md) — SHA-256 `b42232fd0f6a559a680c5447845502a0947b0d96caaaddae208c8bf0c94a2f9b`
 - [利用者による最小運用契約実行の製品受入判断](records/development/2026-08-16-minimal-operation-contract-execution-product-acceptance-decision-v1.md) — SHA-256 `8386ee089ff54b0fde80fca4592a58d8e660e71cd11cb9687e676ca3f824e808`
 - [Codex独立完了再レビュー・verified判定](records/development/2026-08-16-minimal-operation-contract-execution-independent-completion-rereview-v1.md) — SHA-256 `00825b1fbce7a3ea91177d1493c9098bbfea6a7a76868e24f8f050b1f59dc927`
 - [blocking 3件の訂正Evidence](records/development/2026-08-16-minimal-operation-contract-execution-correction-evidence-v1.md) — SHA-256 `c2a386c87e542a7f626e77b931bb24672fd6bf392fda71e216a5c19923959c30`
@@ -30,21 +31,20 @@
 
 ## 次に行う一作業
 
-Claudeが『G02一件レビューの安全投影操作の追加』の契約候補v1を定義する：受入済み実行器のregistryへ
-`one_item_review_prepare`を追加し、G02核関数の直接呼出し、自由文（資料本文・目標・採否理由）を実行記録へ
-入れない固定投影、ReviewStopの固定変換（理由転記・停止元none）、束縛照合位置を一意に固定する。定義後、
-Codexの独立確認へ回し、開始可と利用者の採用判断を経てから実装する。
+Codexが固定された契約候補v1を成果物変更なしで読み、定義反証（投影allowlistによる自由文遮断の一意性、
+ReviewStop変換の一意性、束縛照合位置のG02現物との一致、変更対象・保護基準の固定、006停止表との整合）を行い、
+開始可または修正要の判定record 1件を単独commitして停止する。起動はClaudeがcodex execで行う。
 
 開始条件：
 
-- 受入判断record、本TODOが意味単位commitへ固定され、作業treeがcleanである
-- 契約定義前にG02核関数の現物形（入出力・停止・結果形式）を機械走査で固定する
+- 契約候補v1、依頼record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- Codexは依頼recordの鮮度検査に合格してから動く
 
 完了条件：
 
-- 契約候補v1が固定され、Codex独立確認の判定recordが得られ、Claudeが事後照合する
+- 判定recordが得られ、Claudeが鮮度・変更path 1件・判定内容を機械照合する
 
-後続作業：開始可なら利用者へ縮小境界と実装開始の判断を求める（新契約のため条件付き事前承認は引き継がない）。
+後続作業：開始可なら利用者へ縮小境界の採用と実装開始の判断を求める（新契約のため条件付き事前承認は引き継がない）。修正要ならClaudeが契約だけを次版へ訂正し限定再確認へ戻す。
 
 ## blocker・Human判断待ち
 
