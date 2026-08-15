@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [Codexへの独立完了レビュー依頼record](records/session-handoffs/2026-08-16-g24-requirement-candidate-check-completion-review-codex-request-v1.md) — SHA-256 `c602fdcace6e113e30e7c3ce7276c17f7ff81240314b7e82e6e0526f92bc59d2`
 - [実装成功Evidence（RED・GREEN・全試験・合成E2E）](records/development/2026-08-16-one-requirement-candidate-consistency-check-green-evidence-v1.md) — SHA-256 `50386e4a981e039e21af3bcec1fb3c37ba078739ff506b9afa19d63d806be6d2`
 - [利用者による縮小境界・契約v3採用・案C実装開始の承認](records/development/2026-08-15-one-requirement-candidate-consistency-check-adoption-decision-v1.md) — SHA-256 `35eb9a0b34d6ecf3e7d503498ca0a0f04234fd4519c33eecee3b816cf8dd5c41`
 - [Codexによる契約候補v3限定再確認・開始可判定](records/development/2026-08-15-one-requirement-candidate-consistency-check-candidate-v3-limited-rereview-v1.md) — SHA-256 `94f2650b0a5a96b273370c15e07097f5fc5675a700ad2597ab4165cb7809678b`
@@ -25,13 +26,13 @@
 
 ## 次に行う一作業
 
-Claudeが独立完了レビューの依頼recordを作成・commitし、codex execでCodexを起動する。Codexは実装済み製品を
-成果物変更なしでレビューし（受入条件21：誤合格・未接続・禁止作用・上位目的への悪影響の反証）、判定record 1件を
-単独commitして停止する。判定後の照合と利用者への受入提示はClaudeが実施する。
+Claudeが依頼recordを対象にcodex execでCodexを起動する。Codexは実装済み製品を成果物変更なしでレビューし
+（受入条件21：誤合格・未接続・禁止作用・上位目的への悪影響の反証）、判定record 1件を単独commitして停止する。
+判定後の照合と利用者への受入提示はClaudeが実施する。
 
 開始条件：
 
-- 実装一式と成功Evidence、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 実装一式、成功Evidence、依頼record、本TODOが意味単位commitへ固定され、作業treeがcleanである
 - Codexは製品コード、既存試験、契約、G08、既存G24を変更せず、判定record 1件だけを作成する
 
 完了条件：
@@ -45,7 +46,7 @@ Claudeが独立完了レビューの依頼recordを作成・commitし、codex ex
 ## blocker・Human判断待ち
 
 - blocker：技術blockerなし
-- Human判断待ち：独立完了レビュー用のCodex起動指示。レビュー合格まで製品受入の判断を求めない
+- Human判断待ち：なし。利用者指示によりCodex起動済み。独立完了レビュー合格まで製品受入の判断を求めない
 
 ## stale・deferred
 
