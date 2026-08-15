@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：利用者はcodexCLI枯渇のため暫定レビュー体制（独立確認＝利用者がGeminiを手動利用・Human中継、codex exec停止）を決定し、次の縦切りに候補5のG20（外部送信安全境界）を選択した。Dの内部部品としてA-Cは不要（G02 prepare出力・機微検査・承認機構・安全保存を使う）と整理済み。次はG20の事前走査と契約定義である。G02安全投影までの4製品処理は受入済み。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v2 / accepted`（次契約は定義前）
+- 現在作業：G20最初の縦切り『Gemini一回送信の最小経路』の契約候補v1を作成した。中心設計は利用者決定の「送信ごとの人の確認なし」（行為の起点は利用者の指示、内容の守りは機械層：機微検査・path allowlist・digest束縛・送信前試行record・累計100件上限・鍵の非表示）。初の通信と環境値解決（GEMINI_API_KEY一変数のみ）を許可する最高危険度契約である。次は暫定体制（利用者がGeminiへ手動運搬）での独立確認である。
+- Task Contract：`TC-RC3-PRODUCT-GEMINI-SINGLE-SEND-008 / v1 / independent_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,6 +17,7 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
+- [Gemini一回送信の契約候補v1](records/task-contract/2026-08-16-gemini-single-send-candidate-v1.md) — SHA-256 `a1cad58471d5928239d64c7a6fdf63211bbfaef199b89f4d57df6709d4e7b627`
 - [暫定レビュー体制の決定（Gemini手動利用・Human中継）](records/development/2026-08-16-interim-gemini-review-regime-decision-v1.md) — SHA-256 `1a5fffc5792d17791f5c275b40183a0d4d076233d6d1b7a267cd91cf92174792`
 - [利用者によるG02安全投影の製品受入判断](records/development/2026-08-16-one-item-review-safe-projection-product-acceptance-decision-v1.md) — SHA-256 `2cea891bb43fa83b15259310d97a459b6f446898bdedf79630cd2e945d8008cc`
 - [Codex独立完了レビュー・verified判定](records/development/2026-08-16-one-item-review-safe-projection-independent-completion-review-v1.md) — SHA-256 `0152fb5ba32397ab651c29291f36e45d8c030f10188bc2ebf3f6f2bb2ce4a145`
@@ -38,20 +39,20 @@
 
 ## 次に行う一作業
 
-ClaudeがG20（外部送信安全境界）の事前走査（既存egress 7 module・保留7 pathの所在・現物形・Digest固定・接続点）を
-行い、最初の縦切り（承認付き一回送信の最小経路）の契約候補v1を定義する。独立確認は暫定体制
-（依頼record作成→利用者がGeminiへ運搬→判定をClaudeが判定recordへ転記・照合）で行う。
+契約候補v1の独立確認を暫定体制で行う。Claudeが依頼文面（Geminiへ渡す指示と対象記載）を用意し、利用者が
+Geminiへ手動で運搬する。Geminiの判定を利用者がClaudeへ渡し、Claudeが判定record（Reviewer=Gemini・
+Human中継の旨を冒頭記載）へ転記・commitし、数値と判定内容を機械照合する。
 
 開始条件：
 
-- 暫定体制の決定record、本TODOが意味単位commitへ固定され、作業treeがcleanである
-- codex execを起動しない。Claudeは外部送信を行わず、送信文面の準備までとする
+- 契約候補v1、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- codex execを起動しない。Claudeは外部送信を行わず、依頼文面の準備までとする
 
 完了条件：
 
-- 契約候補v1が固定され、Gemini独立確認の判定が判定recordへ転記・照合される
+- Geminiの判定が判定recordへ転記・照合され、開始可または修正要が確定する
 
-後続作業：開始可なら利用者へ縮小境界の採用と実装開始の判断を求める。
+後続作業：開始可なら利用者へ縮小境界の採用と実装開始の判断を求める。修正要なら契約だけを次版へ訂正する。
 
 ## blocker・Human判断待ち
 
