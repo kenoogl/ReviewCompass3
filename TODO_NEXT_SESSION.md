@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段と、最初の製品機能G25読取り専用入口は完了した。現在は立て直し後の二つ目の製品機能である安全保存の実装準備を進めている。
-- 現在作業：安全保存の境界1から9と最終技術検証は完了した。製品入口E2E、利用時点属性反例24件、独立oracle、対象85件、関連30件、正規全1,850件が成功した。次は開始担当とは別の独立担当による完了レビューを行う。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_reuse_adjudicated_tdd_boundaries_1_9_green_final_verification_passed_completion_review_pending`
+- 現在作業：安全保存の独立完了レビューは修正要となった。全試験は成功したが、片root中断、operation完全照合、監査印公開後再試行、途中出力区分の4原因が受入を止めるため、最終技術検証完了表示をstaleにして対象限定のTDD修正へ戻る。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_completion_review_fix_required_four_causes_remediation_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -36,26 +36,27 @@
 - [安全保存境界8のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-8-tdd-evidence-v1.md) — SHA-256 `ba01f116de413c5627a2965bb309a2dfc6286a9906ceeb59df672d0c4ddb8d0f`
 - [安全保存境界9のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-9-tdd-evidence-v1.md) — SHA-256 `9f04021540534f327f7bbfeb80012d3ee3f54575222311111b15f10264adc47e`
 - [安全保存の最終技術検証Evidence](records/development/2026-08-15-session-artifact-safe-storage-final-verification-evidence-v1.md) — SHA-256 `b43a1d7256985a7ab606219cf7cbbe19271edca4b1f2d657ce21e9429c59de14`
+- [安全保存の独立完了レビュー修正要](records/development/2026-08-15-session-artifact-safe-storage-independent-completion-review-v1.md) — SHA-256 `083ebadd2cc20e8006d2998c2cd71a812d52c59fea3f1838cb8d276980b4dc76`
 
 ## 次に行う一作業
 
-開始担当とは別の独立担当が、固定された境界1から9、最終Evidence、契約22条件、変更範囲を読取り専用で反証し、止める指摘0件の開始可または修正要を返す。
+独立完了レビューの四原因を、operation完全照合、片root中断、監査印公開後再試行、途中製品出力の順で一原因ずつREDへ固定し、契約と既存期待を変えずGREEN commitへ修正する。
 
 開始条件：
 
-- 最終技術検証、Evidence、TODOが意味単位commitへ固定され、worktreeがcleanである
-- 開始前レビュー担当とは異なる担当を使う
-- 採用契約v3、累積作業票v2＋v3、境界commit、最終Evidenceを固定入力にする
-- レビューは読取り専用とし、製品code、試験、契約を変更しない
+- 修正要レビュー記録とstale化したTODOが意味単位commitへ固定され、worktreeがcleanである
+- 採用契約v3と独立完了レビューv1を固定入力にする
+- 一つのREDを一つの主要原因で失敗させ、既存試験期待と契約schemaを変更しない
+- 全Python commandに.venv/bin/python3を使い、repository外の合成fixtureだけを使う
 
 完了条件：
 
-- 契約受入条件1から21に未接続または反証未了がない
-- 保存、再読込み、削除、秘密不在、利用時点属性、故障再試行の主張がEvidenceと一致する
-- 変更範囲外の責務追加、既存入口変更、外部能力追加がない
-- 止める指摘0件で開始可、または修正対象がpathと根拠付きで明確になる
+- operation固定schemaと存在本文Digestを三操作が利用時点で完全照合する
+- 片rootの有効途中状態が同じ入力で再開でき、確認済み削除で中止できる
+- 既存監査印を正本に同じ確認値で完了でき、入口がincompleteとdeletion_incompleteを区別する
+- 四原因の限定試験、対象・関連・正規全試験、独立再レビューが合格する
 
-後続作業：独立完了レビューが開始可なら、受入条件22として目的・根拠・合否基準・推奨・影響を利用者へ提示し、製品受入だけを依頼する。修正要なら受入を提示せず対象限定で直す。
+後続作業：四原因を意味単位commitで閉じた後、最終Evidence v2を作り、同じ独立完了レビュー担当へ再反証を依頼する。開始可になるまで条件22を利用者へ提示しない。
 
 ## blocker・Human判断待ち
 
@@ -64,8 +65,8 @@
 
 ## stale・deferred
 
-- stale：固定20 pathによる旧検索、過大な平坦候補を作った能力検索v1からv3、および対応する旧証明書は履歴観測として保持するが、現在の実装開始根拠に使わない
-- deferred：独立完了レビューではfileを変更しない。中央一覧、push、外部送信、自動削除、実Session記録の使用は開始しない
+- stale：最終技術検証Evidence v1と同時点の技術完了表示は独立完了レビューv1の四指摘によりstale。固定20 pathによる旧検索と旧能力検索証明も履歴観測として保持するが現在根拠に使わない
+- deferred：四原因以外の設計、契約、既存入口、中央一覧、push、外部送信、自動削除、実Session記録の使用は変更・開始しない
 
 ## Git・Test
 
@@ -73,8 +74,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：保存核と新入口85件、既存正式入口・pipeline・provenance・開発環境30件が終了コード0。利用時点属性反例24件と独立oracleを含む
-- 直近の全Test：正規全試験は1,850件成功、失敗・error・skip 0、終了コード0。receipt SHA-256は5da2cac4dd26d96c0ae0f9d73badb07425bf8e5b955966c0a21bd85718db4f0b
+- 直近の関連Test：レビュー時の保存核と新入口85件、関連30件は終了コード0だが、独立合成反例5件が契約差を再現したため合格表示はstale
+- 直近の全Test：正規全1,850件成功は実測として保持するが、四原因を試験が未検出だったため製品受入根拠としてstale。修正後に再実行する
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
