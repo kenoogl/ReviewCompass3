@@ -78,6 +78,14 @@ class StorageStop(Exception):
         super().__init__(reason)
 
 
+class StorageIncomplete(StorageStop):
+    """有効な操作情報が残り、安全な再試行または中止ができる。"""
+
+    def __init__(self, reason, result):
+        self.result = result
+        super().__init__(reason)
+
+
 def _path(value):
     try:
         path = Path(value)
@@ -652,6 +660,30 @@ def _read_existing_file(record_fd, name):
         os.close(file_descriptor)
 
 
+def _has_expected_operation(record_fd, expected_values):
+    if record_fd is None:
+        return False
+    names = set(os.listdir(record_fd))
+    for name in ("operation.json", "operation.json.tmp"):
+        if name in names:
+            try:
+                if _read_existing_file(record_fd, name) in expected_values:
+                    return True
+            except StorageStop:
+                return False
+    return False
+
+
+def _incomplete_result(status, record_id, operation_bytes):
+    return {
+        "error": f"{status}_interrupted",
+        "external_send_approved": False,
+        "operation_sha256": sha256_hex(operation_bytes),
+        "record_id": record_id,
+        "status": status,
+    }
+
+
 def _prevalidate_store_area(
     record_fd,
     names,
@@ -1031,6 +1063,23 @@ def store_new(
             committed_operation,
         )
         _publish_file(data_record_fd, "commit.json", commit_bytes)
+    except StorageStop as error:
+        if _has_expected_operation(
+            sensitive_record_fd,
+            {incomplete_operation, committed_operation},
+        ) or _has_expected_operation(
+            data_record_fd,
+            {incomplete_operation, committed_operation},
+        ):
+            raise StorageIncomplete(
+                error.reason,
+                _incomplete_result(
+                    "incomplete",
+                    record_id,
+                    incomplete_operation,
+                ),
+            ) from error
+        raise
     finally:
         if sensitive_record_fd is not None:
             os.close(sensitive_record_fd)
@@ -1485,6 +1534,7 @@ def delete_record(
     data_root_fd = _open_directory_fd(data_root)
     sensitive_record_fd = None
     data_record_fd = None
+    deleting_bytes = None
     try:
         sensitive_record_fd = _open_existing_record(sensitive_root_fd, record_id)
         data_record_fd = _open_existing_record(data_root_fd, record_id)
@@ -1704,6 +1754,17 @@ def delete_record(
             "record_id": record_id,
             "status": "deleted",
         }
+    except StorageStop as error:
+        if deleting_bytes is not None:
+            raise StorageIncomplete(
+                error.reason,
+                _incomplete_result(
+                    "deletion_incomplete",
+                    record_id,
+                    deleting_bytes,
+                ),
+            ) from error
+        raise
     finally:
         if sensitive_record_fd is not None:
             os.close(sensitive_record_fd)

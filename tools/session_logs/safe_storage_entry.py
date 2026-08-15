@@ -6,6 +6,7 @@ import sys
 
 from tools.session_logs.read_only_entry import prepare_safe_result
 from tools.session_logs.safe_storage import (
+    StorageIncomplete,
     StorageStop,
     delete_record,
     load_derived,
@@ -117,6 +118,9 @@ def run(argv=None):
         arguments = _arguments(sys.argv[1:] if argv is None else argv)
         result = _execute(arguments)
         exit_code = EXIT_OK
+    except StorageIncomplete as error:
+        result = error.result
+        exit_code = 3
     except StorageStop as error:
         result = _stopped(error.reason)
         exit_code = EXIT_STOPPED

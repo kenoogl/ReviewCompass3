@@ -241,6 +241,129 @@ def test_storage_stop_is_one_fixed_json_without_exception_or_path(tmp_path, caps
     assert "StorageStop" not in serialized
 
 
+def test_store_reports_resumable_incomplete_result(tmp_path, monkeypatch, capsys):
+    entry = _entry()
+    storage = importlib.import_module("tools.session_logs.safe_storage")
+    roots = _roots(tmp_path)
+    monkeypatch.setattr(
+        entry,
+        "prepare_safe_result",
+        lambda raw_root, raw_log: (0, _safe_result(roots["raw_bytes"])),
+    )
+    original_publish = storage._publish_file
+
+    def stop_after_raw(directory_fd, final_name, content):
+        result = original_publish(directory_fd, final_name, content)
+        if final_name == "raw.bin":
+            raise storage.StorageStop("private exception detail")
+        return result
+
+    monkeypatch.setattr(storage, "_publish_file", stop_after_raw)
+    exit_code, result, serialized = _run(entry, capsys, [
+        "store",
+        "--repository-root",
+        str(roots["repository_root"]),
+        "--raw-root",
+        str(roots["raw_root"]),
+        "--raw-log",
+        str(roots["raw_log"]),
+        "--sensitive-root",
+        str(roots["sensitive_root"]),
+        "--data-root",
+        str(roots["data_root"]),
+        "--stored-at",
+        "2026-08-15T00:00:00+00:00",
+        "--retention-until",
+        "2026-08-16T00:00:00+00:00",
+    ])
+
+    assert exit_code == 3
+    assert result["status"] == "incomplete"
+    assert result["external_send_approved"] is False
+    assert set(result) == {
+        "error",
+        "external_send_approved",
+        "operation_sha256",
+        "record_id",
+        "status",
+    }
+    assert "private exception detail" not in serialized
+    assert "raw-private-value" not in serialized
+
+
+def test_delete_reports_resumable_deletion_incomplete(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    entry = _entry()
+    storage = importlib.import_module("tools.session_logs.safe_storage")
+    roots = _roots(tmp_path)
+    monkeypatch.setattr(
+        entry,
+        "prepare_safe_result",
+        lambda raw_root, raw_log: (0, _safe_result(roots["raw_bytes"])),
+    )
+    common = [
+        "--sensitive-root",
+        str(roots["sensitive_root"]),
+        "--data-root",
+        str(roots["data_root"]),
+    ]
+    ignored, stored, ignored = _run(entry, capsys, [
+        "store",
+        "--repository-root",
+        str(roots["repository_root"]),
+        "--raw-root",
+        str(roots["raw_root"]),
+        "--raw-log",
+        str(roots["raw_log"]),
+        *common,
+        "--stored-at",
+        "2026-08-15T00:00:00+00:00",
+        "--retention-until",
+        "2026-08-16T00:00:00+00:00",
+    ])
+    ignored, plan, ignored = _run(entry, capsys, [
+        "plan-delete",
+        *common,
+        "--record-id",
+        stored["record_id"],
+    ])
+    original_unlink = storage._unlink_verified
+
+    def stop_after_raw(directory_fd, name):
+        result = original_unlink(directory_fd, name)
+        if name == "raw.bin":
+            raise storage.StorageStop("private deletion detail")
+        return result
+
+    monkeypatch.setattr(storage, "_unlink_verified", stop_after_raw)
+    exit_code, result, serialized = _run(entry, capsys, [
+        "delete",
+        *common,
+        "--record-id",
+        stored["record_id"],
+        "--confirmation-sha256",
+        plan["confirmation_sha256"],
+        "--deleted-at",
+        "2026-08-15T13:00:00+00:00",
+    ])
+
+    assert exit_code == 3
+    assert result["status"] == "deletion_incomplete"
+    assert result["external_send_approved"] is False
+    assert set(result) == {
+        "error",
+        "external_send_approved",
+        "operation_sha256",
+        "record_id",
+        "status",
+    }
+    assert plan["confirmation_sha256"] not in serialized
+    assert "private deletion detail" not in serialized
+
+
 def test_pyproject_registers_safe_storage_entry_and_source_has_no_expansion():
     entry = _entry()
     document = importlib.import_module("tomllib").loads(
