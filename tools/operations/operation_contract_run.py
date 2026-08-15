@@ -82,7 +82,12 @@ def _sha256(value):
 
 
 def _absolute_path_parts(value, reason, source):
-    if not isinstance(value, str) or not value.startswith("/"):
+    if (
+        not isinstance(value, str)
+        or not value.startswith("/")
+        or "\x00" in value
+        or any(0xD800 <= ord(character) <= 0xDFFF for character in value)
+    ):
         raise OperationContractStop(reason, source)
     if value == "/":
         return ()
@@ -164,8 +169,22 @@ def read_contract_file(contract_path):
         raise OperationContractStop("unreadable_input", "contract")
     os.close(file_descriptor)
 
-    before_identity = (before.st_mode, before.st_size, before.st_dev, before.st_ino)
-    after_identity = (after.st_mode, after.st_size, after.st_dev, after.st_ino)
+    before_identity = (
+        before.st_mode,
+        before.st_size,
+        before.st_dev,
+        before.st_ino,
+        before.st_mtime_ns,
+        before.st_ctime_ns,
+    )
+    after_identity = (
+        after.st_mode,
+        after.st_size,
+        after.st_dev,
+        after.st_ino,
+        after.st_mtime_ns,
+        after.st_ctime_ns,
+    )
     if (
         not stat.S_ISREG(after.st_mode)
         or before_identity != after_identity

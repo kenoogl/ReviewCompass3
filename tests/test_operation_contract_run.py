@@ -558,6 +558,32 @@ def test_high_entropy_identifier_stops_sensitive(work_root):
     assert b'"sensitive_data_remaining"' in payload
 
 
+@pytest.mark.parametrize(
+    "sensitive_value",
+    (
+        "Bearer abcdefabcdef0123456789",
+        "api_key = abcdef123456789012",
+        "-----BEGIN PRIVATE KEY-----\nZm9v\n-----END PRIVATE KEY-----",
+    ),
+)
+def test_remaining_pattern_types_stop_sensitive(work_root, sensitive_value):
+    contract, _, _, _ = _prepare(work_root)
+    contract["unknown_member"] = sensitive_value
+    contract_path = _write_contract(work_root, contract)
+
+    code, payload = _run(contract_path)
+
+    assert code == 3
+    assert payload == _canonical(
+        {
+            "external_send_approved": False,
+            "reason": "sensitive_data_remaining",
+            "source": "contract",
+            "status": "stopped",
+        },
+    ) + b"\n"
+
+
 def test_registry_operation_names_are_not_flagged(work_root):
     contract, _, _, _ = _prepare(work_root, "requirement_candidate_check")
     contract_path = _write_contract(work_root, contract)
@@ -634,6 +660,54 @@ def test_relative_contract_path_stops_invalid_path(work_root):
 
     assert code == 2
     assert b'"invalid_path"' in payload
+
+
+@pytest.mark.parametrize(
+    "contract_path_value",
+    ("/x/with\x00nul.json", "/x/with\ud800surrogate.json"),
+)
+def test_nul_and_surrogate_paths_stop_before_reading(
+    work_root,
+    contract_path_value,
+):
+    code, payload = _run_arguments(
+        ["run", "--contract", contract_path_value],
+    )
+
+    assert code == 2
+    assert payload == _canonical(
+        {
+            "external_send_approved": False,
+            "reason": "invalid_path",
+            "source": "arguments",
+            "status": "stopped",
+        },
+    ) + b"\n"
+
+
+def test_same_size_modification_during_read_stops(work_root, monkeypatch):
+    contract, _, _, output_root = _prepare(work_root)
+    contract_path = _write_contract(work_root, contract)
+    core = _core()
+    original_read = os.read
+    state = {"fired": False}
+
+    def racing_read(descriptor, size):
+        data = original_read(descriptor, size)
+        if not state["fired"] and data:
+            state["fired"] = True
+            raw = contract_path.read_bytes()
+            contract_path.write_bytes(bytes(reversed(raw)))
+        return data
+
+    monkeypatch.setattr(core.os, "read", racing_read)
+
+    code, payload = _run(contract_path)
+
+    assert code == 2
+    assert b'"unreadable_input"' in payload
+    assert b'"contract"' in payload
+    assert list(output_root.iterdir()) == []
 
 
 def test_contract_symlink_stops_unreadable(work_root):

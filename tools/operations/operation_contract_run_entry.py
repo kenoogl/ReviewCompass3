@@ -38,6 +38,10 @@ _EXIT_CODES = {
 def _is_absolute_lexical_path(value):
     if not isinstance(value, str) or not value.startswith("/"):
         return False
+    if "\x00" in value or any(
+        0xD800 <= ord(character) <= 0xDFFF for character in value
+    ):
+        return False
     if value == "/":
         return True
     return all(part not in ("", ".", "..") for part in value.split("/")[1:])
