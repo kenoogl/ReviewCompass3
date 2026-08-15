@@ -2,13 +2,16 @@
 
 import hashlib
 import json
+import os
 import re
+import stat
 
 
 _SAFE_IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")
 _OPERATORS = frozenset(("equals", "not_equals", "contains_all", "contains_none"))
 _QUEUE_ORDER = ("contradicted", "missing", "satisfied", "unreferenced_fact")
 _INTEGER_LIMIT = 9007199254740991
+_INPUT_SIZE_LIMIT = 262144
 
 
 class DesignAcceptanceStop(Exception):
@@ -51,14 +54,21 @@ def _unique_object(pairs):
 def _decode_input(raw, source):
     if not isinstance(raw, bytes):
         raise DesignAcceptanceStop("invalid_schema", source)
+    decode_failed = False
     try:
         text = raw.decode("utf-8")
-    except UnicodeDecodeError as error:
-        raise DesignAcceptanceStop("invalid_utf8", source) from error
+    except UnicodeDecodeError:
+        decode_failed = True
+    if decode_failed:
+        raise DesignAcceptanceStop("invalid_utf8", source)
+    schema_failed = False
     try:
-        return json.loads(text, object_pairs_hook=_unique_object)
-    except (json.JSONDecodeError, _DuplicateMember, RecursionError) as error:
-        raise DesignAcceptanceStop("invalid_schema", source) from error
+        value = json.loads(text, object_pairs_hook=_unique_object)
+    except (json.JSONDecodeError, _DuplicateMember, RecursionError):
+        schema_failed = True
+    if schema_failed:
+        raise DesignAcceptanceStop("invalid_schema", source)
+    return value
 
 
 def _is_safe_identifier(value):
@@ -308,6 +318,195 @@ def _build_result(design, acceptance):
     }
     result["comparison_sha256"] = _sha256(result)
     return result
+
+
+def _absolute_path_parts(value):
+    if not isinstance(value, str) or not value.startswith("/"):
+        raise DesignAcceptanceStop("invalid_path", "arguments")
+    if value == "/":
+        return ()
+    parts = value.split("/")[1:]
+    if not parts or any(part in ("", ".", "..") for part in parts):
+        raise DesignAcceptanceStop("invalid_path", "arguments")
+    return tuple(parts)
+
+
+def _required_open_flags():
+    no_follow = getattr(os, "O_NOFOLLOW", 0)
+    directory = getattr(os, "O_DIRECTORY", 0)
+    nonblock = getattr(os, "O_NONBLOCK", 0)
+    if not no_follow or not directory or not nonblock:
+        raise DesignAcceptanceStop("unreadable_input", "none")
+    return no_follow, directory, nonblock
+
+
+def _open_root(root_parts, no_follow, directory):
+    flags = os.O_RDONLY | no_follow | directory
+    current = None
+    open_failed = False
+    try:
+        current = os.open("/", flags)
+        for component in root_parts:
+            next_descriptor = os.open(component, flags, dir_fd=current)
+            os.close(current)
+            current = next_descriptor
+    except OSError:
+        open_failed = True
+    if open_failed:
+        if current is not None:
+            try:
+                os.close(current)
+            except OSError:
+                pass
+        raise DesignAcceptanceStop("unreadable_input", "none")
+    return current
+
+
+def _open_file_from_root(
+    root_descriptor,
+    relative_parts,
+    source,
+    no_follow,
+    directory,
+    nonblock,
+):
+    current = None
+    file_descriptor = None
+    open_failed = False
+    try:
+        current = os.dup(root_descriptor)
+        directory_flags = os.O_RDONLY | no_follow | directory
+        for component in relative_parts[:-1]:
+            next_descriptor = os.open(
+                component,
+                directory_flags,
+                dir_fd=current,
+            )
+            os.close(current)
+            current = next_descriptor
+        file_descriptor = os.open(
+            relative_parts[-1],
+            os.O_RDONLY | no_follow | nonblock,
+            dir_fd=current,
+        )
+        os.close(current)
+    except OSError:
+        open_failed = True
+    if open_failed:
+        if current is not None:
+            try:
+                os.close(current)
+            except OSError:
+                pass
+        if file_descriptor is not None:
+            try:
+                os.close(file_descriptor)
+            except OSError:
+                pass
+        raise DesignAcceptanceStop("unreadable_input", source)
+    return file_descriptor
+
+
+def _read_regular_file(file_descriptor, source):
+    read_failed = False
+    try:
+        before = os.fstat(file_descriptor)
+        if not stat.S_ISREG(before.st_mode):
+            raise DesignAcceptanceStop("unreadable_input", source)
+        if before.st_size > _INPUT_SIZE_LIMIT:
+            raise DesignAcceptanceStop("size_limit_exceeded", source)
+        chunks = []
+        remaining = _INPUT_SIZE_LIMIT + 1
+        while remaining:
+            chunk = os.read(file_descriptor, remaining)
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
+        data = b"".join(chunks)
+        if len(data) > _INPUT_SIZE_LIMIT:
+            raise DesignAcceptanceStop("size_limit_exceeded", source)
+        after = os.fstat(file_descriptor)
+    except DesignAcceptanceStop:
+        raise
+    except OSError:
+        read_failed = True
+    if read_failed:
+        raise DesignAcceptanceStop("unreadable_input", source)
+
+    before_identity = (before.st_mode, before.st_size, before.st_dev, before.st_ino)
+    after_identity = (after.st_mode, after.st_size, after.st_dev, after.st_ino)
+    if (
+        not stat.S_ISREG(after.st_mode)
+        or before_identity != after_identity
+        or len(data) != before.st_size
+    ):
+        raise DesignAcceptanceStop("unreadable_input", source)
+    return data, (before.st_dev, before.st_ino)
+
+
+def _read_one_input(
+    root_descriptor,
+    relative_parts,
+    source,
+    no_follow,
+    directory,
+    nonblock,
+):
+    file_descriptor = _open_file_from_root(
+        root_descriptor,
+        relative_parts,
+        source,
+        no_follow,
+        directory,
+        nonblock,
+    )
+    try:
+        return _read_regular_file(file_descriptor, source)
+    finally:
+        os.close(file_descriptor)
+
+
+def read_input_pair(input_root, design_path, acceptance_path):
+    """明示root内の異なる通常file二件を非追跡で安全に読む。"""
+
+    root_parts = _absolute_path_parts(input_root)
+    design_parts = _absolute_path_parts(design_path)
+    acceptance_parts = _absolute_path_parts(acceptance_path)
+    root_size = len(root_parts)
+    if (
+        design_parts[:root_size] != root_parts
+        or acceptance_parts[:root_size] != root_parts
+        or len(design_parts) <= root_size
+        or len(acceptance_parts) <= root_size
+        or design_parts == acceptance_parts
+    ):
+        raise DesignAcceptanceStop("invalid_path", "arguments")
+
+    no_follow, directory, nonblock = _required_open_flags()
+    root_descriptor = _open_root(root_parts, no_follow, directory)
+    try:
+        design_data, design_identity = _read_one_input(
+            root_descriptor,
+            design_parts[root_size:],
+            "design",
+            no_follow,
+            directory,
+            nonblock,
+        )
+        acceptance_data, acceptance_identity = _read_one_input(
+            root_descriptor,
+            acceptance_parts[root_size:],
+            "acceptance",
+            no_follow,
+            directory,
+            nonblock,
+        )
+    finally:
+        os.close(root_descriptor)
+    if design_identity == acceptance_identity:
+        raise DesignAcceptanceStop("invalid_path", "arguments")
+    return design_data, acceptance_data
 
 
 def compare_inputs(design_bytes, acceptance_bytes):

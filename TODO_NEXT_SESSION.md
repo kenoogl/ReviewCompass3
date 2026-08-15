@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。残る7候補を順に実行中である。
-- 現在作業：候補2の境界2は、安全読込の追加試験24件が公開関数不在だけを原因として期待失敗し、境界1の43件は成功を維持した。試験とRED Evidenceを固定し、安全読込だけを実装する。
-- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / boundary_2_red_verified / green_pending`
+- 現在作業：候補2の境界2は、対象70件と既存関連31件が成功し、保護対象差分0でGREENとなった。fixture手戻りと明示例の接続漏れは訂正Evidenceへ分離し、境界3の正式命令入口と安全表示の先行試験を固定する。
+- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / boundary_2_green / boundary_3_red_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [境界2の安全読込70件と既存関連31件を固定したGREEN Evidence](records/development/2026-08-15-one-design-acceptance-boundary2-green-evidence-v1.md) — SHA-256 `b76a3033df2e9040bd3b3ec2b4602a68440e1625172633d00af7568e499d960e`
+- [境界2のfixture手戻り・接続漏れ・例外保持訂正Evidence](records/development/2026-08-15-one-design-acceptance-boundary2-test-correction-evidence-v1.md) — SHA-256 `d4cedfab68c4871be8b6c8c57379e18e838fd8a03c83bad5c93723c9b51e1b30`
 - [境界2の期待失敗24件と原因を固定したRED Evidence](records/development/2026-08-15-one-design-acceptance-boundary2-red-evidence-v1.md) — SHA-256 `7fa3eed3ee2170afdbfb8fef1351da1c0addeb43dab4645232dfcabc7e3ec658`
 - [境界1の固定試験43件と既存関連31件を固定したGREEN Evidence](records/development/2026-08-15-one-design-acceptance-boundary1-green-evidence-v1.md) — SHA-256 `eacbcb1198916f00c2cbc6356f2ef5d3a8fab262959b6b3ebcbe033ab0042709`
 - [境界1の期待失敗43件と原因を固定したRED Evidence](records/development/2026-08-15-one-design-acceptance-boundary1-red-evidence-v1.md) — SHA-256 `37790022390ee14875f7b9706604ac448df588a58b182db9245b56f0b911371e`
@@ -32,21 +34,21 @@
 
 ## 次に行う一作業
 
-境界2の固定済み追加試験24件を変更せず、比較核moduleへ安全読込だけを実装する。
+境界3の正式命令入口について、引数、source別停止、正常・停止の正準JSON、空stderr、安全表示、禁止作用の先行失敗試験だけを追加する。
 
 開始条件：
 
-- 境界2試験、RED Evidence、本TODOが意味単位commitへ固定される
-- 境界1と境界2の試験67件を変更しない
-- CLI入口と配布設定には着手しない
+- 境界2の安全読込、GREEN・訂正Evidence、本TODOが意味単位commitへ固定される
+- 境界1・2の固定試験70件を変更しない
+- 配布設定を作らず、repository内の薄い入口だけを試験対象とする
 
 完了条件：
 
-- 対象試験67件を単独実行して全件成功し、終了コード0となる
-- 既存G08保護対象4fileが基準commitから差分0である
-- 安全読込とGREEN Evidenceをcommitしてから境界3へ進む
+- 境界3追加試験を単独実行し、入口module不在だけを原因として期待失敗する
+- 失敗件数と原因を境界3 RED Evidenceへ固定する
+- 試験とEvidenceをcommitしてから正式入口実装へ進む
 
-後続作業：境界3の正式命令入口と安全表示について先行失敗試験を固定する。
+後続作業：境界3の試験を変えず、正式入口だけを実装して全対象試験を成功させる。
 
 ## blocker・Human判断待ち
 
@@ -64,7 +66,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：候補2の境界2追加試験24件は安全読込公開関数不在だけを原因として期待失敗、境界1固定43件は成功、対象全体は終了コード1。既存G08関連31件は直前成功、保護対象4fileは基準commitから差分0
+- 直近の関連Test：候補2の境界1・2固定70件と既存G08関連31件の計101件が成功、終了コード0。既存G08 2実装fileと2試験fileは基準commitから差分0
 - 直近の全Test：直近の正規全試験2,020件成功、失敗・error・skip 0、終了コード0。候補2実装後に再実行する
 - 差分検査：`git diff --check`合格
 

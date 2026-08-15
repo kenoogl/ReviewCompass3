@@ -5,7 +5,7 @@ import hashlib
 import importlib
 import json
 import os
-import socket
+import stat
 from types import SimpleNamespace
 
 import pytest
@@ -603,25 +603,41 @@ def test_rejects_symlinks_at_every_path_layer(tmp_path, location):
 
 
 @pytest.mark.parametrize("kind", ("directory", "fifo", "socket"))
-def test_rejects_non_regular_inputs_without_blocking(tmp_path, kind):
+def test_rejects_non_regular_inputs_without_blocking(
+    tmp_path,
+    monkeypatch,
+    kind,
+):
     module = _module()
     reader = module.read_input_pair
     root, _, acceptance_path = _input_files(tmp_path)
     design_path = root / f"not-regular-{kind}"
-    unix_socket = None
     if kind == "directory":
         design_path.mkdir()
     elif kind == "fifo":
         os.mkfifo(design_path)
     else:
-        unix_socket = socket.socket(socket.AF_UNIX)
-        unix_socket.bind(str(design_path))
-    try:
-        with pytest.raises(module.DesignAcceptanceStop) as caught:
-            reader(str(root), str(design_path), str(acceptance_path))
-    finally:
-        if unix_socket is not None:
-            unix_socket.close()
+        design_path.write_bytes(b"socket-placeholder")
+        real_fstat = module.os.fstat
+        first_call = True
+
+        def socket_fstat(file_descriptor):
+            nonlocal first_call
+            result = real_fstat(file_descriptor)
+            if not first_call:
+                return result
+            first_call = False
+            return SimpleNamespace(
+                st_mode=stat.S_IFSOCK,
+                st_size=result.st_size,
+                st_dev=result.st_dev,
+                st_ino=result.st_ino,
+            )
+
+        monkeypatch.setattr(module.os, "fstat", socket_fstat)
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(str(root), str(design_path), str(acceptance_path))
 
     assert caught.value.reason == "unreadable_input"
     assert caught.value.source == "design"
@@ -637,6 +653,49 @@ def test_rejects_size_above_the_fixed_limit(tmp_path):
         reader(str(root), str(design_path), str(acceptance_path))
 
     assert caught.value.reason == "size_limit_exceeded"
+    assert caught.value.source == "design"
+
+
+def test_rejects_distinct_names_for_the_same_open_file(tmp_path):
+    module = _module()
+    reader = module.read_input_pair
+    root, design_path, _ = _input_files(tmp_path)
+    acceptance_path = root / "acceptance-hard-link.json"
+    os.link(design_path, acceptance_path)
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(str(root), str(design_path), str(acceptance_path))
+
+    assert caught.value.reason == "invalid_path"
+    assert caught.value.source == "arguments"
+
+
+def test_rejects_symlink_substituted_after_lexical_validation(
+    tmp_path,
+    monkeypatch,
+):
+    module = _module()
+    reader = module.read_input_pair
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    real_open = module.os.open
+    substituted = False
+
+    def substituting_open(path, flags, *args, **kwargs):
+        nonlocal substituted
+        if path == "design.json" and kwargs.get("dir_fd") is not None:
+            original = root / "design-original.json"
+            design_path.rename(original)
+            design_path.symlink_to(original)
+            substituted = True
+        return real_open(path, flags, *args, **kwargs)
+
+    monkeypatch.setattr(module.os, "open", substituting_open)
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(str(root), str(design_path), str(acceptance_path))
+
+    assert substituted is True
+    assert caught.value.reason == "unreadable_input"
     assert caught.value.source == "design"
 
 
@@ -770,3 +829,23 @@ def test_reading_does_not_change_input_tree(tmp_path):
         for path in root.iterdir()
     )
     assert after == before
+
+
+def test_stops_do_not_retain_lower_level_exception_details(tmp_path):
+    module = _module()
+
+    with pytest.raises(module.DesignAcceptanceStop) as malformed:
+        module.compare_inputs(b'{"secret":', _json_bytes(_acceptance()))
+    assert malformed.value.__cause__ is None
+    assert malformed.value.__context__ is None
+
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    design_path.unlink()
+    with pytest.raises(module.DesignAcceptanceStop) as unreadable:
+        module.read_input_pair(
+            str(root),
+            str(design_path),
+            str(acceptance_path),
+        )
+    assert unreadable.value.__cause__ is None
+    assert unreadable.value.__context__ is None
