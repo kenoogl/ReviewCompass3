@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段と、最初の製品機能G25読取り専用入口は完了した。現在は立て直し後の二つ目の製品機能である安全保存の実装準備を進めている。
-- 現在作業：安全保存実装作業票v1の独立開始前レビューは修正要だった。機能範囲を変えず、安全な事前拒否、確定保存、同一入力・競合を分け、契約条件5、6、7、9と削除後監査期限を具体的なREDへ固定した九境界のv2へ限定訂正した。次は同じ独立担当による変更点確認である。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_reuse_adjudicated_tdd_boundary_corrected_correction_review_pending`
+- 現在作業：安全保存実装作業票v2の独立訂正確認ではv1の二指摘が解消したが、作成物と後続利用時の権限再確認に止める指摘1件があった。機能範囲と九境界を変えず、作成物の0700／0600相当、所有者、追加ACL、symlink非追跡open後検査を具体的なREDと最終検証へ固定する一点訂正v3を作った。次は同じ独立担当による一点確認である。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_reuse_adjudicated_tdd_boundary_one_point_corrected_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -24,38 +24,38 @@
 - [再利用方法とHuman裁定負荷の承認判断](records/development/2026-08-15-safe-storage-capability-reuse-human-adjudication-decision-v1.md) — SHA-256 `68e9807328b8af3a8443534ab20b8da6d45afd42b03226a2b3964891ca9e1ceb`
 - [Python仮想環境入口の不一致訂正Evidence](records/development/2026-08-15-python-venv-entry-correction-evidence-v1.md) — SHA-256 `17cc86a8ebde21a89cbf284b4f09dbbb18f7d261da9cf6b888bdb3f3398f9733`
 - [製品TDD実装境界の事前確認方針](records/development/2026-08-15-tdd-implementation-boundary-precheck-policy-decision-v1.md) — SHA-256 `5c844a835b272283eb7ac485e2f5e4be792b7ded6dcf4d600054934a1007edfd`
-- [安全保存実装作業票v1の独立開始前レビュー](records/development/2026-08-15-session-artifact-safe-storage-implementation-start-review-v1.md) — SHA-256 `b639560e017cc87718e6d1cd9b398c969278d08652ab0ba44a996c1979e473ce`
-- [限定訂正した安全保存の製品TDD実装作業票v2](docs/development/2026-08-15-session-artifact-safe-storage-implementation-work-ticket-v2.md) — SHA-256 `96cdfc57006557249143d29c2676f0361e90fec9beb9b3ecf3227b87bb0e0cc0`
+- [安全保存実装作業票v2の独立訂正レビュー](records/development/2026-08-15-session-artifact-safe-storage-implementation-start-review-v2.md) — SHA-256 `9bcf716d88988e81304849583f42bce1d459f039c14f18154f19e7f59dccdada`
+- [作成物の権限確認を一点訂正した安全保存実装作業票v3](docs/development/2026-08-15-session-artifact-safe-storage-implementation-work-ticket-v3.md) — SHA-256 `61deaecb4aec32bd0f16b595c75270d0dec1fbae555f3c99540b3a4455077938`
 
 ## 次に行う一作業
 
-限定訂正した安全保存実装作業票v2を、v1を確認した同じ独立担当が読み取り専用で再確認し、二つの止める指摘が解消し、契約22条件と九境界に新たな止める不整合がないか開始可または修正要を返す。
+安全保存実装作業票v2と一点訂正v3を、同じ独立担当が累積作業票として読み取り専用で再確認し、作成物と後続利用時の権限検査が契約へ一致するか開始可または修正要を返す。
 
 開始条件：
 
-- 作業票v2、v1レビュー記録、固定入力のSHA-256がcommitへ固定され、worktreeがcleanである
-- v1を確認した独立担当が、成果物を変更せず変更点と全体整合を再確認する
+- 作業票v2、一点訂正v3、v2レビュー記録、固定入力のSHA-256がcommitへ固定され、worktreeがcleanである
+- これまでを確認した同じ独立担当が、成果物を変更せず一点訂正と全体整合を再確認する
 - 製品コード、製品試験、製品設定、配布入口が未変更である
 - レビューは上位契約との矛盾、承認欠落、誤った合否、安全境界、範囲違反に限定する
 
 完了条件：
 
-- 安全な事前拒否、確定保存、同一入力・競合が別のRED理由と最小実装になっている
-- 条件5、6、7、9と削除後監査期限が具体的なRED、観測対象、最小実装、不変条件へ接続されている
-- 契約受入条件1から22の未接続0、九境界の必須欄欠落0である
+- 作成した記録directoryとfileの0700／0600相当、所有者、種類、追加ACL、open後検査が境界3へ固定されている
+- 保存再試行、復旧、再読込み、削除計画、削除が利用時点で同じ安全検査を行い、不合格時に変更しない
+- 九境界、契約受入条件1から22、機能範囲、禁止事項に新たな矛盾がない
 - 判定が開始可、止める指摘0件である
 
 後続作業：開始可の場合だけ境界1の失敗試験へ進む。修正要が残る場合は製品コードへ進まず、目的、根拠、判断基準、推奨案、影響へ圧縮して利用者へ戻す。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。製品試験開始は独立訂正確認の開始可まで保留する
+- blocker：なし。製品試験開始は独立一点確認の開始可まで保留する
 - Human判断待ち：なし。内部の開始レビュー担当と完了レビュー担当を使う許可は取得済みで、製品受入判断だけを最終段階で利用者へ戻す
 
 ## stale・deferred
 
 - stale：固定20 pathによる旧検索、過大な平坦候補を作った能力検索v1からv3、および対応する旧証明書は履歴観測として保持するが、現在の実装開始根拠に使わない
-- deferred：独立訂正確認が開始可となるまで、失敗試験、製品コード、製品設定、配布入口を変更しない。中央一覧、push、外部送信も開始しない
+- deferred：独立一点確認が開始可となるまで、失敗試験、製品コード、製品設定、配布入口を変更しない。中央一覧、push、外部送信も開始しない
 
 ## Git・Test
 
@@ -63,7 +63,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：実装境界は文書作業であり製品試験は未実施。九境界の必須欄、受入条件1から22の欠落0、参照Digest、TODO単一入口を機械確認する
+- 直近の関連Test：実装境界は文書作業であり製品試験は未実施。v2とv3の参照Digest、九境界、受入条件1から22、TODO単一入口を機械確認する
 - 直近の全Test：直近の正規全試験は1,762件成功、失敗・error・skip 0、終了コード0。今回の変更では製品コード、試験、設定を変更していない
 - 差分検査：`git diff --check`合格
 
