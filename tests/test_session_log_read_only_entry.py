@@ -34,6 +34,83 @@ def _run(entry, capsys, raw_root, raw_log):
 
 
 @pytest.mark.parametrize(
+    ("records", "expected_exit", "expected_status", "expected_reason"),
+    (
+        (
+            ({
+                "uuid": "user-1",
+                "type": "user",
+                "sessionId": "session-1",
+                "message": {"role": "user", "content": "safe"},
+            },),
+            0,
+            "ok",
+            None,
+        ),
+        (
+            (
+                {
+                    "uuid": "user-1",
+                    "type": "user",
+                    "sessionId": "session-1",
+                    "message": {"role": "user", "content": "safe"},
+                },
+                {
+                    "uuid": "event-2",
+                    "type": "private_issue_detail",
+                    "sessionId": "session-1",
+                    "message": {"role": "user", "content": "ignored"},
+                },
+            ),
+            3,
+            "partial",
+            None,
+        ),
+        (
+            ({
+                "uuid": "user-1",
+                "type": "user",
+                "sessionId": "session-1",
+                "message": {
+                    "role": "user",
+                    "content": "value=A9fK2mQ7xR4vT8pL3nC6sW1yH5jD0bZ",
+                },
+            },),
+            4,
+            "stopped",
+            "sensitive_data_remaining",
+        ),
+    ),
+)
+def test_prepare_safe_result_returns_value_without_output(
+    tmp_path,
+    capsys,
+    monkeypatch,
+    records,
+    expected_exit,
+    expected_status,
+    expected_reason,
+):
+    entry = _entry()
+    monkeypatch.setattr(entry.metadata, "version", lambda name: "0.0.1")
+    raw_root = tmp_path / "raw"
+    raw_log = raw_root / "session.jsonl"
+    _write_records(raw_log, records)
+
+    exit_code, result = entry.prepare_safe_result(
+        raw_root.resolve(),
+        raw_log.resolve(),
+    )
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == ""
+    assert exit_code == expected_exit
+    assert result["status"] == expected_status
+    assert result.get("error") == expected_reason
+
+
+@pytest.mark.parametrize(
     ("records", "source_kind", "expected_text"),
     (
         (

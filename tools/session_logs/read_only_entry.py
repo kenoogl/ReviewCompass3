@@ -156,12 +156,13 @@ def _arguments(argv):
     return parser.parse_args(argv)
 
 
-def run(argv=None):
-    arguments = _arguments(sys.argv[1:] if argv is None else argv)
+def prepare_safe_result(raw_root, raw_log):
+    """安全結果を標準出力せず、終了コードと値で返す。"""
+
     try:
         raw_root, raw_log = _resolve_source(
-            arguments.raw_root,
-            arguments.raw_log,
+            raw_root,
+            raw_log,
         )
         artifact = prepare_artifact(
             raw_log,
@@ -171,23 +172,29 @@ def run(argv=None):
         )
         result = _safe_result(artifact)
     except EntryStop as error:
-        _print_json(_stopped(error.reason))
-        return EXIT_STOPPED
+        return EXIT_STOPPED, _stopped(error.reason)
     except SensitiveDataRemaining:
-        _print_json(_stopped("sensitive_data_remaining"))
-        return EXIT_STOPPED
+        return EXIT_STOPPED, _stopped("sensitive_data_remaining")
     except UnsupportedSourceKind:
-        _print_json(_stopped("unsupported_source"))
-        return EXIT_STOPPED
+        return EXIT_STOPPED, _stopped("unsupported_source")
     except (OSError, ParseError, UnicodeError):
-        _print_json(_stopped("unreadable_source"))
-        return EXIT_STOPPED
+        return EXIT_STOPPED, _stopped("unreadable_source")
     except Exception:
-        _print_json(_stopped("internal_error"))
-        return EXIT_STOPPED
+        return EXIT_STOPPED, _stopped("internal_error")
+
+    exit_code = EXIT_PARTIAL if result["status"] == "partial" else EXIT_OK
+    return exit_code, result
+
+
+def run(argv=None):
+    arguments = _arguments(sys.argv[1:] if argv is None else argv)
+    exit_code, result = prepare_safe_result(
+        arguments.raw_root,
+        arguments.raw_log,
+    )
 
     _print_json(result)
-    return EXIT_PARTIAL if result["status"] == "partial" else EXIT_OK
+    return exit_code
 
 
 def main():
