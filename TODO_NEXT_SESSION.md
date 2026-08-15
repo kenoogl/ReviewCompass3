@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：候補3のG24について、契約候補v2のClaude独立再確認は停止原因1件（機微情報規則の規則内容識別値が計算方法未定義）で修正要となった。利用者指示の最小修正(a)により、規則内容識別値の固定を撤回しfile内容識別値・公開関数・既定pattern件数の照合へ限定した契約候補v3を作成した。製品実装は未開始で、G24全体の作成責務は未完了である。
+- 現在作業：候補3のG24について、契約候補v2のClaude独立再確認は停止原因1件（機微情報規則の規則内容識別値が計算方法未定義）で修正要となった。利用者指示の最小修正(a)で契約候補v3を作成し、利用者指示によりv3の限定再確認を作成者以外のCodexへ引き継ぐ。製品実装は未開始で、G24全体の作成責務は未完了である。
 - Task Contract：`TC-RC3-PRODUCT-ONE-REQUIREMENT-FEATURE-SOURCE-005 / v3 / limited_independent_rereview_pending`
 
 ## 現在作業に影響する改善候補／Issue
@@ -17,20 +17,20 @@
 ## 最新のauthority／Evidence
 
 - [利用者が条件20を満たしたG08製品受入判断](records/development/2026-08-15-one-design-acceptance-product-acceptance-decision-v1.md) — SHA-256 `7e3eb626474f72ebcd3a3d5ec2646cf004ba192606f03684a50ae6f0b251ce86`
+- [Codexが再開するためのG24契約候補v3引継ぎメモ](records/session-handoffs/2026-08-15-g24-contract-v3-codex-handoff-v1.md) — SHA-256 `1b966f1fdcd51f6ed46e3b9bb83c6f3049cff9975ac29bbc1e95a2336c913fe4`
 - [G24契約候補v2を停止原因1件で修正要としたClaude独立再確認](records/development/2026-08-15-one-requirement-candidate-consistency-check-contract-v2-independent-rereview-v1.md) — SHA-256 `270505d0f073fb59daf4d963824ca0eb9e2c854c580ed46dde2f63181242eb38`
 - [最小修正(a)を限定適用した一件の要求候補整合検査契約候補v3](records/task-contract/2026-08-15-one-requirement-candidate-consistency-check-candidate-v3.md) — SHA-256 `7ad6da3c77632f3fc82bdbbabcb71d431d490bc78e12004d2331ef44cfdf0081`
-- [4原因を限定訂正した一件の要求候補整合検査契約候補v2](records/task-contract/2026-08-15-one-requirement-candidate-consistency-check-candidate-v2.md) — SHA-256 `a4d544e29d877ac45dca65b748557387bd1b04f58adda59ffacf91fc47a216bb`
 - [現行50要求を解決する要求権限束v2](records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json) — SHA-256 `760e33ea2ecf6937f56d7bf8d2bd703b18b47dbd2bd6b2bd5919e0dd556d9dae`
 
 ## 次に行う一作業
 
-契約候補v3の作成を担当しなかった別担当が、固定されたv3を成果物変更なしで読み、v2の停止原因1件（規則内容識別値の
-計算方法未定義）が閉じたことと、v2で閉じた他境界に退行がないことだけを限定再確認する。
+Codexが固定された契約候補v3を成果物変更なしで読み、v2の停止原因1件（規則内容識別値の計算方法未定義）が
+閉じたことと、v2で閉じた他境界に退行がないことだけを限定再確認する。
 
 開始条件：
 
-- v2再確認記録、契約候補v3、本TODOが一つの意味単位commitへ固定され、作業treeがcleanである
-- 担当はAGENTS.md、TODO、v2再確認記録を読み、Pythonは.venv/bin/python3だけを使う
+- 引継ぎメモ、v2再確認記録、契約候補v3、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- CodexはAGENTS.md、TODO、引継ぎメモを読み、Pythonは.venv/bin/python3だけを使う
 - 製品コード、既存試験、G08、既存G24を変更せず読取り専用で確認する
 
 完了条件：
@@ -43,8 +43,8 @@
 
 ## blocker・Human判断待ち
 
-- blocker：技術blockerなし
-- Human判断待ち：契約候補v3の限定再確認の担当指定（v3作成はClaudeのため、Claude以外を推奨）。再確認が開始可になるまで、縮小境界の採用と実装開始判断を求めない
+- blocker：技術blockerなし。利用者指示により限定再確認の担当をCodexとする
+- Human判断待ち：なし。Codexの限定再確認が開始可になるまで、縮小境界の採用と実装開始判断を求めない
 
 ## stale・deferred
 
