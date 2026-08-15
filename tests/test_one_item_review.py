@@ -6,6 +6,7 @@ import json
 import os
 import socket
 import subprocess
+import sys
 import tomllib
 from pathlib import Path
 
@@ -1116,3 +1117,59 @@ def test_pyproject_declares_only_the_one_item_review_entry():
     assert document["project"]["scripts"]["reviewcompass3-one-item-review"] == (
         "tools.reviews.one_item_review_entry:main"
     )
+
+
+def _installed_one_item_review():
+    return Path(sys.executable).parent / "reviewcompass3-one-item-review"
+
+
+def test_installed_entry_runs_from_an_unrelated_current_directory(tmp_path):
+    files = _cli_files(tmp_path)
+    unrelated = tmp_path / "unrelated"
+    unrelated.mkdir()
+    executable = _installed_one_item_review()
+
+    completed = subprocess.run(
+        [
+            str(executable),
+            "prepare",
+            "--input-root", str(files["root"]),
+            "--material", str(files["material"]),
+            "--review-spec", str(files["spec"]),
+        ],
+        cwd=unrelated,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0
+    assert completed.stdout == _canonical(files["package"]) + b"\n"
+    assert completed.stderr == b""
+
+
+def test_installed_entry_rejects_old_results_after_material_change(tmp_path):
+    files = _cli_files(tmp_path)
+    executable = _installed_one_item_review()
+    files["material"].write_bytes(b"changed line\nsecond line\n")
+
+    completed = subprocess.run(
+        [
+            str(executable),
+            "organize",
+            "--input-root", str(files["root"]),
+            "--material", str(files["material"]),
+            "--review-spec", str(files["spec"]),
+            "--results", str(files["results"]),
+        ],
+        cwd=tmp_path,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode == 2
+    assert json.loads(completed.stdout) == {
+        "external_send_approved": False,
+        "reason": "stale_material",
+        "status": "stopped",
+    }
+    assert completed.stderr == b""

@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
-- 現在作業：境界5は試験を変えず実装し、境界1〜5の156件が成功した。境界6の別現在位置からの配置、古い結果拒否、G02不変更、結合・回帰確認へ進む。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / boundaries_1_2_3_4_5_green / boundary_6_ready`
+- 現在作業：境界6の2試験を追加し、既存156件成功を維持したまま仮想環境の正式実行file不在で失敗することを確認した。依存追加なしで再導入し、配置と結合を確認する。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / boundaries_1_2_3_4_5_green / boundary_6_red_confirmed`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [境界6の別現在位置実行2件と期待失敗](records/development/2026-08-15-one-item-review-boundary6-red-evidence-v1.md) — SHA-256 `afd763b8560c85f75eb92cbb79a5c11b7dadb6b71cf7a3d0009adaec0caec3b4`
 - [境界5の正式入口・安全表示156件成功](records/development/2026-08-15-one-item-review-boundary5-green-evidence-v1.md) — SHA-256 `2bf610c3dc0d45642a6e7824929e12d1bbf63bc0f780f70c832cb05cc31d7237`
 - [境界5の正式入口・安全表示10件と期待失敗](records/development/2026-08-15-one-item-review-boundary5-red-evidence-v1.md) — SHA-256 `32670c7428a2f0ecc5fbbf76cdfa4d275db61dd8e8bd2041b14045d106820244`
 - [境界4の分類・人の判断一覧146件成功](records/development/2026-08-15-one-item-review-boundary4-green-evidence-v1.md) — SHA-256 `f3d593576970cc65b3ca57687f564bae6cb01cac8f1056f27e6aab8cee4620fc`
@@ -43,13 +44,13 @@
 
 ## 次に行う一作業
 
-導入後を模した別現在位置から正式実行名を動かし、材料変更後の古い結果拒否、G02 14 file不変更、対象・関連回帰を確認する。
+仮想環境へ依存追加なしで再導入し、別現在位置から正式実行名を動かし、古い結果拒否、G02不変更、対象・関連回帰を確認する。
 
 開始条件：
 
-- 境界5実装、成功証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 導入確認は依存追加なしで行う
-- 既存G02 14 fileと既存試験を変更しない
+- 境界6試験、失敗証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 依存追加とnetworkを使わない
+- 既存G02 14 fileと試験を変更しない
 
 完了条件：
 
@@ -75,7 +76,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：境界1〜5の対象156件が成功、失敗・error・skip 0、終了コード0。境界5の試験変更0
+- 直近の関連Test：既存156件成功、新規2件は正式実行file不在だけで失敗、終了コード1で期待失敗を確認
 - 直近の全Test：製品コードと試験を変更していないため再実行していない。直近の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0
 - 差分検査：`git diff --check`合格
 
