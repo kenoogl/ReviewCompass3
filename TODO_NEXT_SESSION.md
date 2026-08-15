@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：『G02一件レビューの安全投影操作の追加』の契約候補v1を作成した。受入済み実行器のregistryへ`one_item_review_prepare`を、G02核2関数の直接呼出し・固定allowlist投影（自由文遮断）・ReviewStopの固定変換で追加する縦切りである。Codexの独立確認へ進む。実装は未開始で、開始可後に利用者の採用判断を求める。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v1 / independent_review_pending`
+- 現在作業：『G02一件レビューの安全投影操作の追加』の契約候補v1はCodex独立確認で停止原因1件（§7.1の停止理由集合が8種の記載と9件の列挙で競合）の修正要となった。`stale_material`（organize経路専用）を外した8理由の閉じた列挙へ訂正した契約候補v2を作成し、Codexの限定再確認へ進む。投影・束縛・保護基準は問題なしと判定済み。実装は未開始で、開始可後に利用者の採用判断を求める。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v2 / limited_independent_rereview_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,7 +17,8 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
-- [G02安全投影操作追加の契約候補v1](records/task-contract/2026-08-16-one-item-review-safe-projection-candidate-v1.md) — SHA-256 `b42232fd0f6a559a680c5447845502a0947b0d96caaaddae208c8bf0c94a2f9b`
+- [停止理由集合を一意化したG02安全投影の契約候補v2](records/task-contract/2026-08-16-one-item-review-safe-projection-candidate-v2.md) — SHA-256 `9a35a25fc6481a62e8978574f8f1e73dc123eda2f96e9acb213851686d10f603`
+- [契約候補v1を停止原因1件で修正要としたCodex独立確認](records/development/2026-08-16-one-item-review-safe-projection-v1-independent-review-v1.md) — SHA-256 `b211626ba83409e9a892c202c0903e1363b535dc93b6f390627d42361ba3d33f`
 - [利用者による最小運用契約実行の製品受入判断](records/development/2026-08-16-minimal-operation-contract-execution-product-acceptance-decision-v1.md) — SHA-256 `8386ee089ff54b0fde80fca4592a58d8e660e71cd11cb9687e676ca3f824e808`
 - [Codex独立完了再レビュー・verified判定](records/development/2026-08-16-minimal-operation-contract-execution-independent-completion-rereview-v1.md) — SHA-256 `00825b1fbce7a3ea91177d1493c9098bbfea6a7a76868e24f8f050b1f59dc927`
 - [blocking 3件の訂正Evidence](records/development/2026-08-16-minimal-operation-contract-execution-correction-evidence-v1.md) — SHA-256 `c2a386c87e542a7f626e77b931bb24672fd6bf392fda71e216a5c19923959c30`
@@ -31,13 +32,13 @@
 
 ## 次に行う一作業
 
-Codexが固定された契約候補v1を成果物変更なしで読み、定義反証（投影allowlistによる自由文遮断の一意性、
-ReviewStop変換の一意性、束縛照合位置のG02現物との一致、変更対象・保護基準の固定、006停止表との整合）を行い、
-開始可または修正要の判定record 1件を単独commitして停止する。起動はClaudeがcodex execで行う。
+Codexが固定された契約候補v2を成果物変更なしで読み、v1の停止原因1件（停止理由集合の8種・9種競合）が
+閉じた8理由の列挙で解消したかと、他境界の退行の有無だけを限定再確認し、判定record 1件を単独commitして停止する。
+起動はClaudeがcodex execで行う。
 
 開始条件：
 
-- 契約候補v1、依頼record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 契約候補v2、依頼record、本TODOが意味単位commitへ固定され、作業treeがcleanである
 - Codexは依頼recordの鮮度検査に合格してから動く
 
 完了条件：
