@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。残る7候補を順に実行中である。
-- 現在作業：候補2の境界3は、正式命令入口の追加試験18件が入口module不在だけを原因として期待失敗し、境界1・2の70件は成功を維持した。試験とRED Evidenceを固定し、薄い入口だけを実装する。
-- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / boundary_3_red_verified / green_pending`
+- 現在作業：候補2の境界3は、固定対象88件と既存関連31件の計119件が成功し、試験変更と保護対象差分0でGREENとなった。境界4の配布・結合について先行失敗試験を固定する。
+- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / boundary_3_green / boundary_4_red_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [境界3の正式入口88件と既存関連31件を固定したGREEN Evidence](records/development/2026-08-15-one-design-acceptance-boundary3-green-evidence-v1.md) — SHA-256 `515e84efd523eb4cdb661512c63a0566aa88c4c8ec681f757d3b86c78fa92c6c`
 - [境界3の期待失敗18件と原因を固定したRED Evidence](records/development/2026-08-15-one-design-acceptance-boundary3-red-evidence-v1.md) — SHA-256 `93ee4790afac1a66a9893d544b5afa75431b3c9c34ec2ac44c5e2ca298c89cbf`
 - [境界2の安全読込70件と既存関連31件を固定したGREEN Evidence](records/development/2026-08-15-one-design-acceptance-boundary2-green-evidence-v1.md) — SHA-256 `b76a3033df2e9040bd3b3ec2b4602a68440e1625172633d00af7568e499d960e`
 - [境界2のfixture手戻り・接続漏れ・例外保持訂正Evidence](records/development/2026-08-15-one-design-acceptance-boundary2-test-correction-evidence-v1.md) — SHA-256 `d4cedfab68c4871be8b6c8c57379e18e838fd8a03c83bad5c93723c9b51e1b30`
@@ -35,21 +36,21 @@
 
 ## 次に行う一作業
 
-境界3の固定済み追加試験18件を変更せず、tools/design/one_design_acceptance_entry.pyの薄い入口だけを実装する。
+境界4の配布・結合について、pyproject実行名、repository外の配置後実行、核・repository入口・配置後入口の同一bytesを先行失敗試験へ固定する。
 
 開始条件：
 
-- 境界3試験、RED Evidence、本TODOが意味単位commitへ固定される
-- 境界1〜3の試験88件を変更しない
-- pyproject.tomlと配置済みcommandには着手しない
+- 境界3の入口、GREEN Evidence、本TODOが意味単位commitへ固定される
+- 境界1〜3の固定試験88件を変更しない
+- pyproject.tomlを変更せず、配布契約の試験だけを追加する
 
 完了条件：
 
-- 対象試験88件を単独実行して全件成功し、終了コード0となる
-- 正常・全停止例が正準JSON一件、改行一つ、空stderr、固定終了コードとなる
-- 入口とGREEN Evidenceをcommitしてから境界4へ進む
+- 境界4追加試験が実行名未登録または配置後command不在だけを原因として期待失敗する
+- 失敗件数と原因を境界4 RED Evidenceへ固定する
+- 試験とEvidenceをcommitしてから配布設定へ進む
 
-後続作業：境界4の配布・結合について先行失敗試験を固定する。
+後続作業：pyproject.tomlへ実行名一件だけを追加し、network・依存追加なしで配置して全確認を行う。
 
 ## blocker・Human判断待ち
 
@@ -67,7 +68,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：候補2の境界3追加試験18件は入口module不在だけを原因として期待失敗、境界1・2固定70件は成功、対象全体は終了コード1。既存G08関連31件は直前成功、保護対象4fileは基準commitから差分0
+- 直近の関連Test：候補2の境界1〜3固定88件と既存G08関連31件の計119件が成功、終了コード0。境界3試験はRED commitから差分0、既存G08 2実装fileと2試験fileは基準commitから差分0
 - 直近の全Test：直近の正規全試験2,020件成功、失敗・error・skip 0、終了コード0。候補2実装後に再実行する
 - 差分検査：`git diff --check`合格
 
