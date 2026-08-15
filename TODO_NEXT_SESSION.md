@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。残る7候補を順に実行中である。
-- 現在作業：候補2の独立完了確認は、形式検査1系統3変種により修正要となった。条件9・12が不成立で製品受入を停止し、厳密なschema version、巨大整数、単独surrogateの反例を先行失敗試験へ固定する。
-- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / independent_review_correction_required / schema_correction_red_pending`
+- 現在作業：候補2の限定修正は、独立反例を設計・受入条件、直接核・正式入口へ接続し、14件の期待失敗と2件の既存成功を確認した。試験とRED Evidenceを固定し、形式検査1系統だけを修正する。
+- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / schema_correction_red_verified / green_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [独立反例3変種の14期待失敗を固定した限定修正RED Evidence](records/development/2026-08-15-one-design-acceptance-independent-correction-red-evidence-v1.md) — SHA-256 `24faa206378cb6ae14f8c8913288ac7d8832ad9dacbcc46110ffdee7462be493`
 - [形式検査1系統3変種で修正要となった独立完了確認v1](records/development/2026-08-15-one-design-acceptance-independent-completion-review-v1.md) — SHA-256 `4af8107d8f617f26720cf34bc6ab12167e8f73c31439ecfc7aa4f14f6ca05888`
 - [境界4の配布・対象・関連・全試験・合成一件completion Evidence](records/development/2026-08-15-one-design-acceptance-boundary4-completion-evidence-v1.md) — SHA-256 `e307eaf7dc9edaf8463b5a66ffb85f46932d1d02f75f481d9f8d27424cd81c09`
 - [境界4の期待失敗3件と原因を固定したRED Evidence](records/development/2026-08-15-one-design-acceptance-boundary4-red-evidence-v1.md) — SHA-256 `ab53723b7e6ce54f3fd6435cdafd4a5552dbe1dfc710b7f7a49387722c6a4ec1`
@@ -39,21 +40,21 @@
 
 ## 次に行う一作業
 
-独立反例3変種を設計側・受入条件側の先行失敗試験へ固定し、schema version誤受理と巨大整数・単独surrogateの誤停止を再現する。
+固定済み限定修正試験16件を変更せず、厳密なschema version型、JSON復号ValueError、正準UTF-8化不能文字の検査だけを修正する。
 
 開始条件：
 
-- 独立完了確認v1と本TODOが意味単位commitへ固定される
-- 既存91件の期待値を変更せず、3変種だけを追加する
-- 契約、正常・停止schema、変更上限を変更しない
+- 限定修正試験、RED Evidence、本TODOが意味単位commitへ固定される
+- 既存91件と追加16件の期待値を変更しない
+- tools/design/one_design_acceptance.py以外の製品fileを変更しない
 
 完了条件：
 
-- 追加反例が誤受理またはinternal_failureを原因として期待失敗する
-- 設計・受入条件、直接核・正式入口の各sourceと終了コードを固定する
-- RED Evidenceと試験をcommitしてから形式検査だけを限定修正する
+- 追加16件と既存91件の計107件が成功し、終了コード0となる
+- 関連31件、隔離全試験、保護対象差分0を再確認する
+- 限定修正GREEN Evidenceを固定commitへ置いて同じ別担当へ再確認を依頼する
 
-後続作業：厳密型、JSON復号ValueError、正準UTF-8化不能文字だけを修正し、全確認と再独立レビューを行う。
+後続作業：再独立確認がverifiedなら、利用者へ条件20の製品受入を求める。
 
 ## blocker・Human判断待ち
 
@@ -71,7 +72,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：候補2の既存91件と既存G08関連31件は成功、終了コード0だが、独立反例で条件9・12の誤合格を実証。既存G08 2実装fileと2試験fileは基準commitから差分0
+- 直近の関連Test：限定修正の追加16件中14件が独立反例どおり期待失敗、false形式版2件は成功、終了コード1。既存91件と既存G08関連31件は直前成功、保護対象4fileは基準commitから差分0
 - 直近の全Test：禁止認証環境6件を除く隔離条件で正規全試験2,111件成功、終了コード0。通常host環境では既存executor安全機構がANTHROPIC_API_KEYを拒否し12件失敗・2,099件成功、終了コード1
 - 差分検査：`git diff --check`合格
 

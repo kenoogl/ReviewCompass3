@@ -1200,3 +1200,91 @@ def test_installed_entry_returns_the_fixed_stop_outside_the_repository(
     assert result.returncode == 2
     assert result.stdout == _stopped("invalid_path", "arguments")
     assert result.stderr == b""
+
+
+@pytest.mark.parametrize("source", ("design", "acceptance"))
+@pytest.mark.parametrize("schema_version", (True, False, 1.0))
+def test_rejects_non_integer_schema_versions(source, schema_version):
+    module = _module()
+    design = _design()
+    acceptance = _acceptance()
+    if source == "design":
+        design["schema_version"] = schema_version
+    else:
+        acceptance["schema_version"] = schema_version
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        _compare(design, acceptance)
+
+    assert caught.value.reason == "invalid_schema"
+    assert caught.value.source == source
+
+
+def _noncanonical_input_bytes(source, case):
+    if source == "design":
+        prefix = (
+            b'{"design_identifier":"DESIGN-ONE","facts":['
+            b'{"fact_id":"F-X","subject":"x","value":'
+        )
+        suffix = b'}],"schema_version":1}'
+    else:
+        prefix = (
+            b'{"acceptance_identifier":"ACCEPTANCE-ONE","conditions":['
+            b'{"condition_id":"C-X","expected":'
+        )
+        suffix = b',"operator":"equals","subject":"x"}],"schema_version":1}'
+    if case == "huge_integer":
+        value = b"9" * 5000
+    elif case == "surrogate_string":
+        value = b'"\\ud800"'
+    else:
+        value = b'["\\ud800"]'
+        if source == "acceptance":
+            suffix = (
+                b',"operator":"contains_all","subject":"x"}],'
+                b'"schema_version":1}'
+            )
+    return prefix + value + suffix
+
+
+@pytest.mark.parametrize("source", ("design", "acceptance"))
+@pytest.mark.parametrize(
+    "case",
+    ("huge_integer", "surrogate_string", "surrogate_array"),
+)
+def test_rejects_values_that_cannot_be_normalized_to_canonical_json(
+    source,
+    case,
+):
+    module = _module()
+    design_bytes = _json_bytes(_design())
+    acceptance_bytes = _json_bytes(_acceptance())
+    if source == "design":
+        design_bytes = _noncanonical_input_bytes(source, case)
+    else:
+        acceptance_bytes = _noncanonical_input_bytes(source, case)
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        module.compare_inputs(design_bytes, acceptance_bytes)
+
+    assert caught.value.reason == "invalid_schema"
+    assert caught.value.source == source
+
+
+@pytest.mark.parametrize("source", ("design", "acceptance"))
+@pytest.mark.parametrize("case", ("huge_integer", "surrogate_string"))
+def test_entry_classifies_noncanonical_values_as_the_input_schema(
+    tmp_path,
+    source,
+    case,
+):
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    target_path = design_path if source == "design" else acceptance_path
+    target_path.write_bytes(_noncanonical_input_bytes(source, case))
+
+    exit_code, output = _run_entry(
+        _entry_arguments(root, design_path, acceptance_path)
+    )
+
+    assert exit_code == 2
+    assert output == _stopped("invalid_schema", source)
