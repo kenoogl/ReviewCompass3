@@ -6,67 +6,49 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。残る7候補を順に実行中である。
-- 現在作業：候補2は、限定修正後の独立再確認で止める原因・未接続条件・誤合格・禁止作用・退行が各0件となり、条件1〜19を満たした。残る条件20は利用者による製品受入だけである。
-- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / conditions_1_to_19_verified / human_product_acceptance_pending`
+- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
+- 現在作業：候補2のG08は利用者判断により正式受入となった。候補3のG24について、要求固定・機能分割・由来追跡の既存5fileと関連試験、上流文書候補の不一致、利用者価値境界を実測し、Task Contract候補の根拠を作る。
+- Task Contract：`G24 / requirement_fixing_feature_partition_source_trace / contract_definition_evidence_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：現在の候補2実装を妨げず、立て直し計画を未完了へ戻さない持ち越し負債である、次：Issue状態を変更せず、状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：現在のG24契約定義を妨げず、立て直し計画を未完了へ戻さない持ち越し負債である、次：Issue状態を変更せず、状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する
 
 ## 最新のauthority／Evidence
 
-- [止める原因0件で条件1〜19を満たした限定修正独立再確認](records/development/2026-08-15-one-design-acceptance-independent-correction-rereview-v1.md) — SHA-256 `8a4793e617f9d0ce3204ba6c2bc85ce309afb75df0d7add988a8bcb270eda7bc`
-- [形式検査3変種を閉じた限定修正GREEN Evidence](records/development/2026-08-15-one-design-acceptance-independent-correction-green-evidence-v1.md) — SHA-256 `1cbc200bf3e78786dbaacf4590d383d613142074e6ead1927e7ef6227452a1e0`
-- [独立反例3変種の14期待失敗を固定した限定修正RED Evidence](records/development/2026-08-15-one-design-acceptance-independent-correction-red-evidence-v1.md) — SHA-256 `24faa206378cb6ae14f8c8913288ac7d8832ad9dacbcc46110ffdee7462be493`
-- [形式検査1系統3変種で修正要となった独立完了確認v1](records/development/2026-08-15-one-design-acceptance-independent-completion-review-v1.md) — SHA-256 `4af8107d8f617f26720cf34bc6ab12167e8f73c31439ecfc7aa4f14f6ca05888`
-- [境界4の配布・対象・関連・全試験・合成一件completion Evidence](records/development/2026-08-15-one-design-acceptance-boundary4-completion-evidence-v1.md) — SHA-256 `e307eaf7dc9edaf8463b5a66ffb85f46932d1d02f75f481d9f8d27424cd81c09`
-- [境界4の期待失敗3件と原因を固定したRED Evidence](records/development/2026-08-15-one-design-acceptance-boundary4-red-evidence-v1.md) — SHA-256 `ab53723b7e6ce54f3fd6435cdafd4a5552dbe1dfc710b7f7a49387722c6a4ec1`
-- [境界3の正式入口88件と既存関連31件を固定したGREEN Evidence](records/development/2026-08-15-one-design-acceptance-boundary3-green-evidence-v1.md) — SHA-256 `515e84efd523eb4cdb661512c63a0566aa88c4c8ec681f757d3b86c78fa92c6c`
-- [境界3の期待失敗18件と原因を固定したRED Evidence](records/development/2026-08-15-one-design-acceptance-boundary3-red-evidence-v1.md) — SHA-256 `93ee4790afac1a66a9893d544b5afa75431b3c9c34ec2ac44c5e2ca298c89cbf`
-- [境界2の安全読込70件と既存関連31件を固定したGREEN Evidence](records/development/2026-08-15-one-design-acceptance-boundary2-green-evidence-v1.md) — SHA-256 `b76a3033df2e9040bd3b3ec2b4602a68440e1625172633d00af7568e499d960e`
-- [境界2のfixture手戻り・接続漏れ・例外保持訂正Evidence](records/development/2026-08-15-one-design-acceptance-boundary2-test-correction-evidence-v1.md) — SHA-256 `d4cedfab68c4871be8b6c8c57379e18e838fd8a03c83bad5c93723c9b51e1b30`
-- [境界2の期待失敗24件と原因を固定したRED Evidence](records/development/2026-08-15-one-design-acceptance-boundary2-red-evidence-v1.md) — SHA-256 `7fa3eed3ee2170afdbfb8fef1351da1c0addeb43dab4645232dfcabc7e3ec658`
-- [境界1の固定試験43件と既存関連31件を固定したGREEN Evidence](records/development/2026-08-15-one-design-acceptance-boundary1-green-evidence-v1.md) — SHA-256 `eacbcb1198916f00c2cbc6356f2ef5d3a8fab262959b6b3ebcbe033ab0042709`
-- [境界1の期待失敗43件と原因を固定したRED Evidence](records/development/2026-08-15-one-design-acceptance-boundary1-red-evidence-v1.md) — SHA-256 `37790022390ee14875f7b9706604ac448df588a58b182db9245b56f0b911371e`
-- [実装開始前限定再確認・開始可](records/development/2026-08-15-one-design-acceptance-implementation-start-correction-review-v1.md) — SHA-256 `b4a4c837eeb0e74867bff6a9ff5e6696cd7972b2bdb0c94edf30ea9ca1600b15`
-- [条件12だけを限定訂正した実装作業票v2](docs/development/2026-08-15-one-design-acceptance-implementation-work-ticket-v2.md) — SHA-256 `a733a57203a0148c52d722713be4b3948134192da6f5bceef8ab5eb92e9a58ec`
-- [実装開始前独立確認・条件12修正要](records/development/2026-08-15-one-design-acceptance-implementation-start-review-v1.md) — SHA-256 `886f599af67d2b80389b95d3b06b504ab5ae7f77f27723892c3a02b177269db1`
-- [候補2の契約採用・案C実装開始判断](records/development/2026-08-15-one-design-acceptance-contract-adoption-and-implementation-start-decision-v1.md) — SHA-256 `0287184fd38a3b47bc8630ef447c6c491b4cfad2c614692b4cdab99af8abad0d`
-- [独立確認済みの採用契約v3](records/task-contract/2026-08-15-one-design-acceptance-conformance-candidate-v3.md) — SHA-256 `8d8b4a608372162c68665155ecde9c1dce8122402ab1ebea0dc40e2c621bac80`
-- [候補2の既存G08実測と契約定義Evidence](records/development/2026-08-15-one-design-acceptance-contract-definition-evidence-v1.md) — SHA-256 `9bad2d80fcddb6f97f9db71fa05a4811ce59404353aa07fb55c3070784d5f6b5`
-- [直前製品の受入判断](records/development/2026-08-15-one-item-review-product-acceptance-decision-v1.md) — SHA-256 `8401ff7bd145755af2d5893db2da1fd5d00ee62c224d1602c3080c380f454441`
-- [安全保存受入後の次製品作業候補8件](records/development/2026-08-15-post-safe-storage-next-product-work-candidates-v1.md) — SHA-256 `bcb4ba2947e32254edc547068728fa580bc6b7919fa0f04d9b9353ab6c7899ba`
-- [製品コード候補と作業契約入力の目録](records/development/2026-08-14-stage4-product-code-and-task-contract-input-inventory-evidence-v1.md) — SHA-256 `c55367fc6b8f72f7041612cedc11d609b359909156f619fcb72e6d72bd33e72a`
+- [利用者が条件20を満たしたG08製品受入判断](records/development/2026-08-15-one-design-acceptance-product-acceptance-decision-v1.md) — SHA-256 `7e3eb626474f72ebcd3a3d5ec2646cf004ba192606f03684a50ae6f0b251ce86`
+- [G08の条件1〜19をverifiedとした独立再確認](records/development/2026-08-15-one-design-acceptance-independent-correction-rereview-v1.md) — SHA-256 `8a4793e617f9d0ce3204ba6c2bc85ce309afb75df0d7add988a8bcb270eda7bc`
+- [G24を候補3とした次製品作業候補](records/development/2026-08-15-post-safe-storage-next-product-work-candidates-v1.md) — SHA-256 `bcb4ba2947e32254edc547068728fa580bc6b7919fa0f04d9b9353ab6c7899ba`
+- [G24の既存5fileと5試験fileを示す製品候補目録](records/development/2026-08-14-stage4-product-code-and-task-contract-input-inventory-evidence-v1.md) — SHA-256 `c55367fc6b8f72f7041612cedc11d609b359909156f619fcb72e6d72bd33e72a`
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `e3e6b0d2c7a1265f7cde2c2e00cc888f43d63ce0d1945c300b2b2e5f7730b559`
 
 ## 次に行う一作業
 
-利用者へ、製品の働き、根拠、限界、独立再確認結果を一件の判断材料として示し、条件20の製品受入を求める。
+G24の既存5実装file・5試験file、参照する上流要求資料、現行入口と副作用を機械抽出し、目的・使える部分・危険・最小製品境界を一件の契約定義Evidenceへ固定する。
 
 開始条件：
 
-- 独立再確認recordと本TODOが意味単位commitへ固定される
-- 受入対象を固定commit 1fec247の製品2file・試験・配布設定へ限定する
-- AIはHuman条件20を代行せず、受入前に候補3へ進まない
+- G08製品受入Decisionと本TODOが意味単位commitへ固定される
+- G24の既存成果物を変更せず読取り専用で実測する
+- 暫定文書を正式要求へ自動昇格せず、上流不一致を先に列挙する
 
 完了条件：
 
-- 利用者が根拠と限界を確認し、受け入れるか修正を求める
-- 受入なら製品受入Decisionを固定し、完了作業単位をcommitする
-- 受入後にだけ候補3の契約定義へ進む
+- 5実装file・5試験fileの存在、内容識別値、公開関数、作用、関連試験結果を固定する
+- 上流資料候補の一致・不一致と、採用せず保留する入力を示す
+- 異なる3実装案を比較し、最小製品境界をTask Contract候補へ接続する
 
-後続作業：候補2受入後、候補3のG24について目的・既存実装・価値境界を実測し、Task Contract候補を定義する。
+後続作業：G24のTask Contract候補を別担当の定義確認へ渡し、開始可の場合だけ利用者へ採用・実装開始判断を求める。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。技術条件1〜19はverified
-- Human判断待ち：条件20の製品受入。受入対象は固定commit 1fec247の一件設計・受入条件照合製品
+- blocker：なし。G24の上流資料不一致は本調査で確定する
+- Human判断待ち：なし。G08製品受入は完了し、G24は契約候補作成まで承認済みの自律実行範囲
 
 ## stale・deferred
 
-- stale：独立完了確認v1の修正要、形式検査修正待ち、限定再確認待ち、境界1〜4 GREENだけの表示はstale
-- deferred：候補2の製品受入、候補3以降の採用・実装、外部送信、実利用者設計は後続境界まで対象外
+- stale：G08の製品受入待ち、独立再確認待ち、形式検査修正待ちの表示はstale
+- deferred：G24契約の採用・製品実装、候補4以降、外部送信、実利用者要求資料の使用は後続境界まで対象外
 
 ## Git・Test
 
@@ -74,8 +56,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：候補2の既存91件と限定修正16件の計107件、既存G08関連31件が各単独成功、終了コード0。限定修正試験はRED commitから差分0、保護対象4fileは基準commitから差分0
-- 直近の全Test：禁止認証環境6件を除く隔離条件で正規全試験2,127件成功、終了コード0。通常host環境の既存executor安全拒否は独立確認v1でG08退行なしと判断済み
+- 直近の関連Test：G08対象107件、既存G08関連31件が各単独成功、終了コード0。G24関連試験は契約定義Evidence作成時に単独実行する
+- 直近の全Test：禁止認証環境6件を除く隔離条件で正規全試験2,127件成功、終了コード0。通常host環境の既存executor安全拒否はG08独立確認で退行なしと判断済み
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
