@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：利用者は受入済み部品の運用化目標を指示し、候補4（G30最小作業契約実行）の契約定義を選択した。運用化目標recordを固定し、G30の最初の縦切り『最小運用契約実行』（承認済み運用契約一件→固定registry部品一件の実行→束縛照合→実行記録一件の着地）の契約候補v1を作成した。独立確認は未実施で、実装開始不可である。候補3のG24は縦切り受入済み・作成責務が後続に残る。
-- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v1 / independent_review_pending`
+- 現在作業：G30最初の縦切り『最小運用契約実行』の契約候補v1はCodex独立確認で2原因（一件レビュー部品と現物の形式不一致、停止時無作成と書込み後失敗の矛盾）の修正要となった。利用者の本線1-4自律実行指示に基づき、2原因だけを訂正した契約候補v2（registryをG08・G24の2操作へ縮小、一時成果＋hard link原子公開の書込み境界）を作成し、Codexの限定再確認へ進む。実装は未開始である。
+- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v2 / limited_independent_rereview_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,36 +17,37 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
-- [最小運用契約実行の作業契約候補v1](records/task-contract/2026-08-16-minimal-operation-contract-execution-candidate-v1.md) — SHA-256 `1ed92a89a96550fe1ea5df74fc40fd74102694e8bfefa07b5ec0c9d09df1bb6d`
+- [2原因を限定訂正した最小運用契約実行の契約候補v2](records/task-contract/2026-08-16-minimal-operation-contract-execution-candidate-v2.md) — SHA-256 `927965f9502c0762c0ba289968d37d16237ae0ef433f15c2ac53cc8dacd94090`
+- [契約候補v1を2原因で修正要としたCodex独立確認](records/development/2026-08-16-minimal-operation-contract-execution-v1-independent-review-v1.md) — SHA-256 `3eb9eba738171ac0f66572de1da5454377684f5ab4d4c110e85397c86657e5ca`
 - [利用者による一件の要求候補整合検査の製品受入判断](records/development/2026-08-16-one-requirement-candidate-consistency-check-product-acceptance-decision-v1.md) — SHA-256 `dd9edcfd5895c143f7c83c05dcc2df986d36d066030782a5577d534071866fd8`
 - [次製品作業の候補一覧（8候補・推奨順）](records/development/2026-08-15-post-safe-storage-next-product-work-candidates-v1.md) — SHA-256 `bcb4ba2947e32254edc547068728fa580bc6b7919fa0f04d9b9353ab6c7899ba`
 - [現行50要求を解決する要求権限束v2](records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json) — SHA-256 `760e33ea2ecf6937f56d7bf8d2bd703b18b47dbd2bd6b2bd5919e0dd556d9dae`
 
 ## 次に行う一作業
 
-契約候補v1の作成を担当しなかった別担当（Codex）が、固定された契約候補v1を成果物変更なしで読み、定義反証
-（目的縮小の固定、機微検査、正常・停止形式の一意性、再利用・保護基準、書込み一件の境界）を行い、
-開始可または修正要の判定record 1件を単独commitして停止する。起動はClaudeがcodex execで行う。
+Codexが固定された契約候補v2を成果物変更なしで読み、v1の停止原因2系統（一件レビュー部品の除外で形式不一致が
+閉じたか、一時成果＋原子公開で書込み境界が両立するか）と、他境界の退行の有無だけを限定再確認し、判定record
+1件を単独commitして停止する。起動はClaudeがcodex execで行う（利用者の本線1-4自律実行指示による）。
 
 開始条件：
 
-- 運用化目標record、契約候補v1、本TODOが意味単位commitへ固定され、作業treeがcleanである
-- 起動は利用者の指示を受けてClaudeが行い、Codexは依頼recordの鮮度検査に合格してから動く
+- 契約候補v2、依頼record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- Codexは依頼recordの鮮度検査に合格してから動く
 - 製品コード、既存試験、既存G30基盤、受入済み部品を変更せず読取り専用で確認する
 
 完了条件：
 
-- 4系統の定義反証と、file書込み境界（新規一件・上書きなし・停止時無作成）の後決め要素の有無を確認する
-- 再利用6 file・保護8 path・機微規則の内容識別値一致を機械確認する
+- 訂正2点の閉鎖と、v1で問題なしとされた境界（目的縮小、機微検査、束縛照合位置、固定識別値）の退行有無を確認する
+- 再利用4 file・保護10 path・機微規則の内容識別値一致を機械確認する
 - 判定recordに開始可または修正要を根拠、未接続条件、最小修正とともに書き、単独commitして停止する
 - Claudeが判定recordの鮮度・変更path 1件・判定内容を機械照合する
 
-後続作業（Claudeが実施）：開始可なら利用者へ『G30全体ではない最初の実行縦切り』の採用と案Cの実装開始を一判断として求め、修正要なら契約だけを次版へ訂正する。
+後続作業（Claudeが実施、自律実行指示の範囲）：開始可なら条件付き事前承認に基づき採用judgmentを記録して実装（失敗試験→最小実装→退行確認→独立完了レビュー）へ進み、修正要なら契約だけを次版へ訂正する。最終の製品受入だけは利用者判断として残す。
 
 ## blocker・Human判断待ち
 
 - blocker：技術blockerなし
-- Human判断待ち：契約候補v1の独立確認用のCodex起動指示。開始可になるまで縮小境界の採用と実装開始判断を求めない
+- Human判断待ち：なし。利用者の本線1-4自律実行指示の下で進行中。最終の製品受入だけを後で求める
 
 ## stale・deferred
 
