@@ -836,3 +836,172 @@ def test_plan_delete_rejects_unknown_file_without_changes(tmp_path):
 
     assert caught.value.reason == "record_conflict"
     assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+@pytest.mark.parametrize("bad_confirmation", (None, "0" * 64, "f" * 64))
+def test_delete_record_rejects_bad_confirmation_without_changes(
+    tmp_path,
+    bad_confirmation,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+    if bad_confirmation == plan["confirmation_sha256"]:
+        bad_confirmation = "e" * 64
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.delete_record(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+            confirmation_sha256=bad_confirmation,
+            deleted_at="2026-08-15T13:00:00+00:00",
+        )
+
+    assert caught.value.reason == "confirmation_mismatch"
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+def test_delete_record_keeps_audit_until_explicit_post_retention_delete(tmp_path):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    other_sensitive = arguments["sensitive_root"] / ("a" * 64)
+    other_data = arguments["data_root"] / ("a" * 64)
+    other_sensitive.mkdir(mode=0o700)
+    other_data.mkdir(mode=0o700)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+
+    result = storage.delete_record(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+        confirmation_sha256=plan["confirmation_sha256"],
+        deleted_at="2026-08-15T13:00:00+00:00",
+    )
+
+    assert result == {
+        "deleted": True,
+        "external_send_approved": False,
+        "record_id": stored["record_id"],
+        "status": "deleted",
+    }
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    assert list(sensitive_record.iterdir()) == []
+    assert {path.name for path in data_record.iterdir()} == {"deleted.json"}
+    audit = _stored_json(data_record / "deleted.json")
+    assert set(audit) == {
+        "deleted",
+        "deleted_at",
+        "deleted_sha256",
+        "record_id",
+        "retention_until",
+        "schema_version",
+    }
+    assert audit["deleted"] is True
+    assert "confirmation" not in _canonical_bytes(audit).decode("utf-8")
+    assert other_sensitive.is_dir()
+    assert other_data.is_dir()
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.plan_delete(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+            current_at="2026-08-15T14:00:00+00:00",
+        )
+    assert caught.value.reason == "audit_retention_active"
+
+    audit_plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+        current_at="2026-08-16T00:00:01+00:00",
+    )
+    assert audit_plan["state"] == "deleted"
+    assert [target["name"] for target in audit_plan["targets"]] == ["deleted.json"]
+    removed = storage.delete_record(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+        confirmation_sha256=audit_plan["confirmation_sha256"],
+        deleted_at="2026-08-16T00:00:02+00:00",
+        current_at="2026-08-16T00:00:02+00:00",
+    )
+    assert removed["status"] == "audit_removed"
+    assert list(data_record.iterdir()) == []
+    assert other_sensitive.is_dir()
+    assert other_data.is_dir()
+
+
+@pytest.mark.parametrize(
+    "fault_point",
+    ("first_deleting", "raw.bin", "derived.json", "commit.json"),
+)
+def test_delete_record_retries_same_confirmation_after_failure(
+    tmp_path,
+    monkeypatch,
+    fault_point,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+    original_replace = storage._replace_file
+    original_unlink = getattr(storage, "_unlink_verified", None)
+    injected = False
+
+    def failing_replace(directory_fd, final_name, content):
+        nonlocal injected
+        result = original_replace(directory_fd, final_name, content)
+        if not injected and fault_point == "first_deleting" and b'"state":"deleting"' in content:
+            injected = True
+            raise storage.StorageStop("injected_delete_failure")
+        return result
+
+    def failing_unlink(directory_fd, name):
+        nonlocal injected
+        result = original_unlink(directory_fd, name)
+        if not injected and name == fault_point:
+            injected = True
+            raise storage.StorageStop("injected_delete_failure")
+        return result
+
+    monkeypatch.setattr(storage, "_replace_file", failing_replace)
+    monkeypatch.setattr(storage, "_unlink_verified", failing_unlink, raising=False)
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.delete_record(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+            confirmation_sha256=plan["confirmation_sha256"],
+            deleted_at="2026-08-15T13:00:00+00:00",
+        )
+    assert caught.value.reason == "injected_delete_failure"
+    assert injected is True
+
+    monkeypatch.setattr(storage, "_replace_file", original_replace)
+    monkeypatch.setattr(storage, "_unlink_verified", original_unlink, raising=False)
+    result = storage.delete_record(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+        confirmation_sha256=plan["confirmation_sha256"],
+        deleted_at="2026-08-15T13:00:00+00:00",
+    )
+
+    assert result["status"] == "deleted"

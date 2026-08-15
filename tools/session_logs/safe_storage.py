@@ -424,6 +424,36 @@ def _replace_file(directory_fd, final_name, content):
     _verify_final_file(directory_fd, final_name, content)
 
 
+def _unlink_verified(directory_fd, name):
+    """属性を利用時点で再確認した固定fileだけを削除する。"""
+
+    _validate_created_fd(directory_fd, "directory", 0o700)
+    try:
+        file_descriptor = os.open(
+            name,
+            os.O_RDONLY | os.O_NOFOLLOW,
+            dir_fd=directory_fd,
+        )
+    except FileNotFoundError:
+        return
+    except OSError as error:
+        raise StorageStop("record_conflict") from error
+    try:
+        _validate_created_fd(file_descriptor, "file", 0o600)
+    finally:
+        os.close(file_descriptor)
+    try:
+        os.unlink(name, dir_fd=directory_fd)
+        os.fsync(directory_fd)
+    except OSError as error:
+        raise StorageStop("storage_write_failed") from error
+    try:
+        os.stat(name, dir_fd=directory_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        return
+    raise StorageStop("storage_verification_failed")
+
+
 def _derived_result(safe_result):
     try:
         derived = {key: safe_result[key] for key in _DERIVED_KEYS}
@@ -964,7 +994,42 @@ def load_derived(*, sensitive_root, data_root, record_id, current_at):
         os.close(data_root_fd)
 
 
-def plan_delete(*, sensitive_root, data_root, record_id):
+def _audit_document(content, record_id):
+    audit = _integrity_json(content)
+    if set(audit) != {
+        "deleted",
+        "deleted_at",
+        "deleted_sha256",
+        "record_id",
+        "retention_until",
+        "schema_version",
+    }:
+        raise StorageStop("record_integrity_failed")
+    if (
+        audit.get("deleted") is not True
+        or audit.get("record_id") != record_id
+        or audit.get("schema_version") != 1
+        or not isinstance(audit.get("deleted_sha256"), str)
+        or len(audit["deleted_sha256"]) != 64
+        or any(
+            character not in "0123456789abcdef"
+            for character in audit["deleted_sha256"]
+        )
+    ):
+        raise StorageStop("record_integrity_failed")
+    _timestamp(audit.get("deleted_at"), "record_integrity_failed")
+    _timestamp(audit.get("retention_until"), "record_integrity_failed")
+    return audit
+
+
+def _delete_plan(plan):
+    return {
+        **plan,
+        "confirmation_sha256": sha256_hex(canonical_json_bytes(plan)),
+    }
+
+
+def plan_delete(*, sensitive_root, data_root, record_id, current_at=None):
     """当該記録の実在固定fileだけから読取り専用の削除計画を返す。"""
 
     sensitive_root = _path(sensitive_root)
@@ -993,6 +1058,65 @@ def plan_delete(*, sensitive_root, data_root, record_id):
         }
         if not sensitive_names <= allowed_sensitive or not data_names <= allowed_data:
             raise StorageStop("record_conflict")
+        for record_fd, names in (
+            (sensitive_record_fd, sensitive_names),
+            (data_record_fd, data_names),
+        ):
+            if record_fd is None:
+                continue
+            _validate_created_fd(record_fd, "directory", 0o700)
+            for name in names:
+                _read_existing_file(record_fd, name)
+
+        body_names = {
+            "raw.bin",
+            "raw.bin.tmp",
+            "derived.json",
+            "derived.json.tmp",
+            "manifest.json",
+            "manifest.json.tmp",
+            "commit.json",
+            "commit.json.tmp",
+        }
+        if "deleted.json" in data_names and not (
+            sensitive_names | data_names
+        ) & body_names:
+            audit = _audit_document(
+                _read_existing_file(data_record_fd, "deleted.json"),
+                record_id,
+            )
+            if current_at is None:
+                raise StorageStop("audit_retention_active")
+            current_time = _timestamp(current_at, "invalid_current_at")
+            retention_time = _timestamp(
+                audit["retention_until"],
+                "record_integrity_failed",
+            )
+            if current_time <= retention_time:
+                raise StorageStop("audit_retention_active")
+            targets = []
+            for area, names in (
+                ("sensitive", sensitive_names),
+                ("data", data_names),
+            ):
+                for name in sorted(names):
+                    targets.append({
+                        "area": area,
+                        "kind": "temporary" if name.endswith(".tmp") else "final",
+                        "name": name,
+                    })
+            return _delete_plan({
+                "audit": {"action": "remove"},
+                "external_send_approved": False,
+                "manifest_sha256": None,
+                "operation_sha256": None,
+                "record_id": record_id,
+                "state": "deleted",
+                "status": "delete_planned",
+                "target_count": len(targets),
+                "targets": targets,
+            })
+
         operation_documents = []
         for record_fd, names in (
             (sensitive_record_fd, sensitive_names),
@@ -1049,9 +1173,285 @@ def plan_delete(*, sensitive_root, data_root, record_id):
             "target_count": len(targets),
             "targets": targets,
         }
+        return _delete_plan(plan)
+    finally:
+        if sensitive_record_fd is not None:
+            os.close(sensitive_record_fd)
+        if data_record_fd is not None:
+            os.close(data_record_fd)
+        os.close(sensitive_root_fd)
+        os.close(data_root_fd)
+
+
+def _operation_without_deletion(operation):
+    return {
+        key: value
+        for key, value in operation.items()
+        if key != "deletion_confirmation_sha256"
+    }
+
+
+def _validate_deleting_operations(operation_documents, record_id):
+    deleting = [
+        operation
+        for ignored, operation in operation_documents
+        if operation.get("state") == "deleting"
+    ]
+    if not deleting:
+        return None
+    reference = deleting[0]
+    confirmation = reference.get("deletion_confirmation_sha256")
+    if (
+        reference.get("record_id") != record_id
+        or not isinstance(confirmation, str)
+        or len(confirmation) != 64
+        or any(character not in "0123456789abcdef" for character in confirmation)
+    ):
+        raise StorageStop("record_conflict")
+    reference_base = _operation_without_deletion(reference)
+    reference_base["state"] = "committed"
+    for ignored, operation in operation_documents:
+        if operation.get("state") == "deleting":
+            if operation != reference:
+                raise StorageStop("record_conflict")
+            continue
+        candidate = _operation_without_deletion(operation)
+        if candidate.get("state") not in {"committed", "incomplete"}:
+            raise StorageStop("record_conflict")
+        candidate["state"] = "committed"
+        if candidate != reference_base:
+            raise StorageStop("record_conflict")
+    return reference
+
+
+def _finish_deleting_operation(record_fd, deleting_bytes):
+    names = set(os.listdir(record_fd))
+    if "operation.json.tmp" in names:
+        if _read_existing_file(record_fd, "operation.json.tmp") != deleting_bytes:
+            raise StorageStop("record_conflict")
+        os.rename(
+            "operation.json.tmp",
+            "operation.json",
+            src_dir_fd=record_fd,
+            dst_dir_fd=record_fd,
+        )
+        os.fsync(record_fd)
+        _verify_final_file(record_fd, "operation.json", deleting_bytes)
+        return
+    if "operation.json" not in names:
+        _publish_file(record_fd, "operation.json", deleting_bytes)
+        return
+    if _read_existing_file(record_fd, "operation.json") != deleting_bytes:
+        _replace_file(record_fd, "operation.json", deleting_bytes)
+
+
+def _record_operation_documents(record_pairs):
+    documents = []
+    for record_fd, names in record_pairs:
+        if record_fd is None:
+            continue
+        for name in ("operation.json", "operation.json.tmp"):
+            if name in names:
+                content = _read_existing_file(record_fd, name)
+                documents.append((content, _integrity_json(content)))
+    return documents
+
+
+def delete_record(
+    *,
+    sensitive_root,
+    data_root,
+    record_id,
+    confirmation_sha256,
+    deleted_at,
+    current_at=None,
+):
+    """確認済みの一記録だけを削除し、期限付き監査印を残す。"""
+
+    sensitive_root = _path(sensitive_root)
+    data_root = _path(data_root)
+    _validate_storage_root(sensitive_root)
+    _validate_storage_root(data_root)
+    record_id = _record_name(record_id)
+    _timestamp(deleted_at, "invalid_deleted_at")
+    sensitive_root_fd = _open_directory_fd(sensitive_root)
+    data_root_fd = _open_directory_fd(data_root)
+    sensitive_record_fd = None
+    data_record_fd = None
+    try:
+        sensitive_record_fd = _open_existing_record(sensitive_root_fd, record_id)
+        data_record_fd = _open_existing_record(data_root_fd, record_id)
+        if sensitive_record_fd is None and data_record_fd is None:
+            raise StorageStop("record_not_found")
+        sensitive_names = (
+            set()
+            if sensitive_record_fd is None
+            else set(os.listdir(sensitive_record_fd))
+        )
+        data_names = (
+            set()
+            if data_record_fd is None
+            else set(os.listdir(data_record_fd))
+        )
+        allowed_sensitive = set(_SENSITIVE_FINAL_FILES) | {
+            f"{name}.tmp" for name in _SENSITIVE_FINAL_FILES
+        }
+        allowed_data = set(_DATA_FINAL_FILES) | {
+            f"{name}.tmp" for name in _DATA_FINAL_FILES
+        }
+        if not sensitive_names <= allowed_sensitive or not data_names <= allowed_data:
+            raise StorageStop("record_conflict")
+        for record_fd, names in (
+            (sensitive_record_fd, sensitive_names),
+            (data_record_fd, data_names),
+        ):
+            if record_fd is None:
+                continue
+            _validate_created_fd(record_fd, "directory", 0o700)
+            for name in names:
+                _read_existing_file(record_fd, name)
+
+        body_names = {
+            "raw.bin",
+            "raw.bin.tmp",
+            "derived.json",
+            "derived.json.tmp",
+            "manifest.json",
+            "manifest.json.tmp",
+            "commit.json",
+            "commit.json.tmp",
+        }
+        audit_present = "deleted.json" in data_names
+        operation_documents = _record_operation_documents((
+            (sensitive_record_fd, sensitive_names),
+            (data_record_fd, data_names),
+        ))
+        deleting_operation = _validate_deleting_operations(
+            operation_documents,
+            record_id,
+        )
+
+        if audit_present and not (sensitive_names | data_names) & body_names:
+            if deleting_operation is not None and confirmation_sha256 == deleting_operation.get(
+                "deletion_confirmation_sha256"
+            ):
+                pass
+            else:
+                audit_plan = plan_delete(
+                    sensitive_root=sensitive_root,
+                    data_root=data_root,
+                    record_id=record_id,
+                    current_at=current_at,
+                )
+                if confirmation_sha256 != audit_plan["confirmation_sha256"]:
+                    raise StorageStop("confirmation_mismatch")
+                for record_fd, names in (
+                    (sensitive_record_fd, sensitive_names),
+                    (data_record_fd, data_names),
+                ):
+                    if record_fd is None:
+                        continue
+                    for name in sorted(names):
+                        _unlink_verified(record_fd, name)
+                return {
+                    "external_send_approved": False,
+                    "record_id": record_id,
+                    "status": "audit_removed",
+                }
+
+        if deleting_operation is None:
+            plan = plan_delete(
+                sensitive_root=sensitive_root,
+                data_root=data_root,
+                record_id=record_id,
+            )
+            if confirmation_sha256 != plan["confirmation_sha256"]:
+                raise StorageStop("confirmation_mismatch")
+            if not operation_documents:
+                raise StorageStop("record_unrecoverable")
+            operation = operation_documents[0][1]
+            if any(
+                document != operation
+                for ignored, document in operation_documents[1:]
+            ):
+                raise StorageStop("record_conflict")
+            deleting_operation = {
+                **operation,
+                "deletion_confirmation_sha256": confirmation_sha256,
+                "state": "deleting",
+            }
+        elif confirmation_sha256 != deleting_operation.get(
+            "deletion_confirmation_sha256"
+        ):
+            raise StorageStop("confirmation_mismatch")
+
+        if sensitive_record_fd is None or data_record_fd is None:
+            raise StorageStop("record_unrecoverable")
+        deleting_bytes = canonical_json_bytes(deleting_operation)
+        _finish_deleting_operation(sensitive_record_fd, deleting_bytes)
+        _finish_deleting_operation(data_record_fd, deleting_bytes)
+
+        for name in ("raw.bin.tmp", "raw.bin"):
+            _unlink_verified(sensitive_record_fd, name)
+        for name in (
+            "derived.json.tmp",
+            "derived.json",
+            "manifest.json.tmp",
+            "manifest.json",
+            "commit.json.tmp",
+            "commit.json",
+        ):
+            _unlink_verified(data_record_fd, name)
+        remaining_sensitive = set(os.listdir(sensitive_record_fd))
+        remaining_data = set(os.listdir(data_record_fd))
+        if remaining_sensitive - {"operation.json", "operation.json.tmp"}:
+            raise StorageStop("storage_verification_failed")
+        if remaining_data - {
+            "operation.json",
+            "operation.json.tmp",
+            "deleted.json",
+            "deleted.json.tmp",
+        }:
+            raise StorageStop("storage_verification_failed")
+
+        audit = {
+            "deleted": True,
+            "deleted_at": deleted_at,
+            "deleted_sha256": sha256_hex(canonical_json_bytes(
+                deleting_operation.get("expected_sha256")
+            )),
+            "record_id": record_id,
+            "retention_until": deleting_operation.get("retention_until"),
+            "schema_version": 1,
+        }
+        audit_bytes = canonical_json_bytes(audit)
+        if "deleted.json" in remaining_data:
+            if _read_existing_file(data_record_fd, "deleted.json") != audit_bytes:
+                raise StorageStop("record_conflict")
+        elif "deleted.json.tmp" in remaining_data:
+            if _read_existing_file(data_record_fd, "deleted.json.tmp") != audit_bytes:
+                raise StorageStop("record_conflict")
+            os.rename(
+                "deleted.json.tmp",
+                "deleted.json",
+                src_dir_fd=data_record_fd,
+                dst_dir_fd=data_record_fd,
+            )
+            os.fsync(data_record_fd)
+            _verify_final_file(data_record_fd, "deleted.json", audit_bytes)
+        else:
+            _publish_file(data_record_fd, "deleted.json", audit_bytes)
+        _verify_final_file(data_record_fd, "deleted.json", audit_bytes)
+
+        _unlink_verified(sensitive_record_fd, "operation.json.tmp")
+        _unlink_verified(data_record_fd, "operation.json.tmp")
+        _unlink_verified(sensitive_record_fd, "operation.json")
+        _unlink_verified(data_record_fd, "operation.json")
         return {
-            **plan,
-            "confirmation_sha256": sha256_hex(canonical_json_bytes(plan)),
+            "deleted": True,
+            "external_send_approved": False,
+            "record_id": record_id,
+            "status": "deleted",
         }
     finally:
         if sensitive_record_fd is not None:
