@@ -710,3 +710,211 @@ def test_rejects_unsafe_result_strings_without_exposing_them(
 
     assert caught.value.reason == reason
     assert candidate not in str(caught.value)
+
+
+def _finding(finding_id, issue_key, *, severity="warning", title="Issue", description="Description."):
+    return {
+        "finding_id": finding_id,
+        "issue_key": issue_key,
+        "severity": severity,
+        "title": title,
+        "description": description,
+        "criterion_ids": ["C-1"],
+        "start_line": 1,
+        "end_line": 1,
+    }
+
+
+def _organization_results(material_sha256):
+    duplicate_finding = _finding(
+        "F-DUP",
+        "ISSUE-DUP",
+        title="Duplicated review issue",
+    )
+    return {
+        "schema_version": 1,
+        "material_package_sha256": material_sha256,
+        "reviews": [
+            {
+                "reviewer_id": "R-B",
+                "verdict": "findings_present",
+                "summary": "Second report.",
+                "findings": [
+                    _finding("F-M2", "ISSUE-MATCH", title="Matching issue"),
+                    _finding(
+                        "F-C2",
+                        "ISSUE-CONFLICT",
+                        severity="info",
+                        title="Different conflict wording",
+                    ),
+                    _finding("F-K2", "ISSUE-KEY-2", title="Same signature"),
+                ],
+            },
+            {
+                "reviewer_id": "R-A",
+                "verdict": "findings_present",
+                "summary": "First report.",
+                "findings": [
+                    _finding("F-S", "ISSUE-SINGLE", title="Single issue"),
+                    _finding("F-M1", "ISSUE-MATCH", title="Matching issue"),
+                    _finding("F-C1", "ISSUE-CONFLICT", title="Conflict wording"),
+                    _finding("F-K1", "ISSUE-KEY-1", title="Same signature"),
+                ],
+            },
+            {
+                "reviewer_id": "R-C",
+                "verdict": "insufficient_evidence",
+                "summary": "Evidence is insufficient.",
+                "findings": [],
+            },
+            {
+                "reviewer_id": "R-E",
+                "verdict": "findings_present",
+                "summary": "Duplicated report.",
+                "findings": [duplicate_finding],
+            },
+            {
+                "reviewer_id": "R-D",
+                "verdict": "findings_present",
+                "summary": "Duplicated report.",
+                "findings": [duplicate_finding],
+            },
+        ],
+    }
+
+
+def _organize(review, results=None):
+    material = _prepare(review)
+    supplied = (
+        _organization_results(material["material_package_sha256"])
+        if results is None
+        else results
+    )
+    validated = review.validate_results(material, _canonical(supplied))
+    return material, review.organize_results(material, validated)
+
+
+def test_organizes_every_issue_and_preserves_every_human_decision():
+    review = _review()
+    material, actual = _organize(review)
+
+    assert set(actual) == {
+        "status",
+        "schema_version",
+        "decision_status",
+        "material",
+        "result_set_sha256",
+        "reviews",
+        "counts",
+        "issue_groups",
+        "possible_duplicate_reviews",
+        "possible_duplicate_keys",
+        "insufficient_evidence_reviewers",
+        "unresolved_issue_keys",
+        "human_decision_queue",
+        "grouping_basis",
+        "semantic_deduplication_performed",
+        "external_send_approved",
+    }
+    assert actual["status"] == "results_organized"
+    assert actual["decision_status"] == "pending_human_decision"
+    assert actual["external_send_approved"] is False
+    assert actual["semantic_deduplication_performed"] is False
+    assert actual["material"] == {
+        "identifier": material["material"]["identifier"],
+        "content_sha256": material["material"]["content_sha256"],
+        "material_package_sha256": material["material_package_sha256"],
+    }
+    assert actual["counts"] == {
+        "review_count": 5,
+        "finding_count": 9,
+        "issue_count": 6,
+    }
+    dispositions = {
+        group["issue_key"]: group["disposition"]
+        for group in actual["issue_groups"]
+    }
+    assert dispositions == {
+        "ISSUE-CONFLICT": "conflict",
+        "ISSUE-DUP": "single_report",
+        "ISSUE-KEY-1": "single_report",
+        "ISSUE-KEY-2": "single_report",
+        "ISSUE-MATCH": "matching_reports",
+        "ISSUE-SINGLE": "single_report",
+    }
+    assert actual["insufficient_evidence_reviewers"] == ["R-C"]
+    assert actual["unresolved_issue_keys"] == [
+        "ISSUE-CONFLICT",
+        "ISSUE-DUP",
+        "ISSUE-KEY-1",
+        "ISSUE-KEY-2",
+        "ISSUE-SINGLE",
+    ]
+    assert [item["reviewer_id"] for item in actual["reviews"]] == [
+        "R-A", "R-B", "R-C", "R-D", "R-E",
+    ]
+    assert "content" not in actual["material"]
+
+
+def test_duplicate_reviews_are_flagged_and_not_counted_as_matching_evidence():
+    review = _review()
+    _, actual = _organize(review)
+
+    assert len(actual["possible_duplicate_reviews"]) == 1
+    assert actual["possible_duplicate_reviews"][0]["reviewer_ids"] == ["R-D", "R-E"]
+    duplicate_group = next(
+        item for item in actual["issue_groups"] if item["issue_key"] == "ISSUE-DUP"
+    )
+    assert duplicate_group["reporters"] == ["R-D", "R-E"]
+    assert duplicate_group["disposition"] == "single_report"
+
+
+def test_matching_and_duplicate_candidates_all_remain_in_the_human_queue():
+    review = _review()
+    _, actual = _organize(review)
+
+    kinds = [item["kind"] for item in actual["human_decision_queue"]]
+    assert kinds == sorted(
+        kinds,
+        key=(
+            "insufficient_evidence",
+            "conflict",
+            "possible_duplicate_review",
+            "possible_duplicate_key",
+            "single_report",
+            "matching_reports",
+        ).index,
+    )
+    assert set(kinds) == {
+        "insufficient_evidence",
+        "conflict",
+        "possible_duplicate_review",
+        "possible_duplicate_key",
+        "single_report",
+        "matching_reports",
+    }
+    assert any(
+        item["kind"] == "matching_reports"
+        and item["identifiers"] == ["ISSUE-MATCH"]
+        for item in actual["human_decision_queue"]
+    )
+
+
+def test_organization_is_independent_of_all_set_like_input_order():
+    review = _review()
+    material = _prepare(review)
+    first = _organization_results(material["material_package_sha256"])
+    second = json.loads(json.dumps(first))
+    second["reviews"].reverse()
+    for item in second["reviews"]:
+        item["findings"].reverse()
+        for finding in item["findings"]:
+            finding["criterion_ids"].reverse()
+
+    first_validated = review.validate_results(material, _canonical(first))
+    second_validated = review.validate_results(material, _canonical(second))
+
+    assert review.organize_results(material, first_validated) == review.organize_results(
+        material,
+        second_validated,
+    )
