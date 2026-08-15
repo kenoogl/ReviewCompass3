@@ -1200,6 +1200,57 @@ def test_delete_record_retries_same_confirmation_after_failure(
     assert result["status"] == "deleted"
 
 
+def test_delete_record_reuses_existing_audit_when_retry_time_changes(
+    tmp_path,
+    monkeypatch,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+    )
+    original_unlink = storage._unlink_verified
+    injected = False
+
+    def stop_before_operation_removal(directory_fd, name):
+        nonlocal injected
+        if not injected and name == "operation.json":
+            injected = True
+            raise storage.StorageStop("injected_delete_failure")
+        return original_unlink(directory_fd, name)
+
+    monkeypatch.setattr(storage, "_unlink_verified", stop_before_operation_removal)
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.delete_record(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+            confirmation_sha256=plan["confirmation_sha256"],
+            deleted_at="2026-08-15T13:00:00+00:00",
+        )
+    assert caught.value.reason == "injected_delete_failure"
+    assert injected is True
+    data_record = arguments["data_root"] / stored["record_id"]
+    original_audit = (data_record / "deleted.json").read_bytes()
+
+    monkeypatch.setattr(storage, "_unlink_verified", original_unlink)
+    result = storage.delete_record(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=stored["record_id"],
+        confirmation_sha256=plan["confirmation_sha256"],
+        deleted_at="2026-08-15T13:00:01+00:00",
+    )
+
+    assert result["status"] == "deleted"
+    assert (data_record / "deleted.json").read_bytes() == original_audit
+    assert _stored_json(data_record / "deleted.json")["deleted_at"] == (
+        "2026-08-15T13:00:00+00:00"
+    )
+
+
 def _invoke_existing_operation(storage, operation, arguments, stored, plan=None):
     if operation == "store":
         return storage.store_new(

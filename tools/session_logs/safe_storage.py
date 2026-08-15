@@ -1640,20 +1640,45 @@ def delete_record(
         }:
             raise StorageStop("storage_verification_failed")
 
-        audit = {
-            "deleted": True,
-            "deleted_at": deleted_at,
-            "deleted_sha256": sha256_hex(canonical_json_bytes(
-                deleting_operation.get("expected_sha256")
-            )),
-            "record_id": record_id,
-            "retention_until": deleting_operation.get("retention_until"),
-            "schema_version": 1,
-        }
-        audit_bytes = canonical_json_bytes(audit)
-        if "deleted.json" in remaining_data:
-            if _read_existing_file(data_record_fd, "deleted.json") != audit_bytes:
+        deleted_sha256 = sha256_hex(canonical_json_bytes(
+            deleting_operation.get("expected_sha256")
+        ))
+        existing_audit_name = None
+        for name in ("deleted.json", "deleted.json.tmp"):
+            if name in remaining_data:
+                existing_audit_name = name
+                break
+        if existing_audit_name is not None:
+            audit_bytes = _read_existing_file(
+                data_record_fd,
+                existing_audit_name,
+            )
+            audit = _audit_document(audit_bytes, record_id)
+            if (
+                audit.get("deleted_sha256") != deleted_sha256
+                or audit.get("retention_until")
+                != deleting_operation.get("retention_until")
+            ):
                 raise StorageStop("record_conflict")
+        else:
+            audit = {
+                "deleted": True,
+                "deleted_at": deleted_at,
+                "deleted_sha256": deleted_sha256,
+                "record_id": record_id,
+                "retention_until": deleting_operation.get("retention_until"),
+                "schema_version": 1,
+            }
+            audit_bytes = canonical_json_bytes(audit)
+        if "deleted.json" in remaining_data:
+            _verify_final_file(data_record_fd, "deleted.json", audit_bytes)
+            if "deleted.json.tmp" in remaining_data:
+                if _read_existing_file(
+                    data_record_fd,
+                    "deleted.json.tmp",
+                ) != audit_bytes:
+                    raise StorageStop("record_conflict")
+                _unlink_verified(data_record_fd, "deleted.json.tmp")
         elif "deleted.json.tmp" in remaining_data:
             if _read_existing_file(data_record_fd, "deleted.json.tmp") != audit_bytes:
                 raise StorageStop("record_conflict")
