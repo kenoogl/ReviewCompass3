@@ -250,3 +250,198 @@ def test_preflight_accepts_safe_values_without_creating_files(tmp_path):
     }
     assert _snapshot(arguments["sensitive_root"]) == sensitive_before
     assert _snapshot(arguments["data_root"]) == data_before
+
+
+def _canonical_bytes(value):
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+
+
+def _stored_json(path):
+    content = path.read_bytes()
+    value = json.loads(content)
+    assert content == _canonical_bytes(value)
+    return value
+
+
+def test_store_new_commits_fixed_files_with_safe_content(
+    tmp_path,
+    monkeypatch,
+):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+    raw_secret = b"raw-secret-value\n"
+    arguments["raw_log"].write_bytes(raw_secret)
+    arguments["safe_result"] = _safe_result(raw_secret)
+    arguments["safe_result"]["provenance"]["source_path"] = "session.jsonl"
+    published = []
+    original_publish = getattr(storage, "_publish_file", None)
+
+    def recording_publish(directory_fd, final_name, content):
+        published.append(final_name)
+        return original_publish(directory_fd, final_name, content)
+
+    monkeypatch.setattr(
+        storage,
+        "_publish_file",
+        recording_publish,
+        raising=False,
+    )
+
+    result = storage.store_new(
+        **arguments,
+        stored_at="2026-08-15T00:00:00+00:00",
+        retention_until="2026-08-16T00:00:00+00:00",
+    )
+
+    assert result["status"] == "stored"
+    assert result["committed"] is True
+    assert result["external_send_approved"] is False
+    assert published[-1] == "commit.json"
+    record_id = result["record_id"]
+    assert len(record_id) == 64
+    assert set(record_id) <= set("0123456789abcdef")
+
+    sensitive_record = arguments["sensitive_root"] / record_id
+    data_record = arguments["data_root"] / record_id
+    assert {path.name for path in sensitive_record.iterdir()} == {
+        "operation.json",
+        "raw.bin",
+    }
+    assert {path.name for path in data_record.iterdir()} == {
+        "commit.json",
+        "derived.json",
+        "manifest.json",
+        "operation.json",
+    }
+    assert not tuple(sensitive_record.glob("*.tmp"))
+    assert not tuple(data_record.glob("*.tmp"))
+
+    for directory in (sensitive_record, data_record):
+        details = directory.stat()
+        assert details.st_uid == os.geteuid()
+        assert details.st_mode & 0o777 == 0o700
+        descriptor = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            assert storage._has_extended_acl(descriptor) is False
+        finally:
+            os.close(descriptor)
+        for path in directory.iterdir():
+            details = path.stat()
+            assert path.is_file()
+            assert details.st_uid == os.geteuid()
+            assert details.st_mode & 0o777 == 0o600
+            descriptor = os.open(path, os.O_RDONLY)
+            try:
+                assert storage._has_extended_acl(descriptor) is False
+            finally:
+                os.close(descriptor)
+
+    assert (sensitive_record / "raw.bin").read_bytes() == raw_secret
+    derived = _stored_json(data_record / "derived.json")
+    manifest = _stored_json(data_record / "manifest.json")
+    sensitive_operation = _stored_json(sensitive_record / "operation.json")
+    data_operation = _stored_json(data_record / "operation.json")
+    commit = _stored_json(data_record / "commit.json")
+    assert sensitive_operation == data_operation
+    assert sensitive_operation["state"] == "committed"
+    assert commit["committed"] is True
+    assert commit["record_id"] == record_id
+
+    assert set(derived) == {
+        "external_send_approved",
+        "parse_issues",
+        "provenance",
+        "redaction_findings",
+        "source_kind",
+        "status",
+        "summary",
+        "summary_redaction_findings",
+        "transcript",
+    }
+    assert set(derived["provenance"]) == {
+        "end_line",
+        "redaction_rules_sha256",
+        "source_sha256",
+        "start_line",
+        "summary_changed_files",
+        "summary_commits",
+        "summary_sha256",
+        "tool_version",
+        "transcript_sha256",
+    }
+    assert "source_path" not in derived["provenance"]
+
+    raw_sha256 = hashlib.sha256(raw_secret).hexdigest()
+    derived_sha256 = hashlib.sha256(
+        (data_record / "derived.json").read_bytes()
+    ).hexdigest()
+    manifest_sha256 = hashlib.sha256(
+        (data_record / "manifest.json").read_bytes()
+    ).hexdigest()
+    assert result["raw_sha256"] == raw_sha256
+    assert result["derived_sha256"] == derived_sha256
+    assert result["manifest_sha256"] == manifest_sha256
+    assert manifest["raw_sha256"] == raw_sha256
+    assert manifest["derived_sha256"] == derived_sha256
+    assert commit["manifest_sha256"] == manifest_sha256
+    assert commit["operation_id"] == sensitive_operation["operation_id"]
+
+    visible = _canonical_bytes({
+        "result": result,
+        "derived": derived,
+        "manifest": manifest,
+        "operation": sensitive_operation,
+        "commit": commit,
+        "sensitive_names": sorted(path.name for path in sensitive_record.iterdir()),
+        "data_names": sorted(path.name for path in data_record.iterdir()),
+    }).decode("utf-8")
+    for forbidden in (
+        "raw-secret-value",
+        "session.jsonl",
+        "synthetic-home-value",
+        "synthetic-user-value",
+        "synthetic-host-value",
+        str(arguments["raw_root"]),
+        str(arguments["sensitive_root"]),
+        str(arguments["data_root"]),
+    ):
+        assert forbidden not in visible
+
+
+@pytest.mark.parametrize(
+    "reason",
+    ("insecure_owner", "insecure_mode", "insecure_acl", "invalid_file_type"),
+)
+def test_store_new_does_not_commit_when_created_object_is_unsafe(
+    tmp_path,
+    monkeypatch,
+    reason,
+):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+
+    def reject_created_object(file_descriptor, expected_kind, expected_mode):
+        raise storage.StorageStop(reason)
+
+    monkeypatch.setattr(
+        storage,
+        "_validate_created_fd",
+        reject_created_object,
+        raising=False,
+    )
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.store_new(
+            **arguments,
+            stored_at="2026-08-15T00:00:00+00:00",
+            retention_until="2026-08-16T00:00:00+00:00",
+        )
+
+    assert caught.value.reason == reason
+    assert not tuple(arguments["sensitive_root"].rglob("commit.json"))
+    assert not tuple(arguments["data_root"].rglob("commit.json"))

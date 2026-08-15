@@ -6,14 +6,47 @@ import hashlib
 import os
 import stat
 import sys
+from datetime import datetime
 from pathlib import Path
 
+from tools.common.digests import canonical_json_bytes, sha256_hex
 from tools.session_logs.read_only_entry import _contains_absolute_path
 
 
 _ACL_TYPE_EXTENDED = 0x00000100
 _ACL_FIRST_ENTRY = 0
 _DIRECTORY_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+_FILE_FLAGS = os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
+
+_DERIVED_KEYS = (
+    "external_send_approved",
+    "parse_issues",
+    "redaction_findings",
+    "source_kind",
+    "status",
+    "summary",
+    "summary_redaction_findings",
+    "transcript",
+)
+_PROVENANCE_KEYS = (
+    "end_line",
+    "redaction_rules_sha256",
+    "source_sha256",
+    "start_line",
+    "summary_changed_files",
+    "summary_commits",
+    "summary_sha256",
+    "tool_version",
+    "transcript_sha256",
+)
+_SENSITIVE_FINAL_FILES = ("operation.json", "raw.bin")
+_DATA_FINAL_FILES = (
+    "operation.json",
+    "derived.json",
+    "manifest.json",
+    "commit.json",
+    "deleted.json",
+)
 
 
 class StorageStop(Exception):
@@ -254,4 +287,345 @@ def preflight_store(
     return {
         "external_send_approved": False,
         "status": "ready",
+    }
+
+
+def _validate_created_fd(file_descriptor, expected_kind, expected_mode):
+    details = os.fstat(file_descriptor)
+    if expected_kind == "directory":
+        kind_matches = stat.S_ISDIR(details.st_mode)
+    else:
+        kind_matches = stat.S_ISREG(details.st_mode)
+    if not kind_matches:
+        raise StorageStop("invalid_file_type")
+    if details.st_uid != os.geteuid():
+        raise StorageStop("insecure_owner")
+    if stat.S_IMODE(details.st_mode) != expected_mode:
+        raise StorageStop("insecure_mode")
+    if _has_extended_acl(file_descriptor):
+        raise StorageStop("insecure_acl")
+
+
+def _create_record_directory(root_fd, record_id):
+    try:
+        os.mkdir(record_id, mode=0o700, dir_fd=root_fd)
+    except FileExistsError as error:
+        raise StorageStop("record_exists") from error
+    except OSError as error:
+        raise StorageStop("storage_write_failed") from error
+    os.fsync(root_fd)
+    try:
+        record_fd = os.open(record_id, _DIRECTORY_FLAGS, dir_fd=root_fd)
+    except OSError as error:
+        raise StorageStop("storage_write_failed") from error
+    try:
+        os.fchmod(record_fd, 0o700)
+        _validate_created_fd(record_fd, "directory", 0o700)
+    except Exception:
+        os.close(record_fd)
+        raise
+    return record_fd
+
+
+def _read_fd_bytes(file_descriptor):
+    os.lseek(file_descriptor, 0, os.SEEK_SET)
+    chunks = []
+    while True:
+        chunk = os.read(file_descriptor, 1024 * 1024)
+        if not chunk:
+            break
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
+def _write_all(file_descriptor, content):
+    offset = 0
+    while offset < len(content):
+        written = os.write(file_descriptor, content[offset:])
+        if written <= 0:
+            raise StorageStop("storage_write_failed")
+        offset += written
+
+
+def _write_temp(directory_fd, temporary_name, content):
+    try:
+        file_descriptor = os.open(
+            temporary_name,
+            _FILE_FLAGS,
+            0o600,
+            dir_fd=directory_fd,
+        )
+    except OSError as error:
+        raise StorageStop("storage_write_failed") from error
+    try:
+        os.fchmod(file_descriptor, 0o600)
+        _validate_created_fd(file_descriptor, "file", 0o600)
+        _write_all(file_descriptor, content)
+        os.fsync(file_descriptor)
+        if _read_fd_bytes(file_descriptor) != content:
+            raise StorageStop("storage_verification_failed")
+    finally:
+        os.close(file_descriptor)
+
+
+def _verify_final_file(directory_fd, final_name, expected):
+    try:
+        file_descriptor = os.open(
+            final_name,
+            os.O_RDONLY | os.O_NOFOLLOW,
+            dir_fd=directory_fd,
+        )
+    except OSError as error:
+        raise StorageStop("storage_verification_failed") from error
+    try:
+        _validate_created_fd(file_descriptor, "file", 0o600)
+        if _read_fd_bytes(file_descriptor) != expected:
+            raise StorageStop("storage_verification_failed")
+    finally:
+        os.close(file_descriptor)
+
+
+def _publish_file(directory_fd, final_name, content):
+    temporary_name = f"{final_name}.tmp"
+    _write_temp(directory_fd, temporary_name, content)
+    try:
+        os.stat(final_name, dir_fd=directory_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        pass
+    else:
+        raise StorageStop("record_exists")
+    try:
+        os.rename(
+            temporary_name,
+            final_name,
+            src_dir_fd=directory_fd,
+            dst_dir_fd=directory_fd,
+        )
+        os.fsync(directory_fd)
+    except OSError as error:
+        raise StorageStop("storage_write_failed") from error
+    _verify_final_file(directory_fd, final_name, content)
+
+
+def _replace_file(directory_fd, final_name, content):
+    temporary_name = f"{final_name}.tmp"
+    _write_temp(directory_fd, temporary_name, content)
+    try:
+        os.rename(
+            temporary_name,
+            final_name,
+            src_dir_fd=directory_fd,
+            dst_dir_fd=directory_fd,
+        )
+        os.fsync(directory_fd)
+    except OSError as error:
+        raise StorageStop("storage_write_failed") from error
+    _verify_final_file(directory_fd, final_name, content)
+
+
+def _derived_result(safe_result):
+    try:
+        derived = {key: safe_result[key] for key in _DERIVED_KEYS}
+        derived["provenance"] = {
+            key: safe_result["provenance"][key]
+            for key in _PROVENANCE_KEYS
+        }
+    except (KeyError, TypeError) as error:
+        raise StorageStop("unsafe_source_result") from error
+    if _contains_absolute_path(derived):
+        raise StorageStop("absolute_path_remaining")
+    return derived
+
+
+def _timestamp(value, reason):
+    try:
+        parsed = datetime.fromisoformat(value)
+    except (TypeError, ValueError) as error:
+        raise StorageStop(reason) from error
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise StorageStop(reason)
+    return parsed
+
+
+def _operation_document(
+    *,
+    state,
+    operation_id,
+    record_id,
+    retention_until,
+    expected_sha256,
+):
+    sensitive_temporary = [
+        f"{name}.tmp" for name in _SENSITIVE_FINAL_FILES
+    ]
+    data_temporary = [f"{name}.tmp" for name in _DATA_FINAL_FILES]
+    return {
+        "expected_sha256": expected_sha256,
+        "files": {
+            "data": {
+                "final": list(_DATA_FINAL_FILES),
+                "temporary": data_temporary,
+            },
+            "sensitive": {
+                "final": list(_SENSITIVE_FINAL_FILES),
+                "temporary": sensitive_temporary,
+            },
+        },
+        "operation_id": operation_id,
+        "record_id": record_id,
+        "retention_until": retention_until,
+        "schema_version": 1,
+        "state": state,
+        "temporary_to_final": {
+            name: name.removesuffix(".tmp")
+            for name in sensitive_temporary + data_temporary
+        },
+    }
+
+
+def store_new(
+    *,
+    repository_root,
+    raw_root,
+    raw_log,
+    sensitive_root,
+    data_root,
+    safe_result,
+    stored_at,
+    retention_until,
+):
+    """適合する新規一件を二領域へ書き、最後に確定印を置く。"""
+
+    preflight_store(
+        repository_root=repository_root,
+        raw_root=raw_root,
+        raw_log=raw_log,
+        sensitive_root=sensitive_root,
+        data_root=data_root,
+        safe_result=safe_result,
+    )
+    stored_time = _timestamp(stored_at, "invalid_stored_at")
+    retention_time = _timestamp(retention_until, "invalid_retention")
+    if retention_time <= stored_time:
+        raise StorageStop("invalid_retention")
+
+    raw_root = _path(raw_root)
+    raw_log = _path(raw_log)
+    sensitive_root = _path(sensitive_root)
+    data_root = _path(data_root)
+    raw_bytes = _read_raw(raw_root, raw_log)
+    raw_sha256 = sha256_hex(raw_bytes)
+    if raw_sha256 != safe_result["provenance"]["source_sha256"]:
+        raise StorageStop("raw_digest_mismatch")
+
+    derived = _derived_result(safe_result)
+    derived_bytes = canonical_json_bytes(derived)
+    derived_sha256 = sha256_hex(derived_bytes)
+    identity = {
+        "derived_sha256": derived_sha256,
+        "raw_sha256": raw_sha256,
+        "redaction_rules_sha256": derived["provenance"][
+            "redaction_rules_sha256"
+        ],
+        "retention_until": retention_until,
+        "tool_version": derived["provenance"]["tool_version"],
+    }
+    record_id = sha256_hex(canonical_json_bytes(identity))
+    manifest = {
+        "derived_sha256": derived_sha256,
+        "raw_sha256": raw_sha256,
+        "record_id": record_id,
+        "retention_until": retention_until,
+        "schema_version": 1,
+        "stored_at": stored_at,
+    }
+    manifest_bytes = canonical_json_bytes(manifest)
+    manifest_sha256 = sha256_hex(manifest_bytes)
+    operation_id = sha256_hex(canonical_json_bytes({
+        "manifest_sha256": manifest_sha256,
+        "record_id": record_id,
+        "schema_version": 1,
+    }))
+    commit = {
+        "committed": True,
+        "derived_sha256": derived_sha256,
+        "manifest_sha256": manifest_sha256,
+        "operation_id": operation_id,
+        "raw_sha256": raw_sha256,
+        "record_id": record_id,
+        "schema_version": 1,
+    }
+    commit_bytes = canonical_json_bytes(commit)
+    expected_sha256 = {
+        "commit.json": sha256_hex(commit_bytes),
+        "derived.json": derived_sha256,
+        "manifest.json": manifest_sha256,
+        "raw.bin": raw_sha256,
+    }
+    incomplete_operation = canonical_json_bytes(_operation_document(
+        state="incomplete",
+        operation_id=operation_id,
+        record_id=record_id,
+        retention_until=retention_until,
+        expected_sha256=expected_sha256,
+    ))
+    committed_operation = canonical_json_bytes(_operation_document(
+        state="committed",
+        operation_id=operation_id,
+        record_id=record_id,
+        retention_until=retention_until,
+        expected_sha256=expected_sha256,
+    ))
+
+    sensitive_root_fd = _open_directory_fd(sensitive_root)
+    data_root_fd = _open_directory_fd(data_root)
+    sensitive_record_fd = None
+    data_record_fd = None
+    try:
+        sensitive_record_fd = _create_record_directory(
+            sensitive_root_fd,
+            record_id,
+        )
+        _publish_file(
+            sensitive_record_fd,
+            "operation.json",
+            incomplete_operation,
+        )
+        data_record_fd = _create_record_directory(data_root_fd, record_id)
+        _publish_file(
+            data_record_fd,
+            "operation.json",
+            incomplete_operation,
+        )
+        _publish_file(sensitive_record_fd, "raw.bin", raw_bytes)
+        _publish_file(data_record_fd, "derived.json", derived_bytes)
+        _publish_file(data_record_fd, "manifest.json", manifest_bytes)
+        _replace_file(
+            sensitive_record_fd,
+            "operation.json",
+            committed_operation,
+        )
+        _replace_file(
+            data_record_fd,
+            "operation.json",
+            committed_operation,
+        )
+        _publish_file(data_record_fd, "commit.json", commit_bytes)
+    finally:
+        if sensitive_record_fd is not None:
+            os.close(sensitive_record_fd)
+        if data_record_fd is not None:
+            os.close(data_record_fd)
+        os.close(sensitive_root_fd)
+        os.close(data_root_fd)
+
+    return {
+        "committed": True,
+        "derived_sha256": derived_sha256,
+        "external_send_approved": False,
+        "manifest_sha256": manifest_sha256,
+        "raw_sha256": raw_sha256,
+        "record_id": record_id,
+        "retention_until": retention_until,
+        "status": "stored",
     }

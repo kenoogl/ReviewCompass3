@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段と、最初の製品機能G25読取り専用入口は完了した。現在は立て直し後の二つ目の製品機能である安全保存の実装準備を進めている。
-- 現在作業：安全保存の境界2は、三root、分離、所有者、mode、追加ACL、symlink、正式入口結果、raw識別値を保存前に検査し、正常・不適合の21例で保存root変更0の最小GREENとなった。次は境界3の新規一記録確定保存だけを進める。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_reuse_adjudicated_tdd_boundaries_1_2_green_boundary_3_pending`
+- 現在作業：安全保存の境界3は、適合する合成一件を二rootの固定fileへ安全属性付きで保存し、同期・再読込み後にcommit.jsonを最後に置く最小GREENとなった。専用26件、関連47件が成功した。次は境界4の同一入力再保存と競合拒否だけを進める。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_reuse_adjudicated_tdd_boundaries_1_3_green_boundary_4_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -28,26 +28,27 @@
 - [安全保存実装の独立開始前レビュー開始可](records/development/2026-08-15-session-artifact-safe-storage-implementation-start-review-v3.md) — SHA-256 `f04b91fc28710cd8bc52b4a325febb14a087a1659484d510db12f01e2b4e60b7`
 - [安全保存境界1のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-1-tdd-evidence-v1.md) — SHA-256 `2811b864c5e494800ce4364bac0d601cc4073e06ffffd6d096fef5b1f22e3051`
 - [安全保存境界2のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-2-tdd-evidence-v1.md) — SHA-256 `aa6fabd0c0c7fe7856edfc317900e8f052cd648aa5f579b918d37b553c629189`
+- [安全保存境界3のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-3-tdd-evidence-v1.md) — SHA-256 `58181132c2e905820d390b207155cc9a6b1d6dd89cc0f69c39470756bffa8b6b`
 
 ## 次に行う一作業
 
-境界3の試験として、適合する合成一件が二rootの固定fileへ保存され、作成物の所有者・0700／0600・追加ACLなし、許可項目だけの派生物、秘密値不在、同期後再読込みDigest一致、commit.json最後、stored結果を要求する。store不在のRED後に新規一件だけを確定する最小実装を行う。
+境界4の試験として、同じ入力の二回目が同じ記録IDのunchangedとなり全fileのbytes・mtime・inodeを変えないこと、異なるbytesを既存IDへ上書きしないこと、同じ記録の二更新が両方成功しないことを要求する。RED後に既存確定状態の照合と一件限定排他だけを実装する。
 
 開始条件：
 
-- 境界2のGREEN、Evidence、TODOが意味単位commitへ固定され、worktreeがcleanである
-- 累積作業票v2＋v3の境界3と契約の固定file・保存許可項目・保存成功を固定入力にする
+- 境界3のGREEN、Evidence、TODOが意味単位commitへ固定され、worktreeがcleanである
+- 累積作業票v2＋v3の境界4と契約受入条件9を固定入力にする
 - repository外の合成rootだけを用い、実Session記録と実保存rootを使わない
-- 既存ID、途中保存、同時更新、通常再読込み、削除を境界3へ入れない
+- 途中状態の復旧、通常再読込み、削除を境界4へ入れない
 
 完了条件：
 
-- 新規一件の確定保存処理不在を主要理由に対象試験がREDになる
-- 固定file、一時file、operation、manifest、commitの内容・順序・Digest・modeが契約と一致する
-- 保存用派生物、manifest、結果、固定名にsource_path、入力path、home、利用者名、host名、秘密値がない
-- 境界3のGREEN commit後に作業単位遷移が合格する
+- 既存IDと同時更新を安全に区別する処理不在を主要理由に対象試験がREDになる
+- 完全一致だけがunchangedとなり、全対象fileのbytes・mtime・inodeが不変である
+- 異なる内容と同時更新は無変更で停止し、一つの記録へ二処理を同時確定しない
+- 境界4のGREEN commit後に作業単位遷移が合格する
 
-後続作業：境界3を意味単位commitで閉じた後だけ、境界4の同一入力再保存と競合拒否REDへ進む。既存ID、復旧、読込み、削除を先取りする必要があれば停止する。
+後続作業：境界4を意味単位commitで閉じた後だけ、境界5の中断保存再開REDへ進む。復旧、通常再読込み、削除を先取りする必要があれば停止する。
 
 ## blocker・Human判断待ち
 
@@ -57,7 +58,7 @@
 ## stale・deferred
 
 - stale：固定20 pathによる旧検索、過大な平坦候補を作った能力検索v1からv3、および対応する旧証明書は履歴観測として保持するが、現在の実装開始根拠に使わない
-- deferred：境界3では既存ID、途中保存、同時更新、通常再読込み、削除、製品設定、配布入口を変更しない。中央一覧、push、外部送信も開始しない
+- deferred：境界4では途中状態の復旧、通常再読込み、削除、製品設定、配布入口を変更しない。中央一覧、push、外部送信も開始しない
 
 ## Git・Test
 
@@ -65,7 +66,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：境界2は対象21件、境界1を含む関連42件が終了コード0。次は同じ専用試験fileへ境界3の新規確定保存REDを追加して単独実行する
+- 直近の関連Test：境界3は新規5件、専用26件、境界1を含む関連47件が終了コード0。次は同じ専用試験fileへ境界4のunchanged・上書き拒否・競合REDを追加する
 - 直近の全Test：直近の正規全試験は1,762件成功、失敗・error・skip 0、終了コード0。今回の変更では製品コード、試験、設定を変更していない
 - 差分検査：`git diff --check`合格
 
