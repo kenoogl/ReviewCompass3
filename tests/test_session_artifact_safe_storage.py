@@ -556,3 +556,118 @@ def test_store_new_concurrent_calls_do_not_both_succeed(
 
     assert outcomes.count("stored") == 1
     assert outcomes.count("record_busy") == 1
+
+
+@pytest.mark.parametrize(
+    "fault_point",
+    ("raw.bin", "derived.json", "manifest.json", "before_commit", "raw.bin.tmp"),
+)
+def test_store_new_resumes_matching_incomplete_record(
+    tmp_path,
+    monkeypatch,
+    fault_point,
+):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+    times = {
+        "stored_at": "2026-08-15T00:00:00+00:00",
+        "retention_until": "2026-08-16T00:00:00+00:00",
+    }
+    original_publish = storage._publish_file
+    original_write_temp = storage._write_temp
+    injected = False
+
+    def failing_publish(directory_fd, final_name, content):
+        nonlocal injected
+        if fault_point == "before_commit" and final_name == "commit.json":
+            injected = True
+            raise storage.StorageStop("injected_failure")
+        result = original_publish(directory_fd, final_name, content)
+        if not injected and final_name == fault_point:
+            injected = True
+            raise storage.StorageStop("injected_failure")
+        return result
+
+    def failing_write_temp(directory_fd, temporary_name, content):
+        nonlocal injected
+        result = original_write_temp(directory_fd, temporary_name, content)
+        if not injected and temporary_name == fault_point:
+            injected = True
+            raise storage.StorageStop("injected_failure")
+        return result
+
+    monkeypatch.setattr(storage, "_publish_file", failing_publish)
+    monkeypatch.setattr(storage, "_write_temp", failing_write_temp)
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.store_new(**arguments, **times)
+    assert caught.value.reason == "injected_failure"
+    assert injected is True
+    assert not tuple(arguments["data_root"].rglob("commit.json"))
+
+    monkeypatch.setattr(storage, "_publish_file", original_publish)
+    monkeypatch.setattr(storage, "_write_temp", original_write_temp)
+    result = storage.store_new(**arguments, **times)
+
+    assert result["status"] == "stored"
+    record_id = result["record_id"]
+    assert (arguments["data_root"] / record_id / "commit.json").is_file()
+    assert not tuple((arguments["sensitive_root"] / record_id).glob("*.tmp"))
+    assert not tuple((arguments["data_root"] / record_id).glob("*.tmp"))
+
+
+@pytest.mark.parametrize(
+    ("corruption", "reason"),
+    (
+        ("unknown_file", "record_conflict"),
+        ("changed_operation", "record_conflict"),
+        ("missing_operation", "record_unrecoverable"),
+    ),
+)
+def test_store_new_does_not_guess_unsafe_incomplete_record(
+    tmp_path,
+    monkeypatch,
+    corruption,
+    reason,
+):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+    times = {
+        "stored_at": "2026-08-15T00:00:00+00:00",
+        "retention_until": "2026-08-16T00:00:00+00:00",
+    }
+    original_publish = storage._publish_file
+
+    def stop_after_raw(directory_fd, final_name, content):
+        result = original_publish(directory_fd, final_name, content)
+        if final_name == "raw.bin":
+            raise storage.StorageStop("injected_failure")
+        return result
+
+    monkeypatch.setattr(storage, "_publish_file", stop_after_raw)
+    with pytest.raises(storage.StorageStop):
+        storage.store_new(**arguments, **times)
+    monkeypatch.setattr(storage, "_publish_file", original_publish)
+    sensitive_record = next(arguments["sensitive_root"].iterdir())
+    data_record = arguments["data_root"] / sensitive_record.name
+    if corruption == "unknown_file":
+        unknown = data_record / "unknown.bin"
+        unknown.write_bytes(b"unknown")
+        unknown.chmod(0o600)
+    elif corruption == "changed_operation":
+        (data_record / "operation.json").write_bytes(b"{}")
+    else:
+        (sensitive_record / "operation.json").unlink()
+        (data_record / "operation.json").unlink()
+    before = (
+        _record_snapshot(sensitive_record),
+        _record_snapshot(data_record),
+    )
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.store_new(**arguments, **times)
+
+    assert caught.value.reason == reason
+    assert (
+        _record_snapshot(sensitive_record),
+        _record_snapshot(data_record),
+    ) == before

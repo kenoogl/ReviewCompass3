@@ -525,6 +525,7 @@ def _existing_store_outcome(
     record_id,
     expected_sensitive,
     expected_data,
+    incomplete_operation,
     stored_result,
 ):
     sensitive_record_fd = _open_existing_record(
@@ -542,21 +543,131 @@ def _existing_store_outcome(
         sensitive_names = set(os.listdir(sensitive_record_fd))
         data_names = set(os.listdir(data_record_fd))
         if "commit.json" not in data_names:
-            raise StorageStop("record_busy")
-        if sensitive_names != set(expected_sensitive) or data_names != set(
-            expected_data
-        ):
+            return _resume_incomplete_store(
+                sensitive_record_fd=sensitive_record_fd,
+                data_record_fd=data_record_fd,
+                sensitive_names=sensitive_names,
+                data_names=data_names,
+                expected_sensitive=expected_sensitive,
+                expected_data=expected_data,
+                incomplete_operation=incomplete_operation,
+                stored_result=stored_result,
+            )
+        if sensitive_names != set(expected_sensitive) or data_names != set(expected_data):
             raise StorageStop("record_conflict")
-        for name, expected in expected_sensitive.items():
-            if _read_existing_file(sensitive_record_fd, name) != expected:
-                raise StorageStop("record_conflict")
-        for name, expected in expected_data.items():
-            if _read_existing_file(data_record_fd, name) != expected:
-                raise StorageStop("record_conflict")
+        _verify_expected_files(sensitive_record_fd, expected_sensitive)
+        _verify_expected_files(data_record_fd, expected_data)
     finally:
         os.close(sensitive_record_fd)
         os.close(data_record_fd)
     return {**stored_result, "status": "unchanged"}
+
+
+def _verify_expected_files(record_fd, expected_files):
+    for name, expected in expected_files.items():
+        if _read_existing_file(record_fd, name) != expected:
+            raise StorageStop("record_conflict")
+
+
+def _finish_file(record_fd, final_name, expected):
+    names = set(os.listdir(record_fd))
+    temporary_name = f"{final_name}.tmp"
+    if final_name in names:
+        if temporary_name in names:
+            raise StorageStop("record_conflict")
+        if _read_existing_file(record_fd, final_name) != expected:
+            raise StorageStop("record_conflict")
+        return
+    if temporary_name in names:
+        if _read_existing_file(record_fd, temporary_name) != expected:
+            raise StorageStop("record_conflict")
+        os.rename(
+            temporary_name,
+            final_name,
+            src_dir_fd=record_fd,
+            dst_dir_fd=record_fd,
+        )
+        os.fsync(record_fd)
+        _verify_final_file(record_fd, final_name, expected)
+        return
+    _publish_file(record_fd, final_name, expected)
+
+
+def _resume_incomplete_store(
+    *,
+    sensitive_record_fd,
+    data_record_fd,
+    sensitive_names,
+    data_names,
+    expected_sensitive,
+    expected_data,
+    incomplete_operation,
+    stored_result,
+):
+    allowed_sensitive = set(expected_sensitive) | {
+        f"{name}.tmp" for name in expected_sensitive
+    }
+    allowed_data = set(expected_data) | {
+        f"{name}.tmp" for name in expected_data
+    }
+    if not sensitive_names <= allowed_sensitive or not data_names <= allowed_data:
+        raise StorageStop("record_conflict")
+
+    operation_values = []
+    for record_fd, names in (
+        (sensitive_record_fd, sensitive_names),
+        (data_record_fd, data_names),
+    ):
+        for name in ("operation.json", "operation.json.tmp"):
+            if name in names:
+                operation_values.append(_read_existing_file(record_fd, name))
+    if not operation_values:
+        if sensitive_names or data_names:
+            raise StorageStop("record_unrecoverable")
+        raise StorageStop("record_busy")
+    committed_operation = expected_sensitive["operation.json"]
+    if any(
+        value not in {incomplete_operation, committed_operation}
+        for value in operation_values
+    ):
+        raise StorageStop("record_conflict")
+
+    for record_fd, names, expected_files in (
+        (sensitive_record_fd, sensitive_names, expected_sensitive),
+        (data_record_fd, data_names, expected_data),
+    ):
+        for name in names:
+            if name.startswith("operation.json"):
+                continue
+            final_name = name.removesuffix(".tmp")
+            expected = expected_files.get(final_name)
+            if expected is None or _read_existing_file(record_fd, name) != expected:
+                raise StorageStop("record_conflict")
+
+    for record_fd in (sensitive_record_fd, data_record_fd):
+        names = set(os.listdir(record_fd))
+        if "operation.json.tmp" in names:
+            temporary = _read_existing_file(record_fd, "operation.json.tmp")
+            if temporary not in {incomplete_operation, committed_operation}:
+                raise StorageStop("record_conflict")
+            os.rename(
+                "operation.json.tmp",
+                "operation.json",
+                src_dir_fd=record_fd,
+                dst_dir_fd=record_fd,
+            )
+            os.fsync(record_fd)
+        elif "operation.json" not in names:
+            _publish_file(record_fd, "operation.json", incomplete_operation)
+    _finish_file(sensitive_record_fd, "raw.bin", expected_sensitive["raw.bin"])
+    _finish_file(data_record_fd, "derived.json", expected_data["derived.json"])
+    _finish_file(data_record_fd, "manifest.json", expected_data["manifest.json"])
+    if _read_existing_file(sensitive_record_fd, "operation.json") != committed_operation:
+        _replace_file(sensitive_record_fd, "operation.json", committed_operation)
+    if _read_existing_file(data_record_fd, "operation.json") != committed_operation:
+        _replace_file(data_record_fd, "operation.json", committed_operation)
+    _finish_file(data_record_fd, "commit.json", expected_data["commit.json"])
+    return stored_result
 
 
 def store_new(
@@ -693,6 +804,7 @@ def store_new(
                 record_id=record_id,
                 expected_sensitive=expected_sensitive,
                 expected_data=expected_data,
+                incomplete_operation=incomplete_operation,
                 stored_result=stored_result,
             )
         _publish_file(

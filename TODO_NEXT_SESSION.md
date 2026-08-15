@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段と、最初の製品機能G25読取り専用入口は完了した。現在は立て直し後の二つ目の製品機能である安全保存の実装準備を進めている。
-- 現在作業：安全保存の境界4は、同一入力を全file無変更のunchangedとし、異なる内容のID衝突と同時更新を無変更停止する最小GREENとなった。専用29件、関連50件が成功した。次は境界5の中断保存再開だけを進める。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_reuse_adjudicated_tdd_boundaries_1_4_green_boundary_5_pending`
+- 現在作業：安全保存の境界5は、五つの途中停止点を同じ入力・同じIDで再開し、不明file・改変・operation不在を無変更停止する最小GREENとなった。専用37件、既存入口関連21件が成功した。次は境界6の検証付き再読込みを進める。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_reuse_adjudicated_tdd_boundaries_1_5_green_boundary_6_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -30,26 +30,27 @@
 - [安全保存境界2のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-2-tdd-evidence-v1.md) — SHA-256 `aa6fabd0c0c7fe7856edfc317900e8f052cd648aa5f579b918d37b553c629189`
 - [安全保存境界3のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-3-tdd-evidence-v1.md) — SHA-256 `58181132c2e905820d390b207155cc9a6b1d6dd89cc0f69c39470756bffa8b6b`
 - [安全保存境界4のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-4-tdd-evidence-v1.md) — SHA-256 `c76bdd396126a87d7aa6495897436d1653bee56c46291df488ab6348a264317a`
+- [安全保存境界5のRED・GREEN Evidence](records/development/2026-08-15-session-artifact-safe-storage-boundary-5-tdd-evidence-v1.md) — SHA-256 `a45d24696a719318f6f96faf1b59ec4360a00fe8eb285824e0fe0a02022b717c`
 
 ## 次に行う一作業
 
-境界5の試験として、raw書込み後、派生物書込み後、確定印前、raw.bin.tmp書込み停止の各途中状態が成功・通常読込みにならず、同じ入力だけを同じIDで再開できることを要求する。一覧外file、不一致、有効operationなしでは変更せず停止する。
+境界6の試験として、二rootと全固定file・識別値が一致する確定記録だけが期限内に派生物を返し、raw・派生物・manifest・operation・commitの一文字改変、途中状態、期限切れでは本文を返さないことを要求する。
 
 開始条件：
 
-- 境界4のGREEN、Evidence、TODOが意味単位commitへ固定され、worktreeがcleanである
-- 累積作業票v2＋v3の境界5と契約受入条件11から13・18を固定入力にする
+- 境界5のGREEN、Evidence、TODOが意味単位commitへ固定され、worktreeがcleanである
+- 累積作業票v2＋v3の境界6と契約受入条件10・13・14を固定入力にする
 - repository外の合成rootだけを用い、実Session記録と実保存rootを使わない
-- 通常再読込みと本文削除を境界5へ入れない
+- 自動削除、探索、一覧、検索を境界6へ入れない
 
 完了条件：
 
-- 途中fileとoperationから安全に同じ操作を再開する状態判定不在を主要理由にREDになる
-- 各停止点は成功を返さず、同じ入力だけが同じIDで確定へ進める
-- 一覧外file、不一致、有効operationなしの一時fileは変更せず停止する
-- 境界5のGREEN commit後に作業単位遷移が合格する
+- 検証付き再読込み処理不在を主要理由にREDになる
+- 確定・期限内・全識別値一致の場合だけ許可済み派生物を返す
+- 一文字改変、途中状態、期限切れは本文を返さずfileを変更しない
+- 境界6のGREEN commit後に作業単位遷移が合格する
 
-後続作業：境界5を意味単位commitで閉じた後だけ、境界6の検証付き再読込みREDへ進む。通常再読込みまたは削除を先取りする必要があれば停止する。
+後続作業：境界6を意味単位commitで閉じた後だけ、境界7の削除計画REDへ進む。削除を先取りする必要があれば停止する。
 
 ## blocker・Human判断待ち
 
@@ -59,7 +60,7 @@
 ## stale・deferred
 
 - stale：固定20 pathによる旧検索、過大な平坦候補を作った能力検索v1からv3、および対応する旧証明書は履歴観測として保持するが、現在の実装開始根拠に使わない
-- deferred：境界5では通常再読込み、削除、製品設定、配布入口を変更しない。中央一覧、push、外部送信も開始しない
+- deferred：境界6では自動削除、探索、一覧、検索、削除、製品設定、配布入口を変更しない。中央一覧、push、外部送信も開始しない
 
 ## Git・Test
 
@@ -67,7 +68,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：境界4は新規3件、専用29件、境界1を含む関連50件が終了コード0。次は同じ専用試験fileへ境界5の途中保存再開REDを追加する
+- 直近の関連Test：境界5は新規8件、専用37件、既存入口関連21件が終了コード0。次は同じ専用試験fileへ境界6の検証付き再読込みREDを追加する
 - 直近の全Test：直近の正規全試験は1,762件成功、失敗・error・skip 0、終了コード0。今回の変更では製品コード、試験、設定を変更していない
 - 差分検査：`git diff --check`合格
 
