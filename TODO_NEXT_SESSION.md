@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G30『最小運用契約実行』は、独立完了レビュー1周目のblocking 3件（読取り中変更・path 2変種・機微試験の変異耐性）を訂正し、再レビューで`verified`（blocking 0件）となった。対象67件・関連414件・正規全試験2,305件が各単独成功。残るHuman判断は受入条件22の製品受入だけであり、利用者へ提示して停止中。本線1-4自律実行はここまで完了、#4（後続縦切りの選択）は受入後の利用者選択待ち。
-- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v4 / verified_product_acceptance_pending`
+- 現在作業：G30『最小運用契約実行』は利用者が製品受入した（8候補中4件目の受入済み製品処理。候補4全体は未完了）。利用者の選択により、次の縦切り『G02一件レビューの安全投影操作の追加』の契約定義へ進む。実行registryへG02 prepare操作を、自由文を実行記録へ入れない固定投影・核関数直接呼出し・停止の固定変換で追加する縦切りである。
+- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v4 / accepted`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,6 +17,7 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
+- [利用者による最小運用契約実行の製品受入判断](records/development/2026-08-16-minimal-operation-contract-execution-product-acceptance-decision-v1.md) — SHA-256 `8386ee089ff54b0fde80fca4592a58d8e660e71cd11cb9687e676ca3f824e808`
 - [Codex独立完了再レビュー・verified判定](records/development/2026-08-16-minimal-operation-contract-execution-independent-completion-rereview-v1.md) — SHA-256 `00825b1fbce7a3ea91177d1493c9098bbfea6a7a76868e24f8f050b1f59dc927`
 - [blocking 3件の訂正Evidence](records/development/2026-08-16-minimal-operation-contract-execution-correction-evidence-v1.md) — SHA-256 `c2a386c87e542a7f626e77b931bb24672fd6bf392fda71e216a5c19923959c30`
 - [実装成功Evidence（RED・契約欠陥発見・GREEN・全試験・E2E）](records/development/2026-08-16-minimal-operation-contract-execution-green-evidence-v1.md) — SHA-256 `145f4938b7358acf301195901dfcacdf633b712927e60539c2db8e956c088336`
@@ -29,24 +30,26 @@
 
 ## 次に行う一作業
 
-利用者が受入条件22の製品受入を判断する：『最小運用契約実行』（G30全体ではない最初の実行縦切り）を、実装結果
-（対象67件・関連414件・正規全2,305件成功、E2E成功、独立完了再レビュー`verified`）と後続未完了の限界を確認して
-製品処理として受け入れるか。
+Claudeが『G02一件レビューの安全投影操作の追加』の契約候補v1を定義する：受入済み実行器のregistryへ
+`one_item_review_prepare`を追加し、G02核関数の直接呼出し、自由文（資料本文・目標・採否理由）を実行記録へ
+入れない固定投影、ReviewStopの固定変換（理由転記・停止元none）、束縛照合位置を一意に固定する。定義後、
+Codexの独立確認へ回し、開始可と利用者の採用判断を経てから実装する。
 
 開始条件：
 
-- 再レビュー判定record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 受入判断record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 契約定義前にG02核関数の現物形（入出力・停止・結果形式）を機械走査で固定する
 
 完了条件：
 
-- 利用者の受入または保留の文言がchatで得られ、Decision recordへ固定される
+- 契約候補v1が固定され、Codex独立確認の判定recordが得られ、Claudeが事後照合する
 
-後続作業：受入後、本線#4（運用化目標の後続縦切り）の選択肢（G02安全投影、入力組み立て支援、部品連鎖、保存統合）から利用者が次の一件を選び、契約定義へ進む。
+後続作業：開始可なら利用者へ縮小境界と実装開始の判断を求める（新契約のため条件付き事前承認は引き継がない）。
 
 ## blocker・Human判断待ち
 
 - blocker：技術blockerなし
-- Human判断待ち：受入条件22の製品受入（本線1-4自律実行のうち、事前承認できない唯一のHuman境界）
+- Human判断待ち：なし。契約候補v1の独立確認が開始可になった後に、採用と実装開始の判断を求める
 
 ## stale・deferred
 
