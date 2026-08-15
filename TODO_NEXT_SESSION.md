@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：『G02一件レビューの安全投影操作の追加』は利用者承認の下で実装が完了した。対象75件・関連414件・隔離条件の正規全試験2,313件が各単独成功し、repository外E2Eで自由文漏えい0件の実行記録着地を確認した。次はCodexによる独立完了レビュー（受入条件11）である。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v2 / implemented_independent_completion_review_pending`
+- 現在作業：『G02一件レビューの安全投影操作の追加』はCodex独立完了レビューで`verified`（blocking 0件）となった。残るHuman判断は受入条件12の製品受入だけであり、利用者へ提示して停止中。受入後、実行器は3操作（G02 prepare・G08照合・G24整合検査）を持つ。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v2 / verified_product_acceptance_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,6 +17,7 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
+- [Codex独立完了レビュー・verified判定](records/development/2026-08-16-one-item-review-safe-projection-independent-completion-review-v1.md) — SHA-256 `0152fb5ba32397ab651c29291f36e45d8c030f10188bc2ebf3f6f2bb2ce4a145`
 - [実装成功Evidence（RED・GREEN・全試験・自由文遮断E2E）](records/development/2026-08-16-one-item-review-safe-projection-green-evidence-v1.md) — SHA-256 `6b9e6dbd7c43f1d34dc456f3fff6bc5e17c82103a8aa5db623f0b841be84fb63`
 - [利用者による契約v2採用・実装開始の承認](records/development/2026-08-16-one-item-review-safe-projection-adoption-decision-v1.md) — SHA-256 `17b4f4f522810db3a851b1bc8dd1ab65bb90fb9ce5df2276ae60a42fcb19ec99`
 - [契約候補v2を開始可としたCodex限定再確認](records/development/2026-08-16-one-item-review-safe-projection-v2-limited-rereview-v1.md) — SHA-256 `135f3a5e4daa3be2548831c6d2f97c5b77fba0b1e8e00611bafd6be9e9051afc`
@@ -35,25 +36,24 @@
 
 ## 次に行う一作業
 
-Claudeが独立完了レビューの依頼recordを作成・commitし、codex execでCodexを起動する。Codexは実装済みの
-prepare操作追加を成果物変更なしでレビューし（受入条件11：誤合格・未接続・禁止作用・上位目的への悪影響の反証。
-投影の自由文遮断と変換の閉じた8理由が中心）、判定record 1件を単独commitして停止する。判定後の照合と
-利用者への受入提示はClaudeが実施する。
+利用者が受入条件12の製品受入を判断する：『G02一件レビューの安全投影操作の追加』を、実装結果（対象75件・
+関連414件・正規全2,313件成功、自由文漏えい0件のE2E、独立完了レビュー`verified`）とorganize・連鎖・保存統合が
+後続に残る限界を確認して製品処理として受け入れるか。
 
 開始条件：
 
-- 実装一式と成功Evidence、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 完了レビュー判定record、本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 判定recordが得られ、Claudeが鮮度・変更path 1件・判定内容を機械照合する
+- 利用者の受入または保留の文言がchatで得られ、Decision recordへ固定される
 
-後続作業：レビュー合格後、利用者へ受入条件12の製品受入だけを一判断として提示して停止する。
+後続作業：受入後、運用化目標の残り（G02 organize、入力組み立て支援、部品連鎖、保存統合）または候補5（G20外部送信）から次の一件を利用者が選ぶ。
 
 ## blocker・Human判断待ち
 
 - blocker：技術blockerなし
-- Human判断待ち：なし。独立完了レビュー合格まで製品受入の判断を求めない
+- Human判断待ち：受入条件12の製品受入
 
 ## stale・deferred
 
