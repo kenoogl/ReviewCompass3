@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：候補3のG24の最初の縦切り「一件の要求候補整合検査」は、Codex独立完了レビュー`verified`（blocking 0件）を経て利用者が製品受入した。候補3全体は未完了で、要求文・機能区分・出典対応の「作成」責務が後続に残る。次はG24残り責務の継続か候補4（G30最小作業契約実行)への移行かの利用者選択である。
-- Task Contract：`TC-RC3-PRODUCT-ONE-REQUIREMENT-FEATURE-SOURCE-005 / v3 / accepted`
+- 現在作業：利用者は受入済み部品の運用化目標を指示し、候補4（G30最小作業契約実行）の契約定義を選択した。運用化目標recordを固定し、G30の最初の縦切り『最小運用契約実行』（承認済み運用契約一件→固定registry部品一件の実行→束縛照合→実行記録一件の着地）の契約候補v1を作成した。独立確認は未実施で、実装開始不可である。候補3のG24は縦切り受入済み・作成責務が後続に残る。
+- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v1 / independent_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,39 +16,42 @@
 
 ## 最新のauthority／Evidence
 
+- [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
+- [最小運用契約実行の作業契約候補v1](records/task-contract/2026-08-16-minimal-operation-contract-execution-candidate-v1.md) — SHA-256 `1ed92a89a96550fe1ea5df74fc40fd74102694e8bfefa07b5ec0c9d09df1bb6d`
 - [利用者による一件の要求候補整合検査の製品受入判断](records/development/2026-08-16-one-requirement-candidate-consistency-check-product-acceptance-decision-v1.md) — SHA-256 `dd9edcfd5895c143f7c83c05dcc2df986d36d066030782a5577d534071866fd8`
-- [Codex独立完了レビュー・verified判定](records/development/2026-08-16-one-requirement-candidate-consistency-check-independent-completion-review-v1.md) — SHA-256 `ab78ec0cb391ecaa1413275cf8a27a746039f42c6fdce95a794050947a14a50c`
-- [実装成功Evidence（RED・GREEN・全試験・合成E2E）](records/development/2026-08-16-one-requirement-candidate-consistency-check-green-evidence-v1.md) — SHA-256 `50386e4a981e039e21af3bcec1fb3c37ba078739ff506b9afa19d63d806be6d2`
-- [採用された一件の要求候補整合検査契約v3](records/task-contract/2026-08-15-one-requirement-candidate-consistency-check-candidate-v3.md) — SHA-256 `7ad6da3c77632f3fc82bdbbabcb71d431d490bc78e12004d2331ef44cfdf0081`
 - [次製品作業の候補一覧（8候補・推奨順）](records/development/2026-08-15-post-safe-storage-next-product-work-candidates-v1.md) — SHA-256 `bcb4ba2947e32254edc547068728fa580bc6b7919fa0f04d9b9353ab6c7899ba`
 - [現行50要求を解決する要求権限束v2](records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json) — SHA-256 `760e33ea2ecf6937f56d7bf8d2bd703b18b47dbd2bd6b2bd5919e0dd556d9dae`
 
 ## 次に行う一作業
 
-利用者が次の一件を選択する：(A) 候補3の残り責務（G24の要求文・機能区分・出典対応の「作成」縦切り）の契約定義へ進む、
-(B) 候補4（G30最小作業契約実行）の契約定義へ進む。選択後、Claudeが同じ手順（契約候補→独立確認→採用→
-失敗試験→最小実装→独立完了レビュー→受入）で進める。
+契約候補v1の作成を担当しなかった別担当（Codex）が、固定された契約候補v1を成果物変更なしで読み、定義反証
+（目的縮小の固定、機微検査、正常・停止形式の一意性、再利用・保護基準、書込み一件の境界）を行い、
+開始可または修正要の判定record 1件を単独commitして停止する。起動はClaudeがcodex execで行う。
 
 開始条件：
 
-- 受入判断record、本TODOが意味単位commitへ固定され、作業treeがcleanである
-- 選択前に契約定義・実装を開始しない
+- 運用化目標record、契約候補v1、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 起動は利用者の指示を受けてClaudeが行い、Codexは依頼recordの鮮度検査に合格してから動く
+- 製品コード、既存試験、既存G30基盤、受入済み部品を変更せず読取り専用で確認する
 
 完了条件：
 
-- 利用者の選択がchat文言で得られ、対応する契約候補の定義作業へ引き継がれる
+- 4系統の定義反証と、file書込み境界（新規一件・上書きなし・停止時無作成）の後決め要素の有無を確認する
+- 再利用6 file・保護8 path・機微規則の内容識別値一致を機械確認する
+- 判定recordに開始可または修正要を根拠、未接続条件、最小修正とともに書き、単独commitして停止する
+- Claudeが判定recordの鮮度・変更path 1件・判定内容を機械照合する
 
-後続作業：なし（改善候補の登録は完了済み。仕分けはHuman裁定待ちの持ち越し）。
+後続作業（Claudeが実施）：開始可なら利用者へ『G30全体ではない最初の実行縦切り』の採用と案Cの実装開始を一判断として求め、修正要なら契約だけを次版へ訂正する。
 
 ## blocker・Human判断待ち
 
 - blocker：技術blockerなし
-- Human判断待ち：次の一件の選択（A：G24作成責務の継続、B：候補4のG30へ移行）
+- Human判断待ち：契約候補v1の独立確認用のCodex起動指示。開始可になるまで縮小境界の採用と実装開始判断を求めない
 
 ## stale・deferred
 
-- stale：v3の実装中・レビュー待ち・受入待ちの表示はstale
-- deferred：G24の要求作成責務（選択Aまで）、現行要求変更、候補5以降、外部送信、実利用者要求資料の使用は後続境界まで対象外。`.gitignore`食い違いは`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`として登録済み、Human仕分け待ち
+- stale：候補3実行中の表示、次の一件の選択待ち表示はstale
+- deferred：G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補5以降、外部送信、実利用者資料の使用は後続境界まで対象外。`.gitignore`食い違いは`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`として登録済み、Human仕分け待ち
 
 ## Git・Test
 
