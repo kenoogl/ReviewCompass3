@@ -3,6 +3,7 @@
 import copy
 import hashlib
 import importlib
+import io
 import json
 import os
 import stat
@@ -849,3 +850,252 @@ def test_stops_do_not_retain_lower_level_exception_details(tmp_path):
         )
     assert unreadable.value.__cause__ is None
     assert unreadable.value.__context__ is None
+
+
+def _entry_module():
+    return importlib.import_module("tools.design.one_design_acceptance_entry")
+
+
+def _entry_arguments(root, design_path, acceptance_path):
+    return [
+        "check",
+        "--input-root",
+        str(root),
+        "--design",
+        str(design_path),
+        "--acceptance",
+        str(acceptance_path),
+    ]
+
+
+def _run_entry(arguments):
+    output = io.BytesIO()
+    exit_code = _entry_module().main(arguments, output=output)
+    return exit_code, output.getvalue()
+
+
+def _stopped(reason, source):
+    return _json_bytes(
+        {
+            "external_send_approved": False,
+            "reason": reason,
+            "source": source,
+            "status": "stopped",
+        }
+    ) + b"\n"
+
+
+def test_entry_returns_the_exact_core_result_and_empty_stderr(tmp_path, capsys):
+    module = _module()
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    expected = module.canonical_json_bytes(
+        module.compare_inputs(design_path.read_bytes(), acceptance_path.read_bytes())
+    ) + b"\n"
+
+    exit_code, output = _run_entry(
+        _entry_arguments(root, design_path, acceptance_path)
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert output == expected
+    assert captured.err == ""
+
+
+@pytest.mark.parametrize(
+    ("arguments", "reason"),
+    (
+        ([], "invalid_arguments"),
+        (["unknown"], "invalid_arguments"),
+        (["check", "--unknown", "x"], "invalid_arguments"),
+        (
+            [
+                "check",
+                "--input-root",
+                "/input",
+                "--input-root",
+                "/other",
+                "--design",
+                "/input/design.json",
+                "--acceptance",
+                "/input/acceptance.json",
+            ],
+            "invalid_arguments",
+        ),
+        (
+            [
+                "check",
+                "--input-root",
+                "relative",
+                "--design",
+                "relative/design.json",
+                "--acceptance",
+                "relative/acceptance.json",
+            ],
+            "invalid_path",
+        ),
+    ),
+)
+def test_entry_rejects_invalid_arguments_before_reading(
+    monkeypatch,
+    arguments,
+    reason,
+):
+    entry = _entry_module()
+
+    def unexpected_read(*_arguments):
+        raise AssertionError("input read must not start")
+
+    monkeypatch.setattr(entry, "read_input_pair", unexpected_read)
+    output = io.BytesIO()
+
+    exit_code = entry.main(arguments, output=output)
+
+    assert exit_code == 2
+    assert output.getvalue() == _stopped(reason, "arguments")
+
+
+@pytest.mark.parametrize(
+    ("target", "content", "reason"),
+    (
+        ("design", b"x" * 262145, "size_limit_exceeded"),
+        ("acceptance", b"x" * 262145, "size_limit_exceeded"),
+        ("design", b"\xff", "invalid_utf8"),
+        ("acceptance", b"\xff", "invalid_utf8"),
+        ("design", b'{"secret-design":', "invalid_schema"),
+        ("acceptance", b'{"secret-acceptance":', "invalid_schema"),
+    ),
+    ids=(
+        "design-size",
+        "acceptance-size",
+        "design-utf8",
+        "acceptance-utf8",
+        "design-schema",
+        "acceptance-schema",
+    ),
+)
+def test_entry_reports_the_specific_invalid_input_source(
+    tmp_path,
+    target,
+    content,
+    reason,
+):
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    target_path = design_path if target == "design" else acceptance_path
+    target_path.write_bytes(content)
+
+    exit_code, output = _run_entry(
+        _entry_arguments(root, design_path, acceptance_path)
+    )
+
+    assert exit_code == 2
+    assert output == _stopped(reason, target)
+
+
+@pytest.mark.parametrize("target", ("design", "acceptance"))
+def test_entry_reports_a_target_specific_open_failure(
+    tmp_path,
+    monkeypatch,
+    target,
+):
+    entry = _entry_module()
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    real_open = entry.core.os.open
+    target_name = f"{target}.json"
+
+    def failing_open(path, flags, *args, **kwargs):
+        if path == target_name and kwargs.get("dir_fd") is not None:
+            raise PermissionError("secret-open-detail")
+        return real_open(path, flags, *args, **kwargs)
+
+    monkeypatch.setattr(entry.core.os, "open", failing_open)
+    output = io.BytesIO()
+
+    exit_code = entry.main(
+        _entry_arguments(root, design_path, acceptance_path),
+        output=output,
+    )
+
+    assert exit_code == 2
+    assert output.getvalue() == _stopped("unreadable_input", target)
+
+
+def test_entry_uses_none_when_the_failed_read_has_no_input_owner(tmp_path):
+    missing_root = tmp_path / "missing-root"
+    design_path = missing_root / "design.json"
+    acceptance_path = missing_root / "acceptance.json"
+
+    exit_code, output = _run_entry(
+        _entry_arguments(missing_root, design_path, acceptance_path)
+    )
+
+    assert exit_code == 2
+    assert output == _stopped("unreadable_input", "none")
+
+
+def test_entry_discards_internal_exception_text_and_values(
+    tmp_path,
+    monkeypatch,
+):
+    entry = _entry_module()
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    secret = "secret-internal-value"
+
+    def failing_compare(*_arguments):
+        raise RuntimeError(f"{secret}:{design_path}")
+
+    monkeypatch.setattr(entry, "compare_inputs", failing_compare)
+    output = io.BytesIO()
+
+    exit_code = entry.main(
+        _entry_arguments(root, design_path, acceptance_path),
+        output=output,
+    )
+
+    assert exit_code == 4
+    assert output.getvalue() == _stopped("internal_failure", "none")
+    assert secret.encode() not in output.getvalue()
+    assert str(design_path).encode() not in output.getvalue()
+
+
+def test_entry_output_never_contains_input_values_or_paths(tmp_path, capsys):
+    secret_directory = tmp_path / "secret-path-component"
+    secret_directory.mkdir()
+    root, design_path, acceptance_path = _input_files(secret_directory)
+    secret_value = "secret-input-value"
+    design_path.write_bytes(
+        _json_bytes(
+            _design([
+                {"fact_id": "F-X", "subject": "x", "value": secret_value},
+            ])
+        )
+    )
+
+    exit_code, output = _run_entry(
+        _entry_arguments(root, design_path, acceptance_path)
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert secret_value.encode() not in output
+    assert str(root).encode() not in output
+    assert captured.err == ""
+
+
+def test_entry_does_not_change_the_input_tree(tmp_path):
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    before = sorted(
+        (str(path.relative_to(root)), path.stat().st_mode, path.read_bytes())
+        for path in root.iterdir()
+    )
+
+    exit_code, _ = _run_entry(
+        _entry_arguments(root, design_path, acceptance_path)
+    )
+
+    after = sorted(
+        (str(path.relative_to(root)), path.stat().st_mode, path.read_bytes())
+        for path in root.iterdir()
+    )
+    assert exit_code == 0
+    assert after == before
