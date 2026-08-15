@@ -80,7 +80,7 @@ def _write_capability_plan(root):
         "failure_behavior": ["失敗を成功として扱わない"],
         "required_properties": ["決定的に処理する"],
         "reference_paths": ["tools/core/engine.py"],
-        "reference_symbols": [],
+        "reference_symbols": ["tools/core/engine.py:store"],
         "symbol_terms": ["store"],
         "required_effect_markers": [],
         "forbidden_effect_markers": ["network"],
@@ -202,8 +202,10 @@ def test_one_operation_accepts_capability_plan_without_fixed_global_list(tmp_pat
 
     assert result["status"] == "completed"
     assert result["searches"][0]["capability_count"] == 1
-    assert result["searches"][0]["uncovered_capability_ids"] == []
-    assert result["searches"][0]["candidate_count"] >= 1
+    assert result["searches"][0]["record_schema_version"] == 4
+    assert result["searches"][0]["no_search_material_capability_ids"] == []
+    assert result["searches"][0]["direct_match_count"] >= 1
+    assert "candidate_count" not in result["searches"][0]
 
 
 def test_capability_attestation_becomes_stale_when_new_code_enters_git_scope(tmp_path):

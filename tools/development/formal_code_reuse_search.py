@@ -286,7 +286,7 @@ def execute_formal_search(
                     "source_scope_paths": [source_include_root],
                     "capabilities": json.loads(json.dumps(search["capabilities"])),
                 }
-                record = reuse.search_required_capabilities(
+                record = reuse.search_required_capabilities_grouped(
                     profile_document=profile_document,
                     discovery_document=discovery_document,
                     declaration=declaration,
@@ -322,14 +322,20 @@ def execute_formal_search(
         result = {
                 "subject": search["subject"],
                 "search_content_digest": record["content_digest"],
-                "hit_count": len(record["hits"]),
-                "group_count": len(record["groups"]),
+                "record_schema_version": record["schema_version"],
                 "attestation_path": str(attestation_path),
                 "attestation_sha256": reuse.file_sha256(attestation_path),
                 "start_allowed": verdict["start_allowed"],
                 "reason": verdict["reason"],
                 "elapsed_seconds": individual_elapsed,
             }
+        if record["schema_version"] <= 3:
+            result.update(
+                {
+                    "hit_count": len(record["hits"]),
+                    "group_count": len(record["groups"]),
+                }
+            )
         if record["schema_version"] == 3:
             result.update(
                 {
@@ -337,6 +343,27 @@ def execute_formal_search(
                     "candidate_count": len(record["hits"]),
                     "uncovered_capability_ids": list(
                         record["uncovered_capability_ids"]
+                    ),
+                }
+            )
+        if record["schema_version"] == 4:
+            result.update(
+                {
+                    "capability_count": len(record["capability_results"]),
+                    "direct_match_count": sum(
+                        len(item["direct_matches"])
+                        for item in record["capability_results"]
+                    ),
+                    "hint_match_count": sum(
+                        len(item["hint_matches"])
+                        for item in record["capability_results"]
+                    ),
+                    "comparison_group_count": sum(
+                        len(item["comparison_groups"])
+                        for item in record["capability_results"]
+                    ),
+                    "no_search_material_capability_ids": list(
+                        record["no_search_material_capability_ids"]
                     ),
                 }
             )

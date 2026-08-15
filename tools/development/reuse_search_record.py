@@ -30,6 +30,12 @@ _RECORD_FIELDS_V3 = (
     "uncovered_capability_ids", "human_adjudication_required", "freshness",
     "content_digest",
 )
+_RECORD_FIELDS_V4 = (
+    "record_kind", "schema_version", "subject", "declaration",
+    "source_identity", "query", "capability_results",
+    "no_search_material_capability_ids", "human_adjudication_required",
+    "freshness", "content_digest",
+)
 _FRESHNESS_FIELDS = (
     "assessed", "observation_snapshot_id", "target_paths",
     "files_at_observation", "changed_files", "new_files", "missing_files", "stale",
@@ -48,6 +54,19 @@ _CAPABILITY_RESULT_FIELDS = (
 _CAPABILITY_CANDIDATE_FIELDS = (
     "symbol_id", "code_reference", "match_reasons", "related_group_ids",
     "conflicting_effect_markers", "declared_lifecycle",
+)
+_GROUPED_CAPABILITY_RESULT_FIELDS = (
+    "capability_id", "search_status", "direct_matches", "hint_matches",
+    "comparison_groups", "missing_reference_paths", "missing_reference_symbols",
+)
+_GROUPED_MATCH_FIELDS = (
+    "symbol_id", "code_reference", "match_reasons",
+    "conflicting_effect_markers", "declared_lifecycle",
+)
+_COMPARISON_GROUP_SUMMARY_FIELDS = (
+    "group_id", "basis_kind", "basis_evidence", "basis_limitation",
+    "member_count", "presentation_class", "representative_symbol_ids",
+    "member_record_reference", "matched_symbol_ids",
 )
 _IDENTITY_FIELDS = (
     "profile_run_id", "discovery_run_id", "source_content_id",
@@ -77,6 +96,15 @@ _CAPABILITY_QUERY_RULES = (
     "forbidden_effect_marker_annotation",
     "declared_source_lifecycle_observation",
 )
+_GROUPED_CAPABILITY_QUERY_RULES = (
+    "work_specific_capability_declaration",
+    "exact_reference_symbol_and_direct_neighbor",
+    "reference_path_symbol_term_and_required_effect_as_hints",
+    "existing_work4a_comparison_group_summary",
+    "comparison_group_members_not_flattened",
+    "forbidden_effect_marker_annotation",
+    "declared_source_lifecycle_observation",
+)
 _CAPABILITY_EXPANSION_BASIS_KINDS = {
     "structural_exact_match",
     "call_neighborhood",
@@ -89,6 +117,7 @@ _DECLARED_LIFECYCLES = {"stable", "provisional", "stopped"}
 
 
 from tools.common.digests import file_sha256 as file_sha256
+from tools.development import work4a_rebuild_v3 as work4a
 
 
 def _range_matches(relative, target_paths):
@@ -547,6 +576,168 @@ def search_required_capabilities(
     return record
 
 
+def search_required_capabilities_grouped(
+    *,
+    profile_document,
+    discovery_document,
+    declaration,
+    observation_document,
+    project_root=".",
+):
+    """既存の比較集団を崩さず、直接対象と検索上の手掛かりを分ける。"""
+    legacy = search_required_capabilities(
+        profile_document=profile_document,
+        discovery_document=discovery_document,
+        declaration=declaration,
+        observation_document=observation_document,
+        project_root=project_root,
+    )
+    if discovery_document.get("routine_profile_run_id") != _profile_run_id(
+        profile_document
+    ):
+        raise ReuseSearchError("profile and discovery run ids differ")
+    if discovery_document.get("routine_profile_content_digest") != profile_document.get(
+        "content_digest"
+    ):
+        raise ReuseSearchError("profile and discovery content digests differ")
+    source_scope_paths = declaration["source_scope_paths"]
+    routines = [
+        item
+        for item in profile_document.get("routines", [])
+        if any(
+            item["code_reference"]["relative_path"] == prefix
+            or item["code_reference"]["relative_path"].startswith(f"{prefix}/")
+            for prefix in source_scope_paths
+        )
+    ]
+    by_id = {item["symbol_id"]: item for item in routines}
+    capability_results = []
+    no_search_material = []
+    legacy_by_capability = {
+        item["capability_id"]: item for item in legacy["capability_results"]
+    }
+
+    def match_item(candidate, reasons):
+        return {
+            "symbol_id": candidate["symbol_id"],
+            "code_reference": dict(candidate["code_reference"]),
+            "match_reasons": sorted(reasons),
+            "conflicting_effect_markers": list(
+                candidate["conflicting_effect_markers"]
+            ),
+            "declared_lifecycle": candidate["declared_lifecycle"],
+        }
+
+    hint_reason_names = {
+        "reference_path_anchor": "reference_path_hint",
+        "symbol_term_hint": "symbol_term_hint",
+        "required_effect_marker_match": "required_effect_marker_hint",
+    }
+    for capability in declaration["capabilities"]:
+        legacy_result = legacy_by_capability[capability["capability_id"]]
+        candidates = {
+            item["symbol_id"]: item
+            for item in legacy_result["candidates"]
+            if item["symbol_id"] in by_id
+        }
+        direct_reasons = {}
+        hint_reasons = {
+            symbol_id: {
+                hint_reason_names[reason]
+                for reason in item["match_reasons"]
+                if reason in hint_reason_names
+            }
+            for symbol_id, item in candidates.items()
+            if set(item["match_reasons"]) & set(hint_reason_names)
+        }
+        group_seed_ids = set()
+        reference_symbols = set(capability["reference_symbols"])
+        for symbol_id in sorted(reference_symbols & set(by_id)):
+            direct_reasons.setdefault(symbol_id, set()).add("exact_reference_symbol")
+            group_seed_ids.add(symbol_id)
+            routine = by_id[symbol_id]
+            for neighbor in tuple(routine.get("direct_callee_symbol_ids", ())) + tuple(
+                routine.get("direct_caller_symbol_ids", ())
+            ):
+                if neighbor in by_id:
+                    direct_reasons.setdefault(neighbor, set()).add("direct_neighbor")
+
+        for symbol_id, reasons in hint_reasons.items():
+            if "symbol_term_hint" in reasons:
+                group_seed_ids.add(symbol_id)
+
+        for symbol_id in sorted(set(direct_reasons) & set(hint_reasons)):
+            direct_reasons[symbol_id].update(hint_reasons.pop(symbol_id))
+
+        grouped = {}
+        for symbol_id in sorted(group_seed_ids):
+            payload = work4a.build_llm_initial_input(
+                routine_profile_document=profile_document,
+                comparison_discovery_document=discovery_document,
+                symbol_id=symbol_id,
+            )
+            for summary in payload["comparison_groups"]:
+                group_id = summary["group_id"]
+                if group_id not in grouped:
+                    grouped[group_id] = {
+                        **json.loads(json.dumps(summary)),
+                        "matched_symbol_ids": [],
+                    }
+                grouped[group_id]["matched_symbol_ids"].append(symbol_id)
+
+        direct_matches = [
+            match_item(candidates[symbol_id], direct_reasons[symbol_id])
+            for symbol_id in sorted(direct_reasons)
+        ]
+        hint_matches = [
+            match_item(candidates[symbol_id], hint_reasons[symbol_id])
+            for symbol_id in sorted(hint_reasons)
+        ]
+        comparison_groups = []
+        for group_id in sorted(grouped):
+            summary = grouped[group_id]
+            summary["matched_symbol_ids"] = sorted(set(summary["matched_symbol_ids"]))
+            comparison_groups.append(summary)
+
+        if direct_matches:
+            search_status = "direct_matches_found"
+        elif hint_matches or comparison_groups:
+            search_status = "search_hints_found"
+        else:
+            search_status = "no_search_material"
+            no_search_material.append(capability["capability_id"])
+        capability_results.append(
+            {
+                "capability_id": capability["capability_id"],
+                "search_status": search_status,
+                "direct_matches": direct_matches,
+                "hint_matches": hint_matches,
+                "comparison_groups": comparison_groups,
+                "missing_reference_paths": list(
+                    legacy_result["missing_reference_paths"]
+                ),
+                "missing_reference_symbols": list(
+                    legacy_result["missing_reference_symbols"]
+                ),
+            }
+        )
+
+    record = {
+        "record_kind": "reuse_search_record",
+        "schema_version": 4,
+        "subject": legacy["subject"],
+        "declaration": json.loads(json.dumps(legacy["declaration"])),
+        "source_identity": dict(legacy["source_identity"]),
+        "query": {"rules_applied": list(_GROUPED_CAPABILITY_QUERY_RULES)},
+        "capability_results": capability_results,
+        "no_search_material_capability_ids": sorted(no_search_material),
+        "human_adjudication_required": True,
+        "freshness": json.loads(json.dumps(legacy["freshness"])),
+    }
+    record["content_digest"] = _content_digest(record)
+    return record
+
+
 def _require_exact_fields(document, fields, label):
     if not isinstance(document, dict):
         raise ReuseSearchError(f"{label} is not a mapping")
@@ -624,6 +815,64 @@ def validate_reuse_search_record(record, *, expected_identity):
             raise ReuseSearchError("uncovered capability summary differs")
         if record["human_adjudication_required"] is not True:
             raise ReuseSearchError("human adjudication boundary is missing")
+    elif schema_version == 4:
+        _require_exact_fields(record, _RECORD_FIELDS_V4, "reuse search record")
+        _require_exact_fields(record["freshness"], _FRESHNESS_FIELDS, "freshness")
+        _require_exact_fields(
+            record["declaration"],
+            _CAPABILITY_DECLARATION_FIELDS,
+            "capability declaration",
+        )
+        if list(record["freshness"]["target_paths"]) != list(
+            record["declaration"]["source_scope_paths"]
+        ):
+            raise ReuseSearchError(
+                "freshness scope disagrees with the declared source scope"
+            )
+        capability_ids = []
+        for capability in record["declaration"]["capabilities"]:
+            _validate_capability(capability)
+            capability_ids.append(capability["capability_id"])
+        if len(capability_ids) != len(set(capability_ids)):
+            raise ReuseSearchError("capability id is duplicated")
+        result_ids = []
+        no_search_material = []
+        for result in record["capability_results"]:
+            _require_exact_fields(
+                result,
+                _GROUPED_CAPABILITY_RESULT_FIELDS,
+                "grouped capability result",
+            )
+            result_ids.append(result["capability_id"])
+            if result["search_status"] not in (
+                "direct_matches_found",
+                "search_hints_found",
+                "no_search_material",
+            ):
+                raise ReuseSearchError("capability search status is invalid")
+            if result["search_status"] == "no_search_material":
+                no_search_material.append(result["capability_id"])
+            for field in ("direct_matches", "hint_matches"):
+                for match in result[field]:
+                    _require_exact_fields(
+                        match, _GROUPED_MATCH_FIELDS, "grouped capability match"
+                    )
+            for group in result["comparison_groups"]:
+                _require_exact_fields(
+                    group,
+                    _COMPARISON_GROUP_SUMMARY_FIELDS,
+                    "comparison group summary",
+                )
+                if "member_symbol_ids" in group:
+                    raise ReuseSearchError("comparison group members were flattened")
+        if result_ids != capability_ids:
+            raise ReuseSearchError("capability result coverage is incomplete")
+        if sorted(no_search_material) != record[
+            "no_search_material_capability_ids"
+        ]:
+            raise ReuseSearchError("no search material summary differs")
+        if record["human_adjudication_required"] is not True:
+            raise ReuseSearchError("human adjudication boundary is missing")
     else:
         raise ReuseSearchError("schema version is invalid")
     if schema_version in (1, 2):
@@ -639,16 +888,17 @@ def validate_reuse_search_record(record, *, expected_identity):
         if record["source_identity"][field] != expected_identity[field]:
             raise ReuseSearchError(f"source identity is stale: {field}")
 
-    if not isinstance(record["hits"], list):
-        raise ReuseSearchError("hits is not a list")
-    group_ids = set()
-    for group in record["groups"]:
-        _require_exact_fields(group, _GROUP_FIELDS, "group reference")
-        group_ids.add(group["group_id"])
-    for hit in record["hits"]:
-        _require_exact_fields(hit, _HIT_FIELDS, "hit")
-        if hit["group_id"] is not None and hit["group_id"] not in group_ids:
-            raise ReuseSearchError("hit references a group missing from groups")
+    if schema_version <= 3:
+        if not isinstance(record["hits"], list):
+            raise ReuseSearchError("hits is not a list")
+        group_ids = set()
+        for group in record["groups"]:
+            _require_exact_fields(group, _GROUP_FIELDS, "group reference")
+            group_ids.add(group["group_id"])
+        for hit in record["hits"]:
+            _require_exact_fields(hit, _HIT_FIELDS, "hit")
+            if hit["group_id"] is not None and hit["group_id"] not in group_ids:
+                raise ReuseSearchError("hit references a group missing from groups")
 
     if record["content_digest"] != _content_digest(record):
         raise ReuseSearchError("content digest mismatch")
@@ -735,8 +985,16 @@ def _search_matches(record, *, profile_document, discovery_document, project_roo
             observation_document=observation,
             project_root=project_root,
         )
-    else:
+    elif record["schema_version"] == 3:
         rebuilt = search_required_capabilities(
+            profile_document=profile_document,
+            discovery_document=discovery_document,
+            declaration=record["declaration"],
+            observation_document=observation,
+            project_root=project_root,
+        )
+    else:
+        rebuilt = search_required_capabilities_grouped(
             profile_document=profile_document,
             discovery_document=discovery_document,
             declaration=record["declaration"],
@@ -812,12 +1070,30 @@ def _build_attestation(record, *, byte_sha256):
         },
         "source_identity": dict(record["source_identity"]),
         "record_schema_version": record["schema_version"],
-        "hit_count": len(record["hits"]),
     }
+    if record["schema_version"] <= 3:
+        document["hit_count"] = len(record["hits"])
     if record["schema_version"] == 3:
         document["capability_count"] = len(record["capability_results"])
         document["uncovered_capability_count"] = len(
             record["uncovered_capability_ids"]
+        )
+    if record["schema_version"] == 4:
+        document["capability_count"] = len(record["capability_results"])
+        document["direct_match_count"] = sum(
+            len(result["direct_matches"])
+            for result in record["capability_results"]
+        )
+        document["hint_match_count"] = sum(
+            len(result["hint_matches"])
+            for result in record["capability_results"]
+        )
+        document["comparison_group_count"] = sum(
+            len(result["comparison_groups"])
+            for result in record["capability_results"]
+        )
+        document["no_search_material_capability_count"] = len(
+            record["no_search_material_capability_ids"]
         )
     document["content_digest"] = _content_digest(document)
     return document
