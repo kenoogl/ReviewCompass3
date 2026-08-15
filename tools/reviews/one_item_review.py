@@ -24,6 +24,7 @@ _ABSOLUTE_PATH_PATTERNS = (
     re.compile(r"(?<![A-Za-z0-9:])//[^/\\\s\"'<>]+[/\\][^\s\"'<>]+"),
     re.compile(r"\bfile://[^\s\"'<>]+", re.IGNORECASE),
 )
+_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 
 class ReviewStop(Exception):
@@ -180,15 +181,19 @@ def _decoded_strings(value):
         yield value
 
 
-def _check_safe_texts(texts):
+def _check_safe_text(text, *, check_entropy=True):
     pattern_rules = default_pattern_rules()
+    if any(re.search(rule.pattern, text) for rule in pattern_rules):
+        raise ReviewStop("sensitive_data_remaining")
+    if check_entropy and find_high_entropy(text):
+        raise ReviewStop("sensitive_data_remaining")
+    if any(pattern.search(text) for pattern in _ABSOLUTE_PATH_PATTERNS):
+        raise ReviewStop("absolute_path_remaining")
+
+
+def _check_safe_texts(texts):
     for text in texts:
-        if any(re.search(rule.pattern, text) for rule in pattern_rules):
-            raise ReviewStop("sensitive_data_remaining")
-        if find_high_entropy(text):
-            raise ReviewStop("sensitive_data_remaining")
-        if any(pattern.search(text) for pattern in _ABSOLUTE_PATH_PATTERNS):
-            raise ReviewStop("absolute_path_remaining")
+        _check_safe_text(text)
 
 
 def _valid_identifier(value):
@@ -297,3 +302,183 @@ def prepare_material(material_bytes, review_spec_bytes):
     }
     result["material_package_sha256"] = sha256_hex(canonical_json_bytes(result))
     return result
+
+
+def _check_result_strings(value, *, root=False):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            _check_safe_text(key)
+            if root and key == "material_package_sha256":
+                _check_safe_text(item, check_entropy=False)
+            else:
+                _check_result_strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            _check_result_strings(item)
+    elif isinstance(value, str):
+        _check_safe_text(value)
+
+
+def _required_text(value):
+    return isinstance(value, str) and bool(value) and "\x00" not in value
+
+
+def _normalize_finding(value, criterion_ids, line_count):
+    expected_keys = {
+        "finding_id",
+        "issue_key",
+        "severity",
+        "title",
+        "description",
+        "criterion_ids",
+        "start_line",
+        "end_line",
+    }
+    if not isinstance(value, dict) or set(value) != expected_keys:
+        raise ReviewStop("invalid_schema")
+    if not _valid_identifier(value["finding_id"]) or not _valid_identifier(
+        value["issue_key"]
+    ):
+        raise ReviewStop("invalid_schema")
+    if value["severity"] not in {"error", "warning", "info"}:
+        raise ReviewStop("invalid_schema")
+    if not _required_text(value["title"]) or not _required_text(
+        value["description"]
+    ):
+        raise ReviewStop("invalid_schema")
+    selected_criteria = value["criterion_ids"]
+    if (
+        not isinstance(selected_criteria, list)
+        or not selected_criteria
+        or any(not _valid_identifier(item) for item in selected_criteria)
+        or len(set(selected_criteria)) != len(selected_criteria)
+        or not set(selected_criteria).issubset(criterion_ids)
+    ):
+        raise ReviewStop("invalid_schema")
+    start_line = value["start_line"]
+    end_line = value["end_line"]
+    if (
+        type(start_line) is not int
+        or type(end_line) is not int
+        or not 1 <= start_line <= end_line <= line_count
+    ):
+        raise ReviewStop("invalid_schema")
+    return {
+        "criterion_ids": sorted(selected_criteria),
+        "description": value["description"],
+        "end_line": end_line,
+        "finding_id": value["finding_id"],
+        "issue_key": value["issue_key"],
+        "severity": value["severity"],
+        "start_line": start_line,
+        "title": value["title"],
+    }
+
+
+def _normalize_review(value, criterion_ids, line_count):
+    if not isinstance(value, dict) or set(value) != {
+        "reviewer_id",
+        "verdict",
+        "summary",
+        "findings",
+    }:
+        raise ReviewStop("invalid_schema")
+    if not _valid_identifier(value["reviewer_id"]):
+        raise ReviewStop("invalid_schema")
+    verdict = value["verdict"]
+    if verdict not in {
+        "findings_present",
+        "no_findings",
+        "insufficient_evidence",
+    }:
+        raise ReviewStop("invalid_schema")
+    if not _required_text(value["summary"]) or not isinstance(
+        value["findings"], list
+    ):
+        raise ReviewStop("invalid_schema")
+    findings = [
+        _normalize_finding(item, criterion_ids, line_count)
+        for item in value["findings"]
+    ]
+    if (verdict == "findings_present") != bool(findings):
+        raise ReviewStop("invalid_schema")
+    finding_ids = [item["finding_id"] for item in findings]
+    issue_keys = [item["issue_key"] for item in findings]
+    if len(set(finding_ids)) != len(finding_ids) or len(set(issue_keys)) != len(
+        issue_keys
+    ):
+        raise ReviewStop("invalid_schema")
+    findings.sort(key=lambda item: (item["issue_key"], item["finding_id"]))
+    return {
+        "findings": findings,
+        "reviewer_id": value["reviewer_id"],
+        "summary": value["summary"],
+        "verdict": verdict,
+    }
+
+
+def validate_results(material_package, results_bytes):
+    """結果集合を厳格検査し、決定的な順へ正規化する。"""
+
+    if not isinstance(material_package, dict) or not isinstance(results_bytes, bytes):
+        raise ReviewStop("invalid_schema")
+    try:
+        decoded = json.loads(results_bytes.decode("utf-8"))
+    except UnicodeDecodeError as error:
+        raise ReviewStop("invalid_utf8") from error
+    except (json.JSONDecodeError, RecursionError) as error:
+        raise ReviewStop("invalid_schema") from error
+    if not isinstance(decoded, dict):
+        raise ReviewStop("invalid_schema")
+    supplied_sha256 = decoded.get("material_package_sha256")
+    if not isinstance(supplied_sha256, str) or not _SHA256.fullmatch(
+        supplied_sha256
+    ):
+        raise ReviewStop("invalid_schema")
+    if supplied_sha256 != material_package.get("material_package_sha256"):
+        raise ReviewStop("stale_material")
+
+    _check_result_strings(decoded, root=True)
+    if set(decoded) != {"schema_version", "material_package_sha256", "reviews"}:
+        raise ReviewStop("invalid_schema")
+    if type(decoded["schema_version"]) is not int or decoded["schema_version"] != 1:
+        raise ReviewStop("invalid_schema")
+    reviews = decoded["reviews"]
+    if not isinstance(reviews, list) or not 1 <= len(reviews) <= 8:
+        raise ReviewStop("invalid_schema")
+    try:
+        criterion_ids = {
+            item["id"] for item in material_package["review_spec"]["criteria"]
+        }
+        line_count = material_package["material"]["line_count"]
+    except (KeyError, TypeError) as error:
+        raise ReviewStop("invalid_schema") from error
+    normalized_reviews = [
+        _normalize_review(item, criterion_ids, line_count) for item in reviews
+    ]
+    reviewer_ids = [item["reviewer_id"] for item in normalized_reviews]
+    if len(set(reviewer_ids)) != len(reviewer_ids):
+        raise ReviewStop("invalid_schema")
+    if sum(len(item["findings"]) for item in normalized_reviews) > 100:
+        raise ReviewStop("invalid_schema")
+    normalized_reviews.sort(key=lambda item: item["reviewer_id"])
+    normalized_root = {
+        "material_package_sha256": supplied_sha256,
+        "reviews": normalized_reviews,
+        "schema_version": 1,
+    }
+    validated_reviews = []
+    for normalized in normalized_reviews:
+        content = {
+            key: value for key, value in normalized.items() if key != "reviewer_id"
+        }
+        validated_reviews.append({
+            "review": normalized,
+            "review_content_sha256": sha256_hex(canonical_json_bytes(content)),
+            "review_sha256": sha256_hex(canonical_json_bytes(normalized)),
+        })
+    return {
+        "material_package_sha256": supplied_sha256,
+        "result_set_sha256": sha256_hex(canonical_json_bytes(normalized_root)),
+        "reviews": validated_reviews,
+    }
