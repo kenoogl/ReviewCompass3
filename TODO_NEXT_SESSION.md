@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G30『最小運用契約実行』の実装が完了した。契約v4（Codex限定再確認で開始可）の下、対象試験61件・関連414件・隔離条件の正規全試験2,299件が各単独成功し、正式実行名`reviewcompass3-operation-run`のrepository外E2E（運用契約→部品実行→束縛照合→実行記録着地、標準出力とfile完全一致）も成功した。次はCodexによる独立完了レビュー（受入条件20）である。
-- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v4 / implemented_independent_completion_review_pending`
+- 現在作業：G30『最小運用契約実行』は、独立完了レビュー1周目のblocking 3件（読取り中変更・path 2変種・機微試験の変異耐性）を訂正し、再レビューで`verified`（blocking 0件）となった。対象67件・関連414件・正規全試験2,305件が各単独成功。残るHuman判断は受入条件22の製品受入だけであり、利用者へ提示して停止中。本線1-4自律実行はここまで完了、#4（後続縦切りの選択）は受入後の利用者選択待ち。
+- Task Contract：`TC-RC3-PRODUCT-MINIMAL-OPERATION-CONTRACT-EXECUTION-006 / v4 / verified_product_acceptance_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,6 +17,8 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
+- [Codex独立完了再レビュー・verified判定](records/development/2026-08-16-minimal-operation-contract-execution-independent-completion-rereview-v1.md) — SHA-256 `00825b1fbce7a3ea91177d1493c9098bbfea6a7a76868e24f8f050b1f59dc927`
+- [blocking 3件の訂正Evidence](records/development/2026-08-16-minimal-operation-contract-execution-correction-evidence-v1.md) — SHA-256 `c2a386c87e542a7f626e77b931bb24672fd6bf392fda71e216a5c19923959c30`
 - [実装成功Evidence（RED・契約欠陥発見・GREEN・全試験・E2E）](records/development/2026-08-16-minimal-operation-contract-execution-green-evidence-v1.md) — SHA-256 `145f4938b7358acf301195901dfcacdf633b712927e60539c2db8e956c088336`
 - [採用中の最小運用契約実行の契約v4](records/task-contract/2026-08-16-minimal-operation-contract-execution-candidate-v4.md) — SHA-256 `d7b1861ccc73cb8f1c305294bf7c7e2a5fddd6ddb3fb46eab74e3204e8a2a7a1`
 - [条件付き事前承認の成立による契約v3採用judgment](records/development/2026-08-16-minimal-operation-contract-execution-adoption-decision-v1.md) — SHA-256 `5f8c9fab3e3512376359f4b58ca528b87adcb74d0d488e1e86af1af06f2b6614`
@@ -27,26 +29,24 @@
 
 ## 次に行う一作業
 
-Claudeが独立完了レビューの依頼recordを作成・commitし、codex execでCodexを起動する。Codexは実装済み製品を
-成果物変更なしでレビューし（受入条件20：誤合格・未接続・禁止作用・上位目的への悪影響の反証）、判定record 1件を
-単独commitして停止する。判定後の照合と利用者への受入提示はClaudeが実施する。
+利用者が受入条件22の製品受入を判断する：『最小運用契約実行』（G30全体ではない最初の実行縦切り）を、実装結果
+（対象67件・関連414件・正規全2,305件成功、E2E成功、独立完了再レビュー`verified`）と後続未完了の限界を確認して
+製品処理として受け入れるか。
 
 開始条件：
 
-- 実装一式と成功Evidence、本TODOが意味単位commitへ固定され、作業treeがcleanである
-- Codexは製品コード、既存試験、契約、再利用部品、既存G30基盤を変更せず、判定record 1件だけを作成する
+- 再レビュー判定record、本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- Codexが対象・関連・正規全試験の各単独成功と、固定commitの誤合格・未接続・禁止作用・上位目的への悪影響0件を確認し、判定recordを単独commitする
-- Claudeが判定recordの鮮度・変更path 1件・判定内容を機械照合する
+- 利用者の受入または保留の文言がchatで得られ、Decision recordへ固定される
 
-後続作業（Claudeが実施、自律実行指示の範囲）：レビュー合格後、利用者へ受入条件22の製品受入だけを一判断として提示して停止する。合わせて本線#4（運用化目標の後続縦切りの契約定義）の候補を提示する。
+後続作業：受入後、本線#4（運用化目標の後続縦切り）の選択肢（G02安全投影、入力組み立て支援、部品連鎖、保存統合）から利用者が次の一件を選び、契約定義へ進む。
 
 ## blocker・Human判断待ち
 
 - blocker：技術blockerなし
-- Human判断待ち：なし。利用者の本線1-4自律実行指示の下で進行中。最終の製品受入だけを後で求める
+- Human判断待ち：受入条件22の製品受入（本線1-4自律実行のうち、事前承認できない唯一のHuman境界）
 
 ## stale・deferred
 
