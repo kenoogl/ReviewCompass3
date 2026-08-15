@@ -7,6 +7,9 @@ import io
 import json
 import os
 import stat
+import subprocess
+import tomllib
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -1099,3 +1102,101 @@ def test_entry_does_not_change_the_input_tree(tmp_path):
     )
     assert exit_code == 0
     assert after == before
+
+
+def _project_root():
+    return Path(__file__).resolve().parents[1]
+
+
+def test_distribution_registers_only_the_fixed_command_target():
+    project_root = _project_root()
+    with (project_root / "pyproject.toml").open("rb") as stream:
+        configuration = tomllib.load(stream)
+
+    assert configuration["project"]["scripts"][
+        "reviewcompass3-design-acceptance-check"
+    ] == "tools.design.one_design_acceptance_entry:main"
+    assert configuration["project"]["dependencies"] == [
+        "PyYAML>=6,<7",
+        "platformdirs>=4,<5",
+    ]
+
+
+def test_core_repository_and_installed_entries_return_identical_bytes(
+    tmp_path,
+):
+    module = _module()
+    project_root = _project_root()
+    python = project_root / ".venv" / "bin" / "python3"
+    installed = (
+        project_root
+        / ".venv"
+        / "bin"
+        / "reviewcompass3-design-acceptance-check"
+    )
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    arguments = _entry_arguments(root, design_path, acceptance_path)
+    expected = module.canonical_json_bytes(
+        module.compare_inputs(design_path.read_bytes(), acceptance_path.read_bytes())
+    ) + b"\n"
+    repository_result = subprocess.run(
+        [
+            str(python),
+            "-m",
+            "tools.design.one_design_acceptance_entry",
+            *arguments,
+        ],
+        cwd=project_root,
+        capture_output=True,
+        check=False,
+    )
+    outside = tmp_path / "outside"
+    outside.mkdir()
+
+    installed_result = subprocess.run(
+        [str(installed), *arguments],
+        cwd=outside,
+        capture_output=True,
+        check=False,
+    )
+
+    assert repository_result.returncode == 0
+    assert repository_result.stdout == expected
+    assert repository_result.stderr == b""
+    assert installed_result.returncode == 0
+    assert installed_result.stdout == expected
+    assert installed_result.stderr == b""
+
+
+def test_installed_entry_returns_the_fixed_stop_outside_the_repository(
+    tmp_path,
+):
+    project_root = _project_root()
+    installed = (
+        project_root
+        / ".venv"
+        / "bin"
+        / "reviewcompass3-design-acceptance-check"
+    )
+    outside = tmp_path / "outside-stop"
+    outside.mkdir()
+
+    result = subprocess.run(
+        [
+            str(installed),
+            "check",
+            "--input-root",
+            "relative",
+            "--design",
+            "relative/design.json",
+            "--acceptance",
+            "relative/acceptance.json",
+        ],
+        cwd=outside,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert result.stdout == _stopped("invalid_path", "arguments")
+    assert result.stderr == b""
