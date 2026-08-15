@@ -11,6 +11,9 @@ from tools.design.one_design_acceptance_entry import main as design_acceptance_m
 from tools.requirements.one_requirement_feature_source_entry import (
     main as requirement_candidate_main,
 )
+from tools.reviews.one_item_review import ReviewStop
+from tools.reviews.one_item_review import prepare_material
+from tools.reviews.one_item_review import read_input_files
 from tools.session_logs.redaction import default_pattern_rules
 from tools.session_logs.redaction import find_high_entropy
 
@@ -49,7 +52,28 @@ _OPERATIONS = {
             "candidate": ("candidate", "sha256"),
         },
     },
+    "one_item_review_prepare": {
+        "entry": None,
+        "input_names": ("material", "review_spec"),
+        "argument_names": {},
+        "binding_positions": {
+            "material": ("material", "content_sha256"),
+            "review_spec": ("review_spec", "sha256"),
+        },
+    },
 }
+_PREPARE_REASONS = frozenset(
+    (
+        "invalid_arguments",
+        "invalid_path",
+        "invalid_schema",
+        "invalid_utf8",
+        "sensitive_data_remaining",
+        "size_limit_exceeded",
+        "unreadable_input",
+        "absolute_path_remaining",
+    )
+)
 
 
 class OperationContractStop(Exception):
@@ -345,7 +369,68 @@ def _check_output_root(value):
     return final_path, partial_path
 
 
+def _project_prepare_result(raw_result):
+    projection_failed = False
+    try:
+        projection = {
+            "external_send_approved": False,
+            "material": {
+                "content_sha256": raw_result["material"]["content_sha256"],
+                "identifier": raw_result["material"]["identifier"],
+                "line_count": raw_result["material"]["line_count"],
+            },
+            "result_schema": {
+                "grouping_basis": raw_result["result_schema"]["grouping_basis"],
+                "schema_version": raw_result["result_schema"]["schema_version"],
+                "semantic_deduplication_performed": raw_result["result_schema"][
+                    "semantic_deduplication_performed"
+                ],
+            },
+            "review_spec": {"sha256": raw_result["review_spec"]["sha256"]},
+            "schema_version": raw_result["schema_version"],
+            "status": raw_result["status"],
+            "material_package_sha256": raw_result["material_package_sha256"],
+        }
+    except (KeyError, TypeError):
+        projection_failed = True
+    if projection_failed:
+        raise OperationContractStop("internal_failure", "none")
+    return projection
+
+
+def _run_prepare_part(value):
+    try:
+        contents = read_input_files(
+            input_root=value["input_root"],
+            material=value["inputs"]["material"],
+            review_spec=value["inputs"]["review_spec"],
+        )
+        raw_result = prepare_material(
+            contents["material"],
+            contents["review_spec"],
+        )
+    except ReviewStop as stop:
+        reason = stop.args[0] if stop.args else None
+        if reason not in _PREPARE_REASONS:
+            raise OperationContractStop("internal_failure", "none")
+        raise OperationContractStop(
+            "part_stopped",
+            "part",
+            extra={
+                "part_reason": reason,
+                "part_source": "none",
+                "part_exit_code": (
+                    3 if reason == "sensitive_data_remaining" else 2
+                ),
+            },
+        )
+    projection = _project_prepare_result(raw_result)
+    return projection, canonical_json_bytes(projection) + b"\n"
+
+
 def _run_part(value):
+    if value["operation"] == "one_item_review_prepare":
+        return _run_prepare_part(value)
     definition = _OPERATIONS[value["operation"]]
     arguments = ["check", "--input-root", value["input_root"]]
     for name in definition["input_names"]:

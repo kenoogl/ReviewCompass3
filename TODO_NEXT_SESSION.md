@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：『G02一件レビューの安全投影操作の追加』の契約候補v2はCodex限定再確認で開始可（blocking 0件）となった。利用者へ縮小境界の採用と実装開始の一判断を提示して停止中。承認後は同じ手順（失敗試験→最小実装→独立完了レビュー→受入）で実装する。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v2 / reviewed_pending_human_adoption`
+- 現在作業：『G02一件レビューの安全投影操作の追加』は利用者承認の下で実装が完了した。対象75件・関連414件・隔離条件の正規全試験2,313件が各単独成功し、repository外E2Eで自由文漏えい0件の実行記録着地を確認した。次はCodexによる独立完了レビュー（受入条件11）である。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-SAFE-PROJECTION-007 / v2 / implemented_independent_completion_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,6 +17,8 @@
 ## 最新のauthority／Evidence
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
+- [実装成功Evidence（RED・GREEN・全試験・自由文遮断E2E）](records/development/2026-08-16-one-item-review-safe-projection-green-evidence-v1.md) — SHA-256 `6b9e6dbd7c43f1d34dc456f3fff6bc5e17c82103a8aa5db623f0b841be84fb63`
+- [利用者による契約v2採用・実装開始の承認](records/development/2026-08-16-one-item-review-safe-projection-adoption-decision-v1.md) — SHA-256 `17b4f4f522810db3a851b1bc8dd1ab65bb90fb9ce5df2276ae60a42fcb19ec99`
 - [契約候補v2を開始可としたCodex限定再確認](records/development/2026-08-16-one-item-review-safe-projection-v2-limited-rereview-v1.md) — SHA-256 `135f3a5e4daa3be2548831c6d2f97c5b77fba0b1e8e00611bafd6be9e9051afc`
 - [停止理由集合を一意化したG02安全投影の契約候補v2](records/task-contract/2026-08-16-one-item-review-safe-projection-candidate-v2.md) — SHA-256 `9a35a25fc6481a62e8978574f8f1e73dc123eda2f96e9acb213851686d10f603`
 - [契約候補v1を停止原因1件で修正要としたCodex独立確認](records/development/2026-08-16-one-item-review-safe-projection-v1-independent-review-v1.md) — SHA-256 `b211626ba83409e9a892c202c0903e1363b535dc93b6f390627d42361ba3d33f`
@@ -33,23 +35,25 @@
 
 ## 次に行う一作業
 
-利用者が『G02一件レビューの安全投影操作の追加』について、縮小境界（prepare一操作の追加だけ。organize・連鎖・
-保存統合は後続）の採用と、契約v2による実装開始を一判断として承認するかを決める。
+Claudeが独立完了レビューの依頼recordを作成・commitし、codex execでCodexを起動する。Codexは実装済みの
+prepare操作追加を成果物変更なしでレビューし（受入条件11：誤合格・未接続・禁止作用・上位目的への悪影響の反証。
+投影の自由文遮断と変換の閉じた8理由が中心）、判定record 1件を単独commitして停止する。判定後の照合と
+利用者への受入提示はClaudeが実施する。
 
 開始条件：
 
-- 限定再確認の判定record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 実装一式と成功Evidence、本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 利用者の承認または保留の文言がchatで得られ、Decision recordへ固定される
+- 判定recordが得られ、Claudeが鮮度・変更path 1件・判定内容を機械照合する
 
-後続作業：承認後、Claudeが失敗試験の固定→最小実装→退行確認→独立完了レビュー→製品受入提示の順で実装する。
+後続作業：レビュー合格後、利用者へ受入条件12の製品受入だけを一判断として提示して停止する。
 
 ## blocker・Human判断待ち
 
 - blocker：技術blockerなし
-- Human判断待ち：G02安全投影の縮小境界採用と実装開始の一判断
+- Human判断待ち：なし。独立完了レビュー合格まで製品受入の判断を求めない
 
 ## stale・deferred
 
