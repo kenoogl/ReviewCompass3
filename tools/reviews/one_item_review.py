@@ -1,9 +1,14 @@
 """一件レビュー材料と結果集合を扱う読取り専用の製品核。"""
 
 import errno
+import json
 import os
+import re
 import stat
 from pathlib import Path
+
+from tools.common.digests import canonical_json_bytes, sha256_hex
+from tools.session_logs.redaction import default_pattern_rules, find_high_entropy
 
 
 MATERIAL_MAX_BYTES = 262_144
@@ -12,6 +17,13 @@ RESULTS_MAX_BYTES = 1_048_576
 
 _DIRECTORY_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
 _FILE_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
+_IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+_ABSOLUTE_PATH_PATTERNS = (
+    re.compile(r"(?<![A-Za-z0-9._~/-])/(?:[^/\s\"'<>]+/)*[^/\s\"'<>]+"),
+    re.compile(r"(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/]|\\\\)[^\s\"'<>]+"),
+    re.compile(r"(?<![A-Za-z0-9:])//[^/\\\s\"'<>]+[/\\][^\s\"'<>]+"),
+    re.compile(r"\bfile://[^\s\"'<>]+", re.IGNORECASE),
+)
 
 
 class ReviewStop(Exception):
@@ -154,3 +166,134 @@ def read_input_files(*, input_root, material, review_spec, results=None):
         return contents
     finally:
         os.close(root_fd)
+
+
+def _decoded_strings(value):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield key
+            yield from _decoded_strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _decoded_strings(item)
+    elif isinstance(value, str):
+        yield value
+
+
+def _check_safe_texts(texts):
+    pattern_rules = default_pattern_rules()
+    for text in texts:
+        if any(re.search(rule.pattern, text) for rule in pattern_rules):
+            raise ReviewStop("sensitive_data_remaining")
+        if find_high_entropy(text):
+            raise ReviewStop("sensitive_data_remaining")
+        if any(pattern.search(text) for pattern in _ABSOLUTE_PATH_PATTERNS):
+            raise ReviewStop("absolute_path_remaining")
+
+
+def _valid_identifier(value):
+    return isinstance(value, str) and _IDENTIFIER.fullmatch(value) is not None
+
+
+def _validate_review_spec(value):
+    root_keys = {
+        "schema_version",
+        "material_identifier",
+        "goal",
+        "criteria",
+        "constraints",
+    }
+    if not isinstance(value, dict) or set(value) != root_keys:
+        raise ReviewStop("invalid_schema")
+    if type(value["schema_version"]) is not int or value["schema_version"] != 1:
+        raise ReviewStop("invalid_schema")
+    if not _valid_identifier(value["material_identifier"]):
+        raise ReviewStop("invalid_schema")
+    goal = value["goal"]
+    if not isinstance(goal, str) or not 1 <= len(goal) <= 2_000 or "\x00" in goal:
+        raise ReviewStop("invalid_schema")
+
+    criteria = value["criteria"]
+    if not isinstance(criteria, list) or not 1 <= len(criteria) <= 16:
+        raise ReviewStop("invalid_schema")
+    normalized_criteria = []
+    criterion_ids = set()
+    for criterion in criteria:
+        if not isinstance(criterion, dict) or set(criterion) != {"id", "text"}:
+            raise ReviewStop("invalid_schema")
+        criterion_id = criterion["id"]
+        criterion_text = criterion["text"]
+        if (
+            not _valid_identifier(criterion_id)
+            or criterion_id in criterion_ids
+            or not isinstance(criterion_text, str)
+            or not criterion_text
+            or "\x00" in criterion_text
+        ):
+            raise ReviewStop("invalid_schema")
+        criterion_ids.add(criterion_id)
+        normalized_criteria.append({"id": criterion_id, "text": criterion_text})
+
+    constraints = value["constraints"]
+    if not isinstance(constraints, list) or len(constraints) > 16:
+        raise ReviewStop("invalid_schema")
+    if any(
+        not isinstance(constraint, str) or not constraint or "\x00" in constraint
+        for constraint in constraints
+    ):
+        raise ReviewStop("invalid_schema")
+
+    normalized_criteria.sort(key=lambda item: item["id"])
+    return {
+        "constraints": list(constraints),
+        "criteria": normalized_criteria,
+        "goal": goal,
+        "material_identifier": value["material_identifier"],
+        "schema_version": 1,
+    }
+
+
+def prepare_material(material_bytes, review_spec_bytes):
+    """資料と条件から決定的なレビュー材料を作る。"""
+
+    if not isinstance(material_bytes, bytes) or not isinstance(review_spec_bytes, bytes):
+        raise ReviewStop("invalid_schema")
+    try:
+        material_text = material_bytes.decode("utf-8")
+        review_spec_text = review_spec_bytes.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise ReviewStop("invalid_utf8") from error
+    if not material_text or "\x00" in material_text or "\x00" in review_spec_text:
+        raise ReviewStop("invalid_schema")
+    try:
+        decoded_spec = json.loads(review_spec_text)
+    except (json.JSONDecodeError, RecursionError) as error:
+        raise ReviewStop("invalid_schema") from error
+
+    _check_safe_texts((material_text, *_decoded_strings(decoded_spec)))
+    normalized_spec = _validate_review_spec(decoded_spec)
+    review_spec_sha256 = sha256_hex(canonical_json_bytes(normalized_spec))
+    result = {
+        "external_send_approved": False,
+        "material": {
+            "content": material_text,
+            "content_sha256": sha256_hex(material_bytes),
+            "identifier": normalized_spec["material_identifier"],
+            "line_count": len(material_text.splitlines()),
+        },
+        "result_schema": {
+            "grouping_basis": "supplied_issue_key",
+            "schema_version": 1,
+            "semantic_deduplication_performed": False,
+        },
+        "review_spec": {
+            "constraints": normalized_spec["constraints"],
+            "criteria": normalized_spec["criteria"],
+            "goal": normalized_spec["goal"],
+            "sha256": review_spec_sha256,
+        },
+        "schema_version": 1,
+        "status": "material_prepared",
+    }
+    result["material_package_sha256"] = sha256_hex(canonical_json_bytes(result))
+    return result
