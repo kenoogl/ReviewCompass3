@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
-- 現在作業：六境界が完了し、対象158件、G02関連142件、安全表示23件が成功、G02 14 file差分0となった。正規全試験と高危険度反例、独立完了レビューへ進む。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / boundaries_1_to_6_green / completion_verification_pending`
+- 現在作業：六境界、対象・関連・正規全試験、高危険度反例が成功した。固定commitを別実行単位が読取り専用で契約条件1〜18と上位目的へ照合する独立完了レビューへ進む。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / implementation_verified / independent_completion_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [六境界・全試験・高危険度反例の最終検証](records/development/2026-08-15-one-item-review-final-verification-evidence-v1.md) — SHA-256 `3c11a18d68d50b54aba7465290534690b49cabe6c6295126f6a1c29ab1dd4aaa`
 - [境界6の配置・結合・回帰確認成功](records/development/2026-08-15-one-item-review-boundary6-green-evidence-v1.md) — SHA-256 `a9ead3decf81c48e2465eb769929f59d8f2833fe0f3902cb1ef046761991075f`
 - [境界6の別現在位置実行2件と期待失敗](records/development/2026-08-15-one-item-review-boundary6-red-evidence-v1.md) — SHA-256 `afd763b8560c85f75eb92cbb79a5c11b7dadb6b71cf7a3d0009adaec0caec3b4`
 - [境界5の正式入口・安全表示156件成功](records/development/2026-08-15-one-item-review-boundary5-green-evidence-v1.md) — SHA-256 `2bf610c3dc0d45642a6e7824929e12d1bbf63bc0f780f70c832cb05cc31d7237`
@@ -45,19 +46,19 @@
 
 ## 次に行う一作業
 
-正規全試験を単独実行し、改変・複製・機微情報・禁止作用の高危険度反例を確認して、独立完了レビューへ渡す固定証拠を作る。
+固定commitを別実行単位が読取り専用で確認し、契約条件1〜18の未接続、誤合格、範囲外作用、上位目的への悪影響がないか判定する。
 
 開始条件：
 
-- 六境界実装、境界6成功証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 全試験は正規入口から単独commandで行う
-- 独立確認は成果物を変更せず固定commitを読む
+- 最終検証証拠、本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 独立担当は成果物を変更せず固定commitを読む
+- 重要な主張へ少なくとも一つ新しい反証を試す
 
 完了条件：
 
-- 正規全試験が成功する
-- 高危険度反例が契約どおり停止・分類される
-- 独立完了レビューが契約条件1〜18を確認する
+- 独立完了レビューが確認済みまたは修正要を根拠付きで固定する
+- 確認済みなら止める指摘と未接続条件が0件である
+- 修正要なら利用者受入へ進まず限定訂正する
 
 後続作業：独立完了レビューが確認済みなら、合成一件を利用者へ示して受入判断一件だけを求める。
 
@@ -77,8 +78,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：対象158件、G02関連142件、安全表示23件が成功、各終了コード0。G02 14 fileは基準commitから差分0
-- 直近の全Test：製品コードと試験を変更していないため再実行していない。直近の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0
+- 直近の関連Test：対象158件、G02関連142件、安全表示23件、高危険度反例40件が成功、各終了コード0。G02 14 fileは差分0
+- 直近の全Test：正規全試験2,020件成功、失敗・error・skip 0、終了コード0。Python 3.13.14、pytest 8.4.2、runner版2、代替実行なし
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
