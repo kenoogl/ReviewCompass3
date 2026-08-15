@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、最初の製品機能G25読取り専用入口、二つ目の製品機能である一件用安全保存の実装と製品受入が完了した。
-- 現在作業：安全保存は対象97件、関連30件、正規全1,862件が成功し、独立完了再レビューv3で止める指摘0件、条件1から21の未接続0件となった。利用者が条件22を受け入れ、製品処理としての受入まで完了した。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_conditions_1_21_verified_condition_22_human_accepted_product_acceptance_complete`
+- 現在作業：安全保存の製品受入後に未完了な製品用途の意味群を再集計した。製品群9件から完了済みG25を除いた8候補、目録時点61 pathを確認し、G02の外部送信なし一件レビュー処理を次の第一候補とした。
+- Task Contract：`NO-ACTIVE-TASK-CONTRACT / post_safe_storage_product_candidates_8_ranked_g02_recommended_human_selection_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -42,33 +42,34 @@
 - [安全保存の二原因修正後最終技術検証Evidence v3](records/development/2026-08-15-session-artifact-safe-storage-final-verification-evidence-v3.md) — SHA-256 `fc2d86c305b4198b774b57e550205732b599c4f4c753f8db89c52b19175facbd`
 - [安全保存の独立完了再レビューv3開始可](records/development/2026-08-15-session-artifact-safe-storage-independent-completion-review-v3.md) — SHA-256 `233b1833db6b7828e5d835550ec49b27b19e6263720a2665bec819b23d138948`
 - [安全保存の製品受入判断](records/development/2026-08-15-session-artifact-safe-storage-product-acceptance-decision-v1.md) — SHA-256 `7145f57a59efb965f64a5401f6e109685ba1920b5039fe65a4edd644af7573dc`
+- [安全保存受入後の次製品作業候補8件](records/development/2026-08-15-post-safe-storage-next-product-work-candidates-v1.md) — SHA-256 `bcb4ba2947e32254edc547068728fa580bc6b7919fa0f04d9b9353ab6c7899ba`
 
 ## 次に行う一作業
 
-現在の計画、完了記録、持越し項目を機械的に再集計し、安全保存受入後の未完了な製品作業候補を目的、根拠、合否基準、影響、推奨順付きで利用者へ提示する。
+8候補から次の製品作業を一件選ぶ。推奨はG02を一件・外部送信なしへ狭めたレビュー材料作成と結果整理である。
 
 開始条件：
 
-- 安全保存の製品受入判断と現在のTODOが意味単位commitへ固定され、作業場所に未記録差分がない
-- 立て直し計画v5、現在位置記録、初期開発確認表、完了済み製品機能を固定入力にする
-- 完了済み項目を候補へ戻さず、持越し項目と新しい製品作業を分ける
+- 候補一覧と現在のTODOが意味単位commitへ固定され、作業場所に未記録差分がない
+- 候補1の選択はG02全体、外部送信、外部処理、実装開始の承認を意味しない
+- 別候補を選ぶ場合は候補番号だけを指定する
 
 完了条件：
 
-- 候補ごとに目的、根拠、開始条件、完了条件、影響、推奨順が示される
-- 利用者が技術的な再調査をせず次の一作業だけを選べる
+- 利用者が次に扱う候補一件を明示する
+- 選んだ候補について、実装前の作業契約候補を作る範囲だけが固定される
 
-後続作業：利用者が次候補を選んだ場合だけ、その一作業の開始前境界確認へ進む。
+後続作業：推奨どおり候補1なら、固定資料一件のレビュー材料作成と外部送信なし結果整理の作業契約候補を作り、独立した定義確認へ渡す。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：なし。安全保存の条件22は利用者の「受け入れる」により完了した
+- Human判断待ち：次の製品作業一件の選択待ち。推奨は候補1のG02狭域処理で、利用者には候補番号だけを求める
 
 ## stale・deferred
 
 - stale：最終技術検証Evidence v1とv2、および独立完了レビューv1とv2の完了判断はstale。現在根拠はEvidence v3と独立完了再レビューv3開始可である
-- deferred：次候補の提示までは設計、契約、既存入口、中央一覧、push、外部送信、自動削除、実Session記録、複数記録探索を変更・開始しない
+- deferred：候補選択までは設計、作業契約、既存入口、中央一覧、push、外部送信、自動削除、実利用者記録、複数記録探索を変更・開始しない
 
 ## Git・Test
 
@@ -76,7 +77,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：残る2原因の新規2反例を含む保存核と新入口97件、既存正式入口・pipeline・provenance・開発環境30件が終了コード0
+- 直近の関連Test：候補再集計は読取りと文書作成だけで製品コードを変更していない。直前の安全保存対象97件と関連30件は終了コード0
 - 直近の全Test：修正後の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0。receipt SHA-256はe1005f53740a3d2f1f5176a322b70a14874a63df5748cf7df5ab972dea7e3ca9
 - 差分検査：`git diff --check`合格
 
