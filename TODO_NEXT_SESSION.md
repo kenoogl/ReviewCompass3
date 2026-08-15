@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。残る7候補を順に実行中である。
-- 現在作業：候補2の形式検査1系統3変種は、固定試験107件、関連31件、隔離全2127件の成功で限定修正GREENとなった。成果を固定commitへ置き、同じ別担当へ条件9・12を中心とする独立限定再確認を依頼する。
-- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / schema_correction_green / independent_limited_rereview_pending`
+- 現在作業：候補2は、限定修正後の独立再確認で止める原因・未接続条件・誤合格・禁止作用・退行が各0件となり、条件1〜19を満たした。残る条件20は利用者による製品受入だけである。
+- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / conditions_1_to_19_verified / human_product_acceptance_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [止める原因0件で条件1〜19を満たした限定修正独立再確認](records/development/2026-08-15-one-design-acceptance-independent-correction-rereview-v1.md) — SHA-256 `8a4793e617f9d0ce3204ba6c2bc85ce309afb75df0d7add988a8bcb270eda7bc`
 - [形式検査3変種を閉じた限定修正GREEN Evidence](records/development/2026-08-15-one-design-acceptance-independent-correction-green-evidence-v1.md) — SHA-256 `1cbc200bf3e78786dbaacf4590d383d613142074e6ead1927e7ef6227452a1e0`
 - [独立反例3変種の14期待失敗を固定した限定修正RED Evidence](records/development/2026-08-15-one-design-acceptance-independent-correction-red-evidence-v1.md) — SHA-256 `24faa206378cb6ae14f8c8913288ac7d8832ad9dacbcc46110ffdee7462be493`
 - [形式検査1系統3変種で修正要となった独立完了確認v1](records/development/2026-08-15-one-design-acceptance-independent-completion-review-v1.md) — SHA-256 `4af8107d8f617f26720cf34bc6ab12167e8f73c31439ecfc7aa4f14f6ca05888`
@@ -41,30 +42,30 @@
 
 ## 次に行う一作業
 
-限定修正、GREEN Evidence、本TODOを固定commitへ置き、同じ別担当が3反例、条件9・12、他条件退行を読取り専用で再確認する。
+利用者へ、製品の働き、根拠、限界、独立再確認結果を一件の判断材料として示し、条件20の製品受入を求める。
 
 開始条件：
 
-- 限定修正製品差分、GREEN Evidence、本TODOが意味単位commitへ固定される
-- reviewerは成果物を変更せず、前回3反例を設計・受入条件、核・入口で再実行する
-- Human条件20をreviewerが代行しない
+- 独立再確認recordと本TODOが意味単位commitへ固定される
+- 受入対象を固定commit 1fec247の製品2file・試験・配布設定へ限定する
+- AIはHuman条件20を代行せず、受入前に候補3へ進まない
 
 完了条件：
 
-- 前回3変種、条件9・12の不成立、誤合格が0件となる
-- 条件1〜8、10〜17、19、禁止作用、保護対象に退行が0件となる
-- 再確認recordをcommitし、verifiedの場合だけ利用者へ条件20の製品受入を求める
+- 利用者が根拠と限界を確認し、受け入れるか修正を求める
+- 受入なら製品受入Decisionを固定し、完了作業単位をcommitする
+- 受入後にだけ候補3の契約定義へ進む
 
-後続作業：再独立確認がverifiedなら、利用者へ条件20の製品受入を求める。
+後続作業：候補2受入後、候補3のG24について目的・既存実装・価値境界を実測し、Task Contract候補を定義する。
 
 ## blocker・Human判断待ち
 
-- blocker：製品受入を止める形式検査1系統3変種。限定修正は既存契約内で実行可能
-- Human判断待ち：なし。契約v3採用と案C実装開始は利用者が承認済み
+- blocker：なし。技術条件1〜19はverified
+- Human判断待ち：条件20の製品受入。受入対象は固定commit 1fec247の一件設計・受入条件照合製品
 
 ## stale・deferred
 
-- stale：境界1〜4 GREENだけで独立確認待ち・製品受入へ進める表示はstale。開始前の修正要、実装作業票v1単体、契約採用待ちもstale
+- stale：独立完了確認v1の修正要、形式検査修正待ち、限定再確認待ち、境界1〜4 GREENだけの表示はstale
 - deferred：候補2の製品受入、候補3以降の採用・実装、外部送信、実利用者設計は後続境界まで対象外
 
 ## Git・Test
