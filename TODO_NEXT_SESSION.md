@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段を完了した。最初のTask Contractに基づくG25読取り専用入口は、利用者受入、正式・安定表示、第5段完了判断まで完了した。
-- 現在作業：安全保存案Cの実装前コード管理について、一操作の正式入口を実装し、commit 0a02b51の152コードから正式11 pathと保留G26九pathを同一identityで再検索した。両証明書は鮮度確認に合格し、候補採否はHuman裁定待ちとして保持した。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_code_search_complete_tdd_boundary_precheck_pending`
+- 現在作業：安全保存案Cの実装前コード管理について、固定file一覧ではなく作業ごとの必要な働きから直接処理と全repositoryの共通内部部品を探す案Aを実装した。現在は関連試験GREENで、実装commit後の正式な八つの働き検索が未実施である。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_capability_search_green_current_execution_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -18,44 +18,41 @@
 
 - [採用済みの安全保存Task Contract v3](records/task-contract/2026-08-15-session-artifact-safe-storage-candidate-v3.md) — SHA-256 `38de71b1d8910f7cf05ae76a8f881235400d7522f81314f844d8cf1e0e52cfac`
 - [案Cの実装開始判断](records/development/2026-08-15-session-artifact-safe-storage-option-c-implementation-start-decision-v1.md) — SHA-256 `f8c55611de59cd25946aa27bb4330ca66bbf1cf751baba6c5fe5c19a3ec1d45f`
-- [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `14e70e875990c51351b30175c800449f8942117822fd85dd3457baab19aba823`
-- [確定コミット事前確認判断](records/development/2026-08-15-committed-source-formal-search-precheck-decision-v1.md) — SHA-256 `8138c20dca1fb361781846c94f4300afc4ff208241f572510a76d5d801e36539`
-- [一操作入口の実装計画](records/development/2026-08-15-formal-code-reuse-search-one-operation-entry-implementation-plan-v1.md) — SHA-256 `6f2c1174a89e99c33fe1180ef2f23ddab830ba306f8a4cc27fd6a52748a28978`
-- [一操作入口の実装Evidence](records/development/2026-08-15-formal-code-reuse-search-one-operation-entry-implementation-evidence-v1.md) — SHA-256 `bbca763e7fb81e30ae890805ced42c6b49a773d91dbfb65555b1a3f2182dc46b`
-- [安全保存用の作業別検索計画](records/development/2026-08-15-safe-storage-formal-code-reuse-search-plan-v1.json) — SHA-256 `cdecd40cfecf4c945dcf55f0a48de97170caf7858093adb80cb73e04cd796bd5`
+- [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `3453626fd168ac014d5e929017dbfb654bea6425164cfa3aa02bbfdf4aaa1c56`
 - [一操作による現在検索Evidence](records/development/2026-08-15-safe-storage-formal-code-reuse-search-one-operation-execution-evidence-v1.md) — SHA-256 `2b9dffc209a730609a8c3ee8c031c7695db5188245390122f4a21be8c82f55d0`
-- [正式11 pathの現行検索証明書](records/development/2026-08-15-safe-storage-formal-code-reuse-search-attestation-v2.json) — SHA-256 `709d72b7a79c1412e25208b7a405f6354059493240daa50e9552346ae5fc01bd`
-- [保留G26九pathの現行検索証明書](records/development/2026-08-15-safe-storage-provisional-g26-reuse-search-attestation-v2.json) — SHA-256 `05259d87ec6c2a4b93cda21775bfbbc34994df56c839e9c6c43f5f6ac5e298e8`
+- [必要な働きによる検索の実装計画](records/development/2026-08-15-capability-derived-code-reuse-search-implementation-plan-v1.md) — SHA-256 `f9ec5f1546705ce38d6abebbe886723c947331370d27fcf67ebff4ed07dade0d`
+- [必要な働きによる検索の実装Evidence](records/development/2026-08-15-capability-derived-code-reuse-search-implementation-evidence-v1.md) — SHA-256 `05dd4aec4d46547955dfb62370204171c7a599c78d068e3f8fac6926a6938e63`
+- [安全保存の八つの働き検索計画](records/development/2026-08-15-safe-storage-capability-derived-code-reuse-search-plan-v2.json) — SHA-256 `f652448f72e306fcac57ab05bf88200fce352994afb48017db04a3c5e13f1421`
 
 ## 次に行う一作業
 
-コード管理とは別の作業単位として、安全保存Task Contract v3をTDDで扱える小さいRED／GREEN境界へ分けられるかを実装前に確認する。
+必要な働きによる検索実装を意味単位でcommitした後、変更なしの同commitから安全保存の八つの働きを一操作で正式検索し、候補と未対応を固定する。
 
 開始条件：
 
-- 採用済みTask Contract v3、案C実装開始判断、現行検索Evidence、二つの現行証明書を固定入力として読む
-- 製品コードと試験を書き始めず、契約の状態遷移・失敗境界・許可pathを意味的に完結した小単位へ分ける
-- 現行検索候補のうち実装依存として採用する処理があれば、正式・暫定・使用停止と再利用方法を明示してHumanへ戻す
-- コード管理入口とTDD境界確認を一つの機能へ統合しない
+- 検索実装、試験、schema 2計画、開発方針、source universe v7、freshness policy v10がcommitされ、作業場所に未commit変更がない
+- 安全保存の八つの働きとnew-only証明書pathが計画内容識別値へ結び付き、出力先が未作成である
+- 検索元を現在のGit管理コードから生成し、過去の20 pathまたは中央一覧へ制限しない
+- ライフサイクルと再利用方法を自動裁定しない
 
 完了条件：
 
-- 各実装境界が一つの観測可能な振る舞いと対応するRED／GREENで完結し、前後の途中状態を不整合にしない
-- 最初に実装する最小の縦切り、許可変更path、各境界の停止条件と独立確認方法が明示される
-- 再利用候補の採否未決がある境界は実装開始可とせず、正式コードの重複実装を防ぐ
-- 製品コード、製品試験、製品設定、Task Contractを変更せず、開始可否を利用者へ返す
+- 八つの働きが同じcommit、source content ID、Profile、Discoveryへ結び付く
+- 働きごとの候補、根拠、禁止副作用との衝突、sourceの成熟度表示、未対応がnew-only正本と証明書へ残る
+- 候補の採用、不採用、修正利用とDecisionによる正式・使用停止の照合をHuman裁定待ちとして返す
+- 製品コード、製品試験、製品設定、Task Contract、製品TDD境界を変更しない
 
-後続作業：TDD境界確認と独立開始前レビューが合格し、必要な再利用裁定をHumanが行った後だけ、最初のREDへ進む。
+後続作業：検索結果を固定した後、必要な候補だけをHumanが採否判断し、その後に別機能である製品TDD境界確認へ戻る。
 
 ## blocker・Human判断待ち
 
-- blocker：コード管理入口と現行検索にはblockerがない。安全保存の製品実装は、TDD境界確認と必要な再利用候補のHuman裁定が終わるまで開始しない。
-- Human判断待ち：現時点で追加判断はない。TDD境界確認で保留G26または他候補を正式依存へ採用する必要が判明した場合だけ、正式・暫定・使用停止と再利用方法を利用者へ戻す。
+- blocker：検索実装にはblockerがない。正式検索はcleanな実装commitが必要なため、現在の未commit実装状態では実行しない。
+- Human判断待ち：現時点で追加判断はない。正式検索後、実装依存へ採用する候補についてだけ採用、不採用、修正利用と正式・暫定・使用停止を利用者へ戻す。
 
 ## stale・deferred
 
-- stale：旧一時手順による検索とv1証明書は過去観測として保持し、現在の根拠にはcommit 0a02b51へ結び付いたv2証明書だけを使う。作業別計画を将来の検索元または中央一覧にしない。
-- deferred：TDD境界の独立確認が終わるまで、失敗試験、製品コード、製品設定、配布入口を変更しない。ライフサイクル自動裁定、再利用方法の自動裁定、中央一覧、自動commit、push、外部送信も開始しない。
+- stale：固定20 pathによるv1検索と二つのv2証明書はcommit 0a02b51の履歴観測として保持するが、現在の実装開始根拠には八つの働きによる新検索を使う。
+- deferred：八つの働きの検索と候補裁定が終わるまで、製品TDD境界、失敗試験、製品コード、製品設定、配布入口を変更しない。中央一覧、自動commit、push、外部送信も開始しない。
 
 ## Git・Test
 
@@ -63,8 +60,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：一操作入口の新規5件と、確定commit確認、Work 4A、Work 4B、権威参照の関連115件が成功した。module入口の起動確認と、生成後の二証明書の独立鮮度照合も成功した。
-- 直近の全Test：一操作入口と試験を含む正規全試験は1,751件成功、失敗・error・skip 0、終了コード0だった。Python 3.13.14、pytest 8.4.2、runner版2、fallbackなし。
+- 直近の関連Test：必要な働き検索、旧検索、鮮度、外部化、一操作入口の関連46件と、方針・権威参照29件が成功した。新しいコードによるstale、必要・禁止の副作用の同時指定拒否、実行時間と検索identityの分離を含む。
+- 直近の全Test：実行時間の計測を含む正規全試験は1,758件成功、失敗・error・skip 0、終了コード0だった。Python 3.13.14、pytest 8.4.2、runner版2、fallbackなし。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則

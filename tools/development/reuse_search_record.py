@@ -8,8 +8,10 @@
 recordは処置labelを持たず、Human判断を先取りしない。
 """
 
+import ast
 import hashlib
 import json
+import re
 from pathlib import Path
 
 
@@ -22,11 +24,31 @@ _RECORD_FIELDS_V1 = (
     "source_identity", "query", "hits", "groups", "content_digest",
 )
 _RECORD_FIELDS_V2 = _RECORD_FIELDS_V1 + ("freshness",)
+_RECORD_FIELDS_V3 = (
+    "record_kind", "schema_version", "subject", "declaration",
+    "source_identity", "query", "hits", "groups", "capability_results",
+    "uncovered_capability_ids", "human_adjudication_required", "freshness",
+    "content_digest",
+)
 _FRESHNESS_FIELDS = (
     "assessed", "observation_snapshot_id", "target_paths",
     "files_at_observation", "changed_files", "new_files", "missing_files", "stale",
 )
 _DECLARATION_FIELDS = ("subject", "target_paths", "target_symbols")
+_CAPABILITY_DECLARATION_FIELDS = ("subject", "source_scope_paths", "capabilities")
+_CAPABILITY_FIELDS = (
+    "capability_id", "responsibility", "inputs", "outputs", "failure_behavior",
+    "required_properties", "reference_paths", "reference_symbols", "symbol_terms",
+    "required_effect_markers", "forbidden_effect_markers",
+)
+_CAPABILITY_RESULT_FIELDS = (
+    "capability_id", "coverage_status", "anchor_symbol_ids",
+    "missing_reference_paths", "missing_reference_symbols", "candidates",
+)
+_CAPABILITY_CANDIDATE_FIELDS = (
+    "symbol_id", "code_reference", "match_reasons", "related_group_ids",
+    "conflicting_effect_markers", "declared_lifecycle",
+)
 _IDENTITY_FIELDS = (
     "profile_run_id", "discovery_run_id", "source_content_id",
     "profile_schema_version", "extraction_rule_version",
@@ -45,6 +67,21 @@ _QUERY_RULES = (
     "direct_neighbor",
     "group_membership_full_members",
 )
+_CAPABILITY_QUERY_RULES = (
+    "work_specific_capability_declaration",
+    "reference_path_and_exact_symbol_anchor",
+    "symbol_term_hint",
+    "required_effect_marker_match",
+    "direct_neighbor",
+    "comparison_group_full_members",
+    "forbidden_effect_marker_annotation",
+    "declared_source_lifecycle_observation",
+)
+_EFFECT_MARKERS = {
+    "file_read", "file_write", "process_spawn", "network", "environment",
+    "global_mutation",
+}
+_DECLARED_LIFECYCLES = {"stable", "provisional", "stopped"}
 
 
 from tools.common.digests import file_sha256 as file_sha256
@@ -245,6 +282,262 @@ def search_existing_routines(
     return record
 
 
+def _require_string_list(value, field, *, allow_empty=True):
+    if (
+        not isinstance(value, list)
+        or (not allow_empty and not value)
+        or any(not isinstance(item, str) or not item for item in value)
+        or len(value) != len(set(value))
+    ):
+        raise ReuseSearchError(f"capability field is invalid: {field}")
+
+
+def _validate_capability(capability):
+    _require_exact_fields(capability, _CAPABILITY_FIELDS, "capability")
+    for field in ("capability_id", "responsibility"):
+        if not isinstance(capability[field], str) or not capability[field]:
+            raise ReuseSearchError(f"capability field is invalid: {field}")
+    for field in (
+        "inputs", "outputs", "failure_behavior", "required_properties",
+        "reference_paths", "reference_symbols", "symbol_terms",
+        "required_effect_markers", "forbidden_effect_markers",
+    ):
+        _require_string_list(
+            capability[field],
+            field,
+            allow_empty=field not in (
+                "inputs", "outputs", "failure_behavior", "required_properties"
+            ),
+        )
+    if not any(
+        capability[field]
+        for field in (
+            "reference_paths", "reference_symbols", "symbol_terms",
+            "required_effect_markers",
+        )
+    ):
+        raise ReuseSearchError("capability has no machine search input")
+    marker_fields = set(capability["required_effect_markers"]) | set(
+        capability["forbidden_effect_markers"]
+    )
+    if marker_fields - _EFFECT_MARKERS:
+        raise ReuseSearchError("capability effect marker is invalid")
+    if set(capability["required_effect_markers"]) & set(
+        capability["forbidden_effect_markers"]
+    ):
+        raise ReuseSearchError("required and forbidden effect markers overlap")
+    for relative in capability["reference_paths"]:
+        if Path(relative).is_absolute() or ".." in Path(relative).parts:
+            raise ReuseSearchError("capability reference path is invalid")
+
+
+def _source_lifecycle(project_root, relative_path, cache):
+    if relative_path in cache:
+        return cache[relative_path]
+    try:
+        source = (Path(project_root) / relative_path).read_text(encoding="utf-8")
+        document = ast.parse(source)
+        docstring = ast.get_docstring(document) or ""
+    except (OSError, UnicodeDecodeError, SyntaxError):
+        cache[relative_path] = "undeclared"
+        return cache[relative_path]
+    match = re.search(r"(?m)^lifecycle:\s*([a-z_-]+)\s*$", docstring)
+    value = match.group(1) if match else "undeclared"
+    cache[relative_path] = value if value in _DECLARED_LIFECYCLES else "undeclared"
+    return cache[relative_path]
+
+
+def search_required_capabilities(
+    *,
+    profile_document,
+    discovery_document,
+    declaration,
+    observation_document,
+    project_root=".",
+):
+    """作業ごとの必要な働きから、現在の全コードにある候補を導く。"""
+
+    _require_exact_fields(
+        declaration, _CAPABILITY_DECLARATION_FIELDS, "capability declaration"
+    )
+    subject = declaration["subject"]
+    if not isinstance(subject, str) or not subject:
+        raise ReuseSearchError("capability subject is invalid")
+    source_scope_paths = declaration["source_scope_paths"]
+    _require_string_list(source_scope_paths, "source_scope_paths", allow_empty=False)
+    for relative in source_scope_paths:
+        if Path(relative).is_absolute() or ".." in Path(relative).parts:
+            raise ReuseSearchError("source scope path is invalid")
+    capabilities = declaration["capabilities"]
+    if not isinstance(capabilities, list) or not capabilities:
+        raise ReuseSearchError("capabilities are missing")
+    identifiers = []
+    for capability in capabilities:
+        _validate_capability(capability)
+        identifiers.append(capability["capability_id"])
+    if len(identifiers) != len(set(identifiers)):
+        raise ReuseSearchError("capability id is duplicated")
+
+    source_content_id = profile_document.get("source_content_id")
+    if discovery_document.get("source_content_id") != source_content_id:
+        raise ReuseSearchError("profile and discovery source content ids differ")
+    routines = profile_document.get("routines", [])
+    by_id = {item["symbol_id"]: item for item in routines}
+    groups_by_member = {}
+    groups_by_id = {}
+    for group in discovery_document.get("groups", []):
+        groups_by_id[group["group_id"]] = group
+        for member in group.get("member_symbol_ids", []):
+            groups_by_member.setdefault(member, []).append(group)
+
+    observed_paths = {item["path"] for item in observation_document.get("files", [])}
+    lifecycle_cache = {}
+    aggregate_reasons = {}
+    referenced_group_ids = set()
+    capability_results = []
+    uncovered = []
+    for capability in capabilities:
+        reasons = {}
+        anchor_ids = set()
+        capability_group_ids = set()
+        reference_paths = tuple(capability["reference_paths"])
+        reference_symbols = set(capability["reference_symbols"])
+        symbol_terms = tuple(capability["symbol_terms"])
+        required_markers = set(capability["required_effect_markers"])
+        forbidden_markers = set(capability["forbidden_effect_markers"])
+
+        for routine in routines:
+            symbol_id = routine["symbol_id"]
+            relative = routine["code_reference"]["relative_path"]
+            symbol_name = symbol_id.rsplit(":", 1)[-1]
+            direct_reasons = []
+            if any(
+                relative == prefix or relative.startswith(f"{prefix}/")
+                for prefix in reference_paths
+            ):
+                direct_reasons.append("reference_path_anchor")
+            if symbol_id in reference_symbols:
+                direct_reasons.append("reference_symbol_anchor")
+            if any(term in symbol_name for term in symbol_terms):
+                direct_reasons.append("symbol_term_hint")
+            if direct_reasons:
+                anchor_ids.add(symbol_id)
+                reasons.setdefault(symbol_id, set()).update(direct_reasons)
+            if required_markers and required_markers <= set(
+                routine.get("syntactic_effect_markers", [])
+            ):
+                reasons.setdefault(symbol_id, set()).add("required_effect_marker_match")
+
+        for symbol_id in sorted(anchor_ids):
+            routine = by_id[symbol_id]
+            for neighbor in tuple(routine.get("direct_callee_symbol_ids", ())) + tuple(
+                routine.get("direct_caller_symbol_ids", ())
+            ):
+                if neighbor in by_id:
+                    reasons.setdefault(neighbor, set()).add("direct_neighbor")
+            for group in groups_by_member.get(symbol_id, []):
+                referenced_group_ids.add(group["group_id"])
+                capability_group_ids.add(group["group_id"])
+                for member in group.get("member_symbol_ids", []):
+                    if member in by_id:
+                        reasons.setdefault(member, set()).add("comparison_group_member")
+
+        candidates = []
+        for symbol_id in sorted(reasons):
+            routine = by_id[symbol_id]
+            related_groups = sorted(
+                group["group_id"]
+                for group in groups_by_member.get(symbol_id, [])
+                if group["group_id"] in capability_group_ids
+            )
+            markers = set(routine.get("syntactic_effect_markers", []))
+            item = {
+                "symbol_id": symbol_id,
+                "code_reference": dict(routine["code_reference"]),
+                "match_reasons": sorted(reasons[symbol_id]),
+                "related_group_ids": related_groups,
+                "conflicting_effect_markers": sorted(markers & forbidden_markers),
+                "declared_lifecycle": _source_lifecycle(
+                    project_root,
+                    routine["code_reference"]["relative_path"],
+                    lifecycle_cache,
+                ),
+            }
+            candidates.append(item)
+            aggregate_reasons.setdefault(symbol_id, set()).update(reasons[symbol_id])
+        coverage = "candidates_found" if candidates else "no_candidates"
+        if not candidates:
+            uncovered.append(capability["capability_id"])
+        capability_results.append(
+            {
+                "capability_id": capability["capability_id"],
+                "coverage_status": coverage,
+                "anchor_symbol_ids": sorted(anchor_ids),
+                "missing_reference_paths": sorted(
+                    relative
+                    for relative in set(reference_paths)
+                    if not any(
+                        path == relative or path.startswith(f"{relative}/")
+                        for path in observed_paths
+                    )
+                ),
+                "missing_reference_symbols": sorted(reference_symbols - set(by_id)),
+                "candidates": candidates,
+            }
+        )
+
+    hits = [
+        {
+            "symbol_id": symbol_id,
+            "code_reference": dict(by_id[symbol_id]["code_reference"]),
+            "match_reasons": sorted(reasons),
+            "group_id": None,
+            "basis_kind": None,
+        }
+        for symbol_id, reasons in sorted(aggregate_reasons.items())
+    ]
+    groups = [
+        {
+            "group_id": group_id,
+            "basis_kind": groups_by_id[group_id].get("basis_kind"),
+            "member_symbol_ids": list(groups_by_id[group_id]["member_symbol_ids"]),
+        }
+        for group_id in sorted(referenced_group_ids)
+    ]
+    record = {
+        "record_kind": "reuse_search_record",
+        "schema_version": 3,
+        "subject": subject,
+        "declaration": {
+            "subject": subject,
+            "source_scope_paths": list(source_scope_paths),
+            "capabilities": json.loads(json.dumps(capabilities)),
+        },
+        "source_identity": {
+            "profile_run_id": _profile_run_id(profile_document),
+            "discovery_run_id": _discovery_run_id(discovery_document),
+            "source_content_id": source_content_id,
+            "profile_schema_version": profile_document.get("schema_version"),
+            "extraction_rule_version": profile_document.get("extraction_rule_version"),
+            "discovery_schema_version": discovery_document.get("schema_version"),
+            "grouping_rule_version": discovery_document.get("grouping_rule_version"),
+        },
+        "query": {"rules_applied": list(_CAPABILITY_QUERY_RULES)},
+        "hits": hits,
+        "groups": groups,
+        "capability_results": capability_results,
+        "uncovered_capability_ids": sorted(uncovered),
+        "human_adjudication_required": True,
+        "freshness": _assess_freshness(
+            observation_document=observation_document,
+            target_paths=source_scope_paths,
+            project_root=project_root,
+        ),
+    }
+    record["content_digest"] = _content_digest(record)
+    return record
+
+
 def _require_exact_fields(document, fields, label):
     if not isinstance(document, dict):
         raise ReuseSearchError(f"{label} is not a mapping")
@@ -277,9 +570,55 @@ def validate_reuse_search_record(record, *, expected_identity):
             raise ReuseSearchError(
                 "freshness scope disagrees with the declared scope"
             )
+    elif schema_version == 3:
+        _require_exact_fields(record, _RECORD_FIELDS_V3, "reuse search record")
+        _require_exact_fields(record["freshness"], _FRESHNESS_FIELDS, "freshness")
+        _require_exact_fields(
+            record["declaration"],
+            _CAPABILITY_DECLARATION_FIELDS,
+            "capability declaration",
+        )
+        if list(record["freshness"]["target_paths"]) != list(
+            record["declaration"]["source_scope_paths"]
+        ):
+            raise ReuseSearchError(
+                "freshness scope disagrees with the declared source scope"
+            )
+        capability_ids = []
+        for capability in record["declaration"]["capabilities"]:
+            _validate_capability(capability)
+            capability_ids.append(capability["capability_id"])
+        if len(capability_ids) != len(set(capability_ids)):
+            raise ReuseSearchError("capability id is duplicated")
+        result_ids = []
+        uncovered = []
+        for result in record["capability_results"]:
+            _require_exact_fields(
+                result, _CAPABILITY_RESULT_FIELDS, "capability result"
+            )
+            result_ids.append(result["capability_id"])
+            if result["coverage_status"] not in ("candidates_found", "no_candidates"):
+                raise ReuseSearchError("capability coverage status is invalid")
+            if result["coverage_status"] == "no_candidates":
+                uncovered.append(result["capability_id"])
+            for candidate in result["candidates"]:
+                _require_exact_fields(
+                    candidate, _CAPABILITY_CANDIDATE_FIELDS, "capability candidate"
+                )
+                if candidate["declared_lifecycle"] not in (
+                    "stable", "provisional", "stopped", "undeclared"
+                ):
+                    raise ReuseSearchError("declared lifecycle is invalid")
+        if result_ids != capability_ids:
+            raise ReuseSearchError("capability result coverage is incomplete")
+        if sorted(uncovered) != record["uncovered_capability_ids"]:
+            raise ReuseSearchError("uncovered capability summary differs")
+        if record["human_adjudication_required"] is not True:
+            raise ReuseSearchError("human adjudication boundary is missing")
     else:
         raise ReuseSearchError("schema version is invalid")
-    _require_exact_fields(record["declaration"], _DECLARATION_FIELDS, "declaration")
+    if schema_version in (1, 2):
+        _require_exact_fields(record["declaration"], _DECLARATION_FIELDS, "declaration")
     if record["subject"] != record["declaration"]["subject"]:
         raise ReuseSearchError("subject differs from declaration")
 
@@ -368,7 +707,7 @@ def _search_matches(record, *, profile_document, discovery_document, project_roo
     観測欄を持たないschema 1のrecordは再現の材料が無いため、照合しない。
     """
 
-    if record["schema_version"] != 2:
+    if record["schema_version"] == 1:
         return True
     freshness = record["freshness"]
     observation = {
@@ -379,13 +718,22 @@ def _search_matches(record, *, profile_document, discovery_document, project_roo
             for item in freshness["files_at_observation"]
         ],
     }
-    rebuilt = search_existing_routines(
-        profile_document=profile_document,
-        discovery_document=discovery_document,
-        declaration=record["declaration"],
-        observation_document=observation,
-        project_root=project_root,
-    )
+    if record["schema_version"] == 2:
+        rebuilt = search_existing_routines(
+            profile_document=profile_document,
+            discovery_document=discovery_document,
+            declaration=record["declaration"],
+            observation_document=observation,
+            project_root=project_root,
+        )
+    else:
+        rebuilt = search_required_capabilities(
+            profile_document=profile_document,
+            discovery_document=discovery_document,
+            declaration=record["declaration"],
+            observation_document=observation,
+            project_root=project_root,
+        )
     return rebuilt["content_digest"] == record["content_digest"]
 
 
@@ -457,6 +805,11 @@ def _build_attestation(record, *, byte_sha256):
         "record_schema_version": record["schema_version"],
         "hit_count": len(record["hits"]),
     }
+    if record["schema_version"] == 3:
+        document["capability_count"] = len(record["capability_results"])
+        document["uncovered_capability_count"] = len(
+            record["uncovered_capability_ids"]
+        )
     document["content_digest"] = _content_digest(document)
     return document
 
