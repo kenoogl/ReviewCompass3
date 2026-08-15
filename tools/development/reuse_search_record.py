@@ -73,10 +73,14 @@ _CAPABILITY_QUERY_RULES = (
     "symbol_term_hint",
     "required_effect_marker_match",
     "direct_neighbor",
-    "comparison_group_full_members",
+    "focused_structural_or_neighborhood_group_members",
     "forbidden_effect_marker_annotation",
     "declared_source_lifecycle_observation",
 )
+_CAPABILITY_EXPANSION_BASIS_KINDS = {
+    "structural_exact_match",
+    "call_neighborhood",
+}
 _EFFECT_MARKERS = {
     "file_read", "file_write", "process_spawn", "network", "environment",
     "global_mutation",
@@ -436,6 +440,11 @@ def search_required_capabilities(
                 if neighbor in by_id:
                     reasons.setdefault(neighbor, set()).add("direct_neighbor")
             for group in groups_by_member.get(symbol_id, []):
+                if (
+                    group.get("basis_kind") not in _CAPABILITY_EXPANSION_BASIS_KINDS
+                    or group.get("presentation_class") != "focused"
+                ):
+                    continue
                 referenced_group_ids.add(group["group_id"])
                 capability_group_ids.add(group["group_id"])
                 for member in group.get("member_symbol_ids", []):

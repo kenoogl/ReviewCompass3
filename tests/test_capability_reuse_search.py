@@ -36,6 +36,7 @@ def _profile():
     atomic = "tools/common/atomic.py:atomic_replace"
     anchor = "tools/feature/save.py:save_record"
     risky = "tools/other/upload.py:write_and_send"
+    unrelated = "tools/other/display.py:show_status"
     return {
         "profile_run_id": PROFILE_ID,
         "source_content_id": SOURCE_ID,
@@ -45,6 +46,7 @@ def _profile():
             _routine(anchor, markers=("file_write",), callees=(atomic,)),
             _routine(atomic, markers=("file_write",), callers=(anchor,)),
             _routine(risky, markers=("file_write", "network")),
+            _routine(unrelated),
         ],
     }
 
@@ -59,9 +61,19 @@ def _discovery():
             {
                 "group_id": "CG-STRUCT-0001",
                 "basis_kind": "structural_exact_match",
+                "presentation_class": "focused",
                 "member_symbol_ids": [
                     "tools/common/atomic.py:atomic_replace",
                     "tools/feature/save.py:save_record",
+                ],
+            },
+            {
+                "group_id": "CG-IFACE-0001",
+                "basis_kind": "interface_shape_match",
+                "presentation_class": "focused",
+                "member_symbol_ids": [
+                    "tools/feature/save.py:save_record",
+                    "tools/other/display.py:show_status",
                 ],
             }
         ],
@@ -133,6 +145,7 @@ def test_capability_search_expands_from_anchor_to_full_repository_candidates(tmp
         "provisional"
     )
     assert by_id["tools/feature/save.py:save_record"]["declared_lifecycle"] == "stable"
+    assert "tools/other/display.py:show_status" not in by_id
     assert by_id["tools/other/upload.py:write_and_send"][
         "conflicting_effect_markers"
     ] == ["network"]
