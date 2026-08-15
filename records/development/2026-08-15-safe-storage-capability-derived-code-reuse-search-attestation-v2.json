@@ -1,0 +1,24 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "safe_storage_required_capabilities_v2",
+  "external": {
+    "relative_path": "work4b/reuse-searches/404bf047596bf6e17ec3b74ace8324d44c87629581bb5d84f48fe7be0b34a64d.json",
+    "content_digest": "404bf047596bf6e17ec3b74ace8324d44c87629581bb5d84f48fe7be0b34a64d",
+    "byte_sha256": "bb97082bb9834e55de86fe464595f65256cdaf2a4bc4cbf73bd22fbde2a9cde4"
+  },
+  "source_identity": {
+    "profile_run_id": "04c3f28ca7db8752a06c3e18beed22ba558354fa8cd52dd55bab7b7c58307889",
+    "discovery_run_id": "65d89fcfc5bc5346ae8df875ae54bffad8f6b063ae74c0f2fea3545cffdeedd3",
+    "source_content_id": "d6743be4266adb79e1f5ff775ecb3796e343a04acc3b4759196d0c1f43f191f6",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 3,
+  "hit_count": 1023,
+  "capability_count": 8,
+  "uncovered_capability_count": 0,
+  "content_digest": "23d8738a632f7a1ef6f0687fe1da7e8996aea94a6ba4a65ed3d721499056776a"
+}
