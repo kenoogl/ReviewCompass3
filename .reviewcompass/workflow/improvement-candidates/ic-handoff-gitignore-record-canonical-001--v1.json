@@ -1,0 +1,63 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001",
+ "candidate_version": 1,
+ "created_at": "2026-08-16T00:38:19+09:00",
+ "source_work": "g24-one-requirement-candidate-check/codex-handoff-preparation",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-HANDOFF-GITIGNORE-RECORD-CANONICAL-2026-08-16-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-16-handoff-gitignore-record-canonical-mismatch-observation-v1.json",
+  "sha256": "740eec21510aff5b662db8e421d97b2245fbe67616a05d4b4955d5c46644662f"
+ },
+ "problem": ".gitignoreの`records/session-handoffs/*-claude-to-codex-*.md`（2026-08-05、commit 2e68114、Human中継方式の局所メモ除外が目的）が、2026-08-09のrecord正本方式（commit済みrecordだけを正本とし、Claudeがcodex execでCodexを起動する）と食い違う。慣例名で作成した依頼recordがgit statusへ現れず、無音でcommitから外れる。2026-08-15のG24契約候補v3依頼recordで実際に1回発生し、patternを避ける改名で回避した（commit dd3449a）。同patternのfileは観測時点で47件あり、10件がtracked、37件がuntrackedのまま混在している",
+ "impact": [
+  "依頼recordが無音でcommitから外れ、record正本方式の前提（固定commit上のrecordを鮮度検査する）が壊れ得る",
+  "作成者がgit statusを照合しない場合、正本の欠落に気づかないままCodexを起動し得る",
+  "旧方式期の同名file 47件がtracked 10件・untracked 37件で混在し、正本と局所メモを名前で判別できない",
+  "回避策の改名により、Claude発の依頼recordの命名が慣例（claude-to-codex）から外れて不統一になる"
+ ],
+ "scope": [
+  ".gitignoreの当該行の削除または限定（record正本方式と整合させる）の検討",
+  "untracked 37件の扱い（正本へ昇格、別置、廃棄）の仕分けの検討",
+  "依頼recordの命名規約をpilot-driven-record-handoff.mdへ明記する検討"
+ ],
+ "non_scope": [
+  "Human裁定前の.gitignore変更、file移動・削除、文書改定",
+  "record正本方式そのものの見直し",
+  "現在進行中のG24作業・候補4以降の変更"
+ ],
+ "classification_candidates": [
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "issue_resolution"
+ ],
+ "consumer_candidates": [
+  "pilot-driven-record-handoff",
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": ".gitignore",
+   "sha256": "f98cc83eb073ee82529e456fea4fe3b7c9ca4ae74b40d3f3b19bb18eab8cca14"
+  },
+  {
+   "path": "docs/development/pilot-driven-record-handoff.md",
+   "sha256": "eb999d29947f973edbf0700c5cff97ec3bb4a46cbc66119f63a0c9a9b1ea275f"
+  },
+  {
+   "path": "records/development/2026-08-16-handoff-gitignore-record-canonical-mismatch-observation-v1.json",
+   "sha256": "740eec21510aff5b662db8e421d97b2245fbe67616a05d4b4955d5c46644662f"
+  },
+  {
+   "path": "records/session-handoffs/2026-08-15-g24-contract-v3-limited-rereview-codex-request-v1.md",
+   "sha256": "47ae10f6ef13e990a0d10a1bd5e292d2849129c4c5267402029f95169a7dc712"
+  }
+ ],
+ "proposed_action": "Humanが分類、blocking判定、routeを裁定する。候補案は次の2段である。第一に、.gitignoreの当該行を削除し、record正本方式で作る依頼recordを慣例名のままcommitできるようにする（旧方式の局所メモが今後も必要なら、別のprefixまたは別directoryへ限定した規則に置き換える）。第二に、untracked 37件を仕分けし、正本として残す価値のあるものだけをcommit、残りを明示的に廃棄する。いずれもHuman裁定前に実装しない。裁定まで、Claudeは依頼recordへpatternに一致しない名前を使い続ける",
+ "content_digest": "86303d2f3e8c67b9f705a0250bcd02adb19f94266c03d4c25e337e4af91bc59a"
+}

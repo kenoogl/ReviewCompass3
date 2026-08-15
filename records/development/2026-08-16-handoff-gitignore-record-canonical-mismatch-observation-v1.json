@@ -1,0 +1,48 @@
+{
+ "observation_id": "OBS-RC3-HANDOFF-GITIGNORE-RECORD-CANONICAL-2026-08-16-V1",
+ "observed_at": "2026-08-16T00:38:19+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "The .gitignore rule for claude-to-codex handoff records conflicts with the 2026-08-09 record-canonical handoff method that requires committed records as the only canonical content",
+ "source": {
+  "path": "docs/development/pilot-driven-record-handoff.md",
+  "sha256": "eb999d29947f973edbf0700c5cff97ec3bb4a46cbc66119f63a0c9a9b1ea275f"
+ },
+ "machine_observations": {
+  "gitignore_rule": {
+   "path": ".gitignore",
+   "line": 4,
+   "pattern": "records/session-handoffs/*-claude-to-codex-*.md",
+   "added_in_commit": "2e68114825fc117a20930682f1ed5931d985ffdc",
+   "added_on": "2026-08-05",
+   "added_commit_subject": "Ignore local Claude completion reports in transition gate"
+  },
+  "record_canonical_decision": {
+   "path": "docs/development/pilot-driven-record-handoff.md",
+   "decided_on": "2026-08-09",
+   "principle": "内容の正本はcommitted recordだけである"
+  },
+  "matching_files": {
+   "on_disk": 47,
+   "tracked_before_rule": 10,
+   "ignored_untracked": 37,
+   "counted_at_commit": "9cd6e54ecfbde5fd99d2d1e5f8b29e9985a9100f",
+   "commands": [
+    "ls records/session-handoffs/*-claude-to-codex-*.md | wc -l",
+    "git ls-files 'records/session-handoffs/*claude-to-codex*' | wc -l"
+   ]
+  },
+  "incident_2026_08_15": {
+   "event": "G24契約候補v3の限定再確認依頼recordを慣例名2026-08-15-claude-to-codex-g24-contract-v3-limited-rereview-request-v1.mdで作成したところ、git statusに現れずcommit対象から無音で外れた。patternへ一致しない名前へ変更して commit dd3449a356c0d1d4b886a58c54372ea2db725697 へ固定した",
+   "detection": "commit前のgit status --porcelain照合で検出",
+   "repository_change": "無視patternを避ける改名のみ。.gitignoreは未変更"
+  }
+ },
+ "problem": "2026-08-05の無視規則は、当時のHuman中継方式でclaude-to-codex fileがcommitしない局所メモだった前提に立つ。2026-08-09のrecord正本方式はcommit済みrecordだけを正本とするため、慣例名で作った依頼recordが無音でcommitから外れ、正本の欠落や送信内容と記録の不一致を生み得る",
+ "impact": [
+  "依頼recordが無音でcommitされず、record正本方式の前提（固定commit上のrecord）が壊れ得る",
+  "2026-08-15に実際の依頼recordで1回発生し、改名による回避を要した",
+  "旧方式期の同名patternのfile 10件はtracked、37件はuntrackedのまま混在し、正本か局所メモかを名前から判別できない"
+ ],
+ "boundary": "本観測は記録のみである。.gitignoreの変更、既存47 fileの扱いの決定、命名規約の改定は行っていない",
+ "content_digest": "4ec99228a14ff2a5ddf6355034a7d4adfc68733b4fe2e62663a3f8fb650ed35a"
+}

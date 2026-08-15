@@ -38,7 +38,7 @@
 
 - 利用者の選択がchat文言で得られ、対応する契約候補の定義作業へ引き継がれる
 
-後続作業：本線の区切りとして、`.gitignore`のclaude-to-codex無視規則とrecord正本方式の食い違いを改善候補として登録する（利用者が併せて指示した場合）。
+後続作業：なし（改善候補の登録は完了済み。仕分けはHuman裁定待ちの持ち越し）。
 
 ## blocker・Human判断待ち
 
@@ -48,7 +48,7 @@
 ## stale・deferred
 
 - stale：v3の実装中・レビュー待ち・受入待ちの表示はstale
-- deferred：G24の要求作成責務（選択Aまで）、現行要求変更、候補5以降、外部送信、実利用者要求資料の使用は後続境界まで対象外。`.gitignore`のclaude-to-codex無視規則とrecord正本方式の食い違いは改善候補登録待ち
+- deferred：G24の要求作成責務（選択Aまで）、現行要求変更、候補5以降、外部送信、実利用者要求資料の使用は後続境界まで対象外。`.gitignore`食い違いは`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`として登録済み、Human仕分け待ち
 
 ## Git・Test
 
