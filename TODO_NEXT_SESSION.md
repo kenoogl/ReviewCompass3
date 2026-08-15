@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。
-- 現在作業：候補2の作業契約候補v3は独立限定再確認で開始可となった。止める原因0件、未接続条件0件、退行0件で、契約採用と推奨案Cの実装開始について利用者の一判断を残す。
-- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / candidate_v3 / human_adoption_and_implementation_start_pending`
+- 現在作業：利用者が候補2の作業契約v3と案Cを採用し実装開始を承認した。契約20条件を4境界へ接続した実装作業票v1を固定し、製品コード開始前の独立確認へ進む。
+- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / version_3_adopted / implementation_start_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [候補2の4境界TDD実装作業票v1](docs/development/2026-08-15-one-design-acceptance-implementation-work-ticket-v1.md) — SHA-256 `e67bf0f286c4bbfe79edd16fcab2b2f2b30f7d196f2ea54c0c65458061b7154a`
+- [候補2の契約採用・案C実装開始判断](records/development/2026-08-15-one-design-acceptance-contract-adoption-and-implementation-start-decision-v1.md) — SHA-256 `0287184fd38a3b47bc8630ef447c6c491b4cfad2c614692b4cdab99af8abad0d`
 - [作業契約候補v3の独立限定再確認・開始可](records/development/2026-08-15-one-design-acceptance-contract-v3-independent-rereview-v1.md) — SHA-256 `4e216990f74b963ac159ce5997dbe599d40746a78786b6bc919f006bbd210f9e`
 - [独立確認の4原因を限定訂正した作業契約候補v3](records/task-contract/2026-08-15-one-design-acceptance-conformance-candidate-v3.md) — SHA-256 `8d8b4a608372162c68665155ecde9c1dce8122402ab1ebea0dc40e2c621bac80`
 - [作業契約候補v2の独立定義確認・修正要](records/development/2026-08-15-one-design-acceptance-contract-v2-independent-review-v1.md) — SHA-256 `41548a326e1e8ea362605a015f43a5e2beeeab858c57b7d4ce3a3d05b21bb85e`
@@ -56,28 +58,30 @@
 
 ## 次に行う一作業
 
-作業契約候補v3と案Cを採用してTDD実装を開始するか、利用者へ一判断だけを求める。
+固定commitの実装作業票v1を別担当が読取り専用で確認し、4境界、条件1〜20、失敗試験、安全読取り、変更上限に未接続がないか判定する。
 
 開始条件：
 
-- 作業契約候補v3、独立限定再確認、本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 止める原因、未接続条件、退行が各0件である
-- 利用者へ目的、根拠、合否基準、影響、推奨理由を示す
+- 採用判断、実装作業票v1、本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 確認担当は製品コード、試験、作業票、TODOを変更しない
+- 条件1〜20と4境界を機械集計し、主要な欠陥例を失敗試験へ逆引きする
 
 完了条件：
 
-- 利用者が契約v3と案Cの実装開始を承認または拒否する
+- 独立開始前確認が開始可または修正要を固定する
+- 開始可なら止める指摘と未接続条件が0件である
+- 修正要なら境界1へ進まず、指摘原因だけを限定訂正する
 
-後続作業：承認なら実装作業票を固定して境界ごとのTDDへ進む。拒否なら理由に対応する限定訂正だけを行う。
+後続作業：開始可なら境界1の失敗試験を固定して期待失敗を確認する。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：作業契約候補v3と推奨案Cを採用し、実装を開始するかの一判断が必要
+- Human判断待ち：なし。契約v3採用と案C実装開始は利用者が承認済み
 
 ## stale・deferred
 
-- stale：候補2の契約候補v1・v2、v3独立再確認待ち、v2独立確認待ち、候補2の契約候補作成待ちの表示はstale
+- stale：候補2の契約採用待ち、契約候補v1・v2、v3独立再確認待ち、v2独立確認待ちの表示はstale
 - deferred：候補2の採用・実装、既存G08変更、保存、外部送信、外部処理、実利用者設計は次作業の対象外
 
 ## Git・Test
