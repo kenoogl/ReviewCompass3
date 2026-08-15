@@ -534,6 +534,89 @@ def _operation_document(
     }
 
 
+def _is_sha256(value):
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
+def _validate_operation_document(operation, record_id, states, reason):
+    if (
+        not isinstance(operation, dict)
+        or operation.get("record_id") != record_id
+        or operation.get("state") not in states
+        or operation.get("schema_version") != 1
+        or not _is_sha256(operation.get("operation_id"))
+    ):
+        raise StorageStop(reason)
+    expected_sha256 = operation.get("expected_sha256")
+    if (
+        not isinstance(expected_sha256, dict)
+        or set(expected_sha256) != {
+            "commit.json",
+            "derived.json",
+            "manifest.json",
+            "raw.bin",
+        }
+        or not all(_is_sha256(value) for value in expected_sha256.values())
+    ):
+        raise StorageStop(reason)
+    retention_until = operation.get("retention_until")
+    _timestamp(retention_until, reason)
+    expected = _operation_document(
+        state=operation["state"],
+        operation_id=operation["operation_id"],
+        record_id=record_id,
+        retention_until=retention_until,
+        expected_sha256=expected_sha256,
+    )
+    if operation["state"] == "deleting":
+        confirmation = operation.get("deletion_confirmation_sha256")
+        if not _is_sha256(confirmation):
+            raise StorageStop(reason)
+        expected["deletion_confirmation_sha256"] = confirmation
+    if operation != expected:
+        raise StorageStop(reason)
+    return operation
+
+
+def _verify_operation_files(
+    *,
+    operation,
+    sensitive_record_fd,
+    sensitive_names,
+    data_record_fd,
+    data_names,
+    reason,
+):
+    expected = operation["expected_sha256"]
+    expected_by_area = {
+        "sensitive": {"raw.bin": expected["raw.bin"]},
+        "data": {
+            "commit.json": expected["commit.json"],
+            "derived.json": expected["derived.json"],
+            "manifest.json": expected["manifest.json"],
+        },
+    }
+    for area, record_fd, names in (
+        ("sensitive", sensitive_record_fd, sensitive_names),
+        ("data", data_record_fd, data_names),
+    ):
+        if record_fd is None:
+            continue
+        for name in names:
+            final_name = name.removesuffix(".tmp")
+            if final_name in {"operation.json", "deleted.json"}:
+                continue
+            expected_digest = expected_by_area[area].get(final_name)
+            if expected_digest is None:
+                raise StorageStop(reason)
+            if sha256_hex(_read_existing_file(record_fd, name)) != expected_digest:
+                raise StorageStop(reason)
+
+
 def _record_id(identity):
     return sha256_hex(canonical_json_bytes(identity))
 
@@ -965,8 +1048,12 @@ def load_derived(*, sensitive_root, data_root, record_id, current_at):
         derived = _integrity_json(derived_bytes)
         manifest = _integrity_json(manifest_bytes)
         commit = _integrity_json(commit_bytes)
-        if operation.get("state") != "committed":
-            raise StorageStop("record_not_committed")
+        _validate_operation_document(
+            operation,
+            record_id,
+            {"committed"},
+            "record_integrity_failed",
+        )
         raw_sha256 = sha256_hex(raw_bytes)
         derived_sha256 = sha256_hex(derived_bytes)
         manifest_sha256 = sha256_hex(manifest_bytes)
@@ -1183,6 +1270,20 @@ def plan_delete(*, sensitive_root, data_root, record_id, current_at=None):
             state = "incomplete"
             if operation.get("state") not in {"incomplete", "committed"}:
                 raise StorageStop("record_conflict")
+        _validate_operation_document(
+            operation,
+            record_id,
+            {state},
+            "record_conflict",
+        )
+        _verify_operation_files(
+            operation=operation,
+            sensitive_record_fd=sensitive_record_fd,
+            sensitive_names=sensitive_names,
+            data_record_fd=data_record_fd,
+            data_names=data_names,
+            reason="record_conflict",
+        )
         targets = []
         for area, names in (("sensitive", sensitive_names), ("data", data_names)):
             for name in sorted(names):
@@ -1237,6 +1338,12 @@ def _validate_deleting_operations(operation_documents, record_id):
     if not deleting:
         return None
     reference = deleting[0]
+    _validate_operation_document(
+        reference,
+        record_id,
+        {"deleting"},
+        "record_conflict",
+    )
     confirmation = reference.get("deletion_confirmation_sha256")
     if (
         reference.get("record_id") != record_id
@@ -1255,6 +1362,12 @@ def _validate_deleting_operations(operation_documents, record_id):
         candidate = _operation_without_deletion(operation)
         if candidate.get("state") not in {"committed", "incomplete"}:
             raise StorageStop("record_conflict")
+        _validate_operation_document(
+            candidate,
+            record_id,
+            {candidate["state"]},
+            "record_conflict",
+        )
         candidate["state"] = "committed"
         if candidate != reference_base:
             raise StorageStop("record_conflict")
@@ -1367,6 +1480,15 @@ def delete_record(
             operation_documents,
             record_id,
         )
+        if deleting_operation is not None:
+            _verify_operation_files(
+                operation=deleting_operation,
+                sensitive_record_fd=sensitive_record_fd,
+                sensitive_names=sensitive_names,
+                data_record_fd=data_record_fd,
+                data_names=data_names,
+                reason="record_conflict",
+            )
 
         if audit_present and not (sensitive_names | data_names) & body_names:
             if deleting_operation is not None and confirmation_sha256 == deleting_operation.get(

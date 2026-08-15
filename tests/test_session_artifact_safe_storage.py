@@ -819,6 +819,37 @@ def test_load_derived_rejects_any_modified_fixed_file(
     assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
 
 
+@pytest.mark.parametrize("mutation", ("record_id", "files"))
+def test_load_derived_rejects_semantically_changed_operation(
+    tmp_path,
+    mutation,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    for record in (sensitive_record, data_record):
+        operation_path = record / "operation.json"
+        operation = _stored_json(operation_path)
+        if mutation == "record_id":
+            operation["record_id"] = "f" * 64
+        else:
+            operation["files"]["sensitive"]["final"].remove("raw.bin")
+        operation_path.write_bytes(_canonical_bytes(operation))
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.load_derived(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+            current_at="2026-08-15T12:00:00+00:00",
+        )
+
+    assert caught.value.reason == "record_integrity_failed"
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
 @pytest.mark.parametrize("state", ("committed", "incomplete"))
 def test_plan_delete_is_deterministic_and_read_only(tmp_path, monkeypatch, state):
     storage = _storage()
@@ -881,6 +912,41 @@ def test_plan_delete_rejects_unknown_file_without_changes(tmp_path):
     unknown = data_record / "unknown.bin"
     unknown.write_bytes(b"unknown")
     unknown.chmod(0o600)
+    before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
+
+    with pytest.raises(storage.StorageStop) as caught:
+        storage.plan_delete(
+            sensitive_root=arguments["sensitive_root"],
+            data_root=arguments["data_root"],
+            record_id=stored["record_id"],
+        )
+
+    assert caught.value.reason == "record_conflict"
+    assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ("files", "temporary_to_final", "expected_sha256"),
+)
+def test_plan_delete_rejects_semantically_changed_operation_without_changes(
+    tmp_path,
+    mutation,
+):
+    storage = _storage()
+    arguments, stored = _store_fixture(storage, tmp_path)
+    sensitive_record = arguments["sensitive_root"] / stored["record_id"]
+    data_record = arguments["data_root"] / stored["record_id"]
+    for record in (sensitive_record, data_record):
+        operation_path = record / "operation.json"
+        operation = _stored_json(operation_path)
+        if mutation == "files":
+            operation["files"]["sensitive"]["final"].remove("raw.bin")
+        elif mutation == "temporary_to_final":
+            operation["temporary_to_final"].pop("raw.bin.tmp")
+        else:
+            operation["expected_sha256"]["raw.bin"] = "f" * 64
+        operation_path.write_bytes(_canonical_bytes(operation))
     before = (_record_snapshot(sensitive_record), _record_snapshot(data_record))
 
     with pytest.raises(storage.StorageStop) as caught:
