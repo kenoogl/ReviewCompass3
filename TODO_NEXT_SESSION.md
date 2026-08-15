@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段を完了した。最初のTask Contractに基づくG25読取り専用入口は、利用者受入、正式・安定表示、第5段完了判断まで完了した。
-- 現在作業：安全保存案Cの実装前コード管理について、固定file一覧ではなく作業ごとの必要な働きから直接処理と全repositoryの共通内部部品を探す案Aを実装した。現在は関連試験GREENで、実装commit後の正式な八つの働き検索が未実施である。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_capability_search_green_current_execution_pending`
+- 現在作業：安全保存案Cの実装前コード管理について、現在のGit管理コード全体から八つの働きを正式検索し、直接確認対象、手掛かり、比較集団、成熟度を分けた証拠を固定した。候補の再利用方法に関するHuman裁定が未実施である。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_start_approved_capability_search_completed_reuse_adjudication_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -19,40 +19,40 @@
 - [採用済みの安全保存Task Contract v3](records/task-contract/2026-08-15-session-artifact-safe-storage-candidate-v3.md) — SHA-256 `38de71b1d8910f7cf05ae76a8f881235400d7522f81314f844d8cf1e0e52cfac`
 - [案Cの実装開始判断](records/development/2026-08-15-session-artifact-safe-storage-option-c-implementation-start-decision-v1.md) — SHA-256 `f8c55611de59cd25946aa27bb4330ca66bbf1cf751baba6c5fe5c19a3ec1d45f`
 - [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `3453626fd168ac014d5e929017dbfb654bea6425164cfa3aa02bbfdf4aaa1c56`
-- [一操作による現在検索Evidence](records/development/2026-08-15-safe-storage-formal-code-reuse-search-one-operation-execution-evidence-v1.md) — SHA-256 `2b9dffc209a730609a8c3ee8c031c7695db5188245390122f4a21be8c82f55d0`
-- [必要な働きによる検索の実装計画](records/development/2026-08-15-capability-derived-code-reuse-search-implementation-plan-v1.md) — SHA-256 `f9ec5f1546705ce38d6abebbe886723c947331370d27fcf67ebff4ed07dade0d`
-- [必要な働きによる検索の実装Evidence](records/development/2026-08-15-capability-derived-code-reuse-search-implementation-evidence-v1.md) — SHA-256 `05dd4aec4d46547955dfb62370204171c7a599c78d068e3f8fac6926a6938e63`
-- [安全保存の八つの働き検索計画](records/development/2026-08-15-safe-storage-capability-derived-code-reuse-search-plan-v2.json) — SHA-256 `f652448f72e306fcac57ab05bf88200fce352994afb48017db04a3c5e13f1421`
+- [比較候補生成との整合訂正判断](records/development/2026-08-15-capability-reuse-search-work4a-alignment-correction-decision-v1.md) — SHA-256 `1abe7a52c20e33d77f2f908f81dcf96c012bf5e07034b7431cbe9609f686aca6`
+- [必要な働き検索の整合訂正実装Evidence](records/development/2026-08-15-capability-reuse-search-work4a-alignment-implementation-evidence-v1.md) — SHA-256 `addd9838d07f74628af3cce08afff93c3389305dae33695a118962348706504e`
+- [安全保存の八つの働き検索計画v4](records/development/2026-08-15-safe-storage-capability-derived-code-reuse-search-plan-v4.json) — SHA-256 `1c9fef66370e3a067500ea0d6c1ecce9b77e0a9a107b51ad52c99519aab6ac45`
+- [八つの働き正式検索Evidence](records/development/2026-08-15-safe-storage-capability-search-formal-execution-evidence-v1.md) — SHA-256 `d433fcdae6fea26f2fb8f3de703f54db9d7b2905dd4cbd6f2552739d5c645dbc`
+- [八つの働き検索証明書](records/development/2026-08-15-safe-storage-capability-derived-code-reuse-search-attestation-v3.json) — SHA-256 `de06acf8367b99b84ab0643652a05058065cd381798a2bc32d1990281f446322`
 
 ## 次に行う一作業
 
-必要な働きによる検索実装を意味単位でcommitした後、変更なしの同commitから安全保存の八つの働きを一操作で正式検索し、候補と未対応を固定する。
+八つの働きごとに、正式検索で得た直接確認対象を「そのまま再利用」「条件を補って再利用」「参考だけ」「新規実装」のいずれにするか、利用者が裁定する。
 
 開始条件：
 
-- 検索実装、試験、schema 2計画、開発方針、source universe v7、freshness policy v10がcommitされ、作業場所に未commit変更がない
-- 安全保存の八つの働きとnew-only証明書pathが計画内容識別値へ結び付き、出力先が未作成である
-- 検索元を現在のGit管理コードから生成し、過去の20 pathまたは中央一覧へ制限しない
-- ライフサイクルと再利用方法を自動裁定しない
+- 正式検索Evidenceと証明書が同じcommit、source content ID、処理一覧、比較集団へ結び付き、既存検証処理でfreshと確認済みである
+- 手掛かりと比較集団を再利用可能な処理の件数とみなさず、直接確認対象だけを採否の入口にする
+- 暫定処理を自動的に正式化せず、再試行可能な削除は直接対応する既存処理なしという観測を維持する
 
 完了条件：
 
-- 八つの働きが同じcommit、source content ID、Profile、Discoveryへ結び付く
-- 働きごとの候補、根拠、禁止副作用との衝突、sourceの成熟度表示、未対応がnew-only正本と証明書へ残る
-- 候補の採用、不採用、修正利用とDecisionによる正式・使用停止の照合をHuman裁定待ちとして返す
+- 八つの働きそれぞれに再利用方法と理由が一つずつ記録される
+- 採用または修正利用する処理が関数単位、成熟度、安全条件へ結び付く
+- 不採用と参考だけの処理を製品実装の依存として扱わない
 - 製品コード、製品試験、製品設定、Task Contract、製品TDD境界を変更しない
 
-後続作業：検索結果を固定した後、必要な候補だけをHumanが採否判断し、その後に別機能である製品TDD境界確認へ戻る。
+後続作業：再利用方法の裁定後、別機能である製品TDDの実装境界事前確認を行い、小さい失敗確認と成功確認へ分けられる場合だけ実装計画へ進む。
 
 ## blocker・Human判断待ち
 
-- blocker：検索実装にはblockerがない。正式検索はcleanな実装commitが必要なため、現在の未commit実装状態では実行しない。
-- Human判断待ち：現時点で追加判断はない。正式検索後、実装依存へ採用する候補についてだけ採用、不採用、修正利用と正式・暫定・使用停止を利用者へ戻す。
+- blocker：機械検索にblockerはない。製品実装へ進む前に再利用方法のHuman裁定が必要である。
+- Human判断待ち：検索Evidence §5の八つの提案を採用するか。特に、暫定処理は関数単位の修正利用または参考に限定し、再試行可能な削除は新規実装候補とするか。
 
 ## stale・deferred
 
-- stale：固定20 pathによるv1検索と二つのv2証明書はcommit 0a02b51の履歴観測として保持するが、現在の実装開始根拠には八つの働きによる新検索を使う。
-- deferred：八つの働きの検索と候補裁定が終わるまで、製品TDD境界、失敗試験、製品コード、製品設定、配布入口を変更しない。中央一覧、自動commit、push、外部送信も開始しない。
+- stale：固定20 pathによる旧検索、過大な平坦候補を作った能力検索v1からv3、および対応する旧証明書は履歴観測として保持するが、現在の実装開始根拠に使わない。
+- deferred：再利用方法の裁定と製品TDD境界確認が終わるまで、失敗試験、製品コード、製品設定、配布入口を変更しない。中央一覧、自動commit、push、外部送信も開始しない。
 
 ## Git・Test
 
@@ -60,8 +60,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：必要な働き検索、旧検索、鮮度、外部化、一操作入口の関連46件と、方針・権威参照29件が成功した。新しいコードによるstale、必要・禁止の副作用の同時指定拒否、実行時間と検索identityの分離を含む。
-- 直近の全Test：実行時間の計測を含む正規全試験は1,758件成功、失敗・error・skip 0、終了コード0だった。Python 3.13.14、pytest 8.4.2、runner版2、fallbackなし。
+- 直近の関連Test：必要な働き検索と正式入口の対象16件、Work 4A等を含む関連181件が成功した。正式検索証明書と外部正本の再照合もfreshで合格した。
+- 直近の全Test：検索実装の正規全試験は1,762件成功、失敗・error・skip 0、終了コード0だった。Python 3.13.14、pytest 8.4.2、runner版2、fallbackなし。以後の変更は検索計画とEvidenceだけで、コード・試験・設定に変更はない。
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
