@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。
-- 現在作業：候補2の作業契約候補v2は独立定義確認で修正要となった。同名JSON項目、比較の不成立例、root途中symlink、危険度の4原因だけを訂正した候補v3を固定し、限定再確認へ進む。
-- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / candidate_v3 / limited_independent_rereview_pending`
+- 現在作業：候補2の作業契約候補v3は独立限定再確認で開始可となった。止める原因0件、未接続条件0件、退行0件で、契約採用と推奨案Cの実装開始について利用者の一判断を残す。
+- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / candidate_v3 / human_adoption_and_implementation_start_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [作業契約候補v3の独立限定再確認・開始可](records/development/2026-08-15-one-design-acceptance-contract-v3-independent-rereview-v1.md) — SHA-256 `4e216990f74b963ac159ce5997dbe599d40746a78786b6bc919f006bbd210f9e`
 - [独立確認の4原因を限定訂正した作業契約候補v3](records/task-contract/2026-08-15-one-design-acceptance-conformance-candidate-v3.md) — SHA-256 `8d8b4a608372162c68665155ecde9c1dce8122402ab1ebea0dc40e2c621bac80`
 - [作業契約候補v2の独立定義確認・修正要](records/development/2026-08-15-one-design-acceptance-contract-v2-independent-review-v1.md) — SHA-256 `41548a326e1e8ea362605a015f43a5e2beeeab858c57b7d4ce3a3d05b21bb85e`
 - [3原因を限定訂正した一件設計照合作業契約候補v2](records/task-contract/2026-08-15-one-design-acceptance-conformance-candidate-v2.md) — SHA-256 `d34c96e44a716555f61d666e35ad1c1eed5d79cdecfd43be9a95dce4e5812e15`
@@ -55,30 +56,28 @@
 
 ## 次に行う一作業
 
-固定commitの作業契約候補v3について、v2の4原因が解消し他条件が退行していないかを同じ独立担当が読取り専用で限定再確認する。
+作業契約候補v3と案Cを採用してTDD実装を開始するか、利用者へ一判断だけを求める。
 
 開始条件：
 
-- 作業契約候補v3、v2独立確認、本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 確認担当は成果物を変更せず、固定commitだけを読む
-- 同名JSON項目、4比較不成立、root途中symlink、危険度の4点と他条件の退行だけを確認する
+- 作業契約候補v3、独立限定再確認、本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 止める原因、未接続条件、退行が各0件である
+- 利用者へ目的、根拠、合否基準、影響、推奨理由を示す
 
 完了条件：
 
-- 独立定義確認が開始可または修正要を固定する
-- 開始可なら止める指摘と未接続条件が0件である
-- 修正要なら契約採用を求めず、指摘原因だけを限定訂正する
+- 利用者が契約v3と案Cの実装開始を承認または拒否する
 
-後続作業：開始可になった後にだけ、利用者へ契約採用と案Cの実装開始を一判断として求める。
+後続作業：承認なら実装作業票を固定して境界ごとのTDDへ進む。拒否なら理由に対応する限定訂正だけを行う。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：なし。候補2の契約採用は独立定義確認が開始可になった後にだけ求める
+- Human判断待ち：作業契約候補v3と推奨案Cを採用し、実装を開始するかの一判断が必要
 
 ## stale・deferred
 
-- stale：候補2の契約候補v1・v2、v2独立確認待ち、候補2の契約候補作成待ち、候補1の製品受入待ちの表示はstale
+- stale：候補2の契約候補v1・v2、v3独立再確認待ち、v2独立確認待ち、候補2の契約候補作成待ちの表示はstale
 - deferred：候補2の採用・実装、既存G08変更、保存、外部送信、外部処理、実利用者設計は次作業の対象外
 
 ## Git・Test
