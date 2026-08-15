@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：候補2のG08は利用者判断により正式受入となった。候補3のG24について、要求固定・機能分割・由来追跡の既存5fileと関連試験、上流文書候補の不一致、利用者価値境界を実測し、Task Contract候補の根拠を作る。
-- Task Contract：`G24 / requirement_fixing_feature_partition_source_trace / contract_definition_evidence_pending`
+- 現在作業：候補3のG24について、既存5実装・5試験、旧37要求と現行50要求の権限差、3反例を固定し、一件の要求・機能区分・出典対応のTask Contract候補v1を作成した。固定commit後の独立定義確認へ進む。
+- Task Contract：`TC-RC3-PRODUCT-ONE-REQUIREMENT-FEATURE-SOURCE-005 / v1 / independent_definition_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -17,38 +17,38 @@
 ## 最新のauthority／Evidence
 
 - [利用者が条件20を満たしたG08製品受入判断](records/development/2026-08-15-one-design-acceptance-product-acceptance-decision-v1.md) — SHA-256 `7e3eb626474f72ebcd3a3d5ec2646cf004ba192606f03684a50ae6f0b251ce86`
-- [G08の条件1〜19をverifiedとした独立再確認](records/development/2026-08-15-one-design-acceptance-independent-correction-rereview-v1.md) — SHA-256 `8a4793e617f9d0ce3204ba6c2bc85ce309afb75df0d7add988a8bcb270eda7bc`
+- [G24一件処理の目的、上流不一致、3反例、3案比較を固定した契約定義証拠](records/development/2026-08-15-one-requirement-feature-source-contract-definition-evidence-v1.md) — SHA-256 `9d35dc70f5d96eb497bd8530ced4a1b32d5d838a6c0503f24668d8be719987c6`
+- [独立定義確認待ちのG24作業契約候補v1](records/task-contract/2026-08-15-one-requirement-feature-source-candidate-v1.md) — SHA-256 `19702df3b5414b4e271ba30e6fb84ec285c887a98e189ed9bfd88e8ad2df6a25`
 - [G24を候補3とした次製品作業候補](records/development/2026-08-15-post-safe-storage-next-product-work-candidates-v1.md) — SHA-256 `bcb4ba2947e32254edc547068728fa580bc6b7919fa0f04d9b9353ab6c7899ba`
-- [G24の既存5fileと5試験fileを示す製品候補目録](records/development/2026-08-14-stage4-product-code-and-task-contract-input-inventory-evidence-v1.md) — SHA-256 `c55367fc6b8f72f7041612cedc11d609b359909156f619fcb72e6d72bd33e72a`
-- [現行開発方針](docs/development/2026-08-02-development-policy.md) — SHA-256 `e3e6b0d2c7a1265f7cde2c2e00cc888f43d63ce0d1945c300b2b2e5f7730b559`
+- [現行50要求を解決する要求権限束v2](records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json) — SHA-256 `760e33ea2ecf6937f56d7bf8d2bd703b18b47dbd2bd6b2bd5919e0dd556d9dae`
 
 ## 次に行う一作業
 
-G24の既存5実装file・5試験file、参照する上流要求資料、現行入口と副作用を機械抽出し、目的・使える部分・危険・最小製品境界を一件の契約定義Evidenceへ固定する。
+G24契約定義証拠と作業契約候補v1を意味単位commitへ固定し、別担当へ読取り専用の定義反証を委譲する。
 
 開始条件：
 
-- G08製品受入Decisionと本TODOが意味単位commitへ固定される
-- G24の既存成果物を変更せず読取り専用で実測する
-- 暫定文書を正式要求へ自動昇格せず、上流不一致を先に列挙する
+- 契約定義証拠、作業契約候補v1、本TODOの参照内容識別値が一致する
+- 関連59試験、要求artifact関連21試験、git diff --checkが各単独成功する
+- 明示3pathだけをcommitし、commit後の作業treeがcleanである
 
 完了条件：
 
-- 5実装file・5試験fileの存在、内容識別値、公開関数、作用、関連試験結果を固定する
-- 上流資料候補の一致・不一致と、採用せず保留する入力を示す
-- 異なる3実装案を比較し、最小製品境界をTask Contract候補へ接続する
+- 別担当が目的、上流不一致、二入力、全採否、全義務対応、未昇格を反証する
+- 安全読取り、安全表示、変更上限、21受入条件の未固定または誤合格余地を確認する
+- 成果物を変更せず開始可または修正要と根拠付きで返す
 
-後続作業：G24のTask Contract候補を別担当の定義確認へ渡し、開始可の場合だけ利用者へ採用・実装開始判断を求める。
+後続作業：開始可なら利用者へ契約採用と案Cの実装開始を一判断として求め、修正要なら候補を訂正して同じ担当へ再確認する。
 
 ## blocker・Human判断待ち
 
-- blocker：なし。G24の上流資料不一致は本調査で確定する
-- Human判断待ち：なし。G08製品受入は完了し、G24は契約候補作成まで承認済みの自律実行範囲
+- blocker：なし。固定commit後に独立定義確認を開始できる
+- Human判断待ち：なし。独立確認が開始可になるまで契約採用・実装開始判断を求めない
 
 ## stale・deferred
 
-- stale：G08の製品受入待ち、独立再確認待ち、形式検査修正待ちの表示はstale
-- deferred：G24契約の採用・製品実装、候補4以降、外部送信、実利用者要求資料の使用は後続境界まで対象外
+- stale：G24契約定義証拠作成待ち、上流資料不一致の調査待ち、関連試験未実施の表示はstale
+- deferred：G24契約の採用・製品実装、現行要求変更、候補4以降、外部送信、実利用者要求資料の使用は後続境界まで対象外
 
 ## Git・Test
 
@@ -56,7 +56,7 @@ G24の既存5実装file・5試験file、参照する上流要求資料、現行�
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：G08対象107件、既存G08関連31件が各単独成功、終了コード0。G24関連試験は契約定義Evidence作成時に単独実行する
+- 直近の関連Test：G24既存関連59件、要求artifact関連21件が各単独成功、終了コード0
 - 直近の全Test：禁止認証環境6件を除く隔離条件で正規全試験2,127件成功、終了コード0。通常host環境の既存executor安全拒否はG08独立確認で退行なしと判断済み
 - 差分検査：`git diff --check`合格
 
