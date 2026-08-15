@@ -24,6 +24,7 @@ development = [
 reviewcompass3-session-logs = "tools.session_logs.entry:main"
 reviewcompass3-session-artifact = "tools.session_logs.read_only_entry:main"
 reviewcompass3-session-artifact-storage = "tools.session_logs.safe_storage_entry:main"
+reviewcompass3-one-item-review = "tools.reviews.one_item_review_entry:main"
 reviewcompass3-bootstrap-review = "tools.bootstrap.review_cli:main"
 reviewcompass3-pilot = "tools.development.pilot_collaboration_cli:main"
 reviewcompass3-claude-implementation = "tools.development.claude_implementation_route_cli:main"
