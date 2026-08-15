@@ -4,6 +4,9 @@ import copy
 import hashlib
 import importlib
 import json
+import os
+import socket
+from types import SimpleNamespace
 
 import pytest
 
@@ -480,3 +483,290 @@ def test_rejects_non_bytes_and_invalid_utf8_inputs():
         module.compare_inputs(b"\xff", _json_bytes(_acceptance()))
     assert invalid_utf8.value.reason == "invalid_utf8"
     assert invalid_utf8.value.source == "design"
+
+
+def _input_files(tmp_path):
+    root = tmp_path / "input"
+    root.mkdir()
+    design_path = root / "design.json"
+    acceptance_path = root / "acceptance.json"
+    design_path.write_bytes(_json_bytes(_design()))
+    acceptance_path.write_bytes(_json_bytes(_acceptance()))
+    return root, design_path, acceptance_path
+
+
+def _reader():
+    return _module().read_input_pair
+
+
+def test_reads_two_distinct_regular_files_from_the_explicit_root(tmp_path):
+    root, design_path, acceptance_path = _input_files(tmp_path)
+
+    design_bytes, acceptance_bytes = _reader()(
+        str(root),
+        str(design_path),
+        str(acceptance_path),
+    )
+
+    assert design_bytes == design_path.read_bytes()
+    assert acceptance_bytes == acceptance_path.read_bytes()
+
+
+@pytest.mark.parametrize(
+    "case",
+    (
+        "relative_root",
+        "relative_design",
+        "relative_acceptance",
+        "outside_design",
+        "dot_component",
+        "dotdot_component",
+        "empty_component",
+        "same_path",
+    ),
+)
+def test_rejects_lexically_invalid_or_ambiguous_paths(tmp_path, case):
+    module = _module()
+    reader = module.read_input_pair
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    values = [str(root), str(design_path), str(acceptance_path)]
+    if case == "relative_root":
+        values[0] = "input"
+    elif case == "relative_design":
+        values[1] = "design.json"
+    elif case == "relative_acceptance":
+        values[2] = "acceptance.json"
+    elif case == "outside_design":
+        outside = tmp_path / "outside.json"
+        outside.write_bytes(b"{}")
+        values[1] = str(outside)
+    elif case == "dot_component":
+        values[1] = f"{root}/./design.json"
+    elif case == "dotdot_component":
+        values[1] = f"{root}/nested/../design.json"
+    elif case == "empty_component":
+        values[1] = f"{root}//design.json"
+    else:
+        values[2] = values[1]
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(*values)
+
+    assert caught.value.reason == "invalid_path"
+    assert caught.value.source == "arguments"
+
+
+@pytest.mark.parametrize(
+    "location",
+    ("root_intermediate", "root", "file_intermediate", "file"),
+)
+def test_rejects_symlinks_at_every_path_layer(tmp_path, location):
+    module = _module()
+    reader = module.read_input_pair
+    real_parent = tmp_path / "real-parent"
+    real_parent.mkdir()
+    root = real_parent / "input"
+    root.mkdir()
+    data = root / "data"
+    data.mkdir()
+    design_path = data / "design.json"
+    acceptance_path = root / "acceptance.json"
+    design_path.write_bytes(_json_bytes(_design()))
+    acceptance_path.write_bytes(_json_bytes(_acceptance()))
+
+    if location == "root_intermediate":
+        alias = tmp_path / "parent-alias"
+        alias.symlink_to(real_parent, target_is_directory=True)
+        root = alias / "input"
+        design_path = root / "data" / "design.json"
+        acceptance_path = root / "acceptance.json"
+    elif location == "root":
+        alias = tmp_path / "root-alias"
+        alias.symlink_to(root, target_is_directory=True)
+        root = alias
+        design_path = root / "data" / "design.json"
+        acceptance_path = root / "acceptance.json"
+    elif location == "file_intermediate":
+        alias = root / "data-alias"
+        alias.symlink_to(data, target_is_directory=True)
+        design_path = alias / "design.json"
+    else:
+        alias = root / "design-alias.json"
+        alias.symlink_to(design_path)
+        design_path = alias
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(str(root), str(design_path), str(acceptance_path))
+
+    assert caught.value.reason == "unreadable_input"
+    assert caught.value.source in {"design", "none"}
+
+
+@pytest.mark.parametrize("kind", ("directory", "fifo", "socket"))
+def test_rejects_non_regular_inputs_without_blocking(tmp_path, kind):
+    module = _module()
+    reader = module.read_input_pair
+    root, _, acceptance_path = _input_files(tmp_path)
+    design_path = root / f"not-regular-{kind}"
+    unix_socket = None
+    if kind == "directory":
+        design_path.mkdir()
+    elif kind == "fifo":
+        os.mkfifo(design_path)
+    else:
+        unix_socket = socket.socket(socket.AF_UNIX)
+        unix_socket.bind(str(design_path))
+    try:
+        with pytest.raises(module.DesignAcceptanceStop) as caught:
+            reader(str(root), str(design_path), str(acceptance_path))
+    finally:
+        if unix_socket is not None:
+            unix_socket.close()
+
+    assert caught.value.reason == "unreadable_input"
+    assert caught.value.source == "design"
+
+
+def test_rejects_size_above_the_fixed_limit(tmp_path):
+    module = _module()
+    reader = module.read_input_pair
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    design_path.write_bytes(b"x" * 262145)
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(str(root), str(design_path), str(acceptance_path))
+
+    assert caught.value.reason == "size_limit_exceeded"
+    assert caught.value.source == "design"
+
+
+@pytest.mark.parametrize("changed_field", ("st_size", "st_dev", "st_ino"))
+def test_rejects_file_change_observed_after_read(
+    tmp_path,
+    monkeypatch,
+    changed_field,
+):
+    module = _module()
+    reader = module.read_input_pair
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    real_fstat = module.os.fstat
+    regular_calls = 0
+
+    def changing_fstat(file_descriptor):
+        nonlocal regular_calls
+        result = real_fstat(file_descriptor)
+        if not os.path.isfile(f"/dev/fd/{file_descriptor}"):
+            return result
+        regular_calls += 1
+        if regular_calls != 2:
+            return result
+        values = {
+            "st_mode": result.st_mode,
+            "st_size": result.st_size,
+            "st_dev": result.st_dev,
+            "st_ino": result.st_ino,
+        }
+        values[changed_field] += 1
+        return SimpleNamespace(**values)
+
+    monkeypatch.setattr(module.os, "fstat", changing_fstat)
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(str(root), str(design_path), str(acceptance_path))
+
+    assert caught.value.reason == "unreadable_input"
+    assert caught.value.source == "design"
+
+
+def test_rejects_short_read_even_when_metadata_size_is_unchanged(
+    tmp_path,
+    monkeypatch,
+):
+    module = _module()
+    reader = module.read_input_pair
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    real_read = module.os.read
+    shortened = False
+
+    def short_read(file_descriptor, byte_count):
+        nonlocal shortened
+        data = real_read(file_descriptor, byte_count)
+        if not shortened and data:
+            shortened = True
+            return data[:-1]
+        return data
+
+    monkeypatch.setattr(module.os, "read", short_read)
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(str(root), str(design_path), str(acceptance_path))
+
+    assert caught.value.reason == "unreadable_input"
+    assert caught.value.source == "design"
+
+
+def test_opens_every_component_without_following_symlinks(
+    tmp_path,
+    monkeypatch,
+):
+    module = _module()
+    reader = module.read_input_pair
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    real_open = module.os.open
+    calls = []
+
+    def recording_open(path, flags, *args, **kwargs):
+        calls.append((path, flags, kwargs.get("dir_fd")))
+        return real_open(path, flags, *args, **kwargs)
+
+    monkeypatch.setattr(module.os, "open", recording_open)
+
+    reader(str(root), str(design_path), str(acceptance_path))
+
+    assert calls[0][0] == "/"
+    directory_calls = [call for call in calls if call[0] not in {
+        "design.json",
+        "acceptance.json",
+    }]
+    file_calls = [call for call in calls if call[0] in {
+        "design.json",
+        "acceptance.json",
+    }]
+    assert len(directory_calls) >= len(root.parts)
+    assert all(flags & os.O_NOFOLLOW for _, flags, _ in directory_calls)
+    assert all(flags & os.O_DIRECTORY for _, flags, _ in directory_calls)
+    assert all(flags & os.O_NOFOLLOW for _, flags, _ in file_calls)
+    assert all(flags & os.O_NONBLOCK for _, flags, _ in file_calls)
+    assert all(not flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT) for _, flags, _ in calls)
+
+
+def test_rejects_when_required_non_follow_flags_are_unavailable(
+    tmp_path,
+    monkeypatch,
+):
+    module = _module()
+    reader = module.read_input_pair
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    monkeypatch.setattr(module.os, "O_NOFOLLOW", 0)
+
+    with pytest.raises(module.DesignAcceptanceStop) as caught:
+        reader(str(root), str(design_path), str(acceptance_path))
+
+    assert caught.value.reason == "unreadable_input"
+    assert caught.value.source == "none"
+
+
+def test_reading_does_not_change_input_tree(tmp_path):
+    root, design_path, acceptance_path = _input_files(tmp_path)
+    before = sorted(
+        (str(path.relative_to(root)), path.stat().st_mode, path.read_bytes())
+        for path in root.iterdir()
+    )
+
+    _reader()(str(root), str(design_path), str(acceptance_path))
+
+    after = sorted(
+        (str(path.relative_to(root)), path.stat().st_mode, path.read_bytes())
+        for path in root.iterdir()
+    )
+    assert after == before
