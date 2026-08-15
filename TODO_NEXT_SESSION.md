@@ -6,9 +6,9 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理候補へ進んだ。
-- 現在作業：作業契約候補v3は変更点の独立確認で開始可となった。止める指摘は0件で、製品コードと試験は未変更。利用者の契約採用と案Cの実装開始判断を待つ。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / candidate_v3_ready_for_human_contract_and_implementation_decision`
+- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存の製品受入が完了し、三つ目の製品処理を契約v3で実装する段階へ進んだ。
+- 現在作業：利用者が作業契約v3の正式採用と案Cの実装開始を承認した。六つのTDD境界を固定した実装作業票を作成し、製品コードと試験を変更する前の独立開始前レビューを待つ。
+- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / v3_adopted / option_c_implementation_start_approved / independent_start_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [作業契約v3の採用・案C実装開始判断](records/development/2026-08-15-one-item-review-contract-adoption-and-implementation-start-decision-v1.md) — SHA-256 `ceda14c8240794dca7c4d6ab8715ad87750eb41501b5f0223fd3a0fb32416d12`
+- [六境界を固定した製品TDD実装作業票](docs/development/2026-08-15-one-item-review-implementation-work-ticket-v1.md) — SHA-256 `999ccb6b1830816e39f648341b0649205cde573d416b3d586a8c63b7bf06a784`
 - [残る2原因を限定訂正した作業契約候補v3](records/task-contract/2026-08-15-one-item-review-material-and-result-organization-candidate-v3.md) — SHA-256 `a52cd717f6709c5ca01a1e339385272abfe976a0b9ce176e857b427778cf07d6`
 - [作業契約候補v3の変更点確認・開始可](records/development/2026-08-15-one-item-review-task-contract-definition-correction-review-v2.md) — SHA-256 `2e612712b194517097f0439398f61e505d0d9bb18fe8c50ae8c39f9c39e1b423`
 - [作業契約候補v2の変更点確認・修正要](records/development/2026-08-15-one-item-review-task-contract-definition-correction-review-v1.md) — SHA-256 `8544484e25c7af07743002793c63a591aa3ad63c2dd09ce74f512fead4899a1f`
@@ -28,31 +30,31 @@
 
 ## 次に行う一作業
 
-利用者が、開始可となった作業契約候補v3の採用と、案Cの変更上限内での実装開始を判断する。推奨は両方を承認することである。
+固定commit上の契約v3、採用判断、実装作業票を別実行単位が独立に確認し、六境界が受入条件1〜18の誤合格を実装前に防げるかを判定する。
 
 開始条件：
 
-- 作業契約候補v3、開始可の変更点確認、本TODOが意味単位commitへ固定され、作業場所に未記録差分がない
-- 契約採用と実装開始が別の判断であり、承認しても外部送信、外部処理、保存を許可しないことを利用者へ示す
-- 変更上限が新しい製品核1、入口1、実行名1、対象試験1、短い証拠記録だけである
+- 契約v3、採用・開始判断、実装作業票、本TODOが意味単位commitへ固定され、作業場所に未記録差分がない
+- レビュー担当は製品コード・試験・作業票を変更せず、固定commitを読取り専用で確認する
+- 受入条件1〜18、機微情報、path、改変、複製、順序、出力bytes、禁止作用と各REDの対応を照合する
 
 完了条件：
 
-- 利用者が候補v3の契約採用可否を明示する
-- 利用者が案Cの実装開始可否を明示する
-- 不承認または条件付き承認なら、製品codeと試験を変更せず差分条件を固定する
+- 独立レビューが開始可または修正要を根拠とともに固定する
+- 開始可なら止める指摘が0件である
+- 修正要なら製品codeと試験を変更せず、作業票だけを限定訂正する
 
-後続作業：両方承認なら、実装境界の事前確認を作り、失敗試験を先に固定する。承認されない場合は実装へ進まない。
+後続作業：開始可なら境界1の失敗試験を先に追加し、主要理由一つによるREDを確認する。修正要なら作業票の限定訂正へ戻る。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：候補v3を作業契約として採用するか、案Cの変更上限内で実装を開始するかの二点。推奨は両方承認
+- Human判断待ち：なし。契約v3採用と案C実装開始は承認済み。独立開始前レビューは既存規律に基づく機械・技術判定である
 
 ## stale・deferred
 
-- stale：契約候補v1とv2は各修正要により実装開始根拠としてstale。候補1の選択待ち表示と安全保存の旧検証・旧レビューも引き続きstaleである
-- deferred：利用者が契約採用と実装開始を承認するまでは、製品コード、試験、正式入口、実行名、既存G02、保存、外部送信、外部処理、実利用者資料を変更・実行しない
+- stale：契約候補v1とv2、契約採用待ち表示はstale。候補1の選択待ち表示と安全保存の旧検証・旧レビューも引き続きstaleである
+- deferred：独立開始前レビューが開始可になるまでは、製品コード、試験、正式入口、実行名を変更しない。既存G02、保存、外部送信、外部処理、実利用者資料は本作業全体で対象外
 
 ## Git・Test
 
@@ -60,7 +62,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：文書候補だけの変更で製品試験は未実施。固定参照とG02境界は一致。絶対pathの停止例6件と非停止例3件、配列順・指摘署名を独立確認し、終了コード0で開始可
+- 直近の関連Test：承認記録と実装作業票だけの変更で製品試験は未実施。契約v3の定義確認では絶対path停止例6件と非停止例3件、配列順・指摘署名を独立確認済み。実装開始前レビューは未実施
 - 直近の全Test：製品コードと試験を変更していないため再実行していない。直近の正規全試験は1,862件成功、失敗・error・skip 0、終了コード0
 - 差分検査：`git diff --check`合格
 
