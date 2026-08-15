@@ -975,6 +975,50 @@ def test_plan_delete_is_deterministic_and_read_only(tmp_path, monkeypatch, state
     assert (_record_snapshot(sensitive_record), _record_snapshot(data_record)) == before
 
 
+def test_plan_and_delete_accept_precommit_incomplete_state(tmp_path, monkeypatch):
+    storage = _storage()
+    arguments = _roots(tmp_path)
+    original_publish = storage._publish_file
+
+    def stop_before_commit(directory_fd, final_name, content):
+        if final_name == "commit.json":
+            raise storage.StorageStop("injected_failure")
+        return original_publish(directory_fd, final_name, content)
+
+    monkeypatch.setattr(storage, "_publish_file", stop_before_commit)
+    with pytest.raises(storage.StorageStop):
+        storage.store_new(
+            **arguments,
+            stored_at="2026-08-15T00:00:00+00:00",
+            retention_until="2026-08-16T00:00:00+00:00",
+        )
+    monkeypatch.setattr(storage, "_publish_file", original_publish)
+    sensitive_record = next(arguments["sensitive_root"].iterdir())
+    record_id = sensitive_record.name
+    data_record = arguments["data_root"] / record_id
+    assert _stored_json(sensitive_record / "operation.json")["state"] == "committed"
+    assert _stored_json(data_record / "operation.json")["state"] == "committed"
+    assert not (data_record / "commit.json").exists()
+
+    plan = storage.plan_delete(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=record_id,
+    )
+    assert plan["state"] == "incomplete"
+    result = storage.delete_record(
+        sensitive_root=arguments["sensitive_root"],
+        data_root=arguments["data_root"],
+        record_id=record_id,
+        confirmation_sha256=plan["confirmation_sha256"],
+        deleted_at="2026-08-15T13:00:00+00:00",
+    )
+
+    assert result["status"] == "deleted"
+    assert list(sensitive_record.iterdir()) == []
+    assert {path.name for path in data_record.iterdir()} == {"deleted.json"}
+
+
 def test_plan_delete_rejects_unknown_file_without_changes(tmp_path):
     storage = _storage()
     arguments, stored = _store_fixture(storage, tmp_path)

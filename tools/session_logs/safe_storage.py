@@ -1370,16 +1370,18 @@ def plan_delete(*, sensitive_root, data_root, record_id, current_at=None):
             raise StorageStop("record_conflict")
         if "commit.json" in data_names:
             state = "committed"
+            operation_states = {"committed"}
             if operation.get("state") != "committed":
                 raise StorageStop("record_conflict")
         else:
             state = "incomplete"
+            operation_states = {"incomplete", "committed"}
             if operation.get("state") not in {"incomplete", "committed"}:
                 raise StorageStop("record_conflict")
         _validate_operation_document(
             operation,
             record_id,
-            {state},
+            operation_states,
             "record_conflict",
         )
         _verify_operation_files(
