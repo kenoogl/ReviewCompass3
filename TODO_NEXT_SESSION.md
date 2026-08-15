@@ -6,9 +6,9 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第5段と、最初の製品機能G25読取り専用入口は完了した。現在は立て直し後の二つ目の製品機能である安全保存の実装準備を進めている。
-- 現在作業：安全保存の独立完了再レビューv2が残した2原因はREDを変えずGREENとなった。対象97件、関連30件、正規全1,862件が成功した。次は同じ独立担当による完了再々レビューを行う。
-- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_implementation_rereview_v2_two_causes_remediated_final_verification_v3_passed_rereview_pending`
+- 全体：立て直し計画v5の第1段から第5段と、最初の製品機能G25読取り専用入口は完了した。立て直し後の二つ目の製品機能である安全保存は技術条件1から21を満たし、条件22の製品受入判断を待っている。
+- 現在作業：安全保存は対象97件、関連30件、正規全1,862件が成功し、同じ独立担当の完了再レビューv3で止める指摘0件、条件1から21の未接続0件、開始可となった。次は利用者が製品処理として受け入れるかだけを判断する。
+- Task Contract：`TC-RC3-PRODUCT-SESSION-ARTIFACT-SAFE-STORAGE-002 / version_3_adopted_technical_conditions_1_21_passed_independent_completion_review_v3_startable_condition_22_human_acceptance_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -40,36 +40,34 @@
 - [安全保存の四原因修正後最終技術検証Evidence v2](records/development/2026-08-15-session-artifact-safe-storage-final-verification-evidence-v2.md) — SHA-256 `dc84ab5915b636f8d7595bc3652dcedbc288f9aba26f57b245ce9817e967fc4d`
 - [安全保存の独立完了再レビューv2修正要](records/development/2026-08-15-session-artifact-safe-storage-independent-completion-review-v2.md) — SHA-256 `d90364a873586b1be8ccf37196c2f49c5d879d87446379a54fc7194d85b77c88`
 - [安全保存の二原因修正後最終技術検証Evidence v3](records/development/2026-08-15-session-artifact-safe-storage-final-verification-evidence-v3.md) — SHA-256 `fc2d86c305b4198b774b57e550205732b599c4f4c753f8db89c52b19175facbd`
+- [安全保存の独立完了再レビューv3開始可](records/development/2026-08-15-session-artifact-safe-storage-independent-completion-review-v3.md) — SHA-256 `233b1833db6b7828e5d835550ec49b27b19e6263720a2665bec819b23d138948`
 
 ## 次に行う一作業
 
-独立完了再レビューv2と最終技術検証Evidence v3を固定入力にし、同じ独立担当が残る2指摘、条件1から21、変更範囲をread-onlyで再々反証する。
+条件22として、技術条件1から21と独立レビュー開始可を根拠に、固定された安全保存範囲を製品処理として受け入れるか利用者が判断する。
 
 開始条件：
 
-- 二修正commit、Evidence v3、TODOが意味単位commitへ固定され、worktreeがcleanである
-- 採用契約v3、独立完了再レビューv2、Evidence v3を固定入力にする
-- レビューはread-onlyで前回反例を同条件で再実行する
-- 全Python commandに.venv/bin/python3を使う
+- 採用契約v3、Evidence v3、独立完了再レビューv3を固定根拠にする
+- 受入対象を合成一件の二root保存、派生物だけの再読込み、途中状態の再開または確認済み中止、確認値付き削除と監査期限保持に限定する
+- 実Session、実保存root、外部送信、自動削除、複数記録探索は受入対象に含めない
 
 完了条件：
 
-- 前回2指摘の反例が期待する安全結果へ変わる
-- 契約受入条件1から21の未接続が0件になる
-- 新たな責務拡張、秘密出力、既存入口変更、外部能力追加がない
-- 止める指摘0件の開始可、または残る修正要がpathと反例付きで固定される
+- 利用者が固定範囲を製品処理として受け入れるか明示する
+- 受入なら条件22のDecision recordを固定し、非受入なら理由と戻し先を固定する
 
-後続作業：独立再々レビューが開始可なら、条件22として目的・根拠・合否基準・推奨・影響を利用者へ提示し、製品受入だけを依頼する。修正要なら受入を提示しない。
+後続作業：受入なら条件22を完了として固定し、次の製品作業候補を提示する。非受入なら指定された理由だけを対象に戻す。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：なし。内部の開始レビュー担当と完了レビュー担当を使う許可は取得済みで、製品受入判断だけを最終段階で利用者へ戻す
+- Human判断待ち：条件22の製品受入だけを利用者が判断する。技術条件1から21の再裁定や修正方法の選択は求めない
 
 ## stale・deferred
 
-- stale：最終技術検証Evidence v1とv2の完了判断はstale。現在根拠は再レビューv2とEvidence v3で、独立再々レビュー前のため製品受入根拠にはまだしない
-- deferred：独立再レビューではfileを変更しない。設計、契約、既存入口、中央一覧、push、外部送信、自動削除、実Session記録の使用は変更・開始しない
+- stale：最終技術検証Evidence v1とv2、および独立完了レビューv1とv2の完了判断はstale。現在根拠はEvidence v3と独立完了再レビューv3開始可である
+- deferred：設計、契約、既存入口、中央一覧、push、外部送信、自動削除、実Session記録、複数記録探索は変更・開始しない
 
 ## Git・Test
 
