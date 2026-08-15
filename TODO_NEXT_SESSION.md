@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理の製品受入が完了した。
-- 現在作業：候補1の六境界実装、全確認、独立完了レビュー、合成一件、利用者の製品受入を完了した。次は候補2のG08設計・受入条件照合について、実装前の作業契約候補を一件に限定して定義する。
-- Task Contract：`TC-RC3-PRODUCT-ONE-ITEM-REVIEW-003 / completed / accepted_as_product`
+- 現在作業：候補2のG08設計・受入条件照合について、既存2 pathと関連31試験を実測し、一件・通信なし・保存なしの作業契約候補v1を定義した。採用前の独立定義確認へ進む。
+- Task Contract：`TC-RC3-PRODUCT-ONE-DESIGN-ACCEPTANCE-CONFORMANCE-004 / candidate_v1 / independent_definition_review_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [候補2の既存G08実測と契約定義Evidence](records/development/2026-08-15-one-design-acceptance-contract-definition-evidence-v1.md) — SHA-256 `9bad2d80fcddb6f97f9db71fa05a4811ce59404353aa07fb55c3070784d5f6b5`
+- [一件の設計・受入条件照合作業契約候補v1](records/task-contract/2026-08-15-one-design-acceptance-conformance-candidate-v1.md) — SHA-256 `1640ebbfd1ff5d01e4410b43de6c503da8dd0b402bc47d4f96534cbcdf71f52f`
 - [一件レビュー材料作成・結果整理の製品受入判断](records/development/2026-08-15-one-item-review-product-acceptance-decision-v1.md) — SHA-256 `8401ff7bd145755af2d5893db2da1fd5d00ee62c224d1602c3080c380f454441`
 - [合成一件の利用者向け受入表示Evidence](records/development/2026-08-15-one-item-review-synthetic-acceptance-evidence-v1.md) — SHA-256 `de5df0ccb9f7a41431721a59b001c2033af5421635db2c4781ea812ed5c592fe`
 - [固定commitの独立完了レビュー・確認済み](records/development/2026-08-15-one-item-review-independent-completion-review-v1.md) — SHA-256 `8c2a112a095beb93e906b8f969f1f1fc66953643f0ffca9a6c76d67cba159969`
@@ -49,31 +51,31 @@
 
 ## 次に行う一作業
 
-候補2のG08設計・受入条件照合について、既存2 pathと上位目的を読み、一件・通信なし・保存なしの作業契約候補を作る。
+固定commitの作業契約候補v1を別の実行単位が読取り専用で反証し、開始可または修正要を根拠付きで固定する。
 
 開始条件：
 
-- 候補1の製品受入判断と本TODOがcommitへ固定され、作業場所に未記録差分がない
-- 既存候補表のG08に対応する2 pathを機械的に特定し、現在の実測と上位目的を先に確認する
-- 契約候補の作成だけを行い、採用、実装、既存試験変更を行わない
+- 作業契約候補v1、定義Evidence、本TODOがcommitへ固定され、作業場所に未記録差分がない
+- 確認担当は成果物を変更せず、固定commitだけを読む
+- 目的の縮め過ぎ、欠落と矛盾の誤分類、安全表示、既存G08非変更へ少なくとも一つずつ反例を試す
 
 完了条件：
 
-- 目的、入力、期待結果、対象外、許可操作、停止条件、確認方法が一件分に固定される
-- 既存機能だけの最小案を含む3案と推奨理由が示される
-- 独立した定義確認へ渡せる固定材料になる
+- 独立定義確認が開始可または修正要を固定する
+- 開始可なら止める指摘と未接続条件が0件である
+- 修正要なら契約採用を求めず、指摘原因だけを限定訂正する
 
-後続作業：独立した定義確認で開始可になった後にだけ、利用者へ契約採用を求める。
+後続作業：開始可になった後にだけ、利用者へ契約採用と案Cの実装開始を一判断として求める。
 
 ## blocker・Human判断待ち
 
 - blocker：なし
-- Human判断待ち：なし。候補1の製品受入は利用者が明示済み。候補2は契約候補の定義までで実装を開始しない
+- Human判断待ち：なし。候補2の契約採用は独立定義確認が開始可になった後にだけ求める
 
 ## stale・deferred
 
-- stale：候補1の製品受入待ち、独立完了レビュー待ち、実装作業票v1、開始前レビュー待ち、契約候補v1・v2、契約採用待ち、候補1選択待ちの表示はstale
-- deferred：候補2の採用・実装、保存、外部送信、外部処理、実利用者資料、既存G02変更は次作業の対象外
+- stale：候補2の契約候補作成待ち、候補1の製品受入待ち、候補1の独立完了レビュー待ち、候補1の契約採用待ちの表示はstale
+- deferred：候補2の採用・実装、既存G08変更、保存、外部送信、外部処理、実利用者設計は次作業の対象外
 
 ## Git・Test
 
@@ -81,7 +83,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：対象158件、G02関連142件、安全表示23件、高危険度反例40件が成功、各終了コード0。G02 14 fileは差分0
+- 直近の関連Test：候補2の既存G08関連31件が成功、終了コード0。既存G08 2 pathと関連試験2 fileは目録観測commitから差分0
 - 直近の全Test：正規全試験2,020件成功、失敗・error・skip 0、終了コード0。Python 3.13.14、pytest 8.4.2、runner版2、代替実行なし
 - 差分検査：`git diff --check`合格
 
