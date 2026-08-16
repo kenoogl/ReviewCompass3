@@ -48,9 +48,10 @@ REQUIRED_SECTIONS = (
 
 _SLUG_PATTERN = re.compile(r"[a-z0-9][a-z0-9-]*\Z")
 _DATE_PATTERN = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
-_DIGEST_ROW_PATTERN = re.compile(r"^([0-9a-f]{64})  (\S+)$", re.MULTILINE)
+# 行単位でfence内外を区別して照合する（e2e-011-001所見2の修正）
+_DIGEST_ROW_LINE_PATTERN = re.compile(r"([0-9a-f]{64})  (\S+)\Z")
 _MODEL_PATTERN = re.compile(r"許可model `([^`]+)`")
-_POINT_PATTERN = re.compile(r"^(\d+)\.\s", re.MULTILINE)
+_POINT_LINE_PATTERN = re.compile(r"(\d+)\.\s")
 
 
 class BuilderStop(Exception):
@@ -253,19 +254,42 @@ def assemble(
     }
 
 
-def _section_text(text, key):
-    lines = text.splitlines()
-    collected = []
+def _classified_lines(text):
+    """各行を（行, fence内か）の組で返す。fence標識行は状態切替のみ。
+
+    節見出し・digest行の判定はfence外の行だけを対象にする
+    （e2e-011-001所見2：fence内の偽見出し・fence外のdigest行による
+    騙され方の修正）。
+    """
+
+    classified = []
     inside = False
-    for line in lines:
-        if line.startswith("## "):
-            if inside:
-                break
-            inside = key in line
+    for line in text.splitlines():
+        if line.strip().startswith("```"):
+            inside = not inside
             continue
-        if inside:
-            collected.append(line)
-    return "\n".join(collected)
+        classified.append((line, inside))
+    return classified
+
+
+def _is_heading(line, inside):
+    return not inside and line.startswith("## ")
+
+
+def _section_lines(text, key):
+    """指定節の（行, fence内か）一覧。見出し判定はfence外だけで行う。"""
+
+    collected = []
+    inside_section = False
+    for line, in_fence in _classified_lines(text):
+        if _is_heading(line, in_fence):
+            if inside_section:
+                break
+            inside_section = key in line
+            continue
+        if inside_section:
+            collected.append((line, in_fence))
+    return collected
 
 
 def check(*, repository, request_relative_path):
@@ -294,10 +318,11 @@ def check(*, repository, request_relative_path):
     except UnicodeDecodeError as error:
         raise BuilderStop("invalid_utf8") from error
 
+    classified = _classified_lines(text)
     for section in REQUIRED_SECTIONS:
         if not any(
-            line.startswith("## ") and section in line
-            for line in text.splitlines()
+            _is_heading(line, in_fence) and section in line
+            for line, in_fence in classified
         ):
             raise BuilderStop("required_section_missing")
 
@@ -305,18 +330,33 @@ def check(*, repository, request_relative_path):
         if fragment in text:
             raise BuilderStop("placeholder_remaining")
 
-    points_section = _section_text(text, "反証点")
-    numbers = _POINT_PATTERN.findall(points_section)
+    points_lines = _section_lines(text, "反証点")
+    numbers = []
+    for line, in_fence in points_lines:
+        if in_fence:
+            continue
+        match = _POINT_LINE_PATTERN.match(line.strip())
+        if match is not None:
+            numbers.append(match.group(1))
     if not numbers:
         raise BuilderStop("fill_in_missing")
     if len(set(numbers)) != len(numbers):
         raise BuilderStop("request_point_identifiers_invalid")
-    decided_section = _section_text(text, "判断済み・範囲外")
-    if not any(line.strip() for line in decided_section.splitlines()):
+    decided_lines = _section_lines(text, "判断済み・範囲外")
+    if not any(
+        line.strip() for line, in_fence in decided_lines if not in_fence
+    ):
         raise BuilderStop("fill_in_missing")
 
-    table_section = _section_text(text, "対象と固定")
-    rows = _DIGEST_ROW_PATTERN.findall(table_section)
+    table_lines = _section_lines(text, "対象と固定")
+    rows = []
+    for line, in_fence in table_lines:
+        match = _DIGEST_ROW_LINE_PATTERN.fullmatch(line.strip())
+        if match is None:
+            continue
+        if not in_fence:
+            raise BuilderStop("digest_row_outside_fence")
+        rows.append((match.group(1), match.group(2)))
     if not rows:
         raise BuilderStop("digest_table_empty")
     for digest, relative in rows:

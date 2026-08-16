@@ -416,6 +416,50 @@ def test_check_name_without_request_marker_stops(repository):
     assert caught.value.reason == "request_name_invalid"
 
 
+def test_check_fake_heading_inside_fence_does_not_count(repository):
+    # e2e-011-001所見2（blocking）の敵対試験：実§6を削除し、fence内へ
+    # 偽の「## 6. 手順」を置いた場合、見出しとして数えず
+    # required_section_missingで停止しなければならない。
+    core = _core()
+    relative = _ready_record(repository)
+    path = Path(repository) / relative
+    text = path.read_text(encoding="utf-8")
+    head, _, _ = text.partition("## 6.")
+    forged = head + (
+        "```text\n"
+        "## 6. 手順（Human・Claude向け）\n"
+        "```\n"
+    )
+    path.write_text(forged, encoding="utf-8")
+    _git(repository, "add", "--", relative)
+    _git(repository, "commit", "-q", "-m", "Forge heading in fence")
+    with pytest.raises(core.BuilderStop) as caught:
+        core.check(repository=repository, request_relative_path=relative)
+    assert caught.value.reason == "required_section_missing"
+
+
+def test_check_digest_row_outside_fence_stops(repository):
+    # e2e-011-001所見2（blocking）の敵対試験：§1のfence外に置かれた
+    # digest行（正しい値でも）は表として数えず、明示的に停止する。
+    core = _core()
+    relative = _ready_record(repository)
+    path = Path(repository) / relative
+    stray = "%s  records/development/target-a.md" % _sha256_file(
+        Path(repository) / "records/development/target-a.md"
+    )
+    text = path.read_text(encoding="utf-8").replace(
+        "## 2. 開始時の鮮度検査",
+        stray + "\n\n## 2. 開始時の鮮度検査",
+        1,
+    )
+    path.write_text(text, encoding="utf-8")
+    _git(repository, "add", "--", relative)
+    _git(repository, "commit", "-q", "-m", "Add stray digest row")
+    with pytest.raises(core.BuilderStop) as caught:
+        core.check(repository=repository, request_relative_path=relative)
+    assert caught.value.reason == "digest_row_outside_fence"
+
+
 # ---- 機微検査（§7.3・§9-5） ----
 
 
