@@ -50,14 +50,16 @@ schema・検査・台帳の定義は不変）の扱いを決める：(A)軽微�
 
 開始条件：
 
-- 契約候補v5、本TODOが意味単位commitへ固定される（実装途中fileは未commitのままでよい）
+- 契約候補v5、本TODOが意味単位commitへ固定される（実装途中file 4件は未commitのまま作業treeに残す。Git・Test欄参照）
+- 次sessionはAGENTS.md・本TODO・契約候補v5・v2自己レビュー（5段手続きの記録）を読んでから再開する
 
 完了条件：
 
 - 利用者の判断がchatで得られ、Decision recordへ固定される
 
-後続作業：承認後、Claudeが実装fileを新packageへ再配置して対象試験を全緑にし、退行確認→独立完了レビュー
-（Gemini・Human中継）→利用者指示による実送信E2E一回→製品受入提示の順で進める。
+後続作業：承認後、Claudeが実装file 2件を`tools/external_review/`へ再配置（`__init__.py`追加・試験のimport先
+更新）して対象試験49件を全緑にし、退行確認（egress敵対試験の回復を含む）→GREEN commit→独立完了レビュー
+（Gemini・Human中継、5段手続きの下ごしらえつき）→利用者指示による実送信E2E一回→製品受入提示の順で進める。
 
 ## blocker・Human判断待ち
 
@@ -74,9 +76,13 @@ schema・検査・台帳の定義は不変）の扱いを決める：(A)軽微�
 - branch：`main`
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
-- worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：対象111件、G24既存関連59件、要求artifact関連21件、G08対象107件が各単独成功、終了コード0
-- 直近の全Test：禁止認証環境6件を除く隔離条件で正規全試験2,238件成功、終了コード0。通常host環境の既存executor安全拒否12件は実装前cleanなHEADの一時worktreeで同一再現し退行なしと確認済み
+- worktree：**意図的に未commitの実装途中fileが4件残る**（契約v5のHuman判断待ちのため。`tools/egress/`配下に
+  置いたままcommitすると既存敵対試験が不合格になるので、v5承認後に`tools/external_review/`へ再配置してから
+  commitする）：`tools/egress/gemini_send.py`（新規・未追跡）、`tools/egress/gemini_send_entry.py`（新規・未追跡）、
+  `pyproject.toml`（実行名1行追加の変更）、`tests/test_gemini_send.py`（opener試験の実態合わせ変更）。
+  これらを消さずに次sessionで扱うこと
+- 直近の関連Test：G20対象49件（worktreeの実装で成功）、G02 organize追加後の実行器75件、G02 158件、G08 107件、G24 111件、G30基盤38件、egress関連107件（うち敵対1件は上記の置き場所矛盾により実装file存在時のみ不合格）
+- 直近の全Test：隔離条件の正規全試験2,313件成功（G02安全投影GREEN時点）。通常host環境の既存executor安全拒否12件は既知事象で退行なし
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
