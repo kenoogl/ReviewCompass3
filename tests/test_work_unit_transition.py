@@ -128,7 +128,11 @@ def _git(repository, *arguments):
     )
 
 
-def test_preflight_ignores_local_claude_reports_but_blocks_work_artifacts(tmp_path):
+def test_preflight_blocks_request_records_like_any_work_artifact(tmp_path):
+    """依頼record（claude-to-codex名を含む）は特別扱いされず、未commitなら
+    通常の作業成果物としてblockされる（DEC-IC-HANDOFF-GITIGNORE-RECORD-
+    CANONICAL-001：局所メモ除外の廃止とrecord正本方式への整合の固定）。"""
+
     repository = tmp_path / "repository"
     repository.mkdir()
     _git(repository, "init")
@@ -142,16 +146,23 @@ def test_preflight_ignores_local_claude_reports_but_blocks_work_artifacts(tmp_pa
     _git(repository, "add", ".gitignore", "tracked.txt")
     _git(repository, "commit", "-m", "initial")
 
+    assert _module().preflight_next_work(
+        work_status="completed", project_root=repository
+    ).status == "passed"
+
     report = (
         repository
         / "records/session-handoffs/2026-08-05-claude-to-codex-completion.md"
     )
     report.parent.mkdir(parents=True)
-    report.write_text("local report\n", encoding="utf-8")
+    report.write_text("request record\n", encoding="utf-8")
 
     assert _module().preflight_next_work(
         work_status="completed", project_root=repository
-    ).status == "passed"
+    ).status == "blocked"
+
+    _git(repository, "add", str(report.relative_to(repository)))
+    _git(repository, "commit", "-m", "land request record")
 
     (repository / "uncommitted-artifact.md").write_text(
         "artifact\n", encoding="utf-8"
