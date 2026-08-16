@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "order_identifier": "ORD-G20-LIVE-E2E-001",
+  "human_approved": true,
+  "destination_provider": "gemini-api",
+  "destination_model": "gemini-3.1-pro-preview",
+  "pilot_provider": "anthropic-api",
+  "purpose": "受入条件13の実送信E2E一回。契約固定経路（機微検査・allowlist・digest束縛・台帳・上限）の実環境確認",
+  "repository_root": "/Users/Daily/Development/ReviewCompass3",
+  "source_files": [
+    {
+      "path": "docs/development/e2e-live-send-check.md",
+      "sha256": "5469e359ec9baaf6522ade8ceca56b4723c11912494a377e8320702298f88d34"
+    }
+  ]
+}
