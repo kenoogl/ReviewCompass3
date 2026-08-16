@@ -600,6 +600,11 @@ def find_terminal_absolute_paths(managed_root):
     findings = []
     for path in sorted(item for item in root.rglob("*") if item.is_file()):
         relative = path.relative_to(root).as_posix()
+        # 送信台帳の未加工応答（外部データの無加工保存。契約008 §10.2の
+        # 固定名）は自作成果物ではないため、絶対path混入検査の対象外とする
+        # （利用者承認 2026-08-16 chat）。
+        if path.name.endswith("--response-v1.raw"):
+            continue
         try:
             text = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError) as error:

@@ -260,6 +260,23 @@ def test_managed_fixture_contains_no_terminal_absolute_paths():
     assert layout.find_terminal_absolute_paths(EMPTY_PROJECT) == ()
 
 
+def test_raw_response_ledger_artifact_is_exempt_from_absolute_scan(tmp_path):
+    """送信台帳の未加工応答（外部データ）は絶対path混入検査の対象外である。"""
+
+    layout = _layout()
+    managed = tmp_path / "managed"
+    ledger = managed / "egress-ledger"
+    ledger.mkdir(parents=True)
+    external = '{"signature":"/OSkiiNAW3Z/C/6/external-binary-like-data"}'
+    (ledger / "ORD-X--response-v1.raw").write_text(external, encoding="utf-8")
+    (ledger / "note.txt").write_text("/Users/example/leak", encoding="utf-8")
+
+    findings = layout.find_terminal_absolute_paths(managed)
+
+    assert all("response-v1.raw" not in finding for finding in findings)
+    assert any("note.txt" in finding for finding in findings)
+
+
 def test_project_relative_escape_and_incomplete_migration_are_rejected(
     tmp_path,
 ):
