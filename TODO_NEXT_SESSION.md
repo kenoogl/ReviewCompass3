@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：契約009はGREEN到達後、独立完了レビュー（受入条件7）の依頼を5段手続きで作成した。起草側自己レビュー（発見0件）・依頼record（反証4点・digest照合9件一致）まで固定済みで、利用者によるGeminiへのpath伝達と判定文の持ち帰りを待って停止中である。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v2 / green_awaiting_completion_review_verdict`
+- 現在作業：契約009の独立完了レビューがGemini `verified`となり（4類型0件・根拠4点の機械照合一致）、受入条件7が充足した。残るは実用文書の実送信E2E一回（受入条件8）と製品受入（受入条件9）で、E2Eの実施判断を利用者へ諮って停止中である。送信候補（観測record・暫定体制決定record）の検査合格は事前実測済み。
+- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v2 / verified_awaiting_real_doc_e2e_decision`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [契約009独立完了レビュー・verified判定（Gemini・Human中継）](records/development/2026-08-16-external-send-scan-refinement-completion-review-v1.md) — SHA-256 `e2693410b40d1471eed9c3e90f2feaa8460f64af33629dcdb0b41a72dbe423e9`
 - [契約009独立完了レビュー依頼record（Gemini直接読取り・Human中継）](records/session-handoffs/2026-08-16-g20-scan-refinement-completion-review-gemini-request-v1.md) — SHA-256 `06c4ac6bac2195e34c5d798bbac4eaae6a86cdf2fff3dbbaf1900c0a31977aac`
 - [契約009実装の起草側自己レビュー（発見0件）](records/development/2026-08-16-external-send-scan-refinement-impl-self-review-v1.md) — SHA-256 `e0e4a287ba0448da858942adf979c5c43ef12e92a97994a4889c486bae911ce0`
 - [契約009実装成功Evidence（改名・RED・GREEN・退行確認・別件対処）](records/development/2026-08-16-external-send-scan-refinement-green-evidence-v1.md) — SHA-256 `9e001507dcc4b39c840e6345a9ed708acdaf19b848a6a211bfd9cdae07ddb7f7`
@@ -47,27 +48,24 @@
 
 ## 次に行う一作業
 
-利用者がGeminiへ完了レビュー依頼recordのpath
-（`records/session-handoffs/2026-08-16-g20-scan-refinement-completion-review-gemini-request-v1.md`）を伝え、
-判定文を持ち帰る。Claudeは判定文を判定record
-`records/development/2026-08-16-external-send-scan-refinement-completion-review-v1.md`へ転記・commitし、
-根拠と実物の整合を機械照合する。
+利用者が実用文書の実送信E2E一回（受入条件8）の実施と送る資料を決める。承認後、Claudeが送信指示JSON
+一件を作成（commit済み確認・digest機械計算）し、改名後の実行名`reviewcompass3-external-review-send`で
+一回実行して、精密化後の経路で実文書が送れることを実環境確認し、台帳をcommitへ含める。
 
 開始条件：
 
-- 依頼record・自己レビュー・本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 判定record・本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 判定recordがcommitへ固定される
+- E2Eの実施と送る資料の利用者判断がchatで得られる
 
-後続作業：`verified`→実用文書の実送信E2E一回（利用者指示）→製品受入（残余riskの最終受容を含む）。
-`修正要`なら停止して利用者へ諮る。
+後続作業：E2E実施→Evidence固定→製品受入提示（受入条件9。残余risk 3点の最終受容を含む）。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：完了レビュー依頼のGeminiへのpath伝達と判定文の持ち帰り（暫定体制のHuman中継作業）。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`は契約009が消費中、`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けは別途未裁定
+- Human判断待ち：実用文書E2E一回の実施判断と送る資料の選択（受入条件8は利用者の指示を要する）。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`は契約009が消費中、`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けは別途未裁定
 
 ## stale・deferred
 
