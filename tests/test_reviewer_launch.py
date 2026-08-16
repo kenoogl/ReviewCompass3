@@ -157,6 +157,29 @@ def _valid_verdict():
     }
 
 
+def _write_project_config(projects_root, repository, with_grant=True):
+    projects_root.mkdir(parents=True, exist_ok=True)
+    repo = str(Path(repository).resolve())
+    value = {
+        "id": "proj-test",
+        "name": "test-project",
+        "projectResources": {
+            "resources": [
+                {"gitFolder": {"folderUri": "file://" + repo}}
+            ]
+        },
+    }
+    if with_grant:
+        value["permissionGrants"] = {
+            "permissionGrants": {
+                "allow": ["read_file(%s)" % repo],
+            }
+        }
+    (projects_root / "proj-test.json").write_text(
+        json.dumps(value, ensure_ascii=False), encoding="utf-8"
+    )
+
+
 class _FacadeRecorder:
     def __init__(self, stdout="", exit_code=0):
         self.calls = []
@@ -179,6 +202,11 @@ def _launch(repository, monkeypatch, facade, **overrides):
         core, "ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
     )
     monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    projects_root = repository.parent / "projects-config"
+    _write_project_config(projects_root, repository)
+    monkeypatch.setattr(
+        core, "PROJECTS_CONFIG_ROOT", projects_root, raising=True
+    )
     request = _request_relative(repository)
     expected = _sha256_file(repository / request)
     values = {
@@ -249,7 +277,7 @@ def test_fixed_arguments_exact(clean_environment):
     # 事項。書込みを許すaccept-editsは引き続き禁止）。
     core = _core()
     arguments = core.build_arguments(
-        "agy", "prompt-text", TEST_MODEL
+        "agy", "prompt-text", TEST_MODEL, "proj-test"
     )
     schema_text = json.dumps(
         core.VERDICT_SCHEMA, ensure_ascii=False, sort_keys=True
@@ -261,6 +289,7 @@ def test_fixed_arguments_exact(clean_environment):
         "--model=" + TEST_MODEL,
         "--mode=plan",
         "--sandbox",
+        "--project=proj-test",
         "--disable-slash-commands",
         "--print-timeout=600s",
         "--print=prompt-text",
@@ -334,6 +363,66 @@ def test_empty_allowed_models_stops(
 def test_allowed_models_fixed_to_approved_value():
     core = _core()
     assert core.ALLOWED_RESPONSE_MODELS == ("gemini-3.1-pro-high",)
+
+
+# ---- project束縛と読取り恒久許可（e2e-010-006後の実測に基づく） ----
+
+
+def test_project_binding_missing_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder()
+    monkeypatch.setattr(
+        core, "ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
+    )
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    monkeypatch.setattr(
+        core,
+        "PROJECTS_CONFIG_ROOT",
+        repository.parent / "no-projects",
+        raising=True,
+    )
+    request = _request_relative(repository)
+    with pytest.raises(core.LaunchStop) as caught:
+        core.launch_review(
+            repository=repository,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+            private_root=repository.parent / "private",
+            backend_name="antigravity-cli",
+            run_id="run-001",
+        )
+    assert caught.value.reason == "project_binding_missing"
+    assert facade.calls == []
+
+
+def test_read_grant_missing_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder()
+    monkeypatch.setattr(
+        core, "ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
+    )
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    projects_root = repository.parent / "projects-config-nogrant"
+    _write_project_config(projects_root, repository, with_grant=False)
+    monkeypatch.setattr(
+        core, "PROJECTS_CONFIG_ROOT", projects_root, raising=True
+    )
+    request = _request_relative(repository)
+    with pytest.raises(core.LaunchStop) as caught:
+        core.launch_review(
+            repository=repository,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+            private_root=repository.parent / "private",
+            backend_name="antigravity-cli",
+            run_id="run-001",
+        )
+    assert caught.value.reason == "read_grant_missing"
+    assert facade.calls == []
 
 
 # ---- 鮮度（起動直前の再計算。§7.3-1前半） ----

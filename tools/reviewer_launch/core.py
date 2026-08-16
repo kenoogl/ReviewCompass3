@@ -63,6 +63,11 @@ BACKENDS = {
 ASSIGNMENT_NAME = "reviewer"
 RAW_STORE_KIND = "private_root_immutable_store"
 
+# agy CLIのproject設定の置き場所（e2e-010-006後の局所調査で実測）。
+# 利用者が対話sessionで与えた恒久許可（permissionGrants）がここへ保存され、
+# headless起動は--project束縛が無いと許可が適用されない。
+PROJECTS_CONFIG_ROOT = Path.home() / ".gemini" / "config" / "projects"
+
 VERDICT_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
@@ -210,7 +215,7 @@ def build_prompt(repository_root, request_relative_path, expected_sha256):
     )
 
 
-def build_arguments(executable, prompt, model):
+def build_arguments(executable, prompt, model, project_id):
     """契約§7.1の固定引数を組み立てる。
 
     agyの旗解析はGo標準flag形式であり、`--print`は値（prompt本文）を取る
@@ -223,6 +228,9 @@ def build_arguments(executable, prompt, model):
     ある（e2e-010-005の実測：request-review方式ではrepository内の
     view_fileすら承認必須＝headlessで自動拒否となるため、制限を強める
     sandbox内での自動許可を検証する）。
+    `--project=<id>`は利用者の対話sessionで保存済みの読取り恒久許可を
+    headless起動へ結び付ける（e2e-010-006後の実測：許可はproject設定
+    `permissionGrants`に保存され、project束縛の無い起動には適用されない）。
     """
 
     return [
@@ -233,6 +241,7 @@ def build_arguments(executable, prompt, model):
         "--model=" + model,
         "--mode=plan",
         "--sandbox",
+        "--project=" + project_id,
         "--disable-slash-commands",
         "--print-timeout=" + PRINT_TIMEOUT,
         "--print=" + prompt,
@@ -248,6 +257,54 @@ def _child_environment():
         for name in PASSTHROUGH_ENVIRONMENT
         if name in os.environ
     }
+
+
+def resolve_project_binding(repository):
+    """repositoryに対応するagy projectを設定から機械解決する。
+
+    利用者が対話sessionで与えた読取り恒久許可（`read_file(<repo>)`）を持つ
+    projectのidを返す。projectが無ければ`project_binding_missing`、許可が
+    無ければ`read_grant_missing`で起動前に停止する（許可の新設・迂回は
+    行わない。許可を与えるのは利用者の対話sessionだけである）。
+    """
+
+    repo = Path(repository).resolve()
+    folder_uri = "file://%s" % repo
+    required_grant = "read_file(%s)" % repo
+    try:
+        candidates = sorted(PROJECTS_CONFIG_ROOT.glob("*.json"))
+    except OSError:
+        candidates = []
+    for path in candidates:
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if not isinstance(value, dict):
+            continue
+        resources = (
+            (value.get("projectResources") or {}).get("resources") or []
+        )
+        matched = any(
+            isinstance(resource, dict)
+            and (resource.get("gitFolder") or {}).get("folderUri")
+            == folder_uri
+            for resource in resources
+        )
+        if not matched:
+            continue
+        identifier = value.get("id")
+        if not isinstance(identifier, str) or not identifier:
+            continue
+        grants = (
+            (value.get("permissionGrants") or {}).get("permissionGrants")
+            or {}
+        )
+        allow = grants.get("allow") or []
+        if required_grant not in allow:
+            raise LaunchStop("read_grant_missing")
+        return identifier
+    raise LaunchStop("project_binding_missing")
 
 
 def _validate_private_root(repository, private_root):
@@ -372,6 +429,7 @@ def launch_review(
     if not ALLOWED_RESPONSE_MODELS:
         raise LaunchStop("allowed_models_unfixed")
     requested_model = ALLOWED_RESPONSE_MODELS[0]
+    project_id = resolve_project_binding(repository)
     private_path = _validate_private_root(repository, private_root)
 
     if not isinstance(expected_sha256, str) or len(expected_sha256) != 64:
@@ -394,7 +452,7 @@ def launch_review(
         raise LaunchStop("prompt_payload_limit_exceeded")
     prompt_digest = hashlib.sha256(prompt_encoded).hexdigest()
     arguments = build_arguments(
-        backend["executable"], prompt, requested_model
+        backend["executable"], prompt, requested_model, project_id
     )
 
     try:
@@ -430,6 +488,7 @@ def launch_review(
         },
         "prompt_sha256": prompt_digest,
         "print_timeout": PRINT_TIMEOUT,
+        "project_id": project_id,
     }
 
     if completed.returncode != 0:
