@@ -599,7 +599,7 @@ def run_send_order(order_path):
     if len(data) > _RESPONSE_LIMIT:
         raise SendStop("response_size_exceeded", "network", after_attempt=True)
 
-    _publish(data if data.endswith(b"") else data, f"{ledger}/{response_name}")
+    _publish(data, f"{ledger}/{response_name}")
     if status != 200:
         raise SendStop("http_error", "network", after_attempt=True)
 

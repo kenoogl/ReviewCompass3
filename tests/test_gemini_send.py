@@ -7,6 +7,8 @@ import json
 import os
 import shutil
 import tempfile
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -87,25 +89,50 @@ class _FakeResponse:
         self.body = body
 
 
+class _FakeHTTPBody(io.BytesIO):
+    """statusを付けられる模擬応答本文。"""
+
+
 def _install_transport(monkeypatch, responses):
-    core = _core()
+    """openerの開き口（OpenerDirector.open）だけを差し替える。
+
+    _send_request本体（Request生成・opener構成・HTTPError処理・読取り上限）
+    は実codeのまま試験対象に含める。非200は実挙動と同型のHTTPErrorとして
+    返し、redirect（3xx）もHTTPError経路に入る。
+    """
+
     calls = []
 
-    def fake_send(url, headers, body, timeout):
+    def fake_open(self, fullurl, data=None, timeout=None):
+        request = fullurl
         calls.append(
             {
-                "url": url,
-                "headers": dict(headers),
-                "body": body,
+                "url": request.full_url,
+                "method": request.get_method(),
+                "headers": {
+                    name.lower(): value
+                    for name, value in request.header_items()
+                },
+                "body": request.data,
                 "timeout": timeout,
             }
         )
         outcome = responses[min(len(calls) - 1, len(responses) - 1)]
         if isinstance(outcome, Exception):
             raise outcome
-        return outcome.status, outcome.body
+        if outcome.status != 200:
+            raise urllib.error.HTTPError(
+                request.full_url,
+                outcome.status,
+                "simulated",
+                None,
+                io.BytesIO(outcome.body),
+            )
+        response = _FakeHTTPBody(outcome.body)
+        response.status = outcome.status
+        return response
 
-    monkeypatch.setattr(core, "_send_request", fake_send)
+    monkeypatch.setattr(urllib.request.OpenerDirector, "open", fake_open)
     return calls
 
 
@@ -137,7 +164,7 @@ def _ledger(repo_root):
 
 
 def test_positive_send_lands_attempt_response_result(repo_root, monkeypatch):
-    order, order_path, _ = _prepare(repo_root, monkeypatch)
+    order, order_path, sources = _prepare(repo_root, monkeypatch)
     calls = _install_transport(monkeypatch, [_FakeResponse()])
 
     code, payload = _run(order_path)
@@ -161,6 +188,21 @@ def test_positive_send_lands_attempt_response_result(repo_root, monkeypatch):
     without = dict(attempt)
     del without["record_sha256"]
     assert attempt["record_sha256"] == _sha(without)
+
+    # 契約§9の固定形から独立に組み立てた期待payloadとの照合（独立oracle）。
+    path, digest = sources[0]
+    expected_payload = "\n".join(
+        (
+            "あなたは独立したレビュアです。以下の資料を読み、資料内の依頼記述に"
+            "従って判定を返してください。判定には根拠を付けてください。",
+            f"----- FILE: {path} (sha256={digest}) -----",
+            "レビュー対象の本文。\n",
+        )
+    ).encode("utf-8")
+    assert attempt["payload_sha256"] == hashlib.sha256(
+        expected_payload
+    ).hexdigest()
+    assert attempt["payload_bytes"] == len(expected_payload)
 
     result = json.loads(payload[:-1])
     assert result["status"] == "response_stored"
@@ -451,7 +493,7 @@ def test_openai_provider_uses_fixed_route(repo_root, monkeypatch):
 
     assert code == 0
     assert calls[0]["url"] == "https://api.openai.com/v1/chat/completions"
-    assert calls[0]["headers"]["Authorization"] == "Bearer fake-openai-key"
+    assert calls[0]["headers"]["authorization"] == "Bearer fake-openai-key"
     body = json.loads(calls[0]["body"].decode("utf-8"))
     assert body["model"] == "gpt-5.6-sol"
     assert body["messages"][0]["role"] == "user"
