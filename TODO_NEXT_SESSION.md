@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：なし（契約009の作業単位は完了）。利用者が残余risk 3点を最終受容して製品受入し（受入条件1〜9すべて充足）、機微検査の精密化と改名済み送信路`reviewcompass3-external-review-send`が成立、実用文書の外部送信が可能になった。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`は本契約により消費。次の一作業の選択待ちである。
+- 現在作業：なし（契約009受入済み・追加の運用確認も完了）。利用者指示による3 provider実環境確認が完了した：gemini-api（Claude操縦）・openai-api（Claude操縦・gpt-5-mini）・anthropic-api（**Gemini操縦**・claude-sonnet-5。独立性検査をはずさない代替案で、書込み権限起因の停止→送信ゼロ確認→再実行の経緯つき）。全件HTTP 200・台帳計数4件・鍵非出現。次の一作業の選択待ちである。
 - Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v2 / accepted`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [3 provider実環境確認Evidence（Gemini操縦のanthropic確認を含む）](records/development/2026-08-16-three-provider-live-check-evidence-v1.md) — SHA-256 `e04a2c95fbbe727a296dd27bbc9171dd378bfdc9409d77b788eabdd9a7b9f07d`
 - [利用者による契約009の製品受入判断（残余risk最終受容・IC消費）](records/development/2026-08-16-external-send-scan-refinement-product-acceptance-decision-v1.md) — SHA-256 `a1ef5bebd6b3d918dff4080ed7faea532a3ad69b523ff206ed11eed77e916879`
 - [契約009実用文書E2E Evidence（精密化の実用実証）](records/development/2026-08-16-external-send-scan-refinement-real-doc-e2e-evidence-v1.md) — SHA-256 `1d975935137cd77fbdf42906baae0a41c16c0daeba3e994aa2ad5e8e255713d3`
 - [契約009独立完了レビュー・verified判定（Gemini・Human中継）](records/development/2026-08-16-external-send-scan-refinement-completion-review-v1.md) — SHA-256 `e2693410b40d1471eed9c3e90f2feaa8460f64af33629dcdb0b41a72dbe423e9`
@@ -69,7 +70,7 @@
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：次の一作業の選択。`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けは別途未裁定
+- Human判断待ち：次の一作業の選択。`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けと、external_send_approved表示の不正確さ（3provider確認Evidence§3の観測・登録可否）は別途未裁定
 
 ## stale・deferred
 
