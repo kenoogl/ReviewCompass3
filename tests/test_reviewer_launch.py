@@ -260,6 +260,7 @@ def test_fixed_arguments_exact(clean_environment):
         "--json-schema=" + schema_text,
         "--model=" + TEST_MODEL,
         "--mode=plan",
+        "--sandbox",
         "--disable-slash-commands",
         "--print-timeout=600s",
         "--print=prompt-text",

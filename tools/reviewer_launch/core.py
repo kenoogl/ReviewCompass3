@@ -219,6 +219,10 @@ def build_arguments(executable, prompt, model):
     事項。E2E e2e-010-002の実測：既定のrequest-review方式はheadlessで道具
     許可が自動拒否となり、読み取りすら成立しない）。書込みを許す
     `--mode=accept-edits`は使用禁止のまま。
+    `--sandbox`（端末制限つきsandbox実行）は同じ留保事項の確定の続きで
+    ある（e2e-010-005の実測：request-review方式ではrepository内の
+    view_fileすら承認必須＝headlessで自動拒否となるため、制限を強める
+    sandbox内での自動許可を検証する）。
     """
 
     return [
@@ -228,6 +232,7 @@ def build_arguments(executable, prompt, model):
         + json.dumps(VERDICT_SCHEMA, ensure_ascii=False, sort_keys=True),
         "--model=" + model,
         "--mode=plan",
+        "--sandbox",
         "--disable-slash-commands",
         "--print-timeout=" + PRINT_TIMEOUT,
         "--print=" + prompt,
