@@ -1,0 +1,231 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-VERTICAL-A-REQUEST-BUILDER-2026-08-17-V1",
+  "searches": [
+    {
+      "subject": "request_builder_required_capabilities_v1",
+      "capabilities": [
+        {
+          "capability_id": "request_template_generation",
+          "responsibility": "依頼recordの2類型（契約レビュー・完了レビュー）の雛形を機械欄つきで生成する",
+          "inputs": [
+            "類型",
+            "対象の宣言"
+          ],
+          "outputs": [
+            "依頼record草稿"
+          ],
+          "failure_behavior": [
+            "機械欄が埋まらないまま合格として返さない"
+          ],
+          "required_properties": [
+            "固定形式",
+            "類型の登録形"
+          ],
+          "reference_paths": [
+            "tools/reviewer_launch/record.py",
+            "tools/development/todo_handoff_projection.py",
+            "tools/development/todo_record_generation.py"
+          ],
+          "reference_symbols": [
+            "tools/reviewer_launch/record.py:_render_record"
+          ],
+          "symbol_terms": [
+            "render",
+            "template",
+            "generate"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "record_mechanical_inspection",
+          "responsibility": "依頼recordの存在・必須節・識別子一意・参照実在・囲み記号対応を決定的に検査する",
+          "inputs": [
+            "依頼record",
+            "参照一覧"
+          ],
+          "outputs": [
+            "検査結果"
+          ],
+          "failure_behavior": [
+            "形式不備を意味判断の担当へ回して通過させない"
+          ],
+          "required_properties": [
+            "7項目検査",
+            "決定的判定"
+          ],
+          "reference_paths": [
+            "tools/reviewer_launch/record.py",
+            "tools/development/todo_handoff.py",
+            "tools/development/todo_record_generation.py",
+            "tools/development/authority_reference_checker.py"
+          ],
+          "reference_symbols": [
+            "tools/reviewer_launch/record.py:validate_verdict",
+            "tools/development/todo_record_generation.py:verify_reference_digests"
+          ],
+          "symbol_terms": [
+            "verify",
+            "reference",
+            "check",
+            "inspect"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        },
+        {
+          "capability_id": "sensitive_content_scan",
+          "responsibility": "新規作成した依頼record内容へ既定5 patternと高乱雑性検知（除外3形式つき）を適用する",
+          "inputs": [
+            "依頼record内容"
+          ],
+          "outputs": [
+            "機微検査結果"
+          ],
+          "failure_behavior": [
+            "検知時に組み立てを合格として返さない"
+          ],
+          "required_properties": [
+            "既定pattern不変",
+            "除外の契約固定"
+          ],
+          "reference_paths": [
+            "tools/session_logs/redaction.py",
+            "tools/external_review/send.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/redaction.py:find_high_entropy",
+            "tools/session_logs/redaction.py:default_pattern_rules"
+          ],
+          "symbol_terms": [
+            "sensitive",
+            "entropy",
+            "redaction",
+            "scan"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "digest_table_computation",
+          "responsibility": "対象fileのSHA-256を機械計算しdigest表として固定する",
+          "inputs": [
+            "対象path一覧"
+          ],
+          "outputs": [
+            "digest表"
+          ],
+          "failure_behavior": [
+            "手書きのdigestを受け付けない"
+          ],
+          "required_properties": [
+            "決定的なdigest計算",
+            "全件機械転記"
+          ],
+          "reference_paths": [
+            "tools/common/digests.py",
+            "tools/reviewer_launch/core.py"
+          ],
+          "reference_symbols": [
+            "tools/common/digests.py:file_sha256",
+            "tools/common/digests.py:sha256_hex"
+          ],
+          "symbol_terms": [
+            "sha256",
+            "digest"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "commit_and_ignore_verification",
+          "responsibility": "対象がcommit済みでgit管理内（check-ignore不一致なし）であることを機械確認する",
+          "inputs": [
+            "対象path一覧"
+          ],
+          "outputs": [
+            "commit状態の検査結果"
+          ],
+          "failure_behavior": [
+            "未commit・無視対象のfileを依頼対象として通さない"
+          ],
+          "required_properties": [
+            "Git機械取得",
+            "単独終了コード判定"
+          ],
+          "reference_paths": [
+            "tools/reviewer_launch/record.py",
+            "tools/development/work_unit_transition.py",
+            "tools/development/todo_handoff.py"
+          ],
+          "reference_symbols": [
+            "tools/reviewer_launch/record.py:current_commit"
+          ],
+          "symbol_terms": [
+            "git",
+            "committed",
+            "ignore"
+          ],
+          "required_effect_markers": [
+            "process_spawn"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        },
+        {
+          "capability_id": "request_naming_alignment",
+          "responsibility": "生成する依頼record名を起動アダプタの判定record導出規則と整合させる",
+          "inputs": [
+            "依頼record名"
+          ],
+          "outputs": [
+            "整合検査結果"
+          ],
+          "failure_behavior": [
+            "導出不能な名前を合格として返さない"
+          ],
+          "required_properties": [
+            "-request-を含む命名",
+            "導出規則との一致"
+          ],
+          "reference_paths": [
+            "tools/reviewer_launch/record.py"
+          ],
+          "reference_symbols": [
+            "tools/reviewer_launch/record.py:verdict_record_relative_path"
+          ],
+          "symbol_terms": [
+            "request",
+            "verdict",
+            "naming"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-17-vertical-a-request-builder-reuse-search-attestation-v1.json"
+    }
+  ],
+  "content_digest": "b2afd272f4d0e6fb13a87fe258bfe16fec9974bd305a9f04c1d7975a707584a1"
+}
