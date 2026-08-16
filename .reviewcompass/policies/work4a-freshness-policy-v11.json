@@ -1,0 +1,416 @@
+{
+  "basis_kinds": [
+    "structural_exact_match",
+    "interface_shape_match",
+    "shared_direct_callee",
+    "shared_exception_contract",
+    "shared_test_reference",
+    "call_neighborhood"
+  ],
+  "bounded_seed_fields": [
+    "semantic_comparison_candidate_ids",
+    "semantic_candidate_selection_reason"
+  ],
+  "bounded_seed_policy": {
+    "readable_as_history": true,
+    "usable_as_decision_basis": false,
+    "usable_as_discovery_input": false,
+    "usable_as_disposition_proposal_basis": false,
+    "usable_as_entry_basis": false
+  },
+  "candidate_classification_classes": [
+    "known",
+    "unknown"
+  ],
+  "change_class": "ordinary",
+  "change_classes": [
+    "ordinary",
+    "security",
+    "authority",
+    "irreversible"
+  ],
+  "cli_entrypoint_markers": [
+    "argparse.ArgumentParser",
+    "ArgumentParser",
+    "add_argument",
+    "add_parser",
+    "click.command",
+    "typer.Typer"
+  ],
+  "comparison_discovery_reference_direction": "discovery_to_profile_only",
+  "complexity_signal_thresholds": {
+    "high_any_of": {
+      "branch_count": {
+        "operator": "gte",
+        "value": 10
+      },
+      "effect_marker_count": {
+        "operator": "gte",
+        "value": 3
+      },
+      "max_nesting_depth": {
+        "operator": "gte",
+        "value": 4
+      },
+      "return_count": {
+        "operator": "gte",
+        "value": 6
+      },
+      "try_count": {
+        "operator": "gte",
+        "value": 3
+      }
+    },
+    "low_all_of": {
+      "branch_count": {
+        "operator": "lte",
+        "value": 3
+      },
+      "effect_marker_count": {
+        "operator": "lte",
+        "value": 1
+      },
+      "max_nesting_depth": {
+        "operator": "lte",
+        "value": 1
+      },
+      "return_count": {
+        "operator": "lte",
+        "value": 2
+      },
+      "try_count": {
+        "operator": "equals",
+        "value": 0
+      }
+    },
+    "meaning": "split decision ではなく確認優先度の指標",
+    "otherwise": "medium"
+  },
+  "confidence_classes": [
+    "high",
+    "medium",
+    "low"
+  ],
+  "content_digest": "0c9b126610095e3631610f17185d6988aed4e968a046e10a102ee11ea99d3fc7",
+  "detection_scope": {
+    "call_graph": {
+      "does_not_follow": [
+        "alias_import",
+        "dynamic_attribute",
+        "reflection",
+        "callback",
+        "eval",
+        "exec"
+      ],
+      "resolves": "same source universe, syntactically resolvable direct calls only",
+      "unresolved_are_counted": true
+    },
+    "exception": {
+      "does_not_infer": [
+        "propagated_exception",
+        "runtime_type",
+        "dynamically_built_exception"
+      ],
+      "records": "names appearing syntactically in raise and except"
+    },
+    "public_api": {
+      "does_not_prove": "public contract",
+      "inputs": [
+        "__all__",
+        "cross_package_direct_caller",
+        "cli_syntax_marker"
+      ]
+    },
+    "semantic_comparison": {
+      "limit": 10,
+      "not_a_conclusion": "merge",
+      "source": "symbol ids in the same routine profile only"
+    },
+    "test_reference": {
+      "does_not_cover": [
+        "string_reference",
+        "fixture_indirection",
+        "dynamic_import",
+        "integration_test_indirection"
+      ],
+      "escape": "reject",
+      "scope": "tests/**/*.py direct AST references only"
+    }
+  },
+  "development_policy_ref": {
+    "digest_algorithm": "sha256",
+    "file_sha256": "e3e6b0d2c7a1265f7cde2c2e00cc888f43d63ce0d1945c300b2b2e5f7730b559",
+    "record_id": "DEVELOPMENT-POLICY",
+    "record_kind": "development_policy",
+    "relative_path": "docs/development/2026-08-02-development-policy.md",
+    "root_kind": "project",
+    "version": 1
+  },
+  "digest_algorithm": "sha256",
+  "disposition_classes": [
+    "reuse",
+    "extend",
+    "merge",
+    "split",
+    "as_is"
+  ],
+  "disposition_source_classes": [
+    "human_decision"
+  ],
+  "evidence_ref_kinds": [
+    "routine_profile_field",
+    "code_reference"
+  ],
+  "extraction_rule_version": 4,
+  "feature_fields": [
+    "direct_callee_symbol_ids",
+    "direct_caller_symbol_ids",
+    "unresolved_direct_call_count",
+    "raised_exception_names",
+    "caught_exception_names",
+    "bare_except_count",
+    "branch_count",
+    "return_count",
+    "raise_count",
+    "try_count",
+    "max_nesting_depth",
+    "effect_marker_count",
+    "complexity_signal",
+    "direct_test_reference_paths",
+    "direct_test_reference_count",
+    "is_private_name",
+    "is_exported_by_all",
+    "cross_package_caller_count",
+    "cli_entrypoint_marker",
+    "public_api_signal"
+  ],
+  "group_condition_grammar": {
+    "combinator": "and_only",
+    "disjunction": false,
+    "fields": [
+      "package",
+      "symbol_kind",
+      "name_prefix",
+      "name_suffix",
+      "is_private",
+      "syntactic_effect_markers",
+      "marker_count",
+      "internal_reference_count",
+      "line_count",
+      "structural_match_group_id",
+      "structure_digest",
+      "responsibility_class_proposal",
+      "candidate_classification",
+      "base_is_exception"
+    ],
+    "operators": [
+      "equals",
+      "not_equals",
+      "in",
+      "contains",
+      "lte",
+      "gte"
+    ],
+    "regular_expression": false
+  },
+  "grouping_rule_version": 1,
+  "marker_detection_rules": {
+    "environment": [
+      "os.environ",
+      "os.getenv",
+      "os.putenv"
+    ],
+    "file_read": [
+      "read_text",
+      "read_bytes",
+      "exists",
+      "iterdir",
+      "glob",
+      "rglob",
+      "json.load"
+    ],
+    "file_write": [
+      "write_text",
+      "write_bytes",
+      "mkdir",
+      "unlink",
+      "replace",
+      "rename",
+      "chmod",
+      "shutil.copy",
+      "shutil.copytree",
+      "shutil.move",
+      "shutil.rmtree"
+    ],
+    "global_mutation": [
+      "global",
+      "nonlocal"
+    ],
+    "network": [
+      "urllib.request",
+      "http.client",
+      "socket.socket",
+      "requests.get",
+      "requests.post"
+    ],
+    "process_spawn": [
+      "subprocess.run",
+      "subprocess.Popen",
+      "subprocess.call",
+      "os.system"
+    ]
+  },
+  "minimum_group_member_count": 2,
+  "policy_id": "POL-WORK4A-FRESHNESS",
+  "policy_version": 11,
+  "presentation_class_bounds": {
+    "broad": {
+      "maximum": 50,
+      "minimum": 13
+    },
+    "focused": {
+      "maximum": 12,
+      "minimum": 2
+    },
+    "mass": {
+      "maximum": null,
+      "minimum": 51
+    }
+  },
+  "presentation_classes": [
+    "focused",
+    "broad",
+    "mass"
+  ],
+  "public_api_signal_thresholds": {
+    "high_any_of": {
+      "cli_entrypoint_marker": {
+        "operator": "equals",
+        "value": true
+      },
+      "cross_package_caller_count": {
+        "operator": "gte",
+        "value": 2
+      },
+      "is_exported_by_all": {
+        "operator": "equals",
+        "value": true
+      }
+    },
+    "low_all_of": {
+      "cli_entrypoint_marker": {
+        "operator": "equals",
+        "value": false
+      },
+      "cross_package_caller_count": {
+        "operator": "equals",
+        "value": 0
+      },
+      "is_exported_by_all": {
+        "operator": "equals",
+        "value": false
+      },
+      "is_private_name": {
+        "operator": "equals",
+        "value": true
+      }
+    },
+    "meaning": "公開契約の証明ではなく確認優先度の指標",
+    "otherwise": "medium"
+  },
+  "record_kind": "work4a_freshness_policy",
+  "representative_limit": 3,
+  "responsibility_class_rules": [
+    {
+      "rule_id": "R1",
+      "value": "ownership_unclear",
+      "when": "base_is_exception"
+    },
+    {
+      "rule_id": "R2",
+      "value": "implementation_detail",
+      "when": "nested_function"
+    },
+    {
+      "rule_id": "R3",
+      "value": "implementation_detail",
+      "when": "private_and_module_local"
+    },
+    {
+      "rule_id": "R4",
+      "value": "ownership_unclear",
+      "when": "unreferenced"
+    },
+    {
+      "rule_id": "R5",
+      "value": "public_responsibility",
+      "when": "default"
+    }
+  ],
+  "responsibility_classes": [
+    "public_responsibility",
+    "implementation_detail",
+    "ownership_unclear"
+  ],
+  "revalidation_required_classes": [
+    "security",
+    "authority",
+    "irreversible"
+  ],
+  "schema_version": 4,
+  "semantic_comparison_candidate_limit": 10,
+  "signal_classes": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "syntactic_effect_markers": [
+    "file_read",
+    "file_write",
+    "process_spawn",
+    "network",
+    "environment",
+    "global_mutation"
+  ],
+  "test_reference_root": "tests",
+  "verification_outcome_classes": [
+    "invalid_manifest",
+    "unsafe_root",
+    "unknown_root_kind",
+    "path_traversal",
+    "root_escape",
+    "non_regular_file",
+    "missing_record",
+    "digest_mismatch",
+    "content_digest_mismatch",
+    "identity_mismatch",
+    "unknown_field",
+    "foreign_project_data",
+    "unlinked_candidate",
+    "content_identity_mismatch",
+    "summary_vocabulary_violation",
+    "decision_candidate_mismatch",
+    "stale_observation_reuse",
+    "immutable_violation",
+    "baseline_series_broken",
+    "policy_revalidation_required",
+    "data_root_escape",
+    "observation_tampered",
+    "write_verification_failed",
+    "partial_write_detected",
+    "symbol_id_collision",
+    "marker_detection_flag_missing",
+    "advisory_used_as_authority",
+    "advisory_reference_unresolved",
+    "advisory_evidence_missing",
+    "group_coverage_incomplete",
+    "profile_reference_unresolved",
+    "test_reference_out_of_scope",
+    "discovery_profile_mismatch",
+    "member_truncation_detected",
+    "bounded_seed_not_a_basis",
+    "committed_source_unavailable",
+    "uncommitted_repository_state",
+    "committed_source_set_mismatch"
+  ]
+}

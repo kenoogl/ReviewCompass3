@@ -1,0 +1,28 @@
+{
+  "content_digest": "bd8171203820455445b9b302f77b4af4544bf70a5b943c432ea1c4be525941c5",
+  "development_policy_ref": {
+    "digest_algorithm": "sha256",
+    "file_sha256": "e3e6b0d2c7a1265f7cde2c2e00cc888f43d63ce0d1945c300b2b2e5f7730b559",
+    "record_id": "DEVELOPMENT-POLICY",
+    "record_kind": "development_policy",
+    "relative_path": "docs/development/2026-08-02-development-policy.md",
+    "root_kind": "project",
+    "version": 1
+  },
+  "digest_algorithm": "sha256",
+  "excluded_roots": [
+    ".git",
+    ".reviewcompass",
+    ".venv",
+    "docs",
+    "records",
+    "tests"
+  ],
+  "include_glob": "**/*.py",
+  "include_root": "tools",
+  "path_encoding": "posix_relative_utf8",
+  "record_kind": "work4a_source_universe",
+  "schema_version": 1,
+  "source_universe_id": "SRCU-WORK4A-TOOLS-PY-V1",
+  "source_universe_version": 8
+}
