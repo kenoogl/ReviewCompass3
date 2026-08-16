@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G20最初の縦切り『外部レビュア一回送信』は、外部レビュー5段手続きの第1段（起草側自己レビュー）で修正要級4件（SR-1台帳rootの計数未固定、SR-2要求本文の後決め、SR-3リダイレクト・proxy・TLS禁止漏れ、SR-4応答size上限）を発見し、契約候補v3で訂正した（台帳rootは`{repository_root}/.reviewcompass/egress-ledger/`固定へ）。第2・第3段（文脈整理・依頼文作成と点検）を経た運搬文面で、暫定体制（利用者がGeminiへ手動運搬）の独立確認へ進む。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v3 / independent_review_pending`
+- 現在作業：G20最初の縦切り『外部レビュア一回送信』の契約候補v3は、Gemini独立確認（Human中継）で修正要（停止原因3件：repository_root偽装による台帳回避、識別子の高乱雑性検査の扱い未定義、操縦LLMによる台帳削除の限界未明示）となった。契約候補v4で訂正した（原因2はGeminiの除外案でなく非除外の仕様明示を採用、理由は判定record§2に固定）。v4の限定再確認（Gemini・Human中継）へ進む。
+- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v4 / limited_independent_rereview_pending`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -18,7 +18,8 @@
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
 - [外部レビュー準備・実施の機械化目標](records/development/2026-08-16-external-review-preparation-mechanization-goal-v1.md) — SHA-256 `46a415eb630266e23a87562e6083f873e2fe9790acd34a6699f59b30aee0b45e`
-- [自己レビュー4件を訂正した外部レビュア一回送信の契約候補v3](records/task-contract/2026-08-16-external-reviewer-single-send-candidate-v3.md) — SHA-256 `a24b560c5fc7e7a919aff2884713f4bd18940735f0257cb02e721fb118c3e433`
+- [Gemini指摘3件を訂正した外部レビュア一回送信の契約候補v4](records/task-contract/2026-08-16-external-reviewer-single-send-candidate-v4.md) — SHA-256 `e41acfdf0ceb1f8cff0c112d21181cd60a856345de6b38e90e89d3aafa161325`
+- [契約候補v3を修正要としたGemini独立確認（Human中継）](records/development/2026-08-16-external-reviewer-single-send-v3-independent-review-v1.md) — SHA-256 `5198c5fff9a63820e603a613b8db9f4c5cf91ac00ffe2dd90e57fb4c001b9ac0`
 - [契約候補v2の起草側自己レビューと文脈整理](records/development/2026-08-16-external-reviewer-single-send-v2-self-review-v1.md) — SHA-256 `65dd817a2b49b4769d7ed9743fc3d5331c6e0720f3c00123753cf24b3f350d71`
 - [暫定レビュー体制の決定（Gemini手動利用・Human中継）](records/development/2026-08-16-interim-gemini-review-regime-decision-v1.md) — SHA-256 `1a5fffc5792d17791f5c275b40183a0d4d076233d6d1b7a267cd91cf92174792`
 - [利用者によるG02安全投影の製品受入判断](records/development/2026-08-16-one-item-review-safe-projection-product-acceptance-decision-v1.md) — SHA-256 `2cea891bb43fa83b15259310d97a459b6f446898bdedf79630cd2e945d8008cc`
