@@ -288,6 +288,11 @@ def test_empty_allowed_models_stops(
     assert facade.calls == []
 
 
+def test_allowed_models_fixed_to_approved_value():
+    core = _core()
+    assert core.ALLOWED_RESPONSE_MODELS == ("gemini-3.1-pro-high",)
+
+
 # ---- 鮮度（起動直前の再計算。§7.3-1前半） ----
 
 

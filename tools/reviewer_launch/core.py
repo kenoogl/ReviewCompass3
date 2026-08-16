@@ -36,9 +36,9 @@ FORBIDDEN_AUTH_ENVIRONMENT = (
     "GOOGLE_APPLICATION_CREDENTIALS",
 )
 
-# 契約§7.1：許可model一覧。値は実E2E前の利用者承認recordで確定して固定する。
-# 空の間は起動しない（allowed_models_unfixedで停止）。変更は契約改定。
-ALLOWED_RESPONSE_MODELS = ()
+# 契約§7.1：許可model一覧。利用者承認recordで確定した値だけを置く。変更は契約改定。
+# 承認：records/development/2026-08-16-reviewer-launch-allowed-models-approval-v1.md
+ALLOWED_RESPONSE_MODELS = ("gemini-3.1-pro-high",)
 
 PROMPT_BYTE_LIMIT = 16384
 PRINT_TIMEOUT = "600s"
