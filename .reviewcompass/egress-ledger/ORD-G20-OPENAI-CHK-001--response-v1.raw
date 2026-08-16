@@ -1,0 +1,35 @@
+{
+  "id": "chatcmpl-EDTOaPLe0sArtK9UeSjCTGfN8IHoU",
+  "object": "chat.completion",
+  "created": 1786879968,
+  "model": "gpt-5-mini-2025-08-07",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "本資料を受領しました。\n\n判定：受領確認済み（依頼に対応済み）\n根拠：docs/development/e2e-live-send-check.md の本文を確認し、文中の依頼「本資料を受領したことを、一文の日本語で確認してください。」に従って上記の一文を返したため。",
+        "refusal": null,
+        "annotations": []
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 210,
+    "completion_tokens": 1177,
+    "total_tokens": 1387,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 1088,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": null
+}
