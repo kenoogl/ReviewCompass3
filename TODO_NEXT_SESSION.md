@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：なし。外部APIレビューはpending（2026-08-16）。pending後の最初の区切り作業として`.gitignore`仕分け（`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`）を裁定(A)で完了した：正規tool（schema v2・intake v4検証合格）の決定record固定、除外1行の削除、参照済み歴史的依頼原文37件のcommit昇格、旧前提を固定していた既存試験1件の反転固定（利用者承認）。全試験2,375件全緑。次の一作業の選択待ちである。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v2 / accepted`
+- 現在作業：新規取組『レビュー実行体制の正式ツール化』の統合検討を利用者確定の下で固定した（検討record参照）。縦切り3本（A依頼組み立て器・B起動アダプタ・C品質gate）、backend抽象と独立性tier 3段、横串3観点（機械処理化・G30導線への載せ方・導線配備）を定義。次は縦AかBの選択→事前走査→契約候補作成である。外部APIレビュー（API直接送信経路）はpendingのまま（本取組はCLI／subagent経路で別・補完関係）。
+- Task Contract：なし（契約009はaccepted済み。次契約は縦A/B選択後に定義する）
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [レビュー実行体制の正式ツール化 統合検討v1（利用者確定）](records/development/2026-08-16-review-tooling-formalization-study-v1.md) — SHA-256 `c2384f3b17a7c59572548a9195eb89924c6f42f087fc2e736975c7d0b8fcd602`
 - [3 provider実環境確認Evidence（Gemini操縦のanthropic確認を含む）](records/development/2026-08-16-three-provider-live-check-evidence-v1.md) — SHA-256 `e04a2c95fbbe727a296dd27bbc9171dd378bfdc9409d77b788eabdd9a7b9f07d`
 - [利用者による契約009の製品受入判断（残余risk最終受容・IC消費）](records/development/2026-08-16-external-send-scan-refinement-product-acceptance-decision-v1.md) — SHA-256 `a1ef5bebd6b3d918dff4080ed7faea532a3ad69b523ff206ed11eed77e916879`
 - [識別子停止を維持へ訂正した契約009候補v2](records/task-contract/2026-08-16-external-send-scan-refinement-candidate-v2.md) — SHA-256 `58e5f9165e2201892377744377a9758f79be7559fe26f82ed114ec246968e6da`
@@ -30,25 +31,25 @@
 
 ## 次に行う一作業
 
-利用者がpending外の作業から次の一作業を選ぶ。主な選択肢：(1)候補6以降（G26旧処理の残部整理・
-G28継続回収・G27導入解除。候補一覧recordの推奨順）、(2)G24の要求作成責務やG02 organize・G25・
-安全保存との統合など後続境界の再開判断、(3)その他利用者が指定する作業。選択後、Claudeが契約候補・
-作業票の作成から着手する。
+利用者が正式ツール化の最初の縦切りを選ぶ：**縦A（依頼組み立て器）**＝依頼promptの品質を先に機械化
+（手動運搬のままでも全レビューの品質が上がる）、または**縦B（Reviewer起動アダプタ）**＝運搬の機械化を先に
+（gemini-cli＋claude-subagentの2 backendから。codexCLI停止blockerの回避になる）。選択後、Claudeが
+事前走査（5手順）→契約候補v1作成→5段手続き→独立確認（暫定Gemini体制）→採用判断の順で進める。
 
 開始条件：
 
-- 本TODO（pending反映）が意味単位commitへ固定され、作業treeがcleanである
+- 統合検討record（利用者確定）と本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 次の一作業の利用者選択がchatで得られる
+- 縦AまたはBの利用者選択がchatで得られる
 
-後続作業：選択された作業の性質に応じて、仕分け材料の提示または契約候補作成→独立確認→採用判断→実装。
+後続作業：選択された縦の事前走査→契約候補作成→独立確認→採用→RED→実装→レビュー→受入。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：pending外からの次の一作業の選択
+- Human判断待ち：正式ツール化の最初の縦切りの選択（縦A依頼組み立て器か縦B起動アダプタか）
 
 ## stale・deferred
 
