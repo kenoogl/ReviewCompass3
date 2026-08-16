@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G20『外部レビュア一回送信』は完了レビューの修正要3指摘を利用者承認の下で訂正した：通信模擬を下層（`OpenerDirector.open`）差し替えへ変更して`_send_request`本体を試験対象化、契約§9固定形からの独立payload照合を追加、602行の冗長式を整理。対象49件・退行確認・正規全試験2,362件（隔離）が全緑で、限定再確認（訂正の閉じと退行だけ）の依頼recordを固定済み。利用者の運搬と判定持ち帰りを待って停止中である。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v5 / correction_awaiting_limited_rereview`
+- 現在作業：G20『外部レビュア一回送信』は訂正3点の限定再確認がGemini `verified`となり、受入条件12（独立完了レビュー）が訂正後の固定commitに対して満たされた。残るは実送信E2E一回（受入条件13）と製品受入（受入条件14）で、実送信E2Eの実施判断（前提：台帳rootの初回commit用意、送る内容の選択）を利用者へ諮って停止中である。
+- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v5 / verified_awaiting_live_e2e_decision`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [G20訂正の限定再確認・verified判定（Gemini・Human中継）](records/development/2026-08-16-external-reviewer-single-send-correction-rereview-v1.md) — SHA-256 `c2b518f86792bebbe51352543da1b13ea8f2b33c55268c38ceac4996ab297596`
 - [G20訂正の限定再確認依頼record](records/session-handoffs/2026-08-16-g20-single-send-correction-rereview-gemini-request-v1.md) — SHA-256 `f4b761d34993f95c6c71b92aa834db0f37d34511dd2fa17114f19a8e3d4138ae`
 - [G20完了レビュー指摘3件の訂正Evidence](records/development/2026-08-16-external-reviewer-single-send-correction-evidence-v1.md) — SHA-256 `1f10f9c37350bb1acd0173a6753d917b1baddfd670cba66baa546df28b153262`
 - [G20独立完了レビュー・修正要判定（Gemini・Human中継）](records/development/2026-08-16-external-reviewer-single-send-completion-review-v1.md) — SHA-256 `e429f167e57883aae04a72ad85a82416a7aa5801ec4bfc108facdf61a0d12aa9`
@@ -36,28 +37,29 @@
 
 ## 次に行う一作業
 
-利用者がGeminiへ限定再確認依頼recordのpath
-（`records/session-handoffs/2026-08-16-g20-single-send-correction-rereview-gemini-request-v1.md`）を伝え、
-判定文を持ち帰る。Claudeは判定文を判定record
-`records/development/2026-08-16-external-reviewer-single-send-correction-rereview-v1.md`へ転記・commitし、
-根拠と実物の整合を機械照合する。
+利用者が実送信E2E一回（受入条件13）の実施と送る内容を決める。承認後、Claudeが(1)台帳root
+`.reviewcompass/egress-ledger/`（空directoryの目印file付き）を初回commitで用意し、(2)利用者が選んだ
+commit済みfile由来の送信指示JSON一件を作成（Gitでcommit済み確認・digest機械計算・`pilot_provider:
+anthropic-api`）、(3)`reviewcompass3-gemini-send send --order <絶対path>`を一回実行して、試行record・
+未加工応答・結果recordの台帳着地と計数を実環境で確認し、台帳fileを意味単位commitへ含める。これが
+本repositoryで最初の承認済み外部送信となる。
 
 開始条件：
 
-- 訂正commitと限定再確認依頼record・本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 限定再確認`verified`の判定recordと本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 選択providerの環境変数（例：`GEMINI_API_KEY`）が利用者環境に設定済みである
 
 完了条件：
 
-- 限定再確認の判定recordがcommitへ固定される
+- 実送信E2Eの実施と送る内容の利用者判断がchatで得られる
 
-後続作業：`verified`なら利用者へ実送信E2E（受入条件13。前提：台帳root
-`.reviewcompass/egress-ledger/`の初回commit用意）の実施判断を求める→製品受入提示（受入条件14）。
-`修正要`なら停止して利用者へ諮る。
+後続作業：実送信E2E実施→Evidence固定→製品受入提示（受入条件14。「G20全体ではない最初の送信縦切り」の
+限界明示つき）。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：限定再確認依頼のGeminiへのpath伝達と判定文の持ち帰り（暫定体制のHuman中継作業）
+- Human判断待ち：実送信E2E一回の実施判断と送る内容の選択（受入条件13は利用者の指示を要する）
 
 ## stale・deferred
 
