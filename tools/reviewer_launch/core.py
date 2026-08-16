@@ -188,21 +188,21 @@ def build_prompt(request_relative_path, expected_sha256):
 
 
 def build_arguments(executable, prompt, model):
-    """契約§7.1の固定引数を組み立てる。"""
+    """契約§7.1の固定引数を組み立てる。
+
+    agyの旗解析はGo標準flag形式であり、`--print`は値（prompt本文）を取る
+    （E2E e2e-010-001の実測。値旗は`--旗=値`形式で渡し、位置引数を作らない）。
+    """
 
     return [
         executable,
-        "--print",
-        "--output-format",
-        "stream-json",
-        "--json-schema",
-        json.dumps(VERDICT_SCHEMA, ensure_ascii=False, sort_keys=True),
-        "--model",
-        model,
+        "--output-format=stream-json",
+        "--json-schema="
+        + json.dumps(VERDICT_SCHEMA, ensure_ascii=False, sort_keys=True),
+        "--model=" + model,
         "--disable-slash-commands",
-        "--print-timeout",
-        PRINT_TIMEOUT,
-        prompt,
+        "--print-timeout=" + PRINT_TIMEOUT,
+        "--print=" + prompt,
     ]
 
 

@@ -217,25 +217,29 @@ def test_unknown_backend_stops(repository, monkeypatch, clean_environment):
 
 
 def test_fixed_arguments_exact(clean_environment):
+    # E2E e2e-010-001の実測でagyの--printが値旗と判明したため、
+    # 固定引数は`--旗=値`形式・位置引数なしへ訂正した（Evidence参照）。
     core = _core()
     arguments = core.build_arguments(
         "agy", "prompt-text", TEST_MODEL
     )
-    assert arguments[0] == "agy"
-    assert "--print" in arguments
-    assert "--output-format" in arguments
-    index = arguments.index("--output-format")
-    assert arguments[index + 1] == "stream-json"
-    assert "--json-schema" in arguments
-    assert "--model" in arguments
-    model_index = arguments.index("--model")
-    assert arguments[model_index + 1] == TEST_MODEL
-    assert "--disable-slash-commands" in arguments
-    timeout_index = arguments.index("--print-timeout")
-    assert arguments[timeout_index + 1] == "600s"
+    schema_text = json.dumps(
+        core.VERDICT_SCHEMA, ensure_ascii=False, sort_keys=True
+    )
+    assert arguments == [
+        "agy",
+        "--output-format=stream-json",
+        "--json-schema=" + schema_text,
+        "--model=" + TEST_MODEL,
+        "--disable-slash-commands",
+        "--print-timeout=600s",
+        "--print=prompt-text",
+    ]
     assert "--dangerously-skip-permissions" not in arguments
     assert "--mode" not in arguments
-    assert arguments[-1] == "prompt-text"
+    assert not any(
+        argument.startswith("--mode=") for argument in arguments
+    )
 
 
 def test_prompt_contains_fixed_elements(repository):
