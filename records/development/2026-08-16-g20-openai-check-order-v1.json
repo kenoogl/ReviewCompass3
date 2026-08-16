@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "order_identifier": "ORD-G20-OPENAI-CHK-001",
+  "human_approved": true,
+  "destination_provider": "openai-api",
+  "destination_model": "gpt-5-mini",
+  "pilot_provider": "anthropic-api",
+  "purpose": "openai-api経路の実環境確認一回（利用者指示）。確認用文書の受領確認だけを依頼する",
+  "repository_root": "/Users/Daily/Development/ReviewCompass3",
+  "source_files": [
+    {
+      "path": "docs/development/e2e-live-send-check.md",
+      "sha256": "5469e359ec9baaf6522ade8ceca56b4723c11912494a377e8320702298f88d34"
+    }
+  ]
+}
