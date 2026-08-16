@@ -8,7 +8,7 @@
 
 ## 0. 一枚要約（人向け）
 
-ClaudeがCodexへレビューを依頼する既存の仕組み（Pilot起動・record正本方式）を、**GeminiCLIと
+ClaudeがCodexへレビューを依頼する既存の仕組み（Pilot起動・record正本方式）を、**Antigravity CLI（agy。旧Gemini CLIの後継）と
 サブエージェントも起動先に選べる正式ツール**へ広げる。作る縦切りは3本——**A：依頼promptの
 機械組み立て器、B：Reviewer起動アダプタ、C：prompt品質gate**——で、どの縦切りにも共通の
 横串3観点（機械処理化・手続きの機械化・導線配備）を受入条件として入れる。判定基準
@@ -19,6 +19,7 @@ Human受容の下でサブエージェントレビューを許す。
 
 1. Claudeパイロット（利用者はClaudeとだけ会話し、ClaudeがCodexへレビュー依頼・回答取得・提示）の
    既存の仕組みを、**CodexCLIに加えGeminiCLIも対象**にしたい。本sessionの手動Gemini中継の実績を踏まえる。
+   （2026-08-16訂正：Gemini CLIは2026-06-18に提供終了。後継のAntigravity CLI（agy）を対象と読み替える。§9）
 2. レビュー依頼の**プロンプト作成の改善**を、機械化目標record
    （`records/development/2026-08-16-external-review-preparation-mechanization-goal-v1.md`）を参考に図る。
    まずClaudeパイロットで開発し、後にCodexパイロット・Geminiパイロットも対応したい。
@@ -36,7 +37,7 @@ Human受容の下でサブエージェントレビューを許す。
 | 役割分担 | `docs/development/pilot-specific-claude-codex-collaboration.md`（現行入口）、`legacy-pilot-review-collaboration.md`（役割・risk表の設計資産） | pilot: claude／codexの非対称分担。§5.1機械検査・§5.2段階台帳・§5.4保存分離は多くが`specified_only` |
 | 受け渡し経路 | `docs/development/pilot-driven-record-handoff.md`（codex exec起動・試運転成功）、`codex-claude-collaboration.md`（Human中継fallback） | 機械化済みはcodex exec経路のみ。**codexCLIはトークン枯渇で停止中** |
 
-**含意**：GeminiCLI・サブエージェントの追加は経路層だけの拡張で成立し、判定基準・役割規則は不変のまま。
+**含意**：Antigravity CLI（agy）・サブエージェントの追加は経路層だけの拡張で成立し、判定基準・役割規則は不変のまま。
 
 ## 3. 現在地と本sessionの実証【実測】
 
@@ -55,7 +56,7 @@ Human受容の下でサブエージェントレビューを許す。
 
 ### 4.1 backend抽象
 
-Reviewer起動先を`codex-cli`／`gemini-cli`／`claude-subagent`（将来`codex-subagent`等）として抽象化する。
+Reviewer起動先を`codex-cli`／`antigravity-cli`（agy）／`claude-subagent`（将来`codex-subagent`等）として抽象化する。
 起動方法が違うだけで「依頼recordを読ませ→レビューさせ→判定を得る→事後照合」の流れは全backend共通。
 
 ### 4.2 独立性tier（3段）
@@ -78,12 +79,13 @@ Reviewer起動先を`codex-cli`／`gemini-cli`／`claude-subagent`（将来`code
 | 縦 | 内容 | 機械化目標の段 | 依存・特性 |
 | --- | --- | --- | --- |
 | **A：依頼組み立て器** | 5段手続きの型の機械化：§3の構造要素を固定形にした雛形生成＋機械検査（§5.1.1の7項目を流用：存在・commit済み・digest一致・必須項目・識別子・参照実在・囲み記号）＋`git check-ignore`検査 | (1)(2)(3) | **起動方式と独立**。手動運搬のままでも全レビューの品質が上がる |
-| **B：Reviewer起動アダプタ** | backend切り替え起動＋独立性tier＋起動record・未加工出力保存＋事後照合（判定recordの単独commit・鮮度・根拠照合） | (5)(6)の入口 | 要事前走査（GeminiCLI headless仕様・subagent実測）。codexCLI停止blockerの回避になる |
+| **B：Reviewer起動アダプタ** | backend切り替え起動＋独立性tier＋起動record・未加工出力保存＋事後照合（判定recordの単独commit・鮮度・根拠照合） | (5)(6)の入口 | 要事前走査（agy headless仕様・subagent実測）。codexCLI停止blockerの回避になる |
 | **C：prompt品質gate** | 監査役・判定役の多周確認の自動化（pilot-specific §5.1.2の設計流用） | (4) | A・Bの後（Bのbackend抽象の上で自動周回） |
 
 - AとBは直交し、どちらを先にしても他方を妨げない。**順序はHuman判断**（A先行＝品質を先に、
   B先行＝運搬の手間削減を先に）。
-- 実装するbackendは段階化：最初は`gemini-cli`＋`claude-subagent`（codex-cliは疎通回復後の追加縦切り）。
+- 実装するbackendは段階化：最初は`antigravity-cli`（agy）＋`claude-subagent`（codex-cliは疎通回復後の
+  追加縦切り。利用者決定により第1縦切りは`antigravity-cli`、第2縦切りは`claude-subagent`）。
 
 ## 6. 横串3観点（全縦切りの契約に入る共通要件）
 
@@ -122,8 +124,8 @@ Reviewer起動先を`codex-cli`／`gemini-cli`／`claude-subagent`（将来`code
 
 - 危険度は`high`想定：repositoryを読めるagentのheadless起動＝実質の外部送信（課金・データ送出）。
   起動のHuman承認境界（都度か契約水準か）は各契約で定める（008の前例に倣う）。
-- 要調査（契約定義前の事前走査）：GeminiCLIのheadless実行仕様（非対話起動・sandbox／書込み権限・
-  認証引き継ぎ・終了コードと出力の機械取得）、Claudeサブエージェントのレビュー一往復の実測
+- 要調査（契約定義前の事前走査）：Antigravity CLI（agy）のheadless実行仕様（非対話起動・sandbox／
+  書込み権限・認証引き継ぎ・終了コードと出力の機械取得）、Claudeサブエージェントのレビュー一往復の実測
   （`claude_implementation_executor`の能力設定・認証遮断の設計を流用）、codexCLIトークン枯渇の現状。
 - pendingとの関係：外部APIレビュー（契約008・009の経路の機械化）はpendingのまま。本検討のCLI／
   subagent経路はそれと別経路・補完関係であり、pendingの対象外として進める（利用者指示による新規取組）。
@@ -135,3 +137,14 @@ Reviewer起動先を`codex-cli`／`gemini-cli`／`claude-subagent`（将来`code
 3. 契約候補v1の作成→5段手続き→独立確認（暫定Gemini体制）→採用判断→実装
 
 【未実施】契約候補の作成、実装、既存文書の改定、事前走査。
+（2026-08-16追記：縦Bの選択と事前走査は完了した。
+`records/development/2026-08-16-vertical-b-reviewer-launch-adapter-prescan-v1.md`と同追補を参照）
+
+## 9. 訂正履歴
+
+- 2026-08-16：利用者提供の事実（Gemini CLIは2026-06-18に提供終了。後継はAntigravity CLI（agy））と
+  実測（agy 1.1.13導入済み・headless旗一覧）に基づき、backend名`gemini-cli`を`antigravity-cli`（agy）へ
+  訂正した（§0・§1-1注記・§4.1・§5・§7）。承認文言：「追補recordを作成し、統合検討recordもagyへ
+  訂正して。契約候補v1は第1 backend＝agyで作成に進んで」（2026-08-16 chat）。実測の詳細は
+  `records/development/2026-08-16-vertical-b-prescan-agy-addendum-v1.md`。§3の実証記録（手動Gemini
+  中継の8回実運用）は歴史的事実としてそのまま維持する。
