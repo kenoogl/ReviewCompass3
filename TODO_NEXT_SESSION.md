@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G20『外部レビュア一回送信』は実送信E2E一回（受入条件13）を完了した。1回目は資料file名への高乱雑性誤検知で送信前に安全停止（構造問題を観測record・改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`として登録）。利用者裁定(2)の下、検査合格の確認用文書で再実行し、gemini-3.1-pro-previewへの一回送信・未加工応答保存・台帳3 record着地・計数1件・鍵非出現を実環境確認した。残るは製品受入（受入条件14）の利用者判断だけである。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v5 / live_e2e_done_awaiting_product_acceptance`
+- 現在作業：なし（契約008の作業単位は完了）。G20『外部レビュア一回送信』は利用者が限界了解つきで製品受入し（受入条件1〜14すべて充足）、正式の外部送信路が成立した。限界：G20全体ではない最初の縦切り（応答解析・監査自動化・旧設計統合は後続）、機微検査誤検知で実用文書は送信不能（改善候補登録済み）。次の一作業の選択待ちである。
+- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v5 / accepted`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [利用者によるG20一回送信の製品受入判断](records/development/2026-08-16-external-reviewer-single-send-product-acceptance-decision-v1.md) — SHA-256 `6f76c1c6198ccc9a0412e4a8e6751a29a89836d9d9ef5e76900772e6fa8ffa54`
 - [G20実送信E2E Evidence（初回承認済み外部送信）](records/development/2026-08-16-external-reviewer-single-send-live-e2e-evidence-v1.md) — SHA-256 `42f47236a79b04944d84504d837149cbc193637d5a34d405995fd49e7809d95f`
 - [機微検査誤検知の観測record](records/development/2026-08-16-egress-sensitive-scan-false-positive-observation-v1.json) — SHA-256 `e6ffac53245501a57555a19b17225c4715ac394bdf37ef1c6cb025446adfb1b4`
 - [G20訂正の限定再確認・verified判定（Gemini・Human中継）](records/development/2026-08-16-external-reviewer-single-send-correction-rereview-v1.md) — SHA-256 `c2b518f86792bebbe51352543da1b13ea8f2b33c55268c38ceac4996ab297596`
@@ -39,30 +40,30 @@
 
 ## 次に行う一作業
 
-利用者が製品受入（受入条件14）を判断する。提示済みの限界：(1)G20全体ではない最初の送信縦切りで、
-応答解析・監査自動化・旧設計統合は後続、(2)機微検査の現水準では長い連結名・digest記載を含む実用文書が
-誤検知で送信不能（改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`登録済み。精密化は後続契約）。
-受入後はTODOを次候補選択の状態へ更新する。
+利用者が次の一作業を選ぶ。主な選択肢：(1)機微検査精密化の契約候補作成（改善候補
+`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`の仕分けを含む。G20実用化の最短経路）、(2)外部レビュー
+準備の機械化（目標record固定済みの縦切り）、(3)区切り作業（5段手続きの手順書化、`.gitignore`仕分け）、
+(4)候補6以降（G26残部整理・G28継続回収・G27導入解除）。選択後、Claudeが契約候補または作業票の作成から
+着手する。
 
 開始条件：
 
-- 実送信E2E Evidence・観測record・改善候補・本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 受入Decision recordと本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 利用者の受入判断がchatで得られ、Decision recordへ固定される
+- 次の一作業の利用者選択がchatで得られる
 
-後続作業：受入後、候補6以降の次作業選択、または区切り作業（5段手続きの手順書化・`.gitignore`仕分け・
-機微検査精密化の契約候補作成）をHumanが選ぶ。
+後続作業：選択された作業の契約候補作成→独立確認（暫定Gemini体制）→採用判断→実装の順で進める。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：製品受入（受入条件14）の判断。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`の仕分けは受入後の区切りで扱う
+- Human判断待ち：次の一作業の選択。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`と`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けも未裁定
 
 ## stale・deferred
 
-- stale：契約候補v5の判断待ち表示、stash退避中の表示はstale（v5承認済み・stash復元済み）
+- stale：G20の実装・レビュー・E2E各段階の進行中表示はすべてstale（受入完了）
 - deferred：G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補6以降、実利用者資料の使用は後続境界まで対象外。外部レビュー準備の機械化（依頼組み立て器・prompt品質gate・判定取り込み）は目標record固定済みで契約008完了後の縦切り。5段手続きの手順書化は本線の区切りで実施。`.gitignore`食い違いは`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`として登録済み、Human仕分け待ち
 
 ## Git・Test
