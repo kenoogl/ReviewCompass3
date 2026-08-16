@@ -27,6 +27,7 @@
 - Pilot連携は`docs/development/prompts/pilot-collaboration-run.md`を共通入口とする。
 - Reviewer起動アダプタ（契約010）の起動・転記・照合は`docs/development/prompts/reviewer-launch-run.md`を入口とする。
 - 契約候補定義前の事前走査（6手順）は`docs/development/prompts/scope-prescan-run.md`を入口とする。
+- レビュー依頼recordの組み立て・機械検査（契約011）は`docs/development/prompts/request-builder-run.md`を入口とする。
 
 ## 2. 報告と判断の規則
 

@@ -34,6 +34,7 @@ reviewcompass3-pilot = "tools.development.pilot_collaboration_cli:main"
 reviewcompass3-claude-implementation = "tools.development.claude_implementation_route_cli:main"
 reviewcompass3-claude-confirmation = "tools.development.claude_implementation_confirmation:main"
 reviewcompass3-review-plan = "tools.development.review_plan_cli:main"
+reviewcompass3-request-builder = "tools.request_builder.entry:main"
 reviewcompass3-reviewer-launch = "tools.reviewer_launch.entry:main"
 reviewcompass3-trusted-transport = "tools.deployment.trusted_claude_transport:main"
 
