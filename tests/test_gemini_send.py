@@ -17,11 +17,11 @@ _LEDGER_RELATIVE = ".reviewcompass/egress-ledger"
 
 
 def _core():
-    return importlib.import_module("tools.egress.gemini_send")
+    return importlib.import_module("tools.external_review.gemini_send")
 
 
 def _entry():
-    return importlib.import_module("tools.egress.gemini_send_entry")
+    return importlib.import_module("tools.external_review.gemini_send_entry")
 
 
 def _canonical(value):
@@ -517,13 +517,8 @@ def test_model_name_rule_mismatch_stops(repo_root, monkeypatch, provider, model)
 def test_opener_disables_proxy_and_redirects():
     core = _core()
     opener = core._build_opener()
-    proxy_handlers = [
-        handler
-        for handler in opener.handlers
-        if handler.__class__.__name__ == "ProxyHandler"
-    ]
-    assert len(proxy_handlers) == 1
-    assert proxy_handlers[0].proxies == {}
+    handler_names = [handler.__class__.__name__ for handler in opener.handlers]
+    assert "ProxyHandler" not in handler_names
     redirect_handlers = [
         handler
         for handler in opener.handlers
@@ -658,7 +653,7 @@ def test_console_script_is_registered():
 
     assert configuration["project"]["scripts"][
         "reviewcompass3-gemini-send"
-    ] == "tools.egress.gemini_send_entry:main"
+    ] == "tools.external_review.gemini_send_entry:main"
 
 
 def test_existing_egress_modules_unchanged():
