@@ -11,6 +11,7 @@ from tools.design.one_design_acceptance_entry import main as design_acceptance_m
 from tools.requirements.one_requirement_feature_source_entry import (
     main as requirement_candidate_main,
 )
+from tools.reviewer_launch.entry import g30_main as reviewer_launch_prepare_main
 from tools.reviews.one_item_review import ReviewStop
 from tools.reviews.one_item_review import prepare_material
 from tools.reviews.one_item_review import read_input_files
@@ -59,6 +60,14 @@ _OPERATIONS = {
         "binding_positions": {
             "material": ("material", "content_sha256"),
             "review_spec": ("review_spec", "sha256"),
+        },
+    },
+    "reviewer_launch_prepare": {
+        "entry": reviewer_launch_prepare_main,
+        "input_names": ("request",),
+        "argument_names": {"request": "--request"},
+        "binding_positions": {
+            "request": ("request", "sha256"),
         },
     },
 }
