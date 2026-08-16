@@ -1,0 +1,200 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-CLAUDE-SUBAGENT-BACKEND-2026-08-17-V1",
+  "searches": [
+    {
+      "subject": "claude_subagent_backend_required_capabilities_v1",
+      "capabilities": [
+        {
+          "capability_id": "subagent_headless_launch",
+          "responsibility": "claude CLIを読み取り専用の固定引数でheadless起動し、終了コードとstreamを機械取得する",
+          "inputs": [
+            "依頼recordのpathとdigest",
+            "許可model"
+          ],
+          "outputs": [
+            "未加工stream出力"
+          ],
+          "failure_behavior": [
+            "許可外の道具・書込み権限を渡さない"
+          ],
+          "required_properties": [
+            "固定引数",
+            "最小環境渡し",
+            "自動再試行なし"
+          ],
+          "reference_paths": [
+            "tools/development/claude_implementation_executor.py",
+            "tools/reviewer_launch/core.py"
+          ],
+          "reference_symbols": [
+            "tools/development/claude_implementation_executor.py:_arguments",
+            "tools/development/claude_implementation_executor.py:_child_environment",
+            "tools/reviewer_launch/core.py:build_arguments",
+            "tools/reviewer_launch/core.py:launch_review"
+          ],
+          "symbol_terms": [
+            "launch",
+            "print",
+            "arguments"
+          ],
+          "required_effect_markers": [
+            "process_spawn"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        },
+        {
+          "capability_id": "claude_stream_parsing",
+          "responsibility": "claude CLIのstream-json出力からmodel表示と最終結果を機械抽出し許可一覧と照合する",
+          "inputs": [
+            "stream出力"
+          ],
+          "outputs": [
+            "観測model一覧",
+            "判定JSON"
+          ],
+          "failure_behavior": [
+            "許可外modelの応答を合格として返さない"
+          ],
+          "required_properties": [
+            "決定的解析",
+            "model照合"
+          ],
+          "reference_paths": [
+            "tools/development/claude_implementation_executor.py",
+            "tools/reviewer_launch/core.py"
+          ],
+          "reference_symbols": [
+            "tools/development/claude_implementation_executor.py:_parse_stream",
+            "tools/reviewer_launch/core.py:_parse_stream",
+            "tools/reviewer_launch/core.py:_observed_models",
+            "tools/reviewer_launch/core.py:_extract_verdict"
+          ],
+          "symbol_terms": [
+            "stream",
+            "parse",
+            "model"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "tier_declaration_and_acceptance",
+          "responsibility": "独立性tierを機械判定・宣言し、Tier 2／3はHuman受容の明示がある場合だけ起動を許す",
+          "inputs": [
+            "pilot provider",
+            "backend provider",
+            "受容の明示"
+          ],
+          "outputs": [
+            "tier宣言",
+            "起動可否"
+          ],
+          "failure_behavior": [
+            "機械が黙って独立性を緩めない"
+          ],
+          "required_properties": [
+            "tier判定",
+            "明示的受容",
+            "record記載"
+          ],
+          "reference_paths": [
+            "tools/reviewer_launch/core.py",
+            "tools/external_review/send.py"
+          ],
+          "reference_symbols": [
+            "tools/reviewer_launch/core.py:judge_tier",
+            "tools/external_review/send.py:_scan_text"
+          ],
+          "symbol_terms": [
+            "tier",
+            "independent",
+            "provider"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "per_backend_registry_extension",
+          "responsibility": "backend登録形を複数backend（引数組み立て・stream解析・許可model・禁止環境変数の別）へ拡張する",
+          "inputs": [
+            "backend名"
+          ],
+          "outputs": [
+            "backend定義"
+          ],
+          "failure_behavior": [
+            "受入済み製品の公開記号（ALLOWED_RESPONSE_MODELS等）の互換を壊さない"
+          ],
+          "required_properties": [
+            "登録形",
+            "後決め排除",
+            "互換維持"
+          ],
+          "reference_paths": [
+            "tools/reviewer_launch/core.py",
+            "tools/request_builder/core.py"
+          ],
+          "reference_symbols": [
+            "tools/reviewer_launch/core.py:build_prompt",
+            "tools/request_builder/core.py:check"
+          ],
+          "symbol_terms": [
+            "backend",
+            "registry",
+            "allowed"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "anthropic_auth_isolation",
+          "responsibility": "anthropic系のAPI鍵環境変数を検出したら起動前に停止し、subscription認証だけを使う",
+          "inputs": [
+            "環境変数"
+          ],
+          "outputs": [
+            "最小の子環境"
+          ],
+          "failure_behavior": [
+            "API鍵での起動を許さない"
+          ],
+          "required_properties": [
+            "禁止一覧の直書き",
+            "起動前検査"
+          ],
+          "reference_paths": [
+            "tools/development/claude_implementation_executor.py",
+            "tools/reviewer_launch/core.py"
+          ],
+          "reference_symbols": [
+            "tools/reviewer_launch/core.py:_child_environment"
+          ],
+          "symbol_terms": [
+            "environment",
+            "forbidden",
+            "auth"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-17-claude-subagent-backend-reuse-search-attestation-v1.json"
+    }
+  ],
+  "content_digest": "8cf8e3150e7db7032abeaa9c81b8b5e24071a144a07ac0e1d1b89b7943086a0a"
+}
