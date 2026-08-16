@@ -274,7 +274,7 @@ def test_prompt_contains_fixed_elements(repository):
     core = _core()
     request = _request_relative(repository)
     digest = _sha256_file(repository / request)
-    prompt = core.build_prompt(request, digest)
+    prompt = core.build_prompt(str(repository), request, digest)
     assert request in prompt
     assert digest in prompt
     assert "Reviewer" in prompt
@@ -286,6 +286,10 @@ def test_prompt_contains_fixed_elements(repository):
     # e2e-010-003の実測（作業領域外grepで自動拒否→終了）による追加固定
     assert "view_file" in prompt
     assert "作業領域" in prompt
+    # e2e-010-004の実測（読取り道具は絶対path要求）による追加固定
+    assert str(repository) in prompt
+    assert "%s/%s" % (repository, request) in prompt
+    assert "絶対path" in prompt
 
 
 def test_prompt_byte_limit_stops(

@@ -168,28 +168,32 @@ def judge_tier(backend_provider):
     return 1
 
 
-def build_prompt(request_relative_path, expected_sha256):
+def build_prompt(repository_root, request_relative_path, expected_sha256):
     """固定形式の起動promptを生成する。自由文・依頼内容の複製を含めない。
 
-    実行環境は読み取り専用のplan modeであり、端末commandの実行と書込みは
-    できない（E2E e2e-010-002の実測：request-review方式のheadless実行では
-    道具許可が自動拒否され、command指示は会話を終了させる）。
+    実行環境は読み取り専用であり、端末commandの実行と書込みはできない
+    （e2e-010-002実測：headlessでは道具許可が自動拒否され会話が終了する）。
+    読取り道具のpath引数は絶対pathを要求する（e2e-010-004実測：引数名
+    AbsolutePath。相対path指示は失敗し、領域外の絶対path推測で拒否死する）。
     """
 
+    absolute_request = "%s/%s" % (repository_root, request_relative_path)
     return (
         "あなたは独立したReviewerです。次のcommit済み依頼recordだけを"
         "対象にレビューを実施してください。\n"
+        "対象repository（作業領域）：%s\n"
         "対象依頼record：%s\n"
+        "対象依頼recordの絶対path：%s\n"
         "期待SHA-256：%s\n"
         "この実行環境は読み取り専用です。端末commandの実行、repository"
         "への書込み、許可を求める道具の使用は行わず、fileの読取り道具"
         "だけを使ってください。\n"
-        "現在のdirectory（対象repositoryの作業領域）内だけを相対path"
-        "で読み取り、作業領域の外（利用者のhome等）へは一切アクセス"
+        "読取り道具のpath引数には対象repository配下の絶対pathだけを"
+        "渡し、対象repositoryの外（利用者のhome等）へは一切アクセス"
         "しないでください。領域外アクセスは自動拒否され、その時点で"
         "レビューが終了します。\n"
-        "最初の操作として、読取り道具view_fileで上記の対象依頼record"
-        "（相対path）を開き、本依頼の対象であることを確認してください。"
+        "最初の操作として、読取り道具view_fileで対象依頼recordの"
+        "絶対pathを開き、本依頼の対象であることを確認してください。"
         "digestの機械計算がこの環境で行えない場合、freshnessには"
         "expectedへ期待SHA-256を転記し、resultをnot_computableとして"
         "理由を記載してください（内容が明らかに別物ならmismatchとして"
@@ -197,7 +201,12 @@ def build_prompt(request_relative_path, expected_sha256):
         "レビューを完了し、最終応答は指定のJSON schemaに完全に従う"
         "構造化出力だけで返してください。検査できなかった事項は"
         "unexamined配列へ明示してください。\n"
-        % (request_relative_path, expected_sha256)
+        % (
+            repository_root,
+            request_relative_path,
+            absolute_request,
+            expected_sha256,
+        )
     )
 
 
@@ -370,7 +379,11 @@ def launch_review(
     if hashlib.sha256(request_bytes).hexdigest() != expected_sha256:
         raise LaunchStop("request_record_stale")
 
-    prompt = build_prompt(request_relative_path, expected_sha256)
+    prompt = build_prompt(
+        str(Path(repository).resolve()),
+        request_relative_path,
+        expected_sha256,
+    )
     prompt_encoded = prompt.encode("utf-8")
     if len(prompt_encoded) > PROMPT_BYTE_LIMIT:
         raise LaunchStop("prompt_payload_limit_exceeded")

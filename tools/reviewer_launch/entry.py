@@ -86,7 +86,11 @@ def g30_main(arguments=None, *, output=None):
         tier = core.judge_tier(
             core.BACKENDS["antigravity-cli"]["provider"]
         )
-        prompt = core.build_prompt(request_value, digest)
+        prompt = core.build_prompt(
+            str(Path(values["--input-root"]).resolve()),
+            request_value,
+            digest,
+        )
     except core.LaunchStop as stop:
         _stop(selected_output, stop.reason, "request")
         return 2
