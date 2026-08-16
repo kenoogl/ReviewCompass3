@@ -1,0 +1,55 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-REUSE-SEARCH-GATE-CONNECTION-001",
+ "candidate_version": 1,
+ "created_at": "2026-08-17T06:34:02+09:00",
+ "source_work": "review-tooling-formalization/vertical-a-prescan",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-REUSE-SEARCH-GATE-DISCONNECTION-2026-08-17-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-17-reuse-search-gate-disconnection-observation-v1.json",
+  "sha256": "f4c46cc5e90dabec88e48e270e9901b27ac7f31ea32da31c649c0630823829a0"
+ },
+ "problem": "正式再利用検索は文書上の定めだけで機械の強制点に接続されておらず、忘れても何も止まらない。2026-08-15と2026-08-17の2回、同型の未使用進行が発生した。文書導線（AGENTS §1/§4・scope-prescan-run.md）は接続済みだが、文書はLLM・人の読み落としで再度切れうる。",
+ "impact": [
+  "実装開始の合格根拠（start_allowed）なしで製品コードへ着手し、重複実装・再利用漏れのriskが残る",
+  "検索基盤（universe・policyの方針参照）の停止が誰にも検知されず放置される",
+  "同型再発のたびに手戻りと遡及判断が発生する"
+ ],
+ "scope": [
+  "既存の機械検証点への最小接続の検討（例：契約候補の機械点検が整備された時点で「正式検索attestation参照の存在」を検査項目へ追加、またはwork_unit_transition相当の既存gateへの参照存在検査）",
+  "universe・policyの方針参照の鮮度を既存試験へ載せる案の検討（TODO参照digest試験の前例に倣う）",
+  "接続方式の3案比較と、開発方針「新しい包括的な台帳や関門を先に作らない」との整合確認"
+ ],
+ "non_scope": [
+  "新しい包括的gate・台帳の新設（開発方針が禁止する先行構築）",
+  "文書導線の再改定（対策1・2は2026-08-17実施済み）",
+  "本候補登録時点での実装変更"
+ ],
+ "classification_candidates": [
+  "process_improvement",
+  "task_contract"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development",
+  "workflow-ledger"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-17-reuse-search-gate-disconnection-observation-v1.json",
+   "sha256": "f4c46cc5e90dabec88e48e270e9901b27ac7f31ea32da31c649c0630823829a0"
+  },
+  {
+   "path": "records/development/2026-08-17-vertical-a-request-builder-reuse-search-attestation-v1.json",
+   "sha256": "b081e9fa6243f46c653cd2870fc439c22f46cd903f7df21aa23f9f815e35c344"
+  }
+ ],
+ "proposed_action": "機械gateへの最小接続を運用実測後の縦切り候補として扱う。着手はHuman仕分けの裁定による。それまでは文書導線（6手順の手順書とAGENTS規則）を再発防止線とする。",
+ "content_digest": "9c98efcd73aab901f62b13028d8cdf9da517fe425da95ee164ff6c107b5a1ba8"
+}

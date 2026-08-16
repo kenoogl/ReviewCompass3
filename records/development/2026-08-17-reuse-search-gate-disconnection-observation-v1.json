@@ -1,0 +1,20 @@
+{
+ "observation_id": "OBS-RC3-REUSE-SEARCH-GATE-DISCONNECTION-2026-08-17-V1",
+ "observed_at": "2026-08-17T06:34:02+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "正式再利用検索（formal_code_reuse_search）が存在するのに作業導線から参照されず、契約010と縦A事前走査で未使用のまま進行した（2026-08-15の同型事象の再発）",
+ "machine_observations": {
+  "unused_evidence": {
+   "contract_010": "縦B（契約010）の事前走査・実装で一操作入口の実行記録・attestation生成なし（records/内に該当recordなし）",
+   "vertical_a_initial": "縦A事前走査v1（3008c80）も手動grep走査のみで正式検索を含まず、利用者指摘後に実行した"
+  },
+  "staleness_evidence": {
+   "first_run_stop": "digest_mismatch（universe v5〜v7・policy v10の development_policy_ref が現行方針文書 e3e6b0d2… と不一致）",
+   "cause": "development-policy.md最終改定（3e5ca7a・2026-08-15）後にuniverse・policyが再生成されておらず、検索基盤自体も停止状態だった",
+   "recovery": "universe v8・policy v11をnew-only生成（574266a）後、正式検索が完走（start_allowed true・attestation 494f8f3）"
+  },
+  "recurrence_context": "development-policy.md末尾の規則根拠に2026-08-15の同型事象（仕組み存在・導線未接続・利用者の即時修正指示）が記録済みであり、本件は再発である"
+ },
+ "impact_summary": "実装開始の根拠となる重複チェック・再利用検索が2契約分の作業で省略され、方針が定める合格根拠なしで実装が進行した。導線の文書接続（AGENTS §1/§4・scope-prescan-run.md 6手順化）は2026-08-17に実施済みだが、機械の強制点は未接続のまま",
+ "route_proposal": "改善候補IC-REUSE-SEARCH-GATE-CONNECTION-001としてHuman仕分けへ。文書導線で再発を防ぎつつ、機械gateへの接続（既存検証器への検索record参照の存在検査の追加）は運用実測後の縦切りとして扱う"
+}
