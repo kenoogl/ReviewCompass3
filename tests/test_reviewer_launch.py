@@ -283,6 +283,9 @@ def test_prompt_contains_fixed_elements(repository):
     assert "読取り道具" in prompt
     assert "書込み" in prompt
     assert "unexamined" in prompt
+    # e2e-010-003の実測（作業領域外grepで自動拒否→終了）による追加固定
+    assert "view_file" in prompt
+    assert "作業領域" in prompt
 
 
 def test_prompt_byte_limit_stops(
