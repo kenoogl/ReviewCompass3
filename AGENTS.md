@@ -25,6 +25,7 @@
 - 委譲した作業のレビューは`docs/development/work-review-protocol.md`を共通入口とする。ただし、立て直し計画の
   第1段から第4段では同計画§6を入口とし、§6.8が限定する深さで共通プロトコルを適用する。
 - Pilot連携は`docs/development/prompts/pilot-collaboration-run.md`を共通入口とする。
+- Reviewer起動アダプタ（契約010）の起動・転記・照合は`docs/development/prompts/reviewer-launch-run.md`を入口とする。
 
 ## 2. 報告と判断の規則
 

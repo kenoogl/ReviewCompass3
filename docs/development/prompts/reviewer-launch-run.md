@@ -1,0 +1,45 @@
+# Reviewer launch run
+
+契約の正本は`records/task-contract/2026-08-16-reviewer-launch-adapter-candidate-v2.md`（契約010）で
+ある。安全境界（読み取り専用・認証遮断・固定引数・byte上限）と承認境界の規則は正本を参照し、
+この入口には複製しない。
+
+## 用途
+
+commit済みの依頼recordを対象に、Reviewer（第1 backend：`antigravity-cli`＝`agy`）をheadlessで
+読み取り専用起動し、未加工出力をrepo外私有領域へ不変保存し、構造化判定を判定recordへ機械転記・
+単独commitし、事後照合4点（鮮度・単独commit・根拠・形式）を機械実行する。
+
+- 起動の起点は利用者のchatによるレビュー実施指示である（契約§2）。
+- 許可model一覧が空の間は`allowed_models_unfixed`で起動前に停止する（実E2E前に利用者承認で確定）。
+- 失敗時に同じ起動を自動再試行せず、別model・別認証・別経路へ自動で切り替えない。
+- fallbackは暫定手動体制（`records/development/2026-08-16-interim-gemini-review-regime-decision-v1.md`）。
+
+## 単体入口
+
+一往復（起動→保存→転記→事後照合）：
+
+```text
+reviewcompass3-reviewer-launch launch \
+  --repository <対象repositoryの絶対パス> \
+  --request <依頼recordのrepo相対パス> \
+  --expected-sha256 <依頼recordのSHA-256> \
+  --private-root <repo外私有領域の絶対パス> \
+  --run-id <実行識別子>
+```
+
+起動なしの事前検査（G30と同形式）：
+
+```text
+reviewcompass3-reviewer-launch check \
+  --input-root <対象repositoryの絶対パス> \
+  --request <依頼recordのrepo相対パス>
+```
+
+出力は正準JSON一行。終了コードは成功`0`、入力不備または安全境界による停止`2`、内部失敗`1`。
+
+## G30操作
+
+操作名`reviewer_launch_prepare`として`reviewcompass3-operation-run`へ登録済み（入力`request`、
+束縛位置`request.sha256`）。G30経由の実行は起動なしの事前検査だけを行う（外部起動は単体入口
+`launch`だけが行う）。
