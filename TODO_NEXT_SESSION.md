@@ -53,7 +53,7 @@ record記載SHA-256との照合を行う）。返ってきた判定文をClaude�
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：Geminiへの依頼record path伝達と判定文の持ち帰り（暫定体制のHuman中継作業）。その前段でSR-IMPL-1の扱い（判断1）が未裁定
+- Human判断待ち：Geminiへの依頼record path伝達と判定文の持ち帰り（暫定体制のHuman中継作業）。SR-IMPL-1は利用者が(A)を裁定済み＝このまま進め、修正要判定が出た場合に他の指摘とまとめて1回で直す（2026-08-16 chat）
 
 ## stale・deferred
 
