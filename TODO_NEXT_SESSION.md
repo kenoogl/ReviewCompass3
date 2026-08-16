@@ -6,56 +6,54 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合、G20の外部送信2契約（008一回送信・009機微検査精密化と改名）の製品受入が完了し、3 provider実環境確認も済んだ。残る候補と新規取組『レビュー実行体制の正式ツール化』を順に進める。
-- 現在作業：新規取組『レビュー実行体制の正式ツール化』の統合検討を利用者確定の下で固定した（検討record参照）。縦切り3本（A依頼組み立て器・B起動アダプタ・C品質gate）、backend抽象と独立性tier 3段、横串3観点（機械処理化・G30導線への載せ方・導線配備）を定義。次は縦AかBの選択→事前走査→契約候補作成である。外部APIレビュー（API直接送信経路）はpendingのまま（本取組はCLI／subagent経路で別・補完関係）。
-- Task Contract：なし（契約009はaccepted済み。次契約は縦A/B選択後に定義する）
+- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合、G20の外部送信2契約（008・009）の製品受入と3 provider実環境確認が完了。新規取組『レビュー実行体制の正式ツール化』は、縦B（Reviewer起動アダプタ）の契約010を採用し、実装（RED→緑・導線配備・保護対象差分0）まで完了した。
+- 現在作業：契約010の残り受入条件を進める。§9-8実E2E（前提：許可model一覧の利用者承認と定数固定。現状は空一覧のため起動は安全側で停止する）→§9-10独立完了レビュー（暫定体制）→§9-11製品受入。Gemini CLIは2026-06-18提供終了・後継agy 1.1.13導入済み（統合検討はagyへ訂正済み）。外部APIレビュー（API直接送信経路）はpendingのまま。
+- Task Contract：`TC-RC3-PRODUCT-REVIEWER-LAUNCH-ADAPTER-010 / v2`＝`adopted_implementation_started`（採用判断record参照）
 
 ## 現在作業に影響する改善候補／Issue
 
-- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：現在のG24契約定義を妨げず、立て直し計画を未完了へ戻さない持ち越し負債である、次：Issue状態を変更せず、状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する
+- `ISSUE-TEST-GROWTH-STATE-PINNING-001`：`registered / 第3段完了・条件付き再開待ち`、影響：現在の契約010実装を妨げず、立て直し計画を未完了へ戻さない持ち越し負債である、次：Issue状態を変更せず、状態固定試験の変更・削除または別途承認されたWork 8測定の前にだけ対象限定で再開する
 
 ## 最新のauthority／Evidence
 
-- [レビュー実行体制の正式ツール化 統合検討v1（利用者確定）](records/development/2026-08-16-review-tooling-formalization-study-v1.md) — SHA-256 `c2384f3b17a7c59572548a9195eb89924c6f42f087fc2e736975c7d0b8fcd602`
-- [gitignore仕分けのHuman裁定record（裁定A・schema v2）](.reviewcompass/workflow/triage-decisions-v4/dec-ic-handoff-gitignore-record-canonical-001--v1.json) — SHA-256 `a9da1824ab31c330260cabf3b0662ebfe841d46e4685586ffc256289f11541a6`
-- [3 provider実環境確認Evidence（Gemini操縦のanthropic確認を含む）](records/development/2026-08-16-three-provider-live-check-evidence-v1.md) — SHA-256 `e04a2c95fbbe727a296dd27bbc9171dd378bfdc9409d77b788eabdd9a7b9f07d`
-- [利用者による契約009の製品受入判断（残余risk最終受容・IC消費）](records/development/2026-08-16-external-send-scan-refinement-product-acceptance-decision-v1.md) — SHA-256 `a1ef5bebd6b3d918dff4080ed7faea532a3ad69b523ff206ed11eed77e916879`
-- [識別子停止を維持へ訂正した契約009候補v2](records/task-contract/2026-08-16-external-send-scan-refinement-candidate-v2.md) — SHA-256 `58e5f9165e2201892377744377a9758f79be7559fe26f82ed114ec246968e6da`
-- [利用者によるG20一回送信の製品受入判断](records/development/2026-08-16-external-reviewer-single-send-product-acceptance-decision-v1.md) — SHA-256 `6f76c1c6198ccc9a0412e4a8e6751a29a89836d9d9ef5e76900772e6fa8ffa54`
-- [採用中の置き場所矛盾を訂正した契約v5](records/task-contract/2026-08-16-external-reviewer-single-send-candidate-v5.md) — SHA-256 `6fc7b37b07f65519e78353df23fc7277c1c9265956320e46d5e6e35608e9d165`
+- [契約010採用と実装開始のHuman判断record](records/development/2026-08-16-reviewer-launch-adapter-contract-adoption-decision-v1.md) — SHA-256 `351e57108293255989d345a9936cbdb122cc4f6695df7c52b4ff2856ded0a983`
+- [契約010実装Evidence（RED→緑・導線・手戻り記録）](records/development/2026-08-16-reviewer-launch-adapter-implementation-evidence-v1.md) — SHA-256 `9c7863e10f6fae2b654c85b17b0edb7493e47412f19218ae28ed5ee5d7ff58c5`
+- [契約候補v2独立確認判定record（Gemini・開始可）](records/development/2026-08-16-reviewer-launch-adapter-v2-independent-review-v1.md) — SHA-256 `b2c37c97ca4d6fb1989b8bd07be0cdee94c0e819f5b0fca20e1bbad7e13724e3`
+- [採用中の契約010候補v2](records/task-contract/2026-08-16-reviewer-launch-adapter-candidate-v2.md) — SHA-256 `7d159fdf093abad81481ae73eb3d95ad11efd04e2313d6df5a34c27fe583db0a`
+- [契約候補v2のGemini依頼record](records/session-handoffs/2026-08-16-reviewer-launch-adapter-v2-review-gemini-request-v1.md) — SHA-256 `390bc32868a2ee99f11e68d6bb9489826681674786d64b93ea207592399ac995`
+- [契約候補v1自己レビュー（SR-C10-1〜4）](records/development/2026-08-16-reviewer-launch-adapter-v1-self-review-v1.md) — SHA-256 `3fadb74967e52fb6bc9a19b3099db12324b2e52c983fc60207b7587534b8cd8f`
+- [レビュー実行体制の正式ツール化 統合検討v1（agy訂正済み）](records/development/2026-08-16-review-tooling-formalization-study-v1.md) — SHA-256 `00b294afefa90de8cc8dc5141e9d08c23d40971d4338b9ca5021fe857f2daae0`
+- [縦B事前走査v1](records/development/2026-08-16-vertical-b-reviewer-launch-adapter-prescan-v1.md) — SHA-256 `736b9d58227cdb8b66f41abe9b6b0ab1b54515f415e5ccb69170c97bab7cb33a`
+- [縦B事前走査追補v1（agy実測）](records/development/2026-08-16-vertical-b-prescan-agy-addendum-v1.md) — SHA-256 `2f5cdec3c2470ed54cd0df58cd46afa47353c6d159ba97c7494b19f65bf760f8`
 - [暫定レビュー体制の決定（Gemini手動利用・Human中継）](records/development/2026-08-16-interim-gemini-review-regime-decision-v1.md) — SHA-256 `1a5fffc5792d17791f5c275b40183a0d4d076233d6d1b7a267cd91cf92174792`
-- [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
-- [外部レビュー準備・実施の機械化目標](records/development/2026-08-16-external-review-preparation-mechanization-goal-v1.md) — SHA-256 `46a415eb630266e23a87562e6083f873e2fe9790acd34a6699f59b30aee0b45e`
-- [利用者によるG02安全投影の製品受入判断](records/development/2026-08-16-one-item-review-safe-projection-product-acceptance-decision-v1.md) — SHA-256 `2cea891bb43fa83b15259310d97a459b6f446898bdedf79630cd2e945d8008cc`
-- [次製品作業の候補一覧（8候補・推奨順）](records/development/2026-08-15-post-safe-storage-next-product-work-candidates-v1.md) — SHA-256 `bcb4ba2947e32254edc547068728fa580bc6b7919fa0f04d9b9353ab6c7899ba`
 - [現行50要求を解決する要求権限束v2](records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json) — SHA-256 `760e33ea2ecf6937f56d7bf8d2bd703b18b47dbd2bd6b2bd5919e0dd556d9dae`
 
 ## 次に行う一作業
 
-利用者が正式ツール化の最初の縦切りを選ぶ：**縦A（依頼組み立て器）**＝依頼promptの品質を先に機械化
-（手動運搬のままでも全レビューの品質が上がる）、または**縦B（Reviewer起動アダプタ）**＝運搬の機械化を先に
-（gemini-cli＋claude-subagentの2 backendから。codexCLI停止blockerの回避になる）。選択後、Claudeが
-事前走査（5手順）→契約候補v1作成→5段手続き→独立確認（暫定Gemini体制）→採用判断の順で進める。
+利用者が契約010の実E2E（§9-8）の実施を判断する：(1) 許可model一覧に載せるagyのmodel名を利用者が提示・
+承認し、Claudeが直書き定数へ固定する（空一覧の間は`allowed_models_unfixed`で起動前停止）。(2) 実E2Eの
+対象依頼record 1件（commit済み）を利用者が指定し、実施を明示指示する。実施後は独立完了レビュー
+（暫定体制）→製品受入へ進む。
 
 開始条件：
 
-- 統合検討record（利用者確定）と本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 実装Evidenceと本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 縦AまたはBの利用者選択がchatで得られる
+- 許可model一覧の承認と実E2E実施指示（または保留の判断）がchatで得られる
 
-後続作業：選択された縦の事前走査→契約候補作成→独立確認→採用→RED→実装→レビュー→受入。
+後続作業：実E2E→§9-9残余確認→独立完了レビュー→製品受入→第2縦切り（claude-subagent・Tier 2／3受容）。
 
 ## blocker・Human判断待ち
 
-- blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：正式ツール化の最初の縦切りの選択（縦A依頼組み立て器か縦B起動アダプタか）
+- blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）。旧Gemini CLIは2026-06-18提供終了（後継agyへ移行済み・アダプタ実装済み）
+- Human判断待ち：許可model一覧の承認と、実E2E（初回の実起動）の実施指示
 
 ## stale・deferred
 
-- stale：契約008・009の実装・レビュー・E2E各段階の進行中表示はすべてstale（両契約とも受入完了）
-- deferred：**外部API直接送信経路の後続はpending**（2026-08-16。対象：応答解析・監査自動化・旧egress設計統合・複数送信・API経路への運搬移行判断・external_send_approved表示の観測登録。送信路自体は受入済みで利用可能なまま。再開は利用者指示による）。なお当初pendingに含めた依頼組み立て器・prompt品質gate・5段手続きの手順書化は、利用者指示の新規取組『正式ツール化』（統合検討recordの縦A・縦C。経路非依存の部品）へ**移管**した。G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補6以降、実利用者資料の使用は後続境界まで対象外
+- stale：契約008・009の進行中表示（両契約とも受入完了）。縦B事前走査v1 §7の論点1・3（追補v1で差し替え済み）
+- deferred：**外部API直接送信経路の後続はpending**（2026-08-16。対象：応答解析・監査自動化・旧egress設計統合・複数送信・API経路への運搬移行判断・external_send_approved表示の観測登録。送信路自体は受入済みで利用可能なまま。再開は利用者指示による）。契約010の範囲外の後続＝claude-subagent／codex-cli backend・Tier 2／3受容機構・Reviewer書込み方式・縦A依頼組み立て器・縦C品質gate。5手順事前走査の手順書化は改善候補のまま
 
 ## Git・Test
 
@@ -63,8 +61,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：送信路対象61件（改名後`tests/test_external_review_send.py`。既存49＋精密化12）、egress関連107件、G02 158件、G08 107件、G24 111件、実行器75件、G30基盤e2e 38件、layout 13件（応答raw除外の維持試験1件追加後）、作業単位遷移13件（依頼record非特別扱いへの反転固定後）——各単独終了コード0。保護path差分0（基準は契約009 v2 §6の固定commit）
-- 直近の全Test：禁止認証隔離条件の正規全試験2,375件成功・終了コード0（gitignore仕分け・試験反転固定後の再実行）。通常host環境の既存executor安全拒否12件は既知事象で退行なし
+- 直近の関連Test：契約010対象31件（`tests/test_reviewer_launch.py`）、G30運用契約実行75件、layout 13件——各単独終了コード0
+- 直近の全Test：禁止認証隔離条件の正規全試験2,406件成功・終了コード0（契約010実装とTODO参照digest更新後の再実行）。通常host環境の既存executor安全拒否12件は既知事象で退行なし
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
