@@ -169,21 +169,30 @@ def judge_tier(backend_provider):
 
 
 def build_prompt(request_relative_path, expected_sha256):
-    """固定形式の起動promptを生成する。自由文・依頼内容の複製を含めない。"""
+    """固定形式の起動promptを生成する。自由文・依頼内容の複製を含めない。
+
+    実行環境は読み取り専用のplan modeであり、端末commandの実行と書込みは
+    できない（E2E e2e-010-002の実測：request-review方式のheadless実行では
+    道具許可が自動拒否され、command指示は会話を終了させる）。
+    """
 
     return (
         "あなたは独立したReviewerです。次のcommit済み依頼recordだけを"
         "対象にレビューを実施してください。\n"
         "対象依頼record：%s\n"
         "期待SHA-256：%s\n"
-        "開始時に `shasum -a 256 %s` を実行して期待SHA-256との一致を"
-        "確認してください。一致しない場合、または計算できない場合は、"
-        "その旨をfreshnessへ記載してください（mismatchなら判定せず停止）。\n"
-        "判定は指定のJSON schemaに完全に従う構造化出力だけで返して"
-        "ください。\n"
-        "repositoryへの書込み・ファイル変更・commitは行わないでください"
-        "（読み取り専用）。\n"
-        % (request_relative_path, expected_sha256, request_relative_path)
+        "この実行環境は読み取り専用です。端末commandの実行、repository"
+        "への書込み、許可を求める道具の使用は行わず、fileの読取り道具"
+        "だけを使ってください。\n"
+        "開始時に対象依頼recordを読取り道具で開き、本依頼の対象で"
+        "あることを確認してください。digestの機械計算がこの環境で"
+        "行えない場合、freshnessにはexpectedへ期待SHA-256を転記し、"
+        "resultをnot_computableとして理由を記載してください（内容が"
+        "明らかに別物ならmismatchとして判定せず停止）。\n"
+        "レビューを完了し、最終応答は指定のJSON schemaに完全に従う"
+        "構造化出力だけで返してください。検査できなかった事項は"
+        "unexamined配列へ明示してください。\n"
+        % (request_relative_path, expected_sha256)
     )
 
 
@@ -192,6 +201,10 @@ def build_arguments(executable, prompt, model):
 
     agyの旗解析はGo標準flag形式であり、`--print`は値（prompt本文）を取る
     （E2E e2e-010-001の実測。値旗は`--旗=値`形式で渡し、位置引数を作らない）。
+    `--mode=plan`は読み取り専用相当の確定（契約§7.1がRED段の実測へ留保した
+    事項。E2E e2e-010-002の実測：既定のrequest-review方式はheadlessで道具
+    許可が自動拒否となり、読み取りすら成立しない）。書込みを許す
+    `--mode=accept-edits`は使用禁止のまま。
     """
 
     return [
@@ -200,6 +213,7 @@ def build_arguments(executable, prompt, model):
         "--json-schema="
         + json.dumps(VERDICT_SCHEMA, ensure_ascii=False, sort_keys=True),
         "--model=" + model,
+        "--mode=plan",
         "--disable-slash-commands",
         "--print-timeout=" + PRINT_TIMEOUT,
         "--print=" + prompt,
@@ -243,27 +257,42 @@ def _parse_stream(stdout):
 
 
 def _observed_models(events):
+    """agyのstream実形式（e2e-010-002実測）：initイベントのinit.modelを読む。"""
+
     models = []
     for event in events:
-        value = event.get("model")
-        if isinstance(value, str) and value:
-            models.append(value)
+        init = event.get("init")
+        if isinstance(init, dict):
+            value = init.get("model")
+            if isinstance(value, str) and value:
+                models.append(value)
     return models
 
 
 def _extract_verdict(events):
+    """agyのstream実形式：event=\"result\"のresult.responseがJSON本文を持つ。"""
+
     candidate = None
     for event in events:
-        if event.get("type") == "result" and "result" in event:
+        if event.get("event") == "result" and isinstance(
+            event.get("result"), dict
+        ):
             candidate = event["result"]
-    if isinstance(candidate, str):
+    if candidate is None:
+        raise LaunchStop("verdict_schema_nonconforming")
+    response = candidate.get("response")
+    if isinstance(response, str) and response.strip():
         try:
-            candidate = json.loads(candidate)
+            value = json.loads(response)
         except (json.JSONDecodeError, ValueError) as error:
             raise LaunchStop("verdict_schema_nonconforming") from error
-    if not isinstance(candidate, dict):
+    elif "verdict" in candidate:
+        value = candidate
+    else:
         raise LaunchStop("verdict_schema_nonconforming")
-    return candidate
+    if not isinstance(value, dict):
+        raise LaunchStop("verdict_schema_nonconforming")
+    return value
 
 
 def _store_outputs(

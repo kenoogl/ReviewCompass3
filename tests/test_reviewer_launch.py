@@ -101,14 +101,39 @@ def _request_relative(repository):
     )
 
 
-def _stream_text(model=TEST_MODEL, verdict=None, extra_lines=()):
+def _stream_text(model=TEST_MODEL, verdict=None, extra_lines=(), response=None):
+    # agyのstream実形式（e2e-010-002実測）：event鍵で
+    # init（init.modelにmodel名）／step_update／result（result.responseに
+    # 構造化出力のJSON本文）が流れる。
     verdict_value = verdict
     if verdict_value is None:
         verdict_value = _valid_verdict()
+    response_text = (
+        json.dumps(verdict_value, ensure_ascii=False)
+        if response is None
+        else response
+    )
     lines = [
-        json.dumps({"type": "system", "model": model}),
+        json.dumps(
+            {
+                "conversation_id": "c-1",
+                "event": "init",
+                "init": {"model": model, "permission_mode": "plan"},
+            }
+        ),
+        json.dumps(
+            {
+                "event": "step_update",
+                "step_update": {"step_index": 0, "state": "DONE"},
+            }
+        ),
         *extra_lines,
-        json.dumps({"type": "result", "result": verdict_value}),
+        json.dumps(
+            {
+                "event": "result",
+                "result": {"status": "SUCCESS", "response": response_text},
+            }
+        ),
     ]
     return "\n".join(lines) + "\n"
 
@@ -217,8 +242,11 @@ def test_unknown_backend_stops(repository, monkeypatch, clean_environment):
 
 
 def test_fixed_arguments_exact(clean_environment):
-    # E2E e2e-010-001の実測でagyの--printが値旗と判明したため、
-    # 固定引数は`--旗=値`形式・位置引数なしへ訂正した（Evidence参照）。
+    # E2E e2e-010-001の実測でagyの--printが値旗と判明したため
+    # `--旗=値`形式・位置引数なしへ訂正。e2e-010-002の実測で既定の
+    # request-review方式がheadlessで自動拒否となるため、読み取り専用
+    # 相当として--mode=planを確定した（契約§7.1がRED段実測へ留保した
+    # 事項。書込みを許すaccept-editsは引き続き禁止）。
     core = _core()
     arguments = core.build_arguments(
         "agy", "prompt-text", TEST_MODEL
@@ -231,18 +259,18 @@ def test_fixed_arguments_exact(clean_environment):
         "--output-format=stream-json",
         "--json-schema=" + schema_text,
         "--model=" + TEST_MODEL,
+        "--mode=plan",
         "--disable-slash-commands",
         "--print-timeout=600s",
         "--print=prompt-text",
     ]
     assert "--dangerously-skip-permissions" not in arguments
-    assert "--mode" not in arguments
-    assert not any(
-        argument.startswith("--mode=") for argument in arguments
-    )
+    assert "--mode=accept-edits" not in arguments
 
 
 def test_prompt_contains_fixed_elements(repository):
+    # e2e-010-002の実測（headlessでcommand許可が自動拒否）により、
+    # shasum実行指示を読取り道具限定・not_computable申告の指示へ訂正。
     core = _core()
     request = _request_relative(repository)
     digest = _sha256_file(repository / request)
@@ -250,8 +278,11 @@ def test_prompt_contains_fixed_elements(repository):
     assert request in prompt
     assert digest in prompt
     assert "Reviewer" in prompt
-    assert "shasum" in prompt
+    assert "shasum" not in prompt
+    assert "not_computable" in prompt
+    assert "読取り道具" in prompt
     assert "書込み" in prompt
+    assert "unexamined" in prompt
 
 
 def test_prompt_byte_limit_stops(
@@ -397,6 +428,22 @@ def test_schema_nonconforming_result_stops_after_raw_saved(
     broken = dict(_valid_verdict())
     del broken["verdict"]
     facade = _FacadeRecorder(stdout=_stream_text(verdict=broken))
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch(repository, monkeypatch, facade)
+    assert caught.value.reason == "verdict_schema_nonconforming"
+    raw_path = (
+        repository.parent / "private" / "run-001" / "reviewer.raw.json"
+    )
+    assert raw_path.is_file()
+
+
+def test_empty_response_stops_after_raw_saved(
+    repository, monkeypatch, clean_environment
+):
+    # e2e-010-002の実測事象の固定：result.responseが空文字列の場合は
+    # 転記せず停止する（rawは保存済み）。
+    core = _core()
+    facade = _FacadeRecorder(stdout=_stream_text(response=""))
     with pytest.raises(core.LaunchStop) as caught:
         _launch(repository, monkeypatch, facade)
     assert caught.value.reason == "verdict_schema_nonconforming"
