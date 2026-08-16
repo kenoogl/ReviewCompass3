@@ -19,11 +19,11 @@ _LEDGER_RELATIVE = ".reviewcompass/egress-ledger"
 
 
 def _core():
-    return importlib.import_module("tools.external_review.gemini_send")
+    return importlib.import_module("tools.external_review.send")
 
 
 def _entry():
-    return importlib.import_module("tools.external_review.gemini_send_entry")
+    return importlib.import_module("tools.external_review.send_entry")
 
 
 def _canonical(value):
@@ -694,8 +694,8 @@ def test_console_script_is_registered():
         configuration = tomllib.load(stream)
 
     assert configuration["project"]["scripts"][
-        "reviewcompass3-gemini-send"
-    ] == "tools.external_review.gemini_send_entry:main"
+        "reviewcompass3-external-review-send"
+    ] == "tools.external_review.send_entry:main"
 
 
 def test_existing_egress_modules_unchanged():

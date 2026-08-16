@@ -1,4 +1,4 @@
-"""外部レビュア一回送信の正式命令入口（契約008 v5）。
+"""外部レビュア一回送信の正式命令入口（契約008 v5・改名は契約009）。
 
 lifecycle: provisional
 normative_status: non-normative
@@ -7,7 +7,7 @@ promotion_required: true
 
 import sys
 
-from tools.external_review.gemini_send import (
+from tools.external_review.send import (
     SendStop,
     canonical_json_bytes,
     run_send_order,
