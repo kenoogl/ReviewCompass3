@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "order_identifier": "ORD-G20-REAL-DOC-001",
+  "human_approved": true,
+  "destination_provider": "gemini-api",
+  "destination_model": "gemini-3.1-pro-preview",
+  "pilot_provider": "anthropic-api",
+  "purpose": "受入条件8の実用文書E2E一回。精密化前は誤検知で送信不能だった観測recordを、精密化後の経路で送れることの実証",
+  "repository_root": "/Users/Daily/Development/ReviewCompass3",
+  "source_files": [
+    {
+      "path": "records/development/2026-08-16-egress-sensitive-scan-false-positive-observation-v1.json",
+      "sha256": "e6ffac53245501a57555a19b17225c4715ac394bdf37ef1c6cb025446adfb1b4"
+    }
+  ]
+}
