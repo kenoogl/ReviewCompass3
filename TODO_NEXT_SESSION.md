@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：なし。外部APIレビューの取組は、送信路2契約（008・009）の受入と3 provider実環境確認まで完了した区切りで、**利用者判断により一旦pending**とした（2026-08-16 chat）。次はpending外の作業から選択する。
+- 現在作業：なし。外部APIレビューはpending（2026-08-16）。pending後の最初の区切り作業として`.gitignore`仕分け（`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`）を裁定(A)で完了した：正規tool（schema v2・intake v4検証合格）の決定record固定、除外1行の削除、参照済み歴史的依頼原文37件のcommit昇格、旧前提を固定していた既存試験1件の反転固定（利用者承認）。全試験2,375件全緑。次の一作業の選択待ちである。
 - Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v2 / accepted`
 
 ## 現在作業に影響する改善候補／Issue
@@ -30,11 +30,10 @@
 
 ## 次に行う一作業
 
-利用者がpending外の作業から次の一作業を選ぶ。主な選択肢：(1)`.gitignore`仕分け
-（`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`のHuman仕分け）、(2)候補6以降（G26旧処理の残部整理・
-G28継続回収・G27導入解除。候補一覧recordの推奨順）、(3)G24の要求作成責務やG02 organize・G25・
-安全保存との統合など後続境界の再開判断、(4)その他利用者が指定する作業。選択後、Claudeが仕分け材料
-または契約候補・作業票の作成から着手する。
+利用者がpending外の作業から次の一作業を選ぶ。主な選択肢：(1)候補6以降（G26旧処理の残部整理・
+G28継続回収・G27導入解除。候補一覧recordの推奨順）、(2)G24の要求作成責務やG02 organize・G25・
+安全保存との統合など後続境界の再開判断、(3)その他利用者が指定する作業。選択後、Claudeが契約候補・
+作業票の作成から着手する。
 
 開始条件：
 
@@ -49,12 +48,12 @@ G28継続回収・G27導入解除。候補一覧recordの推奨順）、(3)G24�
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：pending外からの次の一作業の選択。`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けは未裁定
+- Human判断待ち：pending外からの次の一作業の選択
 
 ## stale・deferred
 
 - stale：契約008・009の実装・レビュー・E2E各段階の進行中表示はすべてstale（両契約とも受入完了）
-- deferred：**外部APIレビュー関連一式は利用者判断でpending**（2026-08-16。対象：機械化縦切り(a)依頼組み立て器・(b)prompt品質gate・(c)判定取り込み、応答解析・監査自動化・旧egress設計統合・複数送信、開発レビュー運搬のHuman中継から本経路への移行判断、5段手続きの手順書化、external_send_approved表示の観測登録。再開は利用者指示による。送信路自体は受入済みで利用可能なまま）。G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補6以降、実利用者資料の使用は後続境界まで対象外。`.gitignore`食い違いは`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`として登録済み、Human仕分け待ち
+- deferred：**外部APIレビュー関連一式は利用者判断でpending**（2026-08-16。対象：機械化縦切り(a)依頼組み立て器・(b)prompt品質gate・(c)判定取り込み、応答解析・監査自動化・旧egress設計統合・複数送信、開発レビュー運搬のHuman中継から本経路への移行判断、5段手続きの手順書化、external_send_approved表示の観測登録。再開は利用者指示による。送信路自体は受入済みで利用可能なまま）。G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補6以降、実利用者資料の使用は後続境界まで対象外。`.gitignore`食い違い（`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`）は裁定(A)実行済み・解消
 
 ## Git・Test
 
