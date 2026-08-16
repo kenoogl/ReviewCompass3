@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G20『外部レビュア一回送信』の独立完了レビュー（Gemini 3.1 Pro・Human中継）が`修正要`と判定した：blocking 2件（試験の通信模擬が`_send_request`全体差し替えで本体が試験対象外、`payload_sha256`の独立oracle再計算なし）とnon-blocking 1件（開示済みSR-IMPL-1の冗長式）。未接続・禁止作用・上位悪影響は0件。判定recordへ転記済みで、最小修正の扱いの利用者判断を待って停止中である。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v5 / completion_review_correction_pending`
+- 現在作業：G20『外部レビュア一回送信』は完了レビューの修正要3指摘を利用者承認の下で訂正した：通信模擬を下層（`OpenerDirector.open`）差し替えへ変更して`_send_request`本体を試験対象化、契約§9固定形からの独立payload照合を追加、602行の冗長式を整理。対象49件・退行確認・正規全試験2,362件（隔離）が全緑で、限定再確認（訂正の閉じと退行だけ）の依頼recordを固定済み。利用者の運搬と判定持ち帰りを待って停止中である。
+- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v5 / correction_awaiting_limited_rereview`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [G20訂正の限定再確認依頼record](records/session-handoffs/2026-08-16-g20-single-send-correction-rereview-gemini-request-v1.md) — SHA-256 `f4b761d34993f95c6c71b92aa834db0f37d34511dd2fa17114f19a8e3d4138ae`
+- [G20完了レビュー指摘3件の訂正Evidence](records/development/2026-08-16-external-reviewer-single-send-correction-evidence-v1.md) — SHA-256 `1f10f9c37350bb1acd0173a6753d917b1baddfd670cba66baa546df28b153262`
 - [G20独立完了レビュー・修正要判定（Gemini・Human中継）](records/development/2026-08-16-external-reviewer-single-send-completion-review-v1.md) — SHA-256 `e429f167e57883aae04a72ad85a82416a7aa5801ec4bfc108facdf61a0d12aa9`
 - [G20独立完了レビュー依頼record v2（Gemini直接読取り・Human中継）](records/session-handoffs/2026-08-16-g20-single-send-completion-review-gemini-request-v2.md) — SHA-256 `4888796d5ce5c9242400065a85d2043a8cc00c67b13a07cd3ef3b73019013936`
 - [G20実装の起草側自己レビューと文脈整理](records/development/2026-08-16-external-reviewer-single-send-impl-self-review-v1.md) — SHA-256 `899f0697b5124850273dea442f68cd28ac52bd2aa95d1be8410d1e7b3a46dbfe`
@@ -34,27 +36,28 @@
 
 ## 次に行う一作業
 
-利用者が独立完了レビューの修正要3指摘（判定record参照）の扱いを決める。承認後、Claudeが
-(1)試験の強化2件——通信模擬をより下層（`urllib.request.OpenerDirector.open`等）の差し替えへ変更して
-`_send_request`本体を試験対象に含める、契約§9準拠の期待payloadを試験内で独立に組み立て
-`payload_sha256`と照合する——と(2)実装1行の整理（602行を`data`だけへ）を行い、対象試験・退行確認の
-全緑後にcommitし、限定再確認（修正点の閉じと退行の有無だけ）を暫定体制で受ける。
+利用者がGeminiへ限定再確認依頼recordのpath
+（`records/session-handoffs/2026-08-16-g20-single-send-correction-rereview-gemini-request-v1.md`）を伝え、
+判定文を持ち帰る。Claudeは判定文を判定record
+`records/development/2026-08-16-external-reviewer-single-send-correction-rereview-v1.md`へ転記・commitし、
+根拠と実物の整合を機械照合する。
 
 開始条件：
 
-- 判定record・本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 訂正commitと限定再確認依頼record・本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 修正の扱いの利用者判断がchatで得られる
+- 限定再確認の判定recordがcommitへ固定される
 
-後続作業：修正→限定再確認`verified`→実送信E2E（受入条件13。前提：台帳root
-`.reviewcompass/egress-ledger/`の初回commit用意）の実施判断→製品受入提示（受入条件14）。
+後続作業：`verified`なら利用者へ実送信E2E（受入条件13。前提：台帳root
+`.reviewcompass/egress-ledger/`の初回commit用意）の実施判断を求める→製品受入提示（受入条件14）。
+`修正要`なら停止して利用者へ諮る。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：修正要3指摘（blocking 2・non-blocking 1）への対応の扱い。SR-IMPL-1（指摘3と同一）は利用者が(A)を裁定済み＝他の指摘とまとめて1回で直す（2026-08-16 chat）
+- Human判断待ち：限定再確認依頼のGeminiへのpath伝達と判定文の持ち帰り（暫定体制のHuman中継作業）
 
 ## stale・deferred
 
