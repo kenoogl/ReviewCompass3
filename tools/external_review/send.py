@@ -49,6 +49,13 @@ _ORDER_MEMBERS = frozenset(
         "source_files",
     )
 )
+# 契約009 §7.1の除外3形式（契約固定の定数。設定・環境・引数・送信指示から変更できない）。
+# find_high_entropyのallow_patterns（トークン全体一致）として、§7.2の適用範囲だけに渡す。
+_HIGH_ENTROPY_ALLOW_PATTERNS = (
+    r"[0-9a-f]{40}",
+    r"[0-9a-f]{64}",
+    r"(?=.*[G-Zg-z_])[A-Za-z0-9]{1,20}(?:[-_]+[A-Za-z0-9]{1,20})+",
+)
 _PROVIDERS = {
     "gemini-api": {
         "host": "generativelanguage.googleapis.com",
@@ -249,11 +256,14 @@ def _iter_strings(value, path=()):
         yield value, path
 
 
-def _scan_text(text, source):
+def _scan_text(text, source, *, allow_high_entropy_exclusions=True):
     rules = default_pattern_rules()
     if any(re.search(rule.pattern, text) for rule in rules):
         raise SendStop("sensitive_data_remaining", source)
-    if find_high_entropy(text):
+    allow_patterns = (
+        _HIGH_ENTROPY_ALLOW_PATTERNS if allow_high_entropy_exclusions else ()
+    )
+    if find_high_entropy(text, allow_patterns=allow_patterns):
         raise SendStop("sensitive_data_remaining", source)
 
 
@@ -262,7 +272,13 @@ def _scan_order(value):
     for text, path in _iter_strings(value):
         if path is not None and _is_excluded(path, text, provider_name):
             continue
-        _scan_text(text, "order")
+        # 契約009 §7.2：order_identifierの検査には除外を適用しない
+        # （24文字以上の乱雑識別子の停止仕様を維持する）。
+        _scan_text(
+            text,
+            "order",
+            allow_high_entropy_exclusions=(path != ("order_identifier",)),
+        )
 
 
 def _validate_relative_path(value, source):
