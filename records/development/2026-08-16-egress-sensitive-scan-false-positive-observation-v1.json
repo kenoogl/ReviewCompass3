@@ -1,0 +1,30 @@
+{
+ "observation_id": "OBS-RC3-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-2026-08-16-V1",
+ "observed_at": "2026-08-16T17:32:41+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "外部送信の高乱雑性検知が、開発文書の可読file名・digest記載を鍵候補として誤検知し、実用文書の送信が実質不能",
+ "machine_observations": {
+  "trigger": {
+   "order_path": "records/development/2026-08-16-g20-live-e2e-order-v1.json",
+   "stop_result": "sensitive_data_remaining / source order / exit 3（試行record着地前の安全側停止）",
+   "detected_value_kind": "source_files[0].pathのfile名部分51文字のhyphen連結（可読）",
+   "entropy": 3.8309322643069157
+  },
+  "false_positive_survey": {
+   "method": "tools.session_logs.redaction.default_pattern_rules と find_high_entropy を候補文書へ直接適用",
+   "results": [
+    "pyproject.toml: 高乱雑検知18箇所で不合格",
+    "AGENTS.md: 高乱雑検知14箇所で不合格",
+    "docs/development/2026-08-02-development-policy.md: 高乱雑検知24箇所で不合格"
+   ],
+   "passing_example": "短い日本語文書＋短いfile名（docs/development/e2e-live-send-check.md）は合格し、実送信E2Eは同文書で成功"
+  },
+  "design_context": [
+   "契約v5 §6.1はredaction.pyの既定5patternと高乱雑性検知を固定再利用し、由来file内容の不合格を自動停止とする",
+   "契約v5 §8の機微検査除外は送信指示内の正規SHA-256欄・provider固定3値・model名だけで、送信指示のpath欄と由来file内容中のdigest・長い連結名に除外が無い",
+   "redaction.pyは契約v5 §6.2の保護対象で変更不可"
+  ]
+ },
+ "impact_summary": "レビュー依頼運搬の実用（records/docs配下の実文書送信）が現水準の検査では成立しない。契約v1〜v5と独立レビュー2回で見落とされ、実送信E2Eの1回目停止で顕在化した",
+ "route_proposal": "改善候補IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001としてHuman仕分けへ。対処は契約改定（除外の精密化：allowlist合格path・正規SHA-256値・可読連結名の扱い）を伴うため後続契約の縦切りとする"
+}

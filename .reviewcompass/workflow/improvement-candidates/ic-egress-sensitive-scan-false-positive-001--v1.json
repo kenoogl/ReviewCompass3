@@ -1,0 +1,56 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001",
+ "candidate_version": 1,
+ "created_at": "2026-08-16T17:34:09+09:00",
+ "source_work": "external-reviewer-single-send/live-e2e",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-2026-08-16-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-16-egress-sensitive-scan-false-positive-observation-v1.json",
+  "sha256": "e6ffac53245501a57555a19b17225c4715ac394bdf37ef1c6cb025446adfb1b4"
+ },
+ "problem": "外部送信の機微検査（高乱雑性検知）が開発文書の可読file名・digest記載を鍵候補として誤検知し、records/docs配下の実用文書がほぼ送信不能。レビュー依頼運搬という上位目的（運用化目標）が現水準では成立しない。",
+ "impact": [
+  "契約008の実用（実文書のレビュー依頼送信）が確認用の合成文書以外で停止する",
+  "誤検知の回避に送信専用の書き直し文書が毎回必要になり、機械化目標に反する手作業が常態化する",
+  "検査を無検討で緩めると鍵漏えい防止の実体が失われる（安全と実用の均衡はHuman判断事項）"
+ ],
+ "scope": [
+  "契約改定による機微検査除外の精密化（allowlist合格pathの除外、由来file内容中の正規SHA-256値の除外、可読hyphen連結名の扱いの定義）",
+  "除外精密化に対する敵対試験（鍵形式が除外を通り抜けないことの反証）",
+  "独立レビューを含む後続契約の縦切りとしての実施"
+ ],
+ "non_scope": [
+  "redaction.py（契約v5 §6.2保護対象）の変更",
+  "契約008 v5の受入判断自体の変更（限界明示で受入し、本候補は後続で扱う)",
+  "本候補登録時点での実装変更"
+ ],
+ "classification_candidates": [
+  "task_contract",
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development",
+  "external-review-send",
+  "workflow-ledger"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-16-egress-sensitive-scan-false-positive-observation-v1.json",
+   "sha256": "e6ffac53245501a57555a19b17225c4715ac394bdf37ef1c6cb025446adfb1b4"
+  },
+  {
+   "path": "records/development/2026-08-16-g20-live-e2e-order-v1.json",
+   "sha256": "c829583306919957162e651aabf281a1a4ab42b392c5efd5cc4eee10c68f528a"
+  }
+ ],
+ "proposed_action": "機微検査除外の精密化を後続契約の縦切りとして扱う。着手はHuman仕分けの裁定による。それまで実文書の外部送信は行わない。",
+ "content_digest": "6d477b8fe2aa53d0c78608cf82f7bbcb0eac63579fc6b327a043a0c71969642c"
+}
