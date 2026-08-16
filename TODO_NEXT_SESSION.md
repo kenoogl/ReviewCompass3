@@ -18,30 +18,9 @@
 
 - [3 provider実環境確認Evidence（Gemini操縦のanthropic確認を含む）](records/development/2026-08-16-three-provider-live-check-evidence-v1.md) — SHA-256 `e04a2c95fbbe727a296dd27bbc9171dd378bfdc9409d77b788eabdd9a7b9f07d`
 - [利用者による契約009の製品受入判断（残余risk最終受容・IC消費）](records/development/2026-08-16-external-send-scan-refinement-product-acceptance-decision-v1.md) — SHA-256 `a1ef5bebd6b3d918dff4080ed7faea532a3ad69b523ff206ed11eed77e916879`
-- [契約009実用文書E2E Evidence（精密化の実用実証）](records/development/2026-08-16-external-send-scan-refinement-real-doc-e2e-evidence-v1.md) — SHA-256 `1d975935137cd77fbdf42906baae0a41c16c0daeba3e994aa2ad5e8e255713d3`
-- [契約009独立完了レビュー・verified判定（Gemini・Human中継）](records/development/2026-08-16-external-send-scan-refinement-completion-review-v1.md) — SHA-256 `e2693410b40d1471eed9c3e90f2feaa8460f64af33629dcdb0b41a72dbe423e9`
-- [契約009独立完了レビュー依頼record（Gemini直接読取り・Human中継）](records/session-handoffs/2026-08-16-g20-scan-refinement-completion-review-gemini-request-v1.md) — SHA-256 `06c4ac6bac2195e34c5d798bbac4eaae6a86cdf2fff3dbbaf1900c0a31977aac`
-- [契約009実装の起草側自己レビュー（発見0件）](records/development/2026-08-16-external-send-scan-refinement-impl-self-review-v1.md) — SHA-256 `e0e4a287ba0448da858942adf979c5c43ef12e92a97994a4889c486bae911ce0`
-- [契約009実装成功Evidence（改名・RED・GREEN・退行確認・別件対処）](records/development/2026-08-16-external-send-scan-refinement-green-evidence-v1.md) — SHA-256 `9e001507dcc4b39c840e6345a9ed708acdaf19b848a6a211bfd9cdae07ddb7f7`
-- [契約009候補v2を開始可としたGemini独立確認（Human中継）](records/development/2026-08-16-external-send-scan-refinement-v2-independent-review-v1.md) — SHA-256 `0f8b5fbf70c5d7f9f4c32891c2a64ae2556071474cfda331d97637f3c9a9fd68`
-- [契約009候補v2の独立確認依頼record](records/session-handoffs/2026-08-16-g20-scan-refinement-v2-review-gemini-request-v1.md) — SHA-256 `dbf21210b4fe270d53cd7c7eb8a1a46e1b3e0ad87ea183b4bfa22e7b652439af`
-- [契約009候補v1の起草側自己レビュー（SR-C9-1〜3）](records/development/2026-08-16-external-send-scan-refinement-v1-self-review-v1.md) — SHA-256 `1c67b23f3abc42f98a2ac1071b935b01559e0f8a5160d4e3685c6fa7642f8f94`
 - [識別子停止を維持へ訂正した契約009候補v2](records/task-contract/2026-08-16-external-send-scan-refinement-candidate-v2.md) — SHA-256 `58e5f9165e2201892377744377a9758f79be7559fe26f82ed114ec246968e6da`
 - [利用者によるG20一回送信の製品受入判断](records/development/2026-08-16-external-reviewer-single-send-product-acceptance-decision-v1.md) — SHA-256 `6f76c1c6198ccc9a0412e4a8e6751a29a89836d9d9ef5e76900772e6fa8ffa54`
-- [G20実送信E2E Evidence（初回承認済み外部送信）](records/development/2026-08-16-external-reviewer-single-send-live-e2e-evidence-v1.md) — SHA-256 `42f47236a79b04944d84504d837149cbc193637d5a34d405995fd49e7809d95f`
-- [機微検査誤検知の観測record](records/development/2026-08-16-egress-sensitive-scan-false-positive-observation-v1.json) — SHA-256 `e6ffac53245501a57555a19b17225c4715ac394bdf37ef1c6cb025446adfb1b4`
-- [G20訂正の限定再確認・verified判定（Gemini・Human中継）](records/development/2026-08-16-external-reviewer-single-send-correction-rereview-v1.md) — SHA-256 `c2b518f86792bebbe51352543da1b13ea8f2b33c55268c38ceac4996ab297596`
-- [G20訂正の限定再確認依頼record](records/session-handoffs/2026-08-16-g20-single-send-correction-rereview-gemini-request-v1.md) — SHA-256 `f4b761d34993f95c6c71b92aa834db0f37d34511dd2fa17114f19a8e3d4138ae`
-- [G20完了レビュー指摘3件の訂正Evidence](records/development/2026-08-16-external-reviewer-single-send-correction-evidence-v1.md) — SHA-256 `1f10f9c37350bb1acd0173a6753d917b1baddfd670cba66baa546df28b153262`
-- [G20独立完了レビュー・修正要判定（Gemini・Human中継）](records/development/2026-08-16-external-reviewer-single-send-completion-review-v1.md) — SHA-256 `e429f167e57883aae04a72ad85a82416a7aa5801ec4bfc108facdf61a0d12aa9`
-- [G20独立完了レビュー依頼record v2（Gemini直接読取り・Human中継）](records/session-handoffs/2026-08-16-g20-single-send-completion-review-gemini-request-v2.md) — SHA-256 `4888796d5ce5c9242400065a85d2043a8cc00c67b13a07cd3ef3b73019013936`
-- [G20実装の起草側自己レビューと文脈整理](records/development/2026-08-16-external-reviewer-single-send-impl-self-review-v1.md) — SHA-256 `899f0697b5124850273dea442f68cd28ac52bd2aa95d1be8410d1e7b3a46dbfe`
-- [G20実装成功Evidence（RED・v5訂正・GREEN・退行確認・判定系列E2E）](records/development/2026-08-16-external-reviewer-single-send-green-evidence-v1.md) — SHA-256 `51bd4d40e8d6fd3424bae6dac16ca1bc6006e86f95e37c66c93e3465b74cfd9a`
-- [契約v5軽微訂正の直接承認・実装再開の利用者判断](records/development/2026-08-16-external-reviewer-single-send-v5-adoption-decision-v1.md) — SHA-256 `0d80690cb5f71150701d2f6d8613a205c9e5b37a1865e74bd6db377d4e13811f`
 - [採用中の置き場所矛盾を訂正した契約v5](records/task-contract/2026-08-16-external-reviewer-single-send-candidate-v5.md) — SHA-256 `6fc7b37b07f65519e78353df23fc7277c1c9265956320e46d5e6e35608e9d165`
-- [縮小境界・契約v4採用・実装開始の利用者判断](records/development/2026-08-16-external-reviewer-single-send-adoption-decision-v1.md) — SHA-256 `dc525b5ed752103f454008f04c7df58665c85788ca041ea2b9293a29ad7fb201`
-- [契約候補v4を開始可としたGemini限定再確認（Human中継）](records/development/2026-08-16-external-reviewer-single-send-v4-limited-rereview-v1.md) — SHA-256 `75d483ca65c27ac6ece1363f4a708153912447f58254c997ad760aa06b90bc84`
-- [契約候補v2の起草側自己レビューと文脈整理](records/development/2026-08-16-external-reviewer-single-send-v2-self-review-v1.md) — SHA-256 `65dd817a2b49b4769d7ed9743fc3d5331c6e0720f3c00123753cf24b3f350d71`
 - [暫定レビュー体制の決定（Gemini手動利用・Human中継）](records/development/2026-08-16-interim-gemini-review-regime-decision-v1.md) — SHA-256 `1a5fffc5792d17791f5c275b40183a0d4d076233d6d1b7a267cd91cf92174792`
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
 - [外部レビュー準備・実施の機械化目標](records/development/2026-08-16-external-review-preparation-mechanization-goal-v1.md) — SHA-256 `46a415eb630266e23a87562e6083f873e2fe9790acd34a6699f59b30aee0b45e`
@@ -75,7 +54,7 @@
 ## stale・deferred
 
 - stale：契約008・009の実装・レビュー・E2E各段階の進行中表示はすべてstale（両契約とも受入完了）
-- deferred：G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補6以降、実利用者資料の使用は後続境界まで対象外。外部レビュー準備の機械化（依頼組み立て器・prompt品質gate・判定取り込み）は目標record固定済みで契約008完了後の縦切り。5段手続きの手順書化は本線の区切りで実施。`.gitignore`食い違いは`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`として登録済み、Human仕分け待ち
+- deferred：G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補6以降、実利用者資料の使用は後続境界まで対象外。外部レビュー準備の機械化（依頼組み立て器・prompt品質gate・判定取り込み）は目標record固定済みで、送信段（契約008・009受入済み）の上の次候補縦切り。応答解析・監査自動化・旧egress設計統合・複数送信も後続。5段手続きの手順書化は本線の区切りで実施。`.gitignore`食い違いは`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`として登録済み、Human仕分け待ち
 
 ## Git・Test
 
@@ -83,8 +62,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：G20対象49件、egress関連107件（敵対試験の不変条件回復を含む）、G02 158件、G08 107件、G24 111件、実行器75件、G30基盤e2e 38件——各単独終了コード0。保護path差分0（基準は契約v5 §6.2の保護基準commit）
-- 直近の全Test：禁止認証隔離条件の正規全試験2,362件成功・終了コード0（G20 GREEN時点。前回2,313件＋対象49件）。通常host環境の既存executor安全拒否12件は既知事象で退行なし
+- 直近の関連Test：送信路対象61件（改名後`tests/test_external_review_send.py`。既存49＋精密化12）、egress関連107件、G02 158件、G08 107件、G24 111件、実行器75件、G30基盤e2e 38件、layout 13件（応答raw除外の維持試験1件追加後）——各単独終了コード0。保護path差分0（基準は契約009 v2 §6の固定commit）
+- 直近の全Test：禁止認証隔離条件の正規全試験2,375件成功・終了コード0（契約009 GREEN・layout除外後）。通常host環境の既存executor安全拒否12件は既知事象で退行なし
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
