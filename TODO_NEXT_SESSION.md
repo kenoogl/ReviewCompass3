@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：契約009『外部送信の機微検査精密化と送信路改名』の契約候補v1を作成した（利用者指示：精密化契約に改名を含める）。中心は高乱雑性検知への契約固定の除外3形式（40/64桁hex正規形＋可読連結）で、起草時実測により観測3文書・TODO・契約文書の誤検知解消と乱雑列6種の停止維持を確認済み。次は起草側自己レビュー→Gemini独立確認→採用判断である。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v1 / candidate_pending_self_review`
+- 現在作業：契約009の起草側自己レビューで修正要級1件（§7一律適用では64hex識別子の停止仕様が破れる・機械検証済み）を発見し、適用範囲を限定した契約候補v2へ訂正した。Gemini独立確認の依頼record（反証4点：一意性・X2通り抜け耐性・残余risk受容・縮小境界）を固定済みで、利用者の運搬と判定持ち帰りを待って停止中である。
+- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v2 / candidate_pending_independent_review`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,7 +16,9 @@
 
 ## 最新のauthority／Evidence
 
-- [外部送信の機微検査精密化と改名の契約候補v1](records/task-contract/2026-08-16-external-send-scan-refinement-candidate-v1.md) — SHA-256 `a76a7ed489e37cbe937eddf06a1cd96f07e30a47017acec82d7f3865cfd5e85d`
+- [契約009候補v2の独立確認依頼record](records/session-handoffs/2026-08-16-g20-scan-refinement-v2-review-gemini-request-v1.md) — SHA-256 `dbf21210b4fe270d53cd7c7eb8a1a46e1b3e0ad87ea183b4bfa22e7b652439af`
+- [契約009候補v1の起草側自己レビュー（SR-C9-1〜3）](records/development/2026-08-16-external-send-scan-refinement-v1-self-review-v1.md) — SHA-256 `1c67b23f3abc42f98a2ac1071b935b01559e0f8a5160d4e3685c6fa7642f8f94`
+- [識別子停止を維持へ訂正した契約009候補v2](records/task-contract/2026-08-16-external-send-scan-refinement-candidate-v2.md) — SHA-256 `58e5f9165e2201892377744377a9758f79be7559fe26f82ed114ec246968e6da`
 - [利用者によるG20一回送信の製品受入判断](records/development/2026-08-16-external-reviewer-single-send-product-acceptance-decision-v1.md) — SHA-256 `6f76c1c6198ccc9a0412e4a8e6751a29a89836d9d9ef5e76900772e6fa8ffa54`
 - [G20実送信E2E Evidence（初回承認済み外部送信）](records/development/2026-08-16-external-reviewer-single-send-live-e2e-evidence-v1.md) — SHA-256 `42f47236a79b04944d84504d837149cbc193637d5a34d405995fd49e7809d95f`
 - [機微検査誤検知の観測record](records/development/2026-08-16-egress-sensitive-scan-false-positive-observation-v1.json) — SHA-256 `e6ffac53245501a57555a19b17225c4715ac394bdf37ef1c6cb025446adfb1b4`
@@ -41,24 +43,27 @@
 
 ## 次に行う一作業
 
-契約候補v1の起草側自己レビューと文脈整理（5段手続きの第1・2段）を行い、Gemini独立確認の依頼recordを
-作成して利用者の運搬を待つ。判定`開始可`の後、利用者へ縮小境界の採用と実装開始を一判断として求める。
+利用者がGeminiへ独立確認依頼recordのpath
+（`records/session-handoffs/2026-08-16-g20-scan-refinement-v2-review-gemini-request-v1.md`）を伝え、
+判定文を持ち帰る。Claudeは判定文を判定record
+`records/development/2026-08-16-external-send-scan-refinement-v2-independent-review-v1.md`へ転記・commitし、
+根拠と実物の整合を機械照合する。
 
 開始条件：
 
-- 契約候補v1と本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 契約候補v2・自己レビュー・依頼record・本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 独立確認の依頼recordが固定され、利用者がGeminiへ運搬できる状態になる
+- 独立確認の判定recordがcommitへ固定される
 
-後続作業：独立確認→（必要なら訂正）→採用判断→RED試験固定→最小実装→退行確認→独立完了レビュー→
-実用文書の実送信E2E一回（利用者指示）→製品受入。
+後続作業：`開始可`なら採用判断→RED試験固定→最小実装（改名含む）→退行確認→独立完了レビュー→
+実用文書の実送信E2E一回（利用者指示）→製品受入。`修正要`なら停止して利用者へ諮る。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：なし（自己レビューと依頼record作成はClaude作業。その後にGemini運搬のHuman中継が入る）。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`は契約009が消費予定、`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けは別途未裁定
+- Human判断待ち：独立確認依頼のGeminiへのpath伝達と判定文の持ち帰り（暫定体制のHuman中継作業）。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`は契約009が消費予定、`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けは別途未裁定
 
 ## stale・deferred
 
