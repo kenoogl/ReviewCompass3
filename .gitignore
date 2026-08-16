@@ -1,4 +1,3 @@
 .venv/
 *.egg-info/
 __pycache__/
-records/session-handoffs/*-claude-to-codex-*.md

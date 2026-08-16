@@ -1,0 +1,31 @@
+{
+ "record_kind": "human_triage_decision",
+ "schema_version": 2,
+ "decision_id": "DEC-IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001",
+ "decision_version": 1,
+ "decided_at": "2026-08-16T21:05:21+09:00",
+ "decision_maker": "human",
+ "candidate_ref": {
+  "record_path": ".reviewcompass/workflow/improvement-candidates/ic-handoff-gitignore-record-canonical-001--v1.json",
+  "record_sha256": "5284f292ef13e5bace70b27fd573aeef82ccbbab62744aa950a0e1564efa596d",
+  "candidate_id": "IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001",
+  "candidate_content_digest": "86303d2f3e8c67b9f705a0250bcd02adb19f94266c03d4c25e337e4af91bc59a"
+ },
+ "human_fields": {
+  "unresolved": true,
+  "recurrence": true,
+  "impact": "medium",
+  "priority": "medium",
+  "promote_to_issue": false
+ },
+ "disposition": "current_work",
+ "blocking": false,
+ "rationale": "Humanは提示(A)を裁定した。機械分類により、untracked 37件は全件がcommit済みのCodex応答recordから参照される歴史的な依頼原文であり、監査線の片翼欠損と判明した。record正本方式との整合のため、.gitignoreの当該1行を削除し、37件を全件commitへ昇格する。実装・試験へ触れない軽作業でありnonblockingとする。",
+ "next_action": ".gitignoreの`records/session-handoffs/*-claude-to-codex-*.md`行を削除し、untracked 37件をcommitへ昇格し、正規全試験で退行なしを確認する。",
+ "supersedes": null,
+ "issue_promotion": {
+  "approved": false,
+  "issue_id": null
+ },
+ "content_digest": "9717679cf0e4804920a0bf9f86d2008ab81f7f383fd229e5abc8477809286fc8"
+}
