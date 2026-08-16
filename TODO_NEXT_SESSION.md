@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：契約009は採用の下でGREENに到達した。改名（旧名残存0）→RED 3件固定→最小実装（除外3形式の定数直書き＋identifier出し分け）→対象61件・退行確認・正規全試験2,375件（隔離）全緑。本線中の別件（layout検査が台帳応答rawのbase64を絶対path誤検知する契約008由来の衝突）も利用者承認の下で独立対処済み。次は独立完了レビュー（受入条件7）である。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v2 / green_pending_completion_review`
+- 現在作業：契約009はGREEN到達後、独立完了レビュー（受入条件7）の依頼を5段手続きで作成した。起草側自己レビュー（発見0件）・依頼record（反証4点・digest照合9件一致）まで固定済みで、利用者によるGeminiへのpath伝達と判定文の持ち帰りを待って停止中である。
+- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-SEND-SCAN-REFINEMENT-009 / v2 / green_awaiting_completion_review_verdict`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [契約009独立完了レビュー依頼record（Gemini直接読取り・Human中継）](records/session-handoffs/2026-08-16-g20-scan-refinement-completion-review-gemini-request-v1.md) — SHA-256 `06c4ac6bac2195e34c5d798bbac4eaae6a86cdf2fff3dbbaf1900c0a31977aac`
+- [契約009実装の起草側自己レビュー（発見0件）](records/development/2026-08-16-external-send-scan-refinement-impl-self-review-v1.md) — SHA-256 `e0e4a287ba0448da858942adf979c5c43ef12e92a97994a4889c486bae911ce0`
 - [契約009実装成功Evidence（改名・RED・GREEN・退行確認・別件対処）](records/development/2026-08-16-external-send-scan-refinement-green-evidence-v1.md) — SHA-256 `9e001507dcc4b39c840e6345a9ed708acdaf19b848a6a211bfd9cdae07ddb7f7`
 - [契約009候補v2を開始可としたGemini独立確認（Human中継）](records/development/2026-08-16-external-send-scan-refinement-v2-independent-review-v1.md) — SHA-256 `0f8b5fbf70c5d7f9f4c32891c2a64ae2556071474cfda331d97637f3c9a9fd68`
 - [契約009候補v2の独立確認依頼record](records/session-handoffs/2026-08-16-g20-scan-refinement-v2-review-gemini-request-v1.md) — SHA-256 `dbf21210b4fe270d53cd7c7eb8a1a46e1b3e0ad87ea183b4bfa22e7b652439af`
@@ -45,25 +47,27 @@
 
 ## 次に行う一作業
 
-独立完了レビュー（受入条件7）の依頼を5段手続きの下ごしらえつきで作成し、暫定体制（Gemini・Human中継）で
-運搬してもらう。対象はGREEN commit固定の実装（改名済み送信路・除外3形式・出し分け・対象試験61件）と、
-独立対処のlayout除外である。
+利用者がGeminiへ完了レビュー依頼recordのpath
+（`records/session-handoffs/2026-08-16-g20-scan-refinement-completion-review-gemini-request-v1.md`）を伝え、
+判定文を持ち帰る。Claudeは判定文を判定record
+`records/development/2026-08-16-external-send-scan-refinement-completion-review-v1.md`へ転記・commitし、
+根拠と実物の整合を機械照合する。
 
 開始条件：
 
-- GREEN commit（実装＋Evidence＋本TODO）が固定され、作業treeがcleanである
+- 依頼record・自己レビュー・本TODOが意味単位commitへ固定され、作業treeがcleanである
 
 完了条件：
 
-- 依頼recordが固定され、利用者がGeminiへ運搬できる状態になる
+- 判定recordがcommitへ固定される
 
-後続作業：判定`verified`→実用文書の実送信E2E一回（利用者指示）→製品受入（残余riskの最終受容を含む）。
+後続作業：`verified`→実用文書の実送信E2E一回（利用者指示）→製品受入（残余riskの最終受容を含む）。
 `修正要`なら停止して利用者へ諮る。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：なし（レビュー依頼作成はClaude作業。その後にGemini運搬のHuman中継が入る）。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`は契約009が消費中、`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けは別途未裁定
+- Human判断待ち：完了レビュー依頼のGeminiへのpath伝達と判定文の持ち帰り（暫定体制のHuman中継作業）。改善候補`IC-EGRESS-SENSITIVE-SCAN-FALSE-POSITIVE-001`は契約009が消費中、`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`の仕分けは別途未裁定
 
 ## stale・deferred
 
