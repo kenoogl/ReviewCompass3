@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G20『外部レビュア一回送信』はGREEN到達後、独立完了レビュー（受入条件12）の依頼を5段手続きで作成した。起草側自己レビュー・文脈整理・依頼record・運搬文面（機械生成）まで固定済みで、利用者によるGeminiへの運搬と判定文の持ち帰りを待って停止中である。
+- 現在作業：G20『外部レビュア一回送信』はGREEN到達後、独立完了レビュー（受入条件12）の依頼を5段手続きで作成した。依頼recordはv2（Geminiがディレクトリ共有で対象を直接読む方式。v1の全文転写運搬は「Gemini不可読」という古い前提の誤りとして廃止）。利用者がGeminiへ依頼recordのpathを伝え、判定文を持ち帰るのを待って停止中である。
 - Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v5 / green_awaiting_completion_review_verdict`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,7 +16,7 @@
 
 ## 最新のauthority／Evidence
 
-- [G20独立完了レビュー依頼record（Gemini・Human中継）](records/session-handoffs/2026-08-16-g20-single-send-completion-review-gemini-request-v1.md) — SHA-256 `ca86906f1f5ffa9864332f2f670244e3b4004def068340149be98c03f74a29f1`
+- [G20独立完了レビュー依頼record v2（Gemini直接読取り・Human中継）](records/session-handoffs/2026-08-16-g20-single-send-completion-review-gemini-request-v2.md) — SHA-256 `4888796d5ce5c9242400065a85d2043a8cc00c67b13a07cd3ef3b73019013936`
 - [G20実装の起草側自己レビューと文脈整理](records/development/2026-08-16-external-reviewer-single-send-impl-self-review-v1.md) — SHA-256 `899f0697b5124850273dea442f68cd28ac52bd2aa95d1be8410d1e7b3a46dbfe`
 - [G20実装成功Evidence（RED・v5訂正・GREEN・退行確認・判定系列E2E）](records/development/2026-08-16-external-reviewer-single-send-green-evidence-v1.md) — SHA-256 `51bd4d40e8d6fd3424bae6dac16ca1bc6006e86f95e37c66c93e3465b74cfd9a`
 - [契約v5軽微訂正の直接承認・実装再開の利用者判断](records/development/2026-08-16-external-reviewer-single-send-v5-adoption-decision-v1.md) — SHA-256 `0d80690cb5f71150701d2f6d8613a205c9e5b37a1865e74bd6db377d4e13811f`
@@ -33,8 +33,8 @@
 
 ## 次に行う一作業
 
-利用者が運搬文面（Claudeが機械生成しchatで受け渡し済み。再生成手順は依頼record§5）をGemini chatへ
-貼り付け、返ってきた判定文をClaudeへ貼り戻す。Claudeは判定文を判定record
+利用者がGeminiへ依頼record v2のpathを伝える（Geminiはディレクトリ共有で対象を直接読み、開始時に
+record記載SHA-256との照合を行う）。返ってきた判定文をClaudeへ貼り戻し、Claudeは判定record
 `records/development/2026-08-16-external-reviewer-single-send-completion-review-v1.md`へ転記・commitし、
 判定内容と契約の節参照の整合を機械照合する。
 
@@ -53,7 +53,7 @@
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：運搬文面のGeminiへの貼り付けと判定文の持ち帰り（暫定体制のHuman中継作業）
+- Human判断待ち：Geminiへの依頼record path伝達と判定文の持ち帰り（暫定体制のHuman中継作業）。その前段でSR-IMPL-1の扱い（判断1）が未裁定
 
 ## stale・deferred
 
