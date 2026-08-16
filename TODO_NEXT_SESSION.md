@@ -6,7 +6,7 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
+- 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合、G20の外部送信2契約（008一回送信・009機微検査精密化と改名）の製品受入が完了し、3 provider実環境確認も済んだ。残る候補と新規取組『レビュー実行体制の正式ツール化』を順に進める。
 - 現在作業：新規取組『レビュー実行体制の正式ツール化』の統合検討を利用者確定の下で固定した（検討record参照）。縦切り3本（A依頼組み立て器・B起動アダプタ・C品質gate）、backend抽象と独立性tier 3段、横串3観点（機械処理化・G30導線への載せ方・導線配備）を定義。次は縦AかBの選択→事前走査→契約候補作成である。外部APIレビュー（API直接送信経路）はpendingのまま（本取組はCLI／subagent経路で別・補完関係）。
 - Task Contract：なし（契約009はaccepted済み。次契約は縦A/B選択後に定義する）
 
@@ -17,6 +17,7 @@
 ## 最新のauthority／Evidence
 
 - [レビュー実行体制の正式ツール化 統合検討v1（利用者確定）](records/development/2026-08-16-review-tooling-formalization-study-v1.md) — SHA-256 `c2384f3b17a7c59572548a9195eb89924c6f42f087fc2e736975c7d0b8fcd602`
+- [gitignore仕分けのHuman裁定record（裁定A・schema v2）](.reviewcompass/workflow/triage-decisions-v4/dec-ic-handoff-gitignore-record-canonical-001--v1.json) — SHA-256 `a9da1824ab31c330260cabf3b0662ebfe841d46e4685586ffc256289f11541a6`
 - [3 provider実環境確認Evidence（Gemini操縦のanthropic確認を含む）](records/development/2026-08-16-three-provider-live-check-evidence-v1.md) — SHA-256 `e04a2c95fbbe727a296dd27bbc9171dd378bfdc9409d77b788eabdd9a7b9f07d`
 - [利用者による契約009の製品受入判断（残余risk最終受容・IC消費）](records/development/2026-08-16-external-send-scan-refinement-product-acceptance-decision-v1.md) — SHA-256 `a1ef5bebd6b3d918dff4080ed7faea532a3ad69b523ff206ed11eed77e916879`
 - [識別子停止を維持へ訂正した契約009候補v2](records/task-contract/2026-08-16-external-send-scan-refinement-candidate-v2.md) — SHA-256 `58e5f9165e2201892377744377a9758f79be7559fe26f82ed114ec246968e6da`
@@ -54,7 +55,7 @@
 ## stale・deferred
 
 - stale：契約008・009の実装・レビュー・E2E各段階の進行中表示はすべてstale（両契約とも受入完了）
-- deferred：**外部APIレビュー関連一式は利用者判断でpending**（2026-08-16。対象：機械化縦切り(a)依頼組み立て器・(b)prompt品質gate・(c)判定取り込み、応答解析・監査自動化・旧egress設計統合・複数送信、開発レビュー運搬のHuman中継から本経路への移行判断、5段手続きの手順書化、external_send_approved表示の観測登録。再開は利用者指示による。送信路自体は受入済みで利用可能なまま）。G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補6以降、実利用者資料の使用は後続境界まで対象外。`.gitignore`食い違い（`IC-HANDOFF-GITIGNORE-RECORD-CANONICAL-001`）は裁定(A)実行済み・解消
+- deferred：**外部API直接送信経路の後続はpending**（2026-08-16。対象：応答解析・監査自動化・旧egress設計統合・複数送信・API経路への運搬移行判断・external_send_approved表示の観測登録。送信路自体は受入済みで利用可能なまま。再開は利用者指示による）。なお当初pendingに含めた依頼組み立て器・prompt品質gate・5段手続きの手順書化は、利用者指示の新規取組『正式ツール化』（統合検討recordの縦A・縦C。経路非依存の部品）へ**移管**した。G24の要求作成責務、G02 organize・G25・安全保存との統合、既存G30基盤の正式化、候補6以降、実利用者資料の使用は後続境界まで対象外
 
 ## Git・Test
 
@@ -62,8 +63,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：送信路対象61件（改名後`tests/test_external_review_send.py`。既存49＋精密化12）、egress関連107件、G02 158件、G08 107件、G24 111件、実行器75件、G30基盤e2e 38件、layout 13件（応答raw除外の維持試験1件追加後）——各単独終了コード0。保護path差分0（基準は契約009 v2 §6の固定commit）
-- 直近の全Test：禁止認証隔離条件の正規全試験2,375件成功・終了コード0（契約009 GREEN・layout除外後）。通常host環境の既存executor安全拒否12件は既知事象で退行なし
+- 直近の関連Test：送信路対象61件（改名後`tests/test_external_review_send.py`。既存49＋精密化12）、egress関連107件、G02 158件、G08 107件、G24 111件、実行器75件、G30基盤e2e 38件、layout 13件（応答raw除外の維持試験1件追加後）、作業単位遷移13件（依頼record非特別扱いへの反転固定後）——各単独終了コード0。保護path差分0（基準は契約009 v2 §6の固定commit）
+- 直近の全Test：禁止認証隔離条件の正規全試験2,375件成功・終了コード0（gitignore仕分け・試験反転固定後の再実行）。通常host環境の既存executor安全拒否12件は既知事象で退行なし
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
