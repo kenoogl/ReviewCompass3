@@ -710,3 +710,118 @@ def test_existing_egress_modules_unchanged():
     }
     for path, digest in expected.items():
         assert hashlib.sha256(Path(path).read_bytes()).hexdigest() == digest, path
+
+
+# ---------------------------------------------------------------------------
+# 契約009 §7：高乱雑性検知の精密化（除外3形式と適用範囲の限定）
+# ---------------------------------------------------------------------------
+
+_LONG_READABLE_NAME = "2026-08-16-interim-gemini-review-regime-decision-v1.md"
+
+
+def test_readable_long_filename_source_is_not_flagged(repo_root, monkeypatch):
+    """契約009受入条件1：可読な長いhyphen連結file名の資料は停止しない。"""
+
+    order, _, _ = _prepare(repo_root, monkeypatch)
+    path, digest = _write_source(
+        repo_root, f"docs/{_LONG_READABLE_NAME}", "資料本文。\n"
+    )
+    order["source_files"] = [{"path": path, "sha256": digest}]
+    order_path = _write_order(repo_root, order)
+    _install_transport(monkeypatch, [_FakeResponse()])
+
+    code, payload = _run(order_path)
+
+    assert code == 0
+    assert b'"response_stored"' in payload
+
+
+def test_document_with_digests_and_identifiers_is_not_flagged(
+    repo_root, monkeypatch
+):
+    """契約009受入条件2：40/64桁hex・下線連結・大文字ID・実行名を含む文書が合格する。"""
+
+    content = (
+        "保護基準commit aac1f90c17e0a6bdd170fc6beef93ad928abfa22 と\n"
+        "SHA-256 6fc7b37b07f65519e78353df23fc7277c1c9265956320e46d5e6e35608e9d165 の記載。\n"
+        "completed_work_unit_uncommitted と DEC-SEMANTIC-COMMIT-MINIMAL-GUARDS-001、\n"
+        "reviewcompass3-external-review-send を含む一覧。\n"
+    )
+    order, _, _ = _prepare(repo_root, monkeypatch)
+    path, digest = _write_source(repo_root, "docs/mixed-notation.md", content)
+    order["source_files"] = [{"path": path, "sha256": digest}]
+    order_path = _write_order(repo_root, order)
+    _install_transport(monkeypatch, [_FakeResponse()])
+
+    code, _ = _run(order_path)
+
+    assert code == 0
+
+
+def test_hex_digest_in_purpose_is_not_flagged(repo_root, monkeypatch):
+    """契約009受入条件2：purpose内の正規40桁hex記載は停止しない。"""
+
+    order, _, _ = _prepare(repo_root, monkeypatch)
+    order["purpose"] = (
+        "固定commit aac1f90c17e0a6bdd170fc6beef93ad928abfa22 のレビュー依頼"
+    )
+    order_path = _write_order(repo_root, order)
+    _install_transport(monkeypatch, [_FakeResponse()])
+
+    code, _ = _run(order_path)
+
+    assert code == 0
+
+
+def _random_hex(length):
+    stream = ""
+    seed = b"contract-009-adversarial"
+    while len(stream) < length:
+        seed = hashlib.sha256(seed).digest()
+        stream += seed.hex()
+    return stream[:length]
+
+
+@pytest.mark.parametrize(
+    "token",
+    (
+        "xk3jq9zm2pfw8vt5nq7rb4hd",
+        "Xk3Jq9Zm2pFw8vT5nQ7rB4hDe6Gy",
+        "abcdef01-23456789-abcdef01-23456789",
+        "dGhpcyBpcyBub3QgYSByZWFsIGtleSBidXQgbG9uZw",
+        _random_hex(39),
+        _random_hex(41),
+        _random_hex(63),
+        _random_hex(65),
+    ),
+)
+def test_random_source_content_still_stops(repo_root, monkeypatch, token):
+    """契約009受入条件3：乱雑列と境界外hexは由来file内容でも停止が維持される。"""
+
+    order, _, _ = _prepare(repo_root, monkeypatch)
+    path, digest = _write_source(
+        repo_root, "docs/adversarial.md", f"本文に {token} を含む。\n"
+    )
+    order["source_files"] = [{"path": path, "sha256": digest}]
+    order_path = _write_order(repo_root, order)
+    _install_transport(monkeypatch, [_FakeResponse()])
+
+    code, payload = _run(order_path)
+
+    assert code == 3
+    assert b'"sensitive_data_remaining"' in payload
+    assert list(_ledger(repo_root).iterdir()) == []
+
+
+def test_random_purpose_still_stops(repo_root, monkeypatch):
+    """契約009受入条件3：purpose内の乱雑列は停止が維持される。"""
+
+    order, _, _ = _prepare(repo_root, monkeypatch)
+    order["purpose"] = "目的に xk3jq9zm2pfw8vt5nq7rb4hd を含む"
+    order_path = _write_order(repo_root, order)
+    _install_transport(monkeypatch, [_FakeResponse()])
+
+    code, payload = _run(order_path)
+
+    assert code == 3
+    assert b'"sensitive_data_remaining"' in payload
