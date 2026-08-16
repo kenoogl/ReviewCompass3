@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25読取り専用入口、一件用安全保存、一件レビュー材料作成・結果整理、G08一件設計・受入条件照合の製品受入が完了した。残る6候補を順に実行中である。
-- 現在作業：G20最初の縦切り『外部レビュア一回送信』の契約候補v4は、Gemini限定再確認（Human中継）で開始可となった（訂正3点すべて閉じ・退行なし。原因2の代替修正は「提案より優れる」と評価）。利用者へ縮小境界の採用と実装開始の一判断を提示して停止中。承認後は失敗試験→最小実装→独立完了レビュー→実送信E2E→受入の順で進める。
-- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v4 / reviewed_pending_human_adoption`
+- 現在作業：G20『外部レビュア一回送信』は契約v4採用の下で実装に入り（RED 48件→最小実装で対象49件成功）、契約内矛盾を発見した：§11の置き場所`tools/egress/`と、§12.11が成功を要求する既存敵対試験の不変条件「egress配下に通信手段なし」が両立しない。既存試験の書換えはHuman承認事項のため停止し、置き場所だけを新package`tools/external_review/`へ変える契約候補v5を作成した。利用者の判断（軽微訂正として直接承認かGemini限定再確認へ運搬か）を待って停止中。実装fileは未commit。
+- Task Contract：`TC-RC3-PRODUCT-EXTERNAL-REVIEWER-SINGLE-SEND-008 / v5 / correction_pending_human_approval`
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -18,6 +18,7 @@
 
 - [利用者の受入済み部品運用化目標](records/development/2026-08-16-accepted-parts-operationalization-goal-v1.md) — SHA-256 `c5f43f6c3b8eb7bc8b9c6b6dbb57f83039009ffcfe8127a481e04b3f8c7fb42a`
 - [外部レビュー準備・実施の機械化目標](records/development/2026-08-16-external-review-preparation-mechanization-goal-v1.md) — SHA-256 `46a415eb630266e23a87562e6083f873e2fe9790acd34a6699f59b30aee0b45e`
+- [置き場所矛盾を訂正した契約候補v5](records/task-contract/2026-08-16-external-reviewer-single-send-candidate-v5.md) — SHA-256 `6fc7b37b07f65519e78353df23fc7277c1c9265956320e46d5e6e35608e9d165`
 - [契約候補v4を開始可としたGemini限定再確認（Human中継）](records/development/2026-08-16-external-reviewer-single-send-v4-limited-rereview-v1.md) — SHA-256 `75d483ca65c27ac6ece1363f4a708153912447f58254c997ad760aa06b90bc84`
 - [Gemini指摘3件を訂正した外部レビュア一回送信の契約候補v4](records/task-contract/2026-08-16-external-reviewer-single-send-candidate-v4.md) — SHA-256 `e41acfdf0ceb1f8cff0c112d21181cd60a856345de6b38e90e89d3aafa161325`
 - [契約候補v3を修正要としたGemini独立確認（Human中継）](records/development/2026-08-16-external-reviewer-single-send-v3-independent-review-v1.md) — SHA-256 `5198c5fff9a63820e603a613b8db9f4c5cf91ac00ffe2dd90e57fb4c001b9ac0`
@@ -43,24 +44,25 @@
 
 ## 次に行う一作業
 
-利用者が『外部レビュア一回送信の最小経路』について、縮小境界（一回送信・応答は未加工保存まで。応答解析・
-監査自動化・旧設計統合は後続）の採用と、契約v4による実装開始を一判断として承認するかを決める。
+利用者が契約候補v5（置き場所だけの訂正：`tools/egress/`→新package`tools/external_review/`。安全境界・
+schema・検査・台帳の定義は不変）の扱いを決める：(A)軽微訂正として直接承認し実装を再開する、
+(B)Gemini限定再確認へ運搬してから採用判断する。
 
 開始条件：
 
-- v4限定再確認の判定record、本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 契約候補v5、本TODOが意味単位commitへ固定される（実装途中fileは未commitのままでよい）
 
 完了条件：
 
-- 利用者の承認または保留の文言がchatで得られ、Decision recordへ固定される
+- 利用者の判断がchatで得られ、Decision recordへ固定される
 
-後続作業：承認後、Claudeが失敗試験の固定（通信は全模擬）→最小実装→退行確認→独立完了レビュー（Gemini・
-Human中継）→利用者指示による実送信E2E一回→製品受入提示の順で実装する。
+後続作業：承認後、Claudeが実装fileを新packageへ再配置して対象試験を全緑にし、退行確認→独立完了レビュー
+（Gemini・Human中継）→利用者指示による実送信E2E一回→製品受入提示の順で進める。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇により、codex exec起動によるレビューは停止（暫定Gemini体制で代替中）
-- Human判断待ち：G20契約v4の縮小境界採用と実装開始の一判断
+- Human判断待ち：契約候補v5の扱い（直接承認かGemini再確認か）
 
 ## stale・deferred
 
