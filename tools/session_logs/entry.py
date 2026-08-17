@@ -79,6 +79,9 @@ def run(argv=None) -> int:
       "tools.session_logs.eventual_preservation"
     )
     return collection.run(tuple(arguments[1:]))
+  if arguments and arguments[0] == "record-run":
+    record_run = _load_module("tools.session_logs.record_run")
+    return record_run.run(tuple(arguments[1:]))
   parser = argparse.ArgumentParser()
   subcommands = parser.add_subparsers(dest="command", required=True)
   hook_parser = subcommands.add_parser("hook")
