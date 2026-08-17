@@ -59,3 +59,21 @@ v2 §9の6条件を引き継ぎ、条件1のRED対象へ「`dequeue`形（`conte
   され、遡及（非対応→解釈済み）が成立する見込み。
 - 未実施：RED追加、GREEN（`is_known_prefix_record`の操作別分岐）、再実測。
 - 次作業：RED追加→GREEN→再実測（v3冒頭の指示文言により一括承認済み）。
+
+## 12. 注記（2026-08-18追記・原文は無変更）
+
+§7.1の正準列定義に書かれていない2つの場合について、実挙動を機械確認した（確認record＝
+`records/development/2026-08-18-contract-014-canonical-sequence-gaps-observation-v1.md`・
+全10 probe）。**いずれもfail-closedで安全側であり、実装変更は不要**。挙動は敵対試験2本で
+固定した（`tests/test_session_log_prefix_interpretation.py`）。
+
+1. **入力終端**：前置recordだけで入力の終端に達した場合（判定可能recordが存在しない場合）、
+   判定は非対応（`None`）である。§7.4の「到達できないfile」の語が実質これを覆う。
+2. **Codex 2形式との関係**：前置スキップ後の最初の判定可能recordは、Claude本文形式と
+   Codex 2形式の**両方**で従来判定される（前置1件→Codex 2形式は`codex_exec_json`と判定）。
+   前置record自体・必須欄不足の偽装前置がCodex 2形式として誤判定されることはない（打ち切り後の
+   従来判定にも合致せず非対応）。
+
+出所：RQ2 paired trialの独立レビュー（case-001条件D）が欠落を指摘した。改善候補
+`IC-CONTRACT-014-CANONICAL-SEQUENCE-GAPS-001`・仕分けrecord
+`records/development/2026-08-18-rq2-byproduct-candidates-triage-decision-v1.md`。

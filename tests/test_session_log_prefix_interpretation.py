@@ -259,3 +259,24 @@ def test_auxiliary_kind_for_bodyless_agent_file(tmp_path):
   write_jsonl(raw_log, (_agent_record(),))
 
   assert source_kind.identify_auxiliary_kind(raw_log) == "claude_agent"
+
+
+def test_identify_bytes_prefix_only_at_end_of_input_is_unsupported():
+  # 契約014 v3 §12注記1（2026-08-18）：前置recordだけで入力終端に達した場合
+  # （判定可能recordが存在しない）は非対応（fail-closed）。
+  source_kind = _source_kind()
+  data = _encode((_queue_record(), _mode_record(), _title_record()))
+
+  assert source_kind.identify_source_kind_bytes(data) is None
+
+
+def test_identify_bytes_prefix_skip_applies_to_codex_form_too():
+  # 契約014 v3 §12注記2（2026-08-18）：前置スキップ後の従来判定はClaude本文形式と
+  # Codex 2形式の両方に及ぶ。
+  source_kind = _source_kind()
+  data = _encode((
+    _dequeue_record(),
+    {"type": "thread.started", "thread_id": "thread-1"},
+  ))
+
+  assert source_kind.identify_source_kind_bytes(data) == "codex_exec_json"
