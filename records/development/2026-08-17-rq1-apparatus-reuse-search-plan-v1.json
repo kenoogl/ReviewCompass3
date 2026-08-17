@@ -1,0 +1,87 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-RQ1-CONTRACT-COMPLETENESS-2026-08-17-V1",
+  "searches": [
+    {
+      "subject": "rq1_contract_completeness_apparatus_v1",
+      "capabilities": [
+        {
+          "capability_id": "rq1_metric_aggregation",
+          "responsibility": "既存の照合器（requirement被覆）・compiler（6 Plan生成）・compile前検査の出力から、RQ1の5指標（coverage 2種・再生成一致率・negative検出率・誤停止率）を機械集計し、数値の来歴つき正準JSON一行で返す（新しい検証ロジックは書かず読み取り専用で呼ぶ）",
+          "inputs": [
+            "Contract fixture集合の実行結果"
+          ],
+          "outputs": [
+            "RQ1指標JSON"
+          ],
+          "failure_behavior": [
+            "分母0・計測不能を偽値で埋めない（不能は明示欄で申告）"
+          ],
+          "required_properties": [
+            "既存task_contract部品の無変更（読み取り専用利用）",
+            "決定的な集計（同一fixture集合で同一出力）"
+          ],
+          "reference_paths": [
+            "tools/task_contract/contract.py",
+            "tools/task_contract/definition_challenge.py"
+          ],
+          "reference_symbols": [
+            "tools/task_contract/contract.py:check_requirement_coverage",
+            "tools/task_contract/contract.py:compile_contract"
+          ],
+          "symbol_terms": [
+            "coverage",
+            "compile",
+            "metric",
+            "aggregate"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "rq1_fixture_registry",
+          "responsibility": "正常・欠落・競合・staleの4群のContract fixtureを登録形（allowlist）で構築し、一時プロジェクトの組み立てからbind→build→compile→compile前検査の判定までを駆動する",
+          "inputs": [
+            "fixture登録（群・細工の宣言）"
+          ],
+          "outputs": [
+            "fixture別の判定観測（成功・停止・blocking）"
+          ],
+          "failure_behavior": [
+            "期待外の例外を握りつぶさない（fixture別に観測として記録）"
+          ],
+          "required_properties": [
+            "登録形（後から追加可能）",
+            "一時領域のみへの書込み"
+          ],
+          "reference_paths": [
+            "tools/task_contract/contract.py",
+            "tests/test_first_review_task_contract_e2e.py"
+          ],
+          "reference_symbols": [
+            "tools/task_contract/contract.py:bind_requirements",
+            "tools/task_contract/contract.py:build_review_task_contract"
+          ],
+          "symbol_terms": [
+            "fixture",
+            "bind",
+            "contract",
+            "registry"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-17-rq1-apparatus-reuse-search-attestation-v1.json"
+    }
+  ],
+  "content_digest": "8e0f74d265dce1103ee54cfbe3b6b6e5d58844d7068f9d312a41e31734ca9f26"
+}
