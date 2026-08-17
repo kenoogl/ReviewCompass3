@@ -1,0 +1,26 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "rq1_contract_completeness_apparatus_v1",
+  "external": {
+    "relative_path": "work4b/reuse-searches/dee2b8ccd69156539a5b73e0f25b2a87fa4cacef8d47d50311898983eaa98936.json",
+    "content_digest": "dee2b8ccd69156539a5b73e0f25b2a87fa4cacef8d47d50311898983eaa98936",
+    "byte_sha256": "d8001032c876c7d397fa3a9ae0f9c05e857705f43a6fdb1d436f56e8b486ff19"
+  },
+  "source_identity": {
+    "profile_run_id": "bfecce9679d065709f613cc0502c9848e5ed8d1c850586ce00ab4cfebed9b40c",
+    "discovery_run_id": "e7786c201efb3c99fe71bccac8b2870994480a814bb5745dbdf81c61c4f88eb1",
+    "source_content_id": "6ccb00ea1cb5b488d5c1400e046e23f927eb0f1c724dd5488f870f06769f2348",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 4,
+  "capability_count": 2,
+  "direct_match_count": 13,
+  "hint_match_count": 279,
+  "comparison_group_count": 100,
+  "no_search_material_capability_count": 0,
+  "content_digest": "4bd826918ac2d9d066ea20f3f004ecb6719551bd9046f5c5e3e0039143a74c53"
+}
