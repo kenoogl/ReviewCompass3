@@ -1,0 +1,95 @@
+{
+  "content_digest": "c474142142d8455307eba6c57d562e57ba7d78c39be7f9f314cb81a6f610d352",
+  "plan_id": "FCRS-RQ2-PAIRED-TRIAL-2026-08-17-V1",
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "searches": [
+    {
+      "attestation_path": "records/development/2026-08-17-rq2-apparatus-reuse-search-attestation-v1.json",
+      "capabilities": [
+        {
+          "capability_id": "rq2_condition_material_selection",
+          "failure_behavior": [
+            "契約が拒否したpathを黙って除外せず停止として観測する",
+            "条件定義に無い材料を暗黙に足さない"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ],
+          "inputs": [
+            "ケース定義（材料path・独立プールpath）",
+            "条件識別子"
+          ],
+          "outputs": [
+            "条件別のcontext manifest（材料選択の件数と内訳）",
+            "commit可能な依頼record"
+          ],
+          "reference_paths": [
+            "tools/task_contract/execution.py",
+            "tools/evaluation/reviewer_bridge.py"
+          ],
+          "reference_symbols": [
+            "tools/task_contract/execution.py:build_context_manifest",
+            "tools/evaluation/reviewer_bridge.py:build_free_text_request"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "required_properties": [
+            "既存task_contract・request_builder・reviewer_bridge部品の無変更（読み取り専用利用）",
+            "同一ケース・同一条件で同一の材料選択（決定的）"
+          ],
+          "responsibility": "RQ2の4条件（A基準・B契約方式・C無関係資料追加・D必須材料欠落）ごとに契約へ渡す対象path集合を決め、既存のTask Contract chain（bind→snapshot→build→compile→context）を読み取り専用で駆動して依頼recordの材料表まで組み立てる",
+          "symbol_terms": [
+            "context",
+            "manifest",
+            "material",
+            "request"
+          ]
+        },
+        {
+          "capability_id": "rq2_trial_scoring_aggregation",
+          "failure_behavior": [
+            "分母0・計測不能を偽値で埋めない（不能は明示欄で申告）",
+            "中断条件に達したら集計を続けず停止を返す"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ],
+          "inputs": [
+            "正解表（ケース別の期待Finding）",
+            "条件別の実行結果（判定findings・実行メタ）"
+          ],
+          "outputs": [
+            "ケース別の採点",
+            "RQ2指標JSON",
+            "中断判定"
+          ],
+          "reference_paths": [
+            "tools/evaluation/rq1_contract_completeness.py",
+            "tools/evaluation/reviewer_bridge.py"
+          ],
+          "reference_symbols": [
+            "tools/evaluation/rq1_contract_completeness.py:aggregate_metrics",
+            "tools/evaluation/reviewer_bridge.py:convert_findings"
+          ],
+          "required_effect_markers": [],
+          "required_properties": [
+            "決定的な集計（同一入力で同一出力）",
+            "採点の境界例をHuman裁定へ回す欄を持つ"
+          ],
+          "responsibility": "判定recordのfindingsを正解表と突き合わせて検出・誤検出・責務外へ分類し、条件間で材料選択の不変性・入力トークン数・検出率・誤検出率を機械集計する。中断条件4種（連続起動失敗・上限到達・unable比率超過・事後照合不合格）を機械判定する",
+          "symbol_terms": [
+            "aggregate",
+            "metric",
+            "finding",
+            "score"
+          ]
+        }
+      ],
+      "subject": "rq2_paired_trial_apparatus_v1"
+    }
+  ]
+}
