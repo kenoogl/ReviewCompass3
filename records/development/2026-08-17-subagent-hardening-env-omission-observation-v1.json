@@ -1,0 +1,29 @@
+{
+ "observation_id": "OBS-RC3-SUBAGENT-HARDENING-ENV-2026-08-17-V1",
+ "observed_at": "2026-08-17T10:37:15+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "claude-subagentの子環境が実行器の抑制注入変数（自動更新抑止・CLAUDE.md読込み禁止等9種）を流用しておらず、実起動時の本体自動更新という実害が発生した",
+ "machine_observations": {
+  "executor_injects": [
+   "CLAUDE_CODE_MAX_RETRIES=0",
+   "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1",
+   "CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL=1",
+   "CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1",
+   "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1",
+   "CLAUDE_CODE_DISABLE_CLAUDE_MDS=1",
+   "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS=1",
+   "ENABLE_CLAUDEAI_MCP_SERVERS=false",
+   "DISABLE_AUTOUPDATER=1"
+  ],
+  "launcher_omits": "tools/reviewer_launch/core.py の子環境は通過変数のみで注入なし（契約012 §7.2は固定引数・認証遮断・通過変数を流用したが注入変数は対象外だった）",
+  "harm_evidence": {
+   "binary_drift": "2026-08-17早朝の実測stream claude_code_version 2.1.220 → 同日 claude --version 2.1.224（自動更新）",
+   "test_failures": "正規全試験でclaude_binary_mismatch 24件（test_claude_bootstrap.py 21件・同adversarial 3件）",
+   "independence_proof": "契約012訂正の変更2 fileをgit stashで退避しても同一失敗（原因は本体更新のみ）",
+   "recovery": "pin更新record（2026-08-17-claude-bootstrap-binary-pin-update-decision-v1.md）で2.1.224受入・全試験2,461件緑"
+  },
+  "independence_benefit": "CLAUDE_CODE_DISABLE_CLAUDE_MDS等はReviewer文脈への操縦側指示（CLAUDE.md）混入を防ぎ、レビュー独立性にも資する（実測：現行probeのinitはproject memoryのpathを読み込んでいた）"
+ },
+ "impact_summary": "抑制なしの実起動が本体を自己更新させ、外部送信経路の本体同一性pinを破り試験24件を失敗させた。E2E本番でも同様の更新・余分な文脈読込み・背景処理が起こり得る",
+ "route_proposal": "改善候補IC-SUBAGENT-HARDENING-ENV-REUSE-001としてHuman仕分けへ。採用時は契約012の訂正（子環境注入の流用。由来：実行器_child_environment・同値性試験固定）として最小実装する"
+}

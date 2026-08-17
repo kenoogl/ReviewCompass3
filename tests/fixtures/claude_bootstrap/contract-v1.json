@@ -8,8 +8,8 @@
     "claude-opus-5",
     "claude-opus-4-8"
   ],
-  "claude_code_version": "2.1.220",
-  "claude_executable_sha256": "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081",
+  "claude_code_version": "2.1.224",
+  "claude_executable_sha256": "391df9d2ab04e4cf32199335720ac7715a582e91eaecfd4d2198a16f57ea59b3",
   "payloads": [
     {
       "ordinal": 1,

@@ -127,7 +127,7 @@ class FakeClaudeProcess:
         if "--version" in args:
             return FakeCompletedProcess(
                 args=args,
-                stdout="2.1.220 (Claude Code)\n",
+                stdout="2.1.224 (Claude Code)\n",
             )
         if "auth" in args and "status" in args:
             return FakeCompletedProcess(

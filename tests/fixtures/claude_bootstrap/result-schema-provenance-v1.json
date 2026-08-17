@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "record_sha256": "73f871aea0b65cdb6ebe4e0b66ba18038c7102c0533a2046ebfd33bffc962e52",
-  "claude_code_version": "2.1.220",
+  "claude_code_version": "2.1.224",
   "build_git_sha": "4073f59596e272f39393db4f96abc5f4b10eff21",
-  "executable_sha256": "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081",
+  "executable_sha256": "391df9d2ab04e4cf32199335720ac7715a582e91eaecfd4d2198a16f57ea59b3",
   "fragment_length_bytes": 1644,
   "fragment_sha256": "b53d8252b4013f018047e2f31732c8fc3c75838b69cb98a8009842adb700e111",
   "start_marker_count": 1,

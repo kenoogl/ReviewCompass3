@@ -34,9 +34,9 @@ _TRUSTED_TRANSPORT_CAPABILITY = {
     "purpose": _PURPOSE,
     "topology": "same_session_two_payload",
 }
-_VERSION = "2.1.220"
+_VERSION = "2.1.224"
 _EXECUTABLE_SHA256 = (
-    "8addc857f3fe64d5a0368af9ee50321b50afb4a6918ba3ef018ab84f5dbbe081"
+    "391df9d2ab04e4cf32199335720ac7715a582e91eaecfd4d2198a16f57ea59b3"
 )
 _ORDERED_PAYLOAD_SHA256 = (
     "26933d4f45ed497f9d1d9f5fdc741aca87b0ad37c3ed3c35fd99ebff6b2bd8a0"
