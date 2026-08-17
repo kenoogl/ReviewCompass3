@@ -999,6 +999,41 @@ def test_subagent_forbidden_constant_equals_executor():
     )
 
 
+def test_subagent_passthrough_constant_equals_executor():
+    core = _core()
+    from tools.development.claude_implementation_executor import (
+        ALLOWED_CHILD_ENVIRONMENT,
+    )
+
+    assert tuple(core.CLAUDE_PASSTHROUGH_ENVIRONMENT) == tuple(
+        ALLOWED_CHILD_ENVIRONMENT
+    )
+
+
+def test_subagent_child_environment_passes_user_and_tmpdir(
+    repository, monkeypatch, clean_environment
+):
+    monkeypatch.setenv("USER", "reviewer-user")
+    monkeypatch.setenv("TMPDIR", "/tmp/reviewer-test")
+    facade = _FacadeRecorder(stdout=_subagent_stream())
+    _launch_subagent(repository, monkeypatch, facade)
+    environment = facade.calls[0][1]["env"]
+    assert environment["USER"] == "reviewer-user"
+    assert environment["TMPDIR"] == "/tmp/reviewer-test"
+
+
+def test_agy_child_environment_excludes_user(
+    repository, monkeypatch, clean_environment
+):
+    monkeypatch.setenv("USER", "reviewer-user")
+    monkeypatch.setenv("TMPDIR", "/tmp/reviewer-test")
+    facade = _FacadeRecorder(stdout=_stream_text())
+    _launch(repository, monkeypatch, facade)
+    environment = facade.calls[0][1]["env"]
+    assert "USER" not in environment
+    assert "TMPDIR" not in environment
+
+
 def test_subagent_arguments_fixed(clean_environment):
     core = _core()
     from tools.development.claude_implementation_executor import (

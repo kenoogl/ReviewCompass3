@@ -78,6 +78,22 @@ PASSTHROUGH_ENVIRONMENT = (
     "NO_COLOR",
 )
 
+# 契約012 §7.2訂正：claude-subagentの通過変数一覧（由来：実行器ALLOWED_CHILD_ENVIRONMENT。
+# 同値性は試験で固定。変更は契約改定）。USERは保存済みlogin読み出しの必要条件（実測）。
+# 訂正record：records/development/
+# 2026-08-17-claude-subagent-passthrough-environment-correction-decision-v1.md
+CLAUDE_PASSTHROUGH_ENVIRONMENT = (
+    "HOME",
+    "USER",
+    "PATH",
+    "TMPDIR",
+    "LANG",
+    "LC_ALL",
+    "LC_CTYPE",
+    "TERM",
+    "NO_COLOR",
+)
+
 BACKENDS = {
     "antigravity-cli": {
         "provider": "google",
@@ -321,13 +337,13 @@ def build_claude_arguments(executable, prompt, model):
     ]
 
 
-def _child_environment(forbidden_names):
+def _child_environment(forbidden_names, passthrough_names):
     for name in forbidden_names:
         if name in os.environ:
             raise LaunchStop("api_key_environment_forbidden")
     return {
         name: os.environ[name]
-        for name in PASSTHROUGH_ENVIRONMENT
+        for name in passthrough_names
         if name in os.environ
     }
 
@@ -577,10 +593,12 @@ def launch_review(
     if backend_name == "claude-subagent":
         forbidden_names = CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT
         allowed_models = SUBAGENT_ALLOWED_RESPONSE_MODELS
+        passthrough_names = CLAUDE_PASSTHROUGH_ENVIRONMENT
     else:
         forbidden_names = FORBIDDEN_AUTH_ENVIRONMENT
         allowed_models = ALLOWED_RESPONSE_MODELS
-    environment = _child_environment(forbidden_names)
+        passthrough_names = PASSTHROUGH_ENVIRONMENT
+    environment = _child_environment(forbidden_names, passthrough_names)
     tier = _resolve_tier(backend, accept_tier)
     if tier != 1:
         if (
