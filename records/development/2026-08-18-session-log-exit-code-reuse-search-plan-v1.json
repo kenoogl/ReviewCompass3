@@ -1,0 +1,49 @@
+{
+  "content_digest": "1cfeb8bc5b45ec9ef79df885a596d4f26de1d30e531ecb0919d96c468f2f7e9a",
+  "plan_id": "FCRS-SESSION-LOG-EXIT-CODE-VOCABULARY-2026-08-18-V1",
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "searches": [
+    {
+      "attestation_path": "records/development/2026-08-18-session-log-exit-code-reuse-search-attestation-v1.json",
+      "capabilities": [
+        {
+          "capability_id": "eventual_preservation_exit_code_mapping",
+          "failure_behavior": [
+            "未知のstatusを成功側へ倒さない（失敗コードのまま）"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ],
+          "inputs": [
+            "収集結果のstatus（ok／partial／error）"
+          ],
+          "outputs": [
+            "プロセスの終了コード"
+          ],
+          "reference_paths": [
+            "tools/session_logs/cli.py",
+            "tools/session_logs/read_only_entry.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/cli.py:EXIT_UNSUPPORTED",
+            "tools/session_logs/read_only_entry.py:prepare_safe_result"
+          ],
+          "required_effect_markers": [],
+          "required_properties": [
+            "既存の終了コード語彙の定数を使い、生の数字を書かない",
+            "包み役（record_run）の合否判断は不変（要約JSONのstatus欄を読む）"
+          ],
+          "responsibility": "collect-eventualの終了コードを、既存の終了コード語彙（cli.pyの定数）から選んで返す。partialは正常状態であるため失敗コードではなく非対応コードを返し、okは0、例外経路は失敗コードを返す",
+          "symbol_terms": [
+            "exit",
+            "code",
+            "partial",
+            "unsupported"
+          ]
+        }
+      ],
+      "subject": "session_log_exit_code_vocabulary_v1"
+    }
+  ]
+}
