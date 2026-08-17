@@ -9,6 +9,8 @@ import dataclasses
 import json
 from pathlib import Path
 
+from tools.session_logs.source_kind import is_known_prefix_record
+
 
 class ParseError(Exception):
   """生ログを読み取れない場合の解析エラー。"""
@@ -171,6 +173,9 @@ def _parse_lines(lines) -> ParseResult:
         line_no=line_no,
         detail=type(record).__name__,
       ))
+      continue
+    if is_known_prefix_record(record):
+      # 契約014 §7.3：既知前置recordは会話でも異常でもないため無issueで読み飛ばす。
       continue
     role = record.get("type")
     if role not in ("user", "assistant"):

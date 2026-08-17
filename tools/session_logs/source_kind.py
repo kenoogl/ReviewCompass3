@@ -39,33 +39,95 @@ def _identify_first_event(first_event):
   return None
 
 
-def _first_record(lines):
+_PREFIX_TYPES = ("queue-operation", "mode", "custom-title", "started")
+
+PREFIX_RECORD_LIMIT = 16
+
+
+def is_known_prefix_record(record):
+  """既知前置record（契約014 §7.1の必須欄）か判定する。"""
+  if not isinstance(record, dict):
+    return False
+  record_type = record.get("type")
+  session_id = record.get("sessionId")
+  if record_type == "queue-operation":
+    return (
+      record.get("operation") in ("enqueue", "dequeue")
+      and isinstance(session_id, str)
+      and bool(session_id)
+      and "content" in record
+    )
+  if record_type == "mode":
+    return (
+      isinstance(record.get("mode"), str)
+      and isinstance(session_id, str)
+      and bool(session_id)
+    )
+  if record_type == "custom-title":
+    return (
+      isinstance(record.get("customTitle"), str)
+      and isinstance(session_id, str)
+      and bool(session_id)
+    )
+  if record_type == "started":
+    agent_id = record.get("agentId")
+    key = record.get("key")
+    return (
+      isinstance(agent_id, str)
+      and bool(agent_id)
+      and isinstance(key, str)
+      and bool(key)
+    )
+  return False
+
+
+def _iter_records(lines):
   for line in lines:
     if not line.strip():
       continue
     try:
-      return json.loads(line)
+      yield json.loads(line)
     except json.JSONDecodeError:
+      yield None
+      return
+
+
+def _identify_record_stream(records):
+  # 契約014 §7.1：先頭から連続する既知前置recordだけを読み飛ばし
+  # （typeが前置4種なら必須欄不足で打ち切り・上限16超過で打ち切り）、
+  # 最初の判定可能recordで従来判定を行う。
+  skipped = 0
+  for record in records:
+    if not isinstance(record, dict):
       return None
+    if record.get("type") in _PREFIX_TYPES:
+      if not is_known_prefix_record(record):
+        return None
+      skipped += 1
+      if skipped > PREFIX_RECORD_LIMIT:
+        return None
+      continue
+    return _identify_first_event(record)
   return None
 
 
 def identify_source_kind_bytes(data):
   text = data.decode("utf-8")
-  return _identify_first_event(_first_record(text.split("\n")))
+  return _identify_record_stream(_iter_records(text.split("\n")))
 
 
 def identify_source_kind(path):
   try:
     with Path(path).open(encoding="utf-8") as raw_log:
-      first_event = _first_record(raw_log)
+      return _identify_record_stream(_iter_records(raw_log))
   except OSError:
     return None
 
-  return _identify_first_event(first_event)
-
 
 def identify_auxiliary_kind(path):
+  # 契約014 §7.4：本文recordへ到達できるfileは補助でない。
+  if identify_source_kind(path) is not None:
+    return None
   with Path(path).open(encoding="utf-8") as raw_log:
     first_line = raw_log.readline()
 
