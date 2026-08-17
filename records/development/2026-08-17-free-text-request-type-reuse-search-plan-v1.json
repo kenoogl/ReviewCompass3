@@ -1,0 +1,122 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-FREE-TEXT-REQUEST-TYPE-2026-08-17-V1",
+  "searches": [
+    {
+      "subject": "request_builder_free_text_type_v1",
+      "capabilities": [
+        {
+          "capability_id": "request_type_registration",
+          "responsibility": "既存の類型登録形へ第3類型（自由文）を追加し、語彙・label・雛形骨格の分岐（反証点節を自由記入の依頼内容節へ差し替える）を局所化する",
+          "inputs": [
+            "類型",
+            "表題と対象の宣言"
+          ],
+          "outputs": [
+            "依頼record草稿"
+          ],
+          "failure_behavior": [
+            "未登録類型を組み立てない（request_type_unknown停止）"
+          ],
+          "required_properties": [
+            "類型の登録形",
+            "共通骨格の維持"
+          ],
+          "reference_paths": [
+            "tools/request_builder/core.py"
+          ],
+          "reference_symbols": [
+            "tools/request_builder/core.py:_render",
+            "tools/request_builder/core.py:assemble"
+          ],
+          "symbol_terms": [
+            "type",
+            "template",
+            "render",
+            "register"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "free_text_section_inspection",
+          "responsibility": "自由記入節の機械検査を類型別に適用する（placeholder不在・fence規律＝正準位置のみ・反証点番号検査に代わる非空検査）",
+          "inputs": [
+            "依頼record"
+          ],
+          "outputs": [
+            "検査結果"
+          ],
+          "failure_behavior": [
+            "記入不備・fence外構造行を合格として返さない"
+          ],
+          "required_properties": [
+            "fail-closed",
+            "fence状態追跡の維持"
+          ],
+          "reference_paths": [
+            "tools/request_builder/core.py"
+          ],
+          "reference_symbols": [
+            "tools/request_builder/core.py:check",
+            "tools/request_builder/core.py:_classified_lines"
+          ],
+          "symbol_terms": [
+            "check",
+            "section",
+            "fence",
+            "inspect"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        },
+        {
+          "capability_id": "sensitive_content_scan",
+          "responsibility": "自由文記入部へ既定5 patternと高乱雑性検知（除外3形式つき・契約固定のまま）を適用する",
+          "inputs": [
+            "依頼record内容"
+          ],
+          "outputs": [
+            "機微検査結果"
+          ],
+          "failure_behavior": [
+            "検知時に組み立て・検査を合格として返さない"
+          ],
+          "required_properties": [
+            "既定pattern不変",
+            "除外の契約固定"
+          ],
+          "reference_paths": [
+            "tools/session_logs/redaction.py",
+            "tools/request_builder/core.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/redaction.py:find_high_entropy",
+            "tools/session_logs/redaction.py:default_pattern_rules"
+          ],
+          "symbol_terms": [
+            "sensitive",
+            "entropy",
+            "redaction",
+            "scan"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-17-free-text-request-type-reuse-search-attestation-v1.json"
+    }
+  ],
+  "content_digest": "6fcc1241143affa0e7d3ca6d0bc0d938327ec23217e4bc275204379603736f80"
+}
