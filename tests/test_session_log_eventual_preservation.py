@@ -535,3 +535,13 @@ def test_manual_entry_exit_codes_distinguish_partial_from_failure(
   assert payload["counts"]["unsupported"] == 1
   # 保全は完了している（正常状態）ため、失敗コード5を返してはならない
   assert exit_code == 4
+
+
+def test_exit_code_values_match_cli_vocabulary():
+  """eventual_preservationの終了コードはcli.pyの語彙と同じ値である（import無しの複製のため機械固定）。"""
+
+  cli = importlib.import_module("tools.session_logs.cli")
+  module = importlib.import_module("tools.session_logs.eventual_preservation")
+  assert module.EXIT_OK == cli.EXIT_OK
+  assert module.EXIT_UNSUPPORTED == cli.EXIT_UNSUPPORTED
+  assert module.EXIT_FAILED == cli.EXIT_FAILED

@@ -27,6 +27,14 @@ from tools.session_logs.source_adapter import (
 )
 from tools.session_logs.transcript import render_transcript
 
+# 終了コードはcli.pyの語彙（EXIT_OK=0・EXIT_UNSUPPORTED=4・EXIT_FAILED=5）と同じ値。
+# partialは既知の正常状態（保全は全件完了・一部が解釈非対応）であり、失敗ではなく
+# 非対応のコードで知らせる（IC-SESSION-LOG-EXIT-CODE-VOCABULARY-001）。cli.pyは
+# 依存が重いため定数のimportはせず、値の一致を試験で固定する。
+EXIT_OK = 0
+EXIT_UNSUPPORTED = 4
+EXIT_FAILED = 5
+
 
 class CollectionError(Exception):
   """値を表示せずsession log回収失敗を伝える。"""
@@ -889,13 +897,17 @@ def run(argv=None):
       "reason": type(error).__name__,
       "status": "error",
     }, sort_keys=True))
-    return 5
+    return EXIT_FAILED
   print(json.dumps(
     result.report(),
     ensure_ascii=False,
     sort_keys=True,
   ))
-  return 0 if result.status == "ok" else 5
+  if result.status == "ok":
+    return EXIT_OK
+  if result.status == "partial":
+    return EXIT_UNSUPPORTED
+  return EXIT_FAILED
 
 
 def main():

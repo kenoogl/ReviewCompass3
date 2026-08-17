@@ -154,7 +154,8 @@ def test_collect_run_treats_partial_as_success(tmp_path):
 
   system = summary["systems"][0]
   assert system["status"] == "partial"
-  assert system["exit_code"] == 5
+  # partialの系統は非対応コード4（失敗の5ではない。候補IC-SESSION-LOG-EXIT-CODE-VOCABULARY-001）
+  assert system["exit_code"] == 4
   assert system["counts"]["succeeded"] == 1
   assert system["counts"]["unsupported"] == 1
   assert summary["overall_ok"] is True
