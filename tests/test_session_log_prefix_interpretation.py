@@ -41,6 +41,15 @@ def _queue_record(**overrides):
   return record
 
 
+def _dequeue_record():
+  return {
+    "type": "queue-operation",
+    "operation": "dequeue",
+    "sessionId": "session-1",
+    "timestamp": "2026-08-17T10:00:00Z",
+  }
+
+
 def _mode_record():
   return {"type": "mode", "mode": "normal", "sessionId": "session-1"}
 
@@ -79,6 +88,41 @@ def test_identify_bytes_skips_all_known_prefix_kinds():
   ) + _body_records())
 
   assert source_kind.identify_source_kind_bytes(data) == "claude"
+
+
+def test_identify_bytes_skips_dequeue_prefix_without_content():
+  # 契約014 v3 §7.1：dequeueはcontentを持たない実物形（enqueue→dequeue→本文）。
+  source_kind = _source_kind()
+  data = _encode((_queue_record(), _dequeue_record()) + _body_records())
+
+  assert source_kind.identify_source_kind_bytes(data) == "claude"
+
+
+def test_identify_bytes_rejects_enqueue_without_content():
+  # 契約014 v3 §7.5-1 (f)：enqueueのcontent必須は維持（欠落は打ち切り）。
+  source_kind = _source_kind()
+  malformed_enqueue = {
+    "type": "queue-operation",
+    "operation": "enqueue",
+    "sessionId": "session-1",
+  }
+  data = _encode((malformed_enqueue,) + _body_records())
+
+  assert source_kind.identify_source_kind_bytes(data) is None
+
+
+def test_parse_claude_skips_dequeue_prefix_without_issues():
+  parse_claude = _parse_claude()
+  body_only = parse_claude.parse_claude_bytes(_encode(_body_records()))
+  result = parse_claude.parse_claude_bytes(_encode((
+    _queue_record(),
+    _dequeue_record(),
+  ) + _body_records()))
+
+  assert result.issues == ()
+  assert [event.event_id for event in result.events] == [
+    event.event_id for event in body_only.events
+  ]
 
 
 def test_identify_bytes_plain_body_and_codex_unchanged():
