@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25、一件用安全保存、一件レビュー材料、G08一件設計、G20の外部送信2契約（008・009）、『正式ツール化』の縦B契約010（Reviewer起動アダプタ・headless正式経路）と**縦A契約011（依頼組み立て器・2類型）の製品受入**まで完了。依頼record作成はassemble→LLM記入→check合格が正式経路になった。事前走査は6手順へ改定・手順書化し、正式再利用検索の導線を接続、機械gate接続は改善候補`IC-REUSE-SEARCH-GATE-CONNECTION-001`として登録済み。
-- 現在作業：契約012（claude-subagent第2 backend・Tier 2／3受容機構）の残り受入条件を進める。**§9-8実E2Eが成立**（2往復：`e2e-012-001`は経路完走のうえ判定`rejected`＝blocking F-1を検出→利用者採用でF-1〜F-3修正（agy照合をagy専用一覧へ1行差し替え・固定試験3件・RED実証）→`e2e-012-002`が`verified_with_findings`・**blocking 0件**。Tier 3受容・受容根拠record・機械転記・単独commit・事後照合4点まで全自動完走）。残り＝(1) §9-10完了レビュー（agy・Tier 1・**同一対象集合13行**の依頼recordで初の2 oracle比較成立）、(2) §9-11製品受入。
-- Task Contract：`TC-RC3-PRODUCT-CLAUDE-SUBAGENT-BACKEND-012 / v2＋§7.2訂正record3件`＝`adopted_implementation_started`（実装・model承認・訂正・E2E済み。完了レビュー・製品受入待ち）
+- 現在作業：契約012（claude-subagent第2 backend・Tier 2／3受容機構）の受入は**§9-10まで全て成立**。§9-8実E2Eは2往復（`e2e-012-001`＝`rejected`・blocking F-1検出→利用者採用でF-1〜F-3修正→`e2e-012-002`＝`verified_with_findings`・blocking 0）、§9-10完了レビューはagy（Tier 1）が**`verified`・blocking 0・未検査空**。同一対象集合（digest表13行完全一致）への**初の2 oracle比較が成立し、両判定役が一致**。残り＝**§9-11製品受入のみ**（利用者が§7.4残余risk 4点を確認して受け入れる判断。Claudeが4点を提示済み）。
+- Task Contract：`TC-RC3-PRODUCT-CLAUDE-SUBAGENT-BACKEND-012 / v2＋§7.2訂正record3件`＝`adopted_implementation_started`（実装・model承認・訂正・E2E・完了レビュー済み。製品受入待ち）
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [§9-10完了レビュー判定record（agy・Tier 1・verified・blocking 0・機械転記）](records/session-handoffs/2026-08-17-claude-subagent-backend-implementation-completion-review-verdict-v1.md) — SHA-256 `5f0ba930d3c478609b12dd573a87c6815350d159630440dcc971391cbe70441c`
+- [契約012実運用E2E（§9-8）Evidence（2往復・F-1検出と修正・2 oracle実証）](records/development/2026-08-17-claude-subagent-e2e-evidence-v1.md) — SHA-256 `64a40fb7fdb67bb43de08f0a5b777f41aab80ff5f39778b58d30633da72c9407`
 - [E2E 012-002判定record（verified_with_findings・blocking 0・機械転記）](records/session-handoffs/2026-08-17-claude-subagent-backend-implementation-completion-rereview-subagent-verdict-v1.md) — SHA-256 `8af6f9acc49afaecdb0034cc5fae31c8c308fabb5ea71b4720a672d0bd10fcb6`
 - [E2E 012-001判定record（rejected・blocking F-1検出・機械転記）](records/session-handoffs/2026-08-17-claude-subagent-backend-implementation-completion-review-subagent-verdict-v1.md) — SHA-256 `9cde9965fbd120cc30a20c9af6cc45061b153e3d3172691974d5a2ac548c7bcc`
 - [契約012 §7.2子環境の訂正record（抑制注入変数9種の流用・改善候補採用）](records/development/2026-08-17-claude-subagent-child-injection-correction-decision-v1.md) — SHA-256 `db84857854cda3bb8381535bd872653d5d82032d5f59d2a7799d023efad1d199`
@@ -43,28 +45,28 @@
 
 ## 次に行う一作業
 
-利用者の起動明示指示を受けて§9-10完了レビューをagy経路（Tier 1）で行う。内容＝契約011の正式経路で
-**E2Eと同一対象集合（13行のdigest表。`e2e-012-002`依頼と同じ対象・同じ内容状態）**の依頼recordを
-組み立て（slug末尾`-subagent`なし）→LLM記入→check合格→commit→agy起動（既定backend・
-`--accept-tier`不要）→転記・事後照合。これで同一対象へのsubagent判定（`verified_with_findings`・
-blocking 0）とagy判定が並び、**初の2 oracle比較**が成立する。`verified`系（blocking 0件）なら
-§9-11製品受入の利用者判断へ。
+利用者が§9-11の製品受入を判断する。Claudeが提示済みの契約012 §7.4残余risk 4点——(1) Tier 3の
+独立性は限定的（緩和：唯一oracle禁止・機械反証併用・tier明記）、(2) claude CLI仕様変更への追随
+（緩和：安全側停止・raw完全保存）、(3) subagent起動もanthropicへの内容送出を伴う（事実の明示：
+操縦Claudeが同一provider下で常時repositoryを読んでおり新規の露出先は増えない。緩和：利用者指示
+起点・起動record台帳）、(4) 2 oracle不一致時の裁定は手動（合議機械化は縦Cへ持ち越し）——を確認し、
+受入（または保留）の文言をchatで与える。受入後は受入判断record作成→TODO更新→次縦切りの順序選択
+（候補：codex-cli第3 backend（疎通回復待ち）・縦C合議・仕分け6件の処理）へ進む。
 
 開始条件：
 
 - 本handoffを含むcommitが完了し、作業treeがcleanである
-- 利用者のagy起動の明示指示がchatで得られる
 
 完了条件：
 
-- §9-10判定record取得（`verified`系・blocking 0件）、または停止理由の確定
+- §9-11の受入（または保留）の文言がchatで得られる
 
-後続作業：§9-11製品受入（§7.4残余risk 4点の最終受容）→次縦切りの順序選択。
+後続作業：受入判断record→TODO更新→次縦切りの順序選択。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路とclaude-subagent（Tier 3・明示受容つき）の2経路が稼働
-- Human判断待ち：§9-10のagy起動指示（その後に§9-11製品受入）。E2E判定の非blocking所見の仕分け——`F-4`〜`F-7`（e2e-012-001判定record）と`R-1`〜`R-2`（e2e-012-002判定record）
+- Human判断待ち：**§9-11製品受入**（§7.4残余risk 4点の受容）。E2E判定の非blocking所見の仕分け——`F-4`〜`F-7`（e2e-012-001判定record）と`R-1`〜`R-2`（e2e-012-002判定record）
 
 ## stale・deferred
 
