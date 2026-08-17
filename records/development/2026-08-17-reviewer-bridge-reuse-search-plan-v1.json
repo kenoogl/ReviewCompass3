@@ -1,0 +1,89 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-REVIEWER-BRIDGE-2026-08-17-V1",
+  "searches": [
+    {
+      "subject": "reviewer_bridge_v1",
+      "capabilities": [
+        {
+          "capability_id": "free_text_request_composition",
+          "responsibility": "Task Contract実行文脈（contract・context manifest）からfree_text類型の依頼record本文を機械組み立てし、正式経路の組み立て器（assemble）と機械検査（check）を読み取り専用で駆動して合格recordを得る",
+          "inputs": [
+            "contract・context manifest",
+            "対象repositoryと対象file"
+          ],
+          "outputs": [
+            "check合格済み依頼record"
+          ],
+          "failure_behavior": [
+            "check不合格recordを起動対象として返さない（fail-closed）"
+          ],
+          "required_properties": [
+            "正式経路の部品の無変更（読み取り専用利用）",
+            "placeholder残存の禁止"
+          ],
+          "reference_paths": [
+            "tools/request_builder/core.py"
+          ],
+          "reference_symbols": [
+            "tools/request_builder/core.py:assemble",
+            "tools/request_builder/core.py:check"
+          ],
+          "symbol_terms": [
+            "assemble",
+            "check",
+            "request",
+            "compose"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        },
+        {
+          "capability_id": "verdict_finding_conversion",
+          "responsibility": "判定recordのfindings（identifier・claim・severity・blocking・evidence位置）をTask Contract経路のfinding_set形式へ決定的に変換する（blocking真はerrorへ格上げ・出所をllm_reviewで区別・sealed集合として封をする）",
+          "inputs": [
+            "判定findings",
+            "material bundle（sha256照合用）"
+          ],
+          "outputs": [
+            "sealed finding_set"
+          ],
+          "failure_behavior": [
+            "対象材料へ解決できないevidenceを黙って捨てない（unresolvedを明示）"
+          ],
+          "required_properties": [
+            "severity語彙の互換（適合性検査を通る）",
+            "決定的変換"
+          ],
+          "reference_paths": [
+            "tools/task_contract/execution.py",
+            "tools/reviewer_launch/record.py"
+          ],
+          "reference_symbols": [
+            "tools/task_contract/execution.py:run_stub_reviewer",
+            "tools/task_contract/execution.py:evaluate_conformance",
+            "tools/reviewer_launch/record.py:transcribe_verdict_record"
+          ],
+          "symbol_terms": [
+            "finding",
+            "verdict",
+            "convert",
+            "severity"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-17-reviewer-bridge-reuse-search-attestation-v1.json"
+    }
+  ],
+  "content_digest": "b3a1abdba97f5909efa87b012996e14c6eb6bc4bf6a4f1453f326aaf2e55eb39"
+}
