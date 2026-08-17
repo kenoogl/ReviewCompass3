@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25、一件用安全保存、一件レビュー材料、G08一件設計、G20の外部送信2契約（008・009）、『正式ツール化』の縦B契約010（Reviewer起動アダプタ・headless正式経路）と**縦A契約011（依頼組み立て器・2類型）の製品受入**まで完了。依頼record作成はassemble→LLM記入→check合格が正式経路になった。事前走査は6手順へ改定・手順書化し、正式再利用検索の導線を接続、機械gate接続は改善候補`IC-REUSE-SEARCH-GATE-CONNECTION-001`として登録済み。
-- 現在作業：契約012（claude-subagent第2 backend・Tier 2／3受容機構）の残り受入条件を進める。実装完了に加え、subagent許可modelの承認・定数固定（`claude-opus-5`）、§7.2契約訂正3件（`--verbose`列挙漏れ・通過変数の`USER`欠落＝実行器9変数と同値化・抑制注入変数9種の流用＝改善候補採用）まで完了し、**E2Eの前提は全て解消済み**（起動場所は操縦環境＝案B。認証成立・抑制つき起動を実測確認）。付随して本体自動更新（2.1.220→2.1.224）による`claude_bootstrap`のpin不一致24件を利用者承認のpin更新で復旧。残り＝(1) §9-8実E2E（`--accept-tier 3`＋受容根拠の明示。同一対象集合の別名依頼で初の2 oracle比較。**実施指示受領済み**）、(2) §9-10完了レビュー（agy・Tier 1）、(3) §9-11製品受入。
-- Task Contract：`TC-RC3-PRODUCT-CLAUDE-SUBAGENT-BACKEND-012 / v2＋§7.2訂正record3件`＝`adopted_implementation_started`（実装・model承認・訂正済み。E2E・完了レビュー・製品受入待ち）
+- 現在作業：契約012（claude-subagent第2 backend・Tier 2／3受容機構）の残り受入条件を進める。**§9-8実E2Eが成立**（2往復：`e2e-012-001`は経路完走のうえ判定`rejected`＝blocking F-1を検出→利用者採用でF-1〜F-3修正（agy照合をagy専用一覧へ1行差し替え・固定試験3件・RED実証）→`e2e-012-002`が`verified_with_findings`・**blocking 0件**。Tier 3受容・受容根拠record・機械転記・単独commit・事後照合4点まで全自動完走）。残り＝(1) §9-10完了レビュー（agy・Tier 1・**同一対象集合13行**の依頼recordで初の2 oracle比較成立）、(2) §9-11製品受入。
+- Task Contract：`TC-RC3-PRODUCT-CLAUDE-SUBAGENT-BACKEND-012 / v2＋§7.2訂正record3件`＝`adopted_implementation_started`（実装・model承認・訂正・E2E済み。完了レビュー・製品受入待ち）
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [E2E 012-002判定record（verified_with_findings・blocking 0・機械転記）](records/session-handoffs/2026-08-17-claude-subagent-backend-implementation-completion-rereview-subagent-verdict-v1.md) — SHA-256 `8af6f9acc49afaecdb0034cc5fae31c8c308fabb5ea71b4720a672d0bd10fcb6`
+- [E2E 012-001判定record（rejected・blocking F-1検出・機械転記）](records/session-handoffs/2026-08-17-claude-subagent-backend-implementation-completion-review-subagent-verdict-v1.md) — SHA-256 `9cde9965fbd120cc30a20c9af6cc45061b153e3d3172691974d5a2ac548c7bcc`
 - [契約012 §7.2子環境の訂正record（抑制注入変数9種の流用・改善候補採用）](records/development/2026-08-17-claude-subagent-child-injection-correction-decision-v1.md) — SHA-256 `db84857854cda3bb8381535bd872653d5d82032d5f59d2a7799d023efad1d199`
 - [claude本体2.1.224のpin更新record（自動更新起因24件失敗の復旧）](records/development/2026-08-17-claude-bootstrap-binary-pin-update-decision-v1.md) — SHA-256 `3e761b2b8bf31075ded1673c6592c9bb681d3ab6fadd49f25a91ee5daaee6c49`
 - [契約012 §7.2子環境の訂正record（通過変数USER・実行器9変数と同値化）](records/development/2026-08-17-claude-subagent-passthrough-environment-correction-decision-v1.md) — SHA-256 `d80b03d55ea1a75b742aa51f89f3428429eba51fd5bb55986037e808b42b3175`
@@ -41,27 +43,28 @@
 
 ## 次に行う一作業
 
-利用者の明示指示（Tier 3受容の明示を含む）を受けて§9-8実E2Eを行う。内容＝契約011の正式経路で
-§9-10完了レビューと同一対象集合の別名依頼record（slug末尾`-subagent`）を組み立て→受容根拠record作成→
-操縦環境から`--accept-tier 3`・run-id `e2e-012-001`で起動（親環境から`ANTHROPIC_BASE_URL`等の
-禁止変数を外す運用。認証は保存済みsubscriptionログイン——通過変数訂正で成立を実測済み）→
-転記・事後照合。不成立なら停止し、自動再試行をしない。
+利用者の起動明示指示を受けて§9-10完了レビューをagy経路（Tier 1）で行う。内容＝契約011の正式経路で
+**E2Eと同一対象集合（13行のdigest表。`e2e-012-002`依頼と同じ対象・同じ内容状態）**の依頼recordを
+組み立て（slug末尾`-subagent`なし）→LLM記入→check合格→commit→agy起動（既定backend・
+`--accept-tier`不要）→転記・事後照合。これで同一対象へのsubagent判定（`verified_with_findings`・
+blocking 0）とagy判定が並び、**初の2 oracle比較**が成立する。`verified`系（blocking 0件）なら
+§9-11製品受入の利用者判断へ。
 
 開始条件：
 
 - 本handoffを含むcommitが完了し、作業treeがcleanである
-- 利用者のE2E実施指示と`--accept-tier 3`受容の明示がchatで得られる
+- 利用者のagy起動の明示指示がchatで得られる
 
 完了条件：
 
-- E2E一往復の成立（判定record取得）、または停止理由の確定
+- §9-10判定record取得（`verified`系・blocking 0件）、または停止理由の確定
 
-後続作業：§9-10完了レビュー（agy・Tier 1）→§9-11製品受入→次縦切りの順序選択。
+後続作業：§9-11製品受入（§7.4残余risk 4点の最終受容）→次縦切りの順序選択。
 
 ## blocker・Human判断待ち
 
-- blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路が稼働中
-- Human判断待ち：§9-8実E2Eの実施指示（`--accept-tier 3`受容の明示。その後に完了レビュー・製品受入）
+- blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路とclaude-subagent（Tier 3・明示受容つき）の2経路が稼働
+- Human判断待ち：§9-10のagy起動指示（その後に§9-11製品受入）。E2E判定の非blocking所見の仕分け——`F-4`〜`F-7`（e2e-012-001判定record）と`R-1`〜`R-2`（e2e-012-002判定record）
 
 ## stale・deferred
 
@@ -74,8 +77,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：契約012対象57件（`tests/test_reviewer_launch.py`。通過変数・注入の訂正6件を含む）、契約011対象32件（無変更）、G30運用契約実行75件、layout 13件、bootstrap 41件（pin更新後）——各単独終了コード0
-- 直近の全Test：禁止認証隔離条件の正規全試験2,464件成功・終了コード0（注入訂正後の実行）
+- 直近の関連Test：契約012対象60件（`tests/test_reviewer_launch.py`。F-1固定試験・claude経路停止試験2件を含む）、契約011対象32件（無変更）、G30運用契約実行75件、layout 13件、bootstrap 41件——各単独終了コード0
+- 直近の全Test：禁止認証隔離条件の正規全試験2,467件成功・終了コード0（F-1〜F-3修正後の実行）
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
