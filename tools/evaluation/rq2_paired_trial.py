@@ -251,15 +251,47 @@ def selection_signature(context_manifest):
     return {"count": len(paths), "paths": paths}
 
 
+def compose_review_question(contract, context_manifest):
+    """RQ2実験の依頼本文（記入2欄）を組み立てる。
+
+    bridgeの汎用文はContractの責務（runtimeの一般文）を問いに据えるため、実験材料
+    に対しては「材料は責務と無関係」という指摘だけが返り、Finding品質を測れない
+    （予備起動`rq2-case-008-b`の実測）。問いを**材料の内部整合性**へ据え直す。
+    """
+
+    materials = "\n".join(
+        "- `%s`（SHA-256 `%s`）" % (item["relative_path"], item["sha256"])
+        for item in context_manifest["material_bundle"]
+    )
+    request_body = (
+        "次の対象materialを読み、記述の妥当性を検査してください。\n\n"
+        "- 対象material：\n%s\n\n"
+        "検査の問い：対象materialの記述に、**内部矛盾**（同じ事柄が別々の箇所で"
+        "食い違う）・**事実の誤り**（数や識別子が他の記載と合わない）・**必要な"
+        "記述の欠落**・**判定できない曖昧さ**が無いかを検査してください。材料が"
+        "複数ある場合は材料間の整合も見てください。\n"
+        "各findingには根拠（fileのpathと行）を必ず付けてください。問題が無ければ"
+        "findingsを空にしてください。" % materials
+    )
+    decided_scope = (
+        "1. 本依頼はTask Contract実験（RQ2 paired trial）の1ケースである"
+        "（評価データ取得計画v1）。\n"
+        "2. 範囲外：材料の書き換えの実施・対象material以外の文書の参照・実験"
+        "そのものの是非。\n"
+        "3. 対象materialは運用recordの**複製**である。複製であること・複製元の"
+        "所在・版の新旧は検査対象ではない（それらを理由とする指摘は範囲外）。\n"
+        "4. 事実の明示：対象materialのdigestは本record §1の表に固定済みである。"
+    )
+    return request_body, decided_scope
+
+
 def build_case_request(*, project_root, case, condition, record_date):
     """依頼recordを機械組み立てし、repo相対pathを返す（commitは呼び出し側）。"""
 
     contract, context = build_case_context(
         project_root=project_root, case=case, condition=condition
     )
-    request_body, decided_scope = reviewer_bridge.compose_request_body(
-        contract, context
-    )
+    request_body, decided_scope = compose_review_question(contract, context)
     return reviewer_bridge.build_free_text_request(
         repository=project_root,
         record_date=record_date,

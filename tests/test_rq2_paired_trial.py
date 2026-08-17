@@ -378,3 +378,30 @@ def test_extract_read_paths_and_scope_check():
     )
     assert clean["clean"] is True
     assert clean["outside"] == ()
+
+
+def test_review_question_asks_about_the_material_not_the_contract_goal():
+    """依頼の問いは「材料の記述の妥当性」を問う。
+
+    予備起動（rq2-case-008-b）で判明：bridgeの汎用文（Contractの責務に照らして
+    妥当か）を使うと、Contractの責務は runtime の一般文であるため、reviewerは
+    「材料は責務と無関係」と正しく指摘して全ケースがrejectedになる。実験は
+    Finding品質を測れない。問いを材料の内部整合性へ差し替える。
+    """
+
+    rq2 = _rq2()
+    contract = {"responsibility": "束縛Requirementに対する適合を判定する。"}
+    context = {
+        "material_bundle": [
+            {"relative_path": "docs/evaluation/rq2-cases/case-001/a.md",
+             "sha256": "0" * 64},
+        ]
+    }
+    body, scope = rq2.compose_review_question(contract, context)
+    # 材料の内部整合性を問う語が入り、Contract責務の丸写しは入らない
+    for token in ("矛盾", "欠落", "曖昧", "根拠"):
+        assert token in body
+    assert contract["responsibility"] not in body
+    assert "docs/evaluation/rq2-cases/case-001/a.md" in body
+    # 複製であることを理由にした指摘を範囲外と明示する
+    assert "複製" in scope
