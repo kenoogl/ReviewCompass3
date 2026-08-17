@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25、一件用安全保存、一件レビュー材料、G08一件設計、G20の外部送信2契約（008・009）、『正式ツール化』の縦B契約010（Reviewer起動アダプタ・headless正式経路）と**縦A契約011（依頼組み立て器・2類型）の製品受入**まで完了。依頼record作成はassemble→LLM記入→check合格が正式経路になった。事前走査は6手順へ改定・手順書化し、正式再利用検索の導線を接続、機械gate接続は改善候補`IC-REUSE-SEARCH-GATE-CONNECTION-001`として登録済み。
-- 現在作業：契約012（claude-subagent第2 backend・Tier 2／3受容機構）の残り受入条件を進める。実装は完了（RED16→全緑・agy値不変移設の機械証明・和集合互換・保護対象差分0）。残り＝(1) subagent許可modelの利用者承認と定数固定（空の間は起動が安全側で停止）、(2) §9-8実E2E（`--accept-tier 3`＋受容根拠の明示。同一対象集合の別名依頼で初の2 oracle比較）、(3) §9-10完了レビュー（agy・Tier 1）、(4) §9-11製品受入。
-- Task Contract：`TC-RC3-PRODUCT-CLAUDE-SUBAGENT-BACKEND-012 / v2`＝`adopted_implementation_started`（実装済み。model承認・E2E・完了レビュー・製品受入待ち）
+- 現在作業：契約012（claude-subagent第2 backend・Tier 2／3受容機構）の残り受入条件を進める。実装完了（RED16→全緑・agy値不変移設の機械証明・和集合互換・保護対象差分0）に加え、subagent許可modelの承認・定数固定（`claude-opus-5`・和集合更新・試験追随）と§7.2固定引数の契約訂正（`--verbose`列挙漏れ解消・実装・試験追随）まで完了。残り＝(1) §9-8実E2E（`--accept-tier 3`＋受容根拠の明示。同一対象集合の別名依頼で初の2 oracle比較。前提：操縦環境の認証・起動場所の確認——model承認record §4-2）、(2) §9-10完了レビュー（agy・Tier 1）、(3) §9-11製品受入。
+- Task Contract：`TC-RC3-PRODUCT-CLAUDE-SUBAGENT-BACKEND-012 / v2＋§7.2訂正record`＝`adopted_implementation_started`（実装・model承認・引数訂正済み。E2E・完了レビュー・製品受入待ち）
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [契約012 §7.2固定引数の訂正record（--verbose・adopted）](records/development/2026-08-17-claude-subagent-verbose-argument-correction-decision-v1.md) — SHA-256 `3e96a358ea21c7c8a7e08a2436d3546d16dfb6e577706de29ddb1c96e6645375`
+- [契約012 subagent許可model承認record（claude-opus-5・実測3回）](records/development/2026-08-17-subagent-allowed-models-approval-v1.md) — SHA-256 `d6f7420db1948f1755fd9db62453cc1f44e43427839d70408c30ee259b050703`
 - [契約012実装Evidence（RED16→全緑・不変移設証明・保護差分0）](records/development/2026-08-17-claude-subagent-backend-implementation-evidence-v1.md) — SHA-256 `979b48868bdc69751c60fec4bb3f5e9abdf910b4c7d30b941b5cd7fe0922a7de`
 - [契約012採用と実装開始のHuman判断record](records/development/2026-08-17-claude-subagent-backend-contract-adoption-decision-v1.md) — SHA-256 `5af17a1ede1f109d7f378af9457bc1d5f4e044107128c378599163167abc8959`
 - [採用中の契約012候補v2](records/task-contract/2026-08-17-claude-subagent-backend-candidate-v2.md) — SHA-256 `f95446a96b132c9dda5e225460cc4ab0214e535ebbc7ef9b79fdc953d936994d`
@@ -36,26 +38,26 @@
 
 ## 次に行う一作業
 
-利用者がsubagent許可modelを承認する（契約012 §5.1-5）。Claudeが候補案（claude系のmodel名）を提示し、
-利用者の承認文言を受けて承認record作成→`SUBAGENT_ALLOWED_RESPONSE_MODELS`定数へ固定→和集合
-`ALLOWED_RESPONSE_MODELS`の更新と回帰試験の追随を行う。その後、利用者の明示指示で§9-8実E2E
-（`--accept-tier 3`・受容根拠record・同一対象集合の別名依頼・run-id `e2e-012-001`）→§9-10完了レビュー
-（agy）→§9-11製品受入へ進む。
+利用者とE2E前提（操縦環境の認証・起動場所）を確認する（model承認record §4-2）。実測（同§2.2）では
+契約の子環境（通過7変数のみ）でclaude CLIが未login扱いとなり、操縦環境の認証は環境変数由来だった。
+Claudeが選択肢（利用者端末での永続login確認・起動場所の選定等）と推奨案を提示し、利用者の判断を
+受けてから、利用者の明示指示で§9-8実E2E（`--accept-tier 3`・受容根拠record・同一対象集合の別名依頼・
+run-id `e2e-012-001`）→§9-10完了レビュー（agy）→§9-11製品受入へ進む。
 
 開始条件：
 
-- 実装Evidenceと本TODOが意味単位commitへ固定され、作業treeがcleanである
+- 本handoffを含むcommitが完了し、作業treeがcleanである
 
 完了条件：
 
-- subagent許可modelの承認文言（または保留）がchatで得られる
+- E2E起動文脈（認証・起動場所）の利用者判断がchatで得られる
 
-後続作業：model定数固定→E2E（2 oracle比較）→完了レビュー→製品受入→次縦切りの順序選択。
+後続作業：§9-8実E2E（2 oracle比較）→完了レビュー→製品受入→次縦切りの順序選択。
 
 ## blocker・Human判断待ち
 
-- blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路が稼働中
-- Human判断待ち：subagent許可modelの承認（その後にE2E実施指示・製品受入）
+- blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路が稼働中。契約の子環境ではclaude CLIが未login扱い（E2E前提。model承認record §4-2）
+- Human判断待ち：E2E起動文脈（操縦環境の認証・起動場所）の確認（その後にE2E実施指示・製品受入）
 
 ## stale・deferred
 
@@ -68,8 +70,8 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：契約012対象51件（`tests/test_reviewer_launch.py`。既存35無変更＋新設16）、契約011対象32件（無変更）、G30運用契約実行75件、layout 13件——各単独終了コード0
-- 直近の全Test：禁止認証隔離条件の正規全試験2,458件成功・終了コード0（契約012実装後の実行）。通常host環境の既存executor安全拒否12件は既知事象で退行なし
+- 直近の関連Test：契約012対象51件（`tests/test_reviewer_launch.py`。model定数・`--verbose`訂正の追随後）、契約011対象32件（無変更）、G30運用契約実行75件、layout 13件——各単独終了コード0
+- 直近の全Test：禁止認証隔離条件の正規全試験2,458件成功・終了コード0（model定数固定・`--verbose`訂正後の実行）
 - 差分検査：`git diff --check`合格
 
 ## 更新規則
