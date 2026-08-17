@@ -275,6 +275,56 @@ def extract_usage(raw_text):
     return None
 
 
+def extract_read_paths(raw_text, *, repository_root):
+    """reviewerが読取り道具で開いたfileをrepo相対pathで列挙する（出現順）。
+
+    実測：`step_update`の`tool_info.parameters.AbsolutePath`に絶対pathが残る。
+    repository外のpathは対象外（起動promptが領域外アクセスを禁じているため
+    通常は現れないが、現れた場合も相対化できないので数えない）。
+    """
+
+    prefix = str(repository_root).rstrip("/") + "/"
+    found = []
+    for line in str(raw_text).splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict) or event.get("event") != "step_update":
+            continue
+        parameters = (
+            ((event.get("step_update") or {}).get("tool_info") or {})
+            .get("parameters")
+            or {}
+        )
+        value = parameters.get("AbsolutePath")
+        if not isinstance(value, str) or not value.startswith(prefix):
+            continue
+        relative = value[len(prefix):]
+        if relative not in found:
+            found.append(relative)
+    return tuple(found)
+
+
+def check_read_scope(read_paths, *, allowed, request_relative_path):
+    """依頼recordと指定材料の外を読んでいないかを機械判定する。
+
+    範囲外を読んだ実行は**汚染**として集計から外す判断材料になる（repository内には
+    設計・裁定recordが残っており、そこに答の一部が書かれているため）。
+    """
+
+    permitted = set(allowed) | {request_relative_path}
+    outside = tuple(path for path in read_paths if path not in permitted)
+    return {
+        "clean": not outside,
+        "read_count": len(read_paths),
+        "outside": outside,
+    }
+
+
 def run_case(
     *,
     project_root,
@@ -329,6 +379,10 @@ def run_case(
     finding_set = reviewer_bridge.convert_findings(
         verdict.get("findings", ()), context_manifest=context
     )
+    raw_text = outcome.get("raw_text", "")
+    read_paths = extract_read_paths(
+        raw_text, repository_root=Path(project_root).resolve()
+    )
     return {
         "case_id": case["case_id"],
         "condition": condition,
@@ -337,10 +391,18 @@ def run_case(
         "request_relative_path": request_relative_path,
         "expected_sha256": expected_sha256,
         "selection": selection_signature(context),
-        "usage": extract_usage(outcome.get("raw_text", "")),
+        "usage": extract_usage(raw_text),
         "verdict": verdict.get("verdict"),
         "findings": finding_set["findings"],
         "run_id": outcome.get("run_id"),
+        "read_scope": check_read_scope(
+            read_paths,
+            allowed=[
+                item["relative_path"]
+                for item in context["material_bundle"]
+            ],
+            request_relative_path=request_relative_path,
+        ),
     }
 
 

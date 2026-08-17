@@ -332,3 +332,47 @@ def test_run_case_never_spawns_process(tmp_path, monkeypatch):
     assert result["usage"] == {"input_tokens": 42, "output_tokens": 7}
     assert result["selection"]["count"] == 2
     assert result["findings"][0]["severity"] == "error"
+
+
+def test_extract_read_paths_and_scope_check():
+    """reviewerが実際に読んだfileを機械抽出し、範囲外読取りを検出する。
+
+    正解表を私有領域へ退避しても、repository内には設計・裁定recordが残り、
+    そこに答の一部が書かれている。事前に消し切るのではなく**読まれたことを
+    事後に機械検出**して、汚染した実行を集計から外す（実測：raw応答の
+    step_update/tool_info/parameters/AbsolutePathに読取りpathが残る）。
+    """
+
+    rq2 = _rq2()
+    raw = "\n".join(
+        [
+            json.dumps({"event": "step_update", "step_update": {
+                "tool_info": {"parameters": {"AbsolutePath":
+                    "/repo/docs/evaluation/rq2-cases/case-001/material-a.md"}}}}),
+            json.dumps({"event": "step_update", "step_update": {
+                "tool_info": {"parameters": {"AbsolutePath":
+                    "/repo/records/development/leak.md"}}}}),
+            json.dumps({"event": "result", "result": {
+                "usage": {"input_tokens": 1, "output_tokens": 1}}}),
+        ]
+    )
+    paths = rq2.extract_read_paths(raw, repository_root="/repo")
+    assert paths == (
+        "docs/evaluation/rq2-cases/case-001/material-a.md",
+        "records/development/leak.md",
+    )
+    report = rq2.check_read_scope(
+        paths,
+        allowed=("docs/evaluation/rq2-cases/case-001/material-a.md",),
+        request_relative_path="records/session-handoffs/req.md",
+    )
+    assert report["clean"] is False
+    assert report["outside"] == ("records/development/leak.md",)
+    clean = rq2.check_read_scope(
+        ("docs/evaluation/rq2-cases/case-001/material-a.md",
+         "records/session-handoffs/req.md"),
+        allowed=("docs/evaluation/rq2-cases/case-001/material-a.md",),
+        request_relative_path="records/session-handoffs/req.md",
+    )
+    assert clean["clean"] is True
+    assert clean["outside"] == ()
