@@ -1,0 +1,127 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-SESSION-LOG-PREFIX-INTERPRETATION-2026-08-17-V1",
+  "searches": [
+    {
+      "subject": "session_log_prefix_interpretation_v1",
+      "capabilities": [
+        {
+          "capability_id": "prefix_skip_source_identification",
+          "responsibility": "既知前置4種（queue-operation・mode・custom-title・started）を正準列として読み飛ばし、最初の判定可能recordで生ログ種別を確定する。未知種別・本文不在はfail-closed（非対応のまま）",
+          "inputs": [
+            "生ログbytes・path"
+          ],
+          "outputs": [
+            "生ログ種別判定"
+          ],
+          "failure_behavior": [
+            "未知の前置種別・判定可能record不在を推測で解釈しない（None返却で非対応維持）"
+          ],
+          "required_properties": [
+            "正準列の限定（既知4種のみ）",
+            "先頭依存の判定規則の互換維持"
+          ],
+          "reference_paths": [
+            "tools/session_logs/source_kind.py",
+            "tools/session_logs/source_adapter.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/source_kind.py:_identify_first_event",
+            "tools/session_logs/source_kind.py:_first_record",
+            "tools/session_logs/source_kind.py:identify_source_kind_bytes"
+          ],
+          "symbol_terms": [
+            "identify",
+            "first",
+            "record",
+            "skip"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "auxiliary_reclassification_consistency",
+          "responsibility": "前置スキップ導入後の補助分類の整合を保つ。本文recordを持たないfileだけを補助（claude_queue・claude_agent等）・非対応に残し、既存の補助file許容判定（私有領域検証・転写生成のスキップ判定）を壊さない",
+          "inputs": [
+            "生ログpath",
+            "補助分類判定"
+          ],
+          "outputs": [
+            "補助分類の判定結果"
+          ],
+          "failure_behavior": [
+            "本文有無の判定不能fileを補助と断定しない（非対応として申告）"
+          ],
+          "required_properties": [
+            "既存呼び出し2箇所（private_validation・cli）の意味互換",
+            "fail-closed"
+          ],
+          "reference_paths": [
+            "tools/session_logs/source_kind.py",
+            "tools/session_logs/private_validation.py",
+            "tools/session_logs/cli.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/source_kind.py:identify_auxiliary_kind"
+          ],
+          "symbol_terms": [
+            "auxiliary",
+            "kind",
+            "validate"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network",
+            "process_spawn"
+          ]
+        },
+        {
+          "capability_id": "retroactive_reinterpretation_verification",
+          "responsibility": "保全済みrawの解釈非対応分（68件規模）が、判定拡張後の通常実行（collect-eventual再実行）と転写再生成経路で解釈済みへ遷移することを確認する",
+          "inputs": [
+            "保全済みraw",
+            "保全状態（cursor・台帳）"
+          ],
+          "outputs": [
+            "再解釈の遷移確認結果"
+          ],
+          "failure_behavior": [
+            "遷移しないfileを成功として数えない（state・件数の機械照合）"
+          ],
+          "required_properties": [
+            "保全機構（raw先行保存）の不変",
+            "毎回全件解釈試行の既存挙動の利用"
+          ],
+          "reference_paths": [
+            "tools/session_logs/eventual_preservation.py",
+            "tools/session_logs/regeneration.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/eventual_preservation.py:reconcile_source_root",
+            "tools/session_logs/regeneration.py:regenerate_transcript"
+          ],
+          "symbol_terms": [
+            "reconcile",
+            "regenerate",
+            "cursor",
+            "state"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-17-session-log-prefix-interpretation-reuse-search-attestation-v1.json"
+    }
+  ],
+  "content_digest": "6da22aa103aa4b34369ca11a61692aa4a9df3930e659dc525bd6873020cf6d57"
+}
