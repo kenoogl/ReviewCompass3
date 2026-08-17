@@ -43,3 +43,25 @@ reviewcompass3-reviewer-launch check \
 操作名`reviewer_launch_prepare`として`reviewcompass3-operation-run`へ登録済み（入力`request`、
 束縛位置`request.sha256`）。G30経由の実行は起動なしの事前検査だけを行う（外部起動は単体入口
 `launch`だけが行う）。
+
+## claude-subagent backend（契約012）
+
+同一プロバイダのTier 3 Reviewer。**Tier 2／3は明示受容がある場合だけ起動できる**：
+
+```text
+reviewcompass3-reviewer-launch launch \
+  --repository <対象repositoryの絶対パス> \
+  --request <依頼recordのrepo相対パス> \
+  --expected-sha256 <依頼recordのSHA-256> \
+  --private-root <repo外私有領域の絶対パス> \
+  --run-id <実行識別子> \
+  --backend claude-subagent \
+  --accept-tier 3 \
+  --acceptance-ref <受容根拠recordのrepo相対パス>
+```
+
+- `--accept-tier`が宣言tier（claude-subagentは3）と一致し、`--acceptance-ref`が実在する場合だけ
+  起動する。欠落・不一致は`reviewer_not_independent_tier`で停止する（機械が黙って独立性を緩めない）。
+- subagentの許可model一覧が空の間は`allowed_models_unfixed`で停止する（利用者承認recordで確定）。
+- `high` risk作業でTier 2／3を唯一の独立oracleにしない（work-review-protocol §5）。完了レビューは
+  Tier 1（agy）で行う。
