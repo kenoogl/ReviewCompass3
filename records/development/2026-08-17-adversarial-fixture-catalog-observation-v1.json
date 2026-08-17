@@ -1,0 +1,14 @@
+{
+ "observation_id": "OBS-RC3-ADVERSARIAL-FIXTURE-CATALOG-2026-08-17-V1",
+ "observed_at": "2026-08-17T12:14:57+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "既知失敗8類型（文字列理解の失敗）の敵対fixtureがRC3の機械検査群で体系化されておらず、fence系2形＋停止系の個別追加にとどまる",
+ "machine_observations": {
+  "principles_reference": "records/development/2026-08-17-text-interpretation-failure-principles-reference-v1.md §3（8類型）・§4（RC3体現状況）",
+  "current_fixtures": "tools/request_builder（fence内偽見出し・fence外digest行の2形）、tools/reviewer_launch（JSON抽出不能・schema必須鍵欠落・許可外model・応答内model欄の停止系）——いずれも個別事象を契機に追加されたもの",
+  "recurrence_evidence": "fence騙されは三度目の再発だった（RC1 issue 2026-07-06→RC1 issue 2026-07-17 類型(3)→RC3契約011 e2e-011-001所見2）。類型一覧が試験設計の標準入力になっていれば起草時に防げた",
+  "coverage_gap": "8類型のうちRC3の検査器に敵対fixtureが無い類型：(1)byte表現ゆれ（正規化検査は組み立て器の対象外）、(2)shell衝突（shell非経由方式で構造的に回避——fixture不要の可能性）、(5)意味同一とbyte差の区別、(6)schema語彙非対応、(8)文字列層混在"
+ },
+ "impact_summary": "新しい解析器・record類型を追加するたびに、既知類型の騙し方が試験に入らず同型再発の余地が残る。原則参照recordの必読接続（2026-08-17）で起草時の照合は導線化されたが、fixtureの機械的な標準化は未了",
+ "route_proposal": "改善候補IC-ADVERSARIAL-FIXTURE-CATALOG-001としてHuman仕分けへ。採用時は「類型→対象検査器→fixture」の対応表を作り、該当する類型のfixtureを各検査器の試験へ標準装備する縦切り（該当しない類型は方式上不要の根拠を対応表へ記す）"
+}
