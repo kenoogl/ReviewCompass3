@@ -850,6 +850,14 @@ def test_entry_missing_arguments_exits_2():
 # ---- 契約012：claude-subagent backendとTier 2／3受容 ----
 
 SUBAGENT_TEST_MODEL = "claude-test-model"
+SUBAGENT_FORBIDDEN_VARIABLES = (
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_FOUNDRY_API_KEY",
+    "ANTHROPIC_VERTEX_PROJECT_ID",
+    "AWS_BEARER_TOKEN_BEDROCK",
+)
 
 
 def _subagent_stream(model=SUBAGENT_TEST_MODEL, result_text=None, verdict=None):
@@ -990,14 +998,15 @@ def test_subagent_empty_allowed_models_stops(
     assert facade.calls == []
 
 
+@pytest.mark.parametrize("variable", SUBAGENT_FORBIDDEN_VARIABLES)
 def test_subagent_forbidden_env_stops(
-    repository, monkeypatch, clean_environment
+    repository, monkeypatch, clean_environment, variable
 ):
     core = _core()
     facade = _FacadeRecorder()
     for name in core.CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT:
         monkeypatch.delenv(name, raising=False)
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "secret")
+    monkeypatch.setenv(variable, "secret")
     monkeypatch.setattr(
         core,
         "SUBAGENT_ALLOWED_RESPONSE_MODELS",
@@ -1019,6 +1028,57 @@ def test_subagent_forbidden_env_stops(
         )
     assert caught.value.reason == "api_key_environment_forbidden"
     assert facade.calls == []
+
+
+def test_subagent_acceptance_ref_outside_repository_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    outside = repository.parent / "outside-acceptance.md"
+    outside.write_text("受容根拠を装ったrepo外file\n", encoding="utf-8")
+    for reference in (str(outside), "../outside-acceptance.md"):
+        facade = _FacadeRecorder(stdout=_subagent_stream())
+        with pytest.raises(core.LaunchStop) as caught:
+            _launch_subagent(
+                repository, monkeypatch, facade, acceptance_ref=reference
+            )
+        assert caught.value.reason == "acceptance_reference_missing"
+        assert facade.calls == []
+
+
+def test_subagent_message_model_outside_allowed_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    stream = "\n".join(
+        [
+            json.dumps(
+                {
+                    "type": "system",
+                    "subtype": "init",
+                    "model": SUBAGENT_TEST_MODEL,
+                }
+            ),
+            json.dumps(
+                {
+                    "type": "assistant",
+                    "message": {"model": "claude-unlisted-model"},
+                }
+            ),
+            json.dumps(
+                {
+                    "type": "result",
+                    "result": json.dumps(
+                        _valid_verdict(), ensure_ascii=False
+                    ),
+                }
+            ),
+        ]
+    ) + "\n"
+    facade = _FacadeRecorder(stdout=stream)
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_subagent(repository, monkeypatch, facade)
+    assert caught.value.reason == "response_model_not_allowed"
 
 
 def test_subagent_forbidden_constant_equals_executor():
@@ -1095,6 +1155,10 @@ def test_subagent_schema_nonconforming_verdict_stops(
     with pytest.raises(core.LaunchStop) as caught:
         _launch_subagent(repository, monkeypatch, facade)
     assert caught.value.reason == "verdict_schema_nonconforming"
+    raw_path = (
+        repository.parent / "private" / "run-sub-001" / "reviewer.raw.json"
+    )
+    assert raw_path.is_file()
 
 
 def test_subagent_injection_constant_equals_executor(monkeypatch):

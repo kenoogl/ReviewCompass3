@@ -1,0 +1,14 @@
+{
+ "observation_id": "OBS-RC3-REQUEST-BUILDER-UNION-CHECK-2026-08-17-V1",
+ "observed_at": "2026-08-17T11:48:18+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "依頼record組み立て器のmodel欄照合が全backend許可modelの和集合を基準とし、backendとmodelの対応までは検査しない（e2e-012-002判定R-2）",
+ "machine_observations": {
+  "finding_source": "records/session-handoffs/2026-08-17-claude-subagent-backend-implementation-completion-rereview-subagent-verdict-v1.md のR-2（severity low・blocking false）",
+  "current_shape": "tools/request_builder/core.py はALLOWED_RESPONSE_MODELS（現在2値：gemini-3.1-pro-high・claude-opus-5）で依頼recordのmodel欄を照合。既定記載は和集合先頭（agy値）で不変",
+  "boundary_fact": "起動側の照合はF-1修正によりbackend別一覧で厳密（agy＝専用1値・subagent＝専用1値）。組み立て器側だけが和集合基準",
+  "contract_basis": "契約012 §5.1-4「和集合として名称・tuple意味を維持（契約011の検査を無変更で保つ）」の設計どおりの帰結であり契約違反ではない"
+ },
+ "impact_summary": "依頼recordのmodel欄にbackendと不対応のmodel名（例：agy依頼にclaude-opus-5）を書いてもcheckを通る。起動時の実model照合が最終防衛のため実害は限定的",
+ "route_proposal": "改善候補IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001としてHuman仕分けへ。対処するなら契約011の改定候補（backend別照合または記載model・backend対応検査の追加）。契約011成果物は契約012 §6保護対象のため独立の作業単位を要する"
+}

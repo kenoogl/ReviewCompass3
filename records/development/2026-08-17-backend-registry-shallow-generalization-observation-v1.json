@@ -1,0 +1,14 @@
+{
+ "observation_id": "OBS-RC3-BACKEND-REGISTRY-SHALLOW-2026-08-17-V1",
+ "observed_at": "2026-08-17T11:48:18+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "backend登録形の一般化が契約012 §5.1-1の記述より浅く、許可model一覧等の切替えがname比較のif分岐に残っている（e2e-012-001判定F-6）",
+ "machine_observations": {
+  "finding_source": "records/session-handoffs/2026-08-17-claude-subagent-backend-implementation-completion-review-subagent-verdict-v1.md のF-6（severity low・blocking false）",
+  "current_shape": "BACKENDSはprovider・executable・declared_tier・read_tool_nameの4項目のみ。引数組み立て・stream解析・許可model一覧・禁止環境変数一覧・通過変数・注入はlaunch_review等のname分岐で切替え",
+  "induced_defect": "E2E一往復目のblocking F-1（agy照合の和集合使用の取り違え）は、許可model一覧が登録形へ入っていないこの構造が誘発した（判定record F-6の指摘）",
+  "current_mitigation": "F-1は修正済み（agy専用一覧照合＋固定試験）。現状2 backendでは挙動差なし"
+ },
+ "impact_summary": "第3 backend（codex-cli等）追加時に登録行の追加では済まず分岐改修が要り、同型の取り違え再発余地が残る",
+ "route_proposal": "改善候補IC-BACKEND-REGISTRY-DEEPENING-001としてHuman仕分けへ。採用時機は第3 backend追加の縦切りと同時が自然（登録形へ関数・一覧を吊るす一般化を契約改定として実施）"
+}

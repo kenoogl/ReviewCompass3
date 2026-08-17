@@ -623,11 +623,17 @@ def launch_review(
     environment.update(injections)
     tier = _resolve_tier(backend, accept_tier)
     if tier != 1:
-        if (
-            not isinstance(acceptance_ref, str)
-            or not acceptance_ref
-            or not (Path(repository) / acceptance_ref).is_file()
-        ):
+        # e2e-012-001判定F-4：受容根拠はrepository内のrecordに限る
+        # （絶対path・repo外への逸脱は不受理）。
+        reference_valid = False
+        if isinstance(acceptance_ref, str) and acceptance_ref:
+            repository_path = Path(repository).resolve()
+            candidate = (repository_path / acceptance_ref).resolve()
+            reference_valid = (
+                candidate.is_file()
+                and repository_path in candidate.parents
+            )
+        if not reference_valid:
             raise LaunchStop("acceptance_reference_missing")
     if not allowed_models:
         raise LaunchStop("allowed_models_unfixed")
