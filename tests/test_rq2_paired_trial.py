@@ -91,9 +91,11 @@ def test_condition_target_paths_follow_prescan_table(tmp_path):
     # B＝登録材料のみ。C＝Bと同一（契約へ渡すpathは変えない）
     assert selected["B"] == case["materials"]
     assert selected["C"] == case["materials"]
-    # A＝ディレクトリ内の全file（プール込みで5件）
-    assert len(selected["A"]) == 5
-    assert set(case["materials"]).issubset(set(selected["A"]))
+    # A1（資料少）・A2（資料多）＝ディレクトリ内の全file。選択規則は同一で、
+    # 差は物理内容（プールの在／不在）にある。ここではプール在の状態で5件。
+    assert len(selected["A1"]) == 5
+    assert selected["A1"] == selected["A2"]
+    assert set(case["materials"]).issubset(set(selected["A1"]))
     # D＝必須材料を1件欠く
     assert case["required_material"] not in selected["D"]
     assert len(selected["D"]) == len(case["materials"]) - 1
@@ -119,7 +121,7 @@ def test_selection_invariant_between_b_and_c(tmp_path):
     # 対照：A（資料多）は選択が増える
     signature_a = rq2.selection_signature(
         rq2.build_case_context(
-            project_root=with_pool, case=case, condition="A"
+            project_root=with_pool, case=case, condition="A1"
         )[1]
     )
     assert signature_a["count"] == 5

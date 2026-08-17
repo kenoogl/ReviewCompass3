@@ -24,7 +24,9 @@ from tools.task_contract import contract as contract_module
 
 CASE_ROOT = "docs/evaluation/rq2-cases"
 POOL_ROOT = "docs/evaluation/rq2-pool"
-CONDITIONS = ("A", "B", "C", "D")
+# A1＝資料少（プール不在）、A2＝資料多（プール在）。どちらも「ディレクトリ全file」を
+# 契約へ渡す基準条件だが、物理内容が違うため別条件として数える。
+CONDITIONS = ("A1", "A2", "B", "C", "D")
 ABSOLUTE_LAUNCH_LIMIT = 35
 CONSECUTIVE_FAILURE_LIMIT = 3
 UNABLE_RATIO_LIMIT = 0.30
@@ -48,7 +50,7 @@ CASES = (
         "required_material": _material(
             "case-001", "observation-prefix-record-shapes.md"
         ),
-        "conditions": ("A", "B", "C", "D"),
+        "conditions": ("A1", "A2", "B", "C", "D"),
     },
     {
         "case_id": "case-002",
@@ -76,7 +78,7 @@ CASES = (
         "required_material": _material(
             "case-004", "rq1-apparatus-work-ticket.md"
         ),
-        "conditions": ("A", "B", "C"),
+        "conditions": ("A1", "A2", "B", "C"),
     },
     {
         "case_id": "case-005",
@@ -114,7 +116,7 @@ CASES = (
         "required_material": _material(
             "case-008", "session-log-record-run.md"
         ),
-        "conditions": ("A", "B", "C", "D"),
+        "conditions": ("A1", "A2", "B", "C", "D"),
     },
     {
         "case_id": "case-009",
@@ -174,7 +176,7 @@ def select_target_paths(*, project_root, case, condition):
 
     if condition not in CONDITIONS:
         raise ValueError("unknown condition: %s" % condition)
-    if condition == "A":
+    if condition.startswith("A"):
         return directory_paths(project_root=project_root, case=case)
     if condition in ("B", "C"):
         return tuple(case["materials"])
