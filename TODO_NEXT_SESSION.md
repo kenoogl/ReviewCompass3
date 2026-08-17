@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25、一件用安全保存、一件レビュー材料、G08一件設計、G20の外部送信2契約（008・009）、『正式ツール化』の縦B契約010（Reviewer起動アダプタ）・縦A契約011（依頼組み立て器）・契約012（claude-subagent第2 backend）・**契約013（自由文類型）の六契約が製品受入まで完了**。レビュー起動はagy（Tier 1・既定）とclaude-subagent（Tier 3・起動ごとの明示受容つき）の2 backend体制が正式経路で、同一対象集合への2 oracle比較が初成立（両判定役一致）。依頼record作成はassemble→LLM記入→check合格が正式経路（3類型：契約レビュー・完了レビュー・自由文レビュー。類型推定は正準位置方式）。事前走査は6手順＋必読原則record。
-- 現在作業：次の作業単位の順序選択待ち（利用者判断）。契約013は§9-8成立・完了（E2E 1往復で参照文書の陳腐化検出→所見採用まで実証。完了レビューcr-013-002＝`verified`・blocking 0）。候補＝(a) 縦C（合議・判定record比較の上位層。仕分け確定2件——機械gate実測・敵対fixture対応表のRED組み込み——を兼ねる）、(b) codex-cli第3 backend（疎通回復待ち。回復時は登録形深化を含めmodel照合範囲を再評価）、(c) 外部API pending解除・`review_plan`自動変換等の他候補。
+- 現在作業：**レビュー基盤module（『正式ツール化』）の開発は利用者判断で一旦終了**（2026-08-17休止record）。残件はpendingとし、適切な時機に利用者判断で再開する。契約013は§9-8成立・完了（E2E 1往復で参照文書の陳腐化検出→所見採用まで実証。完了レビューcr-013-002＝`verified`・blocking 0）。
 - Task Contract：なし（契約013は§9-8成立・完了。受入判断record＝`2026-08-17-free-text-request-type-product-acceptance-decision-v1.md`。次契約は未定義）
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [レビュー基盤module開発の一時終了record（pending残件と再開の入口）](records/development/2026-08-17-review-tooling-module-pause-decision-v1.md) — SHA-256 `9b4d184f378d5dc8dad203caba5daf6b6e58b2471dd387187d5c5ede971cfd6c`
 - [利用者による契約013の製品受入判断（残余risk 5点受容・自由文類型の正式経路化。013系Evidenceの束縛表つき）](records/development/2026-08-17-free-text-request-type-product-acceptance-decision-v1.md) — SHA-256 `2e01fb5cab0ca5b5218bce77c6e4884ba9692f40f6f14054c65dd3439ffdc810`
 - [文字列理解の失敗類型と対策原則（参照record・事前走査の必読入力。§4は契約013反映済み）](records/development/2026-08-17-text-interpretation-failure-principles-reference-v1.md) — SHA-256 `ea482a3c7653b0966316012f43cc87ae426cdd5e429348a7f96c4e7f05ecd7b6`
 - [改善候補4件の仕分けrecord（採用2・保留2・実施時機の固定）](records/development/2026-08-17-improvement-candidates-triage-decision-v1.md) — SHA-256 `34f7ca163645fe50770734f92b48ad41b6415983ab1eda61c57efc104be8a162`
@@ -26,29 +27,24 @@
 
 ## 次に行う一作業
 
-利用者が次の作業単位の順序を選択する。候補：
-
-- **(a) 縦C（合議・判定record比較の上位層）の契約候補作成**——2 oracle比較の実データ（契約012の
-  一致事例2組）が材料。事前走査（6手順）から着手し、仕分け確定事項2件（`IC-REUSE-SEARCH-GATE-CONNECTION-001`の
-  運用実測・`IC-ADVERSARIAL-FIXTURE-CATALOG-001`のRED段組み込み）を兼ねる。
-- (b) codex-cli第3 backend——トークン枯渇の疎通回復待ちのため着手不可（回復確認が先）。回復時は
-  `IC-BACKEND-REGISTRY-DEEPENING-001`を同縦切りへ含め、`IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001`を再評価。
-- (c) 外部API pending解除・`review_plan`出力の自動変換等の他候補。
+なし（module休止中）。再開時は利用者の再開指示を受け、休止record §3のpending残件——(a) 縦C
+（合議。仕分け確定2件を兼ねる）、(b) codex-cli第3 backend（疎通回復が合図）、(c) 外部API pending
+解除・`review_plan`自動変換等——から順序を選択し、事前走査（6手順・必読原則record）で着手する。
 
 開始条件：
 
-- 本handoffを含むcommitが完了し、作業treeがcleanである
+- 利用者の再開指示と順序選択がchatで得られる
 
 完了条件：
 
-- 順序選択の文言がchatで得られる
+- 選択された作業単位の事前走査record固定（または別moduleの新規着手）
 
-後続作業：選択された作業単位の事前走査（6手順・必読原則record）または着手。
+後続作業：休止record §4の再開の入口を参照。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路とclaude-subagent（Tier 3・明示受容つき）の2経路が稼働
-- Human判断待ち：次の作業単位の順序選択
+- Human判断待ち：なし（module休止中。再開の時機・順序は利用者判断）
 
 ## stale・deferred
 
