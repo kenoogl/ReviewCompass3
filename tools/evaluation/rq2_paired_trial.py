@@ -139,17 +139,41 @@ CASES = (
 )
 
 
-def launch_guard(**arguments):
+def launch_guard(
+    *, repository, request_relative_path, expected_sha256, private_root,
+    run_id, backend="antigravity-cli",
+):
     """**実起動**が通る唯一の呼び出し口（試験は差し替えて禁止する）。
+
+    正式経路の単体入口（`reviewer_launch.entry`のlaunch subcommand）をそのまま
+    呼ぶ。起動・未加工出力の保存・判定recordの機械転記と単独commit・事後照合4点まで
+    含む。安全境界を再構成しない（契約010の入口を迂回しない）。
 
     injectableな`launcher`はここを通らない。実起動バッチが渡すlauncherだけが
     本関数を呼ぶため、試験でここを禁止fakeへ差し替えると「起動ゼロ」を機械で
     証明できる（reviewer_bridgeの`subprocess_guard`と同じ型）。
     """
 
-    from tools.reviewer_launch import core as reviewer_launch
+    import io
 
-    return reviewer_launch.launch_review(**arguments)
+    from tools.reviewer_launch import entry as reviewer_entry
+
+    buffer = io.BytesIO()
+    code = reviewer_entry.main(
+        [
+            "launch",
+            "--repository", str(repository),
+            "--request", request_relative_path,
+            "--expected-sha256", expected_sha256,
+            "--private-root", str(private_root),
+            "--run-id", run_id,
+            "--backend", backend,
+        ],
+        output=buffer,
+    )
+    document = json.loads(buffer.getvalue().decode("utf-8") or "{}")
+    document["exit_code"] = code
+    return document
 
 
 def case_by_id(case_id):
