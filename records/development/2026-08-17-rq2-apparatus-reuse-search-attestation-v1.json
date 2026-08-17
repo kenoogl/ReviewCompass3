@@ -1,0 +1,26 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "rq2_paired_trial_apparatus_v1",
+  "external": {
+    "relative_path": "work4b/reuse-searches/f65321a21f6c801e5c597c64035d400abbfbf32e75617355bbe846a3f04cd8b9.json",
+    "content_digest": "f65321a21f6c801e5c597c64035d400abbfbf32e75617355bbe846a3f04cd8b9",
+    "byte_sha256": "434589cabd30118f1f608d4692df9fe575c99a40d356e872730e28f77665430c"
+  },
+  "source_identity": {
+    "profile_run_id": "6af56dbfc1e98cd14a80b71737df27582d2d92eb2ba1776a95eb9117bf75c5ac",
+    "discovery_run_id": "0cdedd4f27c5c61670759ae6dccd2be8900f2afb3cc074922a35f48c53176019",
+    "source_content_id": "3969377126896eb43028dd4ef792def44dada824c439bd48ebc271fbfaa0a210",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 4,
+  "capability_count": 2,
+  "direct_match_count": 15,
+  "hint_match_count": 316,
+  "comparison_group_count": 113,
+  "no_search_material_capability_count": 0,
+  "content_digest": "40685e2be237993be988d6fce46194c2b32151620c6b8a7021dd7762413bdfb3"
+}
