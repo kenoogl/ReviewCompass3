@@ -1,0 +1,1305 @@
+{
+  "answer_key": "records/development/2026-08-17-rq2-case-answer-key-v2.md",
+  "answer_key_sealed_sha256": "0d290876110440df6ac5f14bd2efcc3d3d8f244b66f5d19354c4e7bb98f8cb64",
+  "conditions": {
+    "A1": "ベースライン・ケースディレクトリ全file・プール不在",
+    "A2": "ベースライン・ケースディレクトリ全file・プール在",
+    "B": "Task Contract方式・登録材料のみ・プール不在",
+    "C": "Task Contract方式・登録材料のみ・プール在",
+    "D": "Task Contract方式・必須材料を1件除去"
+  },
+  "executed_on": "2026-08-17",
+  "experiment": "RQ2 paired trial (Context scalability)",
+  "plan": "records/development/2026-08-17-rq2-paired-trial-plan-v1.md",
+  "preregistration": "records/development/2026-08-17-rq2-preregistration-v1.md",
+  "record_kind": "rq2_paired_trial_dataset",
+  "record_version": 1,
+  "reviewer": {
+    "backend": "antigravity-cli",
+    "model": "gemini-3.1-pro-high",
+    "tier": 1
+  },
+  "trials": [
+    {
+      "case_id": "case-008",
+      "condition": "B",
+      "expected_sha256": "aebbfc2452515ad465521214ecdc4a76c81dfb99928b64e236080ee30fb45698",
+      "findings": [
+        {
+          "description": "終了コード「5」の扱いに内部矛盾があります。19行目では「合否はこのコマンド単独の終了コードで確認する（0=全系統成功、5=いずれか失敗）」とあり終了コード「5」を明確に失敗としていますが、28〜29行目では「系統のexit_codeはokで0・partialで5になるが、partialのexit 5は失敗ではない」と記述されています。終了コード5が「いずれか失敗」と「失敗ではない（partial）」の両方の意味で用いられており、合否判定の基準が破綻しています。（19行目、28-29行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-008/session-log-record-run.md",
+            "sha256": "c0c66a692bc14fada8e6643d34984c75c1fa38b3ebd24fc640e4177770ab0404"
+          }
+        }
+      ],
+      "group": "pass",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-008-b-request-v1.md",
+      "run_id": "rq2b2-case-008-b",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-008/session-log-record-run.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 28304,
+        "output_tokens": 11018
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-001",
+      "condition": "B",
+      "expected_sha256": "41f197a033aa8465bf9fd38341f88b9e46231ecf170bd357695003a384413d55",
+      "findings": [
+        {
+          "description": "contract-canonical-sequence.md（15行目）ではqueue-operationの必須欄としてcontentの存在を要求していますが、observation-prefix-record-shapes.md（15行目）ではoperationがdequeueの場合にcontent欄が存在しないことが示されています。このままでは、観測された76件のdequeueレコードが必須欄を満たさず非対応として扱われてしまう内部矛盾（事実の食い違い）が生じます。（L15）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        },
+        {
+          "description": "contract-canonical-sequence.md（18行目）では4種目の前置recordとしてstartedが定義されていますが、全数調査であるobservation-prefix-record-shapes.mdの表にはstartedが出現していません。enqueueのように別系統での採取に関する補足説明もないため、startedの実物基準となる根拠記述が欠落しています。（L18）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "warning",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 3
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-001-b-request-v1.md",
+      "run_id": "rq2b2-case-001-b",
+      "selection": {
+        "count": 2,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+          "docs/evaluation/rq2-cases/case-001/observation-prefix-record-shapes.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 28276,
+        "output_tokens": 7247
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-002",
+      "condition": "B",
+      "expected_sha256": "0a633551c504425e0f746fb66be5b76de349fc6d1e7b2439c288b039326b5f98",
+      "findings": [
+        {
+          "description": "docs/development/2026-08-17-evaluation-data-acquisition-plan-v1.md のSHA-256の値が、第1節のコマンド出力結果（13行目）と第2節の表（24行目）で一致していません。末尾がcbとceで異なっています。（13行目および24行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-002/prescan-digest-record.md",
+            "sha256": "50437d998848421bb7ae85eafc0f4c11b8ae519ea0190dbfae6488e1a58ec483"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-002-b-request-v1.md",
+      "run_id": "rq2b2-case-002-b",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-002/prescan-digest-record.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 30876,
+        "output_tokens": 3770
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-003",
+      "condition": "B",
+      "expected_sha256": "6f041748351c4f17db9e2aaf14ead6b11088fa0d77560a5847519c2b4545c8ef",
+      "findings": [
+        {
+          "description": "前置record後の本文処理について、対象material間で明確な矛盾があります。`contract-interpretation-scope.md`（8-9, 22-23行目）では「前置を読み飛ばし、本文ありの前置開始fileもスキップされず処理対象になる」とされていますが、`procedure-result-reading.md`（12-15行目）では「先頭が本文形式でない場合は解釈非対応であり、前置後の本文構造化は未対応の改善候補である」と記載されており、仕様と手順書の前提が食い違っています。（8-9行目, 22-23行目 (および procedure-result-reading.md 12-15行目)）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-003/contract-interpretation-scope.md",
+            "sha256": "850dfcbe6aff70f1f9f54deb75bd4377001284e697e8bd0cd06bf6230e95ca95"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 3
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-003-b-request-v1.md",
+      "run_id": "rq2b2-case-003-b",
+      "selection": {
+        "count": 2,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-003/contract-interpretation-scope.md",
+          "docs/evaluation/rq2-cases/case-003/procedure-result-reading.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 34263,
+        "output_tokens": 6329
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-004",
+      "condition": "B",
+      "expected_sha256": "0abfeff75ec02d916300c28796de226143bd553cc2bbbf7adb11a06fb4d7a0c0",
+      "findings": [
+        {
+          "description": "冒頭の文書種別で「範囲固定文書（軽量作業票）」と宣言されているが、第6節の手順1では「作業別計画（schema 2）」の作成を指示している。軽量作業票は重い作業計画の代替であるため、ここで再度schema 2の作成を求めるのは内部矛盾である。（10行目（種別の宣言）および59行目（第6節の手順1））",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md",
+            "sha256": "246f62652a5ab1390579a0f91d198a775e507048f2a8d58ebe58a97fe789e8d9"
+          }
+        },
+        {
+          "description": "第2節の成果物定義において出力されるJSON指標の一つに「数値の来歴欄」が指定されているが、第4節の「指標の定義」にはこの来歴欄がどのような構造・内容を持つべきかの定義が完全に欠落している。（25行目（出力項目の指定）および42-49行目（該当定義の不在））",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md",
+            "sha256": "246f62652a5ab1390579a0f91d198a775e507048f2a8d58ebe58a97fe789e8d9"
+          }
+        },
+        {
+          "description": "第5節の受入条件1において「着手後手続き§6の1-2」と参照しているが、第6節に「1-2」という番号は存在しない。「正式再利用検索の証明書」に関する記述は第6節の「2」のみであり、参照先として不正確である。（52行目）",
+          "finding_id": "F-LLM-003",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "medium",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md",
+            "sha256": "246f62652a5ab1390579a0f91d198a775e507048f2a8d58ebe58a97fe789e8d9"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-004-b-request-v1.md",
+      "run_id": "rq2b2-case-004-b",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 32131,
+        "output_tokens": 13255
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-005",
+      "condition": "B",
+      "expected_sha256": "7c86b5166c3eb5e8ace5dd1ddeae618e3916eda6a00909a1c9e5e6b75f61d6da",
+      "findings": [
+        {
+          "description": "§1の実測JSON出力に記載されている `record_commit` の値（`e87d9f60...`）と、本文中の箇条書きで言及されているcommitの先頭8文字（`e87d9f68`）が一致しておらず、事実の誤り（内部矛盾）が存在します。（行17, 行20）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-005/reviewer-launch-e2e-evidence.md",
+            "sha256": "57145f3824b64632f536c30414be0b359f275007b964bf2b603a1f3ce61bd693"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-005-b-request-v1.md",
+      "run_id": "rq2b2-case-005-b",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-005/reviewer-launch-e2e-evidence.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 28338,
+        "output_tokens": 7759
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-006",
+      "condition": "B",
+      "expected_sha256": "3c345af054d4b8feb790b235611aa7c7aac3f3f74afebac2301781537bdfd870",
+      "findings": [
+        {
+          "description": "「判定recordのfindingsをfinding_set形式へ変換する部品」の作業範囲について、内部矛盾があります。§2「正本範囲（成果物）」の26行目および§6「着手後の手続き」の66行目では本作業のスコープ内として実装対象に含まれていますが、§7「範囲外」の76行目では「順序4の実験装置で扱う」としてスコープ外に指定されており、実装要否が判定できません。（26行目、66行目、76行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-006/reviewer-bridge-work-ticket.md",
+            "sha256": "e675f3aeb1a1e753f535fb9de7465de94e81c8933359acab0eeabd6f64d092eb"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-006-b-request-v1.md",
+      "run_id": "rq2b2-case-006-b",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-006/reviewer-bridge-work-ticket.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 27630,
+        "output_tokens": 5659
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-007",
+      "condition": "B",
+      "expected_sha256": "5a58e41413865c836aa4055c53e2ea86e91361a8bdd5e933805fa3230f87ac7a",
+      "findings": [
+        {
+          "description": "第2節「Human承認境界」の記述において、「適宜合意する」「必要に応じて承認を得る」「状況に応じて適切な時点で実施する」という主観的で判定不可能な曖昧な表現が用いられている。これにより、いつどのような条件で承認が必要になるのかが機械的・一意に判定できず、明確な承認境界として機能しない。（行16-18）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-007/contract-approval-boundary.md",
+            "sha256": "0b1c065cf94514b3d9e0da56829d84353f78066d5905458276d450c09726c579"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-007-b-request-v1.md",
+      "run_id": "rq2b2-case-007-b",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-007/contract-approval-boundary.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 30435,
+        "output_tokens": 5516
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-009",
+      "condition": "B",
+      "group": "pass",
+      "reason": "launch_stopped:{\"reason\": \"verdict_schema_nonconforming\", \"source\": \"launch\", \"status\": \"stopped\", \"exit_code\": 2}",
+      "run_id": "rq2b2-case-009-b",
+      "status": "failed"
+    },
+    {
+      "case_id": "case-010",
+      "condition": "B",
+      "expected_sha256": "e777db931f75c61094ff17313c277f5540bcb849149d614ce274917a4ec0a017",
+      "findings": [
+        {
+          "description": "Section 1およびSection 2.1にて「私有領域launch.jsonへ追記する」としているが、`.json`拡張子のファイルに追記（append）を行うと不正なJSONとなる。配列を読み込んで書き直すのか、`.jsonl`形式で単純追記するのかが明示されておらず、実装時の判定できない曖昧さに該当する。（Section 1, Section 2.1）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-010/launch-metrics-work-ticket.md",
+            "sha256": "a422e4e01a3ed7d17d107078bdd6755f25fd2071b36a759c59de79ddf5dfd223"
+          }
+        },
+        {
+          "description": "Section 3にて「新契約は立てず本軽量作業票＋通常承認で扱う」と定めているが、Section 5.1の手続きでは「作業別計画（schema 2）作成→Human確認」を要求している。本作業票自体が承認対象の計画であるにもかかわらず、着手直後に再度別計画の作成とHuman確認を挟むのは、手続き上の内部矛盾（プロセスの二重化）である。（Section 3, Section 5.1）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-010/launch-metrics-work-ticket.md",
+            "sha256": "a422e4e01a3ed7d17d107078bdd6755f25fd2071b36a759c59de79ddf5dfd223"
+          }
+        },
+        {
+          "description": "Section 2.1で記録項目に `prompt_bytes` を挙げているが、これが「依頼recordファイルのバイト数」なのか「LLMへ実際に送信される構築済みプロンプトのバイト数」なのか定義が欠落しており、解釈の曖昧さが残っている。（Section 2.1）",
+          "finding_id": "F-LLM-003",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "low",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-010/launch-metrics-work-ticket.md",
+            "sha256": "a422e4e01a3ed7d17d107078bdd6755f25fd2071b36a759c59de79ddf5dfd223"
+          }
+        }
+      ],
+      "group": "pass",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-010-b-request-v1.md",
+      "run_id": "rq2b2-case-010-b",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-010/launch-metrics-work-ticket.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 30979,
+        "output_tokens": 15234
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-001",
+      "condition": "A1",
+      "expected_sha256": "63eeff78e02b378e9ffd56f2819a0aa1027a40ae80f659b2e0b05a9e58a7f24c",
+      "findings": [
+        {
+          "description": "契約定義と観測記録の間の矛盾。`contract-canonical-sequence.md`では`queue-operation`（operationがdequeueの場合も含む）の必須欄として`content`を要求しているが、`observation-prefix-record-shapes.md`では`dequeue`には`content`欄が存在しないことが示されている。このままでは実際の`dequeue`レコードが必須欄を満たさないとしてフェイルクローズする。（L15）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 3
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-001-a1-request-v1.md",
+      "run_id": "rq2b2-case-001-a1",
+      "selection": {
+        "count": 2,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+          "docs/evaluation/rq2-cases/case-001/observation-prefix-record-shapes.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 30384,
+        "output_tokens": 5760
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-004",
+      "condition": "A1",
+      "expected_sha256": "6948e15de46c89f6e71f5bc6b28716ca1ec49da1ad87545c71970b9aaa5108d3",
+      "findings": [
+        {
+          "description": "再生成一致率の計算における「成立した割合」の基準が曖昧である。各fixtureについて3回すべて一致したものを1とする（fixture単位）のか、あるいは実行ごとの一致回数を用いるのか、分子・分母の具体的な定義が明記されていない。（行 46）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "medium",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md",
+            "sha256": "246f62652a5ab1390579a0f91d198a775e507048f2a8d58ebe58a97fe789e8d9"
+          }
+        },
+        {
+          "description": "§1で中核となる既存部品として列挙された3つの部品の中に「compile gate」が含まれていないが、§4のnegative case検出率の定義では検査部品として言及されており、記述の不整合または欠落が見られる。（行 18 および 行 47）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "low",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md",
+            "sha256": "246f62652a5ab1390579a0f91d198a775e507048f2a8d58ebe58a97fe789e8d9"
+          }
+        },
+        {
+          "description": "§5 受入条件1の「着手後手続き§6の1-2」という参照が、実際の§6の手順番号（2. 正式再利用検索）と完全には一致しておらず曖昧である。「§6の2」の誤記、あるいは手順1から2を含む意図のいずれかであると推測される。（行 52）",
+          "finding_id": "F-LLM-003",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "low",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md",
+            "sha256": "246f62652a5ab1390579a0f91d198a775e507048f2a8d58ebe58a97fe789e8d9"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-004-a1-request-v1.md",
+      "run_id": "rq2b2-case-004-a1",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 32355,
+        "output_tokens": 9879
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-008",
+      "condition": "A1",
+      "expected_sha256": "21f786da11925fd36e6413f45458b4a6d0942412125b1eef47831af1e0036ad4",
+      "findings": [
+        {
+          "description": "第1節（19行目）ではコマンドの終了コードについて「5=いずれか失敗」と定義し合否の基準としているが、第2節（28-29行目）では「系統のexit_codeはokで0・partialで5になるが、partialのexit 5は失敗ではない（wrapperが成功扱いで集約し、overall_okに反映済み）」と記述されている。終了コード5が全体としての失敗なのか正常なpartial状態なのかが判別できず、合否判定基準に内部矛盾（曖昧さ）が生じている。（19行目および28-29行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-008/session-log-record-run.md",
+            "sha256": "c0c66a692bc14fada8e6643d34984c75c1fa38b3ebd24fc640e4177770ab0404"
+          }
+        }
+      ],
+      "group": "pass",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-008-a1-request-v1.md",
+      "run_id": "rq2b2-case-008-a1",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-008/session-log-record-run.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 30598,
+        "output_tokens": 6589
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-001",
+      "condition": "D",
+      "expected_sha256": "0e6e003d8fa4955ae1bb92c5cb71a9dbe83d53db67aa6a4651aca3ec9042ef64",
+      "findings": [
+        {
+          "description": "Line 10で定義された「従来判定」は「Claude本文形式・Codex 2形式」の両方を対象としますが、Line 20の除外規則では「本文形式と判定しない」とのみ記述されており、「Codex 2形式」としての判定が除外されるかが不明確です。これにより、偽装された前置recordがCodex 2形式として誤判定される可能性があります。（Line 10, Line 20）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        },
+        {
+          "description": "既知前置recordを読み飛ばしている途中でスキップ上限（16件）に達することなく入力の終端（EOF）に達した場合（＝「最初の判定可能record」が存在しない場合）の挙動が記述されていません。fail-closedとして扱う等の明記が欠落しています。（Line 10）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        },
+        {
+          "description": "`queue-operation`における`content`フィールドの条件が「存在」とだけ記載されています。他のフィールドが「str非空」などと型や空値の制限を明記しているのに対し、値の型（文字列やオブジェクト等）やnull/空文字の許容性が判定できない曖昧さがあります。（Line 15）",
+          "finding_id": "F-LLM-003",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "low",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-001-d-request-v1.md",
+      "run_id": "rq2b2-case-001-d",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 27277,
+        "output_tokens": 12359
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-005",
+      "condition": "D",
+      "group": "seeded",
+      "reason": "context_incomplete: target",
+      "run_id": "rq2b2-case-005-d",
+      "status": "blocked_before_launch"
+    },
+    {
+      "case_id": "case-008",
+      "condition": "D",
+      "group": "pass",
+      "reason": "context_incomplete: target",
+      "run_id": "rq2b2-case-008-d",
+      "status": "blocked_before_launch"
+    },
+    {
+      "case_id": "case-009",
+      "condition": "B",
+      "expected_sha256": "fdb954e854b0a32dfc838aeb5fc4bb325706700abb93ca7921218f912086837c",
+      "findings": [],
+      "group": "pass",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-009-b-request-v1.md",
+      "run_id": "rq2b2r-case-009-b",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-009/product-acceptance-decision.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 28924,
+        "output_tokens": 12494
+      },
+      "verdict": "verified"
+    },
+    {
+      "case_id": "case-001",
+      "condition": "C",
+      "expected_sha256": "6a2ab6867fe3547a7cf1ed4a94ab73eb5e57ffe2a70758446f8b596bc2296767",
+      "findings": [
+        {
+          "description": "契約候補（L15）では`queue-operation`の必須欄として`content`の存在を求めているが、観測記録（observation-prefix-record-shapes.md L15, L20-L21）では`operation`が`dequeue`の場合に`content`欄が存在しないと報告されており、事実の誤りおよび内部矛盾がある。（L15）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        },
+        {
+          "description": "契約候補（L18）では既知前置recordとして`started`を挙げているが、観測記録（observation-prefix-record-shapes.md L13-L18）の「実物形の網羅調査」の表には`started`が記載されておらず、事実の食い違いまたは必要な記述の欠落がある。（L18）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        },
+        {
+          "description": "契約候補（L22）には「実測の連続数3〜4個」と記載されているが、観測記録（observation-prefix-record-shapes.md L13-L18）の調査では81件のsource fileに対して前置recordの出現数合計が81件（1ファイル平均1件）となっており、実測データの事実と矛盾している。（L22）",
+          "finding_id": "F-LLM-003",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 3
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-001-c-request-v1.md",
+      "run_id": "rq2b2-case-001-c",
+      "selection": {
+        "count": 2,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+          "docs/evaluation/rq2-cases/case-001/observation-prefix-record-shapes.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 28272,
+        "output_tokens": 8301
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-002",
+      "condition": "C",
+      "group": "real_defect",
+      "reason": "launch_stopped:{\"reason\": \"verdict_schema_nonconforming\", \"source\": \"launch\", \"status\": \"stopped\", \"exit_code\": 2}",
+      "run_id": "rq2b2-case-002-c",
+      "status": "failed"
+    },
+    {
+      "case_id": "case-003",
+      "condition": "C",
+      "expected_sha256": "f871464bfe1415e1638ae02cdc52e1d488e065fc98f1b4a2f3179ad64266a203",
+      "findings": [
+        {
+          "description": "contract-interpretation-scope.md（8-10, 22-23行目）では前置recordを読み飛ばして本文を処理対象にすると定めているが、procedure-result-reading.md（12-15行目）では前置後の本文を構造化する対処は改善候補（IC-SESSION-LOG-PREFIX-INTERPRETATION-001）として未実施・Human仕分け待ちであるとしており、機能の実装状態と処理方針について矛盾している。（行12-15）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-003/procedure-result-reading.md",
+            "sha256": "b600cb2ffe48186c01b650fa41187f206f19c817f1171fad1a565dc89dd4f2ad"
+          }
+        },
+        {
+          "description": "contract-interpretation-scope.md（19-20行目）では `queue-operation` や `started` を「補助判定」として扱い「非対応（None）」とは区別しているが、procedure-result-reading.md（12行目）ではこれらを「解釈非対応（unsupported）」の具体例として挙げており、用語と分類基準に矛盾がある。（行12）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-003/procedure-result-reading.md",
+            "sha256": "b600cb2ffe48186c01b650fa41187f206f19c817f1171fad1a565dc89dd4f2ad"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 3
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-003-c-request-v1.md",
+      "run_id": "rq2b2-case-003-c",
+      "selection": {
+        "count": 2,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-003/contract-interpretation-scope.md",
+          "docs/evaluation/rq2-cases/case-003/procedure-result-reading.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 28373,
+        "output_tokens": 8695
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-004",
+      "condition": "C",
+      "expected_sha256": "083d95138c578b6d250a33a11584333b712ba0ca827d98ffa4bca084d79ccddc",
+      "findings": [
+        {
+          "description": "§5 受入条件の1項において「着手後手続き§6の1-2」と記載されているが、参照先の§6で「正式再利用検索の証明書」に該当する手順は「2. 正式再利用検索→証明書固定。」のみであり、番号が合致していない（「§6の2」の誤記と推測される）。（L52）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "low",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md",
+            "sha256": "246f62652a5ab1390579a0f91d198a775e507048f2a8d58ebe58a97fe789e8d9"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-004-c-request-v1.md",
+      "run_id": "rq2b2-case-004-c",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 29975,
+        "output_tokens": 13144
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-005",
+      "condition": "C",
+      "expected_sha256": "d654bbc242ad05c047ebb4395cef8661528828de3ef02a16bab3116196c358e9",
+      "findings": [
+        {
+          "description": "20行目のcommit hashの略記（e87d9f68）が、17行目のJSON出力に含まれる実際のハッシュ（e87d9f60c357...）の先頭と一致しておらず、事実の誤りがあります。（20行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-005/reviewer-launch-e2e-evidence.md",
+            "sha256": "57145f3824b64632f536c30414be0b359f275007b964bf2b603a1f3ce61bd693"
+          }
+        },
+        {
+          "description": "31行目で「読取り9件」と記載されていますが、直後に列挙されている対象を数えると7件分（依頼record1、test1、tools3、operations1、Evidence1）しかなく、残りの2件分についての記述が欠落しているか、件数に誤りがあります。（31行目）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-005/reviewer-launch-e2e-evidence.md",
+            "sha256": "57145f3824b64632f536c30414be0b359f275007b964bf2b603a1f3ce61bd693"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": false,
+        "outside": [
+          "records/session-handoffs/2026-08-16-reviewer-launch-adapter-implementation-completion-review-verdict-v1.md"
+        ],
+        "read_count": 3
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-005-c-request-v1.md",
+      "run_id": "rq2b2-case-005-c",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-005/reviewer-launch-e2e-evidence.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 43925,
+        "output_tokens": 6992
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-006",
+      "condition": "C",
+      "expected_sha256": "da88d5a2a6bf102c78293c1eddb3f61bd92f9608659234930a1e10be20f68266",
+      "findings": [
+        {
+          "description": "「判定recordのfindingsをfinding_set形式へ変換する部品」の実装要否について、致命的な内部矛盾があります。§1（18行目）、§2.1(b)（26行目）、§5.4（60行目）、および§6.1（66行目）では変換部品の開発・試験を今回の作業範囲（順序3）として定めていますが、§7.範囲外（76行目）では全く同じ部品を「順序4の実験装置で扱う」として作業対象外に指定しており、要求が相反しています。（18, 26, 60, 66行目 と 76行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-006/reviewer-bridge-work-ticket.md",
+            "sha256": "e675f3aeb1a1e753f535fb9de7465de94e81c8933359acab0eeabd6f64d092eb"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-006-c-request-v1.md",
+      "run_id": "rq2b2-case-006-c",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-006/reviewer-bridge-work-ticket.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 31238,
+        "output_tokens": 8791
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-007",
+      "condition": "C",
+      "expected_sha256": "b04fd00a297490cb9e2a6b0e80b4e2f1a3ae7f4be82b0c1caa10f865c58eaf62",
+      "findings": [
+        {
+          "description": "Human承認境界の定義において、「適宜合意する」（16行目）、「必要に応じて承認を得る」（17行目）、「状況に応じて適切な時点で実施する」（18行目）といった表現が用いられており、承認を要する具体的な条件や判定基準が全く定義されておらず、承認境界としての機能を果たせない曖昧さがある。また、19行目の「担当者が判断する」についても具体的な権限者が不明瞭である。（第2節, 16-19行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-007/contract-approval-boundary.md",
+            "sha256": "0b1c065cf94514b3d9e0da56829d84353f78066d5905458276d450c09726c579"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-007-c-request-v1.md",
+      "run_id": "rq2b2-case-007-c",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-007/contract-approval-boundary.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 30798,
+        "output_tokens": 5645
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-008",
+      "condition": "C",
+      "expected_sha256": "091ddd9b1a78a2e1731835883163d86a5584ed32f2dbc2d61f9df3a2f0f8d212",
+      "findings": [
+        {
+          "description": "終了コード「5」の扱いに内部矛盾があります。第1節（19行目）ではコマンド全体の合否確認として「5=いずれか失敗」と記載されていますが、第2節（28〜29行目）では「partialのexit 5は失敗ではない」と記載されています。終了コードが5だった場合に「失敗」として扱うべきか、成功（partial）として扱うべきかの判定ができません。（19行目、28-29行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-008/session-log-record-run.md",
+            "sha256": "c0c66a692bc14fada8e6643d34984c75c1fa38b3ebd24fc640e4177770ab0404"
+          }
+        }
+      ],
+      "group": "pass",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-008-c-request-v1.md",
+      "run_id": "rq2b2-case-008-c",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-008/session-log-record-run.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 29900,
+        "output_tokens": 9933
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-009",
+      "condition": "C",
+      "expected_sha256": "9ddd356ffde90323df3599235c4491fe5d6b69abb2ca0764568570255710af5a",
+      "findings": [],
+      "group": "pass",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-009-c-request-v1.md",
+      "run_id": "rq2b2-case-009-c",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-009/product-acceptance-decision.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 28918,
+        "output_tokens": 7995
+      },
+      "verdict": "verified"
+    },
+    {
+      "case_id": "case-010",
+      "condition": "C",
+      "expected_sha256": "987e99d18e726a319d16e534752066d88c375d4b9bce7e99bf0ea7ba28f88d25",
+      "findings": [
+        {
+          "description": "対象materialが「軽量作業票」であり「新契約は立てない」と宣言しているにも関わらず、着手後の手順1で「作業別計画（schema 2）」の作成と承認を要求しており、宣言と手順が内部矛盾しています。（10行目、38行目 vs 53行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-010/launch-metrics-work-ticket.md",
+            "sha256": "a422e4e01a3ed7d17d107078bdd6755f25fd2071b36a759c59de79ddf5dfd223"
+          }
+        },
+        {
+          "description": "受入条件4の表題が「実機確認1回」であるにも関わらず、内容は「本作業票では試験（模擬実行）で代替する」となっており、実機確認が必要なのかテストで代替するのか自己矛盾しています（代替する場合、受入条件2・3と重複）。（46行目〜47行目）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-010/launch-metrics-work-ticket.md",
+            "sha256": "a422e4e01a3ed7d17d107078bdd6755f25fd2071b36a759c59de79ddf5dfd223"
+          }
+        }
+      ],
+      "group": "pass",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-010-c-request-v1.md",
+      "run_id": "rq2b2-case-010-c",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-010/launch-metrics-work-ticket.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 28020,
+        "output_tokens": 12291
+      },
+      "verdict": "rejected"
+    },
+    {
+      "case_id": "case-001",
+      "condition": "A2",
+      "expected_sha256": "1221036fa56ad4e06fea2e045209695443c0a055f38d7c99cb4b29154097373f",
+      "findings": [
+        {
+          "description": "contract-canonical-sequence.md では queue-operation（enqueueおよびdequeue）の必須欄として content の存在を要求していますが、observation-prefix-record-shapes.md の実測調査によれば、dequeue には content 欄が存在しません（enqueueにのみ存在）。このため、契約の規則をそのまま適用すると正常な dequeue レコードが必須欄違反として打ち切られることになり、ルールと実態（事実）の間に明確な矛盾が生じています。（15行目 (関連事実: observation-prefix-record-shapes.md 15行目, 20-21行目)）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+            "sha256": "f818d2c47a7899f8c5b2788d0cee06f67b5dba6951a8885172c1d0d0724c59e2"
+          }
+        },
+        {
+          "description": "同一の先行Pilotメモ（SHA-256: e0a1a140ad76a06c00e08244314a00d866e92efb0a377773358c00d5c0f4f4ef）の記述内容について、事実認識の食い違いが生じています。pool-02.md では「先行Pilotの暫定配置案にはImprovement Candidateの保存先が明示されていなかった」と主張していますが、pool-03.md では「先行Pilotメモは records/development/issue-resolution-pilot/ を暫定配置としていた」「先行Pilotメモ6節の（同パス）は...採用を取り消す」と主張しており、配置の明示有無について内部矛盾があります。（75-76行目 (関連事実: pool-03.md 44-45行目, 170行目)）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-001/pool-02.md",
+            "sha256": "1f490bec67ea7d4f1c654c9c975048268b75ade2a57b475de540e122c1ae22a4"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 13
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-001-a2-request-v1.md",
+      "run_id": "rq2b2-case-001-a2",
+      "selection": {
+        "count": 12,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-001/contract-canonical-sequence.md",
+          "docs/evaluation/rq2-cases/case-001/observation-prefix-record-shapes.md",
+          "docs/evaluation/rq2-cases/case-001/pool-01.md",
+          "docs/evaluation/rq2-cases/case-001/pool-02.md",
+          "docs/evaluation/rq2-cases/case-001/pool-03.md",
+          "docs/evaluation/rq2-cases/case-001/pool-04.md",
+          "docs/evaluation/rq2-cases/case-001/pool-05.md",
+          "docs/evaluation/rq2-cases/case-001/pool-06.md",
+          "docs/evaluation/rq2-cases/case-001/pool-07.md",
+          "docs/evaluation/rq2-cases/case-001/pool-08.md",
+          "docs/evaluation/rq2-cases/case-001/pool-09.md",
+          "docs/evaluation/rq2-cases/case-001/pool-10.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 127250,
+        "output_tokens": 16063
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-004",
+      "condition": "A2",
+      "expected_sha256": "47a6605bd13abed1b0328aac0940218056b8dd37e00e26c5cb7466686cd69ac1",
+      "findings": [
+        {
+          "description": "pool-02.mdの§4.2（75行目）では「先行Pilotの暫定配置案には保存先が明示されていなかった」と記述されていますが、pool-03.mdの§3（44行目）および§10（170行目）では「先行Pilotメモは暫定配置としていた」と記述されており、事実関係が矛盾しています。（§3 (44行目), §10 (170行目)）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/pool-03.md",
+            "sha256": "c0a336182dfd91288a70ec7d4783da9ec17677c6051d7941cdf49064f424df27"
+          }
+        },
+        {
+          "description": "候補のTest検証状況について、§2（34行目）では「3件中1件のみ（ic-pilot-todo-growth-001--v1.jsonだけ）」と記載されていますが、§3のN9（77行目）では別の候補（ic-authority-reference-digest-check-001--v1.json）が「v3 validatorで合格し続ける」と記載されており、検証済みの事実件数に矛盾があります。（§2 (34行目), §3 (77行目)）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/pool-06.md",
+            "sha256": "f4cfe9af7925cee8fd3ec2cf023777a08f669d2e79f95cf42561caca77f5c479"
+          }
+        },
+        {
+          "description": "Issue保存用ディレクトリの識別子が統一されていません。pool-02.mdの§4.2（82行目）では「issue-records/」と定義されていますが、pool-03.mdの§4（71行目）では「issues/」が使用されており、識別子に事実の誤り（不一致）があります。（§4.2 (82行目)）",
+          "finding_id": "F-LLM-003",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/pool-02.md",
+            "sha256": "1f490bec67ea7d4f1c654c9c975048268b75ade2a57b475de540e122c1ae22a4"
+          }
+        },
+        {
+          "description": "「Work 8A前」という未定義のフェーズ識別子が使用されています。pool-01.md等の全体計画では「Work 8」や「bounded_parallel Pilot」は定義されていますが、「Work 8A」自体の定義が欠落しており、どの作業を指しているか判定できない曖昧さがあります。（§5 (188行目), §5.5 (236-237行目)）",
+          "finding_id": "F-LLM-004",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-004/pool-04.md",
+            "sha256": "bb9ff7af54c4bc50e59e7a83a263cf83658cb23cf63226af326e6a55a252c464"
+          }
+        }
+      ],
+      "group": "seeded",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 12
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-004-a2-request-v1.md",
+      "run_id": "rq2b2-case-004-a2",
+      "selection": {
+        "count": 11,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-004/pool-01.md",
+          "docs/evaluation/rq2-cases/case-004/pool-02.md",
+          "docs/evaluation/rq2-cases/case-004/pool-03.md",
+          "docs/evaluation/rq2-cases/case-004/pool-04.md",
+          "docs/evaluation/rq2-cases/case-004/pool-05.md",
+          "docs/evaluation/rq2-cases/case-004/pool-06.md",
+          "docs/evaluation/rq2-cases/case-004/pool-07.md",
+          "docs/evaluation/rq2-cases/case-004/pool-08.md",
+          "docs/evaluation/rq2-cases/case-004/pool-09.md",
+          "docs/evaluation/rq2-cases/case-004/pool-10.md",
+          "docs/evaluation/rq2-cases/case-004/rq1-apparatus-work-ticket.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 122020,
+        "output_tokens": 25092
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-008",
+      "condition": "A2",
+      "expected_sha256": "3ca5814a1d46c42cbea191bf493b205c93a12be69ad43cabc5b271ef087a4fd0",
+      "findings": [
+        {
+          "description": "session-log-record-run.mdにおいて、19行目でコマンドの終了コードについて「5=いずれか失敗」と定義している一方、28行目では「partialのexit 5は失敗ではない」と定義している。終了コード5が「失敗」なのか正常な「partial」なのかが矛盾しており、機械規律（終了コードによる単独合否判定）を安全に実行できない。（Lines 19, 27-29）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-008/session-log-record-run.md",
+            "sha256": "c0c66a692bc14fada8e6643d34984c75c1fa38b3ebd24fc640e4177770ab0404"
+          }
+        },
+        {
+          "description": "pool-05.mdの63行目〜73行目で「少なくとも答えるべき10項目の組」を定義しているが、99行目以降の「詳細表示の構造」には項目9（cancel、deferred、scope外）および項目10（Evidenceの一致）に対応する表示欄が欠落している。（Lines 63-73, 99-126）",
+          "finding_id": "F-LLM-002",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "low",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-008/pool-05.md",
+            "sha256": "70d62f5d1565f1ace241a058e7e817ffaf6e2a5d90b5750b85c08200a15f3214"
+          }
+        }
+      ],
+      "group": "pass",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 12
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-008-a2-request-v1.md",
+      "run_id": "rq2b2-case-008-a2",
+      "selection": {
+        "count": 11,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-008/pool-01.md",
+          "docs/evaluation/rq2-cases/case-008/pool-02.md",
+          "docs/evaluation/rq2-cases/case-008/pool-03.md",
+          "docs/evaluation/rq2-cases/case-008/pool-04.md",
+          "docs/evaluation/rq2-cases/case-008/pool-05.md",
+          "docs/evaluation/rq2-cases/case-008/pool-06.md",
+          "docs/evaluation/rq2-cases/case-008/pool-07.md",
+          "docs/evaluation/rq2-cases/case-008/pool-08.md",
+          "docs/evaluation/rq2-cases/case-008/pool-09.md",
+          "docs/evaluation/rq2-cases/case-008/pool-10.md",
+          "docs/evaluation/rq2-cases/case-008/session-log-record-run.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 126313,
+        "output_tokens": 27754
+      },
+      "verdict": "verified_with_findings"
+    },
+    {
+      "case_id": "case-002",
+      "condition": "C",
+      "expected_sha256": "12e35c040548ac41b32658d571ec89b56f73df41989dda1ca61d55e94d89da78",
+      "findings": [
+        {
+          "description": "対象material内の記述に内部矛盾（事実の誤り）があります。評価データ取得計画（`docs/development/2026-08-17-evaluation-data-acquisition-plan-v1.md`）のSHA-256値が、§1（機械生成の出力）と§2（権威、証拠の表）で食い違っています（§1では末尾が`55cb`、§2では末尾が`55ce`）。（13行目および24行目）",
+          "finding_id": "F-LLM-001",
+          "requirement_ref": "llm_review",
+          "rule_id": "llm_review",
+          "severity": "error",
+          "target_ref": {
+            "relative_path": "docs/evaluation/rq2-cases/case-002/prescan-digest-record.md",
+            "sha256": "50437d998848421bb7ae85eafc0f4c11b8ae519ea0190dbfae6488e1a58ec483"
+          }
+        }
+      ],
+      "group": "real_defect",
+      "read_scope": {
+        "clean": true,
+        "outside": [],
+        "read_count": 2
+      },
+      "request_relative_path": "records/session-handoffs/2026-08-17-rq2-case-002-c-request-v1.md",
+      "run_id": "rq2b2r-case-002-c",
+      "selection": {
+        "count": 1,
+        "paths": [
+          "docs/evaluation/rq2-cases/case-002/prescan-digest-record.md"
+        ]
+      },
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 35845,
+        "output_tokens": 6894
+      },
+      "verdict": "verified_with_findings"
+    }
+  ]
+}
