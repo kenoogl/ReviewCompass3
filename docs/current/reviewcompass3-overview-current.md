@@ -9,7 +9,7 @@
   「日付〜」はその日から継続中、を表す。
 - 骨格の出自：`docs/design/2026-08-17-rc3-overall-plan-memo-import-v1.md`のA〜F構造
 - 状態語彙：完了／進行中／休止／未着手／凍結
-- 最終更新：2026-08-17
+- 最終更新：2026-08-18
 
 ## A. 製品本体（Work 1〜8）
 
@@ -19,6 +19,8 @@
 | Work 7A（4種root分離・checkout移動照合） | 一部完了 | 2026-08-09 | `tools/deployment/local_integrated_roots.py`ほか（残りは未着手） |
 | Work 7B（更新・移行・解除・巻き戻し） | 未着手 | — | — |
 | Work 8／8A（新旧方式の比較評価・限定並行） | 未着手 | — | Work 8測定の前提に`ISSUE-TEST-GROWTH-STATE-PINNING-001`の限定再開（D欄） |
+| 評価データ取得（計測メタ・RQ1装置・reviewer接続・RQ2 paired trial実験＝実起動30回・裁定確定） | 完了 | 2026-08-17〜2026-08-18 | `records/development/2026-08-17-rq2-paired-trial-evidence-v1.md`（§11確定集計）・`records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md`（論文データ一式の表） |
+| 評価の運用集計コマンド（データ取得計画の順序5） | 未着手 | — | `docs/development/2026-08-17-evaluation-data-acquisition-plan-v1.md` §4 |
 | 最終公開評価 | 未着手 | — | — |
 
 ## B. レビューの仕組み
@@ -47,7 +49,7 @@
 
 | 項目 | 状態 | 時点 | 主な根拠 |
 | --- | --- | --- | --- |
-| セッションログ保全（3系統一括`record-run`・現セッション既定除外） | 完了（稼働中） | 2026-08-17〜 | `docs/development/prompts/session-log-record-run.md` |
+| セッションログ保全（3系統一括`record-run`・現セッション既定除外。終了コード語彙は2026-08-18是正） | 完了（稼働中） | 2026-08-17〜 | `docs/development/prompts/session-log-record-run.md`・`records/development/2026-08-18-session-log-exit-code-vocabulary-evidence-v1.md` |
 | 前置record解釈（実会話の取りこぼし解消・遡及。契約014） | 完了 | 2026-08-17 | `records/development/2026-08-17-session-log-prefix-interpretation-product-acceptance-decision-v1.md` |
 | TODO handoff（現在位置の人向け入口） | 稼働（暫定） | 2026-08-04〜 | `docs/development/prompts/todo-handoff-update.md`。**現在位置の機械導出（projection）は未実装**——方針は横断欄のデプロイ方針record §4c |
 | 改善候補・Issueの経路 | 稼働 | 2026-08-06〜 | AGENTS.md §4の既存経路 |
