@@ -614,7 +614,9 @@ def launch_review(
         injections = CLAUDE_CHILD_ENVIRONMENT_INJECTIONS
     else:
         forbidden_names = FORBIDDEN_AUTH_ENVIRONMENT
-        allowed_models = ALLOWED_RESPONSE_MODELS
+        # 契約012 §7.1：agyの照合はagy専用一覧（和集合は契約011互換の記号のみ。
+        # e2e-012-001判定F-1の修正）。
+        allowed_models = _AGY_ALLOWED_RESPONSE_MODELS
         passthrough_names = PASSTHROUGH_ENVIRONMENT
         injections = {}
     environment = _child_environment(forbidden_names, passthrough_names)

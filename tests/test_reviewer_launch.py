@@ -199,7 +199,7 @@ class _FacadeRecorder:
 def _launch(repository, monkeypatch, facade, **overrides):
     core = _core()
     monkeypatch.setattr(
-        core, "ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
+        core, "_AGY_ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
     )
     monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
     projects_root = repository.parent / "projects-config"
@@ -345,7 +345,7 @@ def test_empty_allowed_models_stops(
     monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
     request = _request_relative(repository)
     monkeypatch.setattr(
-        core, "ALLOWED_RESPONSE_MODELS", (), raising=True
+        core, "_AGY_ALLOWED_RESPONSE_MODELS", (), raising=True
     )
     with pytest.raises(core.LaunchStop) as caught:
         core.launch_review(
@@ -358,6 +358,39 @@ def test_empty_allowed_models_stops(
         )
     assert caught.value.reason == "allowed_models_unfixed"
     assert facade.calls == []
+
+
+def test_agy_model_check_uses_agy_list_not_union(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder(stdout=_stream_text(model="claude-opus-5"))
+    monkeypatch.setattr(
+        core, "_AGY_ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
+    )
+    monkeypatch.setattr(
+        core,
+        "ALLOWED_RESPONSE_MODELS",
+        (TEST_MODEL, "claude-opus-5"),
+        raising=True,
+    )
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    projects_root = repository.parent / "projects-config"
+    _write_project_config(projects_root, repository)
+    monkeypatch.setattr(
+        core, "PROJECTS_CONFIG_ROOT", projects_root, raising=True
+    )
+    request = _request_relative(repository)
+    with pytest.raises(core.LaunchStop) as caught:
+        core.launch_review(
+            repository=repository,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+            private_root=repository.parent / "private",
+            backend_name="antigravity-cli",
+            run_id="run-agy-union-001",
+        )
+    assert caught.value.reason == "response_model_not_allowed"
 
 
 def test_allowed_models_fixed_to_approved_value():
@@ -377,7 +410,7 @@ def test_project_binding_missing_stops(
     core = _core()
     facade = _FacadeRecorder()
     monkeypatch.setattr(
-        core, "ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
+        core, "_AGY_ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
     )
     monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
     monkeypatch.setattr(
@@ -406,7 +439,7 @@ def test_read_grant_missing_stops(
     core = _core()
     facade = _FacadeRecorder()
     monkeypatch.setattr(
-        core, "ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
+        core, "_AGY_ALLOWED_RESPONSE_MODELS", (TEST_MODEL,), raising=True
     )
     monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
     projects_root = repository.parent / "projects-config-nogrant"
@@ -1032,6 +1065,36 @@ def test_agy_child_environment_excludes_user(
     environment = facade.calls[0][1]["env"]
     assert "USER" not in environment
     assert "TMPDIR" not in environment
+
+
+def test_subagent_result_without_json_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder(
+        stdout=_subagent_stream(result_text="構造化出力はありません。")
+    )
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_subagent(repository, monkeypatch, facade)
+    assert caught.value.reason == "verdict_schema_nonconforming"
+    raw_path = (
+        repository.parent / "private" / "run-sub-001" / "reviewer.raw.json"
+    )
+    assert raw_path.is_file()
+
+
+def test_subagent_schema_nonconforming_verdict_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder(
+        stdout=_subagent_stream(
+            result_text=json.dumps({"verdict": "verified"})
+        )
+    )
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_subagent(repository, monkeypatch, facade)
+    assert caught.value.reason == "verdict_schema_nonconforming"
 
 
 def test_subagent_injection_constant_equals_executor(monkeypatch):
