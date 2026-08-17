@@ -84,7 +84,8 @@ def test_compose_request_body_reflects_contract(tmp_path):
     request_body, decided_scope = bridge.compose_request_body(
         contract, context
     )
-    assert contract["responsibility"]["goal"] in request_body
+    # responsibilityは責務宣言の文字列（実測。dictではない）
+    assert contract["responsibility"] in request_body
     assert any(
         material["relative_path"] in request_body
         for material in context["material_bundle"]
