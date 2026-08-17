@@ -1,0 +1,52 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-SESSION-LOG-EXIT-CODE-DOC-DRIFT-001",
+ "candidate_version": 1,
+ "created_at": "2026-08-18T09:00:00+09:00",
+ "source_work": "rq2-paired-trial/byproducts",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-RQ2-BYPRODUCTS-2026-08-18-V2",
+  "source_version": 2,
+  "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
+  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152",
+  "section": "5.1"
+ },
+ "problem": "手順書`docs/development/prompts/session-log-record-run.md`第1節が「0=全系統成功、5=いずれか失敗」と書くが、実装（`tools/session_logs/record_run.py` 149-150行・203行）はどれかの系統が`partial`でも0を返す。第2節は`ok`と`partial`を区別しているため、その語彙で`partial`は「成功」ではない。手順書が実装の挙動を正しく書いていない。",
+ "impact": [
+  "合否を終了コードで確認するという手順書自身の定めが成り立たない",
+  "RQ2実験で独立レビュー4回中4回がこの記述を誤読した（実測）",
+  "誤読すると正常なpartialを失敗と扱い、不要な調査や再実行が起きる"
+ ],
+ "scope": [
+  "第1節の括弧書きを実装の現挙動に合わせて改める（partialを含む場合に0が返ることの明記）",
+  "第1節と第2節で語る対象（包み役の終了コードと系統ごとの終了コード）の区別を文面で明示"
+ ],
+ "non_scope": [
+  "終了コードの値そのものの変更（IC-SESSION-LOG-EXIT-CODE-VOCABULARY-001で扱う）",
+  "record-run wrapperの挙動変更"
+ ],
+ "classification_candidates": [
+  "documentation",
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "related_candidates": [
+  "IC-SESSION-LOG-EXIT-CODE-VOCABULARY-001"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
+   "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152"
+  }
+ ],
+ "proposed_action": "文言修正のみで済む。ただしIC-SESSION-LOG-EXIT-CODE-VOCABULARY-001を採用して終了コードを変える場合は文言を二度書き換えることになるため、その仕分け結果を待って実施時機を決めるのが妥当。",
+ "content_digest": "3abc98d6db9764cdde8334093988d376ef95090daefd6e8713e08372266aa52d"
+}
