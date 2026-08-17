@@ -524,6 +524,26 @@ def test_successful_launch_saves_raw_and_launch_record(
     assert result["raw_digest"] == raw_document["raw_digest"]
 
 
+def test_launch_record_includes_execution_metrics(
+    repository, monkeypatch, clean_environment
+):
+    # launch-metrics作業票v1 §2：時間・prompt規模の観測4項目（既存12項目は不変）。
+    facade = _FacadeRecorder(stdout=_stream_text())
+    _launch(repository, monkeypatch, facade)
+    private_root = repository.parent / "private"
+    launch_document = json.loads(
+        (private_root / "run-001" / "launch.json").read_text(encoding="utf-8")
+    )
+    assert isinstance(launch_document["prompt_bytes"], int)
+    assert launch_document["prompt_bytes"] > 0
+    assert isinstance(launch_document["elapsed_seconds"], (int, float))
+    assert launch_document["elapsed_seconds"] >= 0
+    for key in ("started_at", "finished_at"):
+        value = launch_document[key]
+        assert isinstance(value, str)
+        assert value.endswith("+00:00") or value.endswith("Z")
+
+
 def test_disallowed_model_stops_after_raw_saved(
     repository, monkeypatch, clean_environment
 ):
