@@ -137,7 +137,10 @@ def test_build_case_request_passes_check(tmp_path):
     )
     text = (root / relative_path).read_text(encoding="utf-8")
     assert "<<記入:" not in text
-    assert relative_path.startswith("records/session-handoffs/rq2-case-001-b")
+    # 命名は正式経路の規約（日付＋slug＋-request-v1.md）。実測で確定した形。
+    assert relative_path == (
+        "records/session-handoffs/2026-08-17-rq2-case-001-b-request-v1.md"
+    )
     _git(root, "add", "-A")
     _git(root, "commit", "--quiet", "-m", "request")
     verdict = request_builder.check(
