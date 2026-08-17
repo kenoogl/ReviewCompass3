@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25、一件用安全保存、一件レビュー材料、G08一件設計、G20の外部送信2契約（008・009）、『正式ツール化』の縦B契約010（Reviewer起動アダプタ）・縦A契約011（依頼組み立て器）に続き、**契約012（claude-subagent第2 backend・Tier 2／3受容機構）の製品受入まで完了**。レビュー起動はagy（Tier 1・既定）とclaude-subagent（Tier 3・起動ごとの明示受容つき）の**2 backend体制が正式経路**になり、同一対象集合への2 oracle比較が初成立（両判定役一致）。依頼record作成はassemble→LLM記入→check合格が正式経路。事前走査は6手順へ改定・手順書化し、機械gate接続は改善候補`IC-REUSE-SEARCH-GATE-CONNECTION-001`として登録済み。
-- 現在作業：次の作業単位の順序選択待ち（利用者判断）。E2E非blocking所見6件の仕分けは**完了**（軽微4件＝F-4・F-5・F-7・R-1を修正——F-4はRED先行で受容根拠pathのrepo内包検査を追加、F-5は認証遮断試験を6種全変数へ対称化、F-7・R-1は既存挙動の固定。F-6・R-2は改善候補登録のみ）。候補＝(a) 縦C（合議・判定record比較の上位層）の契約候補作成、(b) codex-cli第3 backend（トークン枯渇の疎通回復待ちのため着手不可）、(c) 自由文類型・外部API pending解除等の他候補、(d) 改善候補の仕分け（`IC-BACKEND-REGISTRY-DEEPENING-001`・`IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001`・`IC-REUSE-SEARCH-GATE-CONNECTION-001`）。
+- 現在作業：次の作業単位の順序選択待ち（利用者判断）。E2E非blocking所見6件の仕分けに続き、**改善候補4件の仕分けも確定済み**（候補1登録形深化＝採用・codex-cli追加と同時、候補2組み立て器model照合＝保留・候補1と同時機再評価、候補3機械gate接続＝保留継続・縦C事前走査の実測後に再仕分け、候補4敵対fixture網羅＝採用・縦C契約のRED段要求へ組み込み）。候補＝(a) 縦C（合議・判定record比較の上位層）の契約候補作成（候補3の実測と候補4の組み込みを兼ねる）、(b) codex-cli第3 backend（疎通回復待ち。回復時は候補1を含め候補2を再評価）、(c) 自由文類型・外部API pending解除等の他候補。
 - Task Contract：なし（契約012は§9-11成立・完了。受入判断record＝`2026-08-17-claude-subagent-backend-product-acceptance-decision-v1.md`。次契約は未定義）
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [改善候補4件の仕分けrecord（採用2・保留2・実施時機の固定）](records/development/2026-08-17-improvement-candidates-triage-decision-v1.md) — SHA-256 `34f7ca163645fe50770734f92b48ad41b6415983ab1eda61c57efc104be8a162`
 - [文字列理解の失敗類型と対策原則（参照record・事前走査の必読入力）](records/development/2026-08-17-text-interpretation-failure-principles-reference-v1.md) — SHA-256 `4c80a56c2f66ffb0baef0a10aae1680e3a04d5c2b883371c826a8f2237bfbcaf`
 - [E2E非blocking所見6件の仕分けrecord（軽微4件修正・改善候補2件登録）](records/development/2026-08-17-e2e-findings-triage-decision-v1.md) — SHA-256 `771bb0b5db3a6aa842d69ab9c30c821b92b70304f60192cea1d79535e4ff316e`
 - [利用者による契約012の製品受入判断（残余risk 4点受容・2 backend正式経路化）](records/development/2026-08-17-claude-subagent-backend-product-acceptance-decision-v1.md) — SHA-256 `dad40e6c88a5c46dd4008806ab0e94c797d4c5f55aefd4f0d3d08891d343afb8`
@@ -52,10 +53,13 @@
 
 - **(a) 縦C（合議・判定record比較の上位層）の契約候補作成**——同一対象集合への2 oracle比較の
   実データ2組（一致事例）が材料として揃った状態。着手する場合は事前走査（6手順）から。
+  仕分け確定事項として、事前走査が`IC-REUSE-SEARCH-GATE-CONNECTION-001`の運用実測を兼ね、
+  RED段要求へ`IC-ADVERSARIAL-FIXTURE-CATALOG-001`（類型→検査器→fixture対応表と先行失敗試験）を
+  組み込む。
 - (b) codex-cli第3 backend——トークン枯渇の疎通回復待ちのため着手不可（回復確認が先）。
+  回復時は`IC-BACKEND-REGISTRY-DEEPENING-001`（採用済み）を同縦切りへ含め、
+  `IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001`を再評価する。
 - (c) 自由文類型・外部API pending解除等の他候補。
-- (d) 改善候補4件の仕分け（backend登録形の深化・組み立て器model照合の範囲・機械gate接続・
-  敵対fixture類型網羅。いずれも採用時機の判断のみで実装は伴わない）。
 
 開始条件：
 
@@ -70,12 +74,12 @@
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路とclaude-subagent（Tier 3・明示受容つき）の2経路が稼働
-- Human判断待ち：次の作業単位の順序選択。改善候補4件の仕分け（`IC-BACKEND-REGISTRY-DEEPENING-001`・`IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001`・`IC-REUSE-SEARCH-GATE-CONNECTION-001`・`IC-ADVERSARIAL-FIXTURE-CATALOG-001`）
+- Human判断待ち：次の作業単位の順序選択のみ（改善候補4件の仕分けは確定済み——2026-08-17仕分けrecord）
 
 ## stale・deferred
 
 - stale：契約008〜012の進行中表示（五契約とも受入完了）。「Tier 1以外は無条件停止」の表示（契約012により宣言＋明示受容の型へ一般化。既定挙動は不変）
-- deferred：**外部API直接送信経路の後続はpending**（2026-08-16。対象・条件は従前どおり。統合する場合はbackend合流でなく判定record規約への準拠——設計方針メモ§3）。契約011範囲外の後続＝自由文類型・`review_plan`出力の自動変換・縦C合議・codex-cli backend。機械gate接続は`IC-REUSE-SEARCH-GATE-CONNECTION-001`（Human仕分け待ち）。`IC-SUBAGENT-HARDENING-ENV-REUSE-001`は**採用・訂正実施済み**（2026-08-17の訂正record3件目）。実装経路確認部品の`CLAUDE_VERSION`（2.1.220のまま）は次回その経路使用時に自経路の手続きで更新。Reviewer側digest実計算の特定command許可は将来の契約改定候補
+- deferred：**外部API直接送信経路の後続はpending**（2026-08-16。対象・条件は従前どおり。統合する場合はbackend合流でなく判定record規約への準拠——設計方針メモ§3）。契約011範囲外の後続＝自由文類型・`review_plan`出力の自動変換・縦C合議・codex-cli backend。改善候補の仕分けは確定済み（2026-08-17仕分けrecord）：`IC-BACKEND-REGISTRY-DEEPENING-001`＝採用・codex-cli追加と同時実施、`IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001`＝保留・同時機再評価、`IC-REUSE-SEARCH-GATE-CONNECTION-001`＝保留継続・縦C事前走査の実測後に再仕分け、`IC-ADVERSARIAL-FIXTURE-CATALOG-001`＝採用・縦C RED段要求へ組み込み。`IC-SUBAGENT-HARDENING-ENV-REUSE-001`は**採用・訂正実施済み**（2026-08-17の訂正record3件目）。実装経路確認部品の`CLAUDE_VERSION`（2.1.220のまま）は次回その経路使用時に自経路の手続きで更新。Reviewer側digest実計算の特定command許可は将来の契約改定候補
 
 ## Git・Test
 
