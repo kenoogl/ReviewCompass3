@@ -1,6 +1,6 @@
 ---
-lifecycle: active
-normative_status: operational-checklist
+lifecycle: frozen
+normative_status: historical-checklist
 document_role: initial-development-execution-checklist
 activated_at: 2026-08-03
 authority_order:
@@ -26,6 +26,16 @@ related_design:
 ---
 
 # ReviewCompass3初期開発チェックリスト
+
+> **凍結（2026-08-17）**：本書は以後更新しない読み取り専用の時点記録である（利用者判断・
+> `records/development/2026-08-17-checklist-freeze-and-overview-decision-v1.md`）。
+> 2026-08-16以降の運用は本書を経由していない（実測）。後継は次のとおり——
+> 全景と進捗：`docs/current/reviewcompass3-overview-current.md`（全体見取り図）／
+> 作業順：立て直し計画v5と作業単位ごとの契約・作業票／
+> 方針・規則：`AGENTS.md`・`docs/development/2026-08-02-development-policy.md`・手順書群／
+> 完了根拠：`records/`のEvidence・受入判断record／現在位置：`TODO_NEXT_SESSION.md`。
+> Work別の完了関門・Evidence記録・未完了Work（7A残り・7B・8・8A・最終公開評価）の詳細を
+> 参照する目的では引き続き読んでよい。本書内の参照digestは凍結時点の値であり以後追従しない。
 
 ## 1. 目的と使い方
 

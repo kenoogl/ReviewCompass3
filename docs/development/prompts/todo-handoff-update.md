@@ -12,6 +12,9 @@
 4. 現在位置、active Issue 1件、最新authority／EvidenceのpathとDigest、次の一作業、blocker、
    Human判断待ち、stale／deferred、Git／Testだけを現在値へ置き換える。過去session、完了Claim、
    手戻り詳細を累積しない。詳細は固定sourceを持つCandidate／Issue／Evidenceへ保存する。
+   作業単位の受入完了を反映する更新では、全体見取り図
+   （`docs/current/reviewcompass3-overview-current.md`）の該当する状態欄も同時に更新する
+   （状態語彙のみ・詳細を書かない）。
 5. `tools/development/todo_compaction.py`の12,288 bytes以下、active ID 1件、禁止履歴0、参照解決、
    `tools/development/todo_handoff.py`のcommit安定Git欄、Evidence節の参照Digest一致を次の**単一入口**で
    まとめて機械検証する。各検証の終了条件を直接判定し、pipeや`;`連結で代替しない。最終stage前に実行する。
