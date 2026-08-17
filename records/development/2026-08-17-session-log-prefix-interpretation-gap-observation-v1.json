@@ -1,0 +1,15 @@
+{
+ "observation_id": "OBS-RC3-SESSION-LOG-PREFIX-INTERPRETATION-GAP-2026-08-17-V1",
+ "observed_at": "2026-08-17T15:28:27+09:00",
+ "status": "fixed_improvement_source",
+ "subject": "デスクトップアプリ起点のClaudeセッションはJSONL先頭が前置record（queue-operation等）になり、実会話を含むfileが全件解釈非対応へ落ちる（当環境の標準状態）",
+ "machine_observations": {
+  "project_source_scan": "~/.claude/projects/-Users-Daily-Development-ReviewCompass3/ の26 file中、先頭record種別はqueue-operation 24・mode 2。本文形式（uuid+sessionId）開始は0件（2026-08-17機械観測）",
+  "body_presence_sample": "queue-operation開始の3件（572行・2,155行・2,459行）すべてに本文形式record（uuid・sessionId）が存在",
+  "accumulated_unsupported": "2026-08-16実行の解釈非対応68件の内訳＝queue-operation 63・custom-title 3・started 2（同日セッションの実測報告）",
+  "preservation_status": "非対応でも生ログ保全は完了（保全→解釈の順。tools/session_logs/eventual_preservation.py 433行以降）。欠けるのは会話としての構造化のみで、原本からの遡及再解釈が可能",
+  "interpreter_shape": "tools/session_logs/source_kind.pyは先頭recordが本文形式・thread.started・session_metaのみ解釈対象。identify_auxiliary_kindはclaude_queue・claude_agentの分類のみで解釈はしない。modeは分類にも未登録"
+ },
+ "impact_summary": "このproject環境のClaude会話はほぼ全件が構造化データから欠落し、下流（検索・要約・参照・機微削除済み派生物）に現れない。デスクトップ起点の利用が続く限り拡大する。原本保全済みのため遡及可能",
+ "route_proposal": "改善候補IC-SESSION-LOG-PREFIX-INTERPRETATION-001としてHuman仕分けへ。対処方向＝既知の前置種別に限り最初の本文形式recordから解釈を開始する正準規則の追加（未知種別はfail-closed維持）。過去分の遡及再解釈を含む。取りこぼしが当環境の標準状態のため高優先の仕分けが妥当"
+}

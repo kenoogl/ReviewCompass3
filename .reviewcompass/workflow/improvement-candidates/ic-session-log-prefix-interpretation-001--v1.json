@@ -1,0 +1,51 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-SESSION-LOG-PREFIX-INTERPRETATION-001",
+ "candidate_version": 1,
+ "created_at": "2026-08-17T15:28:27+09:00",
+ "source_work": "session-log-run-procedure/red-stage",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-SESSION-LOG-PREFIX-INTERPRETATION-GAP-2026-08-17-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-17-session-log-prefix-interpretation-gap-observation-v1.json",
+  "sha256": "c80f9ae9ceca8e94ecf2ddcb67a425eee6551cfbe05ed0a5fb9fec932643d85a"
+ },
+ "problem": "Claude Codeのデスクトップ起点セッションはJSONL先頭が前置record（queue-operation・mode等）になり、解釈器（source_kind）は先頭recordだけで判定するため、実会話を含むfileが全件「解釈非対応」に落ちる。当projectの実測では26 file中24件がqueue-operation開始・本文形式開始0件で、内容の取りこぼしが標準状態になっている。",
+ "impact": [
+  "実会話が構造化データから欠落し、下流（検索・要約・参照・機微削除済み派生物）に現れない",
+  "解釈非対応の件数が増え続け、実行のたびの説明・調査の負担が再発しうる",
+  "デスクトップ起点の利用が続く限り欠落範囲が拡大する（原本保全済みのため遡及は可能）"
+ ],
+ "scope": [
+  "既知の前置種別（queue-operation・mode・custom-title・started）に限り、最初の本文形式recordから解釈を開始する正準規則の追加",
+  "identify_auxiliary_kind（補助分類）との整合とmode種別の登録",
+  "過去分の遡及再解釈の運用（保全済みrawからの再実行）",
+  "前置偽装の敵対fixture（偽の前置recordで本文を隠す形）を試験へ標準で含める"
+ ],
+ "non_scope": [
+  "未知種別の推測解釈（fail-closedを維持し、未知は引き続き非対応）",
+  "record-run wrapper（作業票v2）の変更",
+  "保全機構（raw先行保存）の変更"
+ ],
+ "classification_candidates": [
+  "task_contract",
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-17-session-log-prefix-interpretation-gap-observation-v1.json",
+   "sha256": "c80f9ae9ceca8e94ecf2ddcb67a425eee6551cfbe05ed0a5fb9fec932643d85a"
+  }
+ ],
+ "proposed_action": "既知前置種別の先頭スキップ正準規則を解釈器へ追加する縦切りをHuman仕分けで裁定する。採用時は過去分の遡及再解釈を受入条件に含める。実測（当環境でClaude分ほぼ全件が非対応）に基づき高優先の仕分けが妥当。",
+ "content_digest": "6efce30c3839ab3a6eef4c116fb15cd655e9ece7a467210345e62ab5ce6f0b5c"
+}
