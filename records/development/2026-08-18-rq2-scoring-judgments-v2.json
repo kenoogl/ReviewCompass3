@@ -1,0 +1,57 @@
+{
+  "_ruling": "2026-08-18 利用者裁定。境界例1・3＝実欠陥（case-008・case-010を欠陥ケースへ）、2＝材料の欠陥、4＝依頼の情報欠落、5・6＝誤検出／対象外。主題適中率を採用",
+  "_extension": "裁定の原則を一覧外の同型指摘へも適用した（case-004 B F-002／case-001 D F-001・F-002＝材料で実在を検証済み、case-003 C F-002＝同じ仕込み欠陥の別の面）",
+
+  "case-001|B|F-LLM-001": "detected",
+  "case-001|B|F-LLM-002": "material_defect",
+  "case-001|C|F-LLM-001": "detected",
+  "case-001|C|F-LLM-002": "material_defect",
+  "case-001|C|F-LLM-003": "false_positive",
+  "case-001|A1|F-LLM-001": "detected",
+  "case-001|A2|F-LLM-001": "detected",
+  "case-001|A2|F-LLM-002": "off_subject",
+  "case-001|D|F-LLM-001": "material_defect",
+  "case-001|D|F-LLM-002": "material_defect",
+  "case-001|D|F-LLM-003": "non_counting",
+
+  "case-002|B|F-LLM-001": "detected",
+  "case-002|C|F-LLM-001": "detected",
+
+  "case-003|B|F-LLM-001": "detected",
+  "case-003|C|F-LLM-001": "detected",
+  "case-003|C|F-LLM-002": "detected",
+
+  "case-004|B|F-LLM-001": "request_gap",
+  "case-004|B|F-LLM-002": "material_defect",
+  "case-004|B|F-LLM-003": "non_counting",
+  "case-004|C|F-LLM-001": "non_counting",
+  "case-004|A1|F-LLM-001": "non_counting",
+  "case-004|A1|F-LLM-002": "non_counting",
+  "case-004|A1|F-LLM-003": "non_counting",
+  "case-004|A2|F-LLM-001": "off_subject",
+  "case-004|A2|F-LLM-002": "off_subject",
+  "case-004|A2|F-LLM-003": "off_subject",
+  "case-004|A2|F-LLM-004": "off_subject",
+
+  "case-005|B|F-LLM-001": "detected",
+  "case-005|C|F-LLM-001": "detected",
+  "case-005|C|F-LLM-002": "detected",
+
+  "case-006|B|F-LLM-001": "detected",
+  "case-006|C|F-LLM-001": "detected",
+
+  "case-007|B|F-LLM-001": "detected",
+  "case-007|C|F-LLM-001": "detected",
+
+  "case-008|B|F-LLM-001": "detected",
+  "case-008|C|F-LLM-001": "detected",
+  "case-008|A1|F-LLM-001": "detected",
+  "case-008|A2|F-LLM-001": "detected",
+  "case-008|A2|F-LLM-002": "non_counting",
+
+  "case-010|B|F-LLM-001": "request_gap",
+  "case-010|B|F-LLM-002": "detected",
+  "case-010|B|F-LLM-003": "non_counting",
+  "case-010|C|F-LLM-001": "request_gap",
+  "case-010|C|F-LLM-002": "detected"
+}

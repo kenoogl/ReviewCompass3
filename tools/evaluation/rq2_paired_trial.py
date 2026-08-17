@@ -30,7 +30,24 @@ CONDITIONS = ("A1", "A2", "B", "C", "D")
 ABSOLUTE_LAUNCH_LIMIT = 35
 CONSECUTIVE_FAILURE_LIMIT = 3
 UNABLE_RATIO_LIMIT = 0.30
-JUDGMENTS = ("detected", "false_positive", "out_of_scope", "non_counting")
+# 採点語彙（2026-08-18の利用者裁定で確定）。
+# detected＝仕込んだ欠陥に当たった／material_defect＝材料に実在するが仕込んで
+# いない欠陥を正しく指摘／false_positive＝材料にその問題は無い／request_gap＝
+# 材料は正しいが判断に必要な前提が依頼に無い／off_subject＝材料としては正しいが
+# ケースの主題ではない／out_of_scope＝材料の外側を論じる／non_counting＝軽微。
+JUDGMENTS = (
+    "detected",
+    "material_defect",
+    "false_positive",
+    "request_gap",
+    "off_subject",
+    "out_of_scope",
+    "non_counting",
+)
+# 加算対象（利用者が読んで処理する必要のある指摘）。non_countingだけを除く。
+COUNTED_JUDGMENTS = tuple(
+    value for value in JUDGMENTS if value != "non_counting"
+)
 
 _REQUIREMENTS = tuple(sorted(contract_module.REQUIREMENT_OBLIGATIONS))
 
@@ -490,9 +507,7 @@ def apply_judgments(scoring_sheet, judgments):
     scoring = {}
     for row in scoring_sheet:
         key = (row["case_id"], row["condition"])
-        scoring.setdefault(
-            key, {"detected": False, "false_positive": 0, "out_of_scope": 0}
-        )
+        entry = scoring.setdefault(key, _empty_scoring())
         judgment = judgments.get(
             (row["case_id"], row["condition"], row["finding_id"])
         )
@@ -502,12 +517,23 @@ def apply_judgments(scoring_sheet, judgments):
                 % (row["case_id"], row["condition"], row["finding_id"])
             )
         if judgment == "detected":
-            scoring[key]["detected"] = True
-        elif judgment == "false_positive":
-            scoring[key]["false_positive"] += 1
-        elif judgment == "out_of_scope":
-            scoring[key]["out_of_scope"] += 1
+            entry["detected"] = True
+            entry["subject_hits"] += 1
+        elif judgment != "non_counting":
+            entry[judgment] += 1
     return scoring
+
+
+def _empty_scoring():
+    return {
+        "detected": False,
+        "subject_hits": 0,
+        "material_defect": 0,
+        "false_positive": 0,
+        "request_gap": 0,
+        "off_subject": 0,
+        "out_of_scope": 0,
+    }
 
 
 def _mean(values):
@@ -536,18 +562,40 @@ def aggregate(trials):
             for trial in subset
             if trial.get("usage")
         ]
+        totals = {
+            name: sum(
+                trial["scoring"].get(name, 0) for trial in subset
+            )
+            for name in ("subject_hits",) + COUNTED_JUDGMENTS[1:]
+        }
+        counted = sum(totals[name] for name in totals)
         by_condition[condition] = {
             "trials": len(subset),
             "defect_cases": len(defects),
             "detection_rate": (
                 round(len(detected) / len(defects), 4) if defects else None
             ),
-            "false_positive_total": sum(
-                trial["scoring"]["false_positive"] for trial in subset
+            # 加算対象＝利用者が読んで処理する必要のある指摘（軽微を除く全部）
+            "counted_findings": counted,
+            # 主題適中率＝仕込んだ欠陥に当たった指摘の割合
+            "subject_hit_rate": (
+                round(totals["subject_hits"] / counted, 4) if counted else None
             ),
-            "out_of_scope_total": sum(
-                trial["scoring"]["out_of_scope"] for trial in subset
+            # 有効指摘率＝材料に実在する欠陥を指した指摘の割合（主題＋仕込み外）
+            "valid_finding_rate": (
+                round(
+                    (totals["subject_hits"] + totals["material_defect"])
+                    / counted,
+                    4,
+                )
+                if counted
+                else None
             ),
+            "material_defect_total": totals["material_defect"],
+            "request_gap_total": totals["request_gap"],
+            "off_subject_total": totals["off_subject"],
+            "false_positive_total": totals["false_positive"],
+            "out_of_scope_total": totals["out_of_scope"],
             "input_tokens_mean": _mean(inputs),
             "selection_count_mean": _mean(
                 [trial["selection"]["count"] for trial in subset]

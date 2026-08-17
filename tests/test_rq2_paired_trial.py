@@ -198,9 +198,12 @@ def test_scoring_sheet_and_judgments(tmp_path):
             ("case-001", "B", "F-LLM-002"): "false_positive",
         },
     )
-    assert scoring[("case-001", "B")] == {
-        "detected": True, "false_positive": 1, "out_of_scope": 0,
-    }
+    # 採点語彙の拡張（2026-08-18裁定）後も、検出と誤検出の数え方は変わらない
+    entry = scoring[("case-001", "B")]
+    assert entry["detected"] is True
+    assert entry["subject_hits"] == 1
+    assert entry["false_positive"] == 1
+    assert entry["out_of_scope"] == 0
 
 
 def test_apply_judgments_rejects_unjudged_finding():
@@ -405,3 +408,48 @@ def test_review_question_asks_about_the_material_not_the_contract_goal():
     assert "docs/evaluation/rq2-cases/case-001/a.md" in body
     # 複製であることを理由にした指摘を範囲外と明示する
     assert "複製" in scope
+
+
+def test_extended_judgments_and_subject_hit_rate():
+    """裁定で確定した採点語彙と主題適中率を固定する。
+
+    利用者裁定（2026-08-18）：境界例2＝材料の欠陥、境界例4＝依頼の情報欠落、
+    主題適中率を採用。誤検出（材料にその問題は無い）と、材料に実在する欠陥を
+    正しく指摘したもの・依頼が前提を渡さなかったための指摘・ケースの主題では
+    ない指摘を、別々に数える。
+    """
+
+    rq2 = _rq2()
+    sheet = rq2.build_scoring_sheet([
+        {"case_id": "case-001", "condition": "B", "findings": [
+            {"finding_id": "F-LLM-%03d" % index, "severity": "error",
+             "description": "x", "target_ref": {"relative_path": "docs/x.md"}}
+            for index in range(1, 6)
+        ]},
+    ])
+    scoring = rq2.apply_judgments(sheet, {
+        ("case-001", "B", "F-LLM-001"): "detected",
+        ("case-001", "B", "F-LLM-002"): "material_defect",
+        ("case-001", "B", "F-LLM-003"): "false_positive",
+        ("case-001", "B", "F-LLM-004"): "request_gap",
+        ("case-001", "B", "F-LLM-005"): "off_subject",
+    })
+    entry = scoring[("case-001", "B")]
+    assert entry["detected"] is True
+    assert entry["material_defect"] == 1
+    assert entry["false_positive"] == 1
+    assert entry["request_gap"] == 1
+    assert entry["off_subject"] == 1
+
+    metrics = rq2.aggregate([{
+        "case_id": "case-001", "condition": "B", "group": "real_defect",
+        "status": "succeeded", "selection": {"count": 2},
+        "usage": {"input_tokens": 100, "output_tokens": 10},
+        "scoring": entry,
+    }])
+    condition = metrics["by_condition"]["B"]
+    # 加算対象5件のうち、主題に当たったのは1件
+    assert condition["counted_findings"] == 5
+    assert condition["subject_hit_rate"] == 0.2
+    # 材料に実在する欠陥を指した指摘まで含めた有効指摘率は2件ぶん
+    assert condition["valid_finding_rate"] == 0.4
