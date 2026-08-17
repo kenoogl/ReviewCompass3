@@ -7,8 +7,8 @@
 ## 現在位置
 
 - 全体：立て直し計画v5の第1段から第5段、G25、一件用安全保存、一件レビュー材料、G08一件設計、G20の外部送信2契約（008・009）、『正式ツール化』の縦B契約010（Reviewer起動アダプタ）・縦A契約011（依頼組み立て器）に続き、**契約012（claude-subagent第2 backend・Tier 2／3受容機構）の製品受入まで完了**。レビュー起動はagy（Tier 1・既定）とclaude-subagent（Tier 3・起動ごとの明示受容つき）の**2 backend体制が正式経路**になり、同一対象集合への2 oracle比較が初成立（両判定役一致）。依頼record作成はassemble→LLM記入→check合格が正式経路。事前走査は6手順へ改定・手順書化し、機械gate接続は改善候補`IC-REUSE-SEARCH-GATE-CONNECTION-001`として登録済み。
-- 現在作業：次の作業単位の順序選択待ち（利用者判断）。E2E非blocking所見6件の仕分けに続き、**改善候補4件の仕分けも確定済み**（候補1登録形深化＝採用・codex-cli追加と同時、候補2組み立て器model照合＝保留・候補1と同時機再評価、候補3機械gate接続＝保留継続・縦C事前走査の実測後に再仕分け、候補4敵対fixture網羅＝採用・縦C契約のRED段要求へ組み込み）。候補＝(a) 縦C（合議・判定record比較の上位層）の契約候補作成（候補3の実測と候補4の組み込みを兼ねる）、(b) codex-cli第3 backend（疎通回復待ち。回復時は候補1を含め候補2を再評価）、(c) 自由文類型・外部API pending解除等の他候補。
-- Task Contract：なし（契約012は§9-11成立・完了。受入判断record＝`2026-08-17-claude-subagent-backend-product-acceptance-decision-v1.md`。次契約は未定義）
+- 現在作業：**自由文類型（縦Aの第2縦切り・契約013）**。利用者選択（「自由文類型に取りかかる」）により着手。事前走査（6手順の適用第3号）完走——正式再利用検索`start_allowed: true`（直接一致33件）・適用範囲と規律4点の利用者了解・digest表13行の固定。**契約候補v1起草済み**（登録形へ`free_text`追加・§3を自由記入節へ差し替え・検査の類型分岐・既存2類型はbyte不変）。次＝5段の念入り手続き（自己レビュー→文脈整理→依頼record組み立て→依頼レビュー→独立確認起動〔利用者指示〕）→採用判断→実装。改善候補4件の仕分けは確定済み（採用2件は縦C RED段・codex-cli追加時に実施、保留2件は同時機に再評価——仕分けrecord参照）。
+- Task Contract：`TC-RC3-PRODUCT-FREE-TEXT-REQUEST-TYPE-013 / v1`＝`candidate_pending_independent_review`（起草済み。5段手続き・独立確認・採用判断待ち）
 
 ## 現在作業に影響する改善候補／Issue
 
@@ -16,6 +16,8 @@
 
 ## 最新のauthority／Evidence
 
+- [契約013候補v1（自由文類型・独立確認待ち）](records/task-contract/2026-08-17-free-text-request-type-candidate-v1.md) — SHA-256 `b57f1aab1c69cc2611b6d93da1c82fd0eb5757fbbfef76d5f50520b6609d416d`
+- [自由文類型 事前走査v1（6手順・start_allowed true・範囲整理）](records/development/2026-08-17-free-text-request-type-prescan-v1.md) — SHA-256 `aad68904a58f8ac79a8d99b1075636e1691684fde911fc83e15edc30437d9b55`
 - [改善候補4件の仕分けrecord（採用2・保留2・実施時機の固定）](records/development/2026-08-17-improvement-candidates-triage-decision-v1.md) — SHA-256 `34f7ca163645fe50770734f92b48ad41b6415983ab1eda61c57efc104be8a162`
 - [文字列理解の失敗類型と対策原則（参照record・事前走査の必読入力）](records/development/2026-08-17-text-interpretation-failure-principles-reference-v1.md) — SHA-256 `4c80a56c2f66ffb0baef0a10aae1680e3a04d5c2b883371c826a8f2237bfbcaf`
 - [E2E非blocking所見6件の仕分けrecord（軽微4件修正・改善候補2件登録）](records/development/2026-08-17-e2e-findings-triage-decision-v1.md) — SHA-256 `771bb0b5db3a6aa842d69ab9c30c821b92b70304f60192cea1d79535e4ff316e`
@@ -49,32 +51,28 @@
 
 ## 次に行う一作業
 
-利用者が次の作業単位の順序を選択する。候補：
-
-- **(a) 縦C（合議・判定record比較の上位層）の契約候補作成**——同一対象集合への2 oracle比較の
-  実データ2組（一致事例）が材料として揃った状態。着手する場合は事前走査（6手順）から。
-  仕分け確定事項として、事前走査が`IC-REUSE-SEARCH-GATE-CONNECTION-001`の運用実測を兼ね、
-  RED段要求へ`IC-ADVERSARIAL-FIXTURE-CATALOG-001`（類型→検査器→fixture対応表と先行失敗試験）を
-  組み込む。
-- (b) codex-cli第3 backend——トークン枯渇の疎通回復待ちのため着手不可（回復確認が先）。
-  回復時は`IC-BACKEND-REGISTRY-DEEPENING-001`（採用済み）を同縦切りへ含め、
-  `IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001`を再評価する。
-- (c) 自由文類型・外部API pending解除等の他候補。
+契約013候補v1の5段の念入り手続きを進める。第1・2段（起草側の自己レビュー・文脈整理）はClaudeが
+自律実施し、所見があれば候補v2へ訂正。第3段＝契約011の正式経路（`contract_review`類型）で
+独立確認依頼recordを組み立て→check合格→commit。第4段＝依頼のprompt（記入内容）を送信前に
+レビュー。第5段＝**独立確認の起動は利用者の明示指示**（agy既定・Tier 1）。判定が`verified`系なら
+採用判断へ、blocking所見があれば停止して利用者へ諮る。
 
 開始条件：
 
 - 本handoffを含むcommitが完了し、作業treeがcleanである
+- 利用者の5段手続き開始（または起動）の指示がchatで得られる
 
 完了条件：
 
-- 順序選択の文言がchatで得られる
+- 独立確認の判定record取得（または停止理由の確定）
 
-後続作業：選択された作業単位の事前走査（6手順）または仕分け裁定の記録。
+後続作業：採用判断（Human）→実装（RED先行）→受入条件§9の消化→製品受入。縦C・codex-cliは
+契約013の後の順序選択（仕分け確定事項はTODO現在位置とdeferredに記載）。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路とclaude-subagent（Tier 3・明示受容つき）の2経路が稼働
-- Human判断待ち：次の作業単位の順序選択のみ（改善候補4件の仕分けは確定済み——2026-08-17仕分けrecord）
+- Human判断待ち：契約013候補の5段手続き開始（第5段の独立確認起動は利用者の明示指示）
 
 ## stale・deferred
 
