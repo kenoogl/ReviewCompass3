@@ -51,19 +51,23 @@ LLMが読み書きするrecord、外部へ送るメッセージ——を設計�
 区別欠如による不要な再実行、(6) server非対応schema語彙によるモデル実行前拒否、(7) 巨大単一Markdown×
 網羅観点によるtimeout・思考token枯渇、(8) prompt本文・実行引数・表示用commandの同一文字列層への混在。
 
-## 4. RC3での体現（2026-08-17時点）
+## 4. RC3での体現（2026-08-17時点。同日、契約013実装の反映を追記——e2e-013-001所見
+SEC4-OUTDATED-FREE-TEXTの採用）
 
 - 原則3：Reviewer起動はpath＋SHA-256だけを渡し、レビュー役が読取り道具で読む（契約010/012）。
   本文同梱方式は廃止済み。
 - 原則1・2：依頼recordは機械生成（assemble）→LLM記入は限定2箇所→check（節構造・digest表・
-  placeholder・機微・**fence状態追跡**）合格まで起動対象にしない（契約011）。
+  placeholder・機微・**fence状態追跡**）合格まで起動対象にしない（契約011）。**類型推定は正準位置
+  （冒頭「レビュー種別」行）だけを正とし、本文中のlabel出現では判定しない**（契約013・SR-C13-1）。
 - 原則4：依頼recordはcommit＋SHA-256束縛。起動時に不一致なら`request_record_stale`停止。
 - 原則5：判定はJSON schema検証（`validate_verdict`）。抽出不能・不適合は
   `verdict_schema_nonconforming`停止。
 - 原則6：未加工出力は照合・抽出より前にrepo外私有領域へ保存。判定recordは機械転記＋事後照合4点。
 - 原則7：prompt byte上限16,384（対象本文は運ばないため小さい）。
-- 原則8：fence騙され2形（fence内偽見出し・fence外digest行）と停止系fixtureを標準試験化。
-  **類型網羅の体系化は未了**（改善候補`IC-ADVERSARIAL-FIXTURE-CATALOG-001`）。
+- 原則8：fence騙され2形（fence内偽見出し・fence外digest行）と停止系fixtureを標準試験化。契約013で
+  自由記入節への敵対fixture（fence内偽見出し・fence外digest行の拒否・他類型labelの本文混入で推定が
+  騙されない）を追加。**類型網羅の体系化は未了**（改善候補`IC-ADVERSARIAL-FIXTURE-CATALOG-001`＝
+  採用済み・縦C RED段要求へ組み込み）。
 
 ## 5. 系譜・出典（横repository。2026-08-17の横断検索で特定）
 
