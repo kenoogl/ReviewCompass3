@@ -7,8 +7,13 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess as _subprocess
+
+from tools.development.claude_implementation_executor import (
+    DISALLOWED_TOOLS as _EXECUTOR_DISALLOWED_TOOLS,
+)
 
 from tools.bootstrap.immutable_result_store import (
     ImmutableResultStoreError,
@@ -36,9 +41,29 @@ FORBIDDEN_AUTH_ENVIRONMENT = (
     "GOOGLE_APPLICATION_CREDENTIALS",
 )
 
-# 契約§7.1：許可model一覧。利用者承認recordで確定した値だけを置く。変更は契約改定。
+# 契約010 §7.1：agyの許可model一覧。利用者承認recordで確定した値だけを置く。変更は契約改定。
 # 承認：records/development/2026-08-16-reviewer-launch-allowed-models-approval-v1.md
-ALLOWED_RESPONSE_MODELS = ("gemini-3.1-pro-high",)
+_AGY_ALLOWED_RESPONSE_MODELS = ("gemini-3.1-pro-high",)
+
+# 契約012 §5.1-5：claude-subagentの許可model一覧。空の間はsubagent起動を停止する。
+# 値は実E2E前の利用者承認recordで確定して固定する。変更は契約改定。
+SUBAGENT_ALLOWED_RESPONSE_MODELS = ()
+
+# 契約012 §5.1-4：全backend許可modelの和集合（互換記号。契約011が検査基準にimportする）。
+ALLOWED_RESPONSE_MODELS = (
+    _AGY_ALLOWED_RESPONSE_MODELS + SUBAGENT_ALLOWED_RESPONSE_MODELS
+)
+
+# 契約012 §7.2：claude-subagentの認証遮断（由来：実行器FORBIDDEN_AUTH_ENVIRONMENT。
+# 同値性は試験で固定。変更は契約改定）。
+CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT = (
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_FOUNDRY_API_KEY",
+    "ANTHROPIC_VERTEX_PROJECT_ID",
+    "AWS_BEARER_TOKEN_BEDROCK",
+)
 
 PROMPT_BYTE_LIMIT = 16384
 PRINT_TIMEOUT = "600s"
@@ -57,6 +82,14 @@ BACKENDS = {
     "antigravity-cli": {
         "provider": "google",
         "executable": "agy",
+        "declared_tier": 1,
+        "read_tool_name": "view_file",
+    },
+    "claude-subagent": {
+        "provider": "anthropic",
+        "executable": "claude",
+        "declared_tier": 3,
+        "read_tool_name": "Read",
     },
 }
 
@@ -173,7 +206,12 @@ def judge_tier(backend_provider):
     return 1
 
 
-def build_prompt(repository_root, request_relative_path, expected_sha256):
+def build_prompt(
+    repository_root,
+    request_relative_path,
+    expected_sha256,
+    read_tool_name="view_file",
+):
     """固定形式の起動promptを生成する。自由文・依頼内容の複製を含めない。
 
     実行環境は読み取り専用であり、端末commandの実行と書込みはできない
@@ -197,7 +235,7 @@ def build_prompt(repository_root, request_relative_path, expected_sha256):
         "渡し、対象repositoryの外（利用者のhome等）へは一切アクセス"
         "しないでください。領域外アクセスは自動拒否され、その時点で"
         "レビューが終了します。\n"
-        "最初の操作として、読取り道具view_fileで対象依頼recordの"
+        "最初の操作として、読取り道具%sで対象依頼recordの"
         "絶対pathを開き、本依頼の対象であることを確認してください。"
         "digestの機械計算がこの環境で行えない場合、freshnessには"
         "expectedへ期待SHA-256を転記し、resultをnot_computableとして"
@@ -211,6 +249,7 @@ def build_prompt(repository_root, request_relative_path, expected_sha256):
             request_relative_path,
             absolute_request,
             expected_sha256,
+            read_tool_name,
         )
     )
 
@@ -248,8 +287,35 @@ def build_arguments(executable, prompt, model, project_id):
     ]
 
 
-def _child_environment():
-    for name in FORBIDDEN_AUTH_ENVIRONMENT:
+def build_claude_arguments(executable, prompt, model):
+    """契約012 §7.2のclaude-subagent固定引数（実行器設計の流用・読み取り専用）。"""
+
+    return [
+        executable,
+        "--print",
+        "--output-format",
+        "stream-json",
+        "--tools",
+        "Read,Glob,Grep",
+        "--allowedTools",
+        "Read(/**)",
+        "--disallowedTools",
+        *_EXECUTOR_DISALLOWED_TOOLS,
+        "--permission-mode",
+        "dontAsk",
+        "--strict-mcp-config",
+        "--mcp-config",
+        '{"mcpServers":{}}',
+        "--disable-slash-commands",
+        "--no-chrome",
+        "--model",
+        model,
+        prompt,
+    ]
+
+
+def _child_environment(forbidden_names):
+    for name in forbidden_names:
         if name in os.environ:
             raise LaunchStop("api_key_environment_forbidden")
     return {
@@ -257,6 +323,17 @@ def _child_environment():
         for name in PASSTHROUGH_ENVIRONMENT
         if name in os.environ
     }
+
+
+def _resolve_tier(backend, accept_tier):
+    """契約012 §7.3：tier判定と明示受容。受容が無ければ従来どおり停止。"""
+
+    if backend["provider"] != PILOT_PROVIDER:
+        return 1
+    declared = backend["declared_tier"]
+    if accept_tier == declared:
+        return declared
+    raise LaunchStop("reviewer_not_independent_tier")
 
 
 def resolve_project_binding(repository):
@@ -371,6 +448,65 @@ def _extract_verdict(events):
     return value
 
 
+_JSON_FENCE_PATTERN = re.compile(r"```json\s*\n(.*?)\n```", re.DOTALL)
+
+
+def _claude_observed_models(events):
+    """claude CLIのstream形式：top levelまたはmessage内のmodel欄を読む。"""
+
+    models = []
+    for event in events:
+        value = event.get("model")
+        if isinstance(value, str) and value:
+            models.append(value)
+        message = event.get("message")
+        if isinstance(message, dict):
+            nested = message.get("model")
+            if isinstance(nested, str) and nested:
+                models.append(nested)
+    return models
+
+
+def _parse_json_text(text):
+    stripped = text.strip()
+    try:
+        return json.loads(stripped)
+    except (json.JSONDecodeError, ValueError):
+        pass
+    match = _JSON_FENCE_PATTERN.search(text)
+    if match is not None:
+        try:
+            return json.loads(match.group(1))
+        except (json.JSONDecodeError, ValueError):
+            pass
+    start = stripped.find("{")
+    end = stripped.rfind("}")
+    if 0 <= start < end:
+        try:
+            return json.loads(stripped[start : end + 1])
+        except (json.JSONDecodeError, ValueError):
+            pass
+    raise LaunchStop("verdict_schema_nonconforming")
+
+
+def _claude_extract_verdict(events):
+    """claude CLIのstream形式：type==resultのresult本文からJSONを抽出する。"""
+
+    candidate = None
+    for event in events:
+        if event.get("type") == "result" and "result" in event:
+            candidate = event["result"]
+    if isinstance(candidate, dict):
+        value = candidate
+    elif isinstance(candidate, str) and candidate.strip():
+        value = _parse_json_text(candidate)
+    else:
+        raise LaunchStop("verdict_schema_nonconforming")
+    if not isinstance(value, dict):
+        raise LaunchStop("verdict_schema_nonconforming")
+    return value
+
+
 def _store_outputs(
     private_root,
     run_id,
@@ -418,18 +554,41 @@ def launch_review(
     private_root,
     backend_name,
     run_id,
+    accept_tier=None,
+    acceptance_ref=None,
 ):
-    """読み取り専用レビュー一往復の起動・保存・判定取り出しを行う。"""
+    """読み取り専用レビュー一往復の起動・保存・判定取り出しを行う。
 
-    environment = _child_environment()
+    契約012：backend別の禁止環境変数・許可model・tier受容を扱う。Tier 2／3は
+    `accept_tier`の一致と`acceptance_ref`（実在するrecord path）が無ければ
+    従来どおり停止する。
+    """
+
     backend = BACKENDS.get(backend_name)
     if backend is None:
         raise LaunchStop("backend_unknown")
-    tier = judge_tier(backend["provider"])
-    if not ALLOWED_RESPONSE_MODELS:
+    if backend_name == "claude-subagent":
+        forbidden_names = CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT
+        allowed_models = SUBAGENT_ALLOWED_RESPONSE_MODELS
+    else:
+        forbidden_names = FORBIDDEN_AUTH_ENVIRONMENT
+        allowed_models = ALLOWED_RESPONSE_MODELS
+    environment = _child_environment(forbidden_names)
+    tier = _resolve_tier(backend, accept_tier)
+    if tier != 1:
+        if (
+            not isinstance(acceptance_ref, str)
+            or not acceptance_ref
+            or not (Path(repository) / acceptance_ref).is_file()
+        ):
+            raise LaunchStop("acceptance_reference_missing")
+    if not allowed_models:
         raise LaunchStop("allowed_models_unfixed")
-    requested_model = ALLOWED_RESPONSE_MODELS[0]
-    project_id = resolve_project_binding(repository)
+    requested_model = allowed_models[0]
+    if backend_name == "antigravity-cli":
+        project_id = resolve_project_binding(repository)
+    else:
+        project_id = None
     private_path = _validate_private_root(repository, private_root)
 
     if not isinstance(expected_sha256, str) or len(expected_sha256) != 64:
@@ -446,14 +605,20 @@ def launch_review(
         str(Path(repository).resolve()),
         request_relative_path,
         expected_sha256,
+        read_tool_name=backend["read_tool_name"],
     )
     prompt_encoded = prompt.encode("utf-8")
     if len(prompt_encoded) > PROMPT_BYTE_LIMIT:
         raise LaunchStop("prompt_payload_limit_exceeded")
     prompt_digest = hashlib.sha256(prompt_encoded).hexdigest()
-    arguments = build_arguments(
-        backend["executable"], prompt, requested_model, project_id
-    )
+    if backend_name == "claude-subagent":
+        arguments = build_claude_arguments(
+            backend["executable"], prompt, requested_model
+        )
+    else:
+        arguments = build_arguments(
+            backend["executable"], prompt, requested_model, project_id
+        )
 
     try:
         completed = subprocess.run(
@@ -470,7 +635,10 @@ def launch_review(
     stdout = completed.stdout if isinstance(completed.stdout, str) else ""
     stderr = completed.stderr if isinstance(completed.stderr, str) else ""
     events = _parse_stream(stdout)
-    models = _observed_models(events)
+    if backend_name == "claude-subagent":
+        models = _claude_observed_models(events)
+    else:
+        models = _observed_models(events)
     launch_document = {
         "schema_version": 1,
         "run_id": run_id,
@@ -489,6 +657,9 @@ def launch_review(
         "prompt_sha256": prompt_digest,
         "print_timeout": PRINT_TIMEOUT,
         "project_id": project_id,
+        "accept_tier": accept_tier,
+        "acceptance_reference": acceptance_ref,
+        "read_tool": backend["read_tool_name"],
     }
 
     if completed.returncode != 0:
@@ -523,9 +694,12 @@ def launch_review(
 
     if not models:
         raise LaunchStop("response_model_unobserved")
-    if any(model not in ALLOWED_RESPONSE_MODELS for model in models):
+    if any(model not in allowed_models for model in models):
         raise LaunchStop("response_model_not_allowed")
-    verdict = _extract_verdict(events)
+    if backend_name == "claude-subagent":
+        verdict = _claude_extract_verdict(events)
+    else:
+        verdict = _extract_verdict(events)
     try:
         validate_verdict(verdict)
     except VerdictInvalid as error:

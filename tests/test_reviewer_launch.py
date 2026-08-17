@@ -809,3 +809,357 @@ def test_entry_missing_arguments_exits_2():
     assert exit_code == 2
     result = json.loads(buffer.getvalue().decode("utf-8"))
     assert result["status"] == "stopped"
+
+
+# ---- 契約012：claude-subagent backendとTier 2／3受容 ----
+
+SUBAGENT_TEST_MODEL = "claude-test-model"
+
+
+def _subagent_stream(model=SUBAGENT_TEST_MODEL, result_text=None, verdict=None):
+    value = verdict if verdict is not None else _valid_verdict()
+    text = (
+        json.dumps(value, ensure_ascii=False)
+        if result_text is None
+        else result_text
+    )
+    lines = [
+        json.dumps({"type": "system", "subtype": "init", "model": model}),
+        json.dumps({"type": "result", "result": text}),
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def _launch_subagent(repository, monkeypatch, facade, **overrides):
+    core = _core()
+    for name in core.CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(
+        core,
+        "SUBAGENT_ALLOWED_RESPONSE_MODELS",
+        (SUBAGENT_TEST_MODEL,),
+        raising=True,
+    )
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    request = _request_relative(repository)
+    values = {
+        "repository": repository,
+        "request_relative_path": request,
+        "expected_sha256": _sha256_file(repository / request),
+        "private_root": repository.parent / "private",
+        "backend_name": "claude-subagent",
+        "run_id": "run-sub-001",
+        "accept_tier": 3,
+        "acceptance_ref": request,
+    }
+    values.update(overrides)
+    return core.launch_review(**values)
+
+
+def test_subagent_backend_registered():
+    core = _core()
+    backend = core.BACKENDS["claude-subagent"]
+    assert backend["provider"] == "anthropic"
+    assert backend["declared_tier"] == 3
+    assert backend["read_tool_name"] == "Read"
+    assert backend["executable"] == "claude"
+
+
+def test_agy_backend_values_unchanged():
+    core = _core()
+    backend = core.BACKENDS["antigravity-cli"]
+    assert backend["provider"] == "google"
+    assert backend["executable"] == "agy"
+    assert backend["read_tool_name"] == "view_file"
+    assert backend["declared_tier"] == 1
+
+
+def test_union_allowed_models_preserved():
+    core = _core()
+    assert core.SUBAGENT_ALLOWED_RESPONSE_MODELS == ()
+    assert core.ALLOWED_RESPONSE_MODELS == ("gemini-3.1-pro-high",)
+
+
+def test_subagent_without_acceptance_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder()
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_subagent(
+            repository,
+            monkeypatch,
+            facade,
+            accept_tier=None,
+            acceptance_ref=None,
+        )
+    assert caught.value.reason == "reviewer_not_independent_tier"
+    assert facade.calls == []
+
+
+def test_subagent_wrong_accept_tier_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder()
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_subagent(repository, monkeypatch, facade, accept_tier=2)
+    assert caught.value.reason == "reviewer_not_independent_tier"
+    assert facade.calls == []
+
+
+def test_subagent_acceptance_ref_missing_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder()
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_subagent(
+            repository,
+            monkeypatch,
+            facade,
+            acceptance_ref="records/development/absent-acceptance.md",
+        )
+    assert caught.value.reason == "acceptance_reference_missing"
+    assert facade.calls == []
+
+
+def test_subagent_empty_allowed_models_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder()
+    for name in core.CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    monkeypatch.setattr(
+        core, "SUBAGENT_ALLOWED_RESPONSE_MODELS", (), raising=True
+    )
+    request = _request_relative(repository)
+    with pytest.raises(core.LaunchStop) as caught:
+        core.launch_review(
+            repository=repository,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+            private_root=repository.parent / "private",
+            backend_name="claude-subagent",
+            run_id="run-sub-001",
+            accept_tier=3,
+            acceptance_ref=request,
+        )
+    assert caught.value.reason == "allowed_models_unfixed"
+    assert facade.calls == []
+
+
+def test_subagent_forbidden_env_stops(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder()
+    for name in core.CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "secret")
+    monkeypatch.setattr(
+        core,
+        "SUBAGENT_ALLOWED_RESPONSE_MODELS",
+        (SUBAGENT_TEST_MODEL,),
+        raising=True,
+    )
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    request = _request_relative(repository)
+    with pytest.raises(core.LaunchStop) as caught:
+        core.launch_review(
+            repository=repository,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+            private_root=repository.parent / "private",
+            backend_name="claude-subagent",
+            run_id="run-sub-001",
+            accept_tier=3,
+            acceptance_ref=request,
+        )
+    assert caught.value.reason == "api_key_environment_forbidden"
+    assert facade.calls == []
+
+
+def test_subagent_forbidden_constant_equals_executor():
+    core = _core()
+    from tools.development.claude_implementation_executor import (
+        FORBIDDEN_AUTH_ENVIRONMENT,
+    )
+
+    assert tuple(core.CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT) == tuple(
+        FORBIDDEN_AUTH_ENVIRONMENT
+    )
+
+
+def test_subagent_arguments_fixed(clean_environment):
+    core = _core()
+    from tools.development.claude_implementation_executor import (
+        DISALLOWED_TOOLS,
+    )
+
+    arguments = core.build_claude_arguments(
+        "claude", "prompt-text", SUBAGENT_TEST_MODEL
+    )
+    assert arguments == [
+        "claude",
+        "--print",
+        "--output-format",
+        "stream-json",
+        "--tools",
+        "Read,Glob,Grep",
+        "--allowedTools",
+        "Read(/**)",
+        "--disallowedTools",
+        *DISALLOWED_TOOLS,
+        "--permission-mode",
+        "dontAsk",
+        "--strict-mcp-config",
+        "--mcp-config",
+        '{"mcpServers":{}}',
+        "--disable-slash-commands",
+        "--no-chrome",
+        "--model",
+        SUBAGENT_TEST_MODEL,
+        "prompt-text",
+    ]
+    tools_value = arguments[arguments.index("--tools") + 1]
+    assert "Edit" not in tools_value
+    assert "Write" not in tools_value
+    assert "--dangerously-skip-permissions" not in arguments
+
+
+def test_prompt_read_tool_insertion(repository):
+    core = _core()
+    request = _request_relative(repository)
+    digest = _sha256_file(repository / request)
+    prompt = core.build_prompt(
+        str(repository), request, digest, read_tool_name="Read"
+    )
+    assert "Read" in prompt
+    assert "view_file" not in prompt
+
+
+def test_subagent_successful_launch_saves_and_returns(
+    repository, monkeypatch, clean_environment
+):
+    facade = _FacadeRecorder(stdout=_subagent_stream())
+    result = _launch_subagent(repository, monkeypatch, facade)
+    assert result["status"] == "succeeded"
+    assert result["tier"] == 3
+    assert result["model"] == SUBAGENT_TEST_MODEL
+    private_root = repository.parent / "private"
+    raw_document = json.loads(
+        (private_root / "run-sub-001" / "reviewer.raw.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert raw_document["assignment"]["provider"] == "anthropic"
+    launch_document = json.loads(
+        (private_root / "run-sub-001" / "launch.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert launch_document["tier"] == 3
+    assert launch_document["accept_tier"] == 3
+    assert launch_document["acceptance_reference"] == _request_relative(
+        repository
+    )
+
+
+def test_subagent_fenced_result_extracted(
+    repository, monkeypatch, clean_environment
+):
+    text = (
+        "```json\n"
+        + json.dumps(_valid_verdict(), ensure_ascii=False)
+        + "\n```"
+    )
+    facade = _FacadeRecorder(stdout=_subagent_stream(result_text=text))
+    result = _launch_subagent(
+        repository, monkeypatch, facade, run_id="run-sub-002"
+    )
+    assert result["status"] == "succeeded"
+
+
+def test_subagent_disallowed_model_stops_after_raw_saved(
+    repository, monkeypatch, clean_environment
+):
+    core = _core()
+    facade = _FacadeRecorder(stdout=_subagent_stream(model="other-model"))
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_subagent(
+            repository, monkeypatch, facade, run_id="run-sub-003"
+        )
+    assert caught.value.reason == "response_model_not_allowed"
+    raw_path = (
+        repository.parent / "private" / "run-sub-003" / "reviewer.raw.json"
+    )
+    assert raw_path.is_file()
+
+
+def test_g30_prepare_backend_optional(repository):
+    entry = _entry()
+    import io
+
+    buffer = io.BytesIO()
+    request = _request_relative(repository)
+    exit_code = entry.g30_main(
+        [
+            "check",
+            "--input-root",
+            str(repository),
+            "--request",
+            request,
+            "--backend",
+            "claude-subagent",
+        ],
+        output=buffer,
+    )
+    assert exit_code == 0
+    result = json.loads(buffer.getvalue().decode("utf-8"))
+    assert result["backend"] == "claude-subagent"
+    assert result["tier"] == 3
+
+
+def test_entry_launch_acceptance_ref_missing(repository, monkeypatch):
+    entry = _entry()
+    core = _core()
+    import io
+
+    for name in core.CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(
+        core,
+        "SUBAGENT_ALLOWED_RESPONSE_MODELS",
+        (SUBAGENT_TEST_MODEL,),
+        raising=True,
+    )
+    buffer = io.BytesIO()
+    request = _request_relative(repository)
+    exit_code = entry.main(
+        [
+            "launch",
+            "--repository",
+            str(repository),
+            "--request",
+            request,
+            "--expected-sha256",
+            _sha256_file(repository / request),
+            "--private-root",
+            str(repository.parent / "private"),
+            "--run-id",
+            "run-sub-004",
+            "--backend",
+            "claude-subagent",
+            "--accept-tier",
+            "3",
+            "--acceptance-ref",
+            "records/development/absent-acceptance.md",
+        ],
+        output=buffer,
+    )
+    assert exit_code == 2
+    result = json.loads(buffer.getvalue().decode("utf-8"))
+    assert result["reason"] == "acceptance_reference_missing"

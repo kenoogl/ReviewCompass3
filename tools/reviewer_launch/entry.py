@@ -62,10 +62,17 @@ def g30_main(arguments=None, *, output=None):
         _stop(selected_output, "invalid_arguments", "arguments")
         return 2
     values = _parse_flags(
-        selected_arguments[1:], ("--input-root", "--request")
+        selected_arguments[1:],
+        ("--input-root", "--request"),
+        ("--backend",),
     )
     if values is None:
         _stop(selected_output, "invalid_arguments", "arguments")
+        return 2
+    backend_name = values.get("--backend", "antigravity-cli")
+    backend = core.BACKENDS.get(backend_name)
+    if backend is None:
+        _stop(selected_output, "backend_unknown", "request")
         return 2
     request_value = values["--request"]
     request_path = Path(request_value)
@@ -82,14 +89,16 @@ def g30_main(arguments=None, *, output=None):
         _stop(selected_output, "invalid_utf8", "request")
         return 2
     digest = hashlib.sha256(data).hexdigest()
+    if backend["provider"] != core.PILOT_PROVIDER:
+        tier = 1
+    else:
+        tier = backend["declared_tier"]
     try:
-        tier = core.judge_tier(
-            core.BACKENDS["antigravity-cli"]["provider"]
-        )
         prompt = core.build_prompt(
             str(Path(values["--input-root"]).resolve()),
             request_value,
             digest,
+            read_tool_name=backend["read_tool_name"],
         )
     except core.LaunchStop as stop:
         _stop(selected_output, stop.reason, "request")
@@ -105,7 +114,7 @@ def g30_main(arguments=None, *, output=None):
         {
             "status": "ok",
             "operation": "reviewer_launch_prepare",
-            "backend": "antigravity-cli",
+            "backend": backend_name,
             "request": {"path": request_value, "sha256": digest},
             "tier": tier,
             "prompt_bytes": prompt_bytes,
@@ -125,6 +134,8 @@ def _run_launch(values, output):
         private_root=values["--private-root"],
         backend_name=values.get("--backend", "antigravity-cli"),
         run_id=values["--run-id"],
+        accept_tier=values.get("--accept-tier"),
+        acceptance_ref=values.get("--acceptance-ref"),
     )
     transcription = record_module.transcribe_verdict_record(
         repository=repository,
@@ -179,11 +190,19 @@ def main(argv=None, *, output=None):
         _stop(selected_output, "invalid_arguments", "arguments")
         return 2
     values = _parse_flags(
-        selected_arguments[1:], _LAUNCH_FLAGS, ("--backend",)
+        selected_arguments[1:],
+        _LAUNCH_FLAGS,
+        ("--backend", "--accept-tier", "--acceptance-ref"),
     )
     if values is None:
         _stop(selected_output, "invalid_arguments", "arguments")
         return 2
+    if "--accept-tier" in values:
+        try:
+            values["--accept-tier"] = int(values["--accept-tier"])
+        except ValueError:
+            _stop(selected_output, "invalid_arguments", "arguments")
+            return 2
     try:
         return _run_launch(values, selected_output)
     except core.LaunchStop as stop:
