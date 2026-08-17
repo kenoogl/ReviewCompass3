@@ -1,0 +1,49 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-LAUNCH-EXECUTION-METRICS-2026-08-17-V1",
+  "searches": [
+    {
+      "subject": "launch_execution_metrics_v1",
+      "capabilities": [
+        {
+          "capability_id": "launch_execution_metrics",
+          "responsibility": "reviewer-launch実行の開始・終了時刻（UTC）・経過秒・prompt byte長を計測し、私有領域のlaunch.json文書へ決定的に追記する（repo内判定record・事後照合・安全境界は不変の後方互換の観測追加）",
+          "inputs": [
+            "launch実行の開始・終了時点",
+            "構築済みprompt"
+          ],
+          "outputs": [
+            "launch.jsonの計測4項目"
+          ],
+          "failure_behavior": [
+            "計測不能を偽値で埋めない（欠測はkeyを省略せず正直に記録する設計を候補で確定）"
+          ],
+          "required_properties": [
+            "既存12項目とlaunch保存経路の不変",
+            "決定的な追記（同一実行で同一構造）"
+          ],
+          "reference_paths": [
+            "tools/reviewer_launch/core.py"
+          ],
+          "reference_symbols": [
+            "tools/reviewer_launch/core.py:build_prompt",
+            "tools/reviewer_launch/core.py:launch_review"
+          ],
+          "symbol_terms": [
+            "launch",
+            "prompt",
+            "elapsed",
+            "metrics"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-17-launch-metrics-reuse-search-attestation-v1.json"
+    }
+  ],
+  "content_digest": "00ee46aa233f60710cb345f5bf61a7126c68e78cbe3da0278488f71004a1ad73"
+}
