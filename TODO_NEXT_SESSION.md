@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [文字列理解の失敗類型と対策原則（参照record・事前走査の必読入力）](records/development/2026-08-17-text-interpretation-failure-principles-reference-v1.md) — SHA-256 `4c80a56c2f66ffb0baef0a10aae1680e3a04d5c2b883371c826a8f2237bfbcaf`
 - [E2E非blocking所見6件の仕分けrecord（軽微4件修正・改善候補2件登録）](records/development/2026-08-17-e2e-findings-triage-decision-v1.md) — SHA-256 `771bb0b5db3a6aa842d69ab9c30c821b92b70304f60192cea1d79535e4ff316e`
 - [利用者による契約012の製品受入判断（残余risk 4点受容・2 backend正式経路化）](records/development/2026-08-17-claude-subagent-backend-product-acceptance-decision-v1.md) — SHA-256 `dad40e6c88a5c46dd4008806ab0e94c797d4c5f55aefd4f0d3d08891d343afb8`
 - [§9-10完了レビュー判定record（agy・Tier 1・verified・blocking 0・機械転記）](records/session-handoffs/2026-08-17-claude-subagent-backend-implementation-completion-review-verdict-v1.md) — SHA-256 `5f0ba930d3c478609b12dd573a87c6815350d159630440dcc971391cbe70441c`
@@ -53,8 +54,8 @@
   実データ2組（一致事例）が材料として揃った状態。着手する場合は事前走査（6手順）から。
 - (b) codex-cli第3 backend——トークン枯渇の疎通回復待ちのため着手不可（回復確認が先）。
 - (c) 自由文類型・外部API pending解除等の他候補。
-- (d) 改善候補3件の仕分け（backend登録形の深化・組み立て器model照合の範囲・機械gate接続。
-  いずれも採用時機の判断のみで実装は伴わない）。
+- (d) 改善候補4件の仕分け（backend登録形の深化・組み立て器model照合の範囲・機械gate接続・
+  敵対fixture類型網羅。いずれも採用時機の判断のみで実装は伴わない）。
 
 開始条件：
 
@@ -69,7 +70,7 @@
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路とclaude-subagent（Tier 3・明示受容つき）の2経路が稼働
-- Human判断待ち：次の作業単位の順序選択。改善候補3件の仕分け（`IC-BACKEND-REGISTRY-DEEPENING-001`・`IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001`・`IC-REUSE-SEARCH-GATE-CONNECTION-001`）
+- Human判断待ち：次の作業単位の順序選択。改善候補4件の仕分け（`IC-BACKEND-REGISTRY-DEEPENING-001`・`IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001`・`IC-REUSE-SEARCH-GATE-CONNECTION-001`・`IC-ADVERSARIAL-FIXTURE-CATALOG-001`）
 
 ## stale・deferred
 
