@@ -25,10 +25,11 @@
   （既知の正常状態。§下記）。系統の`exit_code`はokで0・partialで5になるが、**partialのexit 5は
   失敗ではない**（wrapperが成功扱いで集約し、`overall_ok`に反映済み）。
 - `status: runner_error`＝子プロセスの故障（失敗。全体不合格になる）。
-- 解釈非対応（unsupported）＝先頭recordが本文形式でないfile（待ち行列操作`queue-operation`・
-  下請けagent開始`started`・表題変更`custom-title`・`mode`等）。生ログの保全は完了しており、
-  件数の急変時以外は調査しない。前置record後の本文を構造化する対処は改善候補
-  `IC-SESSION-LOG-PREFIX-INTERPRETATION-001`（Human仕分け待ち）に登録済み。
+- 解釈非対応（unsupported）＝既知の前置record（待ち行列操作`queue-operation`・動作モード
+  `mode`・表題変更`custom-title`・下請けagent開始`started`）だけで本文（会話record）を持たない
+  file、または未知種別のfile。**前置recordに続いて本文があるfileは契約014（2026-08-17）で解釈
+  対象になった**ため非対応には数えられない。生ログの保全は非対応でも完了しており、件数の急変時
+  以外は調査しない（急変は新しい前置種別の出現の合図——契約014 §7.6残余risk1）。
 
 ## 3. 進行中セッションの扱い（既定除外）
 
