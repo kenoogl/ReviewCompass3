@@ -8,6 +8,8 @@ import hashlib
 import json
 import os
 import re
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 import subprocess as _subprocess
 
@@ -673,6 +675,8 @@ def launch_review(
             backend["executable"], prompt, requested_model, project_id
         )
 
+    started_at = datetime.now(timezone.utc)
+    start_clock = time.monotonic()
     try:
         completed = subprocess.run(
             arguments,
@@ -684,6 +688,8 @@ def launch_review(
         )
     except Exception as error:
         raise LaunchStop("launch_failed") from error
+    finished_at = datetime.now(timezone.utc)
+    elapsed_seconds = time.monotonic() - start_clock
 
     stdout = completed.stdout if isinstance(completed.stdout, str) else ""
     stderr = completed.stderr if isinstance(completed.stderr, str) else ""
@@ -708,6 +714,10 @@ def launch_review(
             "sha256": expected_sha256,
         },
         "prompt_sha256": prompt_digest,
+        "prompt_bytes": len(prompt_encoded),
+        "started_at": started_at.isoformat(),
+        "finished_at": finished_at.isoformat(),
+        "elapsed_seconds": elapsed_seconds,
         "print_timeout": PRINT_TIMEOUT,
         "project_id": project_id,
         "accept_tier": accept_tier,
