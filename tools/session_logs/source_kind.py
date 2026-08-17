@@ -51,12 +51,13 @@ def is_known_prefix_record(record):
   record_type = record.get("type")
   session_id = record.get("sessionId")
   if record_type == "queue-operation":
-    return (
-      record.get("operation") in ("enqueue", "dequeue")
-      and isinstance(session_id, str)
-      and bool(session_id)
-      and "content" in record
-    )
+    operation = record.get("operation")
+    if not (isinstance(session_id, str) and session_id):
+      return False
+    if operation == "enqueue":
+      return "content" in record
+    # dequeueはcontentを持たない実物形（契約014 v3 §7.1）
+    return operation == "dequeue"
   if record_type == "mode":
     return (
       isinstance(record.get("mode"), str)
