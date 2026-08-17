@@ -1,0 +1,57 @@
+{
+  "_rule": "detected=正解表の期待Findingと同じ欠陥を指す / false_positive=error・warningで期待と対応しない / out_of_scope=材料の外側を論じる / non_counting=medium・low・infoの軽微",
+  "_boundary": "境界例（材料に実在するが仕込んでいない欠陥）は first pass で false_positive とし、Evidenceで個別に列挙して利用者裁定へ回す",
+
+  "case-001|B|F-LLM-001": "detected",
+  "case-001|B|F-LLM-002": "false_positive",
+  "case-001|C|F-LLM-001": "detected",
+  "case-001|C|F-LLM-002": "false_positive",
+  "case-001|C|F-LLM-003": "false_positive",
+  "case-001|A1|F-LLM-001": "detected",
+  "case-001|A2|F-LLM-001": "detected",
+  "case-001|A2|F-LLM-002": "false_positive",
+  "case-001|D|F-LLM-001": "false_positive",
+  "case-001|D|F-LLM-002": "false_positive",
+  "case-001|D|F-LLM-003": "non_counting",
+
+  "case-002|B|F-LLM-001": "detected",
+  "case-002|C|F-LLM-001": "detected",
+
+  "case-003|B|F-LLM-001": "detected",
+  "case-003|C|F-LLM-001": "detected",
+  "case-003|C|F-LLM-002": "false_positive",
+
+  "case-004|B|F-LLM-001": "false_positive",
+  "case-004|B|F-LLM-002": "false_positive",
+  "case-004|B|F-LLM-003": "non_counting",
+  "case-004|C|F-LLM-001": "non_counting",
+  "case-004|A1|F-LLM-001": "non_counting",
+  "case-004|A1|F-LLM-002": "non_counting",
+  "case-004|A1|F-LLM-003": "non_counting",
+  "case-004|A2|F-LLM-001": "false_positive",
+  "case-004|A2|F-LLM-002": "false_positive",
+  "case-004|A2|F-LLM-003": "false_positive",
+  "case-004|A2|F-LLM-004": "false_positive",
+
+  "case-005|B|F-LLM-001": "detected",
+  "case-005|C|F-LLM-001": "detected",
+  "case-005|C|F-LLM-002": "detected",
+
+  "case-006|B|F-LLM-001": "detected",
+  "case-006|C|F-LLM-001": "detected",
+
+  "case-007|B|F-LLM-001": "detected",
+  "case-007|C|F-LLM-001": "detected",
+
+  "case-008|B|F-LLM-001": "false_positive",
+  "case-008|C|F-LLM-001": "false_positive",
+  "case-008|A1|F-LLM-001": "false_positive",
+  "case-008|A2|F-LLM-001": "false_positive",
+  "case-008|A2|F-LLM-002": "non_counting",
+
+  "case-010|B|F-LLM-001": "false_positive",
+  "case-010|B|F-LLM-002": "false_positive",
+  "case-010|B|F-LLM-003": "non_counting",
+  "case-010|C|F-LLM-001": "false_positive",
+  "case-010|C|F-LLM-002": "false_positive"
+}
