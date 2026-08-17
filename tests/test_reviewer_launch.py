@@ -1013,6 +1013,7 @@ def test_subagent_arguments_fixed(clean_environment):
         "--print",
         "--output-format",
         "stream-json",
+        "--verbose",
         "--tools",
         "Read,Glob,Grep",
         "--allowedTools",

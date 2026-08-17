@@ -288,13 +288,20 @@ def build_arguments(executable, prompt, model, project_id):
 
 
 def build_claude_arguments(executable, prompt, model):
-    """契約012 §7.2のclaude-subagent固定引数（実行器設計の流用・読み取り専用）。"""
+    """契約012 §7.2のclaude-subagent固定引数（実行器設計の流用・読み取り専用）。
+
+    `--verbose`はclaude CLIが`--print`＋`--output-format=stream-json`の組で
+    必須とする旗（2.1.220実測）。位置は流用元実行器と同じstream-json直後。
+    訂正record：records/development/
+    2026-08-17-claude-subagent-verbose-argument-correction-decision-v1.md
+    """
 
     return [
         executable,
         "--print",
         "--output-format",
         "stream-json",
+        "--verbose",
         "--tools",
         "Read,Glob,Grep",
         "--allowedTools",
