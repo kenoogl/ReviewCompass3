@@ -494,3 +494,44 @@ def test_manual_entry_reports_counts_without_paths_or_content(tmp_path, capsys):
   assert str(source_root) not in output
   assert str(private_root) not in output
   assert len(tuple((private_root / "raw").rglob("*.jsonl"))) == 1
+
+
+def test_manual_entry_exit_codes_distinguish_partial_from_failure(
+  tmp_path, capsys
+):
+  """終了コードの語彙（作業票2026-08-18・候補IC-SESSION-LOG-EXIT-CODE-VOCABULARY-001）。
+
+  partialは既知の正常状態（保全は全件完了・一部が解釈非対応）であり、失敗コード
+  5ではなく非対応コード4（cli.pyのEXIT_UNSUPPORTED）を返す。okは0のまま。
+  """
+
+  repository = _repository(tmp_path)
+  source_root = tmp_path / "native"
+  _write_jsonl(
+    source_root / "supported.jsonl", _claude_records(secret="EXIT-OK")
+  )
+  _write_jsonl(
+    source_root / "unsupported.jsonl",
+    ({"type": "unknown-kind", "value": 1},),
+  )
+  private_root = tmp_path / "private"
+  entry = importlib.import_module("tools.session_logs.entry")
+
+  exit_code = entry.run((
+    "collect-eventual",
+    "--source-root",
+    str(source_root),
+    "--private-root",
+    str(private_root),
+    "--repository-root",
+    str(repository),
+    "--tool-version",
+    "test-v1",
+  ))
+  payload = json.loads(capsys.readouterr().out)
+
+  assert payload["status"] == "partial"
+  assert payload["counts"]["succeeded"] == 1
+  assert payload["counts"]["unsupported"] == 1
+  # 保全は完了している（正常状態）ため、失敗コード5を返してはならない
+  assert exit_code == 4
