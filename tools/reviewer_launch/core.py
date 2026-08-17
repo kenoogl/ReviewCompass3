@@ -45,9 +45,9 @@ FORBIDDEN_AUTH_ENVIRONMENT = (
 # 承認：records/development/2026-08-16-reviewer-launch-allowed-models-approval-v1.md
 _AGY_ALLOWED_RESPONSE_MODELS = ("gemini-3.1-pro-high",)
 
-# 契約012 §5.1-5：claude-subagentの許可model一覧。空の間はsubagent起動を停止する。
-# 値は実E2E前の利用者承認recordで確定して固定する。変更は契約改定。
-SUBAGENT_ALLOWED_RESPONSE_MODELS = ()
+# 契約012 §5.1-5：claude-subagentの許可model一覧。利用者承認recordで確定した値だけを置く。変更は契約改定。
+# 承認：records/development/2026-08-17-subagent-allowed-models-approval-v1.md
+SUBAGENT_ALLOWED_RESPONSE_MODELS = ("claude-opus-5",)
 
 # 契約012 §5.1-4：全backend許可modelの和集合（互換記号。契約011が検査基準にimportする）。
 ALLOWED_RESPONSE_MODELS = (

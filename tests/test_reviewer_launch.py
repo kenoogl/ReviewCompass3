@@ -362,7 +362,10 @@ def test_empty_allowed_models_stops(
 
 def test_allowed_models_fixed_to_approved_value():
     core = _core()
-    assert core.ALLOWED_RESPONSE_MODELS == ("gemini-3.1-pro-high",)
+    assert core.ALLOWED_RESPONSE_MODELS == (
+        "gemini-3.1-pro-high",
+        "claude-opus-5",
+    )
 
 
 # ---- project束縛と読取り恒久許可（e2e-010-006後の実測に基づく） ----
@@ -876,8 +879,11 @@ def test_agy_backend_values_unchanged():
 
 def test_union_allowed_models_preserved():
     core = _core()
-    assert core.SUBAGENT_ALLOWED_RESPONSE_MODELS == ()
-    assert core.ALLOWED_RESPONSE_MODELS == ("gemini-3.1-pro-high",)
+    assert core.SUBAGENT_ALLOWED_RESPONSE_MODELS == ("claude-opus-5",)
+    assert core.ALLOWED_RESPONSE_MODELS == (
+        "gemini-3.1-pro-high",
+        "claude-opus-5",
+    )
 
 
 def test_subagent_without_acceptance_stops(
