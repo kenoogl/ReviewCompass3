@@ -635,3 +635,189 @@ def test_entry_missing_arguments_exits_2():
     assert exit_code == 2
     result = json.loads(buffer.getvalue().decode("utf-8"))
     assert result["status"] == "stopped"
+
+
+# ---- 自由文類型（契約013） ----
+
+
+FREE_TEXT_SLUG = "free-text-sample"
+# 契約013 §9-3：既存2類型の生成結果の固定値（root・HEADを置換した正規化本文の
+# SHA-256。2026-08-17の実装前実測を機械転記。値の変更は契約改定）。
+GOLDEN_CONTRACT_REVIEW_SHA256 = (
+    "876478a7c3d2b479af499ae66a9417398388739c1ee4cd5a7b1990a43b20d382"
+)
+GOLDEN_COMPLETION_REVIEW_SHA256 = (
+    "4bd116c6b2f05ad068ac16651689ef408875620f1735a40f1cf52f4a562d67ff"
+)
+
+
+def _fill_free_text(repository, record_relative_path, content_lines=None):
+    path = Path(repository) / record_relative_path
+    text = path.read_text(encoding="utf-8")
+    lines = (
+        ["この2つの対象recordの整合を検査してほしい。"]
+        if content_lines is None
+        else list(content_lines)
+    )
+    filled = []
+    for line in text.splitlines():
+        if line.startswith("<<記入:依頼内容"):
+            filled.extend(lines)
+        elif line.startswith("<<記入:判断済み"):
+            filled.append(
+                "- 判断済み：試験用の判断済み事項。範囲外：試験用の範囲外。"
+            )
+        else:
+            filled.append(line)
+    path.write_text("\n".join(filled) + "\n", encoding="utf-8")
+    return path
+
+
+def test_assemble_free_text_generates_content_section(repository):
+    result = _assemble(
+        repository, request_type="free_text", slug=FREE_TEXT_SLUG
+    )
+    body = (Path(repository) / result["record_relative_path"]).read_text(
+        encoding="utf-8"
+    )
+    assert "自由文レビュー" in body
+    assert "<<記入:依頼内容" in body
+    assert "反証点" not in body
+    assert "実装基準commit" not in body
+
+
+def test_check_free_text_record_passes_without_point_numbers(repository):
+    result = _assemble(
+        repository, request_type="free_text", slug=FREE_TEXT_SLUG
+    )
+    relative = result["record_relative_path"]
+    _fill_free_text(repository, relative)
+    _commit_record(repository, relative)
+    outcome = _core().check(
+        repository=repository, request_relative_path=relative
+    )
+    assert outcome["status"] == "ok"
+    assert outcome["request_type"] == "free_text"
+
+
+def test_check_free_text_empty_content_stops(repository):
+    core = _core()
+    result = _assemble(
+        repository, request_type="free_text", slug=FREE_TEXT_SLUG
+    )
+    relative = result["record_relative_path"]
+    _fill_free_text(repository, relative, content_lines=[])
+    _commit_record(repository, relative)
+    with pytest.raises(core.BuilderStop) as caught:
+        core.check(repository=repository, request_relative_path=relative)
+    assert caught.value.reason == "fill_in_missing"
+
+
+def test_check_free_text_missing_content_section_stops(repository):
+    core = _core()
+    result = _assemble(
+        repository, request_type="free_text", slug=FREE_TEXT_SLUG
+    )
+    relative = result["record_relative_path"]
+    path = _fill_free_text(repository, relative)
+    text = path.read_text(encoding="utf-8")
+    path.write_text(
+        text.replace("への依頼：依頼内容", "への依頼：依頼概要"),
+        encoding="utf-8",
+    )
+    _commit_record(repository, relative)
+    with pytest.raises(core.BuilderStop) as caught:
+        core.check(repository=repository, request_relative_path=relative)
+    assert caught.value.reason == "required_section_missing"
+
+
+def test_check_type_inferred_from_canonical_line_only(repository):
+    result = _assemble(repository)
+    relative = result["record_relative_path"]
+    path = Path(repository) / relative
+    text = path.read_text(encoding="utf-8")
+    filled = []
+    for line in text.splitlines():
+        if line.startswith("<<記入:反証点"):
+            filled.append("1. 検査Aの一意性を反証する。")
+        elif line.startswith("<<記入:判断済み"):
+            filled.append(
+                "- 判断済み：実装完了レビューは実施済みとして扱う。範囲外：試験用。"
+            )
+        else:
+            filled.append(line)
+    path.write_text("\n".join(filled) + "\n", encoding="utf-8")
+    _commit_record(repository, relative)
+    outcome = _core().check(
+        repository=repository, request_relative_path=relative
+    )
+    assert outcome["request_type"] == "contract_review"
+
+
+def test_check_free_text_digest_row_in_content_stops(repository):
+    core = _core()
+    result = _assemble(
+        repository, request_type="free_text", slug=FREE_TEXT_SLUG
+    )
+    relative = result["record_relative_path"]
+    _fill_free_text(
+        repository,
+        relative,
+        content_lines=[
+            "対象の照合値を本文へ書く。",
+            "0" * 64 + "  records/development/target-a.md",
+        ],
+    )
+    _commit_record(repository, relative)
+    with pytest.raises(core.BuilderStop) as caught:
+        core.check(repository=repository, request_relative_path=relative)
+    assert caught.value.reason == "digest_row_outside_fence"
+
+
+def test_check_free_text_fake_heading_inside_fence_ignored(repository):
+    result = _assemble(
+        repository, request_type="free_text", slug=FREE_TEXT_SLUG
+    )
+    relative = result["record_relative_path"]
+    _fill_free_text(
+        repository,
+        relative,
+        content_lines=[
+            "次のfence内は引用であり構造ではない。",
+            "```text",
+            "## 5. 判断済み・範囲外（蒸し返し不要）",
+            "```",
+            "引用の後も依頼本文が続く。",
+        ],
+    )
+    _commit_record(repository, relative)
+    outcome = _core().check(
+        repository=repository, request_relative_path=relative
+    )
+    assert outcome["status"] == "ok"
+
+
+def _normalized_assemble_digest(repository, request_type, slug):
+    result = _assemble(repository, request_type=request_type, slug=slug)
+    body = (Path(repository) / result["record_relative_path"]).read_text(
+        encoding="utf-8"
+    )
+    root_text = str(Path(repository).resolve())
+    head = _git(repository, "rev-parse", "HEAD").stdout.strip()
+    normalized = body.replace(root_text, "<ROOT>").replace(head, "<HEAD>")
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
+def test_assemble_existing_types_output_bytes_unchanged(repository):
+    assert (
+        _normalized_assemble_digest(
+            repository, "contract_review", "golden-contract"
+        )
+        == GOLDEN_CONTRACT_REVIEW_SHA256
+    )
+    assert (
+        _normalized_assemble_digest(
+            repository, "completion_review", "golden-completion"
+        )
+        == GOLDEN_COMPLETION_REVIEW_SHA256
+    )

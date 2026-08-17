@@ -19,11 +19,37 @@ from tools.session_logs.redaction import (
 )
 
 
-REQUEST_TYPES = ("contract_review", "completion_review")
+REQUEST_TYPES = ("contract_review", "completion_review", "free_text")
 _TYPE_LABELS = {
     "contract_review": "実装開始前の契約定義反証",
     "completion_review": "実装完了レビュー",
+    "free_text": "自由文レビュー",
 }
+# 契約013：labelから類型への逆引き（類型推定は正準位置＝「レビュー種別」行だけを正とする）
+_LABEL_TYPES = {label: name for name, label in _TYPE_LABELS.items()}
+
+# 契約013 §5.1-2：§3節の類型別本文。既存2類型は従来の反証点節（byte不変）、
+# free_textは自由記入の依頼内容節。
+_POINTS_SECTION = (
+    "## 3. Reviewer（あなた）への依頼：反証点\n"
+    "\n"
+    "あなたは独立したReviewerです。次の反証点をそれぞれ反証的に"
+    "検査し、各findingへ根拠（節番号・file・行）を付けてください。\n"
+    "\n"
+    "<<記入:反証点を「1.」「2.」の番号つき一覧でここへ列挙する>>\n"
+)
+_FREE_TEXT_INSTRUCTION = (
+    "あなたは独立したReviewerです。次の依頼内容を検査し、"
+    "各findingへ根拠（節番号・file・行）を付けてください。"
+)
+_FREE_TEXT_SECTION = (
+    "## 3. Reviewer（あなた）への依頼：依頼内容\n"
+    "\n"
+    + _FREE_TEXT_INSTRUCTION
+    + "\n"
+    "\n"
+    "<<記入:依頼内容（検査してほしい問い・観点・前提）をここへ書く>>\n"
+)
 OUTPUT_DIRECTORY = "records/session-handoffs"
 PLACEHOLDER_PREFIX = "<<記入:"
 # 破損placeholderの断片検知（cr-011-001所見の反映）
@@ -103,6 +129,7 @@ def _render(
     record_relative,
     verdict_relative,
     model,
+    request_section,
 ):
     return (
         "# %s 独立確認依頼record（headless起動対象・Claude→Reviewer）\n"
@@ -130,12 +157,7 @@ def _render(
         "理由を記載する（内容が明らかに別物ならmismatchとして判定せず"
         "停止）。§1のdigest表は本record作成時点の固定値である。\n"
         "\n"
-        "## 3. Reviewer（あなた）への依頼：反証点\n"
-        "\n"
-        "あなたは独立したReviewerです。次の反証点をそれぞれ反証的に"
-        "検査し、各findingへ根拠（節番号・file・行）を付けてください。\n"
-        "\n"
-        "<<記入:反証点を「1.」「2.」の番号つき一覧でここへ列挙する>>\n"
+        "%s"
         "\n"
         "## 4. 判定の形式\n"
         "\n"
@@ -178,6 +200,7 @@ def _render(
             kind_label,
             base_commit_line,
             digest_table,
+            request_section,
             repository_absolute,
             record_relative,
             verdict_relative,
@@ -243,6 +266,11 @@ def assemble(
         record_relative=record_relative,
         verdict_relative=verdict_record_relative_path(record_relative),
         model=ALLOWED_RESPONSE_MODELS[0],
+        request_section=(
+            _FREE_TEXT_SECTION
+            if request_type == "free_text"
+            else _POINTS_SECTION
+        ),
     )
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(body, encoding="utf-8")
@@ -319,7 +347,29 @@ def check(*, repository, request_relative_path):
         raise BuilderStop("invalid_utf8") from error
 
     classified = _classified_lines(text)
-    for section in REQUIRED_SECTIONS:
+
+    # 契約013 §5.1-3：類型推定は正準位置（fence外の「レビュー種別」行）だけを
+    # 正とする。本文中のlabel出現では判定しない（SR-C13-1）。
+    request_type = None
+    for line, in_fence in classified:
+        if in_fence:
+            continue
+        stripped = line.strip()
+        if stripped.startswith("- レビュー種別："):
+            label = stripped[len("- レビュー種別："):].split("（", 1)[0]
+            request_type = _LABEL_TYPES.get(label)
+            break
+    if request_type is None:
+        raise BuilderStop("request_type_unknown")
+
+    if request_type == "free_text":
+        required_sections = tuple(
+            "依頼内容" if section == "反証点" else section
+            for section in REQUIRED_SECTIONS
+        )
+    else:
+        required_sections = REQUIRED_SECTIONS
+    for section in required_sections:
         if not any(
             _is_heading(line, in_fence) and section in line
             for line, in_fence in classified
@@ -330,18 +380,33 @@ def check(*, repository, request_relative_path):
         if fragment in text:
             raise BuilderStop("placeholder_remaining")
 
-    points_lines = _section_lines(text, "反証点")
-    numbers = []
-    for line, in_fence in points_lines:
-        if in_fence:
-            continue
-        match = _POINT_LINE_PATTERN.match(line.strip())
-        if match is not None:
-            numbers.append(match.group(1))
-    if not numbers:
-        raise BuilderStop("fill_in_missing")
-    if len(set(numbers)) != len(numbers):
-        raise BuilderStop("request_point_identifiers_invalid")
+    if request_type == "free_text":
+        content_lines = _section_lines(text, "依頼内容")
+        if not any(
+            line.strip()
+            for line, in_fence in content_lines
+            if not in_fence
+            and line.strip() != _FREE_TEXT_INSTRUCTION
+        ):
+            raise BuilderStop("fill_in_missing")
+        for line, in_fence in content_lines:
+            if in_fence:
+                continue
+            if _DIGEST_ROW_LINE_PATTERN.fullmatch(line.strip()):
+                raise BuilderStop("digest_row_outside_fence")
+    else:
+        points_lines = _section_lines(text, "反証点")
+        numbers = []
+        for line, in_fence in points_lines:
+            if in_fence:
+                continue
+            match = _POINT_LINE_PATTERN.match(line.strip())
+            if match is not None:
+                numbers.append(match.group(1))
+        if not numbers:
+            raise BuilderStop("fill_in_missing")
+        if len(set(numbers)) != len(numbers):
+            raise BuilderStop("request_point_identifiers_invalid")
     decided_lines = _section_lines(text, "判断済み・範囲外")
     if not any(
         line.strip() for line, in_fence in decided_lines if not in_fence
@@ -398,11 +463,6 @@ def check(*, repository, request_relative_path):
     ).strip():
         raise BuilderStop("request_record_uncommitted")
 
-    request_type = (
-        "completion_review"
-        if _TYPE_LABELS["completion_review"] in text
-        else "contract_review"
-    )
     return {
         "status": "ok",
         "operation": "request_builder_check",
