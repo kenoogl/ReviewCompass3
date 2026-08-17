@@ -94,6 +94,23 @@ CLAUDE_PASSTHROUGH_ENVIRONMENT = (
     "NO_COLOR",
 )
 
+# 契約012 §7.2訂正：claude-subagentの子環境注入（由来：実行器_child_environmentの注入。
+# 同値性は試験で固定。変更は契約改定）。自動更新・余分な通信と文脈読込み・背景処理・
+# 自動再試行を抑止する。agyの子環境には注入しない。
+# 訂正record：records/development/
+# 2026-08-17-claude-subagent-child-injection-correction-decision-v1.md
+CLAUDE_CHILD_ENVIRONMENT_INJECTIONS = {
+    "CLAUDE_CODE_MAX_RETRIES": "0",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL": "1",
+    "CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS": "1",
+    "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1",
+    "CLAUDE_CODE_DISABLE_CLAUDE_MDS": "1",
+    "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS": "1",
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+    "DISABLE_AUTOUPDATER": "1",
+}
+
 BACKENDS = {
     "antigravity-cli": {
         "provider": "google",
@@ -594,11 +611,14 @@ def launch_review(
         forbidden_names = CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT
         allowed_models = SUBAGENT_ALLOWED_RESPONSE_MODELS
         passthrough_names = CLAUDE_PASSTHROUGH_ENVIRONMENT
+        injections = CLAUDE_CHILD_ENVIRONMENT_INJECTIONS
     else:
         forbidden_names = FORBIDDEN_AUTH_ENVIRONMENT
         allowed_models = ALLOWED_RESPONSE_MODELS
         passthrough_names = PASSTHROUGH_ENVIRONMENT
+        injections = {}
     environment = _child_environment(forbidden_names, passthrough_names)
+    environment.update(injections)
     tier = _resolve_tier(backend, accept_tier)
     if tier != 1:
         if (

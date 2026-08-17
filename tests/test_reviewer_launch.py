@@ -1034,6 +1034,44 @@ def test_agy_child_environment_excludes_user(
     assert "TMPDIR" not in environment
 
 
+def test_subagent_injection_constant_equals_executor(monkeypatch):
+    core = _core()
+    executor = importlib.import_module(
+        "tools.development.claude_implementation_executor"
+    )
+    for name in executor.FORBIDDEN_AUTH_ENVIRONMENT:
+        monkeypatch.delenv(name, raising=False)
+    for name in executor.ALLOWED_CHILD_ENVIRONMENT:
+        monkeypatch.delenv(name, raising=False)
+    assert core.CLAUDE_CHILD_ENVIRONMENT_INJECTIONS == (
+        executor._child_environment()
+    )
+
+
+def test_subagent_child_environment_injects_hardening(
+    repository, monkeypatch, clean_environment
+):
+    facade = _FacadeRecorder(stdout=_subagent_stream())
+    _launch_subagent(repository, monkeypatch, facade)
+    environment = facade.calls[0][1]["env"]
+    assert environment["DISABLE_AUTOUPDATER"] == "1"
+    assert environment["CLAUDE_CODE_DISABLE_CLAUDE_MDS"] == "1"
+    core = _core()
+    for name, value in core.CLAUDE_CHILD_ENVIRONMENT_INJECTIONS.items():
+        assert environment[name] == value
+
+
+def test_agy_child_environment_excludes_injections(
+    repository, monkeypatch, clean_environment
+):
+    facade = _FacadeRecorder(stdout=_stream_text())
+    _launch(repository, monkeypatch, facade)
+    environment = facade.calls[0][1]["env"]
+    assert "DISABLE_AUTOUPDATER" not in environment
+    assert "CLAUDE_CODE_DISABLE_CLAUDE_MDS" not in environment
+    assert "CLAUDE_CODE_MAX_RETRIES" not in environment
+
+
 def test_subagent_arguments_fixed(clean_environment):
     core = _core()
     from tools.development.claude_implementation_executor import (
