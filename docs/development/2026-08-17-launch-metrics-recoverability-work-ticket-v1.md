@@ -59,3 +59,15 @@ reviewer-launch実行の**時間・prompt規模が現在記録されず、事後
 - 判定record（repo内）のschema変更・事後照合の変更・トークンの独自集計（rawから復元可）。
 - paired evaluation装置・RQ1装置・reviewer接続（計画§4の順序2〜4）。
 - 集計コマンド（順序5）。
+
+## 7. 注記（2026-08-18追記・原文は無変更）
+
+- **受入条件4の表題「実機確認1回」は、内容と一致していない。** 内容は「本作業票では試験
+  （模擬実行）で代替する」であり、**本作業票で実施したのは模擬実行である**。実機確認は将来の
+  レビュー起動へ委ねられている。受入条件を表題だけで追うと、実機確認を実施したと誤読する。
+- 原文（§4-4）は**承認時点の記録として残す**。形式を注記としたのは利用者の裁定による
+  （2026-08-18 chat「候補2は注記形式で」）。
+- 出所：RQ2 paired trialの独立レビューが検出した。観測record
+  `records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md` §5.2、改善候補
+  `IC-LAUNCH-METRICS-ACCEPTANCE-TITLE-001`、仕分けrecord
+  `records/development/2026-08-18-rq2-byproduct-candidates-triage-decision-v1.md`。
