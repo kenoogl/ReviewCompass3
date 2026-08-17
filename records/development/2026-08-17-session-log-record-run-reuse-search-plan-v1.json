@@ -1,0 +1,125 @@
+{
+  "record_kind": "formal_code_reuse_search_plan",
+  "schema_version": 2,
+  "plan_id": "FCRS-SESSION-LOG-RECORD-RUN-2026-08-17-V1",
+  "searches": [
+    {
+      "subject": "session_log_record_run_wrapper_v1",
+      "capabilities": [
+        {
+          "capability_id": "multi_system_batch_collection",
+          "responsibility": "3系統（claude・codex現行・codex保管）の固定値でcollect-eventualを系統ごとに単独プロセスで順次実行し、終了コードと出力JSONを集約する",
+          "inputs": [
+            "実行指示"
+          ],
+          "outputs": [
+            "系統別実行結果"
+          ],
+          "failure_behavior": [
+            "子プロセスの失敗・非ok statusを合格として返さない"
+          ],
+          "required_properties": [
+            "3系統の値のコード固定",
+            "単独プロセス実行"
+          ],
+          "reference_paths": [
+            "tools/session_logs/entry.py",
+            "tools/session_logs/eventual_preservation.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/entry.py:run",
+            "tools/session_logs/eventual_preservation.py:run"
+          ],
+          "symbol_terms": [
+            "subprocess",
+            "collect",
+            "run",
+            "batch"
+          ],
+          "required_effect_markers": [
+            "process_spawn"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        },
+        {
+          "capability_id": "in_progress_session_partition",
+          "responsibility": "実行中に追記のあったfile（現セッションを常に含む）を既定で要約から分離し、指定時のみ要約へ含める。分離判断にLLMを介在させない",
+          "inputs": [
+            "系統別実行結果",
+            "source-root観測"
+          ],
+          "outputs": [
+            "分離済み要約対象"
+          ],
+          "failure_behavior": [
+            "分離判定不能を黙って含めない（進行中扱いで申告する）"
+          ],
+          "required_properties": [
+            "既定除外と指定時包含の切替",
+            "LLM判断の不介在"
+          ],
+          "reference_paths": [
+            "tools/session_logs/eventual_preservation.py",
+            "tools/session_logs/source_kind.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/eventual_preservation.py:reconcile_source_root",
+            "tools/session_logs/source_kind.py:identify_auxiliary_kind"
+          ],
+          "symbol_terms": [
+            "mtime",
+            "progress",
+            "partition",
+            "exclude"
+          ],
+          "required_effect_markers": [
+            "file_read"
+          ],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        },
+        {
+          "capability_id": "run_summary_aggregation",
+          "responsibility": "系統別status・件数・解釈非対応の種別内訳を機械集計した要約JSONを標準出力へ返す（LLMは転記のみ）",
+          "inputs": [
+            "系統別実行結果",
+            "分離済み要約対象"
+          ],
+          "outputs": [
+            "要約JSON"
+          ],
+          "failure_behavior": [
+            "集計不能・欠落を合格として返さない"
+          ],
+          "required_properties": [
+            "機械集計（手書き件数の排除）",
+            "非対応種別内訳の明示"
+          ],
+          "reference_paths": [
+            "tools/session_logs/eventual_preservation.py",
+            "tools/session_logs/source_kind.py"
+          ],
+          "reference_symbols": [
+            "tools/session_logs/eventual_preservation.py:run",
+            "tools/session_logs/source_kind.py:identify_auxiliary_kind"
+          ],
+          "symbol_terms": [
+            "summary",
+            "counts",
+            "aggregate",
+            "status"
+          ],
+          "required_effect_markers": [],
+          "forbidden_effect_markers": [
+            "network"
+          ]
+        }
+      ],
+      "attestation_path": "records/development/2026-08-17-session-log-record-run-reuse-search-attestation-v1.json"
+    }
+  ],
+  "content_digest": "04d29627bd1e0ed71e7fc613a233d6c2a475a72f27b8f1b4d16ec035b152f13b"
+}
