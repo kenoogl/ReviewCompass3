@@ -24,13 +24,16 @@
    ```text
    .venv/bin/python3 -m tools.development.formal_code_reuse_search \
      --project-root . \
-     --runtime-root <repo外私有領域の絶対パス> \
+     --runtime-root /Users/keno/.reviewcompass3-private/reuse-search \
      --universe .reviewcompass/policies/work4a-source-universe-v<最新>.json \
      --policy .reviewcompass/policies/work4a-freshness-policy-v<最新>.json \
-     --plan <作業別計画（schema 2）のpath> \
-     --captured-at <UTC時刻>
+     --plan <作業別計画（schema 2）のpath>
    ```
 
+   - `--runtime-root`は上記が**正準値**である。探索結果や記憶から手で組み立てない（1階層深い
+     誤指定により私有領域へ入れ子treeを誤生成した事故の再発防止。事故記録＝
+     `records/development/2026-08-18-placement-root-resolution-evidence-v1.md` §5）。
+   - `--captured-at`は**渡さない**（省略すると機械が現在時刻を記録する。時刻を手書きしない）。
    - 作業別計画（能力宣言）はHuman確認の下で作成し、確定commitへ先行commitしてから実行する。
    - `digest_mismatch`で停止した場合は、universe・freshness policyの方針参照が古い。正規writer
      （`write_source_universe`・`write_freshness_policy_v4`）で次版をnew-only生成して再実行する。
@@ -41,6 +44,24 @@
 6. **一覧の一元化**：手順1〜5の結果（コマンド・件数・digest表・接続点・証明書参照・契約候補へ渡す
    論点）を事前走査recordへ固定し、意味単位commitする。
 
+## 数値の記録規律（機械化の原則）
+
+recordへ書く数値は機械出力の転記だけを認め、手作業の余地を残さない。
+
+1. 数値には**再現コマンドを併記**する。併記できない数値はrecordへ書かない（併記の無い数値行は
+   誤りの兆候として扱う）。
+2. 数えるときは**数える専用コマンド**（`wc -l`・`grep -c`等）の**全出力**をそのまま転記する。
+   `head`等で途中省略された表示から数字を書かない。省略された残りを推測で補わない。
+3. 他recordの数字を**別の母集団へ流用しない**。母集団が変われば数え直す（実例：RQ2の「31実行の
+   機械記録」＝実起動30＋起動前停止1をlaunch保存数と混同し「49（あり31）」と誤記。機械実測は
+   48（30＋18）。`records/development/2026-08-18-operational-metrics-evidence-v1.md` §4）。
+4. 抽出定義（正規表現等）を作る前に、対象corpus**全体**の形を機械調査する。目にした実例だけから
+   定義しない（実例：承認文言行の定義が見出し形式を数え漏らし7→35。
+   `records/development/2026-08-18-operational-metrics-v2-evidence-v1.md` §4）。
+5. コマンド引数の正準値（保存先path等）は本手順書・recordから転記し、手で組み立てない。
+6. 計測対象に自分の記録が入る**自己言及**（事前走査recordが検索語を含む等）は誤りではないが、
+   毎版明記する。
+
 ## 根拠
 
 - 手順5の位置づけ：`docs/development/2026-08-02-development-policy.md`（123行からの正式検索の定め。
@@ -49,3 +70,6 @@
   再発し、利用者が導線接続を指示した（設計方針・改善候補は
   `records/development/2026-08-17-vertical-a-request-builder-reuse-search-attestation-v1.json`と
   同日の改善候補recordを参照）。
+- 数値の記録規律の節と`--runtime-root`正準値の明記：2026-08-18、事前走査recordでの推測転記
+  （母数誤り）・定義漏れ・引数誤指定が同日に3件重なり、利用者が「手作業の余地がないように機械化
+  するのが正しいアプローチ」として追記を指示した（各事故の記録は節内の参照record）。
