@@ -6,8 +6,8 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5第1〜5段・正式ツール化（契約008〜014）・デプロイ方針決定・全体見取り図までは前回どおり。今回、**評価データ取得（計測メタ・RQ1装置・reviewer接続・RQ2 paired trial）が完了**——実起動30回・裁定確定・論文データ一式をrecord化（論文構想：Task Contracts for Evidence-Bounded LLM Code Review、8/30目標）。RQ2の副産物4件（手順書と実装の食い違い・作業票表題・終了コード語彙・契約014注記）も改善候補経路で対処完了。全景は`docs/current/reviewcompass3-overview-current.md`
-- 現在作業：なし。レビュー基盤moduleは休止中（2026-08-17休止record）。本回完了：RQ2実験全工程（B/C全10ケース・A1/A2/D副実験・主題適中率の採用）・副産物4件対処・セッションログ終了コード是正（partialは非対応4を返す）
+- 全体：立て直し計画v5第1〜5段・正式ツール化（契約008〜014）・デプロイ方針決定・評価データ取得（RQ1装置・RQ2 paired trial＝実起動30回・裁定確定・論文データ一式）・RQ2副産物4件の対処までは前回どおり。今回、**論文執筆を開始**——投稿先確定（WSSE 2026 Special Session・締切**2026-08-30**・LaTeX 5頁・double-blind）＋arXivフルペーパーの二本立て。全景は`docs/current/reviewcompass3-overview-current.md`
+- 現在作業：**論文執筆（WSSE短縮版が締切物）**。執筆体制＝**本スレッドが執筆（`docs/paper/`配下のみ書く）・別スレッドが継続開発（TODO・見取り図・records・製品コードの正本管理）**。論文データの更新は開発スレッドが装置で再集計し新版として固定、執筆側は固定版のみ引用（計画v2 §3の分担規則）
 - Task Contract：`なし（契約014受入完了・注記追記済み。次契約は未定義）`
 
 ## 現在作業に影響する改善候補／Issue
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [論文執筆計画v2（章立て・データ台帳・投稿先WSSE 2026・二本立て・執筆体制の分担規則）](docs/paper/2026-08-18-paper-outline-and-data-inventory-v2.md) — SHA-256 `c87f4e7bcce5d134dd7f722041df95ace781b5769b25faec99db4c95e86f68de`
 - [RQ2 paired trial実行Evidence（§11に裁定後の確定集計を追記）](records/development/2026-08-17-rq2-paired-trial-evidence-v1.md) — SHA-256 `c6dbfa836866524b41edcd156e24b7cd39cec615110a0a9c1c793713a8b5522f`
 - [RQ2裁定・議論・副産物v2（論文データ一式の表・7語彙・主題適中率）](records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md) — SHA-256 `f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152`
 - [RQ2生データ（31実行の機械記録）](records/development/2026-08-18-rq2-paired-trial-dataset-v1.json) — SHA-256 `d34ecd24a8d87c49e5b50f4ae204295841622ea12c34886e29dba5a32c85b893`
@@ -29,22 +30,23 @@
 
 ## 次に行う一作業
 
-なし（module休止中・次契約未定義）。再開の選択肢：(1) 論文執筆（8/30目標。RQ1初回計測とRQ2確定集計・生データ一式が揃った）、(2) 評価の運用集計コマンド（データ取得計画§4順序5）、(3) 休止record §3のpending残件（縦C合議／codex-cli第3 backend＝疎通回復が合図／外部API後続）、(4) デプロイ版の作成（合図＝他アプリ開発の開始決定）。いずれも利用者の指示で選択し、事前走査（6手順・必読原則record）で着手する。
+**論文の共通部品（評価の表と図）の作成→WSSE 5頁版の起草**（執筆スレッド。計画v2 §2.3の順序）。数値は確定recordから転記し、転記後に機械照合する。開発スレッド側の選択肢は従前どおり：運用集計コマンド（順序5・執筆と並行の裁定済み）／休止record §3のpending残件／デプロイ版（合図＝他アプリ開発の開始決定）。
 
 開始条件：
 
-- 利用者の再開指示と順序選択がchatで得られる
+- （執筆）計画v2が固定済み——満たされている
+- （開発）利用者の指示と順序選択がchatで得られる
 
 完了条件：
 
-- 選択された作業単位の事前走査record固定（または新規作業単位の範囲固定文書）
+- （執筆）WSSE 5頁版の初稿が`docs/paper/`へcommitされる
 
-後続作業：休止record §4、デプロイ方針record §4〜5、RQ2裁定record v2 §7（正解表7語彙の正式反映の形式判断ほか）を参照。
+後続作業：計画v2 §2.3（フル版§3〜5→§1・2・7→§8）、休止record §4、デプロイ方針record §4〜5、RQ2裁定record v2 §7を参照。
 
 ## blocker・Human判断待ち
 
 - blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路とclaude-subagent（Tier 3・明示受容つき）の2経路が稼働
-- Human判断待ち：なし（module休止中。再開の時機・順序は利用者判断）
+- Human判断待ち：**WSSEのpreprint方針の確認**（double-blindのためarXiv公開時期に影響。計画v2 §1.2。確認まではWSSE投稿→採否後arXivの安全側で執筆は進められる）
 
 ## stale・deferred
 
