@@ -1,0 +1,21 @@
+{
+  "title": "計画JSON writer（対策2）事前走査の実測",
+  "entries": [
+    {
+      "label": "既存の正規writer（universe・policy）の所在",
+      "argv": ["grep", "-rln", "write_source_universe\\|write_freshness_policy", "tools/"]
+    },
+    {
+      "label": "検索側の計画検証の実装点",
+      "argv": ["grep", "-n", "_PLAN_FIELDS\\|_SEARCH_FIELDS_V2\\|content_digest\\|def _load_plan\\|def _validate", "tools/development/formal_code_reuse_search.py"]
+    },
+    {
+      "label": "正準digest関数の所在",
+      "argv": ["grep", "-n", "def canonical_content_digest", "tools/common/digests.py"]
+    },
+    {
+      "label": "既存の計画record数（手書きheredocの実例母数）",
+      "argv": ["grep", "-rln", "formal_code_reuse_search_plan", "records/development/"]
+    }
+  ]
+}

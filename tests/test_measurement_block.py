@@ -148,3 +148,59 @@ def test_spawn_failure_marks_measurement_incomplete(tmp_path, capsys):
   assert exit_code == 1
   assert summary["status"] == "incomplete"
   assert "spawn_error" in output.read_text(encoding="utf-8")
+
+
+def test_consistent_entry_records_integrity_and_executable(tmp_path, capsys):
+  from tools.development import measurement_block
+
+  declaration = _declaration(tmp_path, [_python_entry("決定的", "print(7)")])
+  output = tmp_path / "block.md"
+  exit_code = measurement_block.run((
+    "--commands", str(declaration),
+    "--output", str(output),
+  ))
+  summary = json.loads(capsys.readouterr().out)
+  assert exit_code == 0
+  assert summary["non_deterministic_count"] == 0
+  text = output.read_text(encoding="utf-8")
+  assert "二重実行一致" in text
+  assert "実行体：" in text
+  assert sys.executable in text
+
+
+def test_nondeterministic_entry_flags_and_keeps_both_outputs(tmp_path, capsys):
+  from tools.development import measurement_block
+
+  declaration = _declaration(tmp_path, [
+    _python_entry("乱数", "import os; print(os.urandom(4).hex())"),
+  ])
+  output = tmp_path / "block.md"
+  exit_code = measurement_block.run((
+    "--commands", str(declaration),
+    "--output", str(output),
+  ))
+  summary = json.loads(capsys.readouterr().out)
+  assert exit_code == 1
+  assert summary["status"] == "incomplete"
+  assert summary["non_deterministic_count"] == 1
+  text = output.read_text(encoding="utf-8")
+  assert "non_deterministic" in text
+  assert "1回目" in text
+  assert "2回目" in text
+
+
+def test_header_records_execution_environment(tmp_path, capsys):
+  from tools.development import measurement_block
+  import platform
+
+  declaration = _declaration(tmp_path, [_python_entry("a", "print(1)")])
+  output = tmp_path / "block.md"
+  exit_code = measurement_block.run((
+    "--commands", str(declaration),
+    "--output", str(output),
+  ))
+  capsys.readouterr()
+  assert exit_code == 0
+  text = output.read_text(encoding="utf-8")
+  assert "実行環境：" in text
+  assert platform.platform() in text

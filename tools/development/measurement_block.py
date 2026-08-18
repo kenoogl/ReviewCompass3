@@ -17,7 +17,9 @@ promotion_required: true
 
 import argparse
 import json
+import platform
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -122,38 +124,67 @@ def _render_stream(name, content):
     return lines
 
 
+def _render_result_streams(result):
+    lines = []
+    if result["stdout"]:
+        lines.extend(_render_stream("stdout", result["stdout"]))
+        lines.append("")
+    if result["stderr"]:
+        lines.extend(_render_stream("stderr", result["stderr"]))
+        lines.append("")
+    return lines
+
+
 def _render(title, declaration_path, captured_at, results):
     lines = [
         f"# 測定ブロック：{title}",
         "",
         f"- captured_at：{captured_at}",
+        f"- 実行環境：{platform.platform()}",
         f"- 宣言file：`{declaration_path}`（SHA-256 "
         f"`{digests.file_sha256(declaration_path)}`）",
         "- 生成tool：`tools/development/measurement_block.py`"
-        "（機械生成file。手編集禁止）",
+        "（機械生成file。手編集禁止。各entryは二重実行の一致検査つき）",
         "",
     ]
-    for label, entry, result in results:
+    for label, entry, first, second, nondeterministic, executable in results:
         lines.append(f"## {label}")
         lines.append("")
         lines.append(
             "- argv：`" + json.dumps(entry["argv"], ensure_ascii=False) + "`"
         )
-        if result["state"] == "ran":
+        lines.append(f"- 実行体：{executable or '未解決'}")
+        if first["state"] == "ran":
             lines.append(
-                f"- exit：{result['exit_code']}・elapsed：{result['elapsed']}s"
+                f"- exit：{first['exit_code']}・elapsed：{first['elapsed']}s"
             )
-        elif result["state"] == "timeout":
-            lines.append(f"- 状態：timeout（elapsed：{result['elapsed']}s）")
+        elif first["state"] == "timeout":
+            lines.append(f"- 状態：timeout（elapsed：{first['elapsed']}s）")
         else:
-            lines.append(f"- 状態：spawn_error（{result['detail']}）")
+            lines.append(f"- 状態：spawn_error（{first['detail']}）")
+        if first["state"] == "ran" and not nondeterministic:
+            lines.append("- 完全性：二重実行一致")
+        elif nondeterministic:
+            lines.append(
+                "- 完全性：**二重実行不一致（non_deterministic）**"
+            )
         lines.append("")
-        if result["stdout"]:
-            lines.extend(_render_stream("stdout", result["stdout"]))
+        if not nondeterministic:
+            lines.extend(_render_result_streams(first))
+        else:
+            lines.append("### 1回目")
             lines.append("")
-        if result["stderr"]:
-            lines.extend(_render_stream("stderr", result["stderr"]))
+            lines.extend(_render_result_streams(first))
+            lines.append("### 2回目")
             lines.append("")
+            if second is None or second["state"] != "ran":
+                state = "実行不能" if second is None else second["state"]
+                lines.append(f"- 状態：{state}")
+                lines.append("")
+            else:
+                lines.append(f"- exit：{second['exit_code']}")
+                lines.append("")
+                lines.extend(_render_result_streams(second))
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -191,30 +222,53 @@ def run(argv=None) -> int:
     results = []
     incomplete = 0
     failed_count = 0
+    nondeterministic_count = 0
     for entry in entries:
-        result = _run_entry(entry, arguments.timeout_seconds)
-        if result["state"] != "ran":
+        executable = shutil.which(entry["argv"][0])
+        first = _run_entry(entry, arguments.timeout_seconds)
+        second = None
+        nondeterministic = False
+        if first["state"] == "ran":
+            # 下層（OS走査層）の一過性欠落を検出するための二重実行guard。
+            # elapsedは本質的に揺れるため比較しない。
+            second = _run_entry(entry, arguments.timeout_seconds)
+            if second["state"] != "ran" or (
+                first["exit_code"],
+                first["stdout"],
+                first["stderr"],
+            ) != (
+                second["exit_code"],
+                second["stdout"],
+                second["stderr"],
+            ):
+                nondeterministic = True
+        if first["state"] != "ran":
             incomplete += 1
-        elif result["exit_code"] != 0:
+        elif nondeterministic:
+            nondeterministic_count += 1
+        elif first["exit_code"] != 0:
             failed_count += 1
-        results.append((entry["label"], entry, result))
+        results.append(
+            (entry["label"], entry, first, second, nondeterministic, executable)
+        )
     content = _render(title, declaration_path, captured_at, results)
     with open(output_path, "x", encoding="utf-8") as stream:
         stream.write(content)
-    status = "ok" if incomplete == 0 else "incomplete"
+    complete = incomplete == 0 and nondeterministic_count == 0
     print(json.dumps(
         {
             "schema_version": 1,
-            "status": status,
+            "status": "ok" if complete else "incomplete",
             "output_path": str(output_path),
             "entry_count": len(entries),
             "failed_count": failed_count,
             "incomplete_count": incomplete,
+            "non_deterministic_count": nondeterministic_count,
         },
         ensure_ascii=False,
         sort_keys=True,
     ))
-    return 0 if incomplete == 0 else 1
+    return 0 if complete else 1
 
 
 def main():
