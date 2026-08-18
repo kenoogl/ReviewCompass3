@@ -6,7 +6,7 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5第1〜5段・正式ツール化（契約008〜014）・デプロイ方針決定・評価データ取得（RQ1装置・RQ2 paired trial＝実起動30回・裁定確定・論文データ一式）・RQ2副産物4件の対処までは前回どおり。今回、**論文執筆を開始**——投稿先確定（WSSE 2026 Special Session・締切**2026-08-30**・LaTeX 5頁・double-blind）＋arXivフルペーパーの二本立て。全景は`docs/current/reviewcompass3-overview-current.md`
+- 全体：立て直し計画v5第1〜5段・正式ツール化（契約008〜014）・デプロイ方針決定・評価データ取得（RQ1装置・RQ2 paired trial＝実起動30回・裁定確定・論文データ一式）・RQ2副産物4件の対処・論文執筆開始（WSSE 2026 Special Session・締切**2026-08-30**・LaTeX 5頁・double-blind＋arXivフルの二本立て）までは前回どおり。今回、RQ2持ち越しの**採点7語彙の正式反映を裁定**——案B＝集計側（裁定record v2・装置・判定JSON）を正本とし、正解表v3はケース集の再利用決定が合図。全景は`docs/current/reviewcompass3-overview-current.md`
 - 現在作業：**論文執筆（WSSE短縮版が締切物）**。執筆体制＝**本スレッドが執筆（`docs/paper/`配下のみ書く）・別スレッドが継続開発（TODO・見取り図・records・製品コードの正本管理）**。論文データの更新は開発スレッドが装置で再集計し新版として固定、執筆側は固定版のみ引用（計画v2 §3の分担規則）
 - Task Contract：`なし（契約014受入完了・注記追記済み。次契約は未定義）`
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [RQ2採点7語彙の形式判断record（案B確定・正本の所在表・v3の合図）](records/development/2026-08-18-rq2-answer-key-vocabulary-format-decision-v1.md) — SHA-256 `63f74966614251c1ad6a268cb021099df783a591e7149bf2b32086cd228825a9`
 - [論文執筆計画v2（章立て・データ台帳・投稿先WSSE 2026・二本立て・執筆体制の分担規則）](docs/paper/2026-08-18-paper-outline-and-data-inventory-v2.md) — SHA-256 `c87f4e7bcce5d134dd7f722041df95ace781b5769b25faec99db4c95e86f68de`
 - [RQ2 paired trial実行Evidence（§11に裁定後の確定集計を追記）](records/development/2026-08-17-rq2-paired-trial-evidence-v1.md) — SHA-256 `c6dbfa836866524b41edcd156e24b7cd39cec615110a0a9c1c793713a8b5522f`
 - [RQ2裁定・議論・副産物v2（論文データ一式の表・7語彙・主題適中率）](records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md) — SHA-256 `f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152`
@@ -51,7 +52,7 @@
 ## stale・deferred
 
 - stale：なし
-- deferred：外部API直接送信経路の後続はpending（2026-08-16。統合時は判定record規約準拠）。後続候補＝`review_plan`自動変換・縦C合議・codex-cli backend（改善候補仕分け2026-08-17の裁定は各candidate recordを参照）。デプロイ関連：デプロイ版作成は他アプリ開発の開始決定が合図・RC3版nextの返答語彙議論は後日・projection導出の本実装は運用実測後。RQ2持ち越し（裁定record v2 §7）：正解表7語彙の正式反映の形式判断・`read_only_entry`独自語彙の統合は別作業単位。契約014持ち越し：残存5件（本文なし前置のみfile）は放置可・新前置種別は`record-run`非対応件数の急変が合図
+- deferred：外部API直接送信経路の後続はpending（2026-08-16。統合時は判定record規約準拠）。後続候補＝`review_plan`自動変換・縦C合議・codex-cli backend（改善候補仕分け2026-08-17の裁定は各candidate recordを参照）。デプロイ関連：デプロイ版作成は他アプリ開発の開始決定が合図・RC3版nextの返答語彙議論は後日・projection導出の本実装は運用実測後。RQ2持ち越し：`read_only_entry`独自語彙の統合は別作業単位（採点7語彙の形式は裁定済み——形式判断record参照。正解表v3はケース集の再利用決定が合図）。契約014持ち越し：残存5件（本文なし前置のみfile）は放置可・新前置種別は`record-run`非対応件数の急変が合図
 
 ## Git・Test
 
