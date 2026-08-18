@@ -27,6 +27,35 @@ _BACKTICK_TOKEN = re.compile(r"`([^`]+)`")
 _APPROVAL_FIELD_LINE = re.compile(
   r"^[\s>*#0-9.\-]*承認文言", re.MULTILINE
 )
+_BARE_HEX_CELL = re.compile(r"^`([0-9a-f]{64})`$")
+
+
+def _table_pair(line):
+  # 書式C（表cell）。裸hexだけのcellがちょうど1つ・path様tokenを含むcellが
+  # ちょうど1つの行だけを組として採点する（fail-closed）。hexがfile名の一部の
+  # tokenはpath側にもhex側にも数えない。
+  stripped = line.strip()
+  if not stripped.startswith("|"):
+    return None, 0
+  cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+  digest_values = []
+  path_values = []
+  for cell in cells:
+    bare = _BARE_HEX_CELL.match(cell)
+    if bare is not None:
+      digest_values.append(bare.group(1))
+      continue
+    for token in _BACKTICK_TOKEN.findall(cell):
+      if (
+        ("/" in token or "." in token)
+        and _HEX_ANYWHERE.fullmatch(token) is None
+        and " " not in token
+      ):
+        path_values.append(token)
+        break
+  if len(digest_values) == 1 and len(path_values) == 1:
+    return (path_values[0], digest_values[0]), 0
+  return None, len(digest_values)
 
 
 def _stats(values):
@@ -93,6 +122,12 @@ def _binding_pairs(text):
     shasum = _SHASUM_LINE.match(line)
     if shasum is not None:
       pairs.append((shasum.group(2), shasum.group(1)))
+      continue
+    if not _INLINE_DIGEST.search(line):
+      table_pair, table_unpaired = _table_pair(line)
+      if table_pair is not None:
+        pairs.append(table_pair)
+      unpaired_count += table_unpaired
       continue
     for match in _INLINE_DIGEST.finditer(line):
       prefix = line[: match.start()]
@@ -211,7 +246,7 @@ def run(argv=None) -> int:
     ))
     return 2
   result = {
-    "schema_version": 2,
+    "schema_version": 3,
     "status": "ok",
     "launch": collect_launch_metrics(launch_root),
     "approvals": collect_approval_metrics(records_root),

@@ -164,7 +164,7 @@ def test_approval_metrics_field_count(tmp_path):
   assert result["field_count"] == 3
 
 
-def test_run_schema_version_2(tmp_path, capsys):
+def test_run_schema_version_3(tmp_path, capsys):
   from tools.evaluation import operational_metrics
 
   launch_root, records_root = _make_stores(tmp_path)
@@ -174,7 +174,7 @@ def test_run_schema_version_2(tmp_path, capsys):
   ))
   document = json.loads(capsys.readouterr().out)
   assert exit_code == 0
-  assert document["schema_version"] == 2
+  assert document["schema_version"] == 3
   assert document["bindings"]["total_hex_count"] == 0
 
 
@@ -197,3 +197,57 @@ def test_module_entry_runs(tmp_path):
   )
   assert completed.returncode == 0
   assert json.loads(completed.stdout)["status"] == "ok"
+
+
+def _make_table_store(tmp_path):
+  from tools.common import digests
+
+  base_root = tmp_path / "cbase"
+  (base_root / "sub").mkdir(parents=True)
+  target = base_root / "sub" / "table-target.txt"
+  target.write_text("gamma", encoding="utf-8")
+  records_root = tmp_path / "table-records"
+  records_root.mkdir()
+  digest_c = digests.file_sha256(target)
+  (records_root / "2026-08-18-table-v1.md").write_text(
+    "\n".join([
+      f"| 実装module | `sub/table-target.txt` | `{digest_c}` |",
+      f"| `sub/table-target.txt` | `{'1' * 64}` |",
+      f"| `work4a/observations/{'2' * 64}.json` | 再観測 |",
+      f"| 修正実装 | `{'3' * 64}` |",
+    ]),
+    encoding="utf-8",
+  )
+  return records_root, base_root
+
+
+def test_table_rows_are_scored(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  records_root, base_root = _make_table_store(tmp_path)
+  result = operational_metrics.collect_binding_metrics(
+    records_root, base_root=base_root
+  )
+  assert result["resolved_match"] == 1
+  assert result["digest_differs"] == 1
+  assert result["scored_count"] == 2
+
+
+def test_hex_inside_filename_is_not_scored(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  records_root, base_root = _make_table_store(tmp_path)
+  result = operational_metrics.collect_binding_metrics(
+    records_root, base_root=base_root
+  )
+  assert result["file_missing"] == 0
+
+
+def test_pathless_hex_row_counts_as_unpaired(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  records_root, base_root = _make_table_store(tmp_path)
+  result = operational_metrics.collect_binding_metrics(
+    records_root, base_root=base_root
+  )
+  assert result["unpaired_count"] == 1
