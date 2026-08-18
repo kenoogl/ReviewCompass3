@@ -8,12 +8,11 @@
  "source_identity": {
   "kind": "observation",
   "source_id": "OBS-RC3-RQ2-BYPRODUCTS-2026-08-18-V2",
-  "source_version": 2,
+  "source_version": 1,
   "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
-  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152",
-  "section": "5.2"
+  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152"
  },
- "problem": "`docs/development/2026-08-17-launch-metrics-recoverability-work-ticket-v1.md`の受入条件4は表題が「実機確認1回」だが、内容は「本作業票では試験（模擬実行）で代替する」である。受入条件は後から充足を照合する対象であり、表題と中身のずれは照合を誤らせる。",
+ "problem": "`docs/development/2026-08-17-launch-metrics-recoverability-work-ticket-v1.md`の受入条件4は表題が「実機確認1回」だが、内容は「本作業票では試験（模擬実行）で代替する」である。受入条件は後から充足を照合する対象であり、表題と中身のずれは照合を誤らせる。出所recordの該当節＝§5.2。出所identityの旧version表記＝2（実anchorはpath＋SHA-256で不変）。",
  "impact": [
   "受入条件の一覧だけを読むと実機確認を実施したと誤認する",
   "同型の書き方が他の作業票へ波及すると照合全体の信頼が落ちる"
@@ -27,7 +26,7 @@
   "他の作業票の一斉点検（必要ならば別候補）"
  ],
  "classification_candidates": [
-  "documentation"
+  "process_improvement"
  ],
  "route_candidates": [
   "checkpoint",
@@ -36,7 +35,6 @@
  "consumer_candidates": [
   "reviewcompass3-development"
  ],
- "related_candidates": [],
  "evidence_refs": [
   {
    "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
@@ -44,5 +42,5 @@
   }
  ],
  "proposed_action": "表題1行の修正で済む。完了済み作業票の改訂にあたるため、改訂か注記かの形式をHuman仕分けで決める。",
- "content_digest": "3b09a6e8a722dd3bb8eb85dab2008461ec25b6be34da4a28c85c2822c9795d73"
+ "content_digest": "19005a497fcd2514dcb1a4b16f6bc8d3660fa69cf2904fc4fbc7f9df1db90b7a"
 }

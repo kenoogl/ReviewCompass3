@@ -8,12 +8,11 @@
  "source_identity": {
   "kind": "observation",
   "source_id": "OBS-RC3-RQ2-BYPRODUCTS-2026-08-18-V2",
-  "source_version": 2,
+  "source_version": 1,
   "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
-  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152",
-  "section": "5.4"
+  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152"
  },
- "problem": "契約014の候補v2・v3の§7.1（正準列の定義）に未記載の場合が2つある。(1)従来判定を「Claude本文形式・Codex 2形式」の両方と定義しながら、前置recordの除外規則は「本文形式と判定しない」とのみ書き、前置recordがCodex 2形式として判定されうるかが不明。(2)前置recordを読み飛ばしている途中で入力の終端に達した場合（判定可能recordが存在しない場合）の挙動が書かれていない。",
+ "problem": "契約014の候補v2・v3の§7.1（正準列の定義）に未記載の場合が2つある。(1)従来判定を「Claude本文形式・Codex 2形式」の両方と定義しながら、前置recordの除外規則は「本文形式と判定しない」とのみ書き、前置recordがCodex 2形式として判定されうるかが不明。(2)前置recordを読み飛ばしている途中で入力の終端に達した場合（判定可能recordが存在しない場合）の挙動が書かれていない。出所recordの該当節＝§5.4。出所identityの旧version表記＝2（実anchorはpath＋SHA-256で不変）。",
  "impact": [
   "契約本文だけでは実装の期待挙動を決められない箇所が残る",
   "将来の改定時に、書かれていない前提が失われる"
@@ -29,7 +28,7 @@
  ],
  "classification_candidates": [
   "task_contract",
-  "documentation"
+  "process_improvement"
  ],
  "route_candidates": [
   "defer",
@@ -38,7 +37,6 @@
  "consumer_candidates": [
   "reviewcompass3-development"
  ],
- "related_candidates": [],
  "evidence_refs": [
   {
    "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
@@ -46,5 +44,5 @@
   }
  ],
  "proposed_action": "契約は受入済みで実害は現時点で観測されていない。現挙動を機械確認したうえで、契約の改定（v4）か注記かを決める。優先度はIC-SESSION-LOG-EXIT-CODE-VOCABULARY-001より低い。",
- "content_digest": "79f4ed43b78811d447a139a43077986b9186a53b41abdb7ce2bb519df6afdb05"
+ "content_digest": "1e0e1432af08254b74eb78c9689f95b0122be23b08020866dda039b4a3932637"
 }

@@ -8,12 +8,11 @@
  "source_identity": {
   "kind": "observation",
   "source_id": "OBS-RC3-RQ2-BYPRODUCTS-2026-08-18-V2",
-  "source_version": 2,
+  "source_version": 1,
   "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
-  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152",
-  "section": "5.1"
+  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152"
  },
- "problem": "手順書`docs/development/prompts/session-log-record-run.md`第1節が「0=全系統成功、5=いずれか失敗」と書くが、実装（`tools/session_logs/record_run.py` 149-150行・203行）はどれかの系統が`partial`でも0を返す。第2節は`ok`と`partial`を区別しているため、その語彙で`partial`は「成功」ではない。手順書が実装の挙動を正しく書いていない。",
+ "problem": "手順書`docs/development/prompts/session-log-record-run.md`第1節が「0=全系統成功、5=いずれか失敗」と書くが、実装（`tools/session_logs/record_run.py` 149-150行・203行）はどれかの系統が`partial`でも0を返す。第2節は`ok`と`partial`を区別しているため、その語彙で`partial`は「成功」ではない。手順書が実装の挙動を正しく書いていない。出所recordの該当節＝§5.1。関連候補＝IC-SESSION-LOG-EXIT-CODE-VOCABULARY-001。出所identityの旧version表記＝2（実anchorはpath＋SHA-256で不変）。",
  "impact": [
   "合否を終了コードで確認するという手順書自身の定めが成り立たない",
   "RQ2実験で独立レビュー4回中4回がこの記述を誤読した（実測）",
@@ -28,7 +27,6 @@
   "record-run wrapperの挙動変更"
  ],
  "classification_candidates": [
-  "documentation",
   "process_improvement"
  ],
  "route_candidates": [
@@ -38,9 +36,6 @@
  "consumer_candidates": [
   "reviewcompass3-development"
  ],
- "related_candidates": [
-  "IC-SESSION-LOG-EXIT-CODE-VOCABULARY-001"
- ],
  "evidence_refs": [
   {
    "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
@@ -48,5 +43,5 @@
   }
  ],
  "proposed_action": "文言修正のみで済む。ただしIC-SESSION-LOG-EXIT-CODE-VOCABULARY-001を採用して終了コードを変える場合は文言を二度書き換えることになるため、その仕分け結果を待って実施時機を決めるのが妥当。",
- "content_digest": "3abc98d6db9764cdde8334093988d376ef95090daefd6e8713e08372266aa52d"
+ "content_digest": "6b24b82b3204e94aac91f617fa7bd1ef7e85b40d0a65e3a1b8512149866bd217"
 }

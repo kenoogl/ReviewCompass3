@@ -8,12 +8,11 @@
  "source_identity": {
   "kind": "observation",
   "source_id": "OBS-RC3-RQ2-BYPRODUCTS-2026-08-18-V2",
-  "source_version": 2,
+  "source_version": 1,
   "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
-  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152",
-  "section": "5.3"
+  "sha256": "f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152"
  },
- "problem": "session_logs部分系に終了コードの語彙が3つ並存し、同じ`partial`が入口によって3にも5にもなる。`tools/session_logs/cli.py` 39-46行が段階を分けた語彙（`EXIT_UNSUPPORTED=4`・`EXIT_FAILED=5`等）を定義する一方、`tools/session_logs/read_only_entry.py` 24-25行は独自に`EXIT_PARTIAL=3`を定義して185行で使い、`tools/session_logs/eventual_preservation.py` 898行は`return 0 if result.status == \"ok\" else 5`と生の数字で`partial`に5（＝失敗）を返す。手順書自身が「既知の正常状態」と呼ぶ状態を失敗のコードで知らせており、「非対応」を意味する4は使われていない。",
+ "problem": "session_logs部分系に終了コードの語彙が3つ並存し、同じ`partial`が入口によって3にも5にもなる。`tools/session_logs/cli.py` 39-46行が段階を分けた語彙（`EXIT_UNSUPPORTED=4`・`EXIT_FAILED=5`等）を定義する一方、`tools/session_logs/read_only_entry.py` 24-25行は独自に`EXIT_PARTIAL=3`を定義して185行で使い、`tools/session_logs/eventual_preservation.py` 898行は`return 0 if result.status == \"ok\" else 5`と生の数字で`partial`に5（＝失敗）を返す。手順書自身が「既知の正常状態」と呼ぶ状態を失敗のコードで知らせており、「非対応」を意味する4は使われていない。出所recordの該当節＝§5.3。関連候補＝IC-SESSION-LOG-EXIT-CODE-DOC-DRIFT-001。出所identityの旧version表記＝2（実anchorはpath＋SHA-256で不変）。",
  "impact": [
   "包み役が子の終了コードを合否判断に使えず、要約JSONを読む迂回が常態化している",
   "その迂回を人へ説明する但し書きが手順書に必要になり、独立レビュー4回中4回が誤読した",
@@ -29,7 +28,7 @@
   "保全機構（raw先行保存）の変更"
  ],
  "classification_candidates": [
-  "design",
+  "implementation",
   "process_improvement"
  ],
  "route_candidates": [
@@ -39,9 +38,6 @@
  "consumer_candidates": [
   "reviewcompass3-development"
  ],
- "related_candidates": [
-  "IC-SESSION-LOG-EXIT-CODE-DOC-DRIFT-001"
- ],
  "evidence_refs": [
   {
    "path": "records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md",
@@ -49,5 +45,5 @@
   }
  ],
  "proposed_action": "外向きの取り決め（終了コード）の変更を含むため、範囲固定文書を立てる作業単位として扱う。IC-SESSION-LOG-EXIT-CODE-DOC-DRIFT-001の文言修正はこの結果に従属する。",
- "content_digest": "6be330ae6c8bf42d6954d73d23cb1148a992602d304585f0715ad8c3666ef99d"
+ "content_digest": "30ab7bee0ab74759a16b067b1188f69c873e6df262afb4845abad4a8f7d85470"
 }
