@@ -377,11 +377,116 @@ def collect_preservation_metrics(preservation_root):
   return {"sections": sections, "root_missing": False}
 
 
+def _line_span_seconds(first_line, last_line):
+  try:
+    first = json.loads(first_line)
+    last = json.loads(last_line)
+    start = datetime.fromisoformat(
+      str(first.get("timestamp")).replace("Z", "+00:00")
+    )
+    end = datetime.fromisoformat(
+      str(last.get("timestamp")).replace("Z", "+00:00")
+    )
+    return round((end - start).total_seconds(), 3)
+  except (ValueError, TypeError):
+    return None
+
+
+def collect_cost_metrics(raw_root):
+  """コスト時系列（第一次）：系統dir別の規模とtool_use計数・実時間幅。
+
+  単一の解釈を全系統へ当てない——厳密一致（保守値）と部分一致（上限値）を
+  別掲し、timestampを解釈できないfileはduration_unrecognizedへ明示計上する。
+  内容は転記しない（数と時刻だけ）。
+  """
+  root = Path(raw_root)
+  if not root.is_dir():
+    return {"systems": {}, "root_missing": True}
+  systems = {}
+  for system_dir in sorted(
+    path for path in root.iterdir() if path.is_dir()
+  ):
+    file_count = 0
+    line_count = 0
+    typed = 0
+    loose = 0
+    duration = 0.0
+    unrecognized = 0
+    for item in sorted(system_dir.rglob("*.jsonl")):
+      file_count += 1
+      first_line = None
+      last_line = None
+      with open(item, "rb") as stream:
+        for raw_line in stream:
+          line_count += 1
+          typed += raw_line.count(b'"type":"tool_use"')
+          loose += raw_line.count(b"tool_use")
+          if first_line is None:
+            first_line = raw_line
+          last_line = raw_line
+      span = (
+        _line_span_seconds(first_line, last_line)
+        if first_line is not None
+        else None
+      )
+      if span is None:
+        unrecognized += 1
+      else:
+        duration += span
+    systems[system_dir.name] = {
+      "file_count": file_count,
+      "line_count": line_count,
+      "tool_use_typed": typed,
+      "tool_use_loose": loose,
+      "duration_seconds": round(duration, 3),
+      "duration_unrecognized": unrecognized,
+    }
+  return {"systems": systems, "root_missing": False}
+
+
+def collect_missing_origin(records_root, base_root=None):
+  """束縛欠落の由来分類：削除・改名（履歴あり）／履歴なし／絶対path束縛。"""
+  base = roots.repo_root() if base_root is None else Path(base_root)
+  missing_deleted = 0
+  missing_never = 0
+  missing_absolute = 0
+  for path in sorted(Path(records_root).glob("*.md")):
+    try:
+      text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+      continue
+    pairs, _ = _binding_pairs(text)
+    for target, _expected in pairs:
+      candidate = Path(target)
+      if candidate.is_absolute():
+        if not candidate.is_file():
+          missing_absolute += 1
+        continue
+      if (base / candidate).is_file():
+        continue
+      history = subprocess.run(
+        ["git", "rev-list", "--all", "-n", "1", "--", target],
+        cwd=base,
+        capture_output=True,
+        text=True,
+      )
+      if history.returncode == 0 and history.stdout.strip():
+        missing_deleted += 1
+      else:
+        missing_never += 1
+  return {
+    "missing_deleted": missing_deleted,
+    "missing_never": missing_never,
+    "missing_absolute": missing_absolute,
+  }
+
+
 def run(argv=None) -> int:
   parser = argparse.ArgumentParser()
   parser.add_argument("--launch-root", required=True)
   parser.add_argument("--records-root", default=None)
   parser.add_argument("--preservation-root", default=None)
+  parser.add_argument("--raw-root", default=None)
   arguments = parser.parse_args(
     list(sys.argv[1:] if argv is None else argv)
   )
@@ -411,8 +516,13 @@ def run(argv=None) -> int:
     if arguments.preservation_root is None
     else Path(arguments.preservation_root)
   )
+  raw_root = (
+    preservation_root / "raw"
+    if arguments.raw_root is None
+    else Path(arguments.raw_root)
+  )
   result = {
-    "schema_version": 5,
+    "schema_version": 6,
     "status": "ok",
     "launch": collect_launch_metrics(launch_root),
     "approvals": collect_approval_metrics(records_root),
@@ -421,6 +531,8 @@ def run(argv=None) -> int:
     ),
     "templates": collect_template_metrics(),
     "preservation": collect_preservation_metrics(preservation_root),
+    "costs": collect_cost_metrics(raw_root),
+    "missing_origin": collect_missing_origin(records_root),
   }
   print(json.dumps(
     result,

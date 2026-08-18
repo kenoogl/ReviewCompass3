@@ -164,7 +164,7 @@ def test_approval_metrics_field_count(tmp_path):
   assert result["field_count"] == 3
 
 
-def test_run_schema_version_5(tmp_path, capsys):
+def test_run_schema_version_6(tmp_path, capsys):
   from tools.evaluation import operational_metrics
 
   launch_root, records_root = _make_stores(tmp_path)
@@ -174,7 +174,7 @@ def test_run_schema_version_5(tmp_path, capsys):
   ))
   document = json.loads(capsys.readouterr().out)
   assert exit_code == 0
-  assert document["schema_version"] == 5
+  assert document["schema_version"] == 6
   assert document["bindings"]["total_hex_count"] == 0
 
 
@@ -372,3 +372,75 @@ def test_preservation_output_has_no_absolute_paths(tmp_path):
   dumped = json.dumps(result, ensure_ascii=False)
   assert str(root) not in dumped
   assert str(tmp_path) not in dumped
+
+
+def test_cost_metrics_counts_per_system(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  raw = tmp_path / "raw"
+  (raw / "sysa").mkdir(parents=True)
+  (raw / "sysa" / "one.jsonl").write_text(
+    '{"timestamp":"2026-08-18T10:00:00+09:00","type":"user"}\n'
+    '{"timestamp":"2026-08-18T10:00:30+09:00","type":"tool_use"}\n'
+    '{"timestamp":"2026-08-18T10:01:00+09:00","type":"assistant"}\n',
+    encoding="utf-8",
+  )
+  result = operational_metrics.collect_cost_metrics(raw)
+  sysa = result["systems"]["sysa"]
+  assert sysa["file_count"] == 1
+  assert sysa["line_count"] == 3
+  assert sysa["tool_use_typed"] == 1
+  assert sysa["tool_use_loose"] == 1
+  assert sysa["duration_seconds"] == 60.0
+  assert sysa["duration_unrecognized"] == 0
+
+
+def test_cost_metrics_flags_unparseable_timestamp(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  raw = tmp_path / "raw2"
+  (raw / "sysb").mkdir(parents=True)
+  (raw / "sysb" / "two.jsonl").write_text(
+    "not json at all\n", encoding="utf-8"
+  )
+  result = operational_metrics.collect_cost_metrics(raw)
+  sysb = result["systems"]["sysb"]
+  assert sysb["duration_unrecognized"] == 1
+  assert sysb["duration_seconds"] == 0.0
+
+
+def test_missing_origin_classification(tmp_path):
+  import subprocess as sp
+  from tools.evaluation import operational_metrics
+
+  repo = tmp_path / "orepo"
+  repo.mkdir()
+
+  def _g(*arguments):
+    sp.run(["git", *arguments], cwd=repo, check=True, capture_output=True)
+
+  _g("init", "-q")
+  _g("config", "user.email", "o@example.invalid")
+  _g("config", "user.name", "o")
+  gone = repo / "d.md"
+  gone.write_text("was here", encoding="utf-8")
+  _g("add", ".")
+  _g("commit", "-qm", "add")
+  _g("rm", "-q", "d.md")
+  _g("commit", "-qm", "remove")
+  records_root = tmp_path / "orec"
+  records_root.mkdir()
+  (records_root / "2026-08-18-o-v1.md").write_text(
+    "\n".join([
+      f"| `d.md` | `{'4' * 64}` |",
+      f"| `never.md` | `{'5' * 64}` |",
+      f"| `/nowhere/x.md` | `{'6' * 64}` |",
+    ]),
+    encoding="utf-8",
+  )
+  result = operational_metrics.collect_missing_origin(
+    records_root, base_root=repo
+  )
+  assert result["missing_deleted"] == 1
+  assert result["missing_never"] == 1
+  assert result["missing_absolute"] == 1

@@ -1,0 +1,38 @@
+{
+ "title": "運用集計v6（時系列復元・欠落由来）受入確認の実測",
+ "entries": [
+  {
+   "label": "運用集計試験21本の単独実行（決定的射影）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nr = subprocess.run(['.venv/bin/python3', '-m', 'pytest', 'tests/test_operational_metrics.py', '-q'], capture_output=True, text=True)\nprint('exit', r.returncode)\nprint(r.stdout.strip().splitlines()[-1].rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "dataset v1〜v5不変とv6・装置・試験のdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "records/development/2026-08-18-operational-metrics-dataset-v1.json",
+    "records/development/2026-08-18-operational-metrics-dataset-v2.json",
+    "records/development/2026-08-18-operational-metrics-dataset-v3.json",
+    "records/development/2026-08-18-operational-metrics-dataset-v4.json",
+    "records/development/2026-08-18-operational-metrics-dataset-v5.json",
+    "records/development/2026-08-18-operational-metrics-dataset-v6.json",
+    "tools/evaluation/operational_metrics.py",
+    "tests/test_operational_metrics.py"
+   ]
+  },
+  {
+   "label": "dataset v6に絶対pathが無いことの機械確認（該当なし＝exit 1が合格）",
+   "argv": [
+    "grep",
+    "-n",
+    "/Users",
+    "records/development/2026-08-18-operational-metrics-dataset-v6.json"
+   ]
+  }
+ ]
+}
