@@ -1,0 +1,52 @@
+{
+ "content_digest": "59c4ad82f8e5a33e6b5d9aea95d610ae854628f13fa0a7831882bed12bcbe44a",
+ "plan_id": "FCRS-OPERATIONAL-METRICS-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-operational-metrics-reuse-search-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "operational_metrics_aggregation",
+     "failure_behavior": [
+      "入力rootの不備は終了コード2で停止し、部分結果を出さない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "launch保存先のrun別launch.json",
+      "records/development配下の判断record（.md）"
+     ],
+     "outputs": [
+      "一行JSONの集計（分計・統計値・母数・skip件数）"
+     ],
+     "reference_paths": [
+      "tools/evaluation/rq2_paired_trial.py",
+      "tools/session_logs/record_run.py",
+      "tools/common/roots.py"
+     ],
+     "reference_symbols": [
+      "tools/common/roots.py:repo_root"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "未知形式は数えずskippedへ計上する（fail-closed）",
+      "root解決はtools/common/roots.pyへ委譲し遡りを複製しない",
+      "標準libraryのみ・読み取り専用（file書込みなし）"
+     ],
+     "responsibility": "launch計測メタ（launch.json）と判断record群から、起動所要時間の分布と承認点の日付分布を機械集計し、一行JSONで返す。手集計・転記をしない",
+     "symbol_terms": [
+      "metrics",
+      "aggregate",
+      "launch",
+      "elapsed",
+      "approval"
+     ]
+    }
+   ],
+   "subject": "operational_metrics_v1"
+  }
+ ]
+}
