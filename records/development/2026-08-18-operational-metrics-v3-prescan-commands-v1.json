@@ -1,0 +1,35 @@
+{
+ "title": "運用集計v3（書式C＝表cell束縛）事前走査の実測",
+ "entries": [
+  {
+   "label": "表行にhexを含む行数（書式Cの母数）",
+   "argv": [
+    "grep",
+    "-rEc",
+    "^\\|.*[0-9a-f]{64}",
+    "records/development/"
+   ]
+  },
+  {
+   "label": "書式C行の実例（形の見本・先頭12行）",
+   "argv": [
+    "grep",
+    "-rEh",
+    "^\\|.*[0-9a-f]{64}",
+    "records/development/",
+    "-m",
+    "2"
+   ]
+  },
+  {
+   "label": "現行装置と試験のdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/evaluation/operational_metrics.py",
+    "tests/test_operational_metrics.py"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,50 @@
+{
+ "content_digest": "1a661fabef46a51d2b5dadf80aa1fe8667d7bad4234679d6c433cf7b2099cc6d",
+ "plan_id": "FCRS-OPERATIONAL-METRICS-V3-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-operational-metrics-v3-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "table_cell_binding_resolution",
+     "failure_behavior": [
+      "組の閉じない行は採点せずunpaired_countへ計上する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "records/development配下の判断record（.md）"
+     ],
+     "outputs": [
+      "書式Cを含む束縛照合集計（schema_version 3）"
+     ],
+     "reference_paths": [
+      "tools/evaluation/operational_metrics.py",
+      "tools/common/digests.py"
+     ],
+     "reference_symbols": [
+      "tools/evaluation/operational_metrics.py:collect_binding_metrics"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "裸hexだけのcellがちょうど1つ・path様cellがちょうど1つの行だけを採点する",
+      "書式Bが一致した行へCを適用しない（二重計上防止）",
+      "既存集計欄の意味とdataset v1・v2を変えない"
+     ],
+     "responsibility": "判断record内の表cell形式（| 見出し | path | hex |等）からpathとSHA-256の組を行単位のfail-closed規則で抽出し、既存の束縛照合（resolved_match／digest_differs／file_missing）へ加える。hexがfile名の一部の行やpathの無いhex行は採点しない",
+     "symbol_terms": [
+      "table",
+      "cell",
+      "binding",
+      "digest",
+      "row"
+     ]
+    }
+   ],
+   "subject": "operational_metrics_v3"
+  }
+ ]
+}
