@@ -325,3 +325,49 @@ def test_one_operation_rejects_non_repository(tmp_path):
         _execute(entry, root, universe, policy, plan, tmp_path)
 
     assert error.value.code == "committed_source_unavailable"
+
+
+def test_latest_policy_file_prefers_numeric_maximum(tmp_path):
+    entry = importlib.import_module("tools.development.formal_code_reuse_search")
+    policies = tmp_path / "policies"
+    policies.mkdir()
+    for version in (1, 9, 10):
+        (policies / f"work4a-freshness-policy-v{version}.json").write_text(
+            "{}", encoding="utf-8"
+        )
+    selected = entry.latest_policy_file(policies, "work4a-freshness-policy")
+    assert selected == policies / "work4a-freshness-policy-v10.json"
+
+
+def test_default_runtime_root_is_home_based():
+    entry = importlib.import_module("tools.development.formal_code_reuse_search")
+    assert entry.default_runtime_root() == (
+        Path.home() / ".reviewcompass3-private" / "reuse-search"
+    )
+
+
+def test_main_stops_when_policies_unresolvable(tmp_path, capsys):
+    entry = importlib.import_module("tools.development.formal_code_reuse_search")
+    exit_code = entry.main([
+        "--project-root",
+        str(tmp_path),
+        "--plan",
+        str(tmp_path / "plan.json"),
+    ])
+    result = json.loads(capsys.readouterr().out)
+    assert exit_code == 1
+    assert result["status"] == "stopped"
+    assert result["reason"] == "policy_resolution_missing"
+
+
+def test_main_rejects_captured_at_flag(tmp_path, capsys):
+    entry = importlib.import_module("tools.development.formal_code_reuse_search")
+    with pytest.raises(SystemExit) as excinfo:
+        entry.main([
+            "--plan",
+            str(tmp_path / "plan.json"),
+            "--captured-at",
+            "2026-08-18T00:00:00+09:00",
+        ])
+    assert excinfo.value.code == 2
+    assert "unrecognized arguments: --captured-at" in capsys.readouterr().err

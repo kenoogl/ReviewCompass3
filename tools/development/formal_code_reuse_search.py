@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import re
 import time
 from datetime import datetime
 from pathlib import Path
@@ -398,24 +399,67 @@ def execute_formal_search(
     }
 
 
+def default_runtime_root():
+    """既定の検索保存先（repo外私有領域）。手で組み立てた引数を不要にする。"""
+    return Path.home() / ".reviewcompass3-private" / "reuse-search"
+
+
+def latest_policy_file(policies_dir, stem):
+    """`<stem>-v<N>.json`の数値最大版を返す。辞書順比較はv9をv10より新しいと誤るため使わない。"""
+    directory = Path(policies_dir)
+    if not directory.is_dir():
+        return None
+    pattern = re.compile(re.escape(stem) + r"-v(\d+)\.json")
+    best = None
+    best_version = -1
+    for path in directory.iterdir():
+        match = pattern.fullmatch(path.name)
+        if match is None:
+            continue
+        version = int(match.group(1))
+        if version > best_version:
+            best_version = version
+            best = path
+    return best
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", default=".")
-    parser.add_argument("--runtime-root", required=True)
+    parser.add_argument("--runtime-root", default=None)
     parser.add_argument("--profile", default="development")
-    parser.add_argument("--universe", required=True)
-    parser.add_argument("--policy", required=True)
+    parser.add_argument("--universe", default=None)
+    parser.add_argument("--policy", default=None)
     parser.add_argument("--plan", required=True)
-    parser.add_argument("--captured-at")
     args = parser.parse_args(argv)
-    captured_at = args.captured_at or datetime.now().astimezone().isoformat(timespec="seconds")
+    policies_dir = Path(args.project_root) / ".reviewcompass" / "policies"
+    universe_path = (
+        args.universe
+        if args.universe is not None
+        else latest_policy_file(policies_dir, "work4a-source-universe")
+    )
+    policy_path = (
+        args.policy
+        if args.policy is not None
+        else latest_policy_file(policies_dir, "work4a-freshness-policy")
+    )
+    if universe_path is None or policy_path is None:
+        result = {"status": "stopped", "reason": "policy_resolution_missing"}
+        print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+        return 1
+    runtime_root = (
+        args.runtime_root
+        if args.runtime_root is not None
+        else default_runtime_root()
+    )
+    captured_at = datetime.now().astimezone().isoformat(timespec="seconds")
     try:
         result = execute_formal_search(
             project_root=args.project_root,
-            runtime_root=args.runtime_root,
+            runtime_root=runtime_root,
             profile=args.profile,
-            universe_path=args.universe,
-            policy_path=args.policy,
+            universe_path=universe_path,
+            policy_path=policy_path,
             plan_path=args.plan,
             captured_at=captured_at,
         )

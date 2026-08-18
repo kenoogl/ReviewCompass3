@@ -23,17 +23,13 @@
 
    ```text
    .venv/bin/python3 -m tools.development.formal_code_reuse_search \
-     --project-root . \
-     --runtime-root /Users/keno/.reviewcompass3-private/reuse-search \
-     --universe .reviewcompass/policies/work4a-source-universe-v<最新>.json \
-     --policy .reviewcompass/policies/work4a-freshness-policy-v<最新>.json \
      --plan <作業別計画（schema 2）のpath>
    ```
 
-   - `--runtime-root`は上記が**正準値**である。探索結果や記憶から手で組み立てない（1階層深い
-     誤指定により私有領域へ入れ子treeを誤生成した事故の再発防止。事故記録＝
-     `records/development/2026-08-18-placement-root-resolution-evidence-v1.md` §5）。
-   - `--captured-at`は**渡さない**（省略すると機械が現在時刻を記録する。時刻を手書きしない）。
+   - 保存先・方針file（universe・freshness policy）の版・時刻は**ツールが自動解決する**
+     （保存先＝home基準の既定値、方針file＝数値最大版、時刻＝機械記録。2026-08-18のCLI既定値化。
+     手組み立て誤指定事故＝`records/development/2026-08-18-placement-root-resolution-evidence-v1.md`
+     §5の構造的再発防止）。上書き用の任意引数はあるが、通常は使わない。
    - 作業別計画（能力宣言）はHuman確認の下で作成し、確定commitへ先行commitしてから実行する。
    - `digest_mismatch`で停止した場合は、universe・freshness policyの方針参照が古い。正規writer
      （`write_source_universe`・`write_freshness_policy_v4`）で次版をnew-only生成して再実行する。
@@ -58,7 +54,9 @@ recordへ書く数値は機械出力の転記だけを認め、手作業の余�
 4. 抽出定義（正規表現等）を作る前に、対象corpus**全体**の形を機械調査する。目にした実例だけから
    定義しない（実例：承認文言行の定義が見出し形式を数え漏らし7→35。
    `records/development/2026-08-18-operational-metrics-v2-evidence-v1.md` §4）。
-5. コマンド引数の正準値（保存先path等）は本手順書・recordから転記し、手で組み立てない。
+5. コマンド引数の正準値は、可能な限り**ツールの既定値へ実装して引数ごと消す**（実例：正式検索の
+   保存先・方針版・時刻は自動解決済み）。それでも残る引数は手順書・recordから転記し、手で
+   組み立てない。
 6. 計測対象に自分の記録が入る**自己言及**（事前走査recordが検索語を含む等）は誤りではないが、
    毎版明記する。
 
