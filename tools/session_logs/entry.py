@@ -7,11 +7,24 @@ promotion_required: true
 
 import argparse
 import importlib
+import importlib.util
 import sys
 from pathlib import Path
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+def _load_roots():
+  # file直接起動（hook・scheduler）ではpackage importが未確立のため、兄弟package
+  # 位置のroots.pyをfile位置から読み込む。root深度の知識はroots.py側だけが持つ。
+  location = Path(__file__).resolve().parent.parent / "common" / "roots.py"
+  specification = importlib.util.spec_from_file_location(
+    "_session_log_entry_roots", location
+  )
+  module = importlib.util.module_from_spec(specification)
+  specification.loader.exec_module(module)
+  return module
+
+
+PROJECT_ROOT = _load_roots().repo_root()
 
 
 def _load_module(name):

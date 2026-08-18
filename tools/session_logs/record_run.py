@@ -17,8 +17,10 @@ import sys
 import time
 from pathlib import Path
 
+from tools.common import roots
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+PROJECT_ROOT = roots.repo_root()
 
 DEFAULT_SYSTEMS = (
   (

@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 
 from tools.common import digests
+from tools.common import roots
 
 
 INSTALL_ROOT = Path("/usr/local/libexec/reviewcompass")
@@ -71,7 +72,7 @@ EXPECTED_PRIOR_RUNTIME_SHA256 = {
 
 
 def _source_root():
-    return Path(__file__).resolve().parents[2]
+    return roots.repo_root()
 
 
 def _regular(path):
