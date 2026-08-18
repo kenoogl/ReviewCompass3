@@ -1,0 +1,52 @@
+{
+ "content_digest": "175d20009888d44999b8540f938cf99c54283a44862ecf5385cf699ce29a129b",
+ "plan_id": "FCRS-OPERATIONAL-METRICS-V4-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-operational-metrics-v4-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "binding_history_and_external_base_resolution",
+     "failure_behavior": [
+      "git取得に失敗したpathはhistory_cappedへ計上し照合済みと偽らない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "records/developmentの判断record",
+      "git履歴（読み取り専用）と私有領域の実file"
+     ],
+     "outputs": [
+      "内訳つき束縛照合集計（schema_version 4）"
+     ],
+     "reference_paths": [
+      "tools/evaluation/operational_metrics.py",
+      "tools/development/formal_code_reuse_search.py",
+      "tools/development/review_plan.py"
+     ],
+     "reference_symbols": [
+      "tools/development/formal_code_reuse_search.py:default_runtime_root"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "既存分類の意味を変えず内訳として追加する",
+      "代替基点はformal_code_reuse_search.default_runtime_rootから機械導出する",
+      "打ち切りは明示計上し黙って欠けない"
+     ],
+     "responsibility": "束縛照合の欠落を機械導出の代替基点（work4a/b実基点）で再解決してexternal_match／external_differsへ分類し、repo相対の不一致をgit履歴の各版内容SHA-256と照合してhistory_match（版の前進）とtrue_mismatchへ判別する。1 pathの照合上限200版・超過はhistory_cappedへ明示計上する",
+     "symbol_terms": [
+      "history",
+      "rev-list",
+      "external",
+      "base",
+      "mismatch"
+     ]
+    }
+   ],
+   "subject": "operational_metrics_v4"
+  }
+ ]
+}
