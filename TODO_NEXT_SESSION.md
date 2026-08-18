@@ -56,7 +56,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：測定ブロック7件（`tests/test_measurement_block.py`）、正式検索12件、運用集計9件、根解決一元化6件、RQ2装置14件、session_logs言及の全59試験file 793件——各単独終了コード0（2026-08-18実測。GREEN固定は機械生成の測定ブロックfileを参照する方式へ移行）
+- 直近の関連Test：測定ブロック10件（`tests/test_measurement_block.py`）、正式検索12件、運用集計9件、根解決一元化6件、RQ2装置14件、session_logs言及の全59試験file 793件——各単独終了コード0（2026-08-18実測。GREEN固定は機械生成の測定ブロックfileを参照する方式へ移行）
 - 直近の全Test：禁止認証隔離条件の正規全試験2,482件成功・終了コード0（2026-08-16・契約013完了時点の実行。以後の作業単位はsession_logs系・評価系の単独緑で受入）
 - 差分検査：`git diff --check`合格
 
