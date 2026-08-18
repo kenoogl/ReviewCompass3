@@ -36,7 +36,7 @@
 | 項目 | 状態 | 時点 | 主な根拠 |
 | --- | --- | --- | --- |
 | 正式再利用検索（実装前の機械検索・証明書） | 完了（稼働中・`--plan`のみへ引数廃止） | 2026-08-15〜 | `docs/development/prompts/scope-prescan-run.md`手順5 |
-| 実測・引数の機械化（測定ブロック＋二重実行guard・CLI既定値化） | 一部完了（対策2＝計画writerが中断中） | 2026-08-18 | `records/development/2026-08-18-measurement-block-integrity-guard-evidence-v1.md`ほか同日Evidence群 |
+| 実測・引数の機械化（測定ブロック＋二重実行guard・CLI既定値化・計画writer） | 一部完了（対策3＝review-plan既定化が候補） | 2026-08-18 | `records/development/2026-08-18-plan-writer-evidence-v1.md`ほか同日Evidence群 |
 | 高危険検証コードの再レビュー | 一部完了 | 2026-08-07 | E/A/B群は修正済み。残（旧C/D群）は立て直し計画v5 §10の枠組みで扱う |
 
 ## D. テストコードの整理
