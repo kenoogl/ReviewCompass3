@@ -31,11 +31,17 @@
 
 ## 4. 検証中の別件発見【実測・対処せず】
 
-台帳保護試験N7（候補置き場の全件検証）が、既存候補
-`ic-contract-014-canonical-sequence-gaps-001--v1.json`（2026-08-18登録・commit `3b76b97`）の
-欄不一致で不合格（v2・v3両validatorで「fields are incomplete or unknown」・V4決定なし・
-allowlist未掲載）。本候補・本決定は同検証の勘定に入って合格しており、**独立の既存事象**である。
-関連テストの結果は67合格・この1件のみ不合格。対処の要否はHuman判断へ（本record時点で未処置）。
+台帳保護試験N7（候補置き場の全件検証）が、既存候補の未充足で不合格。本候補・本決定は同検証の
+勘定に入って合格しており、**独立の既存事象**である。対処の要否はHuman判断へ（本record時点で
+未処置）。
+
+**§4a 訂正（同日）**：初版で「`ic-contract-014-…` 1件のみ不合格」と書いたのは**誤り**
+（pytest省略表示の読み違い。assertの全文表示で確認）。正しくは**未充足4件**——
+`ic-contract-014-canonical-sequence-gaps-001`・`ic-launch-metrics-acceptance-title-001`・
+`ic-session-log-exit-code-doc-drift-001`・`ic-session-log-exit-code-vocabulary-001`
+（2026-08-17〜18登録分）。共通の型＝現行のどのvalidator（v2・v3）も受け付けない欄構成
+（`related_candidates`等）で登録され、V4決定・allowlistのいずれにも束縛されていない。
+関連テストは67合格・N7の1本のみ不合格（不合格の中身が上記4件）。
 
 ## 5. 未実施
 

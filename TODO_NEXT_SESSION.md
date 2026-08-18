@@ -46,7 +46,7 @@
 
 - blocker：codexCLIのトークン枯渇は継続（第3 backend候補として疎通回復待ち）。レビュー実行はagy headless正式経路とclaude-subagent（Tier 3・明示受容つき）の2経路が稼働
 - Human判断待ち：**WSSEのpreprint方針の確認**（double-blindのためarXiv公開時期に影響。計画v2 §1.2。確認まではWSSE投稿→採否後arXivの安全側で執筆は進められる）
-- Human判断待ち：**台帳保護試験N7の既存不合格1件の対処**（`ic-contract-014-canonical-sequence-gaps-001--v1.json`＝2026-08-18登録分の欄不一致・V4決定なし。仕分けrecord 2026-08-19 §4。選択肢＝正規形へ再生成／allowlist掲載／放置の裁定）
+- Human判断待ち：**台帳保護試験N7の既存未充足4件の対処**（2026-08-17〜18登録の候補4件＝validator不合格の欄構成・V4決定なし。仕分けrecord 2026-08-19 §4a（訂正済み）。選択肢＝正規形へ再生成／既存Markdown仕分けのV4決定化／裁定して放置）
 
 ## stale・deferred
 
