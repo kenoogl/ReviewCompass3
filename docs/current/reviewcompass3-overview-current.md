@@ -20,7 +20,7 @@
 | Work 7B（更新・移行・解除・巻き戻し） | 未着手 | — | — |
 | Work 8／8A（新旧方式の比較評価・限定並行） | 未着手 | — | Work 8測定の前提に`ISSUE-TEST-GROWTH-STATE-PINNING-001`の限定再開（D欄） |
 | 評価データ取得（計測メタ・RQ1装置・reviewer接続・RQ2 paired trial実験＝実起動30回・裁定確定） | 完了 | 2026-08-17〜2026-08-18 | `records/development/2026-08-17-rq2-paired-trial-evidence-v1.md`（§11確定集計）・`records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md`（論文データ一式の表） |
-| 評価の運用集計コマンド（データ取得計画の順序5・v2＝H5束縛照合まで） | 一部完了（v3＝書式C等が繰り越し） | 2026-08-18 | `records/development/2026-08-18-operational-metrics-dataset-v2.json`と同Evidence v1・v2 |
+| 評価の運用集計コマンド（データ取得計画の順序5・v3＝表cell束縛照合まで） | 一部完了（v4＝H4手動記入・コスト等が繰り越し） | 2026-08-18 | `records/development/2026-08-18-operational-metrics-dataset-v3.json`と同Evidence v1〜v3 |
 | 最終公開評価 | 未着手 | — | — |
 
 ## B. レビューの仕組み
