@@ -1,0 +1,55 @@
+{
+ "content_digest": "d19510a4e833731e1bd930689c2fde276e04ee36ac1191419e50cb2a307567e9",
+ "plan_id": "FCRS-PLAN-WRITER-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-plan-writer-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "plan_finalize_and_verify",
+     "failure_behavior": [
+      "読めないJSON・構造不正・digest不一致は終了コード2で停止し部分書換えを残さない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "計画草稿JSON（content_digest無し）または完成計画JSON",
+      "project root（既定cwd）"
+     ],
+     "outputs": [
+      "digest埋め込み済み計画file（合格時のみ書換え）",
+      "一行JSONの判定（status・content_digest・reason）"
+     ],
+     "reference_paths": [
+      "tools/development/formal_code_reuse_search.py",
+      "tools/common/digests.py",
+      "tools/development/work4a_rebuild_v3.py"
+     ],
+     "reference_symbols": [
+      "tools/development/formal_code_reuse_search.py:_validate_plan",
+      "tools/common/digests.py:canonical_content_digest"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "検証は検索側_validate_planを再利用し複製しない",
+      "digestはtools.common.digests.canonical_content_digestを使う",
+      "不合格時はfileへ一切書かない",
+      "digest既存の草稿はalready_finalizedで停止する"
+     ],
+     "responsibility": "正式再利用検索の計画草稿へcontent_digestを機械埋め込みし、検索側と同一の検証（_validate_planの再利用）に合格した場合だけfileを書き換える。完成計画の照合（verify）では証明書が既に存在する状態を検索実施済みの正常として扱う。手書きscriptによるdigest計算を排除する",
+     "symbol_terms": [
+      "plan",
+      "finalize",
+      "verify",
+      "digest",
+      "canonical"
+     ]
+    }
+   ],
+   "subject": "reuse_search_plan_writer_v1"
+  }
+ ]
+}
