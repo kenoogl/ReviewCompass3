@@ -1,0 +1,53 @@
+{
+ "content_digest": "13770a9dcc5ed468086fd320c228ee18af33c9d839b466ebda63963d41cdfa2d",
+ "plan_id": "FCRS-OPERATIONAL-METRICS-V2-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-operational-metrics-v2-reuse-search-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "digest_binding_resolution_metrics",
+     "failure_behavior": [
+      "読めないfile・不正な組は黙って成功側へ倒さず、分類件数へ計上する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "records/development配下の判断record（.md）",
+      "repo rootと私有領域の実file"
+     ],
+     "outputs": [
+      "束縛照合の分類集計（一行JSONの一部）"
+     ],
+     "reference_paths": [
+      "tools/evaluation/operational_metrics.py",
+      "tools/common/digests.py",
+      "tools/development/todo_handoff.py"
+     ],
+     "reference_symbols": [
+      "tools/common/digests.py:file_sha256",
+      "tools/common/roots.py:repo_root"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "正準書式以外は採点しない（fail-closed・件数のみ報告）",
+      "相対pathはtools/common/roots.pyのrepo_root基準で解決する",
+      "既存集計（launch・approvals）の定義を変えない"
+     ],
+     "responsibility": "判断record群からpathとSHA-256の束縛の組を正準書式（shasum行・同一行inline）だけ抽出し、実fileとの照合結果を resolved_match／digest_differs／file_missing へ分類して集計する。組の閉じない出現は採点せず件数報告する",
+     "symbol_terms": [
+      "binding",
+      "digest",
+      "sha256",
+      "resolve",
+      "provenance"
+     ]
+    }
+   ],
+   "subject": "operational_metrics_v2"
+  }
+ ]
+}
