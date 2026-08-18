@@ -1,0 +1,55 @@
+{
+ "content_digest": "23184ba23130f11a7090cfeb6e9aeb2e0ae6ab9350e5b493c7b192057509480b",
+ "plan_id": "FCRS-MEASUREMENT-BLOCK-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-measurement-block-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "declared_command_measurement_fixation",
+     "failure_behavior": [
+      "spawn失敗・timeoutは測定不完全として終了コード1で報告する",
+      "生成不能時に部分fileを残さない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "宣言JSON（title・entries[].label・entries[].argv）",
+      "出力先path（未存在であること）"
+     ],
+     "outputs": [
+      "機械生成markdown（測定ブロック）",
+      "一行JSON summary（status・output_path・entry_count・failed_count）"
+     ],
+     "reference_paths": [
+      "tools/session_logs/record_run.py",
+      "tools/common/digests.py",
+      "tools/egress/approval.py"
+     ],
+     "reference_symbols": [
+      "tools/common/digests.py:file_sha256"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "shellを使わない（文字列連結の注入余地を作らない）",
+      "既存fileへ上書きしない（new-only・停止は終了コード2）",
+      "コマンドの非0終了はデータとして記録しtool自体は成功とする",
+      "宣言fileのSHA-256はtools.common.digests.file_sha256で機械埋め込み"
+     ],
+     "responsibility": "宣言JSONに列挙されたコマンド列をshellを使わずargv配列で実行し、コマンド・終了コード・所要秒・stdout／stderrの無加工全文・時刻を1つの機械生成markdownへnew-onlyで固定する。出力中のfenceには外側fenceを内容の最長backtick連より長くして耐える。streamごとの規模上限超過は明示の切り詰め印を機械が記す",
+     "symbol_terms": [
+      "measurement",
+      "subprocess",
+      "capture",
+      "block",
+      "fence"
+     ]
+    }
+   ],
+   "subject": "measurement_block_v1"
+  }
+ ]
+}
