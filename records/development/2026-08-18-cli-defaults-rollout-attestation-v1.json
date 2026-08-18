@@ -1,0 +1,26 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "cli_defaults_rollout_v1",
+  "external": {
+    "relative_path": "work4b/reuse-searches/0c505f1faa4b1253adc6fabc507db867d4b5e39671f0b5ee77207fadfc3c85a6.json",
+    "content_digest": "0c505f1faa4b1253adc6fabc507db867d4b5e39671f0b5ee77207fadfc3c85a6",
+    "byte_sha256": "b7d91a1806697503a56440b2a2a83f8e02ccd3bac1ebfb488fcdcc26e6b0facc"
+  },
+  "source_identity": {
+    "profile_run_id": "13583f43c47a90509403e69ef629a6af32a318ca26bc4195a9eae8600b4a6d94",
+    "discovery_run_id": "664a33f040e450af43b9a04b9b4fe806e356b80c7bdbc0b2a89b6ab0054e8fa1",
+    "source_content_id": "a936ff8bfd6fc0beab0593babcbdec042567f8827e27c003fe02b3f51e49574b",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 4,
+  "capability_count": 1,
+  "direct_match_count": 2,
+  "hint_match_count": 265,
+  "comparison_group_count": 454,
+  "no_search_material_capability_count": 0,
+  "content_digest": "b80581040290968433bb91f7b6193fea0957d7729198ba531f0dc65c80f3aaed"
+}
