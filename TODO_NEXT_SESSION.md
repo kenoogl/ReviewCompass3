@@ -6,7 +6,7 @@
 
 ## 現在位置
 
-- 全体：立て直し計画v5第1〜5段・正式ツール化（契約008〜014）・デプロイ方針決定・評価データ取得（RQ1装置・RQ2 paired trial＝実起動30回・裁定確定・論文データ一式）・RQ2副産物4件の対処・論文執筆開始（WSSE 2026 Special Session・締切**2026-08-30**・LaTeX 5頁・double-blind＋arXivフルの二本立て）までは前回どおり。今回、RQ2持ち越しの**採点7語彙の正式反映を裁定**（案B＝集計側を正本・正解表v3はケース集の再利用決定が合図）、**配置依存3箇所の解消**（デプロイ方針4b-1。`tools/common/roots.py`へ一元化・指紋pin追加済み）、**順序5の運用集計コマンド**（dataset v1固定）を完了——**評価データ取得計画v1の全順序が完了**。続けて**運用集計v2**（H5束縛照合＝一致77.6%・dataset v2固定）、**検索CLIの引数廃止**（保存先・方針版・時刻を自動解決）、**測定ブロックの機械生成tool**（宣言JSON→機械実行→生成file参照。実測の転記を構造的に排除・手順書規律も「転記は例外」へ改定）も完了——方針転換はHuman指示「手作業部分を極力廃してLLMは本来の役割のみ」。全景は`docs/current/reviewcompass3-overview-current.md`
+- 全体：立て直し計画v5第1〜5段・正式ツール化（契約008〜014）・デプロイ方針決定・評価データ取得（RQ1装置・RQ2 paired trial＝実起動30回・裁定確定・論文データ一式）・RQ2副産物4件の対処・論文執筆開始（WSSE 2026 Special Session・締切**2026-08-30**・LaTeX 5頁・double-blind＋arXivフルの二本立て）までは前回どおり。今回、RQ2持ち越しの**採点7語彙の正式反映を裁定**（案B＝集計側を正本・正解表v3はケース集の再利用決定が合図）、**配置依存3箇所の解消**（デプロイ方針4b-1。`tools/common/roots.py`へ一元化・指紋pin追加済み）、**順序5の運用集計コマンド**（dataset v1固定）を完了——**評価データ取得計画v1の全順序が完了**。続けて**運用集計v2**（H5束縛照合＝一致77.6%・dataset v2固定）、**検索CLIの引数廃止**（保存先・方針版・時刻を自動解決）、**測定ブロックの機械生成tool**（宣言JSON→機械実行→生成file参照。実測の転記を構造的に排除・手順書規律も「転記は例外」へ改定）も完了——方針転換はHuman指示「手作業部分を極力廃してLLMは本来の役割のみ」。加えて**運用規範5件を私的メモリからrepoへ移設**（AGENTS §2・§3＋request-builder手順書。デプロイ先のLLMにも規範が届く状態へ）。全景は`docs/current/reviewcompass3-overview-current.md`
 - 現在作業：**論文執筆（WSSE短縮版が締切物）**。執筆体制＝**本スレッドが執筆（`docs/paper/`配下のみ書く）・別スレッドが継続開発（TODO・見取り図・records・製品コードの正本管理）**。論文データの更新は開発スレッドが装置で再集計し新版として固定、執筆側は固定版のみ引用（計画v2 §3の分担規則）
 - Task Contract：`なし（契約014受入完了・注記追記済み。次契約は未定義）`
 
@@ -16,6 +16,7 @@
 
 ## 最新のauthority／Evidence
 
+- [運用規範のrepo移設判断record（メモリ→AGENTS §2・§3＋手順書。5規範の由来つき）](records/development/2026-08-18-agents-norm-transfer-decision-v1.md) — SHA-256 `4c6ee238d174a480fdece459c49152ed6067fab6ee79a7a9effd31b41f4ac998`
 - [測定ブロックtool Evidence（転記排除・dogfooding・fence耐性・手順書改定）](records/development/2026-08-18-measurement-block-evidence-v1.md) — SHA-256 `58a553c9480f59aa72aa816146320908707779b5fd98a946e087d5ccf3f4ade6`
 - [検索CLI引数廃止Evidence（既定値・数値最大版解決・手順書縮小・効果）](records/development/2026-08-18-reuse-search-cli-defaults-evidence-v1.md) — SHA-256 `fa5a153121beca9020d1fdbf76e008b1ee287c86348361bb19d30f42797438df`
 - [運用集計v2 Evidence（H5束縛照合・承認点欄形式・自己言及の記録・v3繰り越し）](records/development/2026-08-18-operational-metrics-v2-evidence-v1.md) — SHA-256 `34a62366f14d1d9651e1abf361da8898d051156cde0d06c34437ca896fedddde`
