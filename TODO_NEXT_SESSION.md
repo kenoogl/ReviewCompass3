@@ -22,12 +22,12 @@
 - [RQ2 paired trial実行Evidence（§11に裁定後の確定集計を追記）](records/development/2026-08-17-rq2-paired-trial-evidence-v1.md) — SHA-256 `c6dbfa836866524b41edcd156e24b7cd39cec615110a0a9c1c793713a8b5522f`
 - [RQ2裁定・議論・副産物v2（論文データ一式の表・7語彙・主題適中率）](records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md) — SHA-256 `f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152`
 - [RQ2生データ（31実行の機械記録）](records/development/2026-08-18-rq2-paired-trial-dataset-v1.json) — SHA-256 `d34ecd24a8d87c49e5b50f4ae204295841622ea12c34886e29dba5a32c85b893`
-- [運用集計dataset v4（従軸の最新固定版：履歴照合つき束縛1,199組＝追跡可能95.9%）](records/development/2026-08-18-operational-metrics-dataset-v4.json) — SHA-256 `faad88327bf4a0a987fb88e8b8eff45a0f55b50d959e6b08a833da33d6cbc8bb`
-- [全体見取り図（人向け全景。受入完了時にTODOと同時更新）](docs/current/reviewcompass3-overview-current.md) — SHA-256 `f5761bf810b265b79899ef9ef73909bd93650e3e1906b14b515bc903a8a646fe`
+- [運用集計dataset v5（従軸の最新固定版：束縛追跡95.9%・H4自動導出率93.9%・保全規模）](records/development/2026-08-18-operational-metrics-dataset-v5.json) — SHA-256 `2b6d9bbe5c99c44eeee08d3e32b9d4718cdc0d6c8fce322f9b604e8f6fdaf186`
+- [全体見取り図（人向け全景。受入完了時にTODOと同時更新）](docs/current/reviewcompass3-overview-current.md) — SHA-256 `6d872d9c7c496655acdaa117e30feed51452c2eeb9240d8e44473695fc6d6e1b`
 
 ## 次に行う一作業
 
-**論文の共通部品（評価の表と図）の作成→WSSE 5頁版の起草**（執筆スレッド。計画v2 §2.3の順序）。数値は確定recordから転記し、転記後に機械照合する。開発スレッド側の選択肢：休止record §3のpending残件（縦C合議等）／運用集計v5（H4手動記入・コスト等＝v4 Evidence §4・候補）／デプロイ版（合図待ち）。
+**論文の共通部品（評価の表と図）の作成→WSSE 5頁版の起草**（執筆スレッド。計画v2 §2.3の順序）。数値は確定recordから転記し、転記後に機械照合する。開発スレッド側の選択肢：休止record §3のpending残件（縦C合議等）／運用集計v6（時系列復元・欠落由来＝v5 Evidence §4・候補）／デプロイ版（合図待ち）。
 
 開始条件：
 
@@ -56,7 +56,7 @@
 - commit境界：本handoffを含むcommit完了時点
 - Git状態：HEAD、upstream、ahead／behind、push状態はGitから機械取得する
 - worktree：本handoffを含むcommit完了時点でclean
-- 直近の関連Test：review-plan 11件（`tests/test_review_plan.py`）、計画writer6件、測定ブロック10件、正式検索12件、運用集計15件、根解決一元化6件、RQ2装置14件、session_logs言及の全59試験file 793件——各単独終了コード0（2026-08-18実測。GREEN固定は機械生成の測定ブロックfileを参照する方式へ移行）
+- 直近の関連Test：review-plan 11件（`tests/test_review_plan.py`）、計画writer6件、測定ブロック10件、正式検索12件、運用集計18件、根解決一元化6件、RQ2装置14件、session_logs言及の全59試験file 793件——各単独終了コード0（2026-08-18実測。GREEN固定は機械生成の測定ブロックfileを参照する方式へ移行）
 - 直近の全Test：禁止認証隔離条件の正規全試験2,482件成功・終了コード0（2026-08-16・契約013完了時点の実行。以後の作業単位はsession_logs系・評価系の単独緑で受入）
 - 差分検査：`git diff --check`合格
 
