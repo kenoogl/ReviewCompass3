@@ -1,0 +1,40 @@
+{
+ "title": "計画JSON writer（対策2）受入確認の実測",
+ "entries": [
+  {
+   "label": "writer試験の単独実行（決定的射影）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nr = subprocess.run(['.venv/bin/python3', '-m', 'pytest', 'tests/test_reuse_search_plan.py', '-q'], capture_output=True, text=True)\nlast = r.stdout.strip().splitlines()[-1]\nprint('exit', r.returncode)\nprint(last.rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "検索側保護試験の単独実行（決定的射影）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nr = subprocess.run(['.venv/bin/python3', '-m', 'pytest', 'tests/test_formal_code_reuse_search.py', '-q'], capture_output=True, text=True)\nlast = r.stdout.strip().splitlines()[-1]\nprint('exit', r.returncode)\nprint(last.rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "committed全計画の一括verify",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import json, io, contextlib\nfrom pathlib import Path\nfrom tools.development import reuse_search_plan\nok = 0\ntotal = 0\nfor p in sorted(Path('records/development').glob('*.json')):\n    try:\n        d = json.loads(p.read_text(encoding='utf-8'))\n    except ValueError:\n        continue\n    if not isinstance(d, dict) or d.get('record_kind') != 'formal_code_reuse_search_plan':\n        continue\n    total += 1\n    buf = io.StringIO()\n    with contextlib.redirect_stdout(buf):\n        code = reuse_search_plan.run(('verify', '--plan', str(p), '--project-root', '.'))\n    verdict = json.loads(buf.getvalue())\n    print(p.name, verdict['status'], code)\n    ok += 1 if code == 0 else 0\nprint(f'plans={total} ok={ok}')\n"
+   ]
+  },
+  {
+   "label": "変更・新設fileのdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/development/reuse_search_plan.py",
+    "tests/test_reuse_search_plan.py",
+    "docs/development/prompts/scope-prescan-run.md"
+   ]
+  }
+ ]
+}

@@ -31,6 +31,10 @@
      手組み立て誤指定事故＝`records/development/2026-08-18-placement-root-resolution-evidence-v1.md`
      §5の構造的再発防止）。上書き用の任意引数はあるが、通常は使わない。
    - 作業別計画（能力宣言）はHuman確認の下で作成し、確定commitへ先行commitしてから実行する。
+     計画の仕上げは**writerで行う**（草稿はcontent_digest無しで書き、
+     `.venv/bin/python3 -m tools.development.reuse_search_plan finalize --plan <path>`が
+     digestを機械埋め込みし検索と同一の検証に合格した場合だけ書き換える。手書きscript・
+     手計算digestを使わない。2026-08-18新設）。
    - `digest_mismatch`で停止した場合は、universe・freshness policyの方針参照が古い。正規writer
      （`write_source_universe`・`write_freshness_policy_v4`）で次版をnew-only生成して再実行する。
    - **生成された証明書（attestation）recordのpathとSHA-256を、契約候補の「権威、証拠」節へ必須で
@@ -54,7 +58,9 @@ recordへ書く数値は機械出力の転記だけを認め、手作業の余�
    で機械生成fileへ固定し、recordは生成物を**参照**して意味の説明だけを書く（数値の転記という
    行為を残さない。2026-08-18新設・fence耐性・切り詰め印・**二重実行の完全性guard**・実行体と
    実行環境の機械記録つき）。**測定コマンドは読み取り専用に限る**（各entryは2回実行されるため。
-   guardの根拠＝同日の非決定的欠落の観測・調査record）。
+   guardの根拠＝同日の非決定的欠落の観測・調査record）。出力に実行時間など**本質的に揺れる値を
+   含むコマンド（pytest等）は、宣言側で決定的な射影**（件数・終了コードだけを印字する包み）に
+   整形して測る（guardの一致要件。実例＝計画writer受入測定）。
 2. 生成物を使えない例外時のみ転記を認める。その場合も、数値には**再現コマンドを併記**し、
    数える専用コマンド（`wc -l`・`grep -c`等）の**全出力**をそのまま転記する。`head`等で途中
    省略された表示から数字を書かない。省略された残りを推測で補わない。
