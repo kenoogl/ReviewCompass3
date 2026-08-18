@@ -1,0 +1,21 @@
+{
+  "title": "測定ブロックtool新設のGREEN測定（dogfooding）",
+  "entries": [
+    {
+      "label": "新設試験の単独実行",
+      "argv": [".venv/bin/python3", "-m", "pytest", "tests/test_measurement_block.py", "-q"]
+    },
+    {
+      "label": "流用元保護（record_run系）の単独実行",
+      "argv": [".venv/bin/python3", "-m", "pytest", "tests/test_session_log_record_run.py", "-q"]
+    },
+    {
+      "label": "複製禁止掃引の単独実行",
+      "argv": [".venv/bin/python3", "-m", "pytest", "tests/test_shared_function_sweep.py", "-q"]
+    },
+    {
+      "label": "遡り一元化の維持確認",
+      "argv": ["grep", "-rn", "parents\\[", "tools/", "--include=*.py"]
+    }
+  ]
+}
