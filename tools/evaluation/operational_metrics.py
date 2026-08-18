@@ -15,6 +15,7 @@ import re
 import statistics
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from tools.common import digests
@@ -299,10 +300,88 @@ def collect_approval_metrics(records_root):
   }
 
 
+def collect_template_metrics():
+  """H4手動記入：builder雛形の記入欄と自動導出率を機械算出する。
+
+  雛形は`_render`（純関数）で類型ごとにin-memory生成し、手数えしない。
+  自動導出率＝1−（記入欄数÷非空行数）。
+  """
+  from tools.request_builder import core
+
+  by_type = {}
+  for request_type in core.REQUEST_TYPES:
+    section = (
+      core._FREE_TEXT_SECTION
+      if request_type == "free_text"
+      else core._POINTS_SECTION
+    )
+    text = core._render(
+      title="probe",
+      kind_label=core._TYPE_LABELS[request_type],
+      record_date="2026-01-01",
+      base_commit_line="- 基点commit：probe\n",
+      digest_table="",
+      repository_absolute="/probe",
+      record_relative="records/session-handoffs/probe-request-v1.md",
+      verdict_relative="records/session-handoffs/probe-verdict-v1.md",
+      model="probe-model",
+      request_section=section,
+    )
+    nonempty = [line for line in text.splitlines() if line.strip()]
+    manual = text.count(core.PLACEHOLDER_PREFIX)
+    by_type[request_type] = {
+      "manual_fields": manual,
+      "nonempty_lines": len(nonempty),
+      "auto_ratio": round(1 - manual / len(nonempty), 4),
+    }
+  return by_type
+
+
+def _day(timestamp):
+  if timestamp is None:
+    return None
+  return (
+    datetime.fromtimestamp(timestamp).astimezone().date().isoformat()
+  )
+
+
+def collect_preservation_metrics(preservation_root):
+  """コスト第一段：保全先の区画別規模（内容不読・区画名のみ出力）。"""
+  root = Path(preservation_root)
+  if not root.is_dir():
+    return {"sections": {}, "root_missing": True}
+  sections = {}
+  for section_dir in sorted(
+    path for path in root.iterdir() if path.is_dir()
+  ):
+    file_count = 0
+    total_bytes = 0
+    oldest = None
+    newest = None
+    for item in section_dir.rglob("*"):
+      if not item.is_file():
+        continue
+      stat = item.stat()
+      file_count += 1
+      total_bytes += stat.st_size
+      if oldest is None or stat.st_mtime < oldest:
+        oldest = stat.st_mtime
+      if newest is None or stat.st_mtime > newest:
+        newest = stat.st_mtime
+    sections[section_dir.name] = {
+      "file_count": file_count,
+      "total_bytes": total_bytes,
+      "oldest": _day(oldest),
+      "newest": _day(newest),
+    }
+  return {"sections": sections, "root_missing": False}
+
+
 def run(argv=None) -> int:
   parser = argparse.ArgumentParser()
   parser.add_argument("--launch-root", required=True)
   parser.add_argument("--records-root", default=None)
+  parser.add_argument("--preservation-root", default=None)
   arguments = parser.parse_args(
     list(sys.argv[1:] if argv is None else argv)
   )
@@ -325,14 +404,23 @@ def run(argv=None) -> int:
   external_bases = (
     default_runtime_root() / "projects" / "reviewcompass3" / "development" / "data",
   )
+  preservation_root = (
+    Path.home()
+    / ".reviewcompass3/projects/reviewcompass3/development/sensitive"
+    / "eventual-preservation"
+    if arguments.preservation_root is None
+    else Path(arguments.preservation_root)
+  )
   result = {
-    "schema_version": 4,
+    "schema_version": 5,
     "status": "ok",
     "launch": collect_launch_metrics(launch_root),
     "approvals": collect_approval_metrics(records_root),
     "bindings": collect_binding_metrics(
       records_root, external_bases=external_bases
     ),
+    "templates": collect_template_metrics(),
+    "preservation": collect_preservation_metrics(preservation_root),
   }
   print(json.dumps(
     result,

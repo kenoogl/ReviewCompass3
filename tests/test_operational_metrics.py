@@ -164,7 +164,7 @@ def test_approval_metrics_field_count(tmp_path):
   assert result["field_count"] == 3
 
 
-def test_run_schema_version_4(tmp_path, capsys):
+def test_run_schema_version_5(tmp_path, capsys):
   from tools.evaluation import operational_metrics
 
   launch_root, records_root = _make_stores(tmp_path)
@@ -174,7 +174,7 @@ def test_run_schema_version_4(tmp_path, capsys):
   ))
   document = json.loads(capsys.readouterr().out)
   assert exit_code == 0
-  assert document["schema_version"] == 4
+  assert document["schema_version"] == 5
   assert document["bindings"]["total_hex_count"] == 0
 
 
@@ -332,3 +332,43 @@ def test_true_mismatch_when_no_version_matches(tmp_path):
   assert result["digest_differs"] == 1
   assert result["history_match"] == 0
   assert result["true_mismatch"] == 1
+
+
+def test_template_metrics_computes_auto_ratio():
+  from tools.evaluation import operational_metrics
+
+  result = operational_metrics.collect_template_metrics()
+  assert set(result) == {
+    "contract_review", "completion_review", "free_text"
+  }
+  for entry in result.values():
+    assert entry["manual_fields"] >= 1
+    assert entry["nonempty_lines"] > entry["manual_fields"]
+    assert 0 < entry["auto_ratio"] < 1
+
+
+def test_preservation_scale_by_section(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  root = tmp_path / "preserve"
+  (root / "raw").mkdir(parents=True)
+  (root / "verbatim").mkdir()
+  (root / "raw" / "a.jsonl").write_text("xx", encoding="utf-8")
+  (root / "raw" / "b.jsonl").write_text("yyyy", encoding="utf-8")
+  (root / "verbatim" / "c.txt").write_text("z", encoding="utf-8")
+  result = operational_metrics.collect_preservation_metrics(root)
+  assert result["sections"]["raw"]["file_count"] == 2
+  assert result["sections"]["raw"]["total_bytes"] == 6
+  assert result["sections"]["verbatim"]["file_count"] == 1
+
+
+def test_preservation_output_has_no_absolute_paths(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  root = tmp_path / "preserve2"
+  (root / "raw").mkdir(parents=True)
+  (root / "raw" / "a.jsonl").write_text("xx", encoding="utf-8")
+  result = operational_metrics.collect_preservation_metrics(root)
+  dumped = json.dumps(result, ensure_ascii=False)
+  assert str(root) not in dumped
+  assert str(tmp_path) not in dumped
