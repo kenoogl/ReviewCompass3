@@ -20,7 +20,7 @@
 | Work 7B（更新・移行・解除・巻き戻し） | 未着手 | — | — |
 | Work 8／8A（新旧方式の比較評価・限定並行） | 未着手 | — | Work 8測定の前提に`ISSUE-TEST-GROWTH-STATE-PINNING-001`の限定再開（D欄） |
 | 評価データ取得（計測メタ・RQ1装置・reviewer接続・RQ2 paired trial実験＝実起動30回・裁定確定） | 完了 | 2026-08-17〜2026-08-18 | `records/development/2026-08-17-rq2-paired-trial-evidence-v1.md`（§11確定集計）・`records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md`（論文データ一式の表） |
-| 評価の運用集計コマンド（データ取得計画の順序5・v2＝H5束縛照合まで） | 完了（v3候補は繰り越し） | 2026-08-18 | `records/development/2026-08-18-operational-metrics-dataset-v2.json`と同Evidence v1・v2 |
+| 評価の運用集計コマンド（データ取得計画の順序5・v2＝H5束縛照合まで） | 一部完了（v3＝書式C等が繰り越し） | 2026-08-18 | `records/development/2026-08-18-operational-metrics-dataset-v2.json`と同Evidence v1・v2 |
 | 最終公開評価 | 未着手 | — | — |
 
 ## B. レビューの仕組み
@@ -36,7 +36,7 @@
 | 項目 | 状態 | 時点 | 主な根拠 |
 | --- | --- | --- | --- |
 | 正式再利用検索（実装前の機械検索・証明書） | 完了（稼働中・`--plan`のみへ引数廃止） | 2026-08-15〜 | `docs/development/prompts/scope-prescan-run.md`手順5 |
-| 実測・引数の機械化（測定ブロック＋二重実行guard・CLI既定値化） | 完了（稼働中） | 2026-08-18 | `records/development/2026-08-18-measurement-block-integrity-guard-evidence-v1.md`ほか同日Evidence群 |
+| 実測・引数の機械化（測定ブロック＋二重実行guard・CLI既定値化） | 一部完了（対策2＝計画writerが中断中） | 2026-08-18 | `records/development/2026-08-18-measurement-block-integrity-guard-evidence-v1.md`ほか同日Evidence群 |
 | 高危険検証コードの再レビュー | 一部完了 | 2026-08-07 | E/A/B群は修正済み。残（旧C/D群）は立て直し計画v5 §10の枠組みで扱う |
 
 ## D. テストコードの整理

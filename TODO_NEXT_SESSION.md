@@ -23,7 +23,7 @@
 - [RQ2裁定・議論・副産物v2（論文データ一式の表・7語彙・主題適中率）](records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md) — SHA-256 `f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152`
 - [RQ2生データ（31実行の機械記録）](records/development/2026-08-18-rq2-paired-trial-dataset-v1.json) — SHA-256 `d34ecd24a8d87c49e5b50f4ae204295841622ea12c34886e29dba5a32c85b893`
 - [運用集計dataset v2（従軸の最新固定版：H4 launch実測・H5束縛照合・H7承認点）](records/development/2026-08-18-operational-metrics-dataset-v2.json) — SHA-256 `d39fbf1f641ae426a63736856cb99d7c3e02620894aae517c6c7e13ee476c0fd`
-- [全体見取り図（人向け全景。受入完了時にTODOと同時更新）](docs/current/reviewcompass3-overview-current.md) — SHA-256 `1b361603bdec25b381984f67bbc5d18f2e41542b7df967780076039499c780db`
+- [全体見取り図（人向け全景。受入完了時にTODOと同時更新）](docs/current/reviewcompass3-overview-current.md) — SHA-256 `12ab4ce5bf1ed9d04b812d23250573a0ff7dd0bc621b33cb8e907fbab2bbf2e8`
 
 ## 次に行う一作業
 
