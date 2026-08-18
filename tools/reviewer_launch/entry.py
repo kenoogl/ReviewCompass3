@@ -14,12 +14,15 @@ from tools.reviewer_launch import record as record_module
 
 
 _LAUNCH_FLAGS = (
-    "--repository",
     "--request",
     "--expected-sha256",
-    "--private-root",
     "--run-id",
 )
+
+
+def default_private_root():
+    """既定の未加工保存先（repo外私有領域）。手組み立て引数を不要にする。"""
+    return Path.home() / ".reviewcompass3-private" / "reviewer-launch"
 
 
 def _write(output, document):
@@ -124,14 +127,15 @@ def g30_main(arguments=None, *, output=None):
 
 
 def _run_launch(values, output):
-    repository = values["--repository"]
+    repository = values.get("--repository") or str(Path.cwd())
     request_relative = values["--request"]
     target_commit = record_module.current_commit(repository)
     result = core.launch_review(
         repository=repository,
         request_relative_path=request_relative,
         expected_sha256=values["--expected-sha256"],
-        private_root=values["--private-root"],
+        private_root=values.get("--private-root")
+        or str(default_private_root()),
         backend_name=values.get("--backend", "antigravity-cli"),
         run_id=values["--run-id"],
         accept_tier=values.get("--accept-tier"),
@@ -192,7 +196,13 @@ def main(argv=None, *, output=None):
     values = _parse_flags(
         selected_arguments[1:],
         _LAUNCH_FLAGS,
-        ("--backend", "--accept-tier", "--acceptance-ref"),
+        (
+            "--backend",
+            "--accept-tier",
+            "--acceptance-ref",
+            "--repository",
+            "--private-root",
+        ),
     )
     if values is None:
         _stop(selected_output, "invalid_arguments", "arguments")

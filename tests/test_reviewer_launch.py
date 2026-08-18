@@ -1390,3 +1390,50 @@ def test_entry_launch_acceptance_ref_missing(repository, monkeypatch):
     assert exit_code == 2
     result = json.loads(buffer.getvalue().decode("utf-8"))
     assert result["reason"] == "acceptance_reference_missing"
+
+
+def test_entry_launch_defaults_repository_and_private_root(
+    repository, monkeypatch
+):
+    entry = _entry()
+    core = _core()
+    import io
+
+    captured = {}
+
+    def _probe(**kwargs):
+        captured.update(kwargs)
+        raise core.LaunchStop("defaults_probe_stop")
+
+    monkeypatch.setattr(core, "launch_review", _probe)
+    monkeypatch.chdir(repository)
+    buffer = io.BytesIO()
+    request = _request_relative(repository)
+    exit_code = entry.main(
+        [
+            "launch",
+            "--request",
+            request,
+            "--expected-sha256",
+            _sha256_file(repository / request),
+            "--run-id",
+            "run-defaults-001",
+        ],
+        output=buffer,
+    )
+    assert exit_code == 2
+    result = json.loads(buffer.getvalue().decode("utf-8"))
+    assert result["reason"] == "defaults_probe_stop"
+    assert Path(captured["repository"]).resolve() == Path(
+        str(repository)
+    ).resolve()
+    assert captured["private_root"] == str(
+        Path.home() / ".reviewcompass3-private" / "reviewer-launch"
+    )
+
+
+def test_default_private_root_is_home_based():
+    entry = _entry()
+    assert entry.default_private_root() == (
+        Path.home() / ".reviewcompass3-private" / "reviewer-launch"
+    )

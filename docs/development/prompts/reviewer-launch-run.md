@@ -21,12 +21,15 @@ commit済みの依頼recordを対象に、Reviewer（第1 backend：`antigravity
 
 ```text
 reviewcompass3-reviewer-launch launch \
-  --repository <対象repositoryの絶対パス> \
   --request <依頼recordのrepo相対パス> \
   --expected-sha256 <依頼recordのSHA-256> \
-  --private-root <repo外私有領域の絶対パス> \
   --run-id <実行識別子>
 ```
+
+- `--repository`（既定＝現在のdirectory。repository根元から実行する）と`--private-root`
+  （既定＝`~/.reviewcompass3-private/reviewer-launch`）は**機械既定で解決**する。上書きは
+  任意引数（2026-08-18既定値化。手組み立てを不要にする）。
+- `--run-id`は意味を担う識別子（契約・ケース等の符号）であり、操作者が命名する。
 
 起動なしの事前検査（G30と同形式）：
 
@@ -50,15 +53,15 @@ reviewcompass3-reviewer-launch check \
 
 ```text
 reviewcompass3-reviewer-launch launch \
-  --repository <対象repositoryの絶対パス> \
   --request <依頼recordのrepo相対パス> \
   --expected-sha256 <依頼recordのSHA-256> \
-  --private-root <repo外私有領域の絶対パス> \
   --run-id <実行識別子> \
   --backend claude-subagent \
   --accept-tier 3 \
   --acceptance-ref <受容根拠recordのrepo相対パス>
 ```
+
+（`--repository`・`--private-root`の機械既定は上記launchと同じ。）
 
 - `--accept-tier`が宣言tier（claude-subagentは3）と一致し、`--acceptance-ref`が実在する場合だけ
   起動する。欠落・不一致は`reviewer_not_independent_tier`で停止する（機械が黙って独立性を緩めない）。

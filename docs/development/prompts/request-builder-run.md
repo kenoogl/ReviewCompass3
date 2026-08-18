@@ -41,22 +41,25 @@
 
 ```text
 reviewcompass3-request-builder assemble \
-  --repository <対象repositoryの絶対パス> \
   --type <contract_review|completion_review|free_text> \
-  --date <YYYY-MM-DD> \
   --slug <小文字とhyphenの識別名> \
   --title <表題> \
   --target <対象fileのrepo相対パス（繰り返し可）>
 ```
+
+- `--repository`（既定＝現在のdirectory。repository根元から実行する）と`--date`（既定＝機械の
+  当日日付）は**機械既定で解決**する。上書きは任意引数（2026-08-18既定値化。日付の手書きを
+  不要にする）。
 
 機械検査（LLM記入とcommitの後。commit前の実行は`request_record_uncommitted`だけが不合格となる
 状態を正常な途中経過とし、最終合格はcommit済み状態での全項目合格）：
 
 ```text
 reviewcompass3-request-builder check \
-  --repository <対象repositoryの絶対パス> \
   --request <依頼recordのrepo相対パス>
 ```
+
+（`--repository`の機械既定は上記assembleと同じ。）
 
 出力は正準JSON一行。終了コードは成功`0`、入力不備または検査不合格`2`、内部失敗`1`。
 合格出力の`request.sha256`が、そのまま`reviewcompass3-reviewer-launch launch`の

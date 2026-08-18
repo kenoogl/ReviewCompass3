@@ -1,0 +1,29 @@
+{
+  "title": "既定値化の横展開 受入確認の実測（GREEN・既定値・placeholder残存・digest）",
+  "entries": [
+    {
+      "label": "reviewer_launch試験の単独実行",
+      "argv": [".venv/bin/python3", "-m", "pytest", "tests/test_reviewer_launch.py", "-q"]
+    },
+    {
+      "label": "request_builder試験の単独実行",
+      "argv": [".venv/bin/python3", "-m", "pytest", "tests/test_request_builder.py", "-q"]
+    },
+    {
+      "label": "reviewer_bridge試験の単独実行",
+      "argv": [".venv/bin/python3", "-m", "pytest", "tests/test_reviewer_bridge.py", "-q"]
+    },
+    {
+      "label": "既定private_rootの実機値",
+      "argv": [".venv/bin/python3", "-c", "from tools.reviewer_launch import entry; print(entry.default_private_root())"]
+    },
+    {
+      "label": "廃止placeholderの残存検索（該当なし＝exit 1が合格）",
+      "argv": ["grep", "-n", "repo外私有領域の絶対パス\\|<YYYY-MM-DD>", "docs/development/prompts/reviewer-launch-run.md", "docs/development/prompts/request-builder-run.md"]
+    },
+    {
+      "label": "変更4fileのdigest固定",
+      "argv": ["shasum", "-a", "256", "tools/reviewer_launch/entry.py", "tools/request_builder/entry.py", "docs/development/prompts/reviewer-launch-run.md", "docs/development/prompts/request-builder-run.md"]
+    }
+  ]
+}

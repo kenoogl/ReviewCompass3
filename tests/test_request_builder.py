@@ -821,3 +821,43 @@ def test_assemble_existing_types_output_bytes_unchanged(repository):
         )
         == GOLDEN_COMPLETION_REVIEW_SHA256
     )
+
+
+def test_entry_assemble_defaults_date_and_repository(repository, monkeypatch):
+    entry = _entry()
+    monkeypatch.chdir(repository)
+    buffer = io.BytesIO()
+    exit_code = entry.main(
+        [
+            "assemble",
+            "--type",
+            "contract_review",
+            "--slug",
+            "defaults-probe-review",
+            "--title",
+            "既定値試験",
+            "--target",
+            "records/development/target-a.md",
+        ],
+        output=buffer,
+    )
+    assert exit_code == 0
+    result = json.loads(buffer.getvalue().decode("utf-8"))
+    from datetime import datetime
+
+    today = datetime.now().astimezone().date().isoformat()
+    assert today in result["record_relative_path"]
+
+
+def test_entry_check_defaults_repository(repository, monkeypatch):
+    entry = _entry()
+    relative = _ready_record(repository)
+    monkeypatch.chdir(repository)
+    buffer = io.BytesIO()
+    exit_code = entry.main(
+        ["check", "--request", relative],
+        output=buffer,
+    )
+    assert exit_code == 0
+    result = json.loads(buffer.getvalue().decode("utf-8"))
+    assert result["status"] == "ok"

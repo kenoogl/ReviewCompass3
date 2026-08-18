@@ -5,6 +5,8 @@
 """
 
 import sys
+from datetime import datetime
+from pathlib import Path
 
 from tools.bootstrap.immutable_result_store import canonical_json_bytes
 from tools.request_builder import core
@@ -20,10 +22,10 @@ def _stop(output, reason, source):
     )
 
 
-def _parse_flags(arguments, required, repeated=()):
+def _parse_flags(arguments, required, repeated=(), optional=()):
     values = {}
     lists = {flag: [] for flag in repeated}
-    known = set(required) | set(repeated)
+    known = set(required) | set(repeated) | set(optional)
     index = 0
     while index < len(arguments):
         flag = arguments[index]
@@ -86,17 +88,19 @@ def main(argv=None, *, output=None):
     if subcommand == "assemble":
         values = _parse_flags(
             selected_arguments[1:],
-            ("--repository", "--type", "--date", "--slug", "--title"),
+            ("--type", "--slug", "--title"),
             repeated=("--target",),
+            optional=("--repository", "--date"),
         )
         if values is None or not values["--target"]:
             _stop(selected_output, "invalid_arguments", "arguments")
             return 2
         try:
             result = core.assemble(
-                repository=values["--repository"],
+                repository=values.get("--repository") or str(Path.cwd()),
                 request_type=values["--type"],
-                record_date=values["--date"],
+                record_date=values.get("--date")
+                or datetime.now().astimezone().date().isoformat(),
                 slug=values["--slug"],
                 title=values["--title"],
                 target_paths=values["--target"],
@@ -111,14 +115,16 @@ def main(argv=None, *, output=None):
         return 0
     if subcommand == "check":
         values = _parse_flags(
-            selected_arguments[1:], ("--repository", "--request")
+            selected_arguments[1:],
+            ("--request",),
+            optional=("--repository",),
         )
         if values is None:
             _stop(selected_output, "invalid_arguments", "arguments")
             return 2
         try:
             result = core.check(
-                repository=values["--repository"],
+                repository=values.get("--repository") or str(Path.cwd()),
                 request_relative_path=values["--request"],
             )
         except core.BuilderStop as stop:
