@@ -1,0 +1,52 @@
+{
+ "content_digest": "4a3d3542c20af29c6543eb17133dcefb889643ad308c037cf91ec86f1511a5a4",
+ "plan_id": "FCRS-REVIEW-PLAN-DEFAULTS-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-review-plan-defaults-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "review_plan_target_commit_default",
+     "failure_behavior": [
+      "Gitで解決できない値は従来どおり停止する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "CLI引数（base-commit必須・target-commit任意）",
+      "cwdのGit状態"
+     ],
+     "outputs": [
+      "解決済みSHAを含む機械的レビュー計画（一行JSON）"
+     ],
+     "reference_paths": [
+      "tools/development/review_plan_cli.py",
+      "tools/development/review_plan.py",
+      "tools/development/formal_code_reuse_search.py"
+     ],
+     "reference_symbols": [
+      "tools/development/review_plan.py:build_review_plan"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "省略時のみ既定を使い明示引数を優先する",
+      "計画生成本体・schema・plan_sha256束縛を変えない",
+      "base-commit省略は従来どおりinput_invalidで停止する"
+     ],
+     "responsibility": "review-plan CLIのtarget-commitを省略時にHEADへ機械既定し、既存のgit rev-parse解決で計画出力へ解決済みSHAを固定する。base-commitは意味情報として必須のまま残す",
+     "symbol_terms": [
+      "target",
+      "commit",
+      "default",
+      "HEAD",
+      "resolve"
+     ]
+    }
+   ],
+   "subject": "review_plan_commit_defaults_v1"
+  }
+ ]
+}

@@ -1,0 +1,42 @@
+{
+ "title": "review-plan commit既定（対策3）事前走査の実測",
+ "entries": [
+  {
+   "label": "CLIの引数固定の現状",
+   "argv": [
+    "grep",
+    "-n",
+    "_FLAGS\\|len(_FLAGS)",
+    "tools/development/review_plan_cli.py"
+   ]
+  },
+  {
+   "label": "commit解決（rev-parse）の実装点",
+   "argv": [
+    "grep",
+    "-n",
+    "rev-parse\\|def _commit",
+    "tools/development/review_plan.py"
+   ]
+  },
+  {
+   "label": "保護試験の基線（決定的射影）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nr = subprocess.run(['.venv/bin/python3', '-m', 'pytest', 'tests/test_review_plan.py', '-q'], capture_output=True, text=True)\nprint('exit', r.returncode)\nprint(r.stdout.strip().splitlines()[-1].rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "対象fileのdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/development/review_plan_cli.py",
+    "tests/test_review_plan.py",
+    "docs/development/prompts/review-plan-run.md"
+   ]
+  }
+ ]
+}
