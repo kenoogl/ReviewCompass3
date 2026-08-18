@@ -36,13 +36,11 @@
 - [評価データ取得計画v1（全順序完了）](docs/development/2026-08-17-evaluation-data-acquisition-plan-v1.md) — SHA-256 `c666bdd7d0b5c44a8fbb876238a19c1d05ee245e693a2b104ceee514cdad55cb`
 - [全体見取り図（人向け全景。受入完了時にTODOと同時更新）](docs/current/reviewcompass3-overview-current.md) — SHA-256 `f53b12562a1cc5b8a6d296a7e7e3470e5b130210b2371a1303939f4c9b39500b`
 - [デプロイ方針Decision（論点1〜4の裁定・next型起点・訂正版P3）](records/development/2026-08-17-deployment-policy-decision-v1.md) — SHA-256 `ad3bbf84931f55d27c62e5243fede3fbfe2cc4c4d97cc87404ccab969e597671`
-- [レビュー基盤module開発の一時終了record（pending残件と再開の入口）](records/development/2026-08-17-review-tooling-module-pause-decision-v1.md) — SHA-256 `9b4d184f378d5dc8dad203caba5daf6b6e58b2471dd387187d5c5ede971cfd6c`
-- [文字列理解の失敗類型と対策原則（参照record・事前走査の必読入力）](records/development/2026-08-17-text-interpretation-failure-principles-reference-v1.md) — SHA-256 `ea482a3c7653b0966316012f43cc87ae426cdd5e429348a7f96c4e7f05ecd7b6`
-- [現行50要求を解決する要求権限束v2](records/requirements/authority/rc3-requirements-authority-2026-08-03--v2.json) — SHA-256 `760e33ea2ecf6937f56d7bf8d2bd703b18b47dbd2bd6b2bd5919e0dd556d9dae`
+- [測定ブロック完全性guard Evidence（観測→根因調査→二重実行guard・環境記録・事故実例で実証）](records/development/2026-08-18-measurement-block-integrity-guard-evidence-v1.md) — SHA-256 `0825a5defdbb771939728500822aa228705979b9e5c752cc8dda6e7a2c6252e0`
 
 ## 次に行う一作業
 
-**論文の共通部品（評価の表と図）の作成→WSSE 5頁版の起草**（執筆スレッド。計画v2 §2.3の順序）。数値は確定recordから転記し、転記後に機械照合する。開発スレッド側の選択肢：休止record §3のpending残件（縦C合議等）／運用集計v3（書式C表cell等＝v2 Evidence §6）／デプロイ版（合図＝他アプリ開発の開始決定）。機械化の単位1・2は完了済み。
+**論文の共通部品（評価の表と図）の作成→WSSE 5頁版の起草**（執筆スレッド。計画v2 §2.3の順序）。数値は確定recordから転記し、転記後に機械照合する。開発スレッド側の選択肢：**対策2再開（計画JSON writer。中断中・事前走査実測は完全版へ差し替え済み）**／休止record §3のpending残件（縦C合議等）／運用集計v3（書式C表cell等）／デプロイ版（合図待ち）。測定ブロックは非決定的欠落の観測→根因調査（下層の一過性・tool無実を機械確定）→**二重実行の完全性guard＋実行体・実行環境の機械記録**で強化済み（読み取り専用限定を要件化）。
 
 開始条件：
 
