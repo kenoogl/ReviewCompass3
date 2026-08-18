@@ -1,0 +1,51 @@
+{
+ "content_digest": "e741b4fe3e0a054f9c7916facdd1dde1db11dd1df78f6ddbd478d90794678f44",
+ "plan_id": "FCRS-OPERATIONAL-METRICS-V6-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-operational-metrics-v6-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "session_cost_timeline_and_missing_origin",
+     "failure_behavior": [
+      "timestampを解釈できないfileはduration_unrecognizedへ計上し推測しない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "保全先raw区画（読み取り専用・内容不転記）",
+      "records/developmentの判断recordとgit履歴"
+     ],
+     "outputs": [
+      "系統別コスト時系列集計と欠落由来counts（schema_version 6）"
+     ],
+     "reference_paths": [
+      "tools/evaluation/operational_metrics.py",
+      "tools/session_logs/record_run.py"
+     ],
+     "reference_symbols": [
+      "tools/evaluation/operational_metrics.py:collect_preservation_metrics"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "単一の解釈を全系統へ当てず厳密・緩い計数を別掲する",
+      "出力へ絶対path・ログ内容を含めない",
+      "既存集計欄の意味とdataset v1〜v5を変えない"
+     ],
+     "responsibility": "保全rawの系統dir別にfile数・行数・tool_use計数（厳密一致と部分一致を別掲）・先頭末尾timestamp差の合計を内容を転記せず機械集計し、束縛照合の欠落をgit履歴でmissing_deleted／missing_never／missing_absoluteへ分類する。時刻を解釈できないfileは件数として明示計上する",
+     "symbol_terms": [
+      "timeline",
+      "tool_use",
+      "timestamp",
+      "origin",
+      "missing"
+     ]
+    }
+   ],
+   "subject": "operational_metrics_v6"
+  }
+ ]
+}

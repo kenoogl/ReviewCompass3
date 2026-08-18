@@ -1,0 +1,30 @@
+{
+ "title": "運用集計v6（時系列復元・欠落由来）事前走査の実測",
+ "entries": [
+  {
+   "label": "raw区画の系統構成",
+   "argv": [
+    "ls",
+    "/Users/keno/.reviewcompass3/projects/reviewcompass3/development/sensitive/eventual-preservation/raw"
+   ]
+  },
+  {
+   "label": "系統別file数と行形の出現数（内容不読・件数のみ）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "from pathlib import Path\nroot = Path('/Users/keno/.reviewcompass3/projects/reviewcompass3/development/sensitive/eventual-preservation/raw')\nfor system_dir in sorted(p for p in root.iterdir() if p.is_dir()):\n    files = sorted(system_dir.rglob('*.jsonl'))\n    print(system_dir.name, 'files:', len(files))\n    if files:\n        sample = files[0]\n        text = sample.read_bytes()\n        print(' ', 'sample_lines:', text.count(b'\\n'))\n        for pattern in (b'\\\"type\\\":\\\"tool_use\\\"', b'\\\"type\\\": \\\"tool_use\\\"', b'tool_use', b'\\\"timestamp\\\"', b'function_call'):\n            print(' ', pattern.decode(), text.count(pattern))\n"
+   ]
+  },
+  {
+   "label": "装置と試験のdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/evaluation/operational_metrics.py",
+    "tests/test_operational_metrics.py"
+   ]
+  }
+ ]
+}
