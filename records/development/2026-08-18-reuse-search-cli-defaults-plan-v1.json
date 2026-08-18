@@ -1,0 +1,53 @@
+{
+ "content_digest": "09667b7500a5e1a885ace2570e05b901c7e633629a4325fb34088c9f0ae209d7",
+ "plan_id": "FCRS-REUSE-SEARCH-CLI-DEFAULTS-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-reuse-search-cli-defaults-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "cli_default_resolution",
+     "failure_behavior": [
+      "方針fileが1つも無いときは推測せず停止する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "実行機のhome directory",
+      ".reviewcompass/policies配下の版付き方針file名"
+     ],
+     "outputs": [
+      "既定runtime root",
+      "最新universe・freshness policyのpath"
+     ],
+     "reference_paths": [
+      "tools/development/formal_code_reuse_search.py",
+      "tools/common/roots.py",
+      "tools/session_logs/record_run.py"
+     ],
+     "reference_symbols": [
+      "tools/development/formal_code_reuse_search.py:main"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "版の比較は数値で行う（辞書順でv9をv10より新しいと誤らない）",
+      "解決不能は既存の停止規約（stopped＋reason・終了コード1）で止める",
+      "検索本体execute_formal_searchの挙動を変えない"
+     ],
+     "responsibility": "正式再利用検索CLIの保存先と方針fileを機械解決する。保存先はhome基準の既定値、方針fileは.reviewcompass/policies配下の数値最大版を選ぶ。手で組み立てた引数を不要にする",
+     "symbol_terms": [
+      "default",
+      "latest",
+      "policy",
+      "runtime",
+      "resolve"
+     ]
+    }
+   ],
+   "subject": "reuse_search_cli_defaults_v1"
+  }
+ ]
+}
