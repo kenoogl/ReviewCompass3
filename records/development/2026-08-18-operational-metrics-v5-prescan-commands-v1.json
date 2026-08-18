@@ -1,0 +1,39 @@
+{
+ "title": "運用集計v5（H4手動記入・コスト）事前走査の実測",
+ "entries": [
+  {
+   "label": "builder製依頼recordの母集団（機械欄digest表を持つfile）",
+   "argv": [
+    "grep",
+    "-rln",
+    "request_builder\\|依頼record",
+    "records/session-handoffs/"
+   ]
+  },
+  {
+   "label": "placeholder書式の実在数",
+   "argv": [
+    "grep",
+    "-rc",
+    "<<記入:",
+    "records/session-handoffs/"
+   ]
+  },
+  {
+   "label": "雛形のplaceholder定義の所在",
+   "argv": [
+    "grep",
+    "-rn",
+    "<<記入:",
+    "tools/request_builder/"
+   ]
+  },
+  {
+   "label": "セッションログ保全先の規模",
+   "argv": [
+    "ls",
+    "/Users/keno/.reviewcompass3/projects/reviewcompass3/development/sensitive/eventual-preservation"
+   ]
+  }
+ ]
+}
