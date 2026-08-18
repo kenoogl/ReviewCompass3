@@ -19,7 +19,7 @@
   `docs/development/2026-08-13-risk-proportional-verification-method-note-v1.md`を判断補助の入口とする。
   軽い作業へ重い確認を一律に強制せず、既存計画の必須レビューと承認境界を優先する。
 - 全景と進捗の俯瞰は`docs/current/reviewcompass3-overview-current.md`（全体見取り図。作業単位の
-  受入完了時にTODO更新と同時に状態だけ更新する）を使う。初期開発checklist
+  受入完了時に現在位置入口の更新と同時に状態だけ更新する）を使う。初期開発checklist
   （`docs/development/2026-08-03-initial-development-checklist.md`）は2026-08-17に凍結済みの
   時点記録であり、Work別詳細の参照にだけ使う。
 - `TODO_NEXT_SESSION.md`の読取・作成・更新・検証は`docs/development/prompts/todo-handoff-update.md`
