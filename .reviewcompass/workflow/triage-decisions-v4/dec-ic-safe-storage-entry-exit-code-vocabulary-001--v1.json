@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-SAFE-STORAGE-ENTRY-EXIT-CODE-VOCABULARY-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-19T06:14:54+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-safe-storage-entry-exit-code-vocabulary-001--v1.json",
+    "record_sha256": "bd3b6c9d9b081e053f7f02bf29e81c4b94d7d92d4537d58fac8dc2f1a166d9e0",
+    "candidate_id": "IC-SAFE-STORAGE-ENTRY-EXIT-CODE-VOCABULARY-001",
+    "candidate_content_digest": "fa3ae5b1107d5d2b8306af50eb9c8fe6f81c5e446856f663c557bd97158425a2"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "low",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "checkpoint",
+  "blocking": false,
+  "rationale": "承認文言「checkpointで採用。合図はWSSE初稿完了後の開発枠」（2026-08-19 chat）。対象は導入コマンドreviewcompass3-session-artifact-storageの外向き終了コードだが、値を読む消費側は現在ゼロ（値結合は自リポジトリの保護試験8箇所のみ・手順書記載なし・契約文書の値固定なし——裁定材料の機械実測）で、実害は現在化していない。一方で「同じ数字が逆向きの意味」（部分成功の生の3と共通語彙の3=対象なし、停止の4と共通語彙の4=非対応）という再発点が導入コマンド1つに残るため、対応自体は採用する。論文（WSSE 2026・締切2026-08-30）が全体の急所であるため、いま開発枠を使わずcheckpointとする。未解消かつread_only_entryに続く同型2件目のためunresolved・recurrenceは真、実害が現在化していないためimpact・priorityはlow、現行Workを止める性質ではないためblockingは偽とする。Issueへの昇格はせず候補台帳で管理する。",
+  "next_action": "WSSE 5頁版初稿の完了後、最初の開発枠で範囲固定文書（軽量作業票＋事前走査）を立てて統合を実施する（2026-08-19のread_only_entry統合と同型）。scope＝StorageIncomplete（生の3）とEXIT_STOPPED=4の値決定・消費側の機械確認・値一致pin試験の追加可否。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "9fe440c77322de071ae41c8ba2456810ced4bf70fcf041d23a5398acc37cfd22"
+}
