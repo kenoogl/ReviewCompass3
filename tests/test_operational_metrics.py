@@ -1,0 +1,120 @@
+"""運用集計コマンド（順序5）の固定。launch実測の分計と承認点分布。
+
+lifecycle: provisional
+normative_status: non-normative
+promotion_required: true
+"""
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _write_launch(root, name, document):
+  directory = root / name
+  directory.mkdir()
+  (directory / "launch.json").write_text(
+    json.dumps(document), encoding="utf-8"
+  )
+
+
+def _make_stores(tmp_path):
+  launch_root = tmp_path / "launch"
+  launch_root.mkdir()
+  records_root = tmp_path / "records"
+  records_root.mkdir()
+  _write_launch(
+    launch_root, "run-a", {"elapsed_seconds": 10.0, "prompt_bytes": 100}
+  )
+  _write_launch(
+    launch_root, "run-b", {"elapsed_seconds": 30.0, "prompt_bytes": 300}
+  )
+  _write_launch(launch_root, "run-c", {"model": "x"})
+  broken = launch_root / "run-d"
+  broken.mkdir()
+  (broken / "launch.json").write_text("{", encoding="utf-8")
+  (records_root / "2026-08-01-a-decision-v1.md").write_text(
+    "- 承認文言：「進めて」", encoding="utf-8"
+  )
+  (records_root / "2026-08-01-b-decision-v1.md").write_text(
+    "- 承認文言（逐語）：「実施」", encoding="utf-8"
+  )
+  (records_root / "2026-08-02-c-evidence-v1.md").write_text(
+    "記録のみ", encoding="utf-8"
+  )
+  return launch_root, records_root
+
+
+def test_launch_metrics_partitions_and_stats(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  launch_root, _ = _make_stores(tmp_path)
+  result = operational_metrics.collect_launch_metrics(launch_root)
+  assert result["instrumented_count"] == 2
+  assert result["legacy_count"] == 1
+  assert result["skipped_count"] == 1
+  assert result["elapsed_seconds"]["total"] == 40.0
+  assert result["elapsed_seconds"]["median"] == 20.0
+  assert result["prompt_bytes"]["max"] == 300
+
+
+def test_approval_metrics_by_date(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  _, records_root = _make_stores(tmp_path)
+  result = operational_metrics.collect_approval_metrics(records_root)
+  assert result["record_count"] == 2
+  assert result["by_date"] == {"2026-08-01": 2}
+
+
+def test_run_emits_single_line_json(tmp_path, capsys):
+  from tools.evaluation import operational_metrics
+
+  launch_root, records_root = _make_stores(tmp_path)
+  exit_code = operational_metrics.run((
+    "--launch-root", str(launch_root),
+    "--records-root", str(records_root),
+  ))
+  captured = capsys.readouterr().out
+  assert exit_code == 0
+  assert captured.count("\n") == 1
+  document = json.loads(captured)
+  assert document["status"] == "ok"
+  assert document["launch"]["instrumented_count"] == 2
+  assert document["approvals"]["record_count"] == 2
+
+
+def test_run_rejects_missing_root(tmp_path, capsys):
+  from tools.evaluation import operational_metrics
+
+  exit_code = operational_metrics.run((
+    "--launch-root", str(tmp_path / "missing"),
+    "--records-root", str(tmp_path),
+  ))
+  document = json.loads(capsys.readouterr().out)
+  assert exit_code == 2
+  assert document["status"] == "input_invalid"
+
+
+def test_module_entry_runs(tmp_path):
+  launch_root, records_root = _make_stores(tmp_path)
+  completed = subprocess.run(
+    [
+      sys.executable,
+      "-m",
+      "tools.evaluation.operational_metrics",
+      "--launch-root",
+      str(launch_root),
+      "--records-root",
+      str(records_root),
+    ],
+    cwd=PROJECT_ROOT,
+    capture_output=True,
+    text=True,
+    timeout=60,
+  )
+  assert completed.returncode == 0
+  assert json.loads(completed.stdout)["status"] == "ok"
