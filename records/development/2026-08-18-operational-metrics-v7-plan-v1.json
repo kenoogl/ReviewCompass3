@@ -1,0 +1,54 @@
+{
+ "content_digest": "478619c9941ed119ce64763acacc81c8c4de22636c568c29f83319068076340a",
+ "plan_id": "FCRS-OPERATIONAL-METRICS-V7-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-operational-metrics-v7-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "system_identity_toolcall_normalization_activity_time",
+     "failure_behavior": [
+      "labelを同定できないdirへ規則を当てず正規化計数をnullにする",
+      "負間隔・時刻なし行・解釈不能行は明示計上し推測しない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "保全先raw区画（読み取り専用・内容不転記）",
+      "保全設定（record_runのDEFAULT_SYSTEMS）とnamespace導出"
+     ],
+     "outputs": [
+      "系統意味づけ・正規化道具計数・活動時間bucket（schema_version 7）"
+     ],
+     "reference_paths": [
+      "tools/evaluation/operational_metrics.py",
+      "tools/session_logs/record_run.py",
+      "tools/session_logs/eventual_preservation.py"
+     ],
+     "reference_symbols": [
+      "tools/evaluation/operational_metrics.py:collect_cost_metrics",
+      "tools/session_logs/eventual_preservation.py:_namespace"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "出力へ絶対path・ログ内容を含めない",
+      "既存集計欄の意味とdataset v1〜v6を変えない",
+      "道具呼び出しは各系統の正準位置の構造計数だけを正とする"
+     ],
+     "responsibility": "保全rawの系統dirを保全設定のnamespace導出で機械照合してlabelを与え、道具呼び出しをClaude=message.content[].type、Codex=response_item×payload.typeの正準位置で構造計数し、隣接timestamp間隔から固定bucket分布と窓付き活動時間を内容を転記せず機械集計する",
+     "symbol_terms": [
+      "namespace",
+      "identity",
+      "tool_call",
+      "activity",
+      "gap"
+     ]
+    }
+   ],
+   "subject": "operational_metrics_v7"
+  }
+ ]
+}
