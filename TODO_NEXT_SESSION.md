@@ -16,27 +16,14 @@
 
 ## 最新のauthority／Evidence
 
-- [既定値化の横展開Evidence（launch・builderのCLI既定・run-id裁定・測定ブロック全面適用）](records/development/2026-08-18-cli-defaults-rollout-evidence-v1.md) — SHA-256 `15e54a475e5f7d88ed400b3be0de234ba1d6f37501a81a9eb5f4c4f062e9631a`
-- [LLM／機械分担の精査record（手順書8件・残る手作業の類型と対策1〜3）](records/development/2026-08-18-llm-machine-split-audit-v1.md) — SHA-256 `4b191e098a100abcb243e66e3c070157e3055c7e10f169513acaf14513c1cbbc`
-- [運用規範のrepo移設判断record（メモリ→AGENTS §2・§3＋手順書。5規範の由来つき）](records/development/2026-08-18-agents-norm-transfer-decision-v1.md) — SHA-256 `4c6ee238d174a480fdece459c49152ed6067fab6ee79a7a9effd31b41f4ac998`
-- [測定ブロックtool Evidence（転記排除・dogfooding・fence耐性・手順書改定）](records/development/2026-08-18-measurement-block-evidence-v1.md) — SHA-256 `58a553c9480f59aa72aa816146320908707779b5fd98a946e087d5ccf3f4ade6`
-- [検索CLI引数廃止Evidence（既定値・数値最大版解決・手順書縮小・効果）](records/development/2026-08-18-reuse-search-cli-defaults-evidence-v1.md) — SHA-256 `fa5a153121beca9020d1fdbf76e008b1ee287c86348361bb19d30f42797438df`
-- [運用集計v2 Evidence（H5束縛照合・承認点欄形式・自己言及の記録・v3繰り越し）](records/development/2026-08-18-operational-metrics-v2-evidence-v1.md) — SHA-256 `34a62366f14d1d9651e1abf361da8898d051156cde0d06c34437ca896fedddde`
-- [運用集計dataset v2（束縛268組：一致208・不一致59・欠落1／承認点49・欄形式35）](records/development/2026-08-18-operational-metrics-dataset-v2.json) — SHA-256 `d39fbf1f641ae426a63736856cb99d7c3e02620894aae517c6c7e13ee476c0fd`
-- [運用集計Evidence（装置新設・実測の要旨・母数訂正の手戻り記録・v2繰り越し）](records/development/2026-08-18-operational-metrics-evidence-v1.md) — SHA-256 `e7a46f56ee3fcfc573e0947ac1845e5f2a9e916399976800b6c132225fc4d4de`
-- [運用集計dataset v1（H4 launch実測30件・H7承認点47件の機械集計）](records/development/2026-08-18-operational-metrics-dataset-v1.json) — SHA-256 `6a85d7d87239bdc17afbad3459c9bdca52d1402cbfc0137039388fb3619cdd25`
-- [roots.py指紋pin追加の判断record（状態固定試験の対象限定再開・復帰まで）](records/development/2026-08-18-roots-module-pin-addition-decision-v1.md) — SHA-256 `9765b6d52f317c0b6105ca19eeee1fb9e88e1146bb6a868b7665e40e89286461`
-- [配置依存3箇所の解消Evidence（roots.py一元化・RED/GREEN・証明書・作業票と事前走査への入口）](records/development/2026-08-18-placement-root-resolution-evidence-v1.md) — SHA-256 `28f734cfa1579b91e93de75e95af13d8dce91f6a77441b1229051a1badcd19e7`
-- [RQ2採点7語彙の形式判断record（案B確定・正本の所在表・v3の合図）](records/development/2026-08-18-rq2-answer-key-vocabulary-format-decision-v1.md) — SHA-256 `63f74966614251c1ad6a268cb021099df783a591e7149bf2b32086cd228825a9`
+（規準：次の一作業の固定入力と判断待ちのauthorityに限る。完了単位の記録は見取り図とgit履歴が正本——todo-handoff-update.md手順4）
+
 - [論文執筆計画v2（章立て・データ台帳・投稿先WSSE 2026・二本立て・執筆体制の分担規則）](docs/paper/2026-08-18-paper-outline-and-data-inventory-v2.md) — SHA-256 `c87f4e7bcce5d134dd7f722041df95ace781b5769b25faec99db4c95e86f68de`
 - [RQ2 paired trial実行Evidence（§11に裁定後の確定集計を追記）](records/development/2026-08-17-rq2-paired-trial-evidence-v1.md) — SHA-256 `c6dbfa836866524b41edcd156e24b7cd39cec615110a0a9c1c793713a8b5522f`
 - [RQ2裁定・議論・副産物v2（論文データ一式の表・7語彙・主題適中率）](records/development/2026-08-18-rq2-adjudication-and-byproducts-v2.md) — SHA-256 `f4191636ea1ee701b3fbc29f42a24e0860afd3c81633a5bb543215777134a152`
 - [RQ2生データ（31実行の機械記録）](records/development/2026-08-18-rq2-paired-trial-dataset-v1.json) — SHA-256 `d34ecd24a8d87c49e5b50f4ae204295841622ea12c34886e29dba5a32c85b893`
-- [副産物4件の仕分け判断record（委任実施・全4件対処済み）](records/development/2026-08-18-rq2-byproduct-candidates-triage-decision-v1.md) — SHA-256 `86ec0e3a5aa064d4f929970a1e576bffc31c387c02e221a555e733d39280cbcf`
-- [評価データ取得計画v1（全順序完了）](docs/development/2026-08-17-evaluation-data-acquisition-plan-v1.md) — SHA-256 `c666bdd7d0b5c44a8fbb876238a19c1d05ee245e693a2b104ceee514cdad55cb`
+- [運用集計dataset v2（従軸の最新固定版：H4 launch実測・H5束縛照合・H7承認点）](records/development/2026-08-18-operational-metrics-dataset-v2.json) — SHA-256 `d39fbf1f641ae426a63736856cb99d7c3e02620894aae517c6c7e13ee476c0fd`
 - [全体見取り図（人向け全景。受入完了時にTODOと同時更新）](docs/current/reviewcompass3-overview-current.md) — SHA-256 `f53b12562a1cc5b8a6d296a7e7e3470e5b130210b2371a1303939f4c9b39500b`
-- [デプロイ方針Decision（論点1〜4の裁定・next型起点・訂正版P3）](records/development/2026-08-17-deployment-policy-decision-v1.md) — SHA-256 `ad3bbf84931f55d27c62e5243fede3fbfe2cc4c4d97cc87404ccab969e597671`
-- [測定ブロック完全性guard Evidence（観測→根因調査→二重実行guard・環境記録・事故実例で実証）](records/development/2026-08-18-measurement-block-integrity-guard-evidence-v1.md) — SHA-256 `0825a5defdbb771939728500822aa228705979b9e5c752cc8dda6e7a2c6252e0`
 
 ## 次に行う一作業
 

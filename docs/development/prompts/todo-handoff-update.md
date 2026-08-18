@@ -11,7 +11,9 @@
    `tools/development/todo_handoff_projection.py`から現在projectionを生成する。
 4. 現在位置、active Issue 1件、最新authority／EvidenceのpathとDigest、次の一作業、blocker、
    Human判断待ち、stale／deferred、Git／Testだけを現在値へ置き換える。過去session、完了Claim、
-   手戻り詳細を累積しない。詳細は固定sourceを持つCandidate／Issue／Evidenceへ保存する。
+   手戻り詳細を累積しない。**Evidence欄は「次の一作業の固定入力」と「判断待ちのauthority」に
+   限る**。完了した作業単位の記録は見取り図とgit履歴を正本とし、TODOへ行を足さない
+   （2026-08-18利用者裁定。累積が12,288byte上限衝突の主因だった）。詳細は固定sourceを持つCandidate／Issue／Evidenceへ保存する。
    作業単位の受入完了を反映する更新では、全体見取り図
    （`docs/current/reviewcompass3-overview-current.md`）の該当する状態欄も同時に更新する
    （状態語彙のみ・詳細を書かない）。
