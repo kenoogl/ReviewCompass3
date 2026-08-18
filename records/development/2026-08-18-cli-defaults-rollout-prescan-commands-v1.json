@@ -1,0 +1,29 @@
+{
+  "title": "既定値化の横展開（reviewer-launch・request-builder）事前走査の実測",
+  "entries": [
+    {
+      "label": "reviewer_launchの引数定義の所在",
+      "argv": ["grep", "-rn", "add_argument", "tools/reviewer_launch/"]
+    },
+    {
+      "label": "request_builderの引数定義の所在",
+      "argv": ["grep", "-rn", "add_argument", "tools/request_builder/"]
+    },
+    {
+      "label": "reviewer_launchのprivate_root既定の現状",
+      "argv": ["grep", "-rn", "private_root", "tools/reviewer_launch/entry.py"]
+    },
+    {
+      "label": "request_builderのdate・repository受け取りの現状",
+      "argv": ["grep", "-rn", "date\\|repository", "tools/request_builder/entry.py"]
+    },
+    {
+      "label": "両CLIの保護試験fileの一覧",
+      "argv": ["grep", "-rln", "reviewer_launch\\|request_builder", "tests/"]
+    },
+    {
+      "label": "私有領域の実run-id命名の実態",
+      "argv": ["ls", "/Users/keno/.reviewcompass3-private/reviewer-launch"]
+    }
+  ]
+}

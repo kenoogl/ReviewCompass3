@@ -1,0 +1,17 @@
+{
+  "title": "既定値化の横展開 事前走査の補助実測（digest・既存試験の固定点）",
+  "entries": [
+    {
+      "label": "対象2fileのdigest固定",
+      "argv": ["shasum", "-a", "256", "tools/reviewer_launch/entry.py", "tools/request_builder/entry.py", "docs/development/prompts/reviewer-launch-run.md", "docs/development/prompts/request-builder-run.md"]
+    },
+    {
+      "label": "reviewer_launch試験の引数欠落固定点",
+      "argv": ["grep", "-n", "invalid_arguments\\|private-root\\|--repository", "tests/test_reviewer_launch.py"]
+    },
+    {
+      "label": "request_builder試験の引数欠落固定点",
+      "argv": ["grep", "-n", "invalid_arguments\\|--date\\|--repository", "tests/test_request_builder.py"]
+    }
+  ]
+}

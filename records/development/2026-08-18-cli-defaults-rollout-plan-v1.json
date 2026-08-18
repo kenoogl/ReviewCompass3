@@ -1,0 +1,52 @@
+{
+ "content_digest": "a168e7755ca21a5773932090718a23e4e2ea53652f4fdd30a1df61525c08becb",
+ "plan_id": "FCRS-CLI-DEFAULTS-ROLLOUT-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-cli-defaults-rollout-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "cli_argument_default_resolution_rollout",
+     "failure_behavior": [
+      "既定で解決できない値は従来どおりinvalid_argumentsで停止する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "実行機のhomeとcwd",
+      "機械の当日日付"
+     ],
+     "outputs": [
+      "既定解決されたCLI引数値"
+     ],
+     "reference_paths": [
+      "tools/reviewer_launch/entry.py",
+      "tools/request_builder/entry.py",
+      "tools/development/formal_code_reuse_search.py"
+     ],
+     "reference_symbols": [
+      "tools/development/formal_code_reuse_search.py:default_runtime_root"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "省略時のみ既定を使い、明示引数を常に優先する",
+      "G30登録形（check --input-root）と安全境界・判定・schemaを変えない",
+      "repository既定はcwd（pip導入後の対象アプリで正しい側）"
+     ],
+     "responsibility": "reviewer-launchとrequest-builderのCLI入口で、正準path（私有領域保存先）・repository・日付を機械既定で解決し、手組み立て引数を不要にする。束縛系（request・expected-sha256）と意味系（run-id・slug・title・type）は変えない",
+     "symbol_terms": [
+      "default",
+      "resolve",
+      "private",
+      "repository",
+      "date"
+     ]
+    }
+   ],
+   "subject": "cli_defaults_rollout_v1"
+  }
+ ]
+}
