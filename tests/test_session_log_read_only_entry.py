@@ -62,7 +62,7 @@ def _run(entry, capsys, raw_root, raw_log):
                     "message": {"role": "user", "content": "ignored"},
                 },
             ),
-            3,
+            4,
             "partial",
             None,
         ),
@@ -76,7 +76,7 @@ def _run(entry, capsys, raw_root, raw_log):
                     "content": "value=A9fK2mQ7xR4vT8pL3nC6sW1yH5jD0bZ",
                 },
             },),
-            4,
+            5,
             "stopped",
             "sensitive_data_remaining",
         ),
@@ -228,7 +228,7 @@ def test_returns_only_safe_parse_issue_fields(tmp_path, capsys, monkeypatch):
         raw_log.resolve(),
     )
 
-    assert exit_code == 3
+    assert exit_code == 4
     assert result["status"] == "partial"
     assert result["parse_issues"] == [{
         "block_index": -1,
@@ -266,7 +266,7 @@ def test_rejects_source_outside_root_before_reading(
         raw_log.absolute(),
     )
 
-    assert exit_code == 4
+    assert exit_code == 5
     assert result == {
         "error": "source_outside_root",
         "external_send_approved": False,
@@ -309,7 +309,7 @@ def test_stops_without_returning_unsafe_content(
         raw_log.resolve(),
     )
 
-    assert exit_code == 4
+    assert exit_code == 5
     assert result == {
         "error": reason,
         "external_send_approved": False,
@@ -332,7 +332,7 @@ def test_rejects_unknown_format_without_input_details(tmp_path, capsys):
         raw_log.resolve(),
     )
 
-    assert exit_code == 4
+    assert exit_code == 5
     assert result == {
         "error": "unsupported_source",
         "external_send_approved": False,
@@ -349,3 +349,14 @@ def test_pyproject_registers_the_installed_entry():
     assert document["project"]["scripts"]["reviewcompass3-session-artifact"] == (
         "tools.session_logs.read_only_entry:main"
     )
+
+
+def test_exit_codes_match_shared_vocabulary():
+    # 部分系共通の語彙（cli.py）との値一致を機械固定する。
+    # partial=非対応（4）・stopped=失敗（5）。独自値の再導入をここで検出する。
+    entry = _entry()
+    cli = importlib.import_module("tools.session_logs.cli")
+
+    assert entry.EXIT_OK == cli.EXIT_OK == 0
+    assert entry.EXIT_UNSUPPORTED == cli.EXIT_UNSUPPORTED == 4
+    assert entry.EXIT_FAILED == cli.EXIT_FAILED == 5

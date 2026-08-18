@@ -1,0 +1,44 @@
+{
+ "title": "read_only_entry終了コード統合 受入確認の実測",
+ "entries": [
+  {
+   "label": "session系全試験の機械列挙実行（決定的射影）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nfrom pathlib import Path\nfiles = sorted(\n    str(path)\n    for pattern in (\n        'test_session_log*.py',\n        'test_session_artifact*.py',\n        'test_redaction*.py',\n        'test_session_bootstrap_e2e.py',\n    )\n    for path in Path('tests').glob(pattern)\n)\nprint('files', len(files))\nresult = subprocess.run(\n    ['.venv/bin/python3', '-m', 'pytest', '-q', *files],\n    capture_output=True,\n    text=True,\n)\nprint('exit', result.returncode)\nprint(result.stdout.strip().splitlines()[-1].rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "統合後の3入口の終了コード定数行（語彙一致の機械転記）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "from pathlib import Path\ntargets = (\n    'tools/session_logs/cli.py',\n    'tools/session_logs/read_only_entry.py',\n    'tools/session_logs/eventual_preservation.py',\n)\nfor target in targets:\n    print(target)\n    for number, line in enumerate(\n        Path(target).read_text(encoding='utf-8').splitlines(), start=1\n    ):\n        stripped = line.strip()\n        if stripped.startswith('EXIT_') and '=' in stripped:\n            print(' ', number, stripped)\n"
+   ]
+  },
+  {
+   "label": "変更fileと消費側のdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/session_logs/read_only_entry.py",
+    "tools/session_logs/safe_storage_entry.py",
+    "tests/test_session_log_read_only_entry.py",
+    "tests/test_session_artifact_safe_storage_entry.py"
+   ]
+  },
+  {
+   "label": "RQ2封緘材料の無変更（tracked差分なし＝出力空が合格）",
+   "argv": [
+    "git",
+    "diff",
+    "--name-only",
+    "--",
+    "docs/evaluation/rq2-cases",
+    "records/development/2026-08-17-rq2-case-answer-key-v2.md"
+   ]
+  }
+ ]
+}

@@ -162,7 +162,7 @@ def test_four_operations_use_one_json_entry_without_private_output(
 
 @pytest.mark.parametrize(
     ("source_exit_code", "source_status"),
-    ((3, "partial"), (4, "stopped")),
+    ((4, "partial"), (5, "stopped")),
 )
 def test_store_rejects_non_ok_source_without_forwarding_source_result(
     tmp_path,

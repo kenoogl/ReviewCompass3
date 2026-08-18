@@ -22,8 +22,8 @@ from tools.session_logs.source_adapter import UnsupportedSourceKind
 
 
 EXIT_OK = 0
-EXIT_PARTIAL = 3
-EXIT_STOPPED = 4
+EXIT_UNSUPPORTED = 4
+EXIT_FAILED = 5
 
 _POSIX_ABSOLUTE_PATH = re.compile(
     r"(?<![A-Za-z0-9._~/-])/(?:[^/\s\"'<>]+/)*[^/\s\"'<>]+"
@@ -172,17 +172,17 @@ def prepare_safe_result(raw_root, raw_log):
         )
         result = _safe_result(artifact)
     except EntryStop as error:
-        return EXIT_STOPPED, _stopped(error.reason)
+        return EXIT_FAILED, _stopped(error.reason)
     except SensitiveDataRemaining:
-        return EXIT_STOPPED, _stopped("sensitive_data_remaining")
+        return EXIT_FAILED, _stopped("sensitive_data_remaining")
     except UnsupportedSourceKind:
-        return EXIT_STOPPED, _stopped("unsupported_source")
+        return EXIT_FAILED, _stopped("unsupported_source")
     except (OSError, ParseError, UnicodeError):
-        return EXIT_STOPPED, _stopped("unreadable_source")
+        return EXIT_FAILED, _stopped("unreadable_source")
     except Exception:
-        return EXIT_STOPPED, _stopped("internal_error")
+        return EXIT_FAILED, _stopped("internal_error")
 
-    exit_code = EXIT_PARTIAL if result["status"] == "partial" else EXIT_OK
+    exit_code = EXIT_UNSUPPORTED if result["status"] == "partial" else EXIT_OK
     return exit_code, result
 
 
