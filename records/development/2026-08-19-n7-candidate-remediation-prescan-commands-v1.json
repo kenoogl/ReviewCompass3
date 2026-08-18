@@ -1,0 +1,45 @@
+{
+ "title": "N7未充足候補4件の是正 事前走査の実測",
+ "entries": [
+  {
+   "label": "4候補の規定形とのずれ・出所束縛の生存（機械診断）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import hashlib\nimport json\nfrom pathlib import Path\ntargets = [\".reviewcompass/workflow/improvement-candidates/ic-contract-014-canonical-sequence-gaps-001--v1.json\", \".reviewcompass/workflow/improvement-candidates/ic-launch-metrics-acceptance-title-001--v1.json\", \".reviewcompass/workflow/improvement-candidates/ic-session-log-exit-code-doc-drift-001--v1.json\", \".reviewcompass/workflow/improvement-candidates/ic-session-log-exit-code-vocabulary-001--v1.json\"]\nconfig = json.load(open('config/development-issue-resolution-pilot-v3.json', encoding='utf-8'))\nexpected = set(config['record_fields']['improvement_candidate'])\nallowed_classifications = set(config['classification_candidates'])\nallowed_routes = set(config['dispositions'])\nfor target in targets:\n    document = json.loads(Path(target).read_text(encoding='utf-8'))\n    print(Path(target).name)\n    print('  extra_fields', sorted(set(document) - expected))\n    print('  missing_fields', sorted(expected - set(document)))\n    source = document.get('source_identity', {})\n    print('  source_identity_keys', sorted(source))\n    print('  invalid_classifications', sorted(set(document.get('classification_candidates', [])) - allowed_classifications))\n    print('  invalid_routes', sorted(set(document.get('route_candidates', [])) - allowed_routes))\n    source_path = Path(str(source.get('path', '')))\n    exists = source_path.is_file()\n    print('  source_exists', exists)\n    if exists:\n        digest = hashlib.sha256(source_path.read_bytes()).hexdigest()\n        print('  source_sha256_matches', digest == source.get('sha256'))\n    refs = document.get('evidence_refs', [])\n    for reference in refs:\n        ref_path = Path(str(reference.get('path', '')))\n        ok = ref_path.is_file() and hashlib.sha256(ref_path.read_bytes()).hexdigest() == reference.get('sha256')\n        print('  evidence_ref', ref_path.name, 'binding_ok', ok)\n"
+   ]
+  },
+  {
+   "label": "4候補の登録履歴（初回commit・改版数）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\ntargets = [\".reviewcompass/workflow/improvement-candidates/ic-contract-014-canonical-sequence-gaps-001--v1.json\", \".reviewcompass/workflow/improvement-candidates/ic-launch-metrics-acceptance-title-001--v1.json\", \".reviewcompass/workflow/improvement-candidates/ic-session-log-exit-code-doc-drift-001--v1.json\", \".reviewcompass/workflow/improvement-candidates/ic-session-log-exit-code-vocabulary-001--v1.json\"]\nfor target in targets:\n    completed = subprocess.run(\n        ['git', 'log', '--format=%h %ad', '--date=short', '--reverse', '--', target],\n        capture_output=True,\n        text=True,\n    )\n    lines = completed.stdout.strip().splitlines()\n    first = lines[0] if lines else '(履歴なし)'\n    print(target.rsplit('/', 1)[-1], '初回commit', first, '改版数', len(lines))\n"
+   ]
+  },
+  {
+   "label": "N7の現在状態（是正前RED・exit 1が現状）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nresult = subprocess.run(\n    ['.venv/bin/python3', '-m', 'pytest', '-q',\n     'tests/test_issue_intake_v4_single_candidate.py::test_n7_all_candidate_records_validate_or_are_allowlisted'],\n    capture_output=True,\n    text=True,\n)\nprint('exit', result.returncode)\nprint(result.stdout.strip().splitlines()[-1].rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "対象4候補・allowlist・検証器・試験のdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    ".reviewcompass/workflow/improvement-candidates/ic-contract-014-canonical-sequence-gaps-001--v1.json",
+    ".reviewcompass/workflow/improvement-candidates/ic-launch-metrics-acceptance-title-001--v1.json",
+    ".reviewcompass/workflow/improvement-candidates/ic-session-log-exit-code-doc-drift-001--v1.json",
+    ".reviewcompass/workflow/improvement-candidates/ic-session-log-exit-code-vocabulary-001--v1.json",
+    ".reviewcompass/workflow/improvement-candidates/historical-allowlist-v1.json",
+    "config/development-issue-resolution-pilot-v3.json",
+    "tools/development/issue_resolution_pilot.py",
+    "tests/test_issue_intake_v4_single_candidate.py"
+   ]
+  }
+ ]
+}

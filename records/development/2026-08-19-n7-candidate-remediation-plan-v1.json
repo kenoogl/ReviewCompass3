@@ -1,0 +1,54 @@
+{
+ "content_digest": "d641abee2f0f1cc8f48c8b00d2e62fdece438599677e574e65af72754bb9a8ee",
+ "plan_id": "FCRS-N7-CANDIDATE-REMEDIATION-2026-08-19-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-19-n7-candidate-remediation-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "ledger_candidate_form_remediation",
+     "failure_behavior": [
+      "検証器不合格の再生成結果はcommitせず停止する",
+      "意味内容の欄（problem・impact・scope等）の値を作り変えない（移記と置換表以外）"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "未充足候補4件の現行JSON（意味内容・出所束縛は生存）",
+      "改善候補の規定形（config v3のrecord_fieldsと語彙）"
+     ],
+     "outputs": [
+      "v3検証器に合格する正規形の候補4件（意味内容保存・digest正準再計算）"
+     ],
+     "reference_paths": [
+      "tools/development/issue_resolution_pilot.py",
+      "tools/common/digests.py",
+      "tests/test_issue_intake_v4_single_candidate.py"
+     ],
+     "reference_symbols": [
+      "tools/development/issue_resolution_pilot.py:validate_record_file",
+      "tools/common/digests.py:canonical_content_digest"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "候補の意味内容・仕分け結果・出所束縛を変えない",
+      "再生成は機械処理で行い各fileを正規検証器の単独合格で確認する",
+      "保護試験N7を赤から緑へ（試験自体は変更しない）"
+     ],
+     "responsibility": "検証器を通さず登録された候補record 4件を、意味内容を保存したまま規定形へ機械再生成し（余分欄の本文移記・無効分類の対応表置換・digest正準再計算）、正規検証器と保護試験N7の合格で台帳の機械検証可能性を回復する",
+     "symbol_terms": [
+      "candidate",
+      "validate",
+      "canonical",
+      "digest",
+      "ledger"
+     ]
+    }
+   ],
+   "subject": "n7_candidate_remediation"
+  }
+ ]
+}
