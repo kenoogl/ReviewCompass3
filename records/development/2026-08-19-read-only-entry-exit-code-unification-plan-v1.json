@@ -1,0 +1,55 @@
+{
+ "content_digest": "f340475a1eda9063be8f381d78a5734256a5df9ed481e354e168360c4941d3c4",
+ "plan_id": "FCRS-READ-ONLY-ENTRY-EXIT-CODE-2026-08-19-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-19-read-only-entry-exit-code-unification-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "read_only_entry_exit_code_unification",
+     "failure_behavior": [
+      "停止系は引き続きfail-closed（安全に結果を返せないときはstoppedのJSONと失敗コード）",
+      "値一致pin試験の不一致は実装不合格として停止する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "read_only_entryの現行終了コード（partial=3・stopped=4）",
+      "部分系共通の終了コード語彙（cli.pyの定数）"
+     ],
+     "outputs": [
+      "共通語彙へ揃えた終了コード（ok=0・partial=4・stopped=5）と値一致pin試験"
+     ],
+     "reference_paths": [
+      "tools/session_logs/read_only_entry.py",
+      "tools/session_logs/cli.py",
+      "tools/session_logs/eventual_preservation.py",
+      "tools/session_logs/safe_storage_entry.py"
+     ],
+     "reference_symbols": [
+      "tools/session_logs/read_only_entry.py:prepare_safe_result",
+      "tools/session_logs/eventual_preservation.py:run"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "終了コードの値以外の挙動（JSON出力・安全境界）を変えない",
+      "消費側gate（0以外は転送せず停止）の意味を保つ",
+      "cli.py語彙との値一致を試験で機械固定する"
+     ],
+     "responsibility": "読み取り専用入口read_only_entryの終了コードを部分系共通の語彙（0=ok・4=非対応partial・5=失敗stop）へ揃え、独自語彙の並存と同一数字の逆向き意味を解消し、値一致を試験で機械固定する。JSON出力と安全境界は変えない",
+     "symbol_terms": [
+      "exit",
+      "partial",
+      "stopped",
+      "unsupported",
+      "failed"
+     ]
+    }
+   ],
+   "subject": "read_only_entry_exit_code_unification"
+  }
+ ]
+}
