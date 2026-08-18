@@ -1,0 +1,54 @@
+{
+ "content_digest": "4e54b5710554f7579b75f3834d052bf0f449cc04f7095b48d9d9e1012964ab00",
+ "plan_id": "FCRS-MEASUREMENT-BLOCK-INTEGRITY-GUARD-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-measurement-block-integrity-guard-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "double_run_integrity_guard",
+     "failure_behavior": [
+      "1回目spawn失敗・timeoutは従来どおり不完全（2回目を行わない）",
+      "2回目だけ実行不能になった場合も不一致として扱う"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "宣言JSONのentry列",
+      "PATH解決とplatform情報"
+     ],
+     "outputs": [
+      "完全性判定つき機械生成markdown",
+      "non_deterministic_countを含む一行JSON summary"
+     ],
+     "reference_paths": [
+      "tools/development/measurement_block.py",
+      "tools/development/formal_code_reuse_search.py"
+     ],
+     "reference_symbols": [
+      "tools/development/measurement_block.py:_run_entry"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "一致時の記録形式は従来互換（1回分のみ・容量増なし）",
+      "不一致時は両回の全文を残し黙って通さない",
+      "elapsedは比較対象にしない（本質的に揺れる）",
+      "測定コマンドは読み取り専用に限る前提を手順書で要件化する"
+     ],
+     "responsibility": "測定ブロックの各コマンドを2回実行して終了コード・stdout・stderrの完全一致を比較し、不一致をnon_deterministicとして両回の出力つきで明示記録し不完全扱いで停止する。実行体の絶対pathと実行環境（OS種別と版）を生成物へ機械記録し、デプロイ先の環境依存を記録自体が開示する",
+     "symbol_terms": [
+      "deterministic",
+      "integrity",
+      "which",
+      "platform",
+      "compare"
+     ]
+    }
+   ],
+   "subject": "measurement_block_integrity_guard_v1"
+  }
+ ]
+}
