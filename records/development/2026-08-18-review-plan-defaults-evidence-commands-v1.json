@@ -1,0 +1,33 @@
+{
+ "title": "review-plan commit既定（対策3）受入確認の実測",
+ "entries": [
+  {
+   "label": "保護試験11本の単独実行（決定的射影）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nr = subprocess.run(['.venv/bin/python3', '-m', 'pytest', 'tests/test_review_plan.py', '-q'], capture_output=True, text=True)\nprint('exit', r.returncode)\nprint(r.stdout.strip().splitlines()[-1].rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "手順書のtarget-commit placeholder残存検索（該当なし＝exit 1が合格）",
+   "argv": [
+    "grep",
+    "-n",
+    "target-commit <",
+    "docs/development/prompts/review-plan-run.md"
+   ]
+  },
+  {
+   "label": "変更fileのdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/development/review_plan_cli.py",
+    "tests/test_review_plan.py",
+    "docs/development/prompts/review-plan-run.md"
+   ]
+  }
+ ]
+}

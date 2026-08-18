@@ -7,22 +7,24 @@ import sys
 from tools.development.review_plan import ReviewPlanStop, build_review_plan
 
 
-_FLAGS = ("base-commit", "target-commit", "risk", "stage", "classification")
+_REQUIRED_FLAGS = ("base-commit", "risk", "stage", "classification")
+_OPTIONAL_FLAGS = ("target-commit",)
 
 
 def _parse(arguments):
-    if len(arguments) != len(_FLAGS) * 2:
+    if len(arguments) % 2 != 0:
         raise ReviewPlanStop("input_invalid")
     values = {}
+    known = set(_REQUIRED_FLAGS) | set(_OPTIONAL_FLAGS)
     for index in range(0, len(arguments), 2):
         flag = arguments[index]
         if not flag.startswith("--"):
             raise ReviewPlanStop("input_invalid")
         name = flag[2:]
-        if name not in _FLAGS or name in values:
+        if name not in known or name in values:
             raise ReviewPlanStop("input_invalid")
         values[name] = arguments[index + 1]
-    if set(values) != set(_FLAGS):
+    if any(name not in values for name in _REQUIRED_FLAGS):
         raise ReviewPlanStop("input_invalid")
     return values
 
@@ -46,7 +48,7 @@ def run(argv=None):
         result = build_review_plan(
             Path.cwd(),
             base_commit=values["base-commit"],
-            target_commit=values["target-commit"],
+            target_commit=values.get("target-commit", "HEAD"),
             risk=values["risk"],
             stage=values["stage"],
             classification_path=values["classification"],

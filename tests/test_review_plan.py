@@ -411,3 +411,39 @@ def test_invalid_classification_documents_stop(tmp_path):
             assert error.code == "classification_invalid"
         else:
             raise AssertionError(f"invalid classification accepted: {document}")
+
+
+def test_cli_defaults_target_commit_to_head(tmp_path, monkeypatch, capsys):
+    repository, base, target = _repository(tmp_path)
+    classification = _classification(repository)
+    cli = importlib.import_module("tools.development.review_plan_cli")
+    monkeypatch.chdir(repository)
+
+    exit_code = cli.run([
+        "--base-commit", base,
+        "--risk", "high",
+        "--stage", "completion",
+        "--classification", str(classification),
+    ])
+    document = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert document["target_commit"] == _git(repository, "rev-parse", "HEAD")
+
+
+def test_cli_keeps_base_commit_required(tmp_path, monkeypatch, capsys):
+    repository, base, target = _repository(tmp_path)
+    classification = _classification(repository)
+    cli = importlib.import_module("tools.development.review_plan_cli")
+    monkeypatch.chdir(repository)
+
+    exit_code = cli.run([
+        "--target-commit", target,
+        "--risk", "high",
+        "--stage", "completion",
+        "--classification", str(classification),
+    ])
+    document = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 2
+    assert document["stop_code"] == "input_invalid"

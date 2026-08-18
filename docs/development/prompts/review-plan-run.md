@@ -4,12 +4,17 @@
 
 ```text
 reviewcompass3-review-plan \
-  --base-commit <作業開始commit> \
-  --target-commit <確認対象commit> \
+  --base-commit <作業開始commit（ref式可）> \
   --risk <low|medium|high> \
   --stage <scope|completion> \
   --classification <対象分類JSON>
 ```
+
+- `--target-commit`は**既定＝`HEAD`**（機械既定。上書きは任意引数。2026-08-18既定値化）。
+  commit値はgit `rev-parse`で解決され、計画には**解決済みSHA**が固定される——`HEAD`等のref式を
+  渡せばよく、**64桁SHAを手書きしない**。
+- `--base-commit`は「どこからの差分をレビュー対象とするか」の**意味情報**であり既定化しない
+  （操作者が指定する。作業票の基準commit欄から機械転記するか、ref式で表す）。
 
 対象分類JSONは、次の形で変更pathと対象種別を一対一に対応付ける。対象path自体は二つのcommitの
 Git差分から生成し、分類入力で追加または除外しない。
