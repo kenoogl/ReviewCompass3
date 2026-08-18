@@ -50,7 +50,7 @@
 
 | 項目 | 状態 | 時点 | 主な根拠 |
 | --- | --- | --- | --- |
-| セッションログ保全（3系統一括`record-run`・現セッション既定除外。終了コード語彙は2026-08-18是正） | 完了（稼働中） | 2026-08-17〜 | `docs/development/prompts/session-log-record-run.md`・`records/development/2026-08-18-session-log-exit-code-vocabulary-evidence-v1.md` |
+| セッションログ保全（3系統一括`record-run`・現セッション既定除外。終了コード語彙は3入口で共通化済み） | 完了（稼働中） | 2026-08-17〜 | `docs/development/prompts/session-log-record-run.md`・`records/development/2026-08-19-read-only-entry-exit-code-unification-evidence-v1.md` |
 | 前置record解釈（実会話の取りこぼし解消・遡及。契約014） | 完了 | 2026-08-17 | `records/development/2026-08-17-session-log-prefix-interpretation-product-acceptance-decision-v1.md` |
 | TODO handoff（現在位置の人向け入口） | 稼働（暫定） | 2026-08-04〜 | `docs/development/prompts/todo-handoff-update.md`。**現在位置の機械導出（projection）は未実装**——方針は横断欄のデプロイ方針record §4c |
 | 改善候補・Issueの経路 | 稼働 | 2026-08-06〜 | AGENTS.md §4の既存経路 |
