@@ -1,0 +1,26 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "operational_metrics_v4",
+  "external": {
+    "relative_path": "work4b/reuse-searches/cd229599b69ab3a08815222d370d1d5efbda582dbafc9f5d7d1f8f3004edbd75.json",
+    "content_digest": "cd229599b69ab3a08815222d370d1d5efbda582dbafc9f5d7d1f8f3004edbd75",
+    "byte_sha256": "7b8537528df1003bea6b4de7b14c4c4797de6a26467465cebdd822a4dd4cf67c"
+  },
+  "source_identity": {
+    "profile_run_id": "8392b23f48542ca7fb5b8175b7c46bfdf773a486c64cc522d1f3048f1abba744",
+    "discovery_run_id": "7e19698e8d3ebbbc565c6ab55559006adde324fdd72c1864e7e98ba065581628",
+    "source_content_id": "c1aca614438b72998ab0ca8d16e8a5890d6a27cfaff4d85eb2169b6fe79a5904",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 4,
+  "capability_count": 1,
+  "direct_match_count": 2,
+  "hint_match_count": 38,
+  "comparison_group_count": 41,
+  "no_search_material_capability_count": 0,
+  "content_digest": "36f101a6e5a989eda35d39dffea456392e5181fc6882f569f33c289498b28dc9"
+}
