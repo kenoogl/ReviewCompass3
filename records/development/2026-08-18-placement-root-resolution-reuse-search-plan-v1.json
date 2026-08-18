@@ -1,0 +1,52 @@
+{
+ "content_digest": "99d7aebdb015be83f97703eb59cde9944d99f430228a8c575f40b6a476ee5e3e",
+ "plan_id": "FCRS-PLACEMENT-ROOT-RESOLUTION-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-placement-root-resolution-reuse-search-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "repository_root_resolution",
+     "failure_behavior": [
+      "rootを推測・探索で当てない（file位置からの決定的導出のみ）"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "module自身のfile位置"
+     ],
+     "outputs": [
+      "repository rootの絶対path"
+     ],
+     "reference_paths": [
+      "tools/session_logs/entry.py",
+      "tools/session_logs/record_run.py",
+      "tools/deployment/trusted_claude_transport.py",
+      "tools/common/paths.py"
+     ],
+     "reference_symbols": [
+      "tools/deployment/trusted_claude_transport.py:_source_root",
+      "tools/common/paths.py:within"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "返す値は現行3箇所のPath(__file__).resolve().parents[2]と同一",
+      "標準libraryのみ（tools/common規約）",
+      "importの副作用なし（純関数）"
+     ],
+     "responsibility": "実行時にrepository rootを一箇所で解決して返す。親ディレクトリ遡り（root深度の知識）を各fileへ複製しない",
+     "symbol_terms": [
+      "root",
+      "project",
+      "repository",
+      "resolve"
+     ]
+    }
+   ],
+   "subject": "placement_root_resolution_v1"
+  }
+ ]
+}
