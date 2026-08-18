@@ -164,7 +164,8 @@ def test_approval_metrics_field_count(tmp_path):
   assert result["field_count"] == 3
 
 
-def test_run_schema_version_6(tmp_path, capsys):
+def test_run_schema_version_7(tmp_path, capsys):
+  # 意図保存の更新：v7でschema 7へ（系統意味づけ・正規化計数・活動時間の追加）。
   from tools.evaluation import operational_metrics
 
   launch_root, records_root = _make_stores(tmp_path)
@@ -174,8 +175,9 @@ def test_run_schema_version_6(tmp_path, capsys):
   ))
   document = json.loads(capsys.readouterr().out)
   assert exit_code == 0
-  assert document["schema_version"] == 6
+  assert document["schema_version"] == 7
   assert document["bindings"]["total_hex_count"] == 0
+  assert "system_identity" in document
 
 
 def test_module_entry_runs(tmp_path):
@@ -407,6 +409,155 @@ def test_cost_metrics_flags_unparseable_timestamp(tmp_path):
   sysb = result["systems"]["sysb"]
   assert sysb["duration_unrecognized"] == 1
   assert sysb["duration_seconds"] == 0.0
+
+
+def test_system_identity_maps_dirs_to_labels(tmp_path):
+  from tools.evaluation import operational_metrics
+  from tools.session_logs.eventual_preservation import _namespace
+
+  raw = tmp_path / "rawid"
+  source_a = tmp_path / "srcA"
+  source_b = tmp_path / "srcB"
+  namespace_a = _namespace(source_a)
+  namespace_b = _namespace(source_b)
+  (raw / namespace_a).mkdir(parents=True)
+  (raw / "0123456789abcdef").mkdir()
+  systems = (
+    ("labelA", str(source_a), "tool-v1"),
+    ("labelB", str(source_b), "tool-v1"),
+  )
+  result = operational_metrics.collect_system_identity(raw, systems=systems)
+  assert result["systems"][namespace_a] == {
+    "label": "labelA",
+    "dir_exists": True,
+  }
+  assert result["systems"][namespace_b] == {
+    "label": "labelB",
+    "dir_exists": False,
+  }
+  assert result["unmatched_dir_count"] == 1
+  assert result["root_missing"] is False
+  dumped = json.dumps(result, ensure_ascii=False)
+  assert str(tmp_path) not in dumped
+
+
+def test_codex_tool_calls_counted_at_canonical_position(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  raw = tmp_path / "rawcx"
+  (raw / "cxdir").mkdir(parents=True)
+  lines = [
+    '{"timestamp":"2026-08-18T10:00:00+00:00","type":"response_item",'
+    '"payload":{"type":"function_call"}}',
+    '{"timestamp":"2026-08-18T10:00:01+00:00","type":"response_item",'
+    '"payload":{"type":"custom_tool_call"}}',
+    '{"timestamp":"2026-08-18T10:00:02+00:00","type":"response_item",'
+    '"payload":{"type":"function_call_output"}}',
+    '{"timestamp":"2026-08-18T10:00:03+00:00","type":"event_msg",'
+    '"payload":{"type":"mcp_tool_call_end"}}',
+    '{"timestamp":"2026-08-18T10:00:04+00:00","type":"event_msg",'
+    '"payload":{"type":"function_call"}}',
+  ]
+  (raw / "cxdir" / "s.jsonl").write_text(
+    "\n".join(lines) + "\n", encoding="utf-8"
+  )
+  result = operational_metrics.collect_cost_metrics(
+    raw, rules={"cxdir": "codex_response_item_call"}
+  )
+  sysdir = result["systems"]["cxdir"]
+  assert sysdir["tool_call_strict"] == 2
+  assert sysdir["tool_call_rule"] == "codex_response_item_call"
+
+
+def test_claude_structural_count_ignores_noncanonical_spoof(tmp_path):
+  # 文字列値内の偽装はJSONエスケープで自壊するため、byte計数を騙せるのは
+  # 非正準位置の入れ子objectだけ。構造計数は正準位置（message.content[]）
+  # のみを数えることを固定する。
+  from tools.evaluation import operational_metrics
+
+  raw = tmp_path / "rawcl"
+  (raw / "cldir").mkdir(parents=True)
+  genuine = json.dumps(
+    {
+      "timestamp": "2026-08-18T10:00:00+00:00",
+      "type": "assistant",
+      "message": {"content": [{"type": "tool_use", "name": "probe"}]},
+    },
+    ensure_ascii=False,
+    separators=(",", ":"),
+  )
+  object_spoof = json.dumps(
+    {
+      "timestamp": "2026-08-18T10:00:01+00:00",
+      "type": "attachment",
+      "data": {"type": "tool_use", "note": "非正準位置の複製"},
+    },
+    ensure_ascii=False,
+    separators=(",", ":"),
+  )
+  text_spoof = json.dumps(
+    {
+      "timestamp": "2026-08-18T10:00:02+00:00",
+      "type": "user",
+      "message": {
+        "content": [
+          {"type": "text", "text": '偽の"type":"tool_use"を本文に置く'}
+        ]
+      },
+    },
+    ensure_ascii=False,
+    separators=(",", ":"),
+  )
+  (raw / "cldir" / "s.jsonl").write_text(
+    genuine + "\n" + object_spoof + "\n" + text_spoof + "\n",
+    encoding="utf-8",
+  )
+  result = operational_metrics.collect_cost_metrics(
+    raw, rules={"cldir": "claude_message_content_tool_use"}
+  )
+  sysdir = result["systems"]["cldir"]
+  assert sysdir["tool_use_typed"] == 2
+  assert sysdir["tool_call_strict"] == 1
+  assert sysdir["tool_call_rule"] == "claude_message_content_tool_use"
+
+
+def test_activity_time_buckets_window_and_failures(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  raw = tmp_path / "rawact"
+  (raw / "adir").mkdir(parents=True)
+  lines = [
+    '{"timestamp":"2026-08-18T10:00:00+00:00","type":"a"}',
+    '{"timestamp":"2026-08-18T10:00:30+00:00","type":"a"}',
+    '{"timestamp":"2026-08-18T10:05:30+00:00","type":"a"}',
+    '{"timestamp":"2026-08-18T10:17:10+00:00","type":"a"}',
+    '{"timestamp":"2026-08-18T10:10:00+00:00","type":"a"}',
+    '{"timestamp":"2026-08-18T11:00:00","type":"naive"}',
+    '{"type":"no-timestamp"}',
+    "not json",
+  ]
+  (raw / "adir" / "s.jsonl").write_text(
+    "\n".join(lines) + "\n", encoding="utf-8"
+  )
+  result = operational_metrics.collect_cost_metrics(raw)
+  adir = result["systems"]["adir"]
+  assert adir["timestamped_line_count"] == 5
+  assert adir["timestamp_naive_count"] == 1
+  assert adir["gap_pair_count"] == 4
+  assert adir["gap_negative_count"] == 1
+  assert adir["gap_buckets"]["le60"] == {"count": 1, "seconds": 30.0}
+  assert adir["gap_buckets"]["le600"] == {"count": 1, "seconds": 300.0}
+  assert adir["gap_buckets"]["le3600"] == {"count": 1, "seconds": 700.0}
+  assert adir["gap_buckets"]["gt3600"] == {"count": 0, "seconds": 0.0}
+  assert adir["activity_seconds"] == 330.0
+  assert adir["activity_window_seconds"] == 600
+  assert adir["tool_call_strict"] is None
+  assert adir["tool_call_rule"] is None
+  narrow = operational_metrics.collect_cost_metrics(
+    raw, activity_window_seconds=60
+  )
+  assert narrow["systems"]["adir"]["activity_seconds"] == 30.0
+  assert narrow["systems"]["adir"]["activity_window_seconds"] == 60
 
 
 def test_missing_origin_classification(tmp_path):

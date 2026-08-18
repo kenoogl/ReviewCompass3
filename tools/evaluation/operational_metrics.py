@@ -377,6 +377,86 @@ def collect_preservation_metrics(preservation_root):
   return {"sections": sections, "root_missing": False}
 
 
+_LABEL_RULES = {
+  "claude": "claude_message_content_tool_use",
+  "codex現行": "codex_response_item_call",
+  "codex保管": "codex_response_item_call",
+}
+
+_CODEX_CALL_PAYLOAD_TYPES = ("function_call", "custom_tool_call")
+
+_GAP_BUCKET_BOUNDS = (("le60", 60), ("le600", 600), ("le3600", 3600))
+
+
+def collect_system_identity(raw_root, systems=None):
+  """系統dirの意味づけ：保全設定のnamespace導出でdir↔labelを機械照合する。
+
+  出力はlabel・namespace（hash）・dir有無・未対応dir数のみ（絶対path不出力）。
+  """
+  from tools.session_logs.eventual_preservation import _namespace
+  from tools.session_logs.record_run import DEFAULT_SYSTEMS
+
+  root = Path(raw_root)
+  if not root.is_dir():
+    return {"systems": {}, "unmatched_dir_count": 0, "root_missing": True}
+  directory_names = {
+    path.name for path in root.iterdir() if path.is_dir()
+  }
+  entries = {}
+  for label, source_root, _tool_version in (
+    DEFAULT_SYSTEMS if systems is None else systems
+  ):
+    namespace = _namespace(source_root)
+    entries[namespace] = {
+      "label": label,
+      "dir_exists": namespace in directory_names,
+    }
+  unmatched_count = sum(
+    1 for name in directory_names if name not in entries
+  )
+  return {
+    "systems": entries,
+    "unmatched_dir_count": unmatched_count,
+    "root_missing": False,
+  }
+
+
+def _aware_timestamp(value):
+  # 戻り値は（時刻帯つきdatetime、naiveか）。解釈不能は（None, False）。
+  try:
+    moment = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+  except ValueError:
+    return None, False
+  if moment.tzinfo is None:
+    return None, True
+  return moment, False
+
+
+def _count_structural_calls(document, rule):
+  if rule == "claude_message_content_tool_use":
+    message = document.get("message")
+    if not (
+      isinstance(message, dict)
+      and isinstance(message.get("content"), list)
+    ):
+      return 0
+    return sum(
+      1
+      for block in message["content"]
+      if isinstance(block, dict) and block.get("type") == "tool_use"
+    )
+  if rule == "codex_response_item_call":
+    payload = document.get("payload")
+    if (
+      document.get("type") == "response_item"
+      and isinstance(payload, dict)
+      and payload.get("type") in _CODEX_CALL_PAYLOAD_TYPES
+    ):
+      return 1
+    return 0
+  return 0
+
+
 def _line_span_seconds(first_line, last_line):
   try:
     first = json.loads(first_line)
@@ -392,30 +472,47 @@ def _line_span_seconds(first_line, last_line):
     return None
 
 
-def collect_cost_metrics(raw_root):
-  """コスト時系列（第一次）：系統dir別の規模とtool_use計数・実時間幅。
+def collect_cost_metrics(raw_root, rules=None, activity_window_seconds=600):
+  """コスト時系列：系統dir別の規模・tool_use計数・実時間幅・活動時間。
 
   単一の解釈を全系統へ当てない——厳密一致（保守値）と部分一致（上限値）を
   別掲し、timestampを解釈できないfileはduration_unrecognizedへ明示計上する。
-  内容は転記しない（数と時刻だけ）。
+  正規化計数は正準規則を割り当てられたdirだけに適用し、未割り当てはnull。
+  活動時間は隣接する解釈可能timestamp対の間隔から機械算出し、負間隔・
+  時刻帯なしは明示計上して除外する。内容は転記しない（数と時刻だけ）。
   """
   root = Path(raw_root)
   if not root.is_dir():
     return {"systems": {}, "root_missing": True}
+  assigned_rules = {} if rules is None else dict(rules)
   systems = {}
   for system_dir in sorted(
     path for path in root.iterdir() if path.is_dir()
   ):
+    rule = assigned_rules.get(system_dir.name)
     file_count = 0
     line_count = 0
     typed = 0
     loose = 0
     duration = 0.0
     unrecognized = 0
+    strict_calls = 0
+    timestamped = 0
+    naive_count = 0
+    pair_count = 0
+    negative_count = 0
+    buckets = {
+      "le60": {"count": 0, "seconds": 0.0},
+      "le600": {"count": 0, "seconds": 0.0},
+      "le3600": {"count": 0, "seconds": 0.0},
+      "gt3600": {"count": 0, "seconds": 0.0},
+    }
+    activity = 0.0
     for item in sorted(system_dir.rglob("*.jsonl")):
       file_count += 1
       first_line = None
       last_line = None
+      previous = None
       with open(item, "rb") as stream:
         for raw_line in stream:
           line_count += 1
@@ -424,6 +521,40 @@ def collect_cost_metrics(raw_root):
           if first_line is None:
             first_line = raw_line
           last_line = raw_line
+          try:
+            document = json.loads(raw_line)
+          except ValueError:
+            continue
+          if not isinstance(document, dict):
+            continue
+          if rule is not None:
+            strict_calls += _count_structural_calls(document, rule)
+          if "timestamp" not in document:
+            continue
+          moment, is_naive = _aware_timestamp(document["timestamp"])
+          if is_naive:
+            naive_count += 1
+            continue
+          if moment is None:
+            continue
+          timestamped += 1
+          if previous is not None:
+            gap = (moment - previous).total_seconds()
+            pair_count += 1
+            if gap < 0:
+              negative_count += 1
+            else:
+              for bucket_name, bound in _GAP_BUCKET_BOUNDS:
+                if gap <= bound:
+                  bucket = buckets[bucket_name]
+                  break
+              else:
+                bucket = buckets["gt3600"]
+              bucket["count"] += 1
+              bucket["seconds"] += gap
+              if gap <= activity_window_seconds:
+                activity += gap
+          previous = moment
       span = (
         _line_span_seconds(first_line, last_line)
         if first_line is not None
@@ -433,6 +564,8 @@ def collect_cost_metrics(raw_root):
         unrecognized += 1
       else:
         duration += span
+    for bucket in buckets.values():
+      bucket["seconds"] = round(bucket["seconds"], 3)
     systems[system_dir.name] = {
       "file_count": file_count,
       "line_count": line_count,
@@ -440,6 +573,15 @@ def collect_cost_metrics(raw_root):
       "tool_use_loose": loose,
       "duration_seconds": round(duration, 3),
       "duration_unrecognized": unrecognized,
+      "tool_call_strict": strict_calls if rule is not None else None,
+      "tool_call_rule": rule,
+      "timestamped_line_count": timestamped,
+      "timestamp_naive_count": naive_count,
+      "gap_pair_count": pair_count,
+      "gap_negative_count": negative_count,
+      "gap_buckets": buckets,
+      "activity_seconds": round(activity, 3),
+      "activity_window_seconds": activity_window_seconds,
     }
   return {"systems": systems, "root_missing": False}
 
@@ -487,6 +629,9 @@ def run(argv=None) -> int:
   parser.add_argument("--records-root", default=None)
   parser.add_argument("--preservation-root", default=None)
   parser.add_argument("--raw-root", default=None)
+  parser.add_argument(
+    "--activity-window-seconds", type=int, default=600
+  )
   arguments = parser.parse_args(
     list(sys.argv[1:] if argv is None else argv)
   )
@@ -521,8 +666,14 @@ def run(argv=None) -> int:
     if arguments.raw_root is None
     else Path(arguments.raw_root)
   )
+  identity = collect_system_identity(raw_root)
+  cost_rules = {}
+  for namespace, entry in identity["systems"].items():
+    rule = _LABEL_RULES.get(entry["label"])
+    if rule is not None and entry["dir_exists"]:
+      cost_rules[namespace] = rule
   result = {
-    "schema_version": 6,
+    "schema_version": 7,
     "status": "ok",
     "launch": collect_launch_metrics(launch_root),
     "approvals": collect_approval_metrics(records_root),
@@ -531,7 +682,12 @@ def run(argv=None) -> int:
     ),
     "templates": collect_template_metrics(),
     "preservation": collect_preservation_metrics(preservation_root),
-    "costs": collect_cost_metrics(raw_root),
+    "system_identity": identity,
+    "costs": collect_cost_metrics(
+      raw_root,
+      rules=cost_rules,
+      activity_window_seconds=arguments.activity_window_seconds,
+    ),
     "missing_origin": collect_missing_origin(records_root),
   }
   print(json.dumps(
