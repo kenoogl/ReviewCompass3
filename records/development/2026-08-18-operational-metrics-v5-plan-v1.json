@@ -1,0 +1,52 @@
+{
+ "content_digest": "04dc47e958d6492562b3eb3d907c9a6d024d4aaceb2f1aa609a515a20c7689be",
+ "plan_id": "FCRS-OPERATIONAL-METRICS-V5-2026-08-18-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-18-operational-metrics-v5-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "manual_fill_ratio_and_preservation_scale",
+     "failure_behavior": [
+      "保全先が無い場合は区画0件として正直に報告する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "request_builderの雛形生成（in-memory）",
+      "保全先の区画構成（読み取り専用・流し読み）"
+     ],
+     "outputs": [
+      "H4自動導出率とコスト規模集計（schema_version 5）"
+     ],
+     "reference_paths": [
+      "tools/evaluation/operational_metrics.py",
+      "tools/request_builder/core.py",
+      "tools/session_logs/record_run.py"
+     ],
+     "reference_symbols": [
+      "tools/request_builder/core.py:assemble"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "雛形の欄数はbuilder実装から機械導出し手数えしない",
+      "保全fileの内容を読まない（規模と時刻のみ）",
+      "既存集計欄の意味とdataset v1〜v4を変えない"
+     ],
+     "responsibility": "request_builderの3類型の雛形をin-memory生成してLLM記入欄と機械欄の比率（自動導出率）を機械算出し、セッションログ保全先の区画別file数・総byte・日付範囲を内容を読まずに集計する。出力へ絶対pathを含めない",
+     "symbol_terms": [
+      "placeholder",
+      "template",
+      "preservation",
+      "scale",
+      "ratio"
+     ]
+    }
+   ],
+   "subject": "operational_metrics_v5"
+  }
+ ]
+}
