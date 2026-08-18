@@ -99,6 +99,85 @@ def test_run_rejects_missing_root(tmp_path, capsys):
   assert document["status"] == "input_invalid"
 
 
+def _make_binding_store(tmp_path):
+  from tools.common import digests
+
+  base_root = tmp_path / "base"
+  (base_root / "sub").mkdir(parents=True)
+  target_a = base_root / "sub" / "target-a.txt"
+  target_a.write_text("alpha", encoding="utf-8")
+  target_b = base_root / "sub" / "target-b.txt"
+  target_b.write_text("beta", encoding="utf-8")
+  records_root = tmp_path / "binding-records"
+  records_root.mkdir()
+  digest_a = digests.file_sha256(target_a)
+  wrong_b = "0" * 64
+  gone_c = "1" * 64
+  unpaired = "2" * 64
+  (records_root / "2026-08-18-binding-v1.md").write_text(
+    "\n".join([
+      "```text",
+      f"{digest_a}  sub/target-a.txt",
+      "```",
+      f"- 資料：`sub/target-b.txt`、SHA-256 `{wrong_b}`",
+      f"- 消えたfile：`sub/gone.txt`（SHA-256 `{gone_c}`）",
+      f"  SHA-256 `{unpaired}`",
+    ]),
+    encoding="utf-8",
+  )
+  return records_root, base_root
+
+
+def test_binding_metrics_classifies_pairs(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  records_root, base_root = _make_binding_store(tmp_path)
+  result = operational_metrics.collect_binding_metrics(
+    records_root, base_root=base_root
+  )
+  assert result["resolved_match"] == 1
+  assert result["digest_differs"] == 1
+  assert result["file_missing"] == 1
+  assert result["scored_count"] == 3
+
+
+def test_binding_metrics_reports_unscored(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  records_root, base_root = _make_binding_store(tmp_path)
+  result = operational_metrics.collect_binding_metrics(
+    records_root, base_root=base_root
+  )
+  assert result["unpaired_count"] == 1
+  assert result["total_hex_count"] == 4
+
+
+def test_approval_metrics_field_count(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  _, records_root = _make_stores(tmp_path)
+  (records_root / "2026-08-03-d-decision-v1.md").write_text(
+    "## 1. 承認文言【記録】\n\n本文", encoding="utf-8"
+  )
+  result = operational_metrics.collect_approval_metrics(records_root)
+  assert result["record_count"] == 3
+  assert result["field_count"] == 3
+
+
+def test_run_schema_version_2(tmp_path, capsys):
+  from tools.evaluation import operational_metrics
+
+  launch_root, records_root = _make_stores(tmp_path)
+  exit_code = operational_metrics.run((
+    "--launch-root", str(launch_root),
+    "--records-root", str(records_root),
+  ))
+  document = json.loads(capsys.readouterr().out)
+  assert exit_code == 0
+  assert document["schema_version"] == 2
+  assert document["bindings"]["total_hex_count"] == 0
+
+
 def test_module_entry_runs(tmp_path):
   launch_root, records_root = _make_stores(tmp_path)
   completed = subprocess.run(

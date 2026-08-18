@@ -11,11 +11,22 @@ promotion_required: true
 
 import argparse
 import json
+import re
 import statistics
 import sys
 from pathlib import Path
 
+from tools.common import digests
 from tools.common import roots
+
+
+_HEX_ANYWHERE = re.compile(r"[0-9a-f]{64}")
+_SHASUM_LINE = re.compile(r"^\s*([0-9a-f]{64})  (\S+)\s*$")
+_INLINE_DIGEST = re.compile(r"SHA-256 `([0-9a-f]{64})`")
+_BACKTICK_TOKEN = re.compile(r"`([^`]+)`")
+_APPROVAL_FIELD_LINE = re.compile(
+  r"^[\s>*#0-9.\-]*承認文言", re.MULTILINE
+)
 
 
 def _stats(values):
@@ -73,8 +84,79 @@ def collect_launch_metrics(launch_root):
   }
 
 
+def _binding_pairs(text):
+  # 正準書式だけを組として採点する（fail-closed）。書式A＝shasum行、
+  # 書式B＝同一行にbacktick付きpathを持つ inline。組の閉じない出現はunpaired。
+  pairs = []
+  unpaired_count = 0
+  for line in text.splitlines():
+    shasum = _SHASUM_LINE.match(line)
+    if shasum is not None:
+      pairs.append((shasum.group(2), shasum.group(1)))
+      continue
+    for match in _INLINE_DIGEST.finditer(line):
+      prefix = line[: match.start()]
+      candidates = [
+        token
+        for token in _BACKTICK_TOKEN.findall(prefix)
+        if ("/" in token or "." in token)
+        and _HEX_ANYWHERE.fullmatch(token) is None
+        and " " not in token
+      ]
+      if candidates:
+        pairs.append((candidates[-1], match.group(1)))
+      else:
+        unpaired_count += 1
+  return pairs, unpaired_count
+
+
+def collect_binding_metrics(records_root, base_root=None):
+  base = roots.repo_root() if base_root is None else Path(base_root)
+  scanned_record_count = 0
+  total_hex_count = 0
+  unpaired_count = 0
+  resolved_match = 0
+  digest_differs = 0
+  file_missing = 0
+  for path in sorted(Path(records_root).glob("*.md")):
+    try:
+      text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+      continue
+    scanned_record_count += 1
+    total_hex_count += len(_HEX_ANYWHERE.findall(text))
+    pairs, unpaired = _binding_pairs(text)
+    unpaired_count += unpaired
+    for target, expected in pairs:
+      candidate = Path(target)
+      if not candidate.is_absolute():
+        candidate = base / candidate
+      if not candidate.is_file():
+        file_missing += 1
+        continue
+      try:
+        actual = digests.file_sha256(candidate)
+      except OSError:
+        file_missing += 1
+        continue
+      if actual == expected:
+        resolved_match += 1
+      else:
+        digest_differs += 1
+  return {
+    "scanned_record_count": scanned_record_count,
+    "scored_count": resolved_match + digest_differs + file_missing,
+    "resolved_match": resolved_match,
+    "digest_differs": digest_differs,
+    "file_missing": file_missing,
+    "unpaired_count": unpaired_count,
+    "total_hex_count": total_hex_count,
+  }
+
+
 def collect_approval_metrics(records_root):
   record_count = 0
+  field_count = 0
   skipped_count = 0
   by_date = {}
   for path in sorted(Path(records_root).glob("*.md")):
@@ -86,6 +168,8 @@ def collect_approval_metrics(records_root):
     if "承認文言" not in text:
       continue
     record_count += 1
+    if _APPROVAL_FIELD_LINE.search(text) is not None:
+      field_count += 1
     prefix = path.name[:10]
     if (
       len(prefix) == 10
@@ -99,6 +183,7 @@ def collect_approval_metrics(records_root):
     by_date[key] = by_date.get(key, 0) + 1
   return {
     "record_count": record_count,
+    "field_count": field_count,
     "skipped_count": skipped_count,
     "by_date": by_date,
   }
@@ -126,10 +211,11 @@ def run(argv=None) -> int:
     ))
     return 2
   result = {
-    "schema_version": 1,
+    "schema_version": 2,
     "status": "ok",
     "launch": collect_launch_metrics(launch_root),
     "approvals": collect_approval_metrics(records_root),
+    "bindings": collect_binding_metrics(records_root),
   }
   print(json.dumps(
     result,
