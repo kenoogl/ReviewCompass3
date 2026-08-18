@@ -51,11 +51,23 @@
   この順に平易に示す。機械処理と意味分析で先に候補を絞り、技術候補の全件判断をHumanへ渡さず、
   意味、risk、authorityなどHumanに残す必要がある最小判断へ圧縮する（根拠：2026-08-15の説明不足と
   `records/development/2026-08-15-safe-storage-capability-reuse-human-adjudication-decision-v1.md`）。
+- 利用者の「推奨」はHuman承認ではない。承認・裁定は**承認文言を逐語で受けてから**実装・破棄・
+  revertへ進み、決定recordには受け取った文言だけを引用する。破棄（復元不能）とrevert（履歴に残る）
+  は性質が違うため同じ承認にまとめない（根拠：2026-08-04の確認、移設record＝§4末尾）。
+- 報告の末尾に、次にHumanがそのまま送れる**指示の文言例**を置く。選択肢は推奨1つ＋代替2つまでとし、
+  推奨を先頭に明示する（根拠：2026-08-10・2026-08-15の利用者指示、移設record＝§4末尾）。
+- 診断・確認を利用者へ依頼する前に、同型の既存実装・過去record・自分の環境での実測で**自分の調査を
+  使い切る**。利用者の操作が必要なら、全分岐（成功・失敗・追加検査）を1本の手順にまとめ、実行1回で
+  完結させる（根拠：2026-08-17契約012切り分けの4往復の実害、移設record＝§4末尾）。
 
 ## 3. 機械規律
 
 - LLMは文章操作と意味分析に限定し、決定的な変換・抽出・集計・照合・file操作・Test・Git確認・
   command実行は機械処理を使う。未整備なら手作業を常態化させず改善候補へrouteする。
+- 手作業で誤りが出たら、「気をつける」規則の追加ではなく**その手作業自体を消す機械化**（引数の
+  既定値化・生成fileによる転記排除・時刻の機械記録等）を対策の第一候補にする（根拠：2026-08-18の
+  転記誤り3件と是正、`records/development/2026-08-18-reuse-search-cli-defaults-evidence-v1.md`・
+  `records/development/2026-08-18-measurement-block-evidence-v1.md`）。
 - test・validatorの合否は**単独で実行したcommandの終了コード**で確認する。pipeや`;`連結の後段で
   合否を判定しない（根拠：2026-08-08、不合格コミット2件通過の実害）。
 - `.reviewcompass/workflow/`配下の台帳recordは**対応する正規tool（検証器を含む）だけで作成・変更**
@@ -90,7 +102,9 @@
   `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）。トリアージ決定は
   `tools/development/issue_intake_v4.py`の`build_human_triage_decision`で組み立て、台帳整合検証に
   合格させる。旧Pilotの置き場所は凍結のまま。候補記録の形式の作り直しを先に提案しない。
-- 正本：開発方針の詳細＝`docs/development/2026-08-02-development-policy.md`。
+- 正本：開発方針の詳細＝`docs/development/2026-08-02-development-policy.md`。§2・§3の2026-08-18
+  追記（規範のrepo移設）の判断record＝
+  `records/development/2026-08-18-agents-norm-transfer-decision-v1.md`。
 
 ## 5. コミット
 
