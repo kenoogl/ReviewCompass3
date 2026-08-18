@@ -164,7 +164,7 @@ def test_approval_metrics_field_count(tmp_path):
   assert result["field_count"] == 3
 
 
-def test_run_schema_version_3(tmp_path, capsys):
+def test_run_schema_version_4(tmp_path, capsys):
   from tools.evaluation import operational_metrics
 
   launch_root, records_root = _make_stores(tmp_path)
@@ -174,7 +174,7 @@ def test_run_schema_version_3(tmp_path, capsys):
   ))
   document = json.loads(capsys.readouterr().out)
   assert exit_code == 0
-  assert document["schema_version"] == 3
+  assert document["schema_version"] == 4
   assert document["bindings"]["total_hex_count"] == 0
 
 
@@ -251,3 +251,84 @@ def test_pathless_hex_row_counts_as_unpaired(tmp_path):
     records_root, base_root=base_root
   )
   assert result["unpaired_count"] == 1
+
+
+def test_external_base_resolution(tmp_path):
+  from tools.common import digests
+  from tools.evaluation import operational_metrics
+
+  base_root = tmp_path / "repo"
+  base_root.mkdir()
+  external = tmp_path / "ext"
+  (external / "work4b").mkdir(parents=True)
+  target = external / "work4b" / "x.json"
+  target.write_text("psi", encoding="utf-8")
+  records_root = tmp_path / "r"
+  records_root.mkdir()
+  (records_root / "2026-08-18-e-v1.md").write_text(
+    f"| `work4b/x.json` | `{digests.file_sha256(target)}` |",
+    encoding="utf-8",
+  )
+  result = operational_metrics.collect_binding_metrics(
+    records_root, base_root=base_root, external_bases=(external,)
+  )
+  assert result["external_match"] == 1
+  assert result["file_missing"] == 0
+
+
+def _git_history_store(tmp_path, cited):
+  import subprocess
+
+  repo = tmp_path / "grepo"
+  repo.mkdir()
+
+  def _g(*arguments):
+    subprocess.run(
+      ["git", *arguments], cwd=repo, check=True, capture_output=True
+    )
+
+  _g("init", "-q")
+  _g("config", "user.email", "x@example.invalid")
+  _g("config", "user.name", "x")
+  target = repo / "doc.md"
+  target.write_text("v1", encoding="utf-8")
+  _g("add", ".")
+  _g("commit", "-qm", "v1")
+  target.write_text("v2", encoding="utf-8")
+  _g("add", ".")
+  _g("commit", "-qm", "v2")
+  records_root = tmp_path / "r2"
+  records_root.mkdir()
+  (records_root / "2026-08-18-h-v1.md").write_text(
+    f"| `doc.md` | `{cited}` |", encoding="utf-8"
+  )
+  return repo, records_root
+
+
+def test_history_match_detects_version_progress(tmp_path):
+  from tools.common import digests
+  from tools.evaluation import operational_metrics
+
+  probe = tmp_path / "probe.md"
+  probe.write_text("v1", encoding="utf-8")
+  repo, records_root = _git_history_store(
+    tmp_path, digests.file_sha256(probe)
+  )
+  result = operational_metrics.collect_binding_metrics(
+    records_root, base_root=repo
+  )
+  assert result["digest_differs"] == 1
+  assert result["history_match"] == 1
+  assert result["true_mismatch"] == 0
+
+
+def test_true_mismatch_when_no_version_matches(tmp_path):
+  from tools.evaluation import operational_metrics
+
+  repo, records_root = _git_history_store(tmp_path, "9" * 64)
+  result = operational_metrics.collect_binding_metrics(
+    records_root, base_root=repo
+  )
+  assert result["digest_differs"] == 1
+  assert result["history_match"] == 0
+  assert result["true_mismatch"] == 1

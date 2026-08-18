@@ -13,6 +13,7 @@ import argparse
 import json
 import re
 import statistics
+import subprocess
 import sys
 from pathlib import Path
 
@@ -145,14 +146,50 @@ def _binding_pairs(text):
   return pairs, unpaired_count
 
 
-def collect_binding_metrics(records_root, base_root=None):
+_HISTORY_CAP = 200
+
+
+def _history_verdict(base, relative, expected):
+  # 不一致が「版の前進」（過去版と一致）か真の不一致かをgit履歴で判別する。
+  # 取得失敗・上限超過はhistory_cappedへ明示計上し、照合済みと偽らない。
+  revisions = subprocess.run(
+    ["git", "rev-list", "HEAD", "--", relative],
+    cwd=base,
+    capture_output=True,
+    text=True,
+  )
+  if revisions.returncode != 0:
+    return "capped"
+  hashes = revisions.stdout.split()
+  capped = len(hashes) > _HISTORY_CAP
+  for commit in hashes[:_HISTORY_CAP]:
+    shown = subprocess.run(
+      ["git", "show", f"{commit}:{relative}"],
+      cwd=base,
+      capture_output=True,
+    )
+    if (
+      shown.returncode == 0
+      and digests.sha256_hex(shown.stdout) == expected
+    ):
+      return "match"
+  return "capped" if capped else "none"
+
+
+def collect_binding_metrics(records_root, base_root=None, external_bases=None):
   base = roots.repo_root() if base_root is None else Path(base_root)
+  externals = tuple(Path(item) for item in (external_bases or ()))
   scanned_record_count = 0
   total_hex_count = 0
   unpaired_count = 0
   resolved_match = 0
   digest_differs = 0
   file_missing = 0
+  external_match = 0
+  external_differs = 0
+  history_match = 0
+  true_mismatch = 0
+  history_capped = 0
   for path in sorted(Path(records_root).glob("*.md")):
     try:
       text = path.read_text(encoding="utf-8")
@@ -164,25 +201,63 @@ def collect_binding_metrics(records_root, base_root=None):
     unpaired_count += unpaired
     for target, expected in pairs:
       candidate = Path(target)
-      if not candidate.is_absolute():
+      relative = not candidate.is_absolute()
+      if relative:
         candidate = base / candidate
-      if not candidate.is_file():
-        file_missing += 1
+      if candidate.is_file():
+        try:
+          actual = digests.file_sha256(candidate)
+        except OSError:
+          file_missing += 1
+          continue
+        if actual == expected:
+          resolved_match += 1
+        else:
+          digest_differs += 1
+          if relative:
+            verdict = _history_verdict(base, target, expected)
+          else:
+            verdict = "capped"
+          if verdict == "match":
+            history_match += 1
+          elif verdict == "none":
+            true_mismatch += 1
+          else:
+            history_capped += 1
         continue
-      try:
-        actual = digests.file_sha256(candidate)
-      except OSError:
+      resolved_external = False
+      if relative:
+        for external in externals:
+          external_candidate = external / target
+          if external_candidate.is_file():
+            try:
+              actual = digests.file_sha256(external_candidate)
+            except OSError:
+              continue
+            if actual == expected:
+              external_match += 1
+            else:
+              external_differs += 1
+            resolved_external = True
+            break
+      if not resolved_external:
         file_missing += 1
-        continue
-      if actual == expected:
-        resolved_match += 1
-      else:
-        digest_differs += 1
   return {
     "scanned_record_count": scanned_record_count,
-    "scored_count": resolved_match + digest_differs + file_missing,
+    "scored_count": (
+      resolved_match
+      + digest_differs
+      + file_missing
+      + external_match
+      + external_differs
+    ),
     "resolved_match": resolved_match,
     "digest_differs": digest_differs,
+    "history_match": history_match,
+    "true_mismatch": true_mismatch,
+    "history_capped": history_capped,
+    "external_match": external_match,
+    "external_differs": external_differs,
     "file_missing": file_missing,
     "unpaired_count": unpaired_count,
     "total_hex_count": total_hex_count,
@@ -245,12 +320,19 @@ def run(argv=None) -> int:
       sort_keys=True,
     ))
     return 2
+  from tools.development.formal_code_reuse_search import default_runtime_root
+
+  external_bases = (
+    default_runtime_root() / "projects" / "reviewcompass3" / "development" / "data",
+  )
   result = {
-    "schema_version": 3,
+    "schema_version": 4,
     "status": "ok",
     "launch": collect_launch_metrics(launch_root),
     "approvals": collect_approval_metrics(records_root),
-    "bindings": collect_binding_metrics(records_root),
+    "bindings": collect_binding_metrics(
+      records_root, external_bases=external_bases
+    ),
   }
   print(json.dumps(
     result,
