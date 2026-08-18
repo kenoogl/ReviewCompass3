@@ -1,0 +1,49 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-SAFE-STORAGE-ENTRY-EXIT-CODE-VOCABULARY-001",
+ "candidate_version": 1,
+ "created_at": "2026-08-19T00:22:53+09:00",
+ "source_work": "read-only-entry-exit-code-unification",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-READ-ONLY-ENTRY-EXIT-CODE-UNIFICATION-2026-08-19-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-19-read-only-entry-exit-code-unification-evidence-v1.md",
+  "sha256": "6c99e3e4cf1dcd88656da54641ade7056d9cefd090075046bcb09196adfbc9b4"
+ },
+ "problem": "セッションログ部分系のstorage入口`tools/session_logs/safe_storage_entry.py`だけが独自の終了コード語彙のまま残っている。18-19行で`EXIT_OK=0`・`EXIT_STOPPED=4`を定義し、123行は`StorageIncomplete`へ生の数字3を返す。2026-08-19の統合で実行入口3つ（`cli.py`・`read_only_entry.py`・`eventual_preservation.py`）は0=ok・4=非対応・5=失敗へ同値化されたが、この入口の3は共通語彙の3（対象なし）と、stopped=4（異常）は共通語彙の4（非対応＝正常寄り）と、同じ数字が逆向きの意味で再び並存している。IC-SESSION-LOG-EXIT-CODE-VOCABULARY-001（scope消化済み）の同型残件である（観測の詳細は出所recordの§4）。",
+ "impact": [
+  "新しい消費側が入口ごとに終了コードの意味を覚える必要が残り、語彙統合の効果が部分系全体へ及ばない",
+  "生の数字3は語彙定数を経由しないため、意味の変更・機械検索が構造的に漏れやすい",
+  "停止=4（異常）と非対応=4（正常寄り）の逆向き並存が再発点として残る"
+ ],
+ "scope": [
+  "`StorageIncomplete`（生の3）と`EXIT_STOPPED=4`の値を共通語彙へ揃えるか、storage系固有の取り決めとして固定するかの決定",
+  "消費側（呼び出し手順・保護試験）の値結合の機械確認",
+  "値一致pin試験の追加可否"
+ ],
+ "non_scope": [
+  "統合済みの実行入口3つ（`cli.py`・`read_only_entry.py`・`eventual_preservation.py`）",
+  "storage機構（保存・再読込み・削除の状態遷移）の変更"
+ ],
+ "classification_candidates": [
+  "implementation",
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-19-read-only-entry-exit-code-unification-evidence-v1.md",
+   "sha256": "6c99e3e4cf1dcd88656da54641ade7056d9cefd090075046bcb09196adfbc9b4"
+  }
+ ],
+ "proposed_action": "外向きの取り決め（終了コード）の変更を含むため、範囲固定文書を立てる作業単位として扱う。観測記録は統合Evidence §4（source_identity束縛先）。",
+ "content_digest": "fa3ae5b1107d5d2b8306af50eb9c8fe6f81c5e446856f663c557bd97158425a2"
+}
