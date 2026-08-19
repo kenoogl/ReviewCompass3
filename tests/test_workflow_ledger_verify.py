@@ -145,13 +145,16 @@ def test_broken_issue_repository_is_listed(tmp_path):
 
 
 def test_real_repository_counts_issues():
+  # 状態の内訳を焼き込まない（状態固定の再発防止。2026-08-19の突合で
+  # registered>=8の焼き込みが正当な遷移により破綻した——意図＝「全issueが
+  # 勘定に入り内訳が総数と整合する」だけを固定する）。
   from tools.development import workflow_ledger_verify as verify
 
   summary = verify.verify(project_root=PROJECT_ROOT)
 
   assert summary["status"] == "passed"
   assert summary["issue_total"] >= 8
-  assert summary["issue_states"].get("registered", 0) >= 8
+  assert sum(summary["issue_states"].values()) == summary["issue_total"]
 
 
 def test_real_repository_ledger_is_green():

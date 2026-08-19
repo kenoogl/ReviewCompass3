@@ -1170,7 +1170,16 @@ def test_l6_repository_issue_set_is_consistent(intake, config):
     stored = sorted(
         (PROJECT_ROOT / config["directories"]["issue_record_v2"]).glob("*.json")
     )
-    assert len(stored) == len(effective)
+    # 終端状態（resolved／rejected）はeffectiveへ載らない設計のため、
+    # 「保存数＝有効＋終端」の整合だけを固定する（状態内訳の焼き込みをしない。
+    # 2026-08-19の対象限定再開recordによる意図保存修正）。
+    terminal_count = sum(
+        1
+        for path in stored
+        if json.loads(path.read_text(encoding="utf-8"))["state"]
+        in config["terminal_issue_states"]
+    )
+    assert len(stored) == len(effective) + terminal_count
     if stored:
         # V4は登録済みIssue数に上限を置かない。Issueの追加を禁止せず、
         # 既存の会話記録Issueが残り内容が変わらないことだけを固定する。
