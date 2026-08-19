@@ -1,0 +1,54 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-LEDGER-LANE-WRITER-MECHANIZATION-001",
+ "candidate_version": 1,
+ "created_at": "2026-08-19T10:49:56+09:00",
+ "source_work": "n7-candidate-remediation/lane-operation",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-N7-CANDIDATE-REMEDIATION-2026-08-19-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-19-n7-candidate-remediation-evidence-v1.md",
+  "sha256": "57e644de42f6f8f4161272492cc1206818b917597b88e3c4465b8766ad7c5425"
+ },
+ "problem": "改善候補〜issue〜解決判定の台帳laneは、検証側（record検証コマンド・保護試験N7・台帳全件検証関数）は機械化済みだが、**作成側（writer）が未機械化**で、候補・仕分け決定・issue・判定の各JSONをLLMが都度組み立てている。実害：2026-08-18に候補4件が検証器を通らずに登録されN7不合格（2026-08-19に是正）、2026-08-19の新規登録でも欄規則の思い違いによる形式不合格が2回発生（検証器が捕捉）。verdict writerとissue状態遷移の未機械化は「実装済み主題がregisteredのまま」の一因。台帳一括検証の単一入口も未整備（pytest経由かpython直呼び）。登録済みIssue ISSUE-HTC-C9F6C917（実行手順の都度組み立て）の台帳laneにおける具体例である（出所recordの§4）。",
+ "impact": [
+  "登録のたびに形式不合格・検証漏れが再発しうる（雛形の記憶依存）",
+  "LLMの都度組み立てがAGENTS §3の機械規律（決定的処理は機械へ）と食い違う",
+  "issue状態が実態とずれ、台帳の信頼と監査性が下がる"
+ ],
+ "scope": [
+  "候補writer（雛形生成・欄検査・digest埋め込み・検証・置き場解決を一操作に）",
+  "仕分け決定・issue登録のwriter入口（既存build関数のコマンド化）",
+  "verdict writerとissue状態遷移の機械化",
+  "台帳一括検証の単一入口（todo_handoff型）"
+ ],
+ "non_scope": [
+  "仕分け・裁定そのもの（Human判断のまま）",
+  "record schemaの変更・凍結済み旧置き場"
+ ],
+ "classification_candidates": [
+  "implementation",
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-19-n7-candidate-remediation-evidence-v1.md",
+   "sha256": "57e644de42f6f8f4161272492cc1206818b917597b88e3c4465b8766ad7c5425"
+  },
+  {
+   "path": "records/development/2026-08-19-safe-storage-entry-exit-code-triage-decision-v1.md",
+   "sha256": "362b329f9cd8c17ade9f8ebe4b332b7da0bc96548bad25315446b6c7872c557f"
+  }
+ ],
+ "proposed_action": "2026-08-18に確立した機械化対策の型（既定値化・writer・単一入口検証）を台帳laneへ横展開する作業単位として範囲固定文書を立てる。issue実態の突合（checkpoint候補）と同枠で扱えば、新writerの初回実運用を突合作業が兼ねられる。関連Issue＝ISSUE-HTC-C9F6C917。",
+ "content_digest": "6c8b302e13d4feba0c2890abe82eef9fd34a19f902653de96b53412446fa7b1f"
+}
