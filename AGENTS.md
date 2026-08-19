@@ -94,10 +94,17 @@
   記録し、safety・authority・Acceptance真偽・必須Provenance・identity・不可逆や外部side effectに
   影響する候補は現行Workを停止、それ以外はcheckpointで扱う。AIの分類とrouteは提案であり、
   上流改定・Issue昇格・risk受容・再開はHumanが判断する。採用候補はconsumerとOutcomeへ接続されるまでclosedにしない。
-- 改善候補の登録は既存経路で行う：`OBS-`観測record→`source_identity`で束縛した`IC-`候補を
-  `.reviewcompass/workflow/improvement-candidates/`へ置き、
-  `.venv/bin/python3 -m tools.development.issue_resolution_pilot --config config/development-issue-resolution-pilot-v3.json record <path>`
-  で検証する。仕分け判断は`records/development/`のDecision recordへ記録する。V4の置き場所は
+- 改善候補の登録は既存経路で行う：`OBS-`観測record→`source_identity`で束縛した`IC-`候補の
+  **草稿（意味欄のみ）**を書き、
+  `.venv/bin/python3 -m tools.development.improvement_candidate_writer --draft <草稿path>`
+  で機械埋め込み（出所SHA-256・時刻・正準digest・置き場解決）と検証合格時のみの書き出しを行う
+  （`.reviewcompass/workflow/improvement-candidates/`への雛形手書き・digest手計算をしない。
+  根拠：2026-08-19の登録不合格2回と是正、
+  `records/development/2026-08-19-ledger-writer-evidence-v1.md`）。既存fileの検証は従来どおり
+  `.venv/bin/python3 -m tools.development.issue_resolution_pilot --config config/development-issue-resolution-pilot-v3.json record <path>`。
+  台帳全体の健全性は
+  `.venv/bin/python3 -m tools.development.workflow_ledger_verify`
+  の単独終了コード（0＝passed）で確認する。仕分け判断は`records/development/`のDecision recordへ記録する。V4の置き場所は
   固定bundle参照に加えて単体形式N1を受け付ける（2026-08-06のN7改定。実例：
   `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）。トリアージ決定は
   `tools/development/issue_intake_v4.py`の`build_human_triage_decision`で組み立て、台帳整合検証に
