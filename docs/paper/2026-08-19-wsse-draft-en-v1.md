@@ -267,13 +267,33 @@ detection moves from post-hoc reading to pre-execution machine checks. To trust 
 the impression of a conversation but on records that can be verified—that is where this method
 arrives.
 
-## References (placeholder — to be identified in the next step; slots from skeleton v2 §3)
+## References (identified — 12 entries; \cite wiring into the body happens at LaTeX typesetting)
 
-[1] Empirical studies of LLM code review (1–2 representative) [2] RAG (1) [3] Context engineering
-(survey, 1) [4] Meyer, Design by Contract [5] Requirements traceability survey [6] LLM agents /
-harnesses (1) [7] Basili-line inspection experiments (defect seeding) [8] Registered reports in
-empirical SE [9] Positioning of specification-driven development / vibe coding (1–2) [10] W3C PROV
-(provenance, if needed)
+[1] Z. Li, S. Lu, D. Guo, N. Duan, S. Jannu, G. Jenks, D. Majumder, J. Green, A. Svyatkovskiy,
+S. Fu, and N. Sundaresan, "Automating Code Review Activities by Large-Scale Pre-training,"
+ESEC/FSE 2022. — `li2022automating`
+[2] R. Tufano, S. Masiero, A. Mastropaolo, L. Pascarella, D. Poshyvanyk, and G. Bavota, "Using
+Pre-Trained Models to Boost Code Review Automation," ICSE 2022. — `tufano2022using`
+[3] P. Lewis et al., "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks,"
+NeurIPS 2020. — `lewis2020rag`
+[4] L. Mei et al., "A Survey of Context Engineering for Large Language Models,"
+arXiv:2507.13334, 2025. — `mei2025context`
+[5] B. Meyer, "Applying 'Design by Contract'," Computer 25(10), 1992. — `meyer1992contract`
+[6] J. Cleland-Huang, O. C. Z. Gotel, J. Huffman Hayes, P. Mäder, and A. Zisman, "Software
+Traceability: Trends and Future Directions," FOSE 2014. — `clelandhuang2014traceability`
+[7] L. Wang et al., "A Survey on Large Language Model Based Autonomous Agents," Frontiers of
+Computer Science 18(6), 2024. — `wang2024agents`
+[8] V. R. Basili, S. Green, O. Laitenberger, F. Lanubile, F. Shull, S. Sørumgård, and
+M. V. Zelkowitz, "The Empirical Investigation of Perspective-Based Reading," Empirical Software
+Engineering 1(2), 1996. — `basili1996pbr`
+[9] N. A. Ernst and M. T. Baldassarre, "Registered Reports in Software Engineering," Empirical
+Software Engineering, 2023. — `ernst2023registered`
+[10] R. Sapkota, K. I. Roumeliotis, and M. Karkee, "Vibe Coding vs. Agentic Coding: Fundamentals
+and Practical Implications of Agentic AI," arXiv:2505.19443, 2025. — `sapkota2025vibe`
+[11] S. Liu, "Spec-Driven Development: Unpacking One of 2025's Key New AI-Assisted Engineering
+Practices," Thoughtworks Insights, Dec. 2025. — `liu2025specdriven`
+[12] L. Moreau and P. Missier (eds.), "PROV-DM: The PROV Data Model," W3C Recommendation,
+Apr. 2013. — `w3c2013provdm`
 
 ---
 
@@ -294,7 +314,136 @@ empirical SE [9] Positioning of specification-driven development / vibe coding (
 - **double-blind配慮**：プロジェクト名・記録のpath・固有の道具名は本文に出さない
   （the subject projectで通す）。公開物（採点語彙・正解表・記録）は投稿時に匿名化して添付する
   前提（preprint方針はHuman判断待ち＝TODO記載のとおり）。
-- **残作業（TODOの後続そのまま）**：図1の作図（現状はキャプションのみ）→文献の特定
-  （[1]〜[10]の枠へ実引用を当てる）→WSSE様式（LaTeX 5頁）での組版→組版後に確定recordとの
-  数値機械照合。
+- **文献の特定（2026-08-19実施）**：骨子v2 §3の枠に対し12件を確定（利用者指示「文献の特定を
+  先に済ませる。出典をbibtex形式で末尾に追記」）。全12件の書誌情報（著者・題名・出版元・年）は
+  web検索で照合済み。BibTeXは本fileの末尾（付記の後）に追記。\citeの本文への当て込みは組版時
+  ——目安：§1 P1のvibe coding→[10]・仕様駆動開発→[11]、§2の来歴→[12]（任意）、§4の欠陥注入→
+  [8]・事前登録→[9]、§5の各文→[1,2]（LLMレビュー実証）・[3,4]（RAG／文脈工学）・[5]（DbC）・
+  [6]（要求追跡）・[7]（agent）・[8]（inspection）・[9]（registered reports）。組版時の残確認
+  ＝[9]の巻号・[2]のDOI・[7]の号数（DOIで機械解決可能）。文献節とBibTeXの年号・巻号は英語側
+  のみの数値であり、ja↔en数値照合の対象外（照合は論文本文の統計値に限る）。
+- **残作業（TODOの後続）**：図1の作図（現状はキャプションのみ）→WSSE様式（LaTeX 5頁）での
+  組版（\cite当て込み含む）→組版後に確定recordとの数値機械照合。
 - v4（原本・日本語）：`docs/paper/2026-08-19-wsse-draft-ja-v4.md`（残す）
+
+---
+
+## 付記2：BibTeX（組版用・論文本文ではない・末尾追記）
+
+```bibtex
+@inproceedings{li2022automating,
+  author    = {Li, Zhiyu and Lu, Shuai and Guo, Daya and Duan, Nan and Jannu, Shailesh and
+               Jenks, Grant and Majumder, Deep and Green, Jared and Svyatkovskiy, Alexey and
+               Fu, Shengyu and Sundaresan, Neel},
+  title     = {Automating Code Review Activities by Large-Scale Pre-training},
+  booktitle = {Proceedings of the 30th ACM Joint European Software Engineering Conference and
+               Symposium on the Foundations of Software Engineering (ESEC/FSE)},
+  year      = {2022},
+  doi       = {10.1145/3540250.3549081}
+}
+
+@inproceedings{tufano2022using,
+  author    = {Tufano, Rosalia and Masiero, Simone and Mastropaolo, Antonio and
+               Pascarella, Luca and Poshyvanyk, Denys and Bavota, Gabriele},
+  title     = {Using Pre-Trained Models to Boost Code Review Automation},
+  booktitle = {Proceedings of the 44th International Conference on Software Engineering (ICSE)},
+  year      = {2022}
+}
+
+@inproceedings{lewis2020rag,
+  author    = {Lewis, Patrick and Perez, Ethan and Piktus, Aleksandra and Petroni, Fabio and
+               Karpukhin, Vladimir and Goyal, Naman and K{\"u}ttler, Heinrich and Lewis, Mike and
+               Yih, Wen-tau and Rockt{\"a}schel, Tim and Riedel, Sebastian and Kiela, Douwe},
+  title     = {Retrieval-Augmented Generation for Knowledge-Intensive {NLP} Tasks},
+  booktitle = {Advances in Neural Information Processing Systems 33 (NeurIPS)},
+  year      = {2020}
+}
+
+@article{mei2025context,
+  author  = {Mei, Lingrui and Yao, Jiayu and Ge, Yuyao and Wang, Yiwei and Bi, Baolong and
+             Cai, Yujun and Liu, Jiazhi and others},
+  title   = {A Survey of Context Engineering for Large Language Models},
+  journal = {arXiv preprint arXiv:2507.13334},
+  year    = {2025}
+}
+
+@article{meyer1992contract,
+  author  = {Meyer, Bertrand},
+  title   = {Applying ``Design by Contract''},
+  journal = {Computer},
+  volume  = {25},
+  number  = {10},
+  pages   = {40--51},
+  year    = {1992},
+  doi     = {10.1109/2.161279}
+}
+
+@inproceedings{clelandhuang2014traceability,
+  author    = {Cleland-Huang, Jane and Gotel, Orlena C. Z. and Huffman Hayes, Jane and
+               M{\"a}der, Patrick and Zisman, Andrea},
+  title     = {Software Traceability: Trends and Future Directions},
+  booktitle = {Future of Software Engineering (FOSE)},
+  pages     = {55--69},
+  year      = {2014},
+  doi       = {10.1145/2593882.2593891}
+}
+
+@article{wang2024agents,
+  author  = {Wang, Lei and Ma, Chen and Feng, Xueyang and Zhang, Zeyu and Yang, Hao and
+             Zhang, Jingsen and others},
+  title   = {A Survey on Large Language Model Based Autonomous Agents},
+  journal = {Frontiers of Computer Science},
+  volume  = {18},
+  number  = {6},
+  pages   = {186345},
+  year    = {2024},
+  doi     = {10.1007/s11704-024-40231-1}
+}
+
+@article{basili1996pbr,
+  author  = {Basili, Victor R. and Green, Scott and Laitenberger, Oliver and Lanubile, Filippo and
+             Shull, Forrest and S{\o}rumg{\aa}rd, Sivert and Zelkowitz, Marvin V.},
+  title   = {The Empirical Investigation of Perspective-Based Reading},
+  journal = {Empirical Software Engineering},
+  volume  = {1},
+  number  = {2},
+  pages   = {133--164},
+  year    = {1996},
+  doi     = {10.1007/BF00368702}
+}
+
+@article{ernst2023registered,
+  author  = {Ernst, Neil A. and Baldassarre, Maria Teresa},
+  title   = {Registered Reports in Software Engineering},
+  journal = {Empirical Software Engineering},
+  year    = {2023},
+  doi     = {10.1007/s10664-022-10277-5}
+}
+
+@article{sapkota2025vibe,
+  author  = {Sapkota, Ranjan and Roumeliotis, Konstantinos I. and Karkee, Manoj},
+  title   = {Vibe Coding vs. Agentic Coding: Fundamentals and Practical Implications of
+             Agentic {AI}},
+  journal = {arXiv preprint arXiv:2505.19443},
+  year    = {2025}
+}
+
+@misc{liu2025specdriven,
+  author       = {Liu, Shangqi},
+  title        = {Spec-Driven Development: Unpacking One of 2025's Key New {AI}-Assisted
+                  Engineering Practices},
+  howpublished = {Thoughtworks Insights},
+  month        = dec,
+  year         = {2025},
+  note         = {\url{https://www.thoughtworks.com/en-us/insights/blog/agile-engineering-practices/spec-driven-development-unpacking-2025-new-engineering-practices}}
+}
+
+@misc{w3c2013provdm,
+  author       = {Moreau, Luc and Missier, Paolo},
+  title        = {{PROV-DM}: The {PROV} Data Model},
+  howpublished = {W3C Recommendation},
+  month        = apr,
+  year         = {2013},
+  note         = {\url{https://www.w3.org/TR/2013/REC-prov-dm-20130430/}}
+}
+```
