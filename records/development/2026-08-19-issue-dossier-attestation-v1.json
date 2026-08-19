@@ -1,0 +1,26 @@
+{
+  "record_kind": "reuse_search_attestation",
+  "schema_version": 1,
+  "subject": "issue_reconciliation_dossier",
+  "external": {
+    "relative_path": "work4b/reuse-searches/3f2a7840bdf451544d41c882d4b71ba5310febdf89837d20a1b400ff91fb1bd0.json",
+    "content_digest": "3f2a7840bdf451544d41c882d4b71ba5310febdf89837d20a1b400ff91fb1bd0",
+    "byte_sha256": "54d71b8eeb00ed9e1acabed48df8c82156139660d2e095d9be47c577a9471301"
+  },
+  "source_identity": {
+    "profile_run_id": "412f844a078c99ae7cce3ace09e5fc0c8edd6617be1d61075cdc43c3ff804b0e",
+    "discovery_run_id": "b25c0f770b9966941bf41738b0064bfbffddfbeac9f7162bd50ec30a14858dfc",
+    "source_content_id": "d616f7ee99048a8727d67a11feaaca739be554d585f629ca6a24fea08f15fee6",
+    "profile_schema_version": 3,
+    "extraction_rule_version": 4,
+    "discovery_schema_version": 1,
+    "grouping_rule_version": 1
+  },
+  "record_schema_version": 4,
+  "capability_count": 1,
+  "direct_match_count": 6,
+  "hint_match_count": 62,
+  "comparison_group_count": 63,
+  "no_search_material_capability_count": 0,
+  "content_digest": "04896e94555e3f7c7285ee1c14e8de6bca6a466ed16201bf6ed027644655cd3c"
+}
