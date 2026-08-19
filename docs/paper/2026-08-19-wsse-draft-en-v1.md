@@ -322,8 +322,14 @@ Apr. 2013. — `w3c2013provdm`
   [6]（要求追跡）・[7]（agent）・[8]（inspection）・[9]（registered reports）。組版時の残確認
   ＝[9]の巻号・[2]のDOI・[7]の号数（DOIで機械解決可能）。文献節とBibTeXの年号・巻号は英語側
   のみの数値であり、ja↔en数値照合の対象外（照合は論文本文の統計値に限る）。
-- **残作業（TODOの後続）**：図1の作図（現状はキャプションのみ）→WSSE様式（LaTeX 5頁）での
-  組版（\cite当て込み含む）→組版後に確定recordとの数値機械照合。
+- **図1（2026-08-19作図済み）**：正本＝`docs/paper/figures/figure1-contract-flow.tex`
+  （TikZ・standalone・単体コンパイル可の形）。構図はキャプションと一致——Compile time＝契約
+  （definition challengeの人間承認注記つき）→16項目義務関門（型付きエラー）→コンパイラ（決定的）→
+  6計画、Run time＝材料一覧→依頼組み立て→読み取り専用レビュー→判定転記→事後検査4点、最下段に
+  封印record（SHA-256）の帯が全段へ破線で接続。本環境にLaTeX処理系が無いため**TikZは未コンパイル**
+  （構文の最終検証は組版時。同構図のSVGプレビューでレイアウト確認済み・chat提示済み）。
+- **残作業（TODOの後続）**：WSSE様式（LaTeX 5頁）での組版（\cite当て込みと図1のコンパイル確認を
+  含む。LaTeX環境が必要＝BasicTeX等の導入またはOverleaf）→組版後に確定recordとの数値機械照合。
 - v4（原本・日本語）：`docs/paper/2026-08-19-wsse-draft-ja-v4.md`（残す）
 
 ---
