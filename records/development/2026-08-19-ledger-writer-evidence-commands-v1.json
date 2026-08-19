@@ -1,0 +1,41 @@
+{
+ "title": "候補writer・台帳一括検証入口 受入確認の実測",
+ "entries": [
+  {
+   "label": "新設試験9本の単独実行（決定的射影）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nresult = subprocess.run(\n    ['.venv/bin/python3', '-m', 'pytest', '-q',\n     'tests/test_improvement_candidate_writer.py',\n     'tests/test_workflow_ledger_verify.py'],\n    capture_output=True,\n    text=True,\n)\nprint('exit', result.returncode)\nprint(result.stdout.strip().splitlines()[-1].rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "台帳関連試験群の単独実行（決定的射影）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import subprocess\nresult = subprocess.run(\n    ['.venv/bin/python3', '-m', 'pytest', '-q',\n     'tests/test_issue_intake_v4_single_candidate.py',\n     'tests/test_issue_intake_v4.py',\n     'tests/test_issue_resolution_pilot.py',\n     'tests/test_agents_lane_guidance.py'],\n    capture_output=True,\n    text=True,\n)\nprint('exit', result.returncode)\nprint(result.stdout.strip().splitlines()[-1].rsplit(' in ', 1)[0])\n"
+   ]
+  },
+  {
+   "label": "実repoでの一括検証入口の単独実行（exit 0が合格）",
+   "argv": [
+    ".venv/bin/python3",
+    "-m",
+    "tools.development.workflow_ledger_verify"
+   ]
+  },
+  {
+   "label": "新設module・試験のdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/development/improvement_candidate_writer.py",
+    "tools/development/workflow_ledger_verify.py",
+    "tests/test_improvement_candidate_writer.py",
+    "tests/test_workflow_ledger_verify.py"
+   ]
+  }
+ ]
+}
