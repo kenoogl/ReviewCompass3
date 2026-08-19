@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-LEDGER-LANE-WRITER-MECHANIZATION-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-19T10:55:43+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-ledger-lane-writer-mechanization-001--v1.json",
+    "record_sha256": "31d5220a1ef0929da81877dc737dd805a619d91f92712dbb78e5b72b4a93f6c4",
+    "candidate_id": "IC-LEDGER-LANE-WRITER-MECHANIZATION-001",
+    "candidate_content_digest": "6c8b302e13d4feba0c2890abe82eef9fd34a19f902653de96b53412446fa7b1f"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "medium",
+    "priority": "medium",
+    "promote_to_issue": false
+  },
+  "disposition": "current_work",
+  "blocking": false,
+  "rationale": "承認文言「current_workで採用。候補writerと一括検証入口だけ先に作って」（2026-08-19 chat）。実害は2日間で2種類が実測済み（2026-08-18の検証器未通過4件登録→保護試験N7が3日間赤・2026-08-19の形式不合格2回）で再発性があり、既存の組み立て関数・検証器の再利用が主で規模は同型前例（計画writer）並みと見込めるため、いま対処とする。ただしscopeを限定し、**候補writerと台帳一括検証の単一入口の2部品だけを先行実装**する。残scope（仕分け決定・issue登録のwriter入口・verdict writerと状態遷移）は後続とし、issue実態の突合（checkpoint候補）と同枠での実施を候補とする。Issueへの昇格はせず候補台帳で管理する。",
+  "next_action": "範囲固定文書（軽量作業票＋事前走査）を立て、候補writer（草稿→機械埋め込み→検証合格時のみ書き出し）と台帳一括検証の単一入口（候補の勘定＋仕分け決定台帳の全件検証）を実装する。残scopeは突合checkpoint枠で再仕分けする。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "2944f39463059af3dd1e63c4f4ab88d81b28b16916488a52b044d17b226c7777"
+}
