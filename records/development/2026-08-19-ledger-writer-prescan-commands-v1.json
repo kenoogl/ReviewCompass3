@@ -1,0 +1,38 @@
+{
+ "title": "候補writer・台帳一括検証入口 事前走査の実測",
+ "entries": [
+  {
+   "label": "台帳の現況（候補・決定・allowlistの件数）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "from pathlib import Path\ncandidates = sorted(Path('.reviewcompass/workflow/improvement-candidates').glob('*.json'))\ndecisions = sorted(Path('.reviewcompass/workflow/triage-decisions-v4').glob('*.json'))\nprint('candidates_json', len(candidates), '(allowlist含む)')\nprint('decisions_v4', len(decisions))\nimport json\nallowlist = json.loads(Path('.reviewcompass/workflow/improvement-candidates/historical-allowlist-v1.json').read_text(encoding='utf-8'))\nprint('allowlist_entries', len(allowlist['entries']))\n"
+   ]
+  },
+  {
+   "label": "新設名の衝突なしの機械確認",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "from pathlib import Path\nfor candidate in (\n    'tools/development/improvement_candidate_writer.py',\n    'tools/development/workflow_ledger_verify.py',\n    'tests/test_improvement_candidate_writer.py',\n    'tests/test_workflow_ledger_verify.py',\n):\n    print(candidate, 'exists', Path(candidate).exists())\nhits = []\nfor base in ('tools', 'tests'):\n    for path in sorted(Path(base).rglob('*.py')):\n        try:\n            text = path.read_text(encoding='utf-8')\n        except (OSError, UnicodeDecodeError):\n            continue\n        if 'workflow_ledger' in text or 'improvement_candidate_writer' in text:\n            hits.append(path.as_posix())\nprint('name_hits', hits)\n"
+   ]
+  },
+  {
+   "label": "流用部品と接続先のdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/development/issue_resolution_pilot.py",
+    "tools/development/issue_intake_v4.py",
+    "tools/development/reuse_search_plan.py",
+    "tools/common/digests.py",
+    "config/development-issue-resolution-pilot-v2.json",
+    "config/development-issue-resolution-pilot-v3.json",
+    "config/development-issue-resolution-pilot-v4.json",
+    ".reviewcompass/workflow/improvement-candidates/historical-allowlist-v1.json",
+    "tests/test_issue_intake_v4_single_candidate.py"
+   ]
+  }
+ ]
+}

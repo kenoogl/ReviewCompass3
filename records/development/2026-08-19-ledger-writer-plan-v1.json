@@ -1,0 +1,58 @@
+{
+ "content_digest": "6ff7516ba0ebeaef274223c45dcaf320923ca2dc7b7367ed69592b17b1f15830",
+ "plan_id": "FCRS-LEDGER-WRITER-2026-08-19-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-19-ledger-writer-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "candidate_writer_and_ledger_verify_entry",
+     "failure_behavior": [
+      "検証器不合格の草稿はfileを書き出さず失敗を返す（fail-closed）",
+      "既存fileへの上書きを拒否する（new-only）",
+      "台帳の不充足はfindingsへ列挙しstatus=failedとexit非0で申告する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "改善候補の草稿JSON（意味欄のみ・機械欄の省略可）",
+      "台帳置き場（候補・allowlist・V4仕分け決定）と規定形config"
+     ],
+     "outputs": [
+      "検証器合格済み候補record（機械埋め込み・置き場解決済み）",
+      "台帳一括検証の一行JSON（findings・status・counts）"
+     ],
+     "reference_paths": [
+      "tools/development/issue_resolution_pilot.py",
+      "tools/development/issue_intake_v4.py",
+      "tools/common/digests.py",
+      "tools/development/reuse_search_plan.py"
+     ],
+     "reference_symbols": [
+      "tools/development/issue_resolution_pilot.py:validate_candidate",
+      "tools/development/issue_intake_v4.py:validate_triage_decision_repository",
+      "tools/common/digests.py:canonical_content_digest"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "既存検証器・保護試験N7・record schemaを変更しない",
+      "digest・時刻・置き場の決定処理をwriterが機械実行しLLMの都度組み立てを消す",
+      "勘定の3分岐（validator・allowlist・V4決定指紋）はN7と同型にする"
+     ],
+     "responsibility": "改善候補の草稿から機械欄（出所SHA-256・時刻・正準digest・置き場）を機械埋め込みし検証器合格時のみ台帳へ書き出すwriterと、候補置き場の勘定とV4決定台帳の全件検証を一操作で行う一括検証入口を新設し、台帳lane作成側の手作業を構造的に排除する",
+     "symbol_terms": [
+      "writer",
+      "candidate",
+      "verify",
+      "ledger",
+      "finalize"
+     ]
+    }
+   ],
+   "subject": "ledger_writer_and_verify"
+  }
+ ]
+}
