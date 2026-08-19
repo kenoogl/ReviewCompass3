@@ -2,9 +2,9 @@
   "record_kind": "issue_record",
   "schema_version": 2,
   "issue_id": "ISSUE-HTC-66C3E6CA",
-  "issue_version": 1,
+  "issue_version": 2,
   "created_at": "2026-08-05T14:02:25+09:00",
-  "state": "registered",
+  "state": "resolved",
   "problem": "LLMがEvidence・TODO等の定型欄を手入力または都度の位置推測で作成している。そのため固定receiptとの転記差、見出し位置の不一致、検証完了前の時刻確定、監査内訳の分かりにくさが発生する。",
   "candidate_ref": {
     "bundle_path": "records/development/2026-08-05-historical-todo-intake-candidates-v1.json",
@@ -20,5 +20,5 @@
     "sha256": "bb2cfbb618f5b1ee918018a1ae4ae78d74a25eccb26a7cd46e07685571c31e5f",
     "content_digest": "dd00713c79f27d8bf6bba3e283a65a388ac7df8c27dfe2ae4e2b8304b65ce536"
   },
-  "content_digest": "047cd3bb508f5f2fdb82c35c29f1198a6e3e695e8610627ea543a909cee9c41a"
+  "content_digest": "ff5d842a13f1ae5733a13fd5f275b503c4e250afe6addb2794b09c94b36667de"
 }
