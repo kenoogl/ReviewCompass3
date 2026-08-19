@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-ARCHITECTURE-CONFORMANCE-CHECK-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-19T12:24:39+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-architecture-conformance-check-001--v1.json",
+    "record_sha256": "4da110f085f5abcd8fa40c7ec969dc2249e87269f565742fe32d2460fd9126ba",
+    "candidate_id": "IC-ARCHITECTURE-CONFORMANCE-CHECK-001",
+    "candidate_content_digest": "a608a10690afafc399b26993153d0e1973c9a544d5974547babfa7e8abd1c209"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "checkpoint",
+  "blocking": false,
+  "rationale": "承認文言「改善候補として登録して。仕分けはcheckpoint、合図はWSSE初稿後・コード管理調査と同枠」（2026-08-19 chat）。整合劣化の実例が反復しており（終了コード語彙の3入口並存・SHA-256補助の14 file重複・lifecycle未宣言73件）recurrenceは真。劣化は静かに蓄積し発見が偶然のレビューに依存するためimpactはmedium。論文（WSSE・締切2026-08-30）が急所のため実施は初稿後としpriorityはlow。全体最適化の判断はAIへ委ねず人に残す設計を維持し、宣言＋整合検査（判断は人・検査は機械）の形に限定する。デプロイ関連のコード管理機構調査（lifecycle棚卸し）と同枠で扱い、棚卸し結果を宣言初版の材料にする。",
+  "next_action": "WSSE初稿完了後の開発枠で、コード管理機構調査と同枠のcheckpointとして範囲固定文書を立てる。アーキテクチャ宣言の初版（Human承認）→検査器の最小3規則（依存方向・lifecycle整合・単一正本）→受入・事前走査への組み込み、の順。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "ea3dd8718d885a0ad803012807aa70bca657b2cc2990d2eeb3862be5c7e78443"
+}

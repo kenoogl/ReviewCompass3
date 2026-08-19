@@ -1,0 +1,55 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-ARCHITECTURE-CONFORMANCE-CHECK-001",
+ "candidate_version": 1,
+ "source_work": "architecture-conformance/observation",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-ARCHITECTURE-CONFORMANCE-2026-08-19-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-19-architecture-conformance-observation-v1.md",
+  "sha256": "b7d9dd76009cadbbd5a9e5c2fe0729c290f4c6598375adf50ce161ac9df201ac"
+ },
+ "problem": "仕様駆動開発の作業単位（TDD）は局所的に健全だが、module構成の全体整合を機械検査する仕組みがなく、全体判断が人の頭の中の再構成に依存している。実例：終了コード語彙の3入口並存は実験レビューが偶然表面化させた（機械検出なし）、lifecycle宣言はprovisional 100・stable 1・未宣言73で依存方向との整合検査が無い、試験のSHA-256補助14 file重複は放置中。roots.py一元化のgrep検査という同型の先行実例はあるが点在している（出所recordの§1）。",
+ "impact": [
+  "横断的な整合の劣化（語彙分裂・依存逆流・複製増殖）が静かに蓄積し、発見が偶然のレビューに依存する",
+  "全体像の再構成が毎回人の負担になり、作業単位間の分断の接続点が属人化する",
+  "デプロイ時の配布境界判断（lifecycle・配置）に機械的な土台がない"
+ ],
+ "scope": [
+  "アーキテクチャ宣言（層と依存方向・lifecycle制約・正本単一性の概念一覧・配置規約）の機械可読な正本をHuman承認で制定する",
+  "整合検査器（import解析・lifecycle整合・単一正本検査・配置allowlist）を新設し違反をfail-closedで列挙する",
+  "作業単位の受入と事前走査への組み込み（点在する既存検査＝roots grep等の集約を含む）",
+  "宣言の改定手続き（Human裁定）の明文化"
+ ],
+ "non_scope": [
+  "構成の良し悪し（分割の筋・抽象の適否）の自動判断——宣言を書く人に残す",
+  "全体アーキテクチャ最適化のAIへの委譲",
+  "既存moduleの一斉再配置"
+ ],
+ "classification_candidates": [
+  "implementation",
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-19-architecture-conformance-observation-v1.md",
+   "sha256": "b7d9dd76009cadbbd5a9e5c2fe0729c290f4c6598375adf50ce161ac9df201ac"
+  },
+  {
+   "path": "records/development/2026-08-19-read-only-entry-exit-code-unification-evidence-v1.md",
+   "sha256": "6c99e3e4cf1dcd88656da54641ade7056d9cefd090075046bcb09196adfbc9b4"
+  }
+ ],
+ "proposed_action": "デプロイ関連の「コード管理機構の調査（lifecycle棚卸し）」と同枠のcheckpointで範囲固定文書を立てる。棚卸し結果を宣言初版の材料にし、検査器は依存方向・lifecycle整合・単一正本の最小3規則から始める。",
+ "created_at": "2026-08-19T12:24:23+09:00",
+ "content_digest": "a608a10690afafc399b26993153d0e1973c9a544d5974547babfa7e8abd1c209"
+}
