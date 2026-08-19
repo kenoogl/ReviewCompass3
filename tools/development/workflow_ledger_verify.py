@@ -127,10 +127,28 @@ def verify(project_root=None):
       continue
     findings.append({"kind": "candidate_unaccounted", "path": path.name})
 
+  issue_total = 0
+  issue_states = {}
+  if v4_config_path.is_file():
+    try:
+      issues = intake.load_v4_issues(project_root=root, config=v4_config)
+      intake.validate_v4_issue_repository(project_root=root, config=v4_config)
+      issue_total = len(issues)
+      for issue in issues:
+        state = issue["state"]
+        issue_states[state] = issue_states.get(state, 0) + 1
+    except (intake.IntakeError, OSError, ValueError) as error:
+      findings.append({
+        "kind": "issue_repository_invalid",
+        "detail": str(error),
+      })
+
   return {
     "candidate_total": candidate_total,
     "accounted": accounted,
     "decision_total": len(effective),
+    "issue_total": issue_total,
+    "issue_states": issue_states,
     "findings": findings,
     "status": "passed" if not findings else "failed",
   }

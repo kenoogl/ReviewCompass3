@@ -125,6 +125,35 @@ def test_allowlist_branch_accounts_candidate(tmp_path):
   assert summary["accounted"]["allowlist"] == 1
 
 
+def test_broken_issue_repository_is_listed(tmp_path):
+  from tools.development import workflow_ledger_verify as verify
+
+  root = _fixture_root(tmp_path)
+  issues = root / ".reviewcompass/workflow/issues-v4"
+  issues.mkdir(parents=True)
+  (issues / "issue-broken-probe-001--v1.json").write_text(
+    '{"record_kind": "issue_record"}\n', encoding="utf-8"
+  )
+
+  summary = verify.verify(project_root=root)
+
+  assert summary["status"] == "failed"
+  assert any(
+    finding["kind"] == "issue_repository_invalid"
+    for finding in summary["findings"]
+  )
+
+
+def test_real_repository_counts_issues():
+  from tools.development import workflow_ledger_verify as verify
+
+  summary = verify.verify(project_root=PROJECT_ROOT)
+
+  assert summary["status"] == "passed"
+  assert summary["issue_total"] >= 8
+  assert summary["issue_states"].get("registered", 0) >= 8
+
+
 def test_real_repository_ledger_is_green():
   from tools.development import workflow_ledger_verify as verify
 
