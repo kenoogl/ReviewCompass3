@@ -1,0 +1,53 @@
+{
+ "content_digest": "e2234ba03841e3ef731451bb4c6400972835fc2bbf0bebcd588b34bbd526a79d",
+ "plan_id": "FCRS-ISSUE-DOSSIER-2026-08-19-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-19-issue-dossier-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "issue_reconciliation_dossier",
+     "failure_behavior": [
+      "未知のissue_idはexit非0で拒否する",
+      "git履歴が取得できない環境では当該欄をnullで申告し推測しない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "issues-v4の台帳record",
+      "records/developmentの記録群・git履歴・TODO_NEXT_SESSION.md"
+     ],
+     "outputs": [
+      "issueごとの機械調書（活動計数・参照生存・拘束flag）の一行JSON"
+     ],
+     "reference_paths": [
+      "tools/development/issue_intake_v4.py",
+      "tools/development/workflow_ledger_verify.py",
+      "tools/development/issue_state_transition.py"
+     ],
+     "reference_symbols": [
+      "tools/development/issue_intake_v4.py:load_v4_issues"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "読み取り専用で台帳・記録を変更しない",
+      "出力は決定的（時刻・乱数を含まない）",
+      "判断欄を持たない（充足・受容・裁定はHumanに残す）"
+     ],
+     "responsibility": "issueごとの実態調書（登録後の活動計数・problem参照pathの生存・TODO拘束flag・台帳欄）を機械生成し、突合の裁定材料収集をLLMの都度調査から機械処理へ移す",
+     "symbol_terms": [
+      "dossier",
+      "reconciliation",
+      "issue",
+      "activity",
+      "constraint"
+     ]
+    }
+   ],
+   "subject": "issue_reconciliation_dossier"
+  }
+ ]
+}
