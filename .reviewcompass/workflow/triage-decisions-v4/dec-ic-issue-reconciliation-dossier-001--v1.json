@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-ISSUE-RECONCILIATION-DOSSIER-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-19T11:53:55+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-issue-reconciliation-dossier-001--v1.json",
+    "record_sha256": "0179dee6f684755799d08451484f3a0aafdb6520051b25a41d1663ecedf08217",
+    "candidate_id": "IC-ISSUE-RECONCILIATION-DOSSIER-001",
+    "candidate_content_digest": "2439f6cc6f00c6059f025376eca45468f9ee5832fe7a3df0781d95c99c01ac62"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "low",
+    "priority": "medium",
+    "promote_to_issue": false
+  },
+  "disposition": "current_work",
+  "blocking": false,
+  "rationale": "承認文言「その内容で改善候補を登録して、すぐに対応」（2026-08-19 chat）。同日のissue実態突合で、裁定材料の収集がLLMの都度調査に依存し、既裁定の拘束（TODO active欄の「Issue状態を変更せず」）の検出が人手の読解頼みだったことを観測した。突合は今後も繰り返すためrecurrenceは真。実害は未発生（今回は拘束に気づけた）のためimpactはlow、指示により即時対応のためpriorityはmedium。判断（充足・受容・裁定）はHumanに残し、材料の機械部分だけを対象とする。Issueへの昇格はせず候補台帳で管理する。",
+  "next_action": "範囲固定文書（軽量作業票＋事前走査）を立て、issue実態調書の機械生成tool（登録後の活動・参照生存・拘束flag）を本日実装する。治癒確認probeは将来拡張。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "aa9edd298e4e5f43f2f32daa22f61520878cf29e216b3529dc0f81132d5da2c1"
+}

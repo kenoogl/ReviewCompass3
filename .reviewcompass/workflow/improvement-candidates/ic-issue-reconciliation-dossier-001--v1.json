@@ -1,0 +1,49 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-ISSUE-RECONCILIATION-DOSSIER-001",
+ "candidate_version": 1,
+ "source_work": "issue-ledger-reconciliation/observation",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-ISSUE-LEDGER-RECONCILIATION-2026-08-19-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-19-issue-ledger-reconciliation-decision-v1.md",
+  "sha256": "4c81a8de622a633df1f87476a576bdd5ebcc25ac3a86384e1837da1df19e505a"
+ },
+ "problem": "issue実態の突合における裁定材料の収集（登録後の活動・参照の生存・既裁定の拘束・治癒確認）が、LLMの都度調査に依存している。2026-08-19の突合では、TODO active欄の拘束（「Issue状態を変更せず」の既裁定）の検出が人手の読解に依存し、見落とせば誤った遷移提案につながるriskがあった。判断そのもの（充足・残余risk受容・裁定）はHumanに残すが、材料の機械部分はissueごとの実態調書（dossier）として機械生成できる。",
+ "impact": [
+  "突合のたびに調査をその場で組み立て直し、網羅が調査者の記憶に依存する",
+  "既裁定の拘束を見落として誤った遷移提案をするriskがある",
+  "裁定材料の再現性がなく、監査で追いにくい"
+ ],
+ "scope": [
+  "issueごとの実態調書の機械生成（登録後の活動＝records・git言及の計数、problem参照pathの生存、TODO active拘束flag）",
+  "一括・単独issueの両対応のコマンド入口",
+  "治癒確認probeの宣言実行は将来拡張とする（probe宣言は意味作業のため）"
+ ],
+ "non_scope": [
+  "充足判断・残余riskの受容・最終裁定（Humanのまま）",
+  "issue schemaの変更・probe宣言形式の標準化"
+ ],
+ "classification_candidates": [
+  "implementation",
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "current_work",
+  "checkpoint"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-19-issue-ledger-reconciliation-decision-v1.md",
+   "sha256": "4c81a8de622a633df1f87476a576bdd5ebcc25ac3a86384e1837da1df19e505a"
+  }
+ ],
+ "proposed_action": "範囲固定文書を立て、issue実態調書の機械生成toolを実装する。次回以降の突合は機械調書＋LLM所見＋Human裁定の分担にし、拘束flagで遷移提案の安全性を上げる。",
+ "created_at": "2026-08-19T11:53:39+09:00",
+ "content_digest": "2439f6cc6f00c6059f025376eca45468f9ee5832fe7a3df0781d95c99c01ac62"
+}
