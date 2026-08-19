@@ -1,0 +1,57 @@
+{
+ "content_digest": "0ae8203ba24577c521dbb3f97001259a492900f962383eb5e253562c5ab15e0f",
+ "plan_id": "FCRS-RETURN-PATH-WRITERS-2026-08-19-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-19-return-path-writers-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "return_path_writers_and_state_transition",
+     "failure_behavior": [
+      "単体検証またはrepository検証に不合格の書き出しは行わず、書いた場合は除去して原状へ戻す",
+      "語彙外のissue状態・new-only違反・N1以外の決定形式は即拒否する"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "仕分け決定の草稿（意味欄のみ・時刻省略可）",
+      "昇格決定record（N1形式）と対象issueの現行record"
+     ],
+     "outputs": [
+      "検証済みの仕分け決定・issue record・版遷移後のissue record",
+      "issues-v4を含む台帳一括検証の勘定"
+     ],
+     "reference_paths": [
+      "tools/development/issue_intake_v4.py",
+      "tools/development/issue_resolution_pilot.py",
+      "tools/development/improvement_candidate_writer.py",
+      "tools/development/workflow_ledger_verify.py"
+     ],
+     "reference_symbols": [
+      "tools/development/issue_intake_v4.py:build_human_triage_decision",
+      "tools/development/issue_intake_v4.py:build_v4_issue_record",
+      "tools/development/issue_intake_v4.py:validate_v4_issue_repository"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "record schema・既存検証器・保護試験を変更しない",
+      "時刻・指紋・digest・置き場・版遷移の決定処理を機械実行しLLMの都度組み立てを消す",
+      "active上限1・重複拒否・終端状態の規則は既存repository検証で機械強制する"
+     ],
+     "responsibility": "台帳laneの復路（仕分け決定の書き出し・issue登録・issueの状態遷移）をコマンド入口の機械処理にし、既存の組み立て関数と検証器を再利用して検証合格時のみ台帳を変更する。閉じる操作は状態遷移で表現し、判定の意味内容はDecision recordへ残す",
+     "symbol_terms": [
+      "decision",
+      "issue",
+      "transition",
+      "state",
+      "writer"
+     ]
+    }
+   ],
+   "subject": "return_path_writers"
+  }
+ ]
+}

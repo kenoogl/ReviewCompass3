@@ -1,0 +1,50 @@
+{
+ "title": "復路writer（決定・issue・状態遷移）事前走査の実測",
+ "entries": [
+  {
+   "label": "intake既存API（build・validate関数の機械列挙）",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "from pathlib import Path\ntext = Path('tools/development/issue_intake_v4.py').read_text(encoding='utf-8')\nfor line in text.splitlines():\n    if line.startswith('def build_') or line.startswith('def validate_'):\n        print(line.split('(')[0])\n"
+   ]
+  },
+  {
+   "label": "v4のissue状態語彙・欄・置き場",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import json\nconfig = json.load(open('config/development-issue-resolution-pilot-v4.json', encoding='utf-8'))\nprint('issue_states', config['issue_states'])\nprint('active', config['active_issue_states'], 'terminal', config['terminal_issue_states'])\nprint('maximum_active_issues', config['maximum_active_issues'])\nprint('issue_record_v2_fields', config['issue_record_v2']['record_fields'])\nprint('issue_dir', config['directories']['issue_record_v2'])\n"
+   ]
+  },
+  {
+   "label": "verdict検証器の不在の機械確認",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "import json\nfrom pathlib import Path\nfor name in ('config/development-issue-resolution-pilot-v2.json', 'config/development-issue-resolution-pilot-v3.json', 'config/development-issue-resolution-pilot-v4.json'):\n    config = json.loads(Path(name).read_text(encoding='utf-8'))\n    fields = config.get('record_fields', {}) or {}\n    print(name.rsplit('-', 1)[-1], 'verdict_fields', fields.get('issue_resolution_verdict'), '| resolution_verdict' in json.dumps(config))\ntext = Path('tools/development/issue_resolution_pilot.py').read_text(encoding='utf-8')\nprint('dispatch_has_resolution_verdict', 'resolution_verdict' in text)\nold = json.loads(Path('.reviewcompass/workflow/resolution-verdicts/verdict-pilot-todo-growth-001--v1.json').read_text(encoding='utf-8'))\nprint('old_verdict_record_kind', old['record_kind'])\n"
+   ]
+  },
+  {
+   "label": "新設名の衝突なしの機械確認",
+   "argv": [
+    ".venv/bin/python3",
+    "-c",
+    "from pathlib import Path\nfor candidate in (\n    'tools/development/triage_decision_writer.py',\n    'tools/development/issue_record_writer.py',\n    'tools/development/issue_state_transition.py',\n    'tests/test_triage_decision_writer.py',\n    'tests/test_issue_record_writer.py',\n    'tests/test_issue_state_transition.py',\n):\n    print(candidate, 'exists', Path(candidate).exists())\n"
+   ]
+  },
+  {
+   "label": "流用部品のdigest固定",
+   "argv": [
+    "shasum",
+    "-a",
+    "256",
+    "tools/development/issue_intake_v4.py",
+    "tools/development/issue_resolution_pilot.py",
+    "tools/development/improvement_candidate_writer.py",
+    "tools/development/workflow_ledger_verify.py",
+    "config/development-issue-resolution-pilot-v4.json"
+   ]
+  }
+ ]
+}
