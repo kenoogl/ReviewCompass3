@@ -107,8 +107,16 @@
   の単独終了コード（0＝passed）で確認する。仕分け判断は`records/development/`のDecision recordへ記録する。V4の置き場所は
   固定bundle参照に加えて単体形式N1を受け付ける（2026-08-06のN7改定。実例：
   `ISSUE-AUTHORITY-REFERENCE-DIGEST-CHECK-001`）。トリアージ決定は
-  `tools/development/issue_intake_v4.py`の`build_human_triage_decision`で組み立て、台帳整合検証に
-  合格させる。旧Pilotの置き場所は凍結のまま。候補記録の形式の作り直しを先に提案しない。
+  `.venv/bin/python3 -m tools.development.triage_decision_writer --draft <草稿path>`
+  で組み立て・検証・書き出しを一操作で行う（組み立ての正本は`issue_intake_v4.py`の
+  `build_human_triage_decision`）。Issue昇格は
+  `.venv/bin/python3 -m tools.development.issue_record_writer --decision <決定path>`、
+  issueの状態変更（着手・完了・却下等）は
+  `.venv/bin/python3 -m tools.development.issue_state_transition --issue-id <ID> --to-state <状態>`
+  を使う。判定の意味内容（承認文言・残余risk受容）はDecision recordへ残し、検証器のない
+  verdict専用recordは作らない（根拠：2026-08-19の復路writer整備、
+  `records/development/2026-08-19-return-path-writers-evidence-v1.md`）。
+  旧Pilotの置き場所は凍結のまま。候補記録の形式の作り直しを先に提案しない。
 - 正本：開発方針の詳細＝`docs/development/2026-08-02-development-policy.md`。§2・§3の2026-08-18
   追記（規範のrepo移設）の判断record＝
   `records/development/2026-08-18-agents-norm-transfer-decision-v1.md`。
