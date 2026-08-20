@@ -1,0 +1,58 @@
+{
+  "title": "契約015 GREEN固定（対象・関連試験の件数と終了コード・分岐消滅固定点・成果物digest）",
+  "entries": [
+    {
+      "label": "reviewer_launch試験の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_reviewer_launch.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "reviewer_launch試験の単独終了コード射影",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_reviewer_launch.py -q -p no:cacheprovider >/dev/null 2>&1; echo exit=$?"]
+    },
+    {
+      "label": "request_builder試験（契約011対象）の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_request_builder.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "request_builder試験の単独終了コード射影",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_request_builder.py -q -p no:cacheprovider >/dev/null 2>&1; echo exit=$?"]
+    },
+    {
+      "label": "G30契約操作試験の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_operation_contract_run.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "G30契約操作試験の単独終了コード射影",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_operation_contract_run.py -q -p no:cacheprovider >/dev/null 2>&1; echo exit=$?"]
+    },
+    {
+      "label": "RQ2装置試験の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_rq2_paired_trial.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "RQ2装置試験の単独終了コード射影",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_rq2_paired_trial.py -q -p no:cacheprovider >/dev/null 2>&1; echo exit=$?"]
+    },
+    {
+      "label": "起動核のname分岐消滅の固定点（0が期待値）",
+      "argv": ["sh", "-c", "grep -c 'backend_name == ' tools/reviewer_launch/core.py || true"]
+    },
+    {
+      "label": "生成promptのgolden digest再計算（改修後）",
+      "argv": [
+        ".venv/bin/python3", "-c",
+        "from tools.reviewer_launch.core import build_prompt\nimport hashlib\nfor tool in ('view_file','Read'):\n    p=build_prompt('/repo-fixed','records/session-handoffs/fixed-request-v1.md','a'*64,read_tool_name=tool)\n    print(tool, len(p.encode('utf-8')), hashlib.sha256(p.encode('utf-8')).hexdigest())\n"
+      ]
+    },
+    {
+      "label": "変更成果物のdigest固定",
+      "argv": [
+        "shasum", "-a", "256",
+        "tools/reviewer_launch/core.py",
+        "tools/reviewer_launch/entry.py",
+        "tests/test_reviewer_launch.py",
+        "docs/development/prompts/reviewer-launch-run.md"
+      ]
+    }
+  ]
+}
