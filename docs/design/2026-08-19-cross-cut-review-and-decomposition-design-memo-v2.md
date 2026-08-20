@@ -4,7 +4,8 @@
 - 種別：考察record（**裁定ではない**。実装の範囲固定はcheckpoint合図後の作業単位で行う）
 - v1からの差分：利用者指摘6点の加筆——(1) 契約の形3案の比較、(2) 構造化要件の詳細化、
   (3) 一括gateのフェーズの明確化、(4) 実装段の横串検査タイミングの詳細、(5) 要件schema欄の素案、
-  (6) 新設部品の実装順序案。v1（`…-design-memo-v1.md`）は候補束縛先として不変のまま残す
+  (6) 新設部品の実装順序案。同日追補＝§11 RC3後追い分割案（宣言初版の下書き）と§12 dogfooding。
+  v1（`…-design-memo-v1.md`）は候補束縛先として不変のまま残す
 - 指示者：利用者（Human）。v1の主要文言に加え【記録】
   > 契約の形の3案A,B,Cについて加筆しておかなくてもよいか？module毎の構造化要件を詳細化して
   > いなくてよいか？全部揃ってから一括の話はどのフェーズでの話か？Task Contract以降での実装時の
@@ -125,3 +126,41 @@ failure_behavior・symbol_terms＝実証済みの型）を土台に、module結�
 機械層`IC-ARCHITECTURE-CONFORMANCE-CHECK-001`と意味層`IC-CROSS-CUT-REVIEW-001`は
 同一checkpoint枠（WSSE初稿後・コード管理調査と同枠）。着手時は宣言を共有正本として同一の
 範囲固定文書で束ね、本memo §8の順序を作業票の初期案とする。
+
+## 11. RC3後追い分割案（宣言初版の下書き・2026-08-19追補）
+
+package構成とfile数は機械抽出【実測】、束ね方はLLMの意味分析＝**版付き仮説**（承認前）。
+**粗い粒度9・細かい粒度13**。
+
+| # | 機能module | 責務（一句） | 対応package | 規模 |
+| --- | --- | --- | --- | --- |
+| 1 | 共通正本 | digest・path・出力の単一定義 | common | 5 |
+| 2 | セッション記録 | 生ログの保全・安全読取・安全保存 | session_logs大半 | 約37 |
+| 3 | レビュー実行 | 依頼組み立て→起動→外部送信統制→判定受領 | request_builder・reviewer_launch・egress・external_review・reviews・reviewer_bridge | 約16 |
+| 4 | SDD前工程 | 要求schema・機能分割・契約compileと執行・設計受入 | requirements・task_contract・design | 17 |
+| 5 | 開発台帳 | 観測→候補→仕分け→issue→状態遷移のlaneと検証 | developmentの台帳系 | 約15 |
+| 6 | 実測・検証基盤 | 測定ブロック・TODO検証・遷移確認・再利用検索 | developmentの基盤系 | 約20 |
+| 7 | 操縦・実行 | claude起動・実装実行経路・運用契約実行 | developmentのclaude_*群・operations | 約10 |
+| 8 | 評価装置 | 運用集計・RQ1／RQ2実験装置 | evaluation | 3 |
+| 9 | 配置・配布 | 配置境界・checkout移設・配布前検証 | deployment・layout・session_logs内deployment_*群 | 約8 |
+
+細分（13）＝#2を保全／安全読取／安全保存へ、#5〜6を台帳lane／実測検証／再利用検索へ。
+別枠＝**時限機構の束**：bootstrap（18）＋extraction（23）＝41 file（約23%）は立て直し期・
+歴史移行の機構で、lifecycle棚卸しの「開発専用・時限」区分の最有力。
+
+**機械信号として既に見える境界の疑い**：(1) developmentの肥大（48 file・最大＝3責務同居）、
+(2) session_logsへの配布系file混在（deployment_lifecycle等）、(3) requirementsに
+`feature_partition`が既存＝後追い宣言はこれを再利用できる。
+
+## 12. dogfooding（実作業での自己適用・2026-08-19追補）
+
+本設計の実作業は**構造的にdogfoodingになる**：
+
+1. **宣言・checker**：初対象はRC3自身。§11の既知の境界の疑い3点が**受入のoracle**になる
+   （初回実行がRC3を素通しなら検査器を疑う）。brownfieldのため初回は違反台帳→Human仕分け
+   （是正／例外宣言／宣言改定）——N7是正・歴史allowlistで確立した型を再利用する。
+2. **横串レビュー（案A）**：初回の対象は**宣言初版そのもの**（§11の束ね方の意味整合）。
+   運用パターンの初回実運用を宣言承認が兼ねる。
+3. **要件writer・横串篩**：本番は新アプリだが、RC3では宣言のprovides／requires粗記述で予行できる。
+4. 前例：台帳laneのwriter群は構築当日に自身の登録・仕分けで初実運用した（2026-08-19）。
+   同じ順序で「作りながら自分に適用」する。
