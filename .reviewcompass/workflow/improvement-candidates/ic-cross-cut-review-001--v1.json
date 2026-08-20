@@ -1,0 +1,55 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-CROSS-CUT-REVIEW-001",
+ "candidate_version": 1,
+ "source_work": "cross-cut-review/design-discussion",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-CROSS-CUT-REVIEW-2026-08-19-V1",
+  "source_version": 1,
+  "path": "docs/design/2026-08-19-cross-cut-review-and-decomposition-design-memo-v1.md",
+  "sha256": "ac5e4ee68ec34f9a5712fc53c3fbf55980a1a6383a0dd13a721461322dd6eb41"
+ },
+ "problem": "Task Contract方式は縦串（小さなE2E縦切り＋受入・完了レビュー）が強い一方、module間の整合を見る横方向のレビュー制度が不在で、意味層の全体整合（責務重複・境界の筋・module間の要件整合）が人の頭の中の再構成に依存している。機械層（依存方向・語彙・配置の整合検査）はIC-ARCHITECTURE-CONFORMANCE-CHECK-001で扱うが、機械で判定できない意味層の横串が残る。設計の全体は出所memo（流れ図・役割分担表・有効性の条件と限界・機能分割のLLM委任評価）に固定済み。",
+ "impact": [
+  "module間の意味的な不整合（責務重複・流儀のずれ）の発見が偶然のレビューに依存し続ける",
+  "新アプリ開発（intent→分割→要件→実装）で分割不適切の信号が要件段で出ず、実装後の手戻りになる",
+  "全体把握の負担が人に集中し、規模拡大とともに見落としriskが増える"
+ ],
+ "scope": [
+  "横串レビューの運用パターン定義（案A＝自由文レビュー類型の利用。観点表＝アーキテクチャ宣言の意味観点部をdigest束縛）",
+  "起票の合図の規約化（初回分割gate・接続点差分・checkpoint全景見直し・デプロイ前）",
+  "構造化要件のschema欄（provides/requires・intent対応・責務語彙）と要件writer・横串篩の設計（新アプリ開発の開始までに要る範囲）",
+  "効果が実証されたら案B（依頼record第4類型「横串レビュー」）への昇格判断"
+ ],
+ "non_scope": [
+  "構成の良し悪しの自動判断・全体最適化のAI委譲（人に残す）",
+  "機械層の整合検査器そのもの（IC-ARCHITECTURE-CONFORMANCE-CHECK-001の領分）",
+  "全module一括の網羅横串の常態化（RC1実測で破綻既知。初回分割時のみ）"
+ ],
+ "classification_candidates": [
+  "process_improvement",
+  "implementation"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": "docs/design/2026-08-19-cross-cut-review-and-decomposition-design-memo-v1.md",
+   "sha256": "ac5e4ee68ec34f9a5712fc53c3fbf55980a1a6383a0dd13a721461322dd6eb41"
+  },
+  {
+   "path": "records/development/2026-08-19-architecture-conformance-observation-v1.md",
+   "sha256": "b7d9dd76009cadbbd5a9e5c2fe0729c290f4c6598375adf50ce161ac9df201ac"
+  }
+ ],
+ "proposed_action": "IC-ARCHITECTURE-CONFORMANCE-CHECK-001と同一のcheckpoint枠（WSSE初稿後・コード管理調査と同枠）で範囲固定する。宣言（機械規則部＋意味観点部）は両候補の共有正本のため、着手時は同一の範囲固定文書で束ねる。実装は案Aから始め、効けば案Bへ昇格。",
+ "created_at": "2026-08-20T09:02:19+09:00",
+ "content_digest": "1196c2f604b29885dad8c04e9b2450870db22592593fd206c24744b200cc5d8f"
+}

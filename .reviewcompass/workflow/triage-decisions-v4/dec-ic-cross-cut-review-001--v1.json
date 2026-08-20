@@ -1,0 +1,31 @@
+{
+  "record_kind": "human_triage_decision",
+  "schema_version": 2,
+  "decision_id": "DEC-IC-CROSS-CUT-REVIEW-001",
+  "decision_version": 1,
+  "decided_at": "2026-08-20T09:02:43+09:00",
+  "decision_maker": "human",
+  "candidate_ref": {
+    "record_path": ".reviewcompass/workflow/improvement-candidates/ic-cross-cut-review-001--v1.json",
+    "record_sha256": "cf9520fa86ea045f35f5ef3f224dc219e2d9f4905f1cb72aee4e11dfccd79c25",
+    "candidate_id": "IC-CROSS-CUT-REVIEW-001",
+    "candidate_content_digest": "1196c2f604b29885dad8c04e9b2450870db22592593fd206c24744b200cc5d8f"
+  },
+  "human_fields": {
+    "unresolved": true,
+    "recurrence": true,
+    "impact": "medium",
+    "priority": "low",
+    "promote_to_issue": false
+  },
+  "disposition": "checkpoint",
+  "blocking": false,
+  "rationale": "承認文言「この役割分担表と流れ図込みで考察memoをdocs/designへ固定し、横串レビュー候補を登録（checkpoint・整合検査と同枠）」（2026-08-19 chat）。横方向の整合レビュー不在による意味的不整合の実例は反復しており（終了コード語彙の3入口並存の偶然発見等）recurrenceは真。劣化は静かに蓄積するためimpactはmedium。論文（WSSE・締切2026-08-30）優先のため実施は初稿後としpriorityはlow。基本方針＝LLMは意味的分析・他は機械処理で決定的に、を役割分担表として設計memoに固定済み。機械層候補IC-ARCHITECTURE-CONFORMANCE-CHECK-001と同一checkpoint枠（WSSE初稿後・コード管理調査と同枠）で扱い、宣言を共有正本として同一の範囲固定文書で束ねる。",
+  "next_action": "WSSE初稿完了後の開発枠で、整合検査（機械層）・コード管理調査（lifecycle棚卸し）と同枠の範囲固定文書を立てる。順序＝宣言初版（記述・Human承認）→横串レビュー運用パターン（案A）→横串篩・要件writerの設計（新アプリ開発の開始までに要る範囲）。",
+  "supersedes": null,
+  "issue_promotion": {
+    "approved": false,
+    "issue_id": null
+  },
+  "content_digest": "17ae92e1229a6850da02cf708b21890d20696c959a3899df7f26d7fcfb14029e"
+}
