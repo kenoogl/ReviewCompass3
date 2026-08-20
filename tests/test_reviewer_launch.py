@@ -1675,15 +1675,17 @@ def test_codex_allowed_models_fixed_by_approval():
     )
 
 
+@pytest.mark.parametrize("variable", CODEX_FORBIDDEN_VARIABLES)
 def test_codex_forbidden_auth_environment_stops(
-    repository, monkeypatch, clean_environment, tmp_path
+    repository, monkeypatch, clean_environment, tmp_path, variable
 ):
+    # 4種すべての個別遮断を機械証明する（codex E2E判定C15-REVIEW-003の是正）。
     # helperのdelenvで検査対象が消えないよう、起動を直接組み立てる。
     core = _core()
     facade = _FacadeRecorder()
     for name in CODEX_FORBIDDEN_VARIABLES:
         monkeypatch.delenv(name, raising=False)
-    monkeypatch.setenv("OPENAI_API_KEY", "secret")
+    monkeypatch.setenv(variable, "secret")
     monkeypatch.setattr(
         core,
         "CODEX_ALLOWED_RESPONSE_MODELS",
