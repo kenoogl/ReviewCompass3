@@ -1,0 +1,53 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-REVIEWER-TRANSCRIBE-REPLAY-ENTRY-001",
+ "candidate_version": 1,
+ "source_work": "contract-016-e2e/observation",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-REVIEWER-TRANSCRIBE-REPLAY-GAP-2026-08-20-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-20-reviewer-transcribe-replay-gap-observation-v1.md",
+  "sha256": "78e909119e43d9af7356383ccc08f6c72eb47060d2ecfb935f2db5be91ca537a"
+ },
+ "problem": "Reviewer起動の転記段が停止した場合（実例：契約016 terra E2Eのworktree_not_clean停止）、保存済みの未加工出力（raw先行保存）とlaunch記録から転記・事後照合だけを再実行する機械入口がなく、復旧がレビューの全再実行（外部送信と課金の重複）になる。raw先行保存の原則（実物を持ち帰って再解析できる）が正式経路の復旧に接続されていない。",
+ "impact": [
+  "外部送信・課金が重複する（同一依頼への再レビュー）",
+  "再実行で判定内容が変わり得るため、停止前のレビュー結果が復旧に使えず失われる",
+  "転記段停止からの復旧手順が手作業判断になり、運用規律頼みが常態化する"
+ ],
+ "scope": [
+  "保存済みraw（reviewer.raw.json）とlaunch記録（launch.json）を入力に、転記・schema検証・事後照合4点だけを再実行する単体入口（外部送信なし）",
+  "既存判定recordが存在する場合の衝突停止（上書きしない）と対象run_idの明示指定",
+  "worktree清浄など既存の転記前提検査は同一のまま流用する"
+ ],
+ "non_scope": [
+  "レビューの自動再実行・自動再送信",
+  "raw保存形式・判定record規約の変更",
+  "停止原因（worktree汚れ等）の自動解消"
+ ],
+ "classification_candidates": [
+  "implementation"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-20-reviewer-transcribe-replay-gap-observation-v1.md",
+   "sha256": "78e909119e43d9af7356383ccc08f6c72eb47060d2ecfb935f2db5be91ca537a"
+  },
+  {
+   "path": "records/development/2026-08-20-contract-016-e2e-findings-remediation-evidence-v1.md",
+   "sha256": "994c41dffcd1b72768a6ae0b9843c0c56bcf7277e805fc8338d1eb5bdd34aeb0"
+  }
+ ],
+ "proposed_action": "縦B（reviewer_launch）の小改定契約候補として、launch単体入口へ転記のみ再実行の副入口（例：transcribe --run-id）を追加する案を仕分けで検討する。着手時は事前走査から入り、raw完全性（digest照合）と衝突停止をRED先行で固定する。",
+ "created_at": "2026-08-20T21:57:11+09:00",
+ "content_digest": "782e9027c4d210e0d59688d5386e1285dd7d5cb8241b4c4f12e9216fc2091bfa"
+}

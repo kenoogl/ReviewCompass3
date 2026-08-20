@@ -1,0 +1,53 @@
+{
+ "record_kind": "improvement_candidate",
+ "schema_version": 1,
+ "candidate_id": "IC-LAUNCH-DIGEST-TABLE-RECHECK-001",
+ "candidate_version": 1,
+ "source_work": "contract-016-e2e/observation",
+ "source_identity": {
+  "kind": "observation",
+  "source_id": "OBS-RC3-LAUNCH-DIGEST-RECHECK-GAP-2026-08-20-V1",
+  "source_version": 1,
+  "path": "records/development/2026-08-20-launch-digest-recheck-gap-observation-v1.md",
+  "sha256": "24c00e50f3906e727c8ab2eb39d579167c9c64e77f16f09626eb7f4ad554577a"
+ },
+ "problem": "依頼recordの組み立て・check合格の後に対象fileが変わると、record内digest表が現物と不一致（陳腐化）になるが、起動（launch）は依頼record自身のSHA-256しか照合せず、表の現物再照合を行う機械層がない。実例：契約016 terra E2Eで組み立て後の互換修正commitにより表1行が陳腐化し、人の目視で起動中に気づいて手動停止・別名再組み立てで回避した。",
+ "impact": [
+  "陳腐化した表のまま起動するとReviewer側でdigest不一致所見となり、外部送信1往復が無駄になる",
+  "検出が人の注意力に依存し、組み立てと起動の間隔が空くほど見逃しの余地が広がる",
+  "既存部品（checkのdigest_mismatch検査）で検出可能な事象が機械経路に接続されていない"
+ ],
+ "scope": [
+  "起動直前のdigest表現物照合の機械化（案a：launchがcheck相当の表照合を内蔵し停止語彙で止める／案b：起動手順にcheck再実行を必須化し手順書と機械確認で固定する——の比較と選択）",
+  "不一致時のfail-closed停止（自動再生成・自動修復はしない）"
+ ],
+ "non_scope": [
+  "digest表の自動更新・依頼recordの自動再組み立て",
+  "check本体の検査内容の変更",
+  "Reviewer側の照合手順の変更"
+ ],
+ "classification_candidates": [
+  "implementation",
+  "process_improvement"
+ ],
+ "route_candidates": [
+  "checkpoint",
+  "defer"
+ ],
+ "consumer_candidates": [
+  "reviewcompass3-development"
+ ],
+ "evidence_refs": [
+  {
+   "path": "records/development/2026-08-20-launch-digest-recheck-gap-observation-v1.md",
+   "sha256": "24c00e50f3906e727c8ab2eb39d579167c9c64e77f16f09626eb7f4ad554577a"
+  },
+  {
+   "path": "records/development/2026-08-20-contract-016-e2e-findings-remediation-evidence-v1.md",
+   "sha256": "994c41dffcd1b72768a6ae0b9843c0c56bcf7277e805fc8338d1eb5bdd34aeb0"
+  }
+ ],
+ "proposed_action": "仕分けで案a／案bを比較して決める。案aは縦Bの小改定契約候補（launch内蔵・停止語彙1つ追加の要否を含む）、案bは手順書2本の改定＋起動Evidenceへのcheck再実行記録の必須化。いずれも自動修復を作らずfail-closedを維持する。",
+ "created_at": "2026-08-20T21:57:11+09:00",
+ "content_digest": "d9e83d406475f6cf21b2da9c66684916616c95990e2449141f8b7fc0ce32a10f"
+}
