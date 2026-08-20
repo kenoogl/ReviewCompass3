@@ -1,0 +1,34 @@
+{
+  "title": "契約016 terra E2E所見是正のGREEN固定（単独実行の終了コード・件数・digest）",
+  "entries": [
+    {
+      "label": "reviewer_launch試験の単独実行（entry exitがpytest自身の終了コード）",
+      "argv": ["sh", "-c", "exec .venv/bin/python3 -m pytest tests/test_reviewer_launch.py -q -p no:cacheprovider >/dev/null 2>&1"]
+    },
+    {
+      "label": "request_builder試験の単独実行",
+      "argv": ["sh", "-c", "exec .venv/bin/python3 -m pytest tests/test_request_builder.py -q -p no:cacheprovider >/dev/null 2>&1"]
+    },
+    {
+      "label": "運用集計試験（保護対象の互換確認）の単独実行",
+      "argv": ["sh", "-c", "exec .venv/bin/python3 -m pytest tests/test_operational_metrics.py -q -p no:cacheprovider >/dev/null 2>&1"]
+    },
+    {
+      "label": "reviewer_launch試験の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_reviewer_launch.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "是正成果物・E2E材料のdigest固定",
+      "argv": [
+        "shasum", "-a", "256",
+        "tools/reviewer_launch/core.py",
+        "docs/development/prompts/reviewer-launch-run.md",
+        "tests/test_reviewer_launch.py",
+        "tools/request_builder/core.py",
+        "records/session-handoffs/2026-08-20-model-selection-correspondence-completion-codex2-request-v1.md",
+        "records/session-handoffs/2026-08-20-model-selection-correspondence-completion-codex2-verdict-v1.md",
+        "records/development/2026-08-20-contract-016-full-test-receipt-v1.json"
+      ]
+    }
+  ]
+}
