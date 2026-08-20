@@ -1,0 +1,156 @@
+{
+ "content_digest": "200094ffd3e689ec85b7b030aed9164b7b95ee3c86ed4be6b11a1ad8774acd7a",
+ "plan_id": "FCRS-MODEL-SELECTION-CORRESPONDENCE-2026-08-20-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-20-model-selection-correspondence-reuse-search-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "launch_model_selection",
+     "failure_behavior": [
+      "許可一覧に属さないmodelでの起動を許さない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "起動引数",
+      "backend別許可model一覧"
+     ],
+     "outputs": [
+      "requested model"
+     ],
+     "reference_paths": [
+      "tools/reviewer_launch/entry.py",
+      "tools/reviewer_launch/core.py"
+     ],
+     "reference_symbols": [
+      "tools/reviewer_launch/entry.py:_parse_flags",
+      "tools/reviewer_launch/entry.py:_run_launch",
+      "tools/reviewer_launch/core.py:launch_review"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "既定不変",
+      "所属検査",
+      "record刻印"
+     ],
+     "responsibility": "起動入力のmodel指定を受領し、起動backendの許可一覧への所属を機械検査して、既定（一覧先頭）を不変のまま選択を許す",
+     "symbol_terms": [
+      "model",
+      "launch",
+      "arguments"
+     ]
+    },
+    {
+     "capability_id": "request_model_backend_correspondence",
+     "failure_behavior": [
+      "backend不対応のmodel記載を合格として通さない",
+      "記載と実行の不一致で起動を進めない"
+     ],
+     "forbidden_effect_markers": [
+      "network",
+      "process_spawn"
+     ],
+     "inputs": [
+      "依頼recordの依頼先行",
+      "起動backendとrequested model"
+     ],
+     "outputs": [
+      "合否"
+     ],
+     "reference_paths": [
+      "tools/request_builder/core.py",
+      "tools/reviewer_launch/core.py"
+     ],
+     "reference_symbols": [
+      "tools/request_builder/core.py:check",
+      "tools/reviewer_launch/core.py:launch_review"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "backend別照合",
+      "既定記載の互換維持"
+     ],
+     "responsibility": "依頼recordの依頼先行へbackendとmodelをbackend別に機械記載し、検査と起動時照合で記載と実行の対応を保証する",
+     "symbol_terms": [
+      "model",
+      "allowed",
+      "check"
+     ]
+    },
+    {
+     "capability_id": "canonical_line_parsing",
+     "failure_behavior": [
+      "fence内や本文中の同形行で騙されない"
+     ],
+     "forbidden_effect_markers": [
+      "network",
+      "process_spawn"
+     ],
+     "inputs": [
+      "依頼record本文"
+     ],
+     "outputs": [
+      "抽出値"
+     ],
+     "reference_paths": [
+      "tools/request_builder/core.py"
+     ],
+     "reference_symbols": [
+      "tools/request_builder/core.py:_classified_lines"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "正準位置のみ",
+      "fence状態追跡"
+     ],
+     "responsibility": "文書冒頭の正準位置の固定行だけを正として機械抽出し、本文中の同形文字列では判定しない",
+     "symbol_terms": [
+      "canonical",
+      "line",
+      "fence"
+     ]
+    },
+    {
+     "capability_id": "model_registration_procedure",
+     "failure_behavior": [
+      "承認recordなしの一覧変更を定型に含めない"
+     ],
+     "forbidden_effect_markers": [
+      "network",
+      "process_spawn"
+     ],
+     "inputs": [
+      "backend登録簿"
+     ],
+     "outputs": [
+      "登録手続きの定型"
+     ],
+     "reference_paths": [
+      "tools/reviewer_launch/core.py",
+      "tests/test_reviewer_launch.py"
+     ],
+     "reference_symbols": [
+      "tools/reviewer_launch/core.py:build_backend_prompt"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "データ駆動試験",
+      "承認pinの維持",
+      "直書き原則の維持"
+     ],
+     "responsibility": "backend登録簿を走査するデータ駆動試験と定型手順により、新modelの追加を定義1行と承認pinの最小差分に保つ",
+     "symbol_terms": [
+      "registry",
+      "models",
+      "backend"
+     ]
+    }
+   ],
+   "subject": "model_selection_correspondence_required_capabilities_v1"
+  }
+ ]
+}
