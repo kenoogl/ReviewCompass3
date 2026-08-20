@@ -30,6 +30,7 @@
 | 外部送信の安全経路（契約008・009） | 完了 | 2026-08-16 | 各製品受入判断record |
 | Reviewer起動アダプタ／依頼組み立て器／第2 backend／自由文類型（契約010〜013） | 完了 | 2026-08-17 | 各製品受入判断record。起動2 backend体制（agy＝Tier 1既定・claude-subagent＝Tier 3明示受容） |
 | 第3 backend＋登録簿深化（契約015：codex-cli） | 完了 | 2026-08-20 | `records/development/2026-08-20-codex-cli-backend-product-acceptance-decision-v1.md`（3 backend体制成立） |
+| モデル選択・記載照合・登録定型化（契約016：全backend） | 完了 | 2026-08-20 | `records/development/2026-08-20-model-selection-correspondence-product-acceptance-decision-v1.md`（terra初起動実証） |
 | レビュー基盤moduleの続き（縦C合議・外部API後続） | **休止** | 2026-08-17 | `records/development/2026-08-17-review-tooling-module-pause-decision-v1.md`（再開は利用者判断。codex-cliは契約015で完了） |
 
 ## C. 開発コードの管理
