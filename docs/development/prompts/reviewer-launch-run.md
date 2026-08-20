@@ -68,3 +68,26 @@ reviewcompass3-reviewer-launch launch \
 - subagentの許可model一覧が空の間は`allowed_models_unfixed`で停止する（利用者承認recordで確定）。
 - `high` risk作業でTier 2／3を唯一の独立oracleにしない（work-review-protocol §5）。完了レビューは
   Tier 1（agy）で行う。
+
+## codex-cli backend（契約015）
+
+第3 backend（provider `openai`・Tier 1＝機械判定。受容引数は不要）：
+
+```text
+reviewcompass3-reviewer-launch launch \
+  --request <依頼recordのrepo相対パス> \
+  --expected-sha256 <依頼recordのSHA-256> \
+  --run-id <実行識別子> \
+  --backend codex-cli
+```
+
+- 許可model一覧は利用者承認record
+  （`records/development/2026-08-20-codex-allowed-models-approval-v1.md`）の2値で、起動は一覧先頭
+  （`gpt-5.6-sol`）。`gpt-5.6-terra`は許可済みだが起動選択機構は範囲外（必要時は小改定）。
+- 判定取得はprompt指示＋JSON抽出（`--output-schema`はserver側strict検査で既存schema非対応＝
+  fallback確定。RED実測Evidence 2026-08-20）。
+- **model観測はrollout**（`$CODEX_HOME/sessions/`配下の`turn_context`）から機械取得する
+  （公開streamにmodelイベントが無いため。訂正record
+  `records/development/2026-08-20-codex-model-observation-correction-decision-v1.md`）。
+  このためcodexのsession記録が`~/.codex/sessions`へ残る（codexの既定挙動と同一）。
+- 認証は利用者のcodexログイン状態のみ（openai系API鍵の環境変数は検出で起動前停止）。

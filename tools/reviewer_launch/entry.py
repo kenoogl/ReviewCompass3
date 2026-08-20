@@ -97,11 +97,11 @@ def g30_main(arguments=None, *, output=None):
     else:
         tier = backend["declared_tier"]
     try:
-        prompt = core.build_prompt(
+        prompt = core.build_backend_prompt(
             str(Path(values["--input-root"]).resolve()),
             request_value,
             digest,
-            read_tool_name=backend["read_tool_name"],
+            backend,
         )
     except core.LaunchStop as stop:
         _stop(selected_output, stop.reason, "request")

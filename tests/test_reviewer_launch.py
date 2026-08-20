@@ -394,10 +394,15 @@ def test_agy_model_check_uses_agy_list_not_union(
 
 
 def test_allowed_models_fixed_to_approved_value():
+    # 和集合は契約015 §5.1-5でcodex 2値の末尾追加（承認record 2026-08-20。
+    # agyの承認値＝先頭要素は不変）。
     core = _core()
+    assert core._AGY_ALLOWED_RESPONSE_MODELS == ("gemini-3.1-pro-high",)
     assert core.ALLOWED_RESPONSE_MODELS == (
         "gemini-3.1-pro-high",
         "claude-opus-5",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
     )
 
 
@@ -939,11 +944,15 @@ def test_agy_backend_values_unchanged():
 
 
 def test_union_allowed_models_preserved():
+    # 契約015 §5.1-5：和集合はcodex 2値の末尾追加（先頭＝agy値は不変。
+    # 4値化は利用者承認record 2026-08-20の確定事項）。
     core = _core()
     assert core.SUBAGENT_ALLOWED_RESPONSE_MODELS == ("claude-opus-5",)
     assert core.ALLOWED_RESPONSE_MODELS == (
         "gemini-3.1-pro-high",
         "claude-opus-5",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
     )
 
 
@@ -1437,3 +1446,395 @@ def test_default_private_root_is_home_based():
     assert entry.default_private_root() == (
         Path.home() / ".reviewcompass3-private" / "reviewer-launch"
     )
+
+
+# ---- 契約015：codex-cli backendと登録簿深化 ----
+
+CODEX_TEST_MODEL = "gpt-test-model"
+CODEX_FORBIDDEN_VARIABLES = (
+    "OPENAI_API_KEY",
+    "OPENAI_BASE_URL",
+    "OPENAI_ORGANIZATION",
+    "OPENAI_PROJECT",
+)
+GOLDEN_PROMPT_INPUTS = (
+    "/repo-fixed",
+    "records/session-handoffs/fixed-request-v1.md",
+    "a" * 64,
+)
+# 改修前実装からの機械取得（2026-08-20。生成promptのbyte不変の基準）。
+GOLDEN_PROMPT_SHA256 = {
+    "view_file": (
+        "79c2cdee58e9425d35704a770f730a7adf15c198d12693e5bf18c89ed9607845"
+    ),
+    "Read": (
+        "40dd4f19c2c4e1ffec43bbed94c36e0a23c2704bdf56dbc94fc3c1df8a60c511"
+    ),
+}
+REGISTRY_REQUIRED_KEYS = {
+    "provider",
+    "executable",
+    "declared_tier",
+    "read_tool_name",
+    "reading_block",
+    "build_arguments",
+    "allowed_models",
+    "forbidden_auth_environment",
+    "passthrough_environment",
+    "child_environment_injections",
+    "project_binding",
+    "observed_models",
+    "extract_verdict",
+}
+CODEX_DANGER_FLAGS = (
+    "--dangerously-bypass-approvals-and-sandbox",
+    "--dangerously-bypass-hook-trust",
+    "--approve-for-me",
+    "--add-dir",
+    "workspace-write",
+    "danger-full-access",
+    "--output-schema",
+    "--ephemeral",
+)
+
+
+def _codex_stream(result_text=None, verdict=None, thread_id="t-1"):
+    # codex exec --json の公開stream実形式（RED実測Evidence 2026-08-20）：
+    # thread.startedにthread_id・最終応答はitem.completedのagent_message.text。
+    value = verdict if verdict is not None else _valid_verdict()
+    text = (
+        json.dumps(value, ensure_ascii=False)
+        if result_text is None
+        else result_text
+    )
+    lines = [
+        json.dumps({"type": "thread.started", "thread_id": thread_id}),
+        json.dumps({"type": "turn.started"}),
+        json.dumps(
+            {
+                "type": "item.completed",
+                "item": {
+                    "id": "item_1",
+                    "type": "agent_message",
+                    "text": text,
+                },
+            }
+        ),
+        json.dumps({"type": "turn.completed", "usage": {}}),
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def _write_rollout(codex_home, thread_id, model):
+    # rollout実形式（RED実測Evidence 2026-08-20）：turn_contextのpayload.model。
+    day = codex_home / "sessions" / "2026" / "08" / "20"
+    day.mkdir(parents=True, exist_ok=True)
+    path = day / ("rollout-2026-08-20T00-00-00-%s.jsonl" % thread_id)
+    lines = [
+        json.dumps(
+            {"type": "session_meta", "payload": {"model_provider": "openai"}}
+        ),
+        json.dumps({"type": "turn_context", "payload": {"model": model}}),
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def _launch_codex(repository, monkeypatch, facade, codex_home, **overrides):
+    core = _core()
+    for name in CODEX_FORBIDDEN_VARIABLES:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(
+        core,
+        "CODEX_ALLOWED_RESPONSE_MODELS",
+        (CODEX_TEST_MODEL,),
+        raising=True,
+    )
+    monkeypatch.setenv("CODEX_HOME", str(codex_home))
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    request = _request_relative(repository)
+    values = {
+        "repository": repository,
+        "request_relative_path": request,
+        "expected_sha256": _sha256_file(repository / request),
+        "private_root": repository.parent / "private",
+        "backend_name": "codex-cli",
+        "run_id": "run-codex-001",
+    }
+    values.update(overrides)
+    return core.launch_review(**values)
+
+
+def test_codex_backend_registered():
+    core = _core()
+    backend = core.BACKENDS["codex-cli"]
+    assert backend["provider"] == "openai"
+    assert backend["executable"] == "codex"
+    assert backend["declared_tier"] == 1
+    assert backend["read_tool_name"] == "shell"
+
+
+def test_backend_registry_deepened_for_all_backends():
+    core = _core()
+    assert set(core.BACKENDS) == {
+        "antigravity-cli",
+        "claude-subagent",
+        "codex-cli",
+    }
+    for backend in core.BACKENDS.values():
+        assert REGISTRY_REQUIRED_KEYS <= set(backend)
+
+
+def test_launch_core_has_no_backend_name_branches():
+    import inspect
+
+    core = _core()
+    source = inspect.getsource(core)
+    assert source.count("backend_name == ") == 0
+
+
+def test_prompt_byte_invariance_golden():
+    core = _core()
+    for tool_name, digest in GOLDEN_PROMPT_SHA256.items():
+        prompt = core.build_prompt(
+            *GOLDEN_PROMPT_INPUTS, read_tool_name=tool_name
+        )
+        assert (
+            hashlib.sha256(prompt.encode("utf-8")).hexdigest() == digest
+        )
+
+
+def test_backend_prompt_agy_claude_byte_identical_to_default():
+    core = _core()
+    for name, tool_name in (
+        ("antigravity-cli", "view_file"),
+        ("claude-subagent", "Read"),
+    ):
+        assert core.build_backend_prompt(
+            *GOLDEN_PROMPT_INPUTS, backend=core.BACKENDS[name]
+        ) == core.build_prompt(
+            *GOLDEN_PROMPT_INPUTS, read_tool_name=tool_name
+        )
+
+
+def test_codex_prompt_uses_contract_reading_block():
+    core = _core()
+    prompt = core.build_backend_prompt(
+        *GOLDEN_PROMPT_INPUTS, backend=core.BACKENDS["codex-cli"]
+    )
+    assert "あなたは独立したReviewerです" in prompt
+    assert "読み取り専用のsandboxです" in prompt
+    assert "shasum -a 256" in prompt
+    assert "unexamined配列へ明示してください" in prompt
+    assert GOLDEN_PROMPT_INPUTS[2] in prompt
+    assert "読取り道具" not in prompt
+
+
+def test_codex_build_arguments_fixed_form():
+    core = _core()
+    arguments = core.build_codex_arguments(
+        "codex", "PROMPT-TEXT", CODEX_TEST_MODEL
+    )
+    assert arguments == [
+        "codex",
+        "exec",
+        "--json",
+        "--sandbox",
+        "read-only",
+        "--skip-git-repo-check",
+        "--ignore-user-config",
+        "-m",
+        CODEX_TEST_MODEL,
+        "PROMPT-TEXT",
+    ]
+
+
+def test_codex_arguments_exclude_danger_and_write_flags():
+    core = _core()
+    arguments = core.build_codex_arguments(
+        "codex", "PROMPT-TEXT", CODEX_TEST_MODEL
+    )
+    joined = " ".join(arguments)
+    for flag in CODEX_DANGER_FLAGS:
+        assert flag not in joined
+    sandbox_index = arguments.index("--sandbox")
+    assert arguments[sandbox_index + 1] == "read-only"
+
+
+def test_codex_allowed_models_fixed_by_approval():
+    core = _core()
+    assert core.CODEX_ALLOWED_RESPONSE_MODELS == (
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+    )
+    assert core.ALLOWED_RESPONSE_MODELS == (
+        "gemini-3.1-pro-high",
+        "claude-opus-5",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+    )
+
+
+def test_codex_forbidden_auth_environment_stops(
+    repository, monkeypatch, clean_environment, tmp_path
+):
+    # helperのdelenvで検査対象が消えないよう、起動を直接組み立てる。
+    core = _core()
+    facade = _FacadeRecorder()
+    for name in CODEX_FORBIDDEN_VARIABLES:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("OPENAI_API_KEY", "secret")
+    monkeypatch.setattr(
+        core,
+        "CODEX_ALLOWED_RESPONSE_MODELS",
+        (CODEX_TEST_MODEL,),
+        raising=True,
+    )
+    monkeypatch.setenv("CODEX_HOME", str(tmp_path / "codex-home"))
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    request = _request_relative(repository)
+    with pytest.raises(core.LaunchStop) as caught:
+        core.launch_review(
+            repository=repository,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+            private_root=repository.parent / "private",
+            backend_name="codex-cli",
+            run_id="run-codex-001",
+        )
+    assert caught.value.reason == "api_key_environment_forbidden"
+    assert facade.calls == []
+
+
+def test_codex_passthrough_includes_codex_home(monkeypatch):
+    core = _core()
+    for name in CODEX_FORBIDDEN_VARIABLES:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("CODEX_HOME", "/codex-home-test")
+    environment = core._child_environment(
+        core.CODEX_FORBIDDEN_AUTH_ENVIRONMENT,
+        core.CODEX_PASSTHROUGH_ENVIRONMENT,
+    )
+    assert environment["CODEX_HOME"] == "/codex-home-test"
+
+
+def test_codex_extract_verdict_from_agent_message():
+    core = _core()
+    events = core._parse_stream(_codex_stream())
+    assert core._codex_extract_verdict(events) == _valid_verdict()
+
+
+def test_codex_extract_nonjson_stops():
+    core = _core()
+    events = core._parse_stream(
+        _codex_stream(result_text="これはJSONではない")
+    )
+    with pytest.raises(core.LaunchStop) as caught:
+        core._codex_extract_verdict(events)
+    assert caught.value.reason == "verdict_schema_nonconforming"
+
+
+def test_codex_rollout_model_observed(monkeypatch, tmp_path):
+    core = _core()
+    codex_home = tmp_path / "codex-home"
+    _write_rollout(codex_home, "t-1", CODEX_TEST_MODEL)
+    monkeypatch.setenv("CODEX_HOME", str(codex_home))
+    events = core._parse_stream(_codex_stream())
+    assert core._codex_observed_models(events) == [CODEX_TEST_MODEL]
+
+
+def test_codex_rollout_missing_returns_empty(monkeypatch, tmp_path):
+    core = _core()
+    monkeypatch.setenv("CODEX_HOME", str(tmp_path / "empty-home"))
+    events = core._parse_stream(_codex_stream())
+    assert core._codex_observed_models(events) == []
+
+
+def test_codex_thread_id_missing_returns_empty(monkeypatch, tmp_path):
+    core = _core()
+    codex_home = tmp_path / "codex-home"
+    _write_rollout(codex_home, "t-1", CODEX_TEST_MODEL)
+    monkeypatch.setenv("CODEX_HOME", str(codex_home))
+    events = [
+        event
+        for event in core._parse_stream(_codex_stream())
+        if event.get("type") != "thread.started"
+    ]
+    assert core._codex_observed_models(events) == []
+
+
+def test_codex_launch_succeeds_with_rollout_model(
+    repository, monkeypatch, clean_environment, tmp_path
+):
+    codex_home = tmp_path / "codex-home"
+    _write_rollout(codex_home, "t-1", CODEX_TEST_MODEL)
+    facade = _FacadeRecorder(stdout=_codex_stream())
+    result = _launch_codex(repository, monkeypatch, facade, codex_home)
+    assert result["status"] == "succeeded"
+    assert result["backend"] == "codex-cli"
+    assert result["tier"] == 1
+    assert result["model"] == CODEX_TEST_MODEL
+    assert result["verdict"]["verdict"] == "verified"
+    arguments, keywords = facade.calls[0]
+    assert arguments[0] == "codex"
+    assert arguments[1] == "exec"
+    assert keywords["stdin"] == host_subprocess.DEVNULL
+    assert "CODEX_HOME" in keywords["env"]
+
+
+def test_codex_launch_disallowed_rollout_model_stops(
+    repository, monkeypatch, clean_environment, tmp_path
+):
+    core = _core()
+    codex_home = tmp_path / "codex-home"
+    _write_rollout(codex_home, "t-1", "other-model")
+    facade = _FacadeRecorder(stdout=_codex_stream())
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_codex(repository, monkeypatch, facade, codex_home)
+    assert caught.value.reason == "response_model_not_allowed"
+
+
+def test_codex_launch_without_rollout_stops(
+    repository, monkeypatch, clean_environment, tmp_path
+):
+    core = _core()
+    facade = _FacadeRecorder(stdout=_codex_stream())
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_codex(
+            repository, monkeypatch, facade, tmp_path / "empty-home"
+        )
+    assert caught.value.reason == "response_model_unobserved"
+
+
+def test_stdin_devnull_for_agy_launch(
+    repository, monkeypatch, clean_environment
+):
+    # 契約015 §7.2：stdin遮断は起動核の共通固定事項（全backend）。
+    facade = _FacadeRecorder(stdout=_stream_text())
+    _launch(repository, monkeypatch, facade)
+    _, keywords = facade.calls[0]
+    assert keywords["stdin"] == host_subprocess.DEVNULL
+
+
+def test_g30_prepare_accepts_codex_backend(repository):
+    import io
+
+    entry = _entry()
+    buffer = io.BytesIO()
+    exit_code = entry.g30_main(
+        [
+            "check",
+            "--input-root",
+            str(repository),
+            "--request",
+            _request_relative(repository),
+            "--backend",
+            "codex-cli",
+        ],
+        output=buffer,
+    )
+    assert exit_code == 0
+    result = json.loads(buffer.getvalue().decode("utf-8"))
+    assert result["status"] == "ok"
+    assert result["backend"] == "codex-cli"
+    assert result["tier"] == 1

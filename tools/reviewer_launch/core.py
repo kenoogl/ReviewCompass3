@@ -51,9 +51,16 @@ _AGY_ALLOWED_RESPONSE_MODELS = ("gemini-3.1-pro-high",)
 # 承認：records/development/2026-08-17-subagent-allowed-models-approval-v1.md
 SUBAGENT_ALLOWED_RESPONSE_MODELS = ("claude-opus-5",)
 
-# 契約012 §5.1-4：全backend許可modelの和集合（互換記号。契約011が検査基準にimportする）。
+# 契約015 §5.1-5：codex-cliの許可model一覧。利用者承認recordで確定した値だけを置く。変更は契約改定。
+# 承認：records/development/2026-08-20-codex-allowed-models-approval-v1.md
+CODEX_ALLOWED_RESPONSE_MODELS = ("gpt-5.6-sol", "gpt-5.6-terra")
+
+# 契約012 §5.1-4・契約015 §5.1-5：全backend許可modelの和集合（互換記号。契約011が
+# 検査基準にimportする。codex 2値の末尾追加で先頭＝agy値は不変）。
 ALLOWED_RESPONSE_MODELS = (
-    _AGY_ALLOWED_RESPONSE_MODELS + SUBAGENT_ALLOWED_RESPONSE_MODELS
+    _AGY_ALLOWED_RESPONSE_MODELS
+    + SUBAGENT_ALLOWED_RESPONSE_MODELS
+    + CODEX_ALLOWED_RESPONSE_MODELS
 )
 
 # 契約012 §7.2：claude-subagentの認証遮断（由来：実行器FORBIDDEN_AUTH_ENVIRONMENT。
@@ -113,20 +120,31 @@ CLAUDE_CHILD_ENVIRONMENT_INJECTIONS = {
     "DISABLE_AUTOUPDATER": "1",
 }
 
-BACKENDS = {
-    "antigravity-cli": {
-        "provider": "google",
-        "executable": "agy",
-        "declared_tier": 1,
-        "read_tool_name": "view_file",
-    },
-    "claude-subagent": {
-        "provider": "anthropic",
-        "executable": "claude",
-        "declared_tier": 3,
-        "read_tool_name": "Read",
-    },
-}
+# 契約015 §7.3：codex-cliの認証遮断（openai系。一覧はRED段実測での追加だけを許す）。
+CODEX_FORBIDDEN_AUTH_ENVIRONMENT = (
+    "OPENAI_API_KEY",
+    "OPENAI_BASE_URL",
+    "OPENAI_ORGANIZATION",
+    "OPENAI_PROJECT",
+)
+
+# 契約015 §7.3：codex-cliの通過変数一覧。CODEX_HOMEはログイン状態の置き場
+# （未設定なら渡らない）。認証は利用者のcodexログイン状態だけを使う。
+CODEX_PASSTHROUGH_ENVIRONMENT = (
+    "PATH",
+    "HOME",
+    "USER",
+    "TMPDIR",
+    "LANG",
+    "LC_ALL",
+    "LC_CTYPE",
+    "TERM",
+    "NO_COLOR",
+    "CODEX_HOME",
+)
+
+# backend登録簿（BACKENDS）は、登録簿が吊るす関数群の定義後（本fileの後方）で
+# 定義する（契約015 §7.1の深化形）。
 
 ASSIGNMENT_NAME = "reviewer"
 RAW_STORE_KIND = "private_root_immutable_store"
@@ -241,28 +259,33 @@ def judge_tier(backend_provider):
     return 1
 
 
-def build_prompt(
-    repository_root,
-    request_relative_path,
-    expected_sha256,
-    read_tool_name="view_file",
-):
-    """固定形式の起動promptを生成する。自由文・依頼内容の複製を含めない。
+_PROMPT_HEAD = (
+    "あなたは独立したReviewerです。次のcommit済み依頼recordだけを"
+    "対象にレビューを実施してください。\n"
+    "対象repository（作業領域）：%s\n"
+    "対象依頼record：%s\n"
+    "対象依頼recordの絶対path：%s\n"
+    "期待SHA-256：%s\n"
+)
 
+_PROMPT_TAIL = (
+    "レビューを完了し、最終応答は指定のJSON schemaに完全に従う"
+    "構造化出力だけで返してください。検査できなかった事項は"
+    "unexamined配列へ明示してください。\n"
+)
+
+
+def _default_reading_block(read_tool_name):
+    """agy・claude-subagent共通の読取り指示ブロック（契約015 §7.2）。
+
+    現行文言の逐語移設であり、生成promptのbyte不変はgolden試験で固定する。
     実行環境は読み取り専用であり、端末commandの実行と書込みはできない
     （e2e-010-002実測：headlessでは道具許可が自動拒否され会話が終了する）。
     読取り道具のpath引数は絶対pathを要求する（e2e-010-004実測：引数名
     AbsolutePath。相対path指示は失敗し、領域外の絶対path推測で拒否死する）。
     """
 
-    absolute_request = "%s/%s" % (repository_root, request_relative_path)
     return (
-        "あなたは独立したReviewerです。次のcommit済み依頼recordだけを"
-        "対象にレビューを実施してください。\n"
-        "対象repository（作業領域）：%s\n"
-        "対象依頼record：%s\n"
-        "対象依頼recordの絶対path：%s\n"
-        "期待SHA-256：%s\n"
         "この実行環境は読み取り専用です。端末commandの実行、repository"
         "への書込み、許可を求める道具の使用は行わず、fileの読取り道具"
         "だけを使ってください。\n"
@@ -275,17 +298,71 @@ def build_prompt(
         "digestの機械計算がこの環境で行えない場合、freshnessには"
         "expectedへ期待SHA-256を転記し、resultをnot_computableとして"
         "理由を記載してください（内容が明らかに別物ならmismatchとして"
-        "判定せず停止）。\n"
-        "レビューを完了し、最終応答は指定のJSON schemaに完全に従う"
-        "構造化出力だけで返してください。検査できなかった事項は"
-        "unexamined配列へ明示してください。\n"
+        "判定せず停止）。\n" % read_tool_name
+    )
+
+
+# 契約015 §7.2：codex-cli用の読取り指示ブロック（契約固定文。微修正は契約訂正）。
+CODEX_READING_BLOCK = (
+    "この実行環境は読み取り専用のsandboxです。読み取り専用の"
+    "shell command（`cat`・`ls`・`shasum`等）だけを使い、fileへの"
+    "書込み・変更・networkアクセス、および対象repositoryの外"
+    "（利用者のhome等）のfile読取りを一切行わないでください。\n"
+    "読取りには対象repository配下の絶対pathだけを使ってください。\n"
+    "最初の操作として、`cat`で対象依頼recordの絶対pathを開いて"
+    "本依頼の対象であることを確認し、`shasum -a 256`で期待SHA-256"
+    "との一致を確認してください。digestの計算がこの環境で行えない"
+    "場合、freshnessにはexpectedへ期待SHA-256を転記し、resultを"
+    "not_computableとして理由を記載してください（内容が明らかに"
+    "別物ならmismatchとして判定せず停止）。\n"
+)
+
+
+def build_prompt(
+    repository_root,
+    request_relative_path,
+    expected_sha256,
+    read_tool_name="view_file",
+    reading_block=None,
+):
+    """固定形式の起動promptを生成する。自由文・依頼内容の複製を含めない。
+
+    共通骨格（Reviewer宣言・対象表示・構造化出力指示）は全backend不変とし、
+    読取り指示ブロックだけをbackend別差し込みにする（契約015 §7.2）。
+    reading_block未指定時はread_tool_name差し込みの共通ブロックを使う
+    （agy・claude-subagentの現行文言＝byte不変）。
+    """
+
+    absolute_request = "%s/%s" % (repository_root, request_relative_path)
+    block = (
+        reading_block
+        if reading_block is not None
+        else _default_reading_block(read_tool_name)
+    )
+    return (
+        _PROMPT_HEAD
         % (
             repository_root,
             request_relative_path,
             absolute_request,
             expected_sha256,
-            read_tool_name,
         )
+        + block
+        + _PROMPT_TAIL
+    )
+
+
+def build_backend_prompt(
+    repository_root, request_relative_path, expected_sha256, backend
+):
+    """backend登録簿の定義から起動promptを組み立てる（契約015 §7.2）。"""
+
+    return build_prompt(
+        repository_root,
+        request_relative_path,
+        expected_sha256,
+        read_tool_name=backend["read_tool_name"],
+        reading_block=backend["reading_block"],
     )
 
 
@@ -549,6 +626,179 @@ def _claude_extract_verdict(events):
     return value
 
 
+def build_codex_arguments(executable, prompt, model):
+    """契約015 §7.2の固定引数（訂正record 2026-08-20の確定列）。
+
+    `--output-schema`はopenai側strict検査が既存schemaを拒否したため
+    不使用（fallback＝prompt指示＋抽出で固定。RED実測Evidence §2-1）。
+    `--ephemeral`はrollout（model観測の正本）生成のため付けない
+    （訂正record §2-1）。危険旗・書込み系値は含めない（両向き試験で固定）。
+    """
+
+    return [
+        executable,
+        "exec",
+        "--json",
+        "--sandbox",
+        "read-only",
+        "--skip-git-repo-check",
+        "--ignore-user-config",
+        "-m",
+        model,
+        prompt,
+    ]
+
+
+def _codex_thread_id(events):
+    """codex公開stream正準位置：thread.startedのthread_id（RED実測）。"""
+
+    for event in events:
+        if event.get("type") == "thread.started":
+            value = event.get("thread_id")
+            if isinstance(value, str) and value:
+                return value
+    return None
+
+
+def _codex_sessions_root():
+    home = os.environ.get("CODEX_HOME")
+    base = Path(home) if home else Path.home() / ".codex"
+    return base / "sessions"
+
+
+def _codex_observed_models(events):
+    """契約015 §7.4（訂正record 2026-08-20）：rolloutからmodelを機械観測する。
+
+    公開stream（--json）にはmodelを載せるイベントが存在しない（RED実測
+    Evidence §2-3）。thread_idで一意に特定したrolloutのturn_contextの
+    payload.modelだけを正とし、観測不能は空一覧（呼び出し側で
+    response_model_unobserved停止）。
+    """
+
+    thread_id = _codex_thread_id(events)
+    if thread_id is None:
+        return []
+    root = _codex_sessions_root()
+    try:
+        candidates = sorted(
+            root.glob("*/*/*/rollout-*-%s.jsonl" % thread_id)
+        )
+    except OSError:
+        candidates = []
+    models = []
+    for path in candidates:
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            continue
+        for line in lines:
+            text = line.strip()
+            if not text:
+                continue
+            try:
+                value = json.loads(text)
+            except (json.JSONDecodeError, ValueError):
+                continue
+            if (
+                not isinstance(value, dict)
+                or value.get("type") != "turn_context"
+            ):
+                continue
+            payload = value.get("payload")
+            if isinstance(payload, dict):
+                model = payload.get("model")
+                if isinstance(model, str) and model:
+                    models.append(model)
+    return models
+
+
+def _codex_extract_verdict(events):
+    """codex公開stream正準位置：item.completedのagent_message.text（RED実測）。"""
+
+    candidate = None
+    for event in events:
+        if event.get("type") != "item.completed":
+            continue
+        item = event.get("item")
+        if (
+            isinstance(item, dict)
+            and item.get("type") == "agent_message"
+            and isinstance(item.get("text"), str)
+        ):
+            candidate = item["text"]
+    if not isinstance(candidate, str) or not candidate.strip():
+        raise LaunchStop("verdict_schema_nonconforming")
+    value = _parse_json_text(candidate)
+    if not isinstance(value, dict):
+        raise LaunchStop("verdict_schema_nonconforming")
+    return value
+
+
+# 契約015 §7.1：backend登録簿（深化形）。直書きの契約固定定数であり、設定file・
+# 環境変数・引数・送信指示から追加・変更できない。agy・claude-subagentの値は
+# 契約010・012の現行値の不変移設（byte不変goldenと既存試験で機械証明）。
+# 許可model一覧はcallable（起動時に現在のmodule定数を読む）。
+BACKENDS = {
+    "antigravity-cli": {
+        "provider": "google",
+        "executable": "agy",
+        "declared_tier": 1,
+        "read_tool_name": "view_file",
+        "reading_block": None,
+        "build_arguments": (
+            lambda executable, prompt, model, project_id: build_arguments(
+                executable, prompt, model, project_id
+            )
+        ),
+        "allowed_models": (lambda: _AGY_ALLOWED_RESPONSE_MODELS),
+        "forbidden_auth_environment": FORBIDDEN_AUTH_ENVIRONMENT,
+        "passthrough_environment": PASSTHROUGH_ENVIRONMENT,
+        "child_environment_injections": {},
+        "project_binding": True,
+        "observed_models": _observed_models,
+        "extract_verdict": _extract_verdict,
+    },
+    "claude-subagent": {
+        "provider": "anthropic",
+        "executable": "claude",
+        "declared_tier": 3,
+        "read_tool_name": "Read",
+        "reading_block": None,
+        "build_arguments": (
+            lambda executable, prompt, model, project_id: (
+                build_claude_arguments(executable, prompt, model)
+            )
+        ),
+        "allowed_models": (lambda: SUBAGENT_ALLOWED_RESPONSE_MODELS),
+        "forbidden_auth_environment": CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT,
+        "passthrough_environment": CLAUDE_PASSTHROUGH_ENVIRONMENT,
+        "child_environment_injections": CLAUDE_CHILD_ENVIRONMENT_INJECTIONS,
+        "project_binding": False,
+        "observed_models": _claude_observed_models,
+        "extract_verdict": _claude_extract_verdict,
+    },
+    "codex-cli": {
+        "provider": "openai",
+        "executable": "codex",
+        "declared_tier": 1,
+        "read_tool_name": "shell",
+        "reading_block": CODEX_READING_BLOCK,
+        "build_arguments": (
+            lambda executable, prompt, model, project_id: (
+                build_codex_arguments(executable, prompt, model)
+            )
+        ),
+        "allowed_models": (lambda: CODEX_ALLOWED_RESPONSE_MODELS),
+        "forbidden_auth_environment": CODEX_FORBIDDEN_AUTH_ENVIRONMENT,
+        "passthrough_environment": CODEX_PASSTHROUGH_ENVIRONMENT,
+        "child_environment_injections": {},
+        "project_binding": False,
+        "observed_models": _codex_observed_models,
+        "extract_verdict": _codex_extract_verdict,
+    },
+}
+
+
 def _store_outputs(
     private_root,
     run_id,
@@ -609,18 +859,13 @@ def launch_review(
     backend = BACKENDS.get(backend_name)
     if backend is None:
         raise LaunchStop("backend_unknown")
-    if backend_name == "claude-subagent":
-        forbidden_names = CLAUDE_FORBIDDEN_AUTH_ENVIRONMENT
-        allowed_models = SUBAGENT_ALLOWED_RESPONSE_MODELS
-        passthrough_names = CLAUDE_PASSTHROUGH_ENVIRONMENT
-        injections = CLAUDE_CHILD_ENVIRONMENT_INJECTIONS
-    else:
-        forbidden_names = FORBIDDEN_AUTH_ENVIRONMENT
-        # 契約012 §7.1：agyの照合はagy専用一覧（和集合は契約011互換の記号のみ。
-        # e2e-012-001判定F-1の修正）。
-        allowed_models = _AGY_ALLOWED_RESPONSE_MODELS
-        passthrough_names = PASSTHROUGH_ENVIRONMENT
-        injections = {}
+    # 契約015 §7.1：backend別の一覧・関数は登録簿だけから引く（照合はbackend
+    # 専用一覧で行い、和集合は契約011互換の記号のみ。e2e-012-001判定F-1と
+    # 観測record F-6＝name分岐構造の再発防止）。
+    forbidden_names = backend["forbidden_auth_environment"]
+    allowed_models = backend["allowed_models"]()
+    passthrough_names = backend["passthrough_environment"]
+    injections = backend["child_environment_injections"]
     environment = _child_environment(forbidden_names, passthrough_names)
     environment.update(injections)
     tier = _resolve_tier(backend, accept_tier)
@@ -640,7 +885,7 @@ def launch_review(
     if not allowed_models:
         raise LaunchStop("allowed_models_unfixed")
     requested_model = allowed_models[0]
-    if backend_name == "antigravity-cli":
+    if backend["project_binding"]:
         project_id = resolve_project_binding(repository)
     else:
         project_id = None
@@ -656,24 +901,19 @@ def launch_review(
     if hashlib.sha256(request_bytes).hexdigest() != expected_sha256:
         raise LaunchStop("request_record_stale")
 
-    prompt = build_prompt(
+    prompt = build_backend_prompt(
         str(Path(repository).resolve()),
         request_relative_path,
         expected_sha256,
-        read_tool_name=backend["read_tool_name"],
+        backend,
     )
     prompt_encoded = prompt.encode("utf-8")
     if len(prompt_encoded) > PROMPT_BYTE_LIMIT:
         raise LaunchStop("prompt_payload_limit_exceeded")
     prompt_digest = hashlib.sha256(prompt_encoded).hexdigest()
-    if backend_name == "claude-subagent":
-        arguments = build_claude_arguments(
-            backend["executable"], prompt, requested_model
-        )
-    else:
-        arguments = build_arguments(
-            backend["executable"], prompt, requested_model, project_id
-        )
+    arguments = backend["build_arguments"](
+        backend["executable"], prompt, requested_model, project_id
+    )
 
     started_at = datetime.now(timezone.utc)
     start_clock = time.monotonic()
@@ -682,6 +922,8 @@ def launch_review(
             arguments,
             cwd=str(repository),
             env=environment,
+            # 契約015 §7.2：stdin遮断は起動核の共通固定事項（全backend）。
+            stdin=_subprocess.DEVNULL,
             capture_output=True,
             text=True,
             timeout=_PROCESS_TIMEOUT_SECONDS,
@@ -694,10 +936,7 @@ def launch_review(
     stdout = completed.stdout if isinstance(completed.stdout, str) else ""
     stderr = completed.stderr if isinstance(completed.stderr, str) else ""
     events = _parse_stream(stdout)
-    if backend_name == "claude-subagent":
-        models = _claude_observed_models(events)
-    else:
-        models = _observed_models(events)
+    models = backend["observed_models"](events)
     launch_document = {
         "schema_version": 1,
         "run_id": run_id,
@@ -759,10 +998,7 @@ def launch_review(
         raise LaunchStop("response_model_unobserved")
     if any(model not in allowed_models for model in models):
         raise LaunchStop("response_model_not_allowed")
-    if backend_name == "claude-subagent":
-        verdict = _claude_extract_verdict(events)
-    else:
-        verdict = _extract_verdict(events)
+    verdict = backend["extract_verdict"](events)
     try:
         validate_verdict(verdict)
     except VerdictInvalid as error:
