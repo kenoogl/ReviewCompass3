@@ -1,0 +1,198 @@
+{
+ "content_digest": "9c4902a88059af33a36b54d9cd01afddebd4defa0c742680bf2622c763993513",
+ "plan_id": "FCRS-CODEX-CLI-BACKEND-2026-08-20-V1",
+ "record_kind": "formal_code_reuse_search_plan",
+ "schema_version": 2,
+ "searches": [
+  {
+   "attestation_path": "records/development/2026-08-20-codex-cli-backend-reuse-search-attestation-v1.json",
+   "capabilities": [
+    {
+     "capability_id": "codex_headless_launch",
+     "failure_behavior": [
+      "書込み権限・承認迂回旗・sandbox解除旗を渡さない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "依頼recordのpathとdigest",
+      "許可model"
+     ],
+     "outputs": [
+      "未加工stream出力"
+     ],
+     "reference_paths": [
+      "tools/reviewer_launch/core.py",
+      "docs/development/pilot-driven-record-handoff.md"
+     ],
+     "reference_symbols": [
+      "tools/reviewer_launch/core.py:build_arguments",
+      "tools/reviewer_launch/core.py:build_claude_arguments",
+      "tools/reviewer_launch/core.py:launch_review"
+     ],
+     "required_effect_markers": [
+      "process_spawn"
+     ],
+     "required_properties": [
+      "固定引数",
+      "最小環境渡し",
+      "自動再試行なし"
+     ],
+     "responsibility": "codex CLIを読み取り専用の固定引数でheadless起動し、終了コードとstreamを機械取得する",
+     "symbol_terms": [
+      "launch",
+      "exec",
+      "arguments"
+     ]
+    },
+    {
+     "capability_id": "codex_stream_parsing",
+     "failure_behavior": [
+      "許可外modelの応答を合格として返さない"
+     ],
+     "forbidden_effect_markers": [
+      "network",
+      "process_spawn"
+     ],
+     "inputs": [
+      "stream出力"
+     ],
+     "outputs": [
+      "観測model一覧",
+      "判定JSON"
+     ],
+     "reference_paths": [
+      "tools/session_logs/parse_codex.py",
+      "tools/reviewer_launch/core.py"
+     ],
+     "reference_symbols": [
+      "tools/session_logs/parse_codex.py:_parse_item",
+      "tools/reviewer_launch/core.py:_parse_stream",
+      "tools/reviewer_launch/core.py:_observed_models",
+      "tools/reviewer_launch/core.py:_extract_verdict"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "決定的解析",
+      "model照合"
+     ],
+     "responsibility": "codex execのJSONL streamからmodel表示と最終結果を機械抽出し、許可一覧と照合する",
+     "symbol_terms": [
+      "stream",
+      "parse",
+      "model"
+     ]
+    },
+    {
+     "capability_id": "backend_registry_deepening",
+     "failure_behavior": [
+      "受入済み製品の公開記号（ALLOWED_RESPONSE_MODELS等）の互換を壊さない",
+      "agy・claude-subagentの現行値を変えない"
+     ],
+     "forbidden_effect_markers": [
+      "network",
+      "process_spawn"
+     ],
+     "inputs": [
+      "backend名"
+     ],
+     "outputs": [
+      "backend定義"
+     ],
+     "reference_paths": [
+      "tools/reviewer_launch/core.py",
+      "tools/request_builder/core.py"
+     ],
+     "reference_symbols": [
+      "tools/reviewer_launch/core.py:launch_review",
+      "tools/reviewer_launch/core.py:build_prompt",
+      "tools/request_builder/core.py:check"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "登録形",
+      "後決め排除",
+      "互換維持",
+      "現行値の不変移設"
+     ],
+     "responsibility": "backend登録形へ引数組み立て・stream解析・許可model・環境変数一覧を吊るし、name分岐を消して第3 backendを登録の追加で足せるようにする",
+     "symbol_terms": [
+      "backend",
+      "registry",
+      "allowed"
+     ]
+    },
+    {
+     "capability_id": "openai_auth_isolation",
+     "failure_behavior": [
+      "API鍵での起動を許さない"
+     ],
+     "forbidden_effect_markers": [
+      "network"
+     ],
+     "inputs": [
+      "環境変数"
+     ],
+     "outputs": [
+      "最小の子環境"
+     ],
+     "reference_paths": [
+      "tools/reviewer_launch/core.py"
+     ],
+     "reference_symbols": [
+      "tools/reviewer_launch/core.py:_child_environment"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "禁止一覧の直書き",
+      "起動前検査"
+     ],
+     "responsibility": "openai系のAPI鍵環境変数を検出したら起動前に停止し、利用者のcodexログイン状態だけを使う",
+     "symbol_terms": [
+      "environment",
+      "forbidden",
+      "auth"
+     ]
+    },
+    {
+     "capability_id": "model_backend_correspondence_check",
+     "failure_behavior": [
+      "backend不対応のmodel記載を合格として通さない"
+     ],
+     "forbidden_effect_markers": [
+      "network",
+      "process_spawn"
+     ],
+     "inputs": [
+      "依頼recordのmodel欄",
+      "backend別許可model一覧"
+     ],
+     "outputs": [
+      "合否"
+     ],
+     "reference_paths": [
+      "tools/request_builder/core.py",
+      "tools/reviewer_launch/core.py"
+     ],
+     "reference_symbols": [
+      "tools/request_builder/core.py:check",
+      "tools/reviewer_launch/core.py:launch_review"
+     ],
+     "required_effect_markers": [],
+     "required_properties": [
+      "backend別照合",
+      "契約011互換の維持"
+     ],
+     "responsibility": "依頼recordのmodel欄が起動backendの許可一覧と対応することを検査する（保留候補の再評価対象）",
+     "symbol_terms": [
+      "model",
+      "allowed",
+      "check"
+     ]
+    }
+   ],
+   "subject": "codex_cli_backend_required_capabilities_v1"
+  }
+ ]
+}
