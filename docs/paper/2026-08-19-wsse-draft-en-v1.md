@@ -194,10 +194,21 @@ studied empirically, but mostly with the review input held fixed (diff, files, o
 while detection performance is measured; deriving the input from the task's mandate is the missing
 part. Retrieval-augmented generation (RAG) and context engineering select input by relevance; but
 similarity-based selection is weak precisely against documents that look relevant yet are
-unnecessary for the verdict—the very kind of document we placed in RQ2. A contract selects
-deterministically from declared obligations, not from similarity. Design by Contract gave program
-components machine-checkable obligations; we lift that idea from program components to review
-tasks, and further compile the contract into execution, verification, and provenance plans.
+unnecessary for the verdict—the very kind of document we placed in RQ2. Repository-level systems
+such as RAIM make retrieval structure-aware—walking a code graph to localize relevant
+functions—and screen candidate patches by impact analysis; yet what to read is still decided
+heuristically from a natural-language description, and the screening criteria belong to the
+framework, not to the task. A contract selects deterministically from declared obligations, not
+from similarity. Structured spec-driven engineering feeds structured specifications—Gherkin
+scenarios, domain models—to the LLM and reports higher-quality, more verifiable repository-level
+generation than natural-language prompts alone. We share the premise that structure beats prose;
+but those specifications describe the product being built and are handed to the model as input,
+whereas our contract describes the review task itself—mandate, scope, evidence—and is compiled
+into plans rather than handed over as-is. Design by Contract gave program components
+machine-checkable obligations; Symboleo extends the contract idea to legal contracts, with
+obligations and powers given machine-interpretable lifecycle semantics. We lift the contract from
+program components and legal parties to review tasks, and further compile it into execution,
+verification, and provenance plans.
 Requirements traceability links requirements to artifacts; our binding tables and sealed records
 mechanize that link and check it before execution. Research on agent harnesses orchestrates LLM
 tool use; in our approach the harness configuration is itself derived from the contract.
@@ -267,7 +278,7 @@ detection moves from post-hoc reading to pre-execution machine checks. To trust 
 the impression of a conversation but on records that can be verified—that is where this method
 arrives.
 
-## References (identified — 12 entries; \cite wiring into the body happens at LaTeX typesetting)
+## References (identified — 15 entries; \cite wiring into the body happens at LaTeX typesetting)
 
 [1] Z. Li, S. Lu, D. Guo, N. Duan, S. Jannu, G. Jenks, D. Majumder, J. Green, A. Svyatkovskiy,
 S. Fu, and N. Sundaresan, "Automating Code Review Activities by Large-Scale Pre-training,"
@@ -294,6 +305,12 @@ and Practical Implications of Agentic AI," arXiv:2505.19443, 2025. — `sapkota2
 Practices," Thoughtworks Insights, Dec. 2025. — `liu2025specdriven`
 [12] L. Moreau and P. Missier (eds.), "PROV-DM: The PROV Data Model," W3C Recommendation,
 Apr. 2013. — `w3c2013provdm`
+[13] M. Liu, Z. Chen, Z. Pei, Z. Wang, Y. Wang, and Z. Zheng, "Architecture-Aware Multi-Design
+Generation for Repository-Level Feature Addition," arXiv:2603.01814, 2026. — `liu2026raim`
+[14] S. Feng, B. Chen, B. H. Meyer, and G. Mussbacher, "LLM-Assisted Repository-Level Generation
+with Structured Spec-Driven Engineering," FSE Companion 2026. — `feng2026ssde`
+[15] S. Sharifi, A. Parvizimosaed, D. Amyot, L. Logrippo, and J. Mylopoulos, "Symboleo: Towards a
+Specification Language for Legal Contracts," RE 2020. — `sharifi2020symboleo`
 
 ---
 
@@ -322,6 +339,14 @@ Apr. 2013. — `w3c2013provdm`
   [6]（要求追跡）・[7]（agent）・[8]（inspection）・[9]（registered reports）。組版時の残確認
   ＝[9]の巻号・[2]のDOI・[7]の号数（DOIで機械解決可能）。文献節とBibTeXの年号・巻号は英語側
   のみの数値であり、ja↔en数値照合の対象外（照合は論文本文の統計値に限る）。
+- **関連研究3本の追補（2026-08-20実施）**：§5の3文と文献3件は英語版のみの追加（数値なし）。
+  ja原本v4は凍結のまま変更しない。追加＝[13] RAIM・[14] SSDE・[15] Symboleo。根拠と比較の正本＝
+  `docs/design/2026-08-20-task-contract-related-work-three-paper-comparison-v1.md`。指示【記録】
+  「この文面案どおりen-v1の§5・文献節・BibTeX・付記を更新して。ja原本v4は凍結のまま、付記に
+  『§5の3文と文献3件は英語版のみの追加（数値なし）』と記録して」（2026-08-20 chat）。
+  \cite当て込みの目安に追加：§5のRAIM文→[13]・SSDE文→[14]・Symboleo文→[15]。書誌は3本とも
+  PDF原文から転記（FSE Companion[14]とSymboleo[15]のDOIは原文記載）。組版時の残確認に追加＝
+  [13]はarXiv版のみで掲載先未定。
 - **図1（2026-08-19作図済み）**：正本＝`docs/paper/figures/figure1-contract-flow.tex`
   （TikZ・standalone・単体コンパイル可の形）。構図はキャプションと一致——Compile time＝契約
   （definition challengeの人間承認注記つき）→16項目義務関門（型付きエラー）→コンパイラ（決定的）→
@@ -451,5 +476,33 @@ Apr. 2013. — `w3c2013provdm`
   month        = apr,
   year         = {2013},
   note         = {\url{https://www.w3.org/TR/2013/REC-prov-dm-20130430/}}
+}
+
+@article{liu2026raim,
+  author  = {Liu, Mingwei and Chen, Zhenxi and Pei, Zheng and Wang, Zihao and
+             Wang, Yanlin and Zheng, Zibin},
+  title   = {Architecture-Aware Multi-Design Generation for Repository-Level Feature Addition},
+  journal = {arXiv preprint arXiv:2603.01814},
+  year    = {2026}
+}
+
+@inproceedings{feng2026ssde,
+  author    = {Feng, Shuzhao and Chen, Boqi and Meyer, Brett H. and Mussbacher, Gunter},
+  title     = {{LLM}-Assisted Repository-Level Generation with Structured Spec-Driven Engineering},
+  booktitle = {Companion Proceedings of the 34th ACM Joint European Software Engineering
+               Conference and Symposium on the Foundations of Software Engineering
+               (FSE Companion)},
+  year      = {2026},
+  doi       = {10.1145/3803437.3805567}
+}
+
+@inproceedings{sharifi2020symboleo,
+  author    = {Sharifi, Sepehr and Parvizimosaed, Alireza and Amyot, Daniel and
+               Logrippo, Luigi and Mylopoulos, John},
+  title     = {Symboleo: Towards a Specification Language for Legal Contracts},
+  booktitle = {Proceedings of the 28th IEEE International Requirements Engineering
+               Conference (RE)},
+  year      = {2020},
+  doi       = {10.1109/RE48521.2020.00049}
 }
 ```
