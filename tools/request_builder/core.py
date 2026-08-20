@@ -133,9 +133,17 @@ def _render(
     repository_absolute,
     record_relative,
     verdict_relative,
-    reviewer_line,
+    reviewer_line=None,
+    model=None,
     request_section,
 ):
+    # 契約016：reviewer_lineが正。旧引数model（保護対象の運用集計が雛形の
+    # in-memory再構成で使用）は互換受けとしてagy既定行へ展開する（byte同一）。
+    if reviewer_line is None:
+        reviewer_line = (
+            "- 依頼先：Reviewer（第1 backend `antigravity-cli`＝`agy`、"
+            "許可model `%s`）\n" % model
+        )
     return (
         "# %s 独立確認依頼record（headless起動対象・Claude→Reviewer）\n"
         "\n"
