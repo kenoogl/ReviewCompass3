@@ -1,0 +1,67 @@
+{
+  "title": "契約016 GREEN固定（単独実行の終了コード・収集件数・保護対象差分・成果物digest）",
+  "entries": [
+    {
+      "label": "reviewer_launch試験の単独実行（entry exitがpytest自身の終了コード）",
+      "argv": ["sh", "-c", "exec .venv/bin/python3 -m pytest tests/test_reviewer_launch.py -q -p no:cacheprovider >/dev/null 2>&1"]
+    },
+    {
+      "label": "request_builder試験（契約011対象）の単独実行",
+      "argv": ["sh", "-c", "exec .venv/bin/python3 -m pytest tests/test_request_builder.py -q -p no:cacheprovider >/dev/null 2>&1"]
+    },
+    {
+      "label": "G30契約操作試験の単独実行",
+      "argv": ["sh", "-c", "exec .venv/bin/python3 -m pytest tests/test_operation_contract_run.py -q -p no:cacheprovider >/dev/null 2>&1"]
+    },
+    {
+      "label": "RQ2装置試験の単独実行",
+      "argv": ["sh", "-c", "exec .venv/bin/python3 -m pytest tests/test_rq2_paired_trial.py -q -p no:cacheprovider >/dev/null 2>&1"]
+    },
+    {
+      "label": "RQ2運搬部品試験の単独実行",
+      "argv": ["sh", "-c", "exec .venv/bin/python3 -m pytest tests/test_reviewer_bridge.py -q -p no:cacheprovider >/dev/null 2>&1"]
+    },
+    {
+      "label": "reviewer_launch試験の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_reviewer_launch.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "request_builder試験の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_request_builder.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "G30・RQ2装置・運搬部品の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_operation_contract_run.py tests/test_rq2_paired_trial.py tests/test_reviewer_bridge.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "契約§6保護対象の基準commit（候補v2固定）からの差分file一覧（空が期待値）",
+      "argv": [
+        "git", "diff", "--name-only", "3eab124..HEAD", "--",
+        "tools/reviewer_launch/record.py",
+        "tools/bootstrap",
+        "tools/session_logs",
+        "tools/common/digests.py",
+        "tools/development/claude_implementation_*",
+        "tools/egress",
+        "tools/external_review/send.py",
+        "tools/operations/operation_contract_run.py",
+        "tools/evaluation"
+      ]
+    },
+    {
+      "label": "成果物・受入材料のdigest固定",
+      "argv": [
+        "shasum", "-a", "256",
+        "tools/reviewer_launch/core.py",
+        "tools/reviewer_launch/entry.py",
+        "tools/request_builder/core.py",
+        "tools/request_builder/entry.py",
+        "tests/test_reviewer_launch.py",
+        "tests/test_request_builder.py",
+        "docs/development/prompts/request-builder-run.md",
+        "docs/development/prompts/reviewer-launch-run.md",
+        "records/development/2026-08-20-contract-016-red-replay-output.txt"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+........................................................................ [ 46%]
+.....................FFFF.FFFFFF........................................ [ 92%]
+....FFFFF.FF                                                             [100%]
+=========================== short test summary info ============================
+FAILED tests/test_reviewer_launch.py::test_extract_reviewer_line_agy_verbatim
+FAILED tests/test_reviewer_launch.py::test_extract_reviewer_line_new_form - A...
+FAILED tests/test_reviewer_launch.py::test_extract_reviewer_line_ignores_fence_and_body
+FAILED tests/test_reviewer_launch.py::test_extract_reviewer_line_backtick_missing
+FAILED tests/test_reviewer_launch.py::test_launch_model_flag_selects_member
+FAILED tests/test_reviewer_launch.py::test_launch_model_flag_nonmember_stops
+FAILED tests/test_reviewer_launch.py::test_launch_request_backend_mismatch_stops
+FAILED tests/test_reviewer_launch.py::test_launch_request_model_mismatch_stops
+FAILED tests/test_reviewer_launch.py::test_launch_missing_reviewer_line_fails_closed
+FAILED tests/test_reviewer_launch.py::test_entry_launch_passes_model_to_core
+FAILED tests/test_request_builder.py::test_assemble_backend_codex_renders_new_line_and_checks
+FAILED tests/test_request_builder.py::test_assemble_backend_unknown_stops - T...
+FAILED tests/test_request_builder.py::test_assemble_model_nonmember_stops - T...
+FAILED tests/test_request_builder.py::test_assemble_model_member_terra - Type...
+FAILED tests/test_request_builder.py::test_check_backend_model_correspondence_stops
+FAILED tests/test_request_builder.py::test_check_missing_canonical_line_fails_closed
+FAILED tests/test_request_builder.py::test_entry_assemble_passes_backend_and_model
+17 failed, 139 passed in 10.02s
