@@ -1,0 +1,76 @@
+{
+  "title": "codex-cli第3 backend事前走査の実測（所在・import元・digest・主題語・試験規模）",
+  "entries": [
+    {
+      "label": "codex CLIの所在",
+      "argv": ["which", "codex"]
+    },
+    {
+      "label": "codex CLIの版",
+      "argv": ["codex", "--version"]
+    },
+    {
+      "label": "契約候補が参照するfileのdigest固定",
+      "argv": [
+        "shasum", "-a", "256",
+        "tools/reviewer_launch/core.py",
+        "tools/reviewer_launch/entry.py",
+        "tools/reviewer_launch/record.py",
+        "tools/request_builder/core.py",
+        "tools/session_logs/parse_codex.py",
+        "docs/development/prompts/reviewer-launch-run.md",
+        "docs/development/pilot-driven-record-handoff.md",
+        "records/task-contract/2026-08-17-claude-subagent-backend-candidate-v2.md",
+        "records/development/2026-08-17-claude-subagent-backend-product-acceptance-decision-v1.md",
+        "records/development/2026-08-17-review-tooling-module-pause-decision-v1.md",
+        "records/development/2026-08-17-improvement-candidates-triage-decision-v1.md",
+        "records/development/2026-08-17-backend-registry-shallow-generalization-observation-v1.json",
+        "records/development/2026-08-17-request-builder-union-model-check-observation-v1.json",
+        "records/development/2026-08-17-text-interpretation-failure-principles-reference-v1.md",
+        "records/development/2026-08-20-codex-cli-backend-reuse-search-plan-v1.json",
+        "records/development/2026-08-20-codex-cli-backend-reuse-search-attestation-v1.json"
+      ]
+    },
+    {
+      "label": "reviewer_launchのimport元（全一致行）",
+      "argv": ["grep", "-rn", "--include=*.py", "tools.reviewer_launch", "tools", "tests"]
+    },
+    {
+      "label": "起動核のname分岐とbackend別定数の所在",
+      "argv": [
+        "grep", "-nE",
+        "backend_name ==|^BACKENDS|_AGY_ALLOWED|^SUBAGENT_ALLOWED|^CLAUDE_FORBIDDEN|^CLAUDE_PASSTHROUGH|^CLAUDE_CHILD_ENVIRONMENT|^ALLOWED_RESPONSE_MODELS|^FORBIDDEN_AUTH_ENVIRONMENT|^PASSTHROUGH_ENVIRONMENT",
+        "tools/reviewer_launch/core.py"
+      ]
+    },
+    {
+      "label": "組み立て器のmodel照合箇所",
+      "argv": ["grep", "-n", "ALLOWED_RESPONSE_MODELS", "tools/request_builder/core.py"]
+    },
+    {
+      "label": "主題語の一致file数（tracked全体）",
+      "argv": [
+        "sh", "-c",
+        "for t in codex codex-cli openai gpt- BACKENDS; do c=$(git grep -il -- \"$t\" | wc -l | tr -d ' '); echo \"$t $c\"; done"
+      ]
+    },
+    {
+      "label": "code層のcodex一致file一覧",
+      "argv": ["git", "grep", "-il", "codex", "--", "tools", "tests"]
+    },
+    {
+      "label": "reviewer_launch試験の収集件数",
+      "argv": [
+        "sh", "-c",
+        ".venv/bin/python3 -m pytest tests/test_reviewer_launch.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"
+      ]
+    },
+    {
+      "label": "request_builder試験の収集件数",
+      "argv": [
+        "sh", "-c",
+        ".venv/bin/python3 -m pytest tests/test_request_builder.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"
+      ]
+    }
+  ]
+}
