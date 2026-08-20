@@ -82,8 +82,9 @@ reviewcompass3-reviewer-launch launch \
 ```
 
 - 許可model一覧は利用者承認record
-  （`records/development/2026-08-20-codex-allowed-models-approval-v1.md`）の2値で、起動は一覧先頭
-  （`gpt-5.6-sol`）。`gpt-5.6-terra`は許可済みだが起動選択機構は範囲外（必要時は小改定）。
+  （`records/development/2026-08-20-codex-allowed-models-approval-v1.md`）の2値。既定起動は一覧
+  先頭（`gpt-5.6-sol`）で、`gpt-5.6-terra`は`--model`で選択できる（契約016。下記
+  「モデル選択と記載照合」節を参照）。
 - 判定取得はprompt指示＋JSON抽出（`--output-schema`はserver側strict検査で既存schema非対応＝
   fallback確定。RED実測Evidence 2026-08-20）。
 - **model観測はrollout**（`$CODEX_HOME/sessions/`配下の`turn_context`）から機械取得する

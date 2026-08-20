@@ -382,12 +382,19 @@ def extract_request_reviewer_line(text):
     """
 
     in_fence = False
+    in_region = False
     for line in text.splitlines():
         stripped = line.strip()
         if stripped.startswith("```"):
             in_fence = not in_fence
             continue
         if in_fence:
+            continue
+        if not in_region:
+            # 契約016 §7.2：正準領域は先頭見出し行の直後から始まる。
+            # 見出し前の行は採用しない（terra E2E判定F-016-001の是正）。
+            if line.startswith("# ") and not line.startswith("## "):
+                in_region = True
             continue
         if line.startswith("## "):
             return None

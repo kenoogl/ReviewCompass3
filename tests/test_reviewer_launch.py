@@ -1889,6 +1889,25 @@ def test_extract_reviewer_line_ignores_fence_and_body():
     assert core.extract_request_reviewer_line(after_heading) is None
 
 
+def test_extract_reviewer_line_requires_top_heading_region():
+    # terra E2E判定F-016-001の是正：正準領域は先頭見出し行の「直後から」。
+    # 見出し前の偽行は採用せず、領域内の正しい行だけを正とする。
+    core = _core()
+    fake = "- 依頼先：Reviewer（backend `codex-cli`、許可model `gpt-5.6-sol`）"
+    before_heading = "%s\n# 表題\n\n%s\n\n## 1. 節\n" % (
+        fake,
+        REVIEWER_LINE_AGY_VERBATIM,
+    )
+    assert core.extract_request_reviewer_line(before_heading) == (
+        "antigravity-cli",
+        "gemini-3.1-pro-high",
+    )
+    only_before = "%s\n# 表題\n\n- 対象：x\n\n## 1. 節\n" % fake
+    assert core.extract_request_reviewer_line(only_before) is None
+    no_heading = "%s\n- 対象：x\n" % fake
+    assert core.extract_request_reviewer_line(no_heading) is None
+
+
 def test_extract_reviewer_line_backtick_missing():
     core = _core()
     text = (
