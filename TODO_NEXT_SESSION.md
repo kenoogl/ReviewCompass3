@@ -7,7 +7,7 @@
 ## 現在位置
 
 - 全体：立て直し計画v5第1〜5段・正式ツール化（契約008〜014）・デプロイ方針決定・評価データ取得（RQ1装置・RQ2 paired trial・論文データ一式・従軸＝運用集計v1〜v7）・測定ブロックと計画／台帳laneの機械化・issue突合まで完了（**詳細は見取り図とgit履歴が正本**。従軸の執筆用固定は台帳追補v1／v2）。論文執筆が進行中：**WSSE 2026 Special Session（締切2026-08-30・LaTeX 5頁・double-blind）＋arXivフルの二本立て**。全景は`docs/current/reviewcompass3-overview-current.md`
-- 現在作業：**論文執筆（WSSE短縮版が締切物）**。進捗＝動機確定→骨子v2（Related Work含む6節）→**日本語草稿v3が完成**：新タイトル**「Keeping LLM Code Reviews Small without Losing Evidence: Task-Contract-Guided Context Selection」**・平易な説明調・RQ2は「関係ありそうに見えるが判定には不要な**周辺文書**」の言い回しで確定（英訳時はtask-adjacent→distractor documents）・モデル名記載と非主張4点は受入済み（草稿v3付記）。執筆体制＝執筆スレッドは`docs/paper/`のみ書く・開発スレッドが正本管理（計画v2 §3の分担規則）
+- 現在作業：**論文執筆（WSSE短縮版が締切物）**。進捗＝動機確定→骨子v2（Related Work含む6節）→**日本語草稿v3が完成**：新タイトル**「Keeping LLM Code Reviews Small without Losing Evidence: Task-Contract-Guided Context Selection」**・平易な説明調・RQ2は「関係ありそうに見えるが判定には不要な**周辺文書**」の言い回しで確定（英訳時はtask-adjacent→distractor documents）・モデル名記載と非主張4点は受入済み（草稿v3付記）。その後**日本語草稿v4**（考察節の明確化）→**英語初稿v1＋文献12件BibTeX＋図1のTikZ源**まで固定（2026-08-19）。執筆体制＝執筆スレッドは`docs/paper/`のみ書く・開発スレッドが正本管理（計画v2 §3の分担規則）
 - Task Contract：`なし（契約014受入完了・注記追記済み。次契約は未定義）`
 
 ## 現在作業に影響する改善候補／Issue
@@ -18,7 +18,9 @@
 
 （規準：次の一作業の固定入力と判断待ちのauthorityに限る。完了単位の記録は見取り図とgit履歴が正本——todo-handoff-update.md手順4）
 
-- [WSSE日本語草稿v3（英訳の原本。新タイトル・周辺文書の言い回し・裁定2件受入済み）](docs/paper/2026-08-19-wsse-draft-ja-v3.md) — SHA-256 `6b37e5fc2c8b4cb3d19de645b7899db761f430168d13f477437f9247d717bdde`
+- [WSSE英語初稿v1（組版の原本。文献12件BibTeX付き）](docs/paper/2026-08-19-wsse-draft-en-v1.md) — SHA-256 `72776728c891ccd9d468b41a1c27f8601a7b4fb666f0c392fae1cc80cc5a6d45`
+- [WSSE日本語草稿v4（照合用の和文原本・考察節明確化）](docs/paper/2026-08-19-wsse-draft-ja-v4.md) — SHA-256 `962f0aa5c1e2a3e8a383af9c9e1e48fc15fc621fb004377574b3fec0087be76b`
+- [図1 TikZ源（契約→実行の流れ）](docs/paper/figures/figure1-contract-flow.tex) — SHA-256 `7ef46ba5370fb8369a54347b76f1791b76d76d840da3e0cce080acb016cc20f8`
 - [WSSE英文骨子v2（6節構成・Related Work・頁配分・引用当て込み）](docs/paper/2026-08-19-wsse-skeleton-v2.md) — SHA-256 `63038d2215a900ec1c5b22848088ed69c6932a958a3836410b65a3f1eec0206c`
 - [論文データ台帳 追補v2（従軸の新版通知＝dataset v7の執筆用固定・v6からの更新注意）](docs/paper/2026-08-18-paper-data-inventory-addendum-v2.md) — SHA-256 `9d910599e7aac153c058bc50fd98828b1dc8d34d49f1954c5483e1aae291a711`
 - [論文データ台帳 追補v1（計画v2以降の固定Evidence＝従軸の実測値と引用先digest表）](docs/paper/2026-08-18-paper-data-inventory-addendum-v1.md) — SHA-256 `70d369a0b59d58478b012618bf885cf85ab75845db31ece7aa407486ed35ec12`
@@ -31,16 +33,16 @@
 
 ## 次に行う一作業
 
-**日本語草稿v3の英訳**（v3が原本。用語対応は草稿v3付記）→図1の作成→文献の特定（骨子v2 §3の当て込み10〜12件）→WSSE様式（LaTeX）での組版。数値は転記後に確定recordと機械照合する。開発スレッド側の選択肢：休止record §3のpending残件（縦C合議等）／運用集計v8（候補）／デプロイ版（合図待ち）／**RQ2追試（主題近接の周辺文書。裁定済み・deferred欄）**。
+**英語初稿の組版**（WSSE様式LaTeXへの流し込み・図1 TikZの組み込み・文献整形）と**転記数値の確定recordとの機械照合**（英訳・文献12件・図1源は固定済み＝2026-08-19）。開発スレッド側の選択肢：休止record §3のpending残件（縦C合議等）／運用集計v8（候補）／デプロイ版（合図待ち）／**RQ2追試（主題近接の周辺文書。裁定済み・deferred欄）**。
 
 開始条件：
 
-- （執筆）日本語草稿v3が固定済み——満たされている
+- （執筆）英語初稿v1・図1 TikZ源が固定済み——満たされている
 - （開発）利用者の指示と順序選択がchatで得られる
 
 完了条件：
 
-- （執筆）WSSE 5頁版の英語初稿が`docs/paper/`へcommitされる
+- （執筆）WSSE様式（LaTeX）で組版・数値照合済みの5頁版一式が`docs/paper/`へcommitされる
 
 後続作業：計画v2 §2.3（フル版§3〜5→§1・2・7→§8）、休止record §4、デプロイ方針record §4〜5、RQ2裁定record v2 §7を参照。
 
