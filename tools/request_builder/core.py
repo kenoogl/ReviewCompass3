@@ -11,7 +11,11 @@ import subprocess as _subprocess
 from pathlib import Path
 
 from tools.common.digests import file_sha256
-from tools.reviewer_launch.core import ALLOWED_RESPONSE_MODELS
+from tools.reviewer_launch.core import (
+    ALLOWED_RESPONSE_MODELS,
+    BACKENDS,
+    extract_request_reviewer_line,
+)
 from tools.reviewer_launch.record import verdict_record_relative_path
 from tools.session_logs.redaction import (
     default_pattern_rules,
@@ -76,7 +80,8 @@ _SLUG_PATTERN = re.compile(r"[a-z0-9][a-z0-9-]*\Z")
 _DATE_PATTERN = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
 # 行単位でfence内外を区別して照合する（e2e-011-001所見2の修正）
 _DIGEST_ROW_LINE_PATTERN = re.compile(r"([0-9a-f]{64})  (\S+)\Z")
-_MODEL_PATTERN = re.compile(r"許可model `([^`]+)`")
+# 契約016 §7.2：依頼先行の抽出は縦Bの正準抽出核（extract_request_reviewer_line）
+# を共用する（文書全体の正規表現検索は廃止）。
 _POINT_LINE_PATTERN = re.compile(r"(\d+)\.\s")
 
 
@@ -128,7 +133,7 @@ def _render(
     repository_absolute,
     record_relative,
     verdict_relative,
-    model,
+    reviewer_line,
     request_section,
 ):
     return (
@@ -136,8 +141,7 @@ def _render(
         "\n"
         "- 作成日：%s\n"
         "- 依頼元：Claude（操縦）\n"
-        "- 依頼先：Reviewer（第1 backend `antigravity-cli`＝`agy`、"
-        "許可model `%s`）\n"
+        "%s"
         "- 起動方式：`reviewcompass3-reviewer-launch launch`による"
         "headless機械起動（利用者の明示指示後）。fallbackは暫定手動体制\n"
         "- レビュー種別：%s（読み取り専用・repositoryへの書込みなし）\n"
@@ -196,7 +200,7 @@ def _render(
         % (
             title,
             record_date,
-            model,
+            reviewer_line,
             kind_label,
             base_commit_line,
             digest_table,
@@ -216,6 +220,8 @@ def assemble(
     slug,
     title,
     target_paths,
+    backend=None,
+    model=None,
 ):
     """類型の雛形から依頼record草稿を生成する（new-only書込み）。"""
 
@@ -254,8 +260,28 @@ def assemble(
         head = _run_git(root, "rev-parse", "HEAD").strip()
         base_commit_line = "- 実装基準commit：`%s`\n" % head
 
-    if not ALLOWED_RESPONSE_MODELS:
+    # 契約016 §5.1-1：backend別の既定と所属検査（既定＝agy・一覧先頭＝現行不変）。
+    backend_name = backend if backend is not None else "antigravity-cli"
+    backend_definition = BACKENDS.get(backend_name)
+    if backend_definition is None:
+        raise BuilderStop("backend_unknown")
+    allowed_models = backend_definition["allowed_models"]()
+    if not allowed_models:
         raise BuilderStop("allowed_models_unfixed")
+    selected_model = model if model is not None else allowed_models[0]
+    if selected_model not in allowed_models:
+        raise BuilderStop("model_not_allowed")
+    if backend_name == "antigravity-cli":
+        # 契約016 §7.2：agy既定行は現行文言をbyte不変で維持する。
+        reviewer_line = (
+            "- 依頼先：Reviewer（第1 backend `antigravity-cli`＝`agy`、"
+            "許可model `%s`）\n" % selected_model
+        )
+    else:
+        reviewer_line = (
+            "- 依頼先：Reviewer（backend `%s`、許可model `%s`）\n"
+            % (backend_name, selected_model)
+        )
     body = _render(
         title=title.strip(),
         kind_label=_TYPE_LABELS[request_type],
@@ -265,7 +291,7 @@ def assemble(
         repository_absolute=str(root.resolve()),
         record_relative=record_relative,
         verdict_relative=verdict_record_relative_path(record_relative),
-        model=ALLOWED_RESPONSE_MODELS[0],
+        reviewer_line=reviewer_line,
         request_section=(
             _FREE_TEXT_SECTION
             if request_type == "free_text"
@@ -436,10 +462,16 @@ def check(*, repository, request_relative_path):
     for required in ("依頼元：", "依頼先：", "読み取り専用"):
         if required not in text:
             raise BuilderStop("required_statement_missing")
-    model_match = _MODEL_PATTERN.search(text)
-    if model_match is None:
+    # 契約016 §7.2：正準位置の依頼先行だけを正とし、backend別一覧で所属検査
+    # （和集合検査の廃止＝IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001の消化。
+    # 和集合記号ALLOWED_RESPONSE_MODELSは互換のため維持）。
+    declared = extract_request_reviewer_line(text)
+    if declared is None:
         raise BuilderStop("required_statement_missing")
-    if model_match.group(1) not in ALLOWED_RESPONSE_MODELS:
+    declared_backend = BACKENDS.get(declared[0])
+    if declared_backend is None:
+        raise BuilderStop("backend_unknown")
+    if declared[1] not in declared_backend["allowed_models"]():
         raise BuilderStop("model_not_allowed")
 
     if text.count("```") % 2 != 0:

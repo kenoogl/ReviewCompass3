@@ -366,6 +366,43 @@ def build_backend_prompt(
     )
 
 
+_REVIEWER_LINE_PREFIX = "- 依頼先："
+_REVIEWER_LINE_MODEL = re.compile(r"許可model `([^`]+)`")
+_REVIEWER_LINE_BACKTICK = re.compile(r"`([^`]+)`")
+
+
+def extract_request_reviewer_line(text):
+    """依頼recordの正準依頼先行から（backend名・model名）を抽出する。
+
+    契約016 §7.2：先頭見出し直後から最初の`## `節見出し（fence外）までの
+    fence外の行群の中の、最初の「- 依頼先：」行だけを正とする。行内の
+    最初のbacktick対＝backend名・`許可model`直後のbacktick対＝model名。
+    抽出が成立しない場合はNone（呼び出し側でfail-closed）。fence内・
+    本文中の同形行では判定しない（文字列理解の原則2）。
+    """
+
+    in_fence = False
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if line.startswith("## "):
+            return None
+        if not line.startswith(_REVIEWER_LINE_PREFIX):
+            continue
+        backticks = _REVIEWER_LINE_BACKTICK.findall(line)
+        if not backticks:
+            return None
+        model_match = _REVIEWER_LINE_MODEL.search(line)
+        if model_match is None:
+            return None
+        return (backticks[0], model_match.group(1))
+    return None
+
+
 def build_arguments(executable, prompt, model, project_id):
     """契約§7.1の固定引数を組み立てる。
 
@@ -848,6 +885,7 @@ def launch_review(
     run_id,
     accept_tier=None,
     acceptance_ref=None,
+    model=None,
 ):
     """読み取り専用レビュー一往復の起動・保存・判定取り出しを行う。
 
@@ -884,7 +922,13 @@ def launch_review(
             raise LaunchStop("acceptance_reference_missing")
     if not allowed_models:
         raise LaunchStop("allowed_models_unfixed")
-    requested_model = allowed_models[0]
+    # 契約016 §7.1：選択は許可一覧の内側のみ。既定＝一覧先頭（現行不変）。
+    if model is not None:
+        if model not in allowed_models:
+            raise LaunchStop("model_not_allowed")
+        requested_model = model
+    else:
+        requested_model = allowed_models[0]
     if backend["project_binding"]:
         project_id = resolve_project_binding(repository)
     else:
@@ -900,6 +944,21 @@ def launch_review(
         raise LaunchStop("request_record_unreadable") from error
     if hashlib.sha256(request_bytes).hexdigest() != expected_sha256:
         raise LaunchStop("request_record_stale")
+
+    # 契約016 §7.3：記載と実行の対応照合（起動前・fail-closed）。
+    try:
+        request_text = request_bytes.decode("utf-8")
+    except UnicodeDecodeError:
+        request_text = None
+    declared = (
+        extract_request_reviewer_line(request_text)
+        if request_text is not None
+        else None
+    )
+    if declared is None or declared[0] != backend_name:
+        raise LaunchStop("request_backend_mismatch")
+    if declared[1] != requested_model:
+        raise LaunchStop("request_model_mismatch")
 
     prompt = build_backend_prompt(
         str(Path(repository).resolve()),

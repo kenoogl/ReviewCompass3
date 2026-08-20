@@ -50,6 +50,12 @@ reviewcompass3-request-builder assemble \
 - `--repository`（既定＝現在のdirectory。repository根元から実行する）と`--date`（既定＝機械の
   当日日付）は**機械既定で解決**する。上書きは任意引数（2026-08-18既定値化。日付の手書きを
   不要にする）。
+- `--backend`（既定`antigravity-cli`）と`--model`（既定＝そのbackendの許可一覧先頭）も任意引数
+  （契約016）。依頼先行へbackend・modelが機械記載され、checkは**正準位置の依頼先行**から
+  backend別の許可一覧で所属を検査する。起動時はアダプタが記載と実行の一致を照合する
+  （不一致は`request_backend_mismatch`／`request_model_mismatch`で停止）ため、**agy以外で
+  起動する依頼recordは組み立て時に`--backend`を指定する**（agy記載のまま他backendで起動する
+  旧型は停止する＝契約016 §7.3の移行整理）。
 
 機械検査（LLM記入とcommitの後。commit前の実行は`request_record_uncommitted`だけが不合格となる
 状態を正常な途中経過とし、最終合格はcommit済み状態での全項目合格）：

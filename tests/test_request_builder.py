@@ -861,3 +861,182 @@ def test_entry_check_defaults_repository(repository, monkeypatch):
     assert exit_code == 0
     result = json.loads(buffer.getvalue().decode("utf-8"))
     assert result["status"] == "ok"
+
+
+# ---- 契約016：モデル選択・記載照合・登録定型化 ----
+
+# 改修前実装からの機械取得（2026-08-20。固定入力での組み立て出力の
+# 正規化SHA-256＝既定不変goldenの基準）。
+GOLDEN_ASSEMBLE_NORMALIZED_SHA256 = (
+    "5d91ae7df1f0fa252e8a340ec92b303dfbd05f08eb1d4ca5c0acde1c935877e3"
+)
+CODEX_REVIEWER_LINE_SOL = (
+    "- 依頼先：Reviewer（backend `codex-cli`、許可model `gpt-5.6-sol`）"
+)
+
+
+def _golden_repository(tmp_path):
+    repo = tmp_path / "golden-repo"
+    (repo / "docs").mkdir(parents=True)
+    target = repo / "docs" / "golden-target.md"
+    target.write_text("# golden対象\n\n固定内容v1\n", encoding="utf-8")
+    host_subprocess.run(
+        ("git", "init", "-q", str(repo)),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    _git(repo, "config", "user.name", "Test")
+    _git(repo, "config", "user.email", "test@example.invalid")
+    _git(repo, "config", "commit.gpgsign", "false")
+    _git(repo, "add", "docs")
+    _git(repo, "commit", "-q", "-m", "add golden target")
+    return repo
+
+
+def test_assemble_default_output_byte_invariant_golden(tmp_path):
+    # 契約016 §9-2：--backend／--model省略時の出力は改修前実装とbyte同一
+    # （repository絶対pathだけを<ROOT>へ正規化して比較する）。
+    core = _core()
+    repo = _golden_repository(tmp_path)
+    result = core.assemble(
+        repository=str(repo),
+        request_type="contract_review",
+        slug="golden-fixed",
+        title="golden固定表題",
+        target_paths=["docs/golden-target.md"],
+        record_date="2026-08-20",
+    )
+    body = (repo / result["record_relative_path"]).read_text(
+        encoding="utf-8"
+    )
+    normalized = body.replace(str(repo.resolve()), "<ROOT>")
+    assert (
+        hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+        == GOLDEN_ASSEMBLE_NORMALIZED_SHA256
+    )
+
+
+def test_assemble_backend_codex_renders_new_line_and_checks(repository):
+    core = _core()
+    relative = _ready_record(repository, backend="codex-cli")
+    body = (Path(repository) / relative).read_text(encoding="utf-8")
+    assert CODEX_REVIEWER_LINE_SOL in body
+    result = core.check(
+        repository=repository, request_relative_path=relative
+    )
+    assert result["status"] == "ok"
+
+
+def test_assemble_backend_unknown_stops(repository):
+    core = _core()
+    with pytest.raises(core.BuilderStop) as caught:
+        _assemble(repository, backend="unknown-backend")
+    assert caught.value.reason == "backend_unknown"
+
+
+def test_assemble_model_nonmember_stops(repository):
+    core = _core()
+    with pytest.raises(core.BuilderStop) as caught:
+        _assemble(repository, backend="codex-cli", model="not-a-model")
+    assert caught.value.reason == "model_not_allowed"
+
+
+def test_assemble_model_member_terra(repository):
+    core = _core()
+    relative = _ready_record(
+        repository, backend="codex-cli", model="gpt-5.6-terra"
+    )
+    body = (Path(repository) / relative).read_text(encoding="utf-8")
+    assert "許可model `gpt-5.6-terra`" in body
+    result = core.check(
+        repository=repository, request_relative_path=relative
+    )
+    assert result["status"] == "ok"
+
+
+def test_check_backend_model_correspondence_stops(repository):
+    # codex行のmodelを他backendの値へ書き換えると、和集合では通っても
+    # backend別所属で停止する（IC-REQUEST-BUILDER-MODEL-CHECK-SCOPE-001の消化）。
+    core = _core()
+    relative = _ready_record(repository, backend="codex-cli")
+    path = Path(repository) / relative
+    text = path.read_text(encoding="utf-8").replace(
+        "許可model `gpt-5.6-sol`", "許可model `claude-opus-5`"
+    )
+    path.write_text(text, encoding="utf-8")
+    _git(repository, "add", "--", relative)
+    _git(repository, "commit", "-q", "-m", "Cross model")
+    with pytest.raises(core.BuilderStop) as caught:
+        core.check(repository=repository, request_relative_path=relative)
+    assert caught.value.reason == "model_not_allowed"
+
+
+def test_check_ignores_body_fake_reviewer_line(repository):
+    core = _core()
+    relative = _ready_record(repository)
+    path = Path(repository) / relative
+    text = path.read_text(encoding="utf-8")
+    text += "\n" + CODEX_REVIEWER_LINE_SOL + "\n"
+    path.write_text(text, encoding="utf-8")
+    _git(repository, "add", "--", relative)
+    _git(repository, "commit", "-q", "-m", "Append body fake")
+    result = core.check(
+        repository=repository, request_relative_path=relative
+    )
+    assert result["status"] == "ok"
+
+
+def test_check_missing_canonical_line_fails_closed(repository):
+    # 正準位置の依頼先行を消し、本文へ同形の偽行だけを残す敵対fixture。
+    core = _core()
+    relative = _ready_record(repository)
+    path = Path(repository) / relative
+    lines = [
+        line
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if not line.startswith("- 依頼先：")
+    ]
+    lines.append(CODEX_REVIEWER_LINE_SOL)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    _git(repository, "add", "--", relative)
+    _git(repository, "commit", "-q", "-m", "Remove canonical line")
+    with pytest.raises(core.BuilderStop) as caught:
+        core.check(repository=repository, request_relative_path=relative)
+    assert caught.value.reason == "required_statement_missing"
+
+
+def test_entry_assemble_passes_backend_and_model(repository, monkeypatch):
+    entry = _entry()
+    core = _core()
+    captured = {}
+
+    def fake_assemble(**keywords):
+        captured.update(keywords)
+        raise core.BuilderStop("assemble_probe_stop")
+
+    monkeypatch.setattr(core, "assemble", fake_assemble, raising=True)
+    buffer = io.BytesIO()
+    exit_code = entry.main(
+        [
+            "assemble",
+            "--repository",
+            str(repository),
+            "--type",
+            "contract_review",
+            "--slug",
+            "entry-backend-probe",
+            "--title",
+            "試験",
+            "--target",
+            "docs/x.md",
+            "--backend",
+            "codex-cli",
+            "--model",
+            "gpt-5.6-terra",
+        ],
+        output=buffer,
+    )
+    assert exit_code == 2
+    assert captured["backend"] == "codex-cli"
+    assert captured["model"] == "gpt-5.6-terra"

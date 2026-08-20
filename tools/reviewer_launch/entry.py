@@ -140,6 +140,7 @@ def _run_launch(values, output):
         run_id=values["--run-id"],
         accept_tier=values.get("--accept-tier"),
         acceptance_ref=values.get("--acceptance-ref"),
+        model=values.get("--model"),
     )
     transcription = record_module.transcribe_verdict_record(
         repository=repository,
@@ -202,6 +203,7 @@ def main(argv=None, *, output=None):
             "--acceptance-ref",
             "--repository",
             "--private-root",
+            "--model",
         ),
     )
     if values is None:

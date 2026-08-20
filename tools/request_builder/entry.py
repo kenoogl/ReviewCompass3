@@ -90,7 +90,7 @@ def main(argv=None, *, output=None):
             selected_arguments[1:],
             ("--type", "--slug", "--title"),
             repeated=("--target",),
-            optional=("--repository", "--date"),
+            optional=("--repository", "--date", "--backend", "--model"),
         )
         if values is None or not values["--target"]:
             _stop(selected_output, "invalid_arguments", "arguments")
@@ -104,6 +104,8 @@ def main(argv=None, *, output=None):
                 slug=values["--slug"],
                 title=values["--title"],
                 target_paths=values["--target"],
+                backend=values.get("--backend"),
+                model=values.get("--model"),
             )
         except core.BuilderStop as stop:
             _stop(selected_output, stop.reason, "assemble")

@@ -91,3 +91,20 @@ reviewcompass3-reviewer-launch launch \
   `records/development/2026-08-20-codex-model-observation-correction-decision-v1.md`）。
   このためcodexのsession記録が`~/.codex/sessions`へ残る（codexの既定挙動と同一）。
 - 認証は利用者のcodexログイン状態のみ（openai系API鍵の環境変数は検出で起動前停止）。
+
+## モデル選択と記載照合（契約016）
+
+- `launch`の任意引数`--model`で、その系統の**許可一覧の内側**からmodelを選べる（既定＝一覧先頭。
+  非所属は`model_not_allowed`で起動前停止）。例：`--backend codex-cli --model gpt-5.6-terra`。
+- 起動前に依頼recordの正準依頼先行（backend・model記載）と実行値の一致を機械照合する。不一致は
+  `request_backend_mismatch`／`request_model_mismatch`で停止する。依頼recordは組み立て時に
+  `--backend`（と必要なら`--model`）を指定して作る（request-builder-run.md参照）。
+
+## モデル追加手続き（契約016 §7.4の定型）
+
+許可model一覧は直書きの契約固定定数であり、実行時に変更できない。追加は次の3点だけで閉じる：
+
+1. 利用者承認record（対象backend・追加する値・理由）を`records/development/`へ作成する。
+2. `tools/reviewer_launch/core.py`の該当backendの許可一覧定数へ**定義1行**を追加する。
+3. `tests/test_reviewer_launch.py`の該当backendの**承認pin試験1行**を更新する
+   （和集合・所属・先頭不変はdata-driven試験が登録簿から自動で検査する）。

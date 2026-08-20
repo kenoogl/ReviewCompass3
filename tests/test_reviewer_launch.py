@@ -196,6 +196,32 @@ class _FacadeRecorder:
         )
 
 
+def _write_launch_request(repository, backend_name, model, slug):
+    # 契約016 §7.3：起動時の記載照合に適合する依頼record（正準依頼先行つき）を
+    # 機械生成する。agy形は現行文言・他backendは新形（契約§7.2）。
+    relative = "records/session-handoffs/2026-08-16-%s-request-v1.md" % slug
+    path = repository / relative
+    if backend_name == "antigravity-cli":
+        reviewer_line = (
+            "- 依頼先：Reviewer（第1 backend `antigravity-cli`＝`agy`、"
+            "許可model `%s`）\n" % model
+        )
+    else:
+        reviewer_line = (
+            "- 依頼先：Reviewer（backend `%s`、許可model `%s`）\n"
+            % (backend_name, model)
+        )
+    content = (
+        "# 依頼record（試験用）\n\n" + reviewer_line + "- 対象：sample\n"
+    )
+    if path.exists() and path.read_text(encoding="utf-8") == content:
+        return relative
+    path.write_text(content, encoding="utf-8")
+    _git(repository, "add", "--", relative)
+    _git(repository, "commit", "-q", "-m", "Add launch request %s" % slug)
+    return relative
+
+
 def _launch(repository, monkeypatch, facade, **overrides):
     core = _core()
     monkeypatch.setattr(
@@ -207,7 +233,10 @@ def _launch(repository, monkeypatch, facade, **overrides):
     monkeypatch.setattr(
         core, "PROJECTS_CONFIG_ROOT", projects_root, raising=True
     )
-    request = _request_relative(repository)
+    requested = overrides.get("model") or TEST_MODEL
+    request = _write_launch_request(
+        repository, "antigravity-cli", requested, "sample-launch-agy"
+    )
     expected = _sha256_file(repository / request)
     values = {
         "repository": repository,
@@ -380,7 +409,10 @@ def test_agy_model_check_uses_agy_list_not_union(
     monkeypatch.setattr(
         core, "PROJECTS_CONFIG_ROOT", projects_root, raising=True
     )
-    request = _request_relative(repository)
+    # 契約016の起動前照合に適合する正準依頼先行つきrecordを使う。
+    request = _write_launch_request(
+        repository, "antigravity-cli", TEST_MODEL, "agy-union-check"
+    )
     with pytest.raises(core.LaunchStop) as caught:
         core.launch_review(
             repository=repository,
@@ -394,16 +426,10 @@ def test_agy_model_check_uses_agy_list_not_union(
 
 
 def test_allowed_models_fixed_to_approved_value():
-    # 和集合は契約015 §5.1-5でcodex 2値の末尾追加（承認record 2026-08-20。
-    # agyの承認値＝先頭要素は不変）。
+    # agyの承認pin（契約016 §7.4：backendごとの承認pin 1本。和集合は
+    # data-driven試験が登録簿から導出して検査する）。
     core = _core()
     assert core._AGY_ALLOWED_RESPONSE_MODELS == ("gemini-3.1-pro-high",)
-    assert core.ALLOWED_RESPONSE_MODELS == (
-        "gemini-3.1-pro-high",
-        "claude-opus-5",
-        "gpt-5.6-sol",
-        "gpt-5.6-terra",
-    )
 
 
 # ---- project束縛と読取り恒久許可（e2e-010-006後の実測に基づく） ----
@@ -910,7 +936,10 @@ def _launch_subagent(repository, monkeypatch, facade, **overrides):
         raising=True,
     )
     monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
-    request = _request_relative(repository)
+    requested = overrides.get("model") or SUBAGENT_TEST_MODEL
+    request = _write_launch_request(
+        repository, "claude-subagent", requested, "sample-launch-subagent"
+    )
     values = {
         "repository": repository,
         "request_relative_path": request,
@@ -919,7 +948,7 @@ def _launch_subagent(repository, monkeypatch, facade, **overrides):
         "backend_name": "claude-subagent",
         "run_id": "run-sub-001",
         "accept_tier": 3,
-        "acceptance_ref": request,
+        "acceptance_ref": _request_relative(repository),
     }
     values.update(overrides)
     return core.launch_review(**values)
@@ -944,16 +973,10 @@ def test_agy_backend_values_unchanged():
 
 
 def test_union_allowed_models_preserved():
-    # 契約015 §5.1-5：和集合はcodex 2値の末尾追加（先頭＝agy値は不変。
-    # 4値化は利用者承認record 2026-08-20の確定事項）。
+    # claude-subagentの承認pin（契約016 §7.4：backendごとの承認pin 1本。
+    # 和集合の導出はdata-driven試験が検査する）。
     core = _core()
     assert core.SUBAGENT_ALLOWED_RESPONSE_MODELS == ("claude-opus-5",)
-    assert core.ALLOWED_RESPONSE_MODELS == (
-        "gemini-3.1-pro-high",
-        "claude-opus-5",
-        "gpt-5.6-sol",
-        "gpt-5.6-terra",
-    )
 
 
 def test_subagent_without_acceptance_stops(
@@ -1540,19 +1563,27 @@ def _write_rollout(codex_home, thread_id, model):
     return path
 
 
-def _launch_codex(repository, monkeypatch, facade, codex_home, **overrides):
+def _launch_codex(
+    repository, monkeypatch, facade, codex_home, allowed=None, **overrides
+):
     core = _core()
     for name in CODEX_FORBIDDEN_VARIABLES:
         monkeypatch.delenv(name, raising=False)
+    allowed_models = (
+        allowed if allowed is not None else (CODEX_TEST_MODEL,)
+    )
     monkeypatch.setattr(
         core,
         "CODEX_ALLOWED_RESPONSE_MODELS",
-        (CODEX_TEST_MODEL,),
+        allowed_models,
         raising=True,
     )
     monkeypatch.setenv("CODEX_HOME", str(codex_home))
     monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
-    request = _request_relative(repository)
+    requested = overrides.get("model") or allowed_models[0]
+    request = _write_launch_request(
+        repository, "codex-cli", requested, "sample-launch-codex"
+    )
     values = {
         "repository": repository,
         "request_relative_path": request,
@@ -1662,14 +1693,9 @@ def test_codex_arguments_exclude_danger_and_write_flags():
 
 
 def test_codex_allowed_models_fixed_by_approval():
+    # codexの承認pin（承認record 2026-08-20。契約016 §7.4のpin 1本方式）。
     core = _core()
     assert core.CODEX_ALLOWED_RESPONSE_MODELS == (
-        "gpt-5.6-sol",
-        "gpt-5.6-terra",
-    )
-    assert core.ALLOWED_RESPONSE_MODELS == (
-        "gemini-3.1-pro-high",
-        "claude-opus-5",
         "gpt-5.6-sol",
         "gpt-5.6-terra",
     )
@@ -1816,6 +1842,235 @@ def test_stdin_devnull_for_agy_launch(
     _launch(repository, monkeypatch, facade)
     _, keywords = facade.calls[0]
     assert keywords["stdin"] == host_subprocess.DEVNULL
+
+
+# ---- 契約016：モデル選択・記載照合・登録定型化 ----
+
+REVIEWER_LINE_AGY_VERBATIM = (
+    "- 依頼先：Reviewer（第1 backend `antigravity-cli`＝`agy`、"
+    "許可model `gemini-3.1-pro-high`）"
+)
+REVIEWER_LINE_CODEX_FORM = (
+    "- 依頼先：Reviewer（backend `codex-cli`、許可model `gpt-5.6-terra`）"
+)
+
+
+def test_extract_reviewer_line_agy_verbatim():
+    # §9-3(a)：commit済み実recordの依頼先行の逐語fixtureで抽出互換を固定。
+    core = _core()
+    text = (
+        "# 表題\n\n%s\n- 対象：x\n\n## 1. 節\n" % REVIEWER_LINE_AGY_VERBATIM
+    )
+    assert core.extract_request_reviewer_line(text) == (
+        "antigravity-cli",
+        "gemini-3.1-pro-high",
+    )
+
+
+def test_extract_reviewer_line_new_form():
+    core = _core()
+    text = "# 表題\n\n%s\n\n## 1. 節\n" % REVIEWER_LINE_CODEX_FORM
+    assert core.extract_request_reviewer_line(text) == (
+        "codex-cli",
+        "gpt-5.6-terra",
+    )
+
+
+def test_extract_reviewer_line_ignores_fence_and_body():
+    core = _core()
+    fenced = "# 表題\n\n```text\n%s\n```\n\n## 1. 節\n%s\n" % (
+        REVIEWER_LINE_CODEX_FORM,
+        REVIEWER_LINE_CODEX_FORM,
+    )
+    assert core.extract_request_reviewer_line(fenced) is None
+    after_heading = "# 表題\n\n- 対象：x\n\n## 1. 節\n%s\n" % (
+        REVIEWER_LINE_CODEX_FORM
+    )
+    assert core.extract_request_reviewer_line(after_heading) is None
+
+
+def test_extract_reviewer_line_backtick_missing():
+    core = _core()
+    text = (
+        "# 表題\n\n- 依頼先：Reviewer（backend codex-cli、"
+        "許可model gpt）\n\n## 1. 節\n"
+    )
+    assert core.extract_request_reviewer_line(text) is None
+
+
+def test_registry_allowed_models_data_driven():
+    # 契約016 §7.4：和集合＝登録簿の各一覧の連結・先頭＝agy承認値。
+    core = _core()
+    lists = [
+        backend["allowed_models"]() for backend in core.BACKENDS.values()
+    ]
+    for models in lists:
+        assert models
+        assert all(isinstance(m, str) and m for m in models)
+    concatenated = tuple(m for models in lists for m in models)
+    assert core.ALLOWED_RESPONSE_MODELS == concatenated
+    assert (
+        core.ALLOWED_RESPONSE_MODELS[0]
+        == core._AGY_ALLOWED_RESPONSE_MODELS[0]
+    )
+
+
+def test_launch_model_flag_selects_member(
+    repository, monkeypatch, clean_environment, tmp_path
+):
+    codex_home = tmp_path / "codex-home"
+    _write_rollout(codex_home, "t-1", "gpt-second-model")
+    facade = _FacadeRecorder(stdout=_codex_stream())
+    result = _launch_codex(
+        repository,
+        monkeypatch,
+        facade,
+        codex_home,
+        allowed=(CODEX_TEST_MODEL, "gpt-second-model"),
+        model="gpt-second-model",
+    )
+    assert result["status"] == "succeeded"
+    assert result["model"] == "gpt-second-model"
+    arguments, _ = facade.calls[0]
+    model_index = arguments.index("-m")
+    assert arguments[model_index + 1] == "gpt-second-model"
+
+
+def test_launch_model_flag_nonmember_stops(
+    repository, monkeypatch, clean_environment, tmp_path
+):
+    core = _core()
+    facade = _FacadeRecorder(stdout=_codex_stream())
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch_codex(
+            repository,
+            monkeypatch,
+            facade,
+            tmp_path / "codex-home",
+            model="not-allowed-model",
+        )
+    assert caught.value.reason == "model_not_allowed"
+    assert facade.calls == []
+
+
+def test_launch_request_backend_mismatch_stops(
+    repository, monkeypatch, clean_environment, tmp_path
+):
+    # 移行整理（§7.3）：agy形recordのまま他backendで起動する旧型は停止する。
+    core = _core()
+    codex_home = tmp_path / "codex-home"
+    _write_rollout(codex_home, "t-1", CODEX_TEST_MODEL)
+    facade = _FacadeRecorder(stdout=_codex_stream())
+    for name in CODEX_FORBIDDEN_VARIABLES:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(
+        core,
+        "CODEX_ALLOWED_RESPONSE_MODELS",
+        (CODEX_TEST_MODEL,),
+        raising=True,
+    )
+    monkeypatch.setenv("CODEX_HOME", str(codex_home))
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    request = _write_launch_request(
+        repository, "antigravity-cli", CODEX_TEST_MODEL, "mismatch-agy-line"
+    )
+    with pytest.raises(core.LaunchStop) as caught:
+        core.launch_review(
+            repository=repository,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+            private_root=repository.parent / "private",
+            backend_name="codex-cli",
+            run_id="run-mm-001",
+        )
+    assert caught.value.reason == "request_backend_mismatch"
+    assert facade.calls == []
+
+
+def test_launch_request_model_mismatch_stops(
+    repository, monkeypatch, clean_environment, tmp_path
+):
+    core = _core()
+    codex_home = tmp_path / "codex-home"
+    _write_rollout(codex_home, "t-1", CODEX_TEST_MODEL)
+    facade = _FacadeRecorder(stdout=_codex_stream())
+    for name in CODEX_FORBIDDEN_VARIABLES:
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setattr(
+        core,
+        "CODEX_ALLOWED_RESPONSE_MODELS",
+        (CODEX_TEST_MODEL, "gpt-second-model"),
+        raising=True,
+    )
+    monkeypatch.setenv("CODEX_HOME", str(codex_home))
+    monkeypatch.setattr(core.subprocess, "run", facade.run, raising=True)
+    request = _write_launch_request(
+        repository, "codex-cli", CODEX_TEST_MODEL, "mismatch-model-line"
+    )
+    with pytest.raises(core.LaunchStop) as caught:
+        core.launch_review(
+            repository=repository,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+            private_root=repository.parent / "private",
+            backend_name="codex-cli",
+            run_id="run-mm-002",
+            model="gpt-second-model",
+        )
+    assert caught.value.reason == "request_model_mismatch"
+    assert facade.calls == []
+
+
+def test_launch_missing_reviewer_line_fails_closed(
+    repository, monkeypatch, clean_environment
+):
+    # 依頼先行の無いrecord（旧fixture形）はfail-closedで停止する（§7.3-3）。
+    core = _core()
+    facade = _FacadeRecorder(stdout=_stream_text())
+    request = _request_relative(repository)
+    with pytest.raises(core.LaunchStop) as caught:
+        _launch(
+            repository,
+            monkeypatch,
+            facade,
+            request_relative_path=request,
+            expected_sha256=_sha256_file(repository / request),
+        )
+    assert caught.value.reason == "request_backend_mismatch"
+    assert facade.calls == []
+
+
+def test_entry_launch_passes_model_to_core(repository, monkeypatch):
+    import io
+
+    entry = _entry()
+    core = _core()
+    captured = {}
+
+    def fake_launch(**keywords):
+        captured.update(keywords)
+        raise core.LaunchStop("model_probe_stop")
+
+    monkeypatch.setattr(core, "launch_review", fake_launch, raising=True)
+    buffer = io.BytesIO()
+    exit_code = entry.main(
+        [
+            "launch",
+            "--repository",
+            str(repository),
+            "--request",
+            _request_relative(repository),
+            "--expected-sha256",
+            "0" * 64,
+            "--run-id",
+            "run-model-probe",
+            "--model",
+            "some-model",
+        ],
+        output=buffer,
+    )
+    assert exit_code == 2
+    assert captured["model"] == "some-model"
 
 
 def test_g30_prepare_accepts_codex_backend(repository):
