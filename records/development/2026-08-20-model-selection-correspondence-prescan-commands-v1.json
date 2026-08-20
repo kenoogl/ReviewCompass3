@@ -1,0 +1,58 @@
+{
+  "title": "契約016（モデル選択＋照合＋登録定型化）事前走査の実測",
+  "entries": [
+    {
+      "label": "契約候補が参照するfileのdigest固定",
+      "argv": [
+        "shasum", "-a", "256",
+        "tools/request_builder/core.py",
+        "tools/request_builder/entry.py",
+        "tools/reviewer_launch/core.py",
+        "tools/reviewer_launch/entry.py",
+        "tests/test_request_builder.py",
+        "tests/test_reviewer_launch.py",
+        "docs/development/prompts/request-builder-run.md",
+        "docs/development/prompts/reviewer-launch-run.md",
+        "records/development/2026-08-20-codex-cli-backend-product-acceptance-decision-v1.md",
+        "records/development/2026-08-20-codex-allowed-models-approval-v1.md",
+        "records/development/2026-08-17-request-builder-union-model-check-observation-v1.json",
+        "records/development/2026-08-17-improvement-candidates-triage-decision-v1.md",
+        "records/development/2026-08-17-text-interpretation-failure-principles-reference-v1.md",
+        "records/development/2026-08-20-model-selection-correspondence-reuse-search-plan-v1.json",
+        "records/development/2026-08-20-model-selection-correspondence-reuse-search-attestation-v1.json"
+      ]
+    },
+    {
+      "label": "組み立て器のmodel・依頼先行の固定点",
+      "argv": ["grep", "-nE", "_MODEL_PATTERN|依頼先：Reviewer|許可model|ALLOWED_RESPONSE_MODELS|model_not_allowed", "tools/request_builder/core.py"]
+    },
+    {
+      "label": "組み立て入口の引数固定点（backend・model旗の不在確認を含む）",
+      "argv": ["grep", "-nE", "\"--type\"|\"--slug\"|\"--target\"|\"--backend\"|\"--model\"|repeated", "tools/request_builder/entry.py"]
+    },
+    {
+      "label": "起動側のmodel選択点と入口旗の固定点",
+      "argv": ["grep", "-nE", "requested_model = |_LAUNCH_FLAGS|\"--backend\"|\"--model\"|\"--accept-tier\"", "tools/reviewer_launch/core.py", "tools/reviewer_launch/entry.py"]
+    },
+    {
+      "label": "RQ2装置の起動形（明示旗列＝任意旗追加の無影響確認）",
+      "argv": ["grep", "-n", "reviewer_entry.main", "tools/evaluation/rq2_paired_trial.py"]
+    },
+    {
+      "label": "両moduleのimport元（全一致行）",
+      "argv": ["grep", "-rnE", "--include=*.py", "tools\\.request_builder|tools\\.reviewer_launch", "tools", "tests"]
+    },
+    {
+      "label": "主題語の一致file数（tracked全体）",
+      "argv": ["sh", "-c", "for t in 許可model ALLOWED_RESPONSE_MODELS 依頼先 requested_model; do c=$(git grep -l -- \"$t\" | wc -l | tr -d ' '); echo \"$t $c\"; done"]
+    },
+    {
+      "label": "reviewer_launch試験の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_reviewer_launch.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    },
+    {
+      "label": "request_builder試験の収集件数",
+      "argv": ["sh", "-c", ".venv/bin/python3 -m pytest tests/test_request_builder.py --collect-only -q -p no:cacheprovider 2>/dev/null | grep -c ::"]
+    }
+  ]
+}
