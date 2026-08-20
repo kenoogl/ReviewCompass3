@@ -1,0 +1,29 @@
+............F..........................F..............................FF [ 76%]
+F.FFFFFFFFFFFFFFFFFFFF                                                   [100%]
+=========================== short test summary info ============================
+FAILED tests/test_reviewer_launch.py::test_allowed_models_fixed_to_approved_value
+FAILED tests/test_reviewer_launch.py::test_union_allowed_models_preserved - A...
+FAILED tests/test_reviewer_launch.py::test_codex_backend_registered - KeyErro...
+FAILED tests/test_reviewer_launch.py::test_backend_registry_deepened_for_all_backends
+FAILED tests/test_reviewer_launch.py::test_launch_core_has_no_backend_name_branches
+FAILED tests/test_reviewer_launch.py::test_backend_prompt_agy_claude_byte_identical_to_default
+FAILED tests/test_reviewer_launch.py::test_codex_prompt_uses_contract_reading_block
+FAILED tests/test_reviewer_launch.py::test_codex_build_arguments_fixed_form
+FAILED tests/test_reviewer_launch.py::test_codex_arguments_exclude_danger_and_write_flags
+FAILED tests/test_reviewer_launch.py::test_codex_allowed_models_fixed_by_approval
+FAILED tests/test_reviewer_launch.py::test_codex_forbidden_auth_environment_stops[OPENAI_API_KEY]
+FAILED tests/test_reviewer_launch.py::test_codex_forbidden_auth_environment_stops[OPENAI_BASE_URL]
+FAILED tests/test_reviewer_launch.py::test_codex_forbidden_auth_environment_stops[OPENAI_ORGANIZATION]
+FAILED tests/test_reviewer_launch.py::test_codex_forbidden_auth_environment_stops[OPENAI_PROJECT]
+FAILED tests/test_reviewer_launch.py::test_codex_passthrough_includes_codex_home
+FAILED tests/test_reviewer_launch.py::test_codex_extract_verdict_from_agent_message
+FAILED tests/test_reviewer_launch.py::test_codex_extract_nonjson_stops - Attr...
+FAILED tests/test_reviewer_launch.py::test_codex_rollout_model_observed - Att...
+FAILED tests/test_reviewer_launch.py::test_codex_rollout_missing_returns_empty
+FAILED tests/test_reviewer_launch.py::test_codex_thread_id_missing_returns_empty
+FAILED tests/test_reviewer_launch.py::test_codex_launch_succeeds_with_rollout_model
+FAILED tests/test_reviewer_launch.py::test_codex_launch_disallowed_rollout_model_stops
+FAILED tests/test_reviewer_launch.py::test_codex_launch_without_rollout_stops
+FAILED tests/test_reviewer_launch.py::test_stdin_devnull_for_agy_launch - Key...
+FAILED tests/test_reviewer_launch.py::test_g30_prepare_accepts_codex_backend
+25 failed, 69 passed in 4.31s
